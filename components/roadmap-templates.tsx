@@ -41,7 +41,7 @@ export default function RoadmapTemplates() {
                     {`Browse our milestone library`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Milestones are the pieces that make up your research plan. Add a template to your plan to see more information on milestones like recommended steps.`}
+                    {`Projects are the pieces that make up your research plan. Add a template to your plan to see more information on projects like recommended steps.`}
                 </p>
             </span>
 
@@ -67,7 +67,7 @@ export default function RoadmapTemplates() {
                             router.refresh()
                         }}
                     >
-                        Add selected milestones
+                        Add selected projects
                     </Button>
                 </div>
             </span>

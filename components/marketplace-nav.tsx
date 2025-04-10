@@ -9,12 +9,12 @@ import {Button} from "@/components/ui/button";
 
 const links = [
     {
-        name: "CROs",
-        href: "/cro",
+        name: "Service Providers",
+        href: "/service-providers",
         comingSoon: false
     },
     {
-        name: "Patient groups",
+        name: "Patient Groups",
         href: "/patient-groups",
         comingSoon: false
     },

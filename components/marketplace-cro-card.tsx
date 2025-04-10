@@ -1,12 +1,14 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
 import {truncate} from "@/lib/utils";
-import React from "react";
+import React, { ReactNode } from "react";
 import {Company} from "@prisma/client";
 import {Separator} from "./ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "@/components/save-cro-dialog";
-import {Briefcase, Building, Building2, Factory, FileText, Rocket, Star, University} from "lucide-react";
+import {Briefcase, Building, Building2, Factory, FileText, LucideProps, Rocket, Star, University} from "lucide-react";
+import { Milestone } from "@/lib/types";
+import { PropertyBadge } from "./property-badge";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -47,8 +49,8 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
         <Link
             href={
                 process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                    : `http://localhost:3000/app/cro/${id}`
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                    : `http://localhost:3000/app/service-providers/${id}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
@@ -69,21 +71,20 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
     );
 }
 
-export function CROMarketplaceCard({cro}: { cro: Company }) {
+export function CROMarketplaceCard({cro, milestone}: { cro: Company, milestone?: Milestone }) {
     const {id} = cro;
 
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
-                <CROCardHeaderContents cro={cro}/>
+                <CROCardHeaderContents cro={cro} milestone={milestone}/>
             </CardHeader>
             <CROCardContents cro={cro}/>
         </Card>
     )
-        ;
 }
 
-export function CROCardHeaderContents({cro}: { cro: Company }) {
+export function CROCardHeaderContents({cro, milestone}: { cro: Company, milestone?: Milestone }) {
     const {id, title, description, companyType, avgRating} = cro;
 
     return (
@@ -92,21 +93,21 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                 <Link
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
-                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                            : `http://localhost:3000/app/cro/${id}`
+                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                            : `http://localhost:3000/app/service-providers/${id}`
                     }
                 >
                     <CardTitle className="text-xl flex flex-row gap-2 items-center">
                         {title}
                     </CardTitle>
                 </Link>
-                <SaveCRODialog cro={cro} type={"card"}/>
+                <SaveCRODialog cro={cro} type={"card"} milestone={milestone}/>
             </div>
             <Link
                 href={
                     process.env.NEXT_PUBLIC_VERCEL_ENV
-                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                        : `http://localhost:3000/app/cro/${id}`
+                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                        : `http://localhost:3000/app/service-providers/${id}`
                 }
                 className="flex flex-col gap-2"
             >
@@ -118,12 +119,12 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                             {companyTypeMap[companyType] || companyType}
                         </div>
                     )}
-                    {typeof avgRating === "number" && avgRating > 0 && (
-                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                            <Star className="size-4 text-gray-500 dark:text-gray-400" />
-                            {avgRating}
-                        </div>
-                    )}
+                    {/*{typeof avgRating === "number" && avgRating > 0 && (*/}
+                    {/*    <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">*/}
+                    {/*        <Star className="size-4 text-gray-500 dark:text-gray-400" />*/}
+                    {/*        {avgRating}*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
                 </div>
                 {description && description.trim() && (
                     <CardDescription className="text-wrap break-words line-clamp-2">
@@ -150,37 +151,37 @@ export function CROCardContents({cro}: { cro: Company }) {
         <Link
             href={
                 process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${cro.id}`
-                    : `http://localhost:3000/app/cro/${cro.id}`
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${cro.id}`
+                    : `http://localhost:3000/app/service-providers/${cro.id}`
             }
         >
             {Object.values(categoryCounts).some(count => count > 0) && (
                 <CardContent className="flex flex-col items-start justify-center">
                     <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2">
                         {categoryLabels
-                            .filter(({key}) => categoryCounts[key] > 0)
+                            // .filter(({key}) => categoryCounts[key] > 0)
                             .map(({key, icon: Icon, label}, index) => {
                                 const count = categoryCounts[key];
                                 const isReview = key === "reviews";
                                 return (
-                                    <div
-                                        key={key}
-                                        className="text-xs flex flex-row justify-start items-center gap-x-1 border-l-2 border-gray-300 pl-2"
-                                    >
-                                        <Icon className="size-4" />
+                                    <PropertyBadge key={key} icon={Icon}>
                                         {isReview ? (
-                                            <div className="text-xs flex items-center gap-x-1">
-                                                {cro.avgRating != null
-                                                    ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
-                                                    : 'N/A'}
-                                            </div>
+                                            count > 0 ? (
+                                                <div className="flex items-center gap-x-1">
+                                                    {cro.avgRating != null
+                                                        ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
+                                                        : 'N/A'}
+                                                </div>
+                                            ) : (
+                                                <div>No reviews yet</div>
+                                            )
                                         ) : (
-                                            <div className="flex flex-row text-xs">
+                                            <div className="flex flex-row">
                                                 {label}:&nbsp;
                                                 <div>{count}</div>
                                             </div>
                                         )}
-                                    </div>
+                                    </PropertyBadge>
                                 );
                             })}
                     </div>

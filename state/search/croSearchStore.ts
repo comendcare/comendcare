@@ -49,6 +49,11 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    milestoneTypes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     types: {
         label: string,
         value: string,
@@ -69,6 +74,7 @@ export type FiltersType = {
 
 export const defaultFilters = {
     categories: [],
+    milestoneTypes: [],
     types: [],
     certifications: [],
     // moneyDeployed: [0, 10000000],
@@ -91,6 +97,14 @@ function generateFiltersString(filters: FiltersType): string {
             .map(category => `categories:=[${escapeValue(category.value)}]`)
             .join(" && ");
         filtersList.push(`(${categoryFilter})`);
+    }
+
+    // Milestone Types (Array Field)
+    if (filters?.milestoneTypes && filters.milestoneTypes.length > 0) {
+        const milestoneTypeFilter = filters.milestoneTypes
+            .map(milestoneType => `milestoneTypes:=[${escapeValue(milestoneType.value)}]`)
+            .join(" && ");
+        filtersList.push(`(${milestoneTypeFilter})`);
     }
 
     // Company Types (Single String Field)
@@ -137,7 +151,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                 types: [],
                 certifications: []
             }
-            const newSearchResults = await getUpdatedSearchResults({
+            const {results: newSearchResults} = await getUpdatedSearchResults({
                 searchTerm: '',
                 sortBy: undefined,
                 filters: newFilters,
@@ -156,13 +170,16 @@ const generateRecommendations = async (milestones: Milestone[]) => {
     return recommendationResults
 }
 
-const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
+const getUpdatedSearchResults = async (
+    state: any,
+    isNewSearch: boolean = true
+) => {
     try {
         const filtersString = generateFiltersString(state.filters)
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title",
+            query_by: "title,description",
             per_page: 10,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
@@ -194,7 +211,10 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
 
         const enrichedResults = ids.map(id => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
 
-        return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
+        return {
+            results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
+            total: results.found || 0,
+        };
 
     } catch (error) {
         console.error("Search error:", error);
@@ -225,7 +245,9 @@ export interface CROSearchState {
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void,
     recommendations: Recommendation[] | undefined
-    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>
+    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
+    totalResults: number,
+    setTotalResults: (total: number) => void,
 }
 
 export const useCROSearchStore = create<CROSearchState>()(
@@ -236,30 +258,31 @@ export const useCROSearchStore = create<CROSearchState>()(
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                console.log(`set search term`)
-                const newSearchResults = await getUpdatedSearchResults({
+                const { results, total } = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
-                }, true)
-                set({ 
-                    searchTerm: newSearch, 
-                    searchResults: newSearchResults, 
-                    lastFetchedPage: 1
-                })
+                }, true);
+
+                set({
+                    searchTerm: newSearch,
+                    searchResults: results,
+                    lastFetchedPage: 1,
+                    totalResults: total,
+                });
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
-                const newSearchResults = await getUpdatedSearchResults({
+                const { results, total } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
                     lastFetchedPage: 1,
                 }, true)
-                set({ sortBy, searchResults: newSearchResults, lastFetchedPage: 1 })
+                set({ sortBy, searchResults: results, lastFetchedPage: 1, totalResults: total })
             },
             lastFetchedPage: 1, // page numbers in TypeSense start at 1
             setLastFetchedPage: async (page: number) => {
-                const updateSearchResults = await getUpdatedSearchResults({ 
+                const {results: updateSearchResults} = await getUpdatedSearchResults({
                     ...get(),
                     lastFetchedPage: page
                 }, false)
@@ -277,15 +300,17 @@ export const useCROSearchStore = create<CROSearchState>()(
                     ...get().filters,
                     ...updatedFilters
                 }
-                const newSearchResults = await getUpdatedSearchResults({
+                const { results, total } = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
                 }, true)
-                set({ 
-                    filters: newFilters, 
+
+                set({
+                    filters: newFilters,
                     lastFetchedPage: 1,
-                    searchResults: newSearchResults
+                    searchResults: results,
+                    totalResults: total,
                 })
             },
             recommendations: undefined,
@@ -293,7 +318,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                 console.log(`get recommendations`, options)
                 set({recommendations: undefined})
                 const recommendationResults = await generateRecommendations(
-                    options?.priority 
+                    options?.priority
                         // ? milestones.sort(function(x,y){ return x == first ? -1 : y == first ? 1 : 0; })
                         ? milestones.sort((x, y) => x.id === options.priority ? -1 : y.id === options.priority ? 1 : 0)
                         : milestones
@@ -301,14 +326,16 @@ export const useCROSearchStore = create<CROSearchState>()(
 
                 // remove duplicates before returning
                 const prunedRecommendations = options?.limit
-                    ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
+                    ? Array.from(new Set(recommendationResults)).slice(0, options.limit)
                     : Array.from(new Set(recommendationResults))
 
                 set({
                     recommendations: prunedRecommendations
                 })
                 return prunedRecommendations
-            }
+            },
+            totalResults: 0,
+            setTotalResults: (total: number) => set({ totalResults: total }),
         }),
         {
             limit: 100, // limit the stored history states to 100

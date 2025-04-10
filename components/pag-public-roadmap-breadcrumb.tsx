@@ -7,10 +7,10 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import { getPublicMilestoneDetails } from "@/lib/fetchers";
 import { Organization, Roadmap } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getMilestoneDetails } from "@/lib/fetchers";
 import { toast } from "sonner";
 
 export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
@@ -24,7 +24,7 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
 
     useEffect(() => {
         if (urlMilestone) {
-            getMilestoneDetails(urlMilestone).then(response => {
+            getPublicMilestoneDetails(urlMilestone).then(response => {
                 if (response?.success && response?.data) {
                     setMilestone(response.data);
                 } else {

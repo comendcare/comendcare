@@ -11,22 +11,74 @@ import {
     MilestoneType,
     ExternalContact,
     ExternalAttachment,
-    ReviewFeedback, Service
+    ReviewFeedback, Service,
+    Milestone as DBMilestone,
+    Asset as DBAsset,
+    RFP as DBRFP
 } from "@prisma/client";
+
+export type Asset = Omit<Prisma.AssetGetPayload<{
+    include: {
+        contacts: true,
+        attachments: true,
+        milestones: {
+            include: {
+                milestone: true
+            }
+        }
+    }
+}>, "milestones"> & {
+    milestones: Array<{
+        asset?: DBAsset,
+        assetId: string,
+        milestone?: DBMilestone,
+        milestoneId: string,
+    }>
+}
+
+export type RFP = Omit<Prisma.RFPGetPayload<{
+    include: {
+        contacts: true,
+        attachments: true,
+        milestones: {
+            include: {
+                milestone: true
+            }
+        }
+    }
+}>, "milestones"> & {
+    milestones: Array<{
+        rfp?: DBRFP,
+        milestoneId?: string,
+        rfpId: string
+    }>
+}
 
 export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {
         node: true,
         contacts: true,
         attachments: true,
-        types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } }
+        types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
+        assets: { include: { asset: true, assetId: true, milestoneId: true } },
+        rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
     }
-}>, "types"> & {
+}>, ("types" | "assets" | "rfps")> & {
     types: Array<{
         milestoneType?: MilestoneType; // Optional
         milestoneId?: string; // Optional
         milestoneTypeId: string; // Required
-    }>;
+    }>,
+    assets: Array<{
+        asset?: DBAsset,
+        milestoneId?: string,
+        assetId: string
+    }>,
+    rfps: Array<{
+        rfp?: DBRFP,
+        milestoneId?: string,
+        rfpId: string,
+    }>
 };
 
 export interface Option {
@@ -37,7 +89,11 @@ export interface Option {
     fixed?: boolean;
 
     /** Group the options by providing key. */
-    [key: string]: string | boolean | undefined;
+    [key: string]: any;
+}
+
+export type AssetTableData = Asset & {
+    asset: Asset
 }
 
 export type SavedCompanyData = SavedCompany & {
@@ -110,7 +166,7 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     //     value: 'ALL',
     // },
     {
-        label: 'CROs',
+        label: 'Service Providers',
         value: 'CRO',
     },
     {

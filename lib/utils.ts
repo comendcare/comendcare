@@ -6,6 +6,73 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
+import Papa from "papaparse";
+
+export type ImportField = {
+    key: string,
+    required: boolean,
+    defaultValue: any,
+    isValid: (value: any) => boolean
+}
+
+export const validateImport = (entry: any, expectedValues: ImportField[]) => {
+    const errors: {key: string, message: string, object: any}[] = []
+
+    expectedValues.forEach(({key, required, isValid}) => {
+        // if required, check if value exists
+        if (required && !entry[key]) {
+            errors.push({key, message: `Required field ${key} is missing`, object: entry})
+            return
+        }
+
+        // if value exists, check if it's valid
+        if (entry[key] && !isValid(entry[key])) {
+            errors.push({key, message: `Field ${key} is not formatted properly`, object: entry})
+            return
+        }
+    })
+
+    if (errors.length > 0) {
+        return {isValid: false, errors: errors}
+    }
+
+    return {isValid: true, errors: []}
+}
+
+export function parseCSV(file: File, expectedValues: ImportField[]): Promise<{values: any[], errors: {key: string, message: string, object: any}[]}> {
+    return new Promise((resolve, reject) => {
+        Papa.parse(file, {
+            header: true, // Adjust based on whether your CSV has headers
+            skipEmptyLines: true,
+            complete: (result) => {
+                const newValues: any[] = []
+                let errors: {key: string, message: string, object: any}[] = []
+
+                try {
+                    result.data.forEach((entry: any) => {
+                        const validate = validateImport(entry, expectedValues)
+                        if (validate.isValid && !validate.errors) {
+                            newValues.push(entry)
+                        } else {
+                            errors = errors.concat(validate.errors)
+
+                            const attemptValue = Object.fromEntries(
+                                expectedValues.map(({key, defaultValue}) => [key, entry[key] || defaultValue || undefined])
+                            )
+                            newValues.push(attemptValue)
+                        }
+                    })
+                } catch (e) {
+                    console.error("Error: failed to import assets", e)
+                    reject(e)
+                }
+
+                resolve({values: newValues, errors: errors})
+            },
+            error: (error) => reject(error),
+        });
+    });
+}
 
 export const acceptedFiletypes = {
     "image/*": [".jpg", ".jpeg", ".png"],

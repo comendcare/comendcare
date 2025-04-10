@@ -4,6 +4,7 @@ import React, { memo, useState } from "react"
 import { Button } from "./ui/button"
 import { StatusType } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { Badge } from "./ui/badge"
 
 export default function StatusButton({
     status = "PLANNED",
@@ -44,12 +45,12 @@ export default function StatusButton({
     }
 
     return (
-        <Button
-            disabled={disabled}
-            className={cn(`${StatusData[status]?.styling}`, className)}
+        <Badge
+            // disabled={disabled}
+            className={cn(`${StatusData[status]?.styling}`, className, "flex justify-center")}
             onClick={handleStateChange}
         >
             {StatusData[status]?.text}
-        </Button>
+        </Badge>
     )
 }

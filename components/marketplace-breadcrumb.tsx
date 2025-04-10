@@ -10,9 +10,9 @@ import {
 import { Organization, Roadmap } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getMilestoneDetails } from "@/lib/fetchers";
 import { toast } from "sonner";
 import { Store } from "lucide-react";
+import { getPublicMilestoneDetails } from "@/lib/fetchers";
 
 export default function MarketplaceBreadcrumb({ organization, roadmap, marketplaceDomain }: {
     organization?: Organization,
@@ -26,7 +26,7 @@ export default function MarketplaceBreadcrumb({ organization, roadmap, marketpla
 
     useEffect(() => {
         if (urlMilestone) {
-            getMilestoneDetails(urlMilestone).then(response => {
+            getPublicMilestoneDetails(urlMilestone).then(response => {
                 if (response?.success && response?.data) {
                     setMilestone(response.data);
                 } else {

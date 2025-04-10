@@ -22,7 +22,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
-    const [selectedMilestoneType, setSelectedMilestoneType] = useState<string>("ASSET")
+    // const [selectedMilestoneType, setSelectedMilestoneType] = useState<string>("ASSET")
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +43,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         <Dialog open={open} onOpenChange={(open: boolean) => {
             if (!open) {
                 setSelectedMilestoneTemplate(undefined)
-                setSelectedMilestoneType("ASSET")
+                // setSelectedMilestoneType("ASSET")
             }
             setOpen(open)
         }}>
@@ -58,11 +58,12 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
             >
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Create a milestone
+                        Create a project
                     </DialogTitle>
                 </DialogHeader>
 
-                <h2 className="text-2xl">1. Select a milestone template</h2>
+                {/* <h2 className="text-2xl">1. Select a milestone template</h2> */}
+                <h2 className="text-2xl">Select a Project template</h2>
 
                 <MilestoneTemplates
                     selectedMilestoneTemplate={selectedMilestoneTemplate}
@@ -73,7 +74,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                     inDialog={true}
                 />
 
-                <h2 className="text-2xl">2. Select a category for your milestone</h2>
+                {/* <h2 className="text-2xl">2. Select a category for your milestone</h2>
 
                 <ToggleGroup
                         type="single"
@@ -103,7 +104,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             </Tooltip>
                         </ToggleGroupItem>
                     ))}
-                </ToggleGroup>
+                </ToggleGroup> */}
 
                 <DialogFooter>
                     <DialogClose>
@@ -114,13 +115,16 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
                     <DialogClose>
                         <Button
-                            disabled={!selectedMilestoneTemplate || !selectedMilestoneType || milestoneTypes.length === 0}
+                            // disabled={!selectedMilestoneTemplate || !selectedMilestoneType || milestoneTypes.length === 0}
+                            disabled={!selectedMilestoneTemplate || milestoneTypes.length === 0}
                             type="button"
+                            variant={"cta"}
                             onClick={() => {
                                 console.log(`add milestone`, selectedMilestoneTemplate)
                                 addMilestones([selectedMilestoneTemplate].map((template: any) => {
                                     return ({
-                                        nodeType: selectedMilestoneType as NodeType,
+                                        // nodeType: selectedMilestoneType as NodeType,
+                                        nodeType: "PROJECT",
                                         title: template?.title,
                                         description: template?.description,
                                         types: template?.types.map((type: string) => {
@@ -137,7 +141,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             }}
                         >
                             <Plus />
-                            Create selected milestone
+                            Create selected project
                         </Button>
                     </DialogClose>
                 </DialogFooter>

@@ -4,7 +4,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Link from "next/link";
 import prisma from "@/lib/prisma"
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
@@ -46,34 +46,12 @@ export default async function ProfilePage() {
         }
     }
 
-    if (organization) {
-
-        let roadmaps = await prisma.roadmap.findMany({
-            where: {organizationId: organization?.id},
-            include: {
-                nodes: {
-                    include: {
-                        data: {
-                            include: {
-                                node: true,
-                                contacts: true,
-                                attachments: true,
-                                types: { include: { milestoneType: true } }
-                            }
-                        }
-                    }
-                },
-                edges: true,
-                milestones: {
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: { include: { milestoneType: true } }
-                    }
-                }
-            }
-        })
+    if (organization && organization?.subdomain) {
+        const [roadmaps, assets, rfps] = await Promise.all([
+            getPublicRoadmapsForOrganization(organization.subdomain),
+            getPublicAssetsForOrganization(organization.subdomain),
+            getPublicRFPsForOrganization(organization.subdomain)
+        ])
 
         // Existing verified organization rendering logic
         return (
@@ -206,10 +184,8 @@ export default async function ProfilePage() {
                                     <div className="flex flex-col gap-4 relative">
                                         <PAGProfileAssetsAndRFPsHoverableCard
                                             isPrivate={true}
-                                            assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "ASSET")}
-                                            rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "RFP")}
-                                            // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                            // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                                            assets={assets}
+                                            rfps={rfps}
                                         />
                                         <RoadmapCard
                                             roadmap={roadmaps[0]}

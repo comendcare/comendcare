@@ -111,8 +111,8 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                     <Image
                         alt="missing roadmap"
                         src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                        width={400}
-                        height={400}
+                        width={300}
+                        height={300}
                     />
                     <p className="text-lg text-stone-500">
                         You do not have a research plan yet. Create one to get started.
@@ -169,8 +169,8 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                     />
                     <p className="text-lg text-stone-500">
                         {isPublic 
-                            ? "This research plan does not have any public milestones."
-                            : "Your research plan does not have any milestones."
+                            ? "This research plan does not have any public projects."
+                            : "Your research plan does not have any public projects."
                         }
                     </p>
                     {!isPublic && (
@@ -182,7 +182,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                             )}
                         >
                                 <Plus />
-                                Create a milestone
+                                Create a project
                         </Link>
                     )}
                 </div>

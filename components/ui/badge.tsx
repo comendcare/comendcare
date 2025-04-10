@@ -4,22 +4,26 @@ import {cva, type VariantProps} from "class-variance-authority"
 import {cn} from "@/lib/utils"
 
 const badgeVariants = cva(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    // "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex gap-1 items-center px-2.5 py-0.5 font-semibold rounded-md text-md min-h-7 rounded-md px-2 py-1",
     {
         variants: {
             variant: {
                 default:
-                    "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+                    // "border-transparent bg-primary text-primary-foreground hover:bg-primary/80 rounded-md",
+                    "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 secondary:
                     "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 destructive:
                     "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
                 positive: "border-transparent bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20",
-                outline: "text-foreground"
+                outline: "text-foreground",
+                milestoneType: "border-transparent bg-blue-light text-blue-dark",
+                certification: "border-transparent bg-emerald-100 text-emerald-700"
             },
             size: {
-                default: "px-2.5 py-0.5 text-xs",
-                large: "px-4 py-1 text-sm"
+                default: "px-2.5 py-0.5 text-md",
+                large: "px-4 py-1 text-lg"
             }
         },
         defaultVariants: {

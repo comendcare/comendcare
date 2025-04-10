@@ -81,19 +81,19 @@ export const columns: ColumnDef<SavedCompanyData>[] = [
         enableHiding: true,
         meta: { name: "Website" }
     },
-    {
-        accessorKey: "engagement",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Engagement" />
-        ),
-        cell: ({ row }) => (
-            <div>
-                {toTitleCase(row.getValue("engagement"))}
-            </div>
-        ),
-        enableHiding: true,
-        meta: { name: "Engagement" }
-    },
+    // {
+    //     accessorKey: "engagement",
+    //     header: ({ column }) => (
+    //         <DataTableColumnHeader column={column} title="Engagement" />
+    //     ),
+    //     cell: ({ row }) => (
+    //         <div>
+    //             {toTitleCase(row.getValue("engagement"))}
+    //         </div>
+    //     ),
+    //     enableHiding: true,
+    //     meta: { name: "Engagement" }
+    // },
     {
         accessorKey: "milestone.title",
         header: ({ column }) => (

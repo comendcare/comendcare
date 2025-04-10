@@ -7,6 +7,7 @@ import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
+import { equal } from "assert"
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -101,7 +102,59 @@ export async function getCROData(id: string) {
     })
 }
 
-export async function getRoadmapsForOrganization(domain: string) {
+export async function getPublicAssetsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const assets = await prisma.asset.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            },
+            private: {equals: false}
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return assets
+}
+
+export async function getPublicRFPsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const rfps = await prisma.rFP.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            },
+            private: {equals: false}
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return rfps
+}
+
+export async function getPublicRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -132,13 +185,68 @@ export async function getRoadmapsForOrganization(domain: string) {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: { include: { milestoneType: true } }
+                            types: { include: { milestoneType: true } },
+                            assets: { 
+                                include: { 
+                                    asset: {
+                                        include: { 
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    asset: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            },
+                            rfps: { 
+                                include: { 
+                                    rfp: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    rfp: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            }
                         }
                     }
                 },
                 where: {
                     data: {private: false}
-                }
+                },
+                orderBy: [{ createdAt: "desc" }]
             },
             edges: true,
             milestones: {
@@ -149,15 +257,66 @@ export async function getRoadmapsForOrganization(domain: string) {
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: { include: { milestoneType: true } }
-                }
+                    types: { include: { milestoneType: true } },
+                    assets: { 
+                        include: { 
+                            asset: {
+                                include: { 
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            asset: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    },
+                    rfps: { 
+                        include: { 
+                            rfp: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            rfp: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    }
+                },
+                orderBy: [{ createdAt: "desc" }]
             },
         },
-        orderBy: [
-            {
-                createdAt: "desc"
-            }
-        ]
+        orderBy: [{ createdAt: "desc" }]
     })
     return roadmaps
 
@@ -314,6 +473,97 @@ export async function getMembers(organizationId: string | undefined) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function getAssets(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedAssets = await prisma?.asset.findMany({
+            where: {organizationId},
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {
+                        milestone: true
+                    }
+                }
+            }
+        })
+
+        if (!fetchedAssets) {
+            return {success: false, error: "assets not found"}
+        }
+
+        return {
+            success: true,
+            data: fetchedAssets
+        }
+    } catch (error: any) {
+        logError("Error fetching assets", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getRFPs(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedRFPs = await prisma?.rFP.findMany({
+            where: {organizationId},
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {
+                        milestone: true
+                    }
+                }
+            }
+        })
+
+        if (!fetchedRFPs) {
+            return {success: false, error: "RFPs not found"}
+        }
+
+        return {
+            success: true,
+            data: fetchedRFPs
+        }
+    } catch (error: any) {
+        logError("Error fetching RFPs", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+// export async function getAssets(organizationId: string | undefined) {
+//     if (!organizationId) {
+//         return {success: false, error: "No organization id provided."};
+//     }
+
+//     try {
+//         const fetchedAssets = await prisma?.asset.findMany({
+//             // include: {user: true},
+//             where: {organizationId}
+//         })
+
+//         if (!fetchedAssets) {
+//             return {success: false, error: "assets not found"};
+//         }
+
+//         return {
+//             success: true,
+//             data: fetchedAssets
+//         };
+//     } catch (error: any) {
+//         logError("Error fetching assets", error);
+//         return {success: false, error: "Internal server error"};
+//     }
+// }
 
 export async function getMilestones(organizationId: string | undefined) {
     if (!organizationId) {
@@ -492,14 +742,19 @@ export async function getRoadmap(orgId: string | null | undefined) {
         const roadmap = await prisma.roadmap.findFirst({
             where: {organizationId: organization.id},
             include: {
-                nodes: true,
+                nodes: {
+                    orderBy: [{ createdAt: "desc" }]
+                },
                 milestones: {
                     include: {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
-                    }
+                        types: { include: { milestoneType: true } },
+                        assets: { include: { asset: true } },
+                        rfps: { include: { rfp: true } }
+                    },
+                    orderBy: [{ createdAt: "desc" }]
                 },
                 edges: true,
                 organization: true
@@ -712,7 +967,8 @@ export async function getMilestoneTypes() {
     }
 }
 
-export async function getMilestoneDetails(id: string) {
+
+export async function getPublicMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
@@ -720,7 +976,61 @@ export async function getMilestoneDetails(id: string) {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: { include: { milestoneType: true } }
+                types: { include: { milestoneType: true } },
+                assets: { 
+                    include: { 
+                        asset: {
+                            include: { 
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        asset: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                },
+                rfps: { 
+                    include: { 
+                        rfp: {
+                            include: {
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        rfp: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                }
             }
         })
 
@@ -758,7 +1068,8 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                 (
                     await prisma.node.findMany({
                         where: {roadmapId: roadmapId},
-                        include: {data: true}
+                        include: {data: true},
+                        orderBy: [{ createdAt: "desc" }]
                     })
                 ).map(async node => {
                     const {id, positionX, positionY, origin, createdAt, updatedAt} = node
@@ -796,8 +1107,11 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: { include: { milestoneType: true } }
-                }
+                    types: { include: { milestoneType: true } },
+                    assets: {include: {asset: true}},
+                    rfps: {include: {rfp: true}}
+                },
+                orderBy: [{ createdAt: "desc" }]
             })
 
             return {success: true, data: {nodes: dbNodes, edges: dbEdges, milestones: dbMilestones}}

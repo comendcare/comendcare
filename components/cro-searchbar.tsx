@@ -11,7 +11,8 @@ const selector = (state: CROSearchState) => ({
     sortBy: state.sortBy,
     setSortBy: state.setSortBy,
     view: state.view,
-    setView: state.setView
+    setView: state.setView,
+    totalResults: state.totalResults
 })
 
 export default function CROSearchBar() {
@@ -22,6 +23,7 @@ export default function CROSearchBar() {
         setSortBy,
         view,
         setView,
+        totalResults,
     } = useCROSearchStore(useShallow(selector))
 
     useEffect(() => {
@@ -35,50 +37,56 @@ export default function CROSearchBar() {
     };
 
     return (
-        <div className="w-full h-full flex flex-row gap-4">
-            <div className="w-full h-full grow">
-                <Input
-                    className="w-full h-full"
-                    placeholder="Search"
-                    value={query}
-                    onChange={handleInputChange}
-                />
+        <div className="w-full h-full flex flex-col gap-4">
+            <div className="w-full h-full flex flex-row gap-4">
+                <div className="w-full h-full grow">
+                    <Input
+                        className="w-full h-full"
+                        placeholder="Search"
+                        value={query}
+                        onChange={handleInputChange}
+                    />
+                </div>
+
+                <Select
+                    value={sortBy}
+                    onValueChange={(value: string) => {
+                        setSortBy(value)
+                    }}
+                >
+                    <SelectTrigger className="w-[220px] h-full">
+                        <SelectValue placeholder="Sort by"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
+                            <SelectItem value="highest-rated">Highest rated</SelectItem>
+                            {/*<SelectItem value="most-reviewed">Most reviewed</SelectItem>*/}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+
+                {/*<Select*/}
+                {/*    onValueChange={(view: string) => {*/}
+                {/*        setView(view as ViewType)*/}
+                {/*    }}*/}
+                {/*    defaultValue={view}*/}
+                {/*>*/}
+                {/*    <SelectTrigger className="w-[150px] h-full">*/}
+                {/*        <SelectValue placeholder="View"/>*/}
+                {/*    </SelectTrigger>*/}
+                {/*    <SelectContent>*/}
+                {/*        <SelectGroup>*/}
+                {/*            <SelectItem value="grid">Grid View</SelectItem>*/}
+                {/*            <SelectItem value="list">List View</SelectItem>*/}
+                {/*        </SelectGroup>*/}
+                {/*    </SelectContent>*/}
+                {/*</Select>*/}
             </div>
 
-            <Select
-                value={sortBy}
-                onValueChange={(value: string) => {
-                    setSortBy(value)
-                }}
-            >
-                <SelectTrigger className="w-[220px] h-full">
-                    <SelectValue placeholder="Sort by"/>
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
-                        <SelectItem value="highest-rated">Highest rated</SelectItem>
-                        {/*<SelectItem value="most-reviewed">Most reviewed</SelectItem>*/}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-            {/*<Select*/}
-            {/*    onValueChange={(view: string) => {*/}
-            {/*        setView(view as ViewType)*/}
-            {/*    }}*/}
-            {/*    defaultValue={view}*/}
-            {/*>*/}
-            {/*    <SelectTrigger className="w-[150px] h-full">*/}
-            {/*        <SelectValue placeholder="View"/>*/}
-            {/*    </SelectTrigger>*/}
-            {/*    <SelectContent>*/}
-            {/*        <SelectGroup>*/}
-            {/*            <SelectItem value="grid">Grid View</SelectItem>*/}
-            {/*            <SelectItem value="list">List View</SelectItem>*/}
-            {/*        </SelectGroup>*/}
-            {/*    </SelectContent>*/}
-            {/*</Select>*/}
+            <div className="text-muted-foreground text-sm">
+                {totalResults} results
+            </div>
         </div>
     )
 }

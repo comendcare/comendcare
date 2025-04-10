@@ -14,15 +14,15 @@ import { TypeBadge } from "./type-badge";
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
         text: "Planned",
-        styling: "bg-red-100 border-red-600 text-red-800"
+        styling: "bg-red-100 border-red-600 text-red-800 font-semibold"
     },
     INPROGRESS: {
         text: "In Progress",
-        styling: "bg-yellow-100 border-yellow-600 text-yellow-800"
+        styling: "bg-yellow-100 border-yellow-600 text-yellow-800 font-semibold"
     },
     COMPLETED: {
         text: "Completed",
-        styling: "bg-green-100 border-green-600 text-green-800"
+        styling: "bg-green-100 border-green-600 text-green-800 font-semibold"
     }
 };
 
