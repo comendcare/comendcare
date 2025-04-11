@@ -107,7 +107,6 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     return (
         <Card className={cn(
             "w-[350px] text-wrap break-words",
-            props.data?.onboardingMilestone ? "research-plan-tour-step2" : "",
             selectedNodeId === props?.id ? "border-black border-2" : "",
             props.id === "preview" ? "opacity-50" : ""
         )}>

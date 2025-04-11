@@ -7,6 +7,16 @@ import { Portal } from "@radix-ui/react-portal";
 
 // Types
 import { OnbordaProps } from "./types";
+import { ResearchPlanOnbordaState, Selector, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore";
+import { useShallow } from "zustand/react/shallow";
+import { sleep } from "@/lib/utils";
+import { init } from "mixpanel-browser";
+
+const selector = (state: ResearchPlanOnbordaState) => ({
+    activeTour: state.activeTour,
+    setActiveTour: state.setActiveTour,
+    setStep: state.setCurrentStep
+})
 
 const Onborda: React.FC<OnbordaProps> = ({
   children,
@@ -34,6 +44,8 @@ const Onborda: React.FC<OnbordaProps> = ({
   const isInView = useInView(observeRef);
   const offset = 20;
 
+  const { activeTour, setActiveTour, setStep } = useResearchPlanOnbordaStore(useShallow(selector))
+
   // - -
   // Route Changes
   const router = useRouter();
@@ -41,26 +53,37 @@ const Onborda: React.FC<OnbordaProps> = ({
   // - -
   // Initialisze
   useEffect(() => {
-    if (isOnbordaVisible && currentTourSteps) {
-      console.log("Onborda: Current Step Changed");
-      const step = currentTourSteps[currentStep];
-      if (step) {
-        const element = document.querySelector(step.selector) as Element | null;
-        if (element) {
-          setPointerPosition(getElementPosition(element));
-          currentElementRef.current = element;
-          setElementToScroll(element);
+    const init = async () => {
+      if (isOnbordaVisible && currentTourSteps) {
+        console.log("Onborda: Current Step Changed, init");
+        const step = currentTourSteps[currentStep];
+  
+        // handle zustand state
+        setActiveTour(currentTour || undefined)
+        setStep(step.selector as Selector || undefined)
 
-          const rect = element.getBoundingClientRect();
-          const isInViewportWithOffset =
-            rect.top >= -offset && rect.bottom <= window.innerHeight + offset;
-
-          if (!isInView || !isInViewportWithOffset) {
-            // element.scrollIntoView({ behavior: "smooth", block: "center" });
+        await sleep(1000)
+  
+        if (step) {
+          const element = document.querySelector(step.selector) as Element | null;
+          if (element) {
+            setPointerPosition(getElementPosition(element));
+            currentElementRef.current = element;
+            setElementToScroll(element);
+  
+            const rect = element.getBoundingClientRect();
+            const isInViewportWithOffset =
+              rect.top >= -offset && rect.bottom <= window.innerHeight + offset;
+  
+            if (!isInView || !isInViewportWithOffset) {
+              // element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
           }
         }
       }
     }
+
+    init()
   }, [currentStep, currentTourSteps, isInView, offset, isOnbordaVisible]);
 
   // - -
@@ -81,8 +104,13 @@ const Onborda: React.FC<OnbordaProps> = ({
   // Update pointerPosition when currentStep changes
   useEffect(() => {
     if (isOnbordaVisible && currentTourSteps) {
-      console.log("Onborda: Current Step Changed");
+      console.log("Onborda: Current Step Changed, pointerPosition changed");
       const step = currentTourSteps[currentStep];
+
+      // handle zustand state
+      setActiveTour(currentTour || undefined)
+      setStep(step.selector as Selector || undefined)
+
       if (step) {
         const element = document.querySelector(step.selector) as Element | null;
         if (element) {

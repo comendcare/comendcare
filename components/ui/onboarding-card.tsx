@@ -63,11 +63,11 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         let onboardingNodeId: string | undefined = nodes.sort((a: any, b: any) => b.createdAt - a.createdAt)[0]?.id
 
         // execute any actions that need to occur before we move to the next step
-        if (step.selector === '.research-plan-tour-step1') {
+        if (step.selector === '.research-plan-tour-step2') {
             // if there are no nodes, we create one to use for the onboarding flow
             if (nodes.length <= 0) {
                 const newNode = await addMilestones([{
-                    title: `New Milestone`,
+                    title: `Basic Science`,
                     status: "PLANNED",
                 }])
                 onboardingNodeId = newNode?.[0]?.id
@@ -75,6 +75,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
 
             if (onboardingNodeId) fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         }
+
         if (step.selector === '.research-plan-tour-step2' && onboardingNodeId) {
             setSelectedNodeId(onboardingNodeId)
             fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
@@ -117,7 +118,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         //     await new Promise(resolve => setTimeout(resolve, 500))
         // }
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // await new Promise(resolve => setTimeout(resolve, 500))
         nextStep()
     }
 
