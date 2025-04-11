@@ -14,6 +14,7 @@ import Image from "next/image"
 import { FeedbackSheet } from "@/components/feedback"
 import { Suspense } from "react"
 import Loading from "./loading";
+import { onbordaTours } from "@/state/onborda/researchPlanOnbordaStore";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -75,145 +76,6 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
-const steps: Tour[] = [
-    {
-        tour: "research-plan-tour",
-        steps: [
-            {
-                icon: <>👋</>,
-                title: "Adding a Milestone",
-                content: <>{`Start building your research plan by adding a new milestone.`}</>,
-                selector: ".research-plan-tour-step1",
-                side: "top-left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
-                icon: <>⭐</>,
-                title: "Milestones",
-                content: <>{`Milestones are the assets, projects, and RFPs that make up your research plan. You can click on a milestone to edit the contents.`}</>,
-                selector: ".research-plan-tour-step2",
-                side: "top-left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Editing Milestones",
-                content: <>{`You can edit the details of a milestone in the edit panel.`}</>,
-                selector: ".research-plan-tour-step3",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Saving a Milestone",
-                content: <>{`Click the save button to submit your changes.`}</>,
-                selector: ".research-plan-tour-step4",
-                side: "top-right" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Connecting Milestones",
-                content: <>
-                    {`Once you've created more than one milestone, you can create relationships between them by clicking and dragging from the + icon. You can remove relationships by clicking the trash icon.`}
-                    <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
-                </>,                
-                selector: ".research-plan-tour-step5",
-                side: "right" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Re-Ordering Milestones",
-            //     content: <>
-            //         {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
-            //         <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
-            //     </>,
-            //     selector: ".research-plan-tour-step5",
-            //     side: "left" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // },
-        ]
-    },
-    {
-        tour: "organization-profile-tour",
-        steps: [
-            {
-                icon: <>👋</>,
-                title: "About your organization",
-                content: <>{`Your organization's information and members can be found here.`}</>,
-                selector: ".organization-profile-tour-step1",
-                side: "top" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
-                icon: <>⭐</>,
-                title: "About your condition",
-                content: <>{`Information about your condition will appear here.`}</>,
-                selector: ".organization-profile-tour-step2",
-                side: "top" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>👋</>,
-                title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, click the pencil icon near the content you want to edit.`}</>,
-                selector: ".organization-profile-tour-step3",
-                side: "bottom" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
-                icon: <>⭐</>,
-                title: "Your research plan",
-                content: <>{`A timeline view of your research plan will be found here. To create and edit your plan, visit the Research Planner.`}</>,
-                selector: ".organization-profile-tour-step4",
-                side: "top-right" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Your miletones",
-                content: <>{`Highlight your assets (ex/ data and models) and requests for proposals (ex/ funding opportunities) to potential partners. We recommend starting here!`}</>,
-                selector: ".organization-profile-tour-step5",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Your organization's activity",
-            //     content: <>{`All posts related to your organization will appear in this tab.`}</>,
-            //     selector: ".organization-profile-tour-step6",
-            //     side: "left" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // },
-        ]
-    }
-]
-
 export default function RootLayout({
     children
 }: {
@@ -234,7 +96,7 @@ export default function RootLayout({
                         enableSystem={false}
                         disableTransitionOnChange
                     >
-                        <Onborda steps={steps} cardComponent={OnboardingCard}>
+                        <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
                             {children}
                             {/* <FeedbackForm /> */}
                             <Analytics />
