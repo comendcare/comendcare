@@ -57,7 +57,13 @@ const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
                     <Star key={index} filled={index < Math.round(avgRating)} />
                 ))}
                 <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                    {totalReviews > 0 ? (Number.isInteger(avgRating) ? avgRating : avgRating.toFixed(2)) : "No reviews yet"} out of 5
+                    {totalReviews > 0 ? (
+                        <>
+                            {Number.isInteger(avgRating) ? avgRating : avgRating.toFixed(2)} out of 5
+                        </>
+                    ) : (
+                        "No reviews yet"
+                    )}
                 </p>
             </div>
 
@@ -72,9 +78,9 @@ const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
             ))}
 
             {/* Placeholder for "How are ratings calculated?" */}
-            <p className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                How are ratings calculated? ▼
-            </p>
+            {/*<p className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">*/}
+            {/*    How are ratings calculated? ▼*/}
+            {/*</p>*/}
         </div>
     );
 };
