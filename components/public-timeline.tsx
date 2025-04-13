@@ -62,7 +62,7 @@ const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {
     urlMilestone?: string | undefined
 }) => {
     return (
-        <li className={cn("ms-6 w-full text-left hover:bg-secondary p-2 rounded-md", item.private ? "pointer-events-none" : "")}>
+        <li className={cn("ml-6 text-left hover:bg-secondary p-2 rounded-md", item.private ? "pointer-events-none" : "")}>
             <a
                 href={
                     subdomain ?
@@ -88,9 +88,9 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
     urlMilestone?: string | undefined
 }) => {
     return (
-        <li className="ms-6">
+        <li className="ml-6">
             <button
-                className={cn("hover:cursor-pointer w-full text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
+                className={cn("hover:cursor-pointer text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
                 onClick={() => {
                     if (setUrlMilestone !== undefined) {
                         setUrlMilestone(item.id)
@@ -113,13 +113,13 @@ const TimelineElementContent = ({item, externalLinkIcon}: { item: any, externalL
                 <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.nodeType || item?.nodeType || "PROJECT"}/>
             </span>
             <div className="flex flex-row items-center justify-start gap-4">
-                <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
+                <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white text-wrap">
                     {item.title}
                 </h3>
                 {item.private && <PrivateBadge iconOnly={true}/>}
-                {!item.private && externalLinkIcon && <ExternalLink className="h-4 w-4"/>}
+                {!item.private && externalLinkIcon && <ExternalLink className="min-h-4 h-4 min-w-4 w-4"/>}
                 <time
-                    className="ml-auto block font-semibold leading-none dark:text-gray-500">
+                    className="ml-auto block font-semibold leading-none dark:text-gray-500 text-wrap">
                     {getDates(item)}
                 </time>
             </div>
