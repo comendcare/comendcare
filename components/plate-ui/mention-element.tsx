@@ -9,7 +9,7 @@ import { IS_APPLE, getHandler } from '@udecode/plate-common';
 import { useElement } from '@udecode/plate-common/react';
 import { useFocused, useSelected } from 'slate-react';
 
-import { useMounted } from '@/hooks/use-mounted';
+import { useMounted } from '@/lib/hooks/use-mounted';
 
 import { PlateElement } from './plate-element';
 

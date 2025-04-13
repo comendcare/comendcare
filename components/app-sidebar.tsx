@@ -35,10 +35,10 @@ const data = {
             variant: "ghost",
             url: "/app/marketplace/service-providers",
             subPages: [{
-                title: "Saves",
+                title: "Shortlist",
                 icon: Bookmark,
                 variant: "ghost",
-                url: "/app/saves"
+                url: "/app/shortlist"
             }]
         },
         {
