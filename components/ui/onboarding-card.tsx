@@ -63,11 +63,11 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         let onboardingNodeId: string | undefined = nodes.sort((a: any, b: any) => b.createdAt - a.createdAt)[0]?.id
 
         // execute any actions that need to occur before we move to the next step
-        if (step.selector === '.research-plan-tour-step1') {
+        if (step.selector === '.onborda-select-a-template') {
             // if there are no nodes, we create one to use for the onboarding flow
             if (nodes.length <= 0) {
                 const newNode = await addMilestones([{
-                    title: `New Milestone`,
+                    title: `Basic Science`,
                     status: "PLANNED",
                 }])
                 onboardingNodeId = newNode?.[0]?.id
@@ -75,17 +75,19 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
 
             if (onboardingNodeId) fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         }
-        if (step.selector === '.research-plan-tour-step2' && onboardingNodeId) {
+
+        if (step.selector === '.onborda-select-a-template' && onboardingNodeId) {
             setSelectedNodeId(onboardingNodeId)
             fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
-        } else if (step.selector === '.research-plan-tour-step3') {
-            const element = document.getElementById("edit-milestone-scroll-area")
-            if (element) {
-                element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500))
         }
+        // if (step.selector === '.click-project-step') {
+        //     const element = document.getElementById("edit-milestone-scroll-area")
+        //     if (element) {
+        //         element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
+        //     }
+
+        //     await new Promise(resolve => setTimeout(resolve, 500))
+        // }
 
         // if (step.selector === '.organization-profile-tour-step1') {
         //     const element = document.getElementsByClassName("organization-profile-tour-step2")[0]
@@ -117,7 +119,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         //     await new Promise(resolve => setTimeout(resolve, 500))
         // }
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // await new Promise(resolve => setTimeout(resolve, 500))
         nextStep()
     }
 
