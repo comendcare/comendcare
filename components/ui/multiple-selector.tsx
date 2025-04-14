@@ -7,7 +7,7 @@ import {forwardRef, useEffect} from 'react';
 
 import {Badge} from '@/components/ui/badge';
 import {Command, CommandGroup, CommandItem, CommandList} from '@/components/ui/command';
-import {cn} from '@/lib/utils';
+import {cn, sleep} from '@/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {ScrollArea} from './scroll-area';
 
@@ -570,7 +570,12 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 onSelect={(value) => {
                                                                     setInputValue("");
                                                                     setSelected((prev) => {
-                                                                        if (selected.length + 1 >= maxSelected) setOpen(false);
+                                                                        const closeDropdown = async () => {
+                                                                            await sleep(100) // sleep to delay setOpen, and avoid rendering errors
+                                                                            setOpen(false)
+                                                                        }
+
+                                                                        if (selected.length + 1 >= maxSelected) closeDropdown()
                                                                         onChange?.([...prev, framework]);
                                                                         return [...prev, framework];
                                                                     });
