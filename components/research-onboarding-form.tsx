@@ -43,8 +43,6 @@ export const researchFormSchema = z.object({
             message: "The name of your condition needs to be shorter than 500 characters",
         })
         .optional(),
-    therapeutics: z.array(optionSchema).min(0).optional(),
-    modalities: z.array(optionSchema).min(0).optional(),
     categories: z.array(optionSchema).optional(),
     prevalenceNumerator: z.string().min(1, {
         message: "Your prevalence numerator must be at least 1",
@@ -85,7 +83,6 @@ export default function ResearchOnboardingForm(
     const router = useRouter()
     const [loading, setLoading] = useState(false);
     const [organization, setOrganization] = useState<Organization | null>();
-    const [otherModality, setOtherModality] = useState<string>("");
     const [otherCategories, setOtherCategories] = useState<string>("");
     const [otherSystem, setOtherSystem] = useState<string>("");
 
@@ -104,8 +101,6 @@ export default function ResearchOnboardingForm(
 
             // Map form values into FormData
             const data = {
-                therapeuticsInDevelopment: values.therapeutics?.map((therapeutic) => therapeutic.label).join(",") || "",
-                interestedModalities: values.modalities?.map((modality) => modality.label).join(",") || "",
                 name: values.disorder || "",
                 summary: values.summary || "",
                 diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
@@ -132,14 +127,6 @@ export default function ResearchOnboardingForm(
                     if (response.success && response.data) {
                         const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
                         toast.success("Successfully created condition.")
-
-                        // Mixpanel tracking for "Other" fields
-                        if (otherModality) {
-                            mixpanel.track("Org has other modality", {
-                                orgName: organization?.name || "Unknown Org",
-                                looking: otherModality,
-                            });
-                        }
 
                         if (otherCategories) {
                             mixpanel.track("Org has other category", {
@@ -408,97 +395,6 @@ export default function ResearchOnboardingForm(
                             {/*    )}*/}
                             {/*/>*/}
 
-                            <FormField
-                                control={form.control}
-                                name="therapeutics"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics under development
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`What types of treatments is your organization currently developing? Select all that apply.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {form.watch("therapeutics")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
-                                                    value={otherModality}
-                                                    onChange={(e) => setOtherModality(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="modalities"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics of interest
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`The treatment modalities your organization is interested in. Select all that apply.`}
-                                            <Tooltip delayDuration={0}>
-                                                {/*disabled to make the tooltip unclickable*/}
-                                                <TooltipTrigger disabled>
-                                                    <Info 
-                                                        className="text-black h-4 inline-block align-baseline mx-1 h-4 w-4"/>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>
-                                                        {`This will help us match you with the experts of your particular modality.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {form.watch("modalities")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
-                                                    value={otherModality}
-                                                    onChange={(e) => setOtherModality(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
 
                             {/*<FormField*/}
                             {/*    control={form.control}*/}
