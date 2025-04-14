@@ -272,7 +272,6 @@ export const createOrganization = async (formData: FormData) => {
             error: "Not authenticated"
         }
     }
-    console.log(formData)
 
     const name = formData.get("orgName") as string;
     const description = formData.get("description") as string;
@@ -293,11 +292,14 @@ export const createOrganization = async (formData: FormData) => {
     const lng = formData.get("lng") as string | null;
     const image = formData.get("image") as string | null;
     const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
-        ? (formData.get("therapeuticsInDevelopment") as any).map((therapeutic: any) => therapeutic.label).join(",")
+        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
         : [];
     const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
-        ? (formData.get("therapeuticsOfInterest") as any).map((therapeutic: any) => therapeutic.label).join(",")
+        ? (formData.get("therapeuticsOfInterest") as string).split(",")
         : [];
+    console.log(therapeuticsOfInterest)
+    console.log(therapeuticsInDevelopment)
+    console.log("fuck")
 
     try {
         const organization = await prisma.organization.upsert({
@@ -334,6 +336,8 @@ export const createOrganization = async (formData: FormData) => {
                 contactEmail,
                 website,
                 incorporationStatus,
+                therapeuticsInDevelopment,
+                therapeuticsOfInterest,
                 address1,
                 address2,
                 formattedAddress,
