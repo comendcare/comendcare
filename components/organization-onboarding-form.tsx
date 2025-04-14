@@ -330,22 +330,6 @@ export default function OrganizationOnboardingForm(
                 }
             }
 
-            // console.log(values.therapeuticsInDevelopment)
-            // console.log(values.therapeuticsOfInterest)
-            // console.log("asdf")
-            // const therapeuticsInDevelopment = values.therapeuticsInDevelopment?.map((item) =>
-            //     item.value
-            // ).join(",") || ""
-            // const therapeuticsOfInterest = values.therapeuticsOfInterest?.map((item) =>
-            //     item.value
-            // ).join(",") || ""
-            // console.log(therapeuticsInDevelopment)
-            // console.log(therapeuticsOfInterest)
-            // formData.append("therapeuticsInDevelopment", therapeuticsInDevelopment)
-            // formData.append("therapeuticsOfInterest", therapeuticsOfInterest)
-            // console.log(formData.get("therapeuticsInDevelopment"))
-            // console.log(formData.get("therapeuticsOfInterest"))
-
             const data = {
                 therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
                 therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
