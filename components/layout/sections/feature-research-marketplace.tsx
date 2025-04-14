@@ -1,4 +1,4 @@
-import {List, Star} from "lucide-react";
+import {Bookmark, Star} from "lucide-react";
 import Image from "next/image"
 import marketplace from "@/public/screenshots/marketplace.png"
 
@@ -7,7 +7,7 @@ const features = [
         name: "Add to shortlist.",
         description:
             "Save relevant service providers to a shortlist to easily find and contact them when you're ready.",
-        icon: List,
+        icon: Bookmark,
     },
     {
         name: "Ratings and reviews.",
