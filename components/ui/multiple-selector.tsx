@@ -1,8 +1,5 @@
 'use client';
 
-// Huge thanks to the person behind this incredibly robust component:
-// https://shadcnui-expansions.typeart.cc/docs/multiple-selector
-
 import {Command as CommandPrimitive, useCommandState} from 'cmdk';
 import {X} from 'lucide-react';
 import * as React from 'react';
@@ -12,9 +9,18 @@ import {Badge} from '@/components/ui/badge';
 import {Command, CommandGroup, CommandItem, CommandList} from '@/components/ui/command';
 import {cn} from '@/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import {useMutationObserver} from "@/lib/hooks/use-mutation-observer";
-import { ScrollArea } from './scroll-area';
-import { Option } from '@/lib/types';
+import {ScrollArea} from './scroll-area';
+
+export interface Option {
+    value: string;
+    label: string;
+    disable?: boolean;
+    /** fixed option that can't be removed. */
+    fixed?: boolean;
+
+    /** Group the options by providing key. */
+    [key: string]: string | boolean | undefined;
+}
 
 interface GroupOption {
     [key: string]: Option[];
@@ -208,15 +214,13 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         const [inputValue, setInputValue] = React.useState('');
         const debouncedSearchTerm = useDebounce(inputValue, delay || 500);
 
-        const [peekedModel, setPeekedModel] = React.useState<Option>()
-
         React.useImperativeHandle(
             ref,
             () => ({
                 selectedValue: [...selected],
                 input: inputRef.current as HTMLInputElement,
                 focus: () => inputRef?.current?.focus(),
-                reset: () => setSelected([])
+                reset: () => setSelected([]),
             }),
             [selected],
         );
@@ -428,197 +432,185 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 
         return (
             <Command
-                onKeyDown={handleKeyDown}
-                className="overflow-visible bg-transparent"
-            >
-            <div 
-                className={cn(
-                    'rounded-md border border-input text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
-                    {
-                        'px-3 py-2': selected.length !== 0,
-                        'cursor-text': !disabled && selected.length !== 0,
-                    },
-                    className,
-                )}
-                onClick={() => {
-                    if (disabled) return;
-                    inputRef?.current?.focus();
+                ref={dropdownRef}
+                {...commandProps}
+                onKeyDown={(e) => {
+                    handleKeyDown(e);
+                    commandProps?.onKeyDown?.(e);
                 }}
+                className={cn('h-auto overflow-visible bg-transparent', commandProps?.className)}
+                shouldFilter={
+                    commandProps?.shouldFilter !== undefined ? commandProps.shouldFilter : !onSearch
+                } // When onSearch is provided, we don't want to filter the options. You can still override it.
+                filter={commandFilter()}
             >
-                <div className="relative flex flex-wrap gap-1">
-                {selected.map((option, index) => {
-                    return (
-                        <Badge
-                            key={index}
-                            className={cn(
-                                // 'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
-                                // 'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
-                                badgeClassName,
-                            )}
-                            data-fixed={option.fixed}
-                            data-disabled={disabled || undefined}
-                        >
-                            {option.label}
-                            <button
-                                className={cn(
-                                    'rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                                    (disabled || option.fixed) && 'hidden',
-                                )}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleUnselect(option);
-                                    }
-                                }}
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                }}
-                                onClick={() => handleUnselect(option)}
-                            >
-                                <X className="h-4 w-4"/>
-                            </button>
-                        </Badge>
-                    );
-                })}
-                {/* Avoid having the "Search" Icon */}
-                <CommandPrimitive.Input
-                    ref={inputRef}
-                    value={inputValue}
-                    disabled={disabled || selected.length === maxSelected}
-                    onValueChange={(value) => {
-                        setInputValue(value);
-                        inputProps?.onValueChange?.(value);
-                    }}
-                    onBlur={(event) => {
-                        setOpen(false);
-                    }}
-                    onFocus={(event) => {
-                        if (selected.length < maxSelected) {
-                            setOpen(true);
-                            triggerSearchOnFocus && onSearch?.(debouncedSearchTerm);
-                            inputProps?.onFocus?.(event);
-                        }
-                    }}
-                    onClick={() => {
-                        if (selected.length < maxSelected) {
-                            setOpen(true)
-                        }
-                    }}
-                    placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
+                <div
                     className={cn(
-                        "ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
+                        'min-h-10 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm',
                         {
-                            'w-full': hidePlaceholderWhenSelected,
-                            'px-3 py-2': selected.length === 0,
-                            'ml-1': selected.length !== 0,
+                            'px-3 py-2': selected.length !== 0,
+                            'cursor-text': !disabled && selected.length !== 0,
                         },
-                        inputProps?.className,
+                        className,
                     )}
-                />
-                <button
-                    type="button"
                     onClick={() => {
-                        setSelected(selected.filter((s) => s.fixed));
-                        onChange?.(selected.filter((s) => s.fixed));
+                        if (disabled) return;
+                        inputRef?.current?.focus();
                     }}
-                    className={cn(
-                        'absolute right-0',
-                        (hideClearAllButton ||
-                            disabled ||
-                            selected.length < 1 ||
-                            selected.filter((s) => s.fixed).length === selected.length) &&
-                        'hidden',
-                    )}
                 >
-                    <X className="h-4 w-4"/>
-                </button>
-                </div>
-            </div>
-    
-            <div className="relative mt-2">
-                <CommandList>
-                    {open && (
-                        <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-                            <ScrollArea 
-                                className="max-h-[300px] overflow-auto"
-                                onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input
-                            >
-                                {isLoading && (
-                                    <>{loadingIndicator}</>
-                                )}
-                                {!isLoading ? (
-                                    <>
-                                    <CommandEmpty>{emptyIndicator}</CommandEmpty>
-                                    <CommandGroup 
-                                        className="h-full"
+                    <div className="relative flex flex-wrap gap-1">
+                        {selected.map((option) => {
+                            return (
+                                <Badge
+                                    key={option.value}
+                                    className={cn(
+                                        'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
+                                        'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                                        badgeClassName,
+                                    )}
+                                    data-fixed={option.fixed}
+                                    data-disabled={disabled || undefined}
+                                >
+                                    {option.label}
+                                    <button
+                                        type="button"
+                                        className={cn(
+                                            'ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                                            (disabled || option.fixed) && 'hidden',
+                                        )}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleUnselect(option);
+                                            }
+                                        }}
+                                        onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                        }}
+                                        onClick={() => handleUnselect(option)}
                                     >
-                                        {Object.entries(selectables).flatMap(value => value[1]).length > 0 && (
-                                            Object.entries(selectables).flatMap(value => value[1]).map((framework, index) => {
-                                                return (
+                                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground"/>
+                                    </button>
+                                </Badge>
+                            );
+                        })}
+                        {/* Avoid having the "Search" Icon */}
+                        <CommandPrimitive.Input
+                            {...inputProps}
+                            ref={inputRef}
+                            value={inputValue}
+                            disabled={disabled}
+                            onValueChange={(value) => {
+                                setInputValue(value);
+                                inputProps?.onValueChange?.(value);
+                            }}
+                            onBlur={(event) => {
+                                if (!onScrollbar) {
+                                    setOpen(false);
+                                }
+                                inputProps?.onBlur?.(event);
+                            }}
+                            onFocus={(event) => {
+                                setOpen(true);
+                                inputProps?.onFocus?.(event);
+                            }}
+                            placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
+                            className={cn(
+                                'flex-1 bg-transparent outline-none placeholder:text-muted-foreground',
+                                {
+                                    'w-full': hidePlaceholderWhenSelected,
+                                    'px-3 py-2': selected.length === 0,
+                                    'ml-1': selected.length !== 0,
+                                },
+                                inputProps?.className,
+                            )}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setSelected(selected.filter((s) => s.fixed));
+                                onChange?.(selected.filter((s) => s.fixed));
+                            }}
+                            className={cn(
+                                'absolute right-0 h-6 w-6 p-0',
+                                (hideClearAllButton ||
+                                    disabled ||
+                                    selected.length < 1 ||
+                                    selected.filter((s) => s.fixed).length === selected.length) &&
+                                'hidden',
+                            )}
+                        >
+                            <X/>
+                        </button>
+                    </div>
+                </div>
+                <div className="relative">
+                    {open && (
+                        <CommandList>
+                            {open && (
+                                <div
+                                    className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+                                    <ScrollArea
+                                        className="max-h-[300px] overflow-auto"
+                                        onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input
+                                    >
+                                        {isLoading ? (
+                                            <>{loadingIndicator}</>
+                                        ) : Object.entries(selectables).flatMap(value => value[1]).length > 0 ? (
+                                            <CommandGroup className="h-full">
+                                                {Object.entries(selectables).flatMap(value => value[1]).map((framework, index) => (
                                                     <HoverCard openDelay={0} closeDelay={0} key={index}>
                                                         <HoverCardTrigger>
-                                                        <CommandItem
-                                                            key={framework.value}
-                                                            onMouseDown={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                            }}
-                                                            onSelect={(value) => {
-                                                                setInputValue("")
-                                                                setSelected((prev) => {
-                                                                    if (selected.length + 1 >= maxSelected) setOpen(false)
-                                                                    onChange?.([...prev, framework])
-                                                                    return [...prev, framework]
-                                                                });
-                                                            }}
-                                                            className={"cursor-pointer multiselect-item"}
-                                                        >
-                                                            {framework.label}
-                                                            <p className="hidden">{framework.value}</p>
-                                                        </CommandItem>
+                                                            <CommandItem
+                                                                key={framework.value}
+                                                                onMouseDown={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                onSelect={(value) => {
+                                                                    setInputValue("");
+                                                                    setSelected((prev) => {
+                                                                        if (selected.length + 1 >= maxSelected) setOpen(false);
+                                                                        onChange?.([...prev, framework]);
+                                                                        return [...prev, framework];
+                                                                    });
+                                                                }}
+                                                                className={"cursor-pointer multiselect-item"}
+                                                            >
+                                                                {framework.label}
+                                                                <p className="hidden">{framework.value}</p>
+                                                            </CommandItem>
                                                         </HoverCardTrigger>
                                                         {showHoverCard && (
-                                                            <HoverCardContent
-                                                                side="left"
-                                                                align="start"
-                                                                className="min-h-[280px]"
-                                                            >
+                                                            <HoverCardContent side="left" align="start" className="min-h-[280px]">
                                                                 <div className="grid gap-2">
                                                                     <h4 className="font-medium leading-none">{framework.label}</h4>
-                                                                    <div className="text-sm text-muted-foreground">
-                                                                        {framework.description}
-                                                                    </div>
-                                                                    {framework.strengths ? (
+                                                                    <div className="text-sm text-muted-foreground">{framework.description}</div>
+                                                                    {framework.strengths && (
                                                                         <div className="mt-4 grid gap-2">
-                                                                            <h5 className="text-sm font-medium leading-none">
-                                                                                Strengths
-                                                                            </h5>
-                                                                            <ul className="text-sm text-muted-foreground">
-                                                                                {framework.strengths}
-                                                                            </ul>
+                                                                            <h5 className="text-sm font-medium leading-none">Strengths</h5>
+                                                                            <ul className="text-sm text-muted-foreground">{framework.strengths}</ul>
                                                                         </div>
-                                                                    ) : null}
+                                                                    )}
                                                                 </div>
                                                             </HoverCardContent>
                                                         )}
                                                     </HoverCard>
-                                                );
-                                            })
+                                                ))}
+                                            </CommandGroup>
+                                        ) : (
+                                            <CommandGroup className="h-full">
+                                                <CommandItem value="-" disabled>
+                                                    {emptyIndicator}
+                                                </CommandItem>
+                                            </CommandGroup>
                                         )}
-                                    </CommandGroup>
-                                    </>
-                                ) : (
-                                    <CommandGroup className="h-full">
-                                        <CommandItem value="-" disabled>
-                                            {emptyIndicator}
-                                        </CommandItem>
-                                    </CommandGroup>
-                                )}
-                            </ScrollArea>
-                        </div>
+                                    </ScrollArea>
+                                </div>
+                            )}
+                        </CommandList>
                     )}
-                </CommandList>
-            </div>
+                </div>
             </Command>
         );
     },
@@ -626,76 +618,3 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 
 MultipleSelector.displayName = 'MultipleSelector';
 export default MultipleSelector;
-
-interface ModelItemProps {
-    option: Option
-    onSelect: () => void
-    selected: any
-    maxSelected: any
-    onMaxSelected: any
-    setInputValue: any
-    setSelected: any
-    onChange: any
-    onPeek: (option: Option) => void
-    setOpen: (open: boolean) => void
-}
-
-function SelectorItem({
-                          option,
-                          selected,
-                          maxSelected,
-                          onMaxSelected,
-                          setInputValue,
-                          setSelected,
-                          onChange,
-                          onPeek,
-                          setOpen
-                      }: ModelItemProps) {
-    const ref = React.useRef<HTMLDivElement>(null)
-
-    useMutationObserver(ref, (mutations) => {
-        mutations.forEach((mutation) => {
-            if (
-                mutation.type === "attributes" &&
-                mutation.attributeName === "aria-selected" &&
-                ref.current?.getAttribute("aria-selected") === "true"
-            ) {
-                onPeek(option)
-            }
-        })
-    })
-
-    return (
-        <CommandItem
-            key={option.value}
-            ref={ref}
-            value={option.value}
-            disabled={option.disable}
-            onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }}
-            onSelect={() => {
-                if (selected.length >= maxSelected) {
-                    onMaxSelected?.(selected.length);
-                    setOpen(false)
-                    return;
-                }
-                setInputValue('');
-                const newOptions = [...selected, option];
-                setSelected(newOptions);
-                onChange?.(newOptions);
-
-                if (newOptions.length >= maxSelected) {
-                    setOpen(false);
-                }
-            }}
-            className={cn(
-                'cursor-pointer',
-                option.disable && 'cursor-default text-muted-foreground',
-            )}
-        >
-            {option.label}
-        </CommandItem>
-    )
-}
