@@ -12,6 +12,7 @@ import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect } f
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -106,6 +107,7 @@ export const MilestoneTemplates = ({ selectedMilestoneTemplate, setSelectedMiles
                         <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
                         {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
                             <MilestoneTemplateCardSingleSelect
+                                className={cn(index === 0 ? "onborda-select-a-template": "")}
                                 key={`category-content-${index}`}
                                 milestoneData={milestoneData}
                                 selectedMilestoneTemplate={selectedMilestoneTemplate}

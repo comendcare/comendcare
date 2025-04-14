@@ -39,6 +39,7 @@ import Loading from "@/app/loading"
 import { MilestoneType } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
+import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -50,6 +51,10 @@ const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
     saveState: state.saveState,
     addMilestones: state.addMilestones
+})
+
+const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
+    step: state.step
 })
 
 export function Roadmap() {
@@ -66,6 +71,7 @@ export function Roadmap() {
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
+    const { step } = useResearchPlanOnbordaStore(useShallow(onbordaSelector))
     const {data: session} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -77,6 +83,12 @@ export function Roadmap() {
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
+
+    useEffect(() => {
+        if (step === ".onborda-select-a-template") {
+            setNewMilestoneIsOpen(true)
+        }
+    }, [step])
 
     useEffect(() => {
         const init = async () => {
@@ -223,40 +235,41 @@ export function Roadmap() {
                                 </div>
                             )}
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button 
-                                        size={"icon"} 
-                                        variant={"cta"} 
-                                        className="research-plan-tour-step1" 
-                                        onClick={() => setNewMilestoneIsOpen(true)}
-                                    >
-                                        <Plus />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Create a project`}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <span className="onborda-create-a-project flex flex-row items-center gap-x-1">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            size={"icon"} 
+                                            variant={"cta"}  
+                                            onClick={() => setNewMilestoneIsOpen(true)}
+                                        >
+                                            <Plus />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80">
+                                        <p>{`Create a project`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button 
-                                        disabled={milestoneTypes.length === 0}
-                                        onClick={() => {
-                                            console.log("Bulk import triggered")
-                                            setBulkImportIsOpen(true)
-                                        }} 
-                                        size={"icon"} 
-                                        variant={"ghost"}
-                                    >
-                                        <Import />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Import projects from .csv`}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            disabled={milestoneTypes.length === 0}
+                                            onClick={() => {
+                                                console.log("Bulk import triggered")
+                                                setBulkImportIsOpen(true)
+                                            }} 
+                                            size={"icon"} 
+                                            variant={"ghost"}
+                                        >
+                                            <Import />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80">
+                                        <p>{`Import projects from .csv`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </span>
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
