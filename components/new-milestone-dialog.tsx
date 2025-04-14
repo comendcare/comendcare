@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { MilestoneTemplates } from "./roadmap-templates"
+import RoadmapTemplates, { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
@@ -11,6 +11,9 @@ import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 import { Info, Plus } from "lucide-react"
+import { DialogDescription } from "@radix-ui/react-dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { ScrollArea } from "./ui/scroll-area"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -47,68 +50,94 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         }}>
             <DialogContent 
                 ref={dialogRef}
-                className="outline-none min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start gap-4" 
+                className="outline-none min-w-[80vw] min-h-[80vh] w-[80vw] flex flex-col justify-start gap-4" 
                 onOpenAutoFocus={(e) => {
                     e.preventDefault(); // Prevent default autofocus
                     setTimeout(() => dialogRef.current?.focus(), 0); // Focus the dialog
                 }}
                 tabIndex={-1} // Make it focusable
             >
-                <DialogHeader>
-                    <DialogTitle className="text-2xl">
-                        Create a project
-                    </DialogTitle>
-                </DialogHeader>
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl">
+                            Create projects
+                        </DialogTitle>
+                        <DialogDescription>
+                            Select projects from a research plan template to get started quickly with a curated set of projects, or select the individual projects you would like to add to your research plan.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                {/* <h2 className="text-2xl">1. Select a milestone template</h2> */}
-                <h2 className="text-2xl">Select a Project template</h2>
+                    <Tabs defaultValue="projects">
+                        <TabsList>
+                            <TabsTrigger value="projects">Project Templates</TabsTrigger>
+                            <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="projects" className="h-full">
+                            <MilestoneTemplates
+                                selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                createEmpty={() => {
+                                    // addMilestones([{name: 'New Milestone'}])
+                                }}
+                                inDialog={true}
+                            />
+                        </TabsContent>
+                        <TabsContent value="research-plans" className="h-full">
+                            {/* <MilestoneTemplates
+                                selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                createEmpty={() => {
+                                    // addMilestones([{name: 'New Milestone'}])
+                                }}
+                                inDialog={true}
+                            /> */}
+                            <ResearchPlanTemplates
+                                selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                createEmpty={() => {
+                                    // addMilestones([{name: 'New Milestone'}])
+                                }}
+                                inDialog={true}
+                            />
+                        </TabsContent>
+                    </Tabs>
 
-                <MilestoneTemplates
-                    selectedMilestonesTemplate={selectedMilestonesTemplate}
-                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
-                    createEmpty={() => {
-                        // addMilestones([{name: 'New Milestone'}])
-                    }}
-                    inDialog={true}
-                />
+                    <DialogFooter>
+                        <DialogClose>
+                            <Button variant="secondary" type="button">
+                                Cancel
+                            </Button>
+                        </DialogClose>
 
-                <DialogFooter>
-                    <DialogClose>
-                        <Button variant="secondary" type="button">
-                            Cancel
-                        </Button>
-                    </DialogClose>
-
-                    <DialogClose>
-                        <Button
-                            disabled={selectedMilestonesTemplate.length === 0 || milestoneTypes.length === 0}
-                            type="button"
-                            variant={"cta"}
-                            onClick={() => {
-                                console.log(`add milestone`, selectedMilestonesTemplate)
-                                addMilestones(selectedMilestonesTemplate.map((template: any) => {
-                                    return ({
-                                        nodeType: "PROJECT",
-                                        title: template?.title,
-                                        description: template?.description,
-                                        types: template?.types.map((type: string) => {
-                                            const milestoneType = milestoneTypes.find(t => t.id === type)
-                                            if (!milestoneType) return // milestone type not found, don't add it to created milestone
-                                            return ({ 
-                                                milestoneTypeId: type,
-                                                milestoneType
-                                             })
-                                        }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
-                                        status: template?.status,
-                                    })
-                                }))
-                            }}
-                        >
-                            <Plus />
-                            Create selected project
-                        </Button>
-                    </DialogClose>
-                </DialogFooter>
+                        <DialogClose>
+                            <Button
+                                disabled={selectedMilestonesTemplate.length === 0 || milestoneTypes.length === 0}
+                                type="button"
+                                variant={"cta"}
+                                onClick={() => {
+                                    console.log(`add milestone`, selectedMilestonesTemplate)
+                                    addMilestones(selectedMilestonesTemplate.map((template: any) => {
+                                        return ({
+                                            nodeType: "PROJECT",
+                                            title: template?.title,
+                                            description: template?.description,
+                                            types: template?.types.map((type: string) => {
+                                                const milestoneType = milestoneTypes.find(t => t.id === type)
+                                                if (!milestoneType) return // milestone type not found, don't add it to created milestone
+                                                return ({ 
+                                                    milestoneTypeId: type,
+                                                    milestoneType
+                                                })
+                                            }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
+                                            status: template?.status,
+                                        })
+                                    }))
+                                }}
+                            >
+                                <Plus />
+                                Create selected project
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
             </DialogContent>
         </Dialog>
     )
