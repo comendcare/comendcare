@@ -59,6 +59,16 @@ export const onbordaTours: Tour[] = [
                 pointerPadding: 10,
                 pointerRadius: 10
             },
+            {
+                icon: <>⭐</>,
+                title: "View marketplace recommendations",
+                content: <>{`Once you've added some details to your project, check out our marketplace recommendations. Marketplace recommendations include results that may be relevant to the contents or goals of your project.`}</>,
+                selector: ".onborda-recommendations",
+                side:  "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
             // {
             //     icon: <>⭐</>,
             //     title: "Connecting Milestones",
@@ -146,7 +156,8 @@ export type Selector =
     ".onborda-select-a-template" | 
     ".click-project-step" |
     ".onborda-editing-project-details" |
-    ".onborda-save-project"
+    ".onborda-save-project" | 
+    ".onborda-recommendations"
 
 export interface ResearchPlanOnbordaState {
     activeTour: string | undefined,
