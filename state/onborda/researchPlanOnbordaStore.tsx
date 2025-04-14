@@ -12,8 +12,8 @@ export const onbordaTours: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Create a Project",
-                content: <>{`Select one from our templates or import multiple at a time making a copy of our spreadsheet.`}</>,
-                selector: ".research-plan-tour-step1",
+                content: <>{`Create a project from a template or import multiple projects at a time.`}</>,
+                selector: ".onborda-create-a-project",
                 side: "bottom-right" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -22,33 +22,43 @@ export const onbordaTours: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Select a template",
-                content: <>{`Pick one of our templates to get started as a guide. You will be able to change the title and description.`}</>,
-                selector: ".research-plan-tour-step2",
+                content: <>{`Pick one of our project templates to get started. You will be able to edit the title and description.`}</>,
+                selector: ".onborda-select-a-template",
                 side:  "bottom-right" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Editing Milestones",
-                content: <>{`You can edit the details of a milestone in the edit panel.`}</>,
-                selector: ".research-plan-tour-step3",
-                side:  "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
             // {
             //     icon: <>⭐</>,
-            //     title: "Saving a Milestone",
-            //     content: <>{`Click the save button to submit your changes.`}</>,
-            //     selector: ".research-plan-tour-step4",
+            //     title: "Editing Projects",
+            //     content: <>{`Once you've created a project, select it to edit the project details.`}</>,
+            //     selector: ".click-project-step",
             //     side:  "bottom-right" as any,
             //     showControls: true,
             //     pointerPadding: 10,
             //     pointerRadius: 10
             // },
+            {
+                icon: <>⭐</>,
+                title: "Editing Project Details",
+                content: <>{`Once you've created a project you can view and edit the details in the project side panel.`}</>,
+                selector: ".onborda-editing-project-details",
+                side:  "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Saving a Project",
+                content: <>{`Click the save button to submit your changes.`}</>,
+                selector: ".onborda-save-project",
+                side:  "top-right" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
             // {
             //     icon: <>⭐</>,
             //     title: "Connecting Milestones",
@@ -132,12 +142,11 @@ export const onbordaTours: Tour[] = [
 ]
 
 export type Selector = 
-    ".research-plan-tour-step1" | 
-    ".research-plan-tour-step2" | 
-    ".research-plan-tour-step3" |
-    ".research-plan-tour-step4" |
-    ".research-plan-tour-step5" |
-    ".research-plan-tour-step6"
+    ".onborda-create-a-project" | 
+    ".onborda-select-a-template" | 
+    ".click-project-step" |
+    ".onborda-editing-project-details" |
+    ".onborda-save-project"
 
 export interface ResearchPlanOnbordaState {
     activeTour: string | undefined,

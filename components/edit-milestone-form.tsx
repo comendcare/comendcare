@@ -421,7 +421,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className="research-plan-tour-step3 px-8 pb-4 h-full">
+            <ScrollArea className="onborda-editing-project-details px-8 pb-4 h-full">
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
@@ -771,7 +771,7 @@ export function EditMilestoneForm({
                                         disabled={!form.formState.isValid}
                                         variant={"cta"}
                                         id="edit-milestone-scroll-area"
-                                        className="research-plan-tour-step4"
+                                        className="onborda-save-project"
                                         onClick={() => {
                                             handleMilestoneFormSubmit(form.getValues())
                                             onClose()

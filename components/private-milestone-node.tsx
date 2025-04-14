@@ -107,8 +107,8 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     return (
         <Card className={cn(
             "w-[350px] text-wrap break-words",
-            selectedNodeId === props?.id ? "border-black border-2" : "",
-            props.id === "preview" ? "opacity-50" : ""
+            selectedNodeId === props?.id ? "border-black border-2 click-project-step" : "",
+            props.id === "preview" ? "opacity-50" : "",
         )}>
             <CardHeader>
                 <div className="flex flex-row align-center items-center justify-end gap-4">
@@ -183,9 +183,9 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             {props.id !== "preview" && (
                 <>
                     <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
-                    <NodeHandle className={cn(props.data?.onboardingMilestone ? "research-plan-tour-step5" : "")}
-                                type="source" position={Position.Right}
-                                node={props as NodeProps<PrivateMilestoneNode>}/>
+                    <NodeHandle 
+                        type="source" position={Position.Right}
+                        node={props as NodeProps<PrivateMilestoneNode>}/>
                 </>
             )}
         </Card>
