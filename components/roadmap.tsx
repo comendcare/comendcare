@@ -85,7 +85,7 @@ export function Roadmap() {
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
 
     useEffect(() => {
-        if (step === ".research-plan-tour-step2") {
+        if (step === ".onborda-select-a-template") {
             setNewMilestoneIsOpen(true)
         }
     }, [step])
@@ -235,7 +235,7 @@ export function Roadmap() {
                                 </div>
                             )}
 
-                            <span className="research-plan-tour-step1 flex flex-row items-center gap-x-1">
+                            <span className="onborda-create-a-project flex flex-row items-center gap-x-1">
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button 

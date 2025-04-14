@@ -103,31 +103,37 @@ const Onborda: React.FC<OnbordaProps> = ({
   // - -
   // Update pointerPosition when currentStep changes
   useEffect(() => {
-    if (isOnbordaVisible && currentTourSteps) {
-      console.log("Onborda: Current Step Changed, pointerPosition changed");
-      const step = currentTourSteps[currentStep];
-
-      // handle zustand state
-      setActiveTour(currentTour || undefined)
-      setStep(step.selector as Selector || undefined)
-
-      if (step) {
-        const element = document.querySelector(step.selector) as Element | null;
-        if (element) {
-          setPointerPosition(getElementPosition(element));
-          currentElementRef.current = element;
-          setElementToScroll(element);
-
-          const rect = element.getBoundingClientRect();
-          const isInViewportWithOffset =
-            rect.top >= -offset && rect.bottom <= window.innerHeight + offset;
-
-          if (!isInView || !isInViewportWithOffset) {
-            // element.scrollIntoView({ behavior: "smooth", block: "center" });
+    const update = async () => {
+      if (isOnbordaVisible && currentTourSteps) {
+        console.log("Onborda: Current Step Changed, pointerPosition changed");
+        const step = currentTourSteps[currentStep];
+  
+        // handle zustand state
+        setActiveTour(currentTour || undefined)
+        setStep(step.selector as Selector || undefined)
+  
+        await sleep(1000)
+  
+        if (step) {
+          const element = document.querySelector(step.selector) as Element | null;
+          if (element) {
+            setPointerPosition(getElementPosition(element));
+            currentElementRef.current = element;
+            setElementToScroll(element);
+  
+            const rect = element.getBoundingClientRect();
+            const isInViewportWithOffset =
+              rect.top >= -offset && rect.bottom <= window.innerHeight + offset;
+  
+            if (!isInView || !isInViewportWithOffset) {
+              // element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
           }
         }
       }
     }
+
+    update()
   }, [currentStep, currentTourSteps, isInView, offset, isOnbordaVisible]);
 
   useEffect(() => {
