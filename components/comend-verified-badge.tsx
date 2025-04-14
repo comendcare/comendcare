@@ -8,7 +8,7 @@ export default function ComendVerifiedBadge({verified}: {verified: boolean}) {
             <HoverCardTrigger asChild>
                 {verified ?
                     <span
-                        className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-emerald-700 h-fit w-fit"
+                        className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-emerald-900 h-fit w-fit"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
