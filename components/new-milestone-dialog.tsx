@@ -21,8 +21,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         addMilestones,
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
-    const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
-    // const [selectedMilestoneType, setSelectedMilestoneType] = useState<string>("ASSET")
+    const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -42,8 +41,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     return (
         <Dialog open={open} onOpenChange={(open: boolean) => {
             if (!open) {
-                setSelectedMilestoneTemplate(undefined)
-                // setSelectedMilestoneType("ASSET")
+                setSelectedMilestonesTemplate([])
             }
             setOpen(open)
         }}>
@@ -66,45 +64,13 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                 <h2 className="text-2xl">Select a Project template</h2>
 
                 <MilestoneTemplates
-                    selectedMilestoneTemplate={selectedMilestoneTemplate}
-                    setSelectedMilestoneTemplate={setSelectedMilestoneTemplate}
+                    selectedMilestonesTemplate={selectedMilestonesTemplate}
+                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
                     createEmpty={() => {
                         // addMilestones([{name: 'New Milestone'}])
                     }}
                     inDialog={true}
                 />
-
-                {/* <h2 className="text-2xl">2. Select a category for your milestone</h2>
-
-                <ToggleGroup
-                        type="single"
-                        variant="outline"
-                        value={selectedMilestoneType}
-                        onValueChange={(value: string) => {
-                            if (value) {
-                                setSelectedMilestoneType(value)
-                            }
-                        }}
-                        className="w-full flex flex-wrap gap-2 justify-between"
-                >
-                    {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                        <ToggleGroupItem
-                            key={value}
-                            value={value}
-                            className={"text-md grow flex gap-2"}
-                        >
-                            {label}
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Info className="h-4 w-4"/>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                    {description}
-                                </TooltipContent>
-                            </Tooltip>
-                        </ToggleGroupItem>
-                    ))}
-                </ToggleGroup> */}
 
                 <DialogFooter>
                     <DialogClose>
@@ -115,15 +81,13 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
                     <DialogClose>
                         <Button
-                            // disabled={!selectedMilestoneTemplate || !selectedMilestoneType || milestoneTypes.length === 0}
-                            disabled={!selectedMilestoneTemplate || milestoneTypes.length === 0}
+                            disabled={selectedMilestonesTemplate.length === 0 || milestoneTypes.length === 0}
                             type="button"
                             variant={"cta"}
                             onClick={() => {
-                                console.log(`add milestone`, selectedMilestoneTemplate)
-                                addMilestones([selectedMilestoneTemplate].map((template: any) => {
+                                console.log(`add milestone`, selectedMilestonesTemplate)
+                                addMilestones(selectedMilestonesTemplate.map((template: any) => {
                                     return ({
-                                        // nodeType: selectedMilestoneType as NodeType,
                                         nodeType: "PROJECT",
                                         title: template?.title,
                                         description: template?.description,
