@@ -83,9 +83,10 @@ export function Roadmap() {
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
+    const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
 
     useEffect(() => {
-        if (step === ".onborda-select-a-template") {
+        if (step === ".onborda-select-a-template" && isOnbordaVisible) {
             setNewMilestoneIsOpen(true)
         }
     }, [step])
