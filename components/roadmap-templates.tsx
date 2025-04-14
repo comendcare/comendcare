@@ -12,6 +12,7 @@ import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect } f
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -95,7 +96,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
     )
 }
 
-export const MilestoneTemplates = ({ selectedMilestoneTemplate, setSelectedMilestoneTemplate, createEmpty, inDialog = false }: {selectedMilestoneTemplate: any, setSelectedMilestoneTemplate: (value: SetStateAction<any>) => void, createEmpty: () => void, inDialog?: boolean}) => {
+export const MilestoneTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, createEmpty, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, createEmpty: () => void, inDialog?: boolean}) => {
     const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
     
     return(
@@ -105,11 +106,17 @@ export const MilestoneTemplates = ({ selectedMilestoneTemplate, setSelectedMiles
                     <>
                         <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
                         {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
-                            <MilestoneTemplateCardSingleSelect
-                                key={`category-content-${index}`}
+                            // <MilestoneTemplateCardSingleSelect
+                            //     className={cn(index === 0 ? "onborda-select-a-template": "")}
+                            //     key={`category-content-${index}`}
+                            //     milestoneData={milestoneData}
+                            //     selectedMilestoneTemplate={selectedMilestoneTemplate}
+                            //     setSelectedMilestoneTemplate={setSelectedMilestoneTemplate}
+                            // />
+                            <MilestoneTemplateCardMultiSelect 
                                 milestoneData={milestoneData}
-                                selectedMilestoneTemplate={selectedMilestoneTemplate}
-                                setSelectedMilestoneTemplate={setSelectedMilestoneTemplate}
+                                selectedMilestones={selectedMilestonesTemplate}
+                                setSelectedMilestones={setSelectedMilestonesTemplate}
                             />
                         ))}
                     </>

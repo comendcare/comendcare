@@ -72,10 +72,16 @@ import { NotificationsState, useNotificationsStore } from "@/state/notifications
 import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
 import { toast } from "sonner"
 import { badgeVariants } from "./ui/badge"
+import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
+
+const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
+    step: state.step
+})
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -135,9 +141,11 @@ const editMilestoneForm = z.object({
 
 export function EditMilestoneForm({
     milestoneData,
+    orgIsPublished,
     onClose
 }: {
     milestoneData: Milestone
+    orgIsPublished: boolean
     onClose: () => void
 }) {
     const { setMilestone } = useRoadmapStore(useShallow(selector))
@@ -145,12 +153,14 @@ export function EditMilestoneForm({
     const { initialized: notificationsInitialized, notifications, addNotification, setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
-    const [orgIsPublished, setOrgIsPublished] = useState(false)
+    // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
+    const { step } = useResearchPlanOnbordaStore(useShallow(onbordaSelector))
+    const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -311,10 +321,10 @@ export function EditMilestoneForm({
     useEffect(() => {
         const init = async () => {
             if (session?.user.organizationId) {
-                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
+                // const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                // if (response.success && response.data) {
+                //     setOrgIsPublished(response.data.published)
+                // }
 
                 const assetsResponse = await getAssets(session.user.organizationId)
                 if (assetsResponse.success && assetsResponse.data) {
@@ -419,9 +429,16 @@ export function EditMilestoneForm({
         if (initializing.current === false) form.trigger()
     }, [formData.startDate, formData.endDate])
 
+    // handle onborda steps
+    useEffect(() => {
+        if (step === ".onborda-recommendations" && isOnbordaVisible) {
+            setTab("recommendations")
+        }
+    }, [step])
+
     return (
         <Form {...form}>
-            <ScrollArea className="research-plan-tour-step3 px-8 pb-4 h-full">
+            <ScrollArea className="onborda-editing-project-details onborda-recommendations px-8 pb-4 h-full">
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
@@ -771,7 +788,7 @@ export function EditMilestoneForm({
                                         disabled={!form.formState.isValid}
                                         variant={"cta"}
                                         id="edit-milestone-scroll-area"
-                                        className="research-plan-tour-step4"
+                                        className="onborda-save-project"
                                         onClick={() => {
                                             handleMilestoneFormSubmit(form.getValues())
                                             onClose()
@@ -859,7 +876,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
-                                badgeClassName={badgeVariants({variant: "milestoneType"})}
+                                badgeClassName={badgeVariants({variant: "blue"})}
                                 defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 options={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
@@ -907,76 +924,141 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
 }
 
 export const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any, formData: any, disabled?: boolean }) => {
-    return (
-        <FormField
-            control={form.control}
-            name="isPrivate"
-            render={({field}) => (
-                <span className="h-full items-center flex flex-row justify-end gap-4">
-                    <FormControl>
-                     <Tooltip disableHoverableContent={disabled}>
-                        <TooltipTrigger disabled={disabled} asChild>
-                            <RadioGroup
-                                onValueChange={(value)=> {
-                                    form.setValue("isPrivate", value === "PRIVATE")
-                                }}
-                                defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-                                className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
-                                disabled={disabled}
-                            >
-                                <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                        <span className="flex gap-2">
-                                            <RadioGroupItem value="PRIVATE" />
-                                            <Tooltip disableHoverableContent={disabled}>
-                                                <TooltipTrigger disabled={disabled} asChild>
+    if (disabled) {
+        return (
+            <FormField
+                control={form.control}
+                name="isPrivate"
+                render={({field}) => (
+                    <span className="h-full items-center flex flex-row justify-end gap-4">
+                        <FormControl>
+                         <Tooltip>
+                            <TooltipTrigger>
+                                <RadioGroup
+                                    onValueChange={(value)=> {
+                                        form.setValue("isPrivate", value === "PRIVATE")
+                                    }}
+                                    defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                                    className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
+                                    disabled={disabled}
+                                >
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <span className="flex gap-2">
+                                                <RadioGroupItem value="PRIVATE" />
+                                                {/* <Tooltip disableHoverableContent={disabled}>
+                                                    <TooltipTrigger disabled={disabled} asChild> */}
+                                                        <FormLabel className="font-normal flex gap-1 items-center">
+                                                            <Lock className="h-4 w-4"/>
+                                                            {`Private`}
+                                                        </FormLabel>
+                                                    {/* </TooltipTrigger>
+                                                    {!disabled && (
+                                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                                            {`Private projects are only visible to your team.`}
+                                                        </TooltipContent>
+                                                    )}
+                                                </Tooltip> */}
+                                            </span>
+                                        </FormControl>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <span className="flex gap-2">
+                                                <RadioGroupItem value="PUBLIC" />
+                                                {/* <Tooltip disableHoverableContent={disabled}>
+                                                <TooltipTrigger disabled={disabled} asChild> */}
                                                     <FormLabel className="font-normal flex gap-1 items-center">
-                                                        <Lock className="h-4 w-4"/>
-                                                        {`Private`}
+                                                        <Globe className="h-4 w-4"/>
+                                                        {`Public`}
                                                     </FormLabel>
-                                                </TooltipTrigger>
+                                                {/* </TooltipTrigger>
                                                 {!disabled && (
                                                     <TooltipContent className="max-w-80 text-wrap text-left">
-                                                        {`Private projects are only visible to your team.`}
+                                                        {`Public projects are visible on your profile and discoverable in the marketplace.`}
                                                     </TooltipContent>
                                                 )}
-                                            </Tooltip>
-                                        </span>
-                                    </FormControl>
-                                </FormItem>
-                                <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                        <span className="flex gap-2">
-                                            <RadioGroupItem value="PUBLIC" />
-                                            <Tooltip disableHoverableContent={disabled}>
+                                            </Tooltip> */}
+                                            </span>
+                                        </FormControl>
+                                    </FormItem>
+                                </RadioGroup>
+                            </TooltipTrigger>
+                            {disabled && (
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                    {`Publish your organization to create public projects.`}
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                        </FormControl>
+                        <FormMessage/>
+                    </span>
+                )}
+            />
+        )
+    }
+
+    return (
+        <FormField
+        control={form.control}
+        name="isPrivate"
+        render={({field}) => (
+            <span className="h-full items-center flex flex-row justify-end gap-4">
+                <FormControl>
+                        <RadioGroup
+                            onValueChange={(value)=> {
+                                form.setValue("isPrivate", value === "PRIVATE")
+                            }}
+                            defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                            className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
+                            disabled={disabled}
+                        >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                    <span className="flex gap-2">
+                                        <RadioGroupItem value="PRIVATE" />
+                                        <Tooltip disableHoverableContent={disabled}>
                                             <TooltipTrigger disabled={disabled} asChild>
                                                 <FormLabel className="font-normal flex gap-1 items-center">
-                                                    <Globe className="h-4 w-4"/>
-                                                    {`Public`}
+                                                    <Lock className="h-4 w-4"/>
+                                                    {`Private`}
                                                 </FormLabel>
                                             </TooltipTrigger>
                                             {!disabled && (
                                                 <TooltipContent className="max-w-80 text-wrap text-left">
-                                                    {`Public projects are visible on your profile and discoverable in the marketplace.`}
+                                                    {`Private projects are only visible to your team.`}
                                                 </TooltipContent>
                                             )}
                                         </Tooltip>
-                                        </span>
-                                    </FormControl>
-                                </FormItem>
-                            </RadioGroup>
-                        </TooltipTrigger>
-                        {disabled && (
-                            <TooltipContent className="max-w-80 text-wrap text-left">
-                                {`Publish your organization to create public projects.`}
-                            </TooltipContent>
-                        )}
-                    </Tooltip>
-                    </FormControl>
-                    <FormMessage/>
-                </span>
-            )}
-        />
+                                    </span>
+                                </FormControl>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                    <span className="flex gap-2">
+                                        <RadioGroupItem value="PUBLIC" />
+                                        <Tooltip disableHoverableContent={disabled}>
+                                        <TooltipTrigger disabled={disabled} asChild>
+                                            <FormLabel className="font-normal flex gap-1 items-center">
+                                                <Globe className="h-4 w-4"/>
+                                                {`Public`}
+                                            </FormLabel>
+                                        </TooltipTrigger>
+                                        {!disabled && (
+                                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                                {`Public projects are visible on your profile and discoverable in the marketplace.`}
+                                            </TooltipContent>
+                                        )}
+                                    </Tooltip>
+                                    </span>
+                                </FormControl>
+                            </FormItem>
+                        </RadioGroup>
+                </FormControl>
+                <FormMessage/>
+            </span>
+        )}
+    />
     )
 }
 

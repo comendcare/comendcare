@@ -26,7 +26,7 @@ import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
 import { handleImageUpload } from "@/lib/upload";
-import { FormImageCropper } from "./edit-pag-profile-page-dialog";
+import { FormImageCropper } from "./form-image-cropper";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),

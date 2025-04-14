@@ -148,9 +148,6 @@ export const createCondition = async (formData: FormData) => {
     const name = formData.get("name") as string;
     const summary = formData.get("summary") as string;
     const slug = toKebabCase(name);
-    const interestedModalities = formData.get("interestedModalities")
-        ? (formData.get("interestedModalities") as string).split(",")
-        : [];
     const diseaseCategories = formData.get("diseaseCategories")
         ? (formData.get("diseaseCategories") as string).split(",")
         : [];
@@ -190,9 +187,6 @@ export const createCondition = async (formData: FormData) => {
     const assetsUnderDevelopment = formData.get("assetsUnderDevelopment")
         ? (formData.get("assetsUnderDevelopment") as string).split(",")
         : [];
-    const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
-        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
-        : [];
 
     try {
         const condition = await prisma.condition.create({
@@ -200,7 +194,6 @@ export const createCondition = async (formData: FormData) => {
                 name,
                 summary,
                 slug,
-                interestedModalities,
                 diseaseCategories,
                 prevalenceNumerator,
                 prevalenceDenominator,
@@ -214,7 +207,6 @@ export const createCondition = async (formData: FormData) => {
                 associatedSignsAndSymptoms,
                 existingDatabasesAndStudies,
                 assetsUnderDevelopment,
-                therapeuticsInDevelopment,
             }
         });
 
@@ -299,6 +291,12 @@ export const createOrganization = async (formData: FormData) => {
     const lat = formData.get("lat") as string | null;
     const lng = formData.get("lng") as string | null;
     const image = formData.get("image") as string | null;
+    const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
+        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
+        : [];
+    const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
+        ? (formData.get("therapeuticsOfInterest") as string).split(",")
+        : [];
 
     try {
         const organization = await prisma.organization.upsert({
@@ -313,6 +311,8 @@ export const createOrganization = async (formData: FormData) => {
                 contactEmail,
                 website,
                 incorporationStatus,
+                therapeuticsInDevelopment,
+                therapeuticsOfInterest,
                 address1,
                 address2,
                 formattedAddress,
@@ -333,6 +333,8 @@ export const createOrganization = async (formData: FormData) => {
                 contactEmail,
                 website,
                 incorporationStatus,
+                therapeuticsInDevelopment,
+                therapeuticsOfInterest,
                 address1,
                 address2,
                 formattedAddress,
@@ -601,6 +603,14 @@ export const updateOrganization = withOrganizationAuth(
             if ((key === "image" || key === "headerImage") && !value) {
                 // remove image
                 data[key] = null
+            }
+
+            if (key === "therapeuticsInDevelopment") {
+                data[key] = value.toString().split(",");
+            }
+
+            if (key === "therapeuticsOfInterest") {
+                data[key] = value.toString().split(",");
             }
 
         });

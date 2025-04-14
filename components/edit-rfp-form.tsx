@@ -389,7 +389,7 @@ export function EditRFPForm({
                                 <FormLabel >{`Linked Projects`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
-                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title}))}
+                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title})) as Option[]}
                                         onChange={field.onChange}
                                         defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
                                         options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}

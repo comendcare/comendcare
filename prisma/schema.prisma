@@ -450,55 +450,57 @@ model Edge {
 }
 
 model Organization {
-  id                       String                    @id @default(cuid())
-  public                   Boolean                   @default(true)
-  verified                 Boolean                   @default(false)
-  published                Boolean                   @default(true)
-  name                     String?
-  description              String?                   @db.Text
-  contactEmail             String?
-  logo                     String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
-  font                     String                    @default("font-cal")
-  image                    String?                   @db.Text
-  imageBlurhash            String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
-  headerImage              String?                   @db.Text
-  biopharmaConsentSettings Boolean                   @default(false)
-  subdomain                String?                   @unique
-  customDomain             String?                   @unique
-  message404               String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
-  statedGoal               Goal?
-  yearFounded              String?
-  incorporationStatus      IncorporationStatus?
-  website                  String?
-  moneyRaised              Int?
-  moneyDeployed            Int?
-  researchBudget           Int?
-  address1                 String?
-  address2                 String?
-  formattedAddress         String?
-  city                     String?
-  region                   String?
-  postalCode               String?
-  country                  String?
-  lat                      String?
-  lng                      String?
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
-  user                     User?                     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  userId                   String?
-  roadmaps                 Roadmap[]
-  members                  Member[]
-  client                   Client[]
-  invitation               Invitation[]
-  membershipRequest        MemberRequest[]
-  condition                ConditionToOrganization[]
-  Kanban                   Kanban?
-  Milestone                Milestone[]
-  PlatformNotification     PlatformNotification[]
-  reviews                  Review[]
-  savedCompanies           SavedCompany[]
-  Asset                    Asset[]
-  RFP                      RFP[]
+  id                        String                    @id @default(cuid())
+  public                    Boolean                   @default(true)
+  verified                  Boolean                   @default(false)
+  published                 Boolean                   @default(true)
+  name                      String?
+  description               String?                   @db.Text
+  contactEmail              String?
+  logo                      String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
+  font                      String                    @default("font-cal")
+  image                     String?                   @db.Text
+  imageBlurhash             String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  headerImage               String?                   @db.Text
+  biopharmaConsentSettings  Boolean                   @default(false)
+  subdomain                 String?                   @unique
+  customDomain              String?                   @unique
+  message404                String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
+  statedGoal                Goal?
+  yearFounded               String?
+  incorporationStatus       IncorporationStatus?
+  therapeuticsOfInterest    String[]
+  therapeuticsInDevelopment String[]
+  website                   String?
+  moneyRaised               Int?
+  moneyDeployed             Int?
+  researchBudget            Int?
+  address1                  String?
+  address2                  String?
+  formattedAddress          String?
+  city                      String?
+  region                    String?
+  postalCode                String?
+  country                   String?
+  lat                       String?
+  lng                       String?
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @updatedAt
+  user                      User?                     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId                    String?
+  roadmaps                  Roadmap[]
+  members                   Member[]
+  client                    Client[]
+  invitation                Invitation[]
+  membershipRequest         MemberRequest[]
+  condition                 ConditionToOrganization[]
+  Kanban                    Kanban?
+  Milestone                 Milestone[]
+  PlatformNotification      PlatformNotification[]
+  reviews                   Review[]
+  savedCompanies            SavedCompany[]
+  Asset                     Asset[]
+  RFP                       RFP[]
 
   @@index([userId])
 }
@@ -520,8 +522,6 @@ model Condition {
   name                        String
   slug                        String                    @unique
   description                 String?
-  interestedModalities        String[]
-  therapeuticsInDevelopment   String[]
   diseaseCategories           String[]
   prevalenceNumerator         Int?
   prevalenceDenominator       Int?

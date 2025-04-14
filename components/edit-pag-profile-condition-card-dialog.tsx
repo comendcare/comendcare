@@ -63,9 +63,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
-                            therapeutics: condition.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
                             categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
-                            modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
                             causal: condition.causalGenes.map((gene) => ({label: gene, value: gene})) || [],
                             genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
                             systems: condition.associatedSystems.map((system) => ({
@@ -116,8 +114,6 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             const mappedData: Record<string, any> = {
                 name: values.disorder || "",
                 summary: values.summary || "",
-                therapeuticsInDevelopment: values.therapeutics?.map((item) => item.label) || [],
-                interestedModalities: values.modalities?.map((item) => item.label) || [],
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
@@ -412,99 +408,6 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                     id="systems-other"
                                                     value={otherSystem}
                                                     onChange={(e) => setOtherSystem(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="therapeutics"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics under development
-                                        </FormLabel>
-                                        <FormDescription>
-                                            Select all that apply.
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {editResearchForm.watch("therapeutics")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
-                                                    value={otherModality}
-                                                    onChange={(e) => setOtherModality(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="modalities"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics of interest
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`The treatment modalities of interest of your organization. Select all that apply.`}
-                                            <Tooltip delayDuration={0}>
-                                                <TooltipTrigger>
-                                                    <Info
-                                                        className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>
-                                                        {`This will help us match you with the experts of your particular modality.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                hidePlaceholderWhenSelected={true}
-                                                placeholder="Select modalities you like..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {editResearchForm.watch("modalities")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
-                                                    value={otherModality}
-                                                    onChange={(e) => setOtherModality(e.target.value)}
                                                 />
                                             </div>
                                         )}
