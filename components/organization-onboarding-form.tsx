@@ -295,6 +295,9 @@ export default function OrganizationOnboardingForm(
             const formData = new FormData()
 
             Object.entries(values).forEach(([key, value]) => {
+                if (key === "therapeuticsInDevelopment") return
+                if (key === "therapeuticsOfInterest") return
+
                 if (value !== undefined) {
                     formData.append(key, value.toString());
                 }
@@ -326,7 +329,32 @@ export default function OrganizationOnboardingForm(
                     return
                 }
             }
-            console.log(formData)
+
+            // console.log(values.therapeuticsInDevelopment)
+            // console.log(values.therapeuticsOfInterest)
+            // console.log("asdf")
+            // const therapeuticsInDevelopment = values.therapeuticsInDevelopment?.map((item) =>
+            //     item.value
+            // ).join(",") || ""
+            // const therapeuticsOfInterest = values.therapeuticsOfInterest?.map((item) =>
+            //     item.value
+            // ).join(",") || ""
+            // console.log(therapeuticsInDevelopment)
+            // console.log(therapeuticsOfInterest)
+            // formData.append("therapeuticsInDevelopment", therapeuticsInDevelopment)
+            // formData.append("therapeuticsOfInterest", therapeuticsOfInterest)
+            // console.log(formData.get("therapeuticsInDevelopment"))
+            // console.log(formData.get("therapeuticsOfInterest"))
+
+            const data = {
+                therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
+                therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (value) {
+                    formData.append(key, value)
+                }
+            });
 
             createOrganization(formData).then((res: any) => {
                 if (res.error) {
