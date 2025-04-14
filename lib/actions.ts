@@ -297,9 +297,6 @@ export const createOrganization = async (formData: FormData) => {
     const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
         ? (formData.get("therapeuticsOfInterest") as string).split(",")
         : [];
-    console.log(therapeuticsOfInterest)
-    console.log(therapeuticsInDevelopment)
-    console.log("fuck")
 
     try {
         const organization = await prisma.organization.upsert({
@@ -606,6 +603,14 @@ export const updateOrganization = withOrganizationAuth(
             if ((key === "image" || key === "headerImage") && !value) {
                 // remove image
                 data[key] = null
+            }
+
+            if (key === "therapeuticsInDevelopment") {
+                data[key] = value.toString().split(",");
+            }
+
+            if (key === "therapeuticsOfInterest") {
+                data[key] = value.toString().split(",");
             }
 
         });
