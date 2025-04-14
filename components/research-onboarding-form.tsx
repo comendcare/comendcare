@@ -160,23 +160,11 @@ export default function ResearchOnboardingForm(
         }
     }
 
-    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
+    const handleAsyncSearch = async (query: string) => {
+        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+        const genes = await res.json();
 
-        setLoading(true);
-
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        } finally {
-            setLoading(false);
-        }
+        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
     };
 
     useEffect(() => {
@@ -285,8 +273,14 @@ export default function ResearchOnboardingForm(
                                                 {...field}
                                                 onSearch={handleAsyncSearch}
                                                 placeholder="Search for genes..."
+                                                triggerSearchOnFocus={true}
                                                 hidePlaceholderWhenSelected={true}
-                                                loadingIndicator={<p>Loading genes...</p>}
+                                                loadingIndicator={
+                                                <p
+                                                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                >
+                                                    Loading genes...
+                                                </p>}
                                                 emptyIndicator={<p>No genes found.</p>}
                                                 showHoverCard={false}
                                             />
