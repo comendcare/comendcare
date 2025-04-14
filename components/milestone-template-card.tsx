@@ -40,7 +40,7 @@ export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilest
     )
 }
 
-export function MilestoneTemplateCardSingleSelect({ milestoneData, selectedMilestoneTemplate, setSelectedMilestoneTemplate }: {milestoneData: any, selectedMilestoneTemplate: any, setSelectedMilestoneTemplate: (value: SetStateAction<any>) => void}) {
+export function MilestoneTemplateCardSingleSelect({ milestoneData, selectedMilestoneTemplate, setSelectedMilestoneTemplate, className }: {milestoneData: any, selectedMilestoneTemplate: any, setSelectedMilestoneTemplate: (value: SetStateAction<any>) => void, className?: string}) {
     const handleCheck = () => {
         if (milestoneData.title !== selectedMilestoneTemplate?.title) {
             setSelectedMilestoneTemplate(milestoneData)
@@ -50,7 +50,7 @@ export function MilestoneTemplateCardSingleSelect({ milestoneData, selectedMiles
     }
     
     return (
-        <button onClick={handleCheck}>
+        <button onClick={handleCheck} className={className}>
             <Card 
                 className="relative h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer"
             >

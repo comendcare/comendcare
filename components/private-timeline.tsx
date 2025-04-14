@@ -214,7 +214,8 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
             style={style}
             className={cn( 
                 "text-left hover:cursor-pointer flex items-start -ml-[54px] gap-2",
-                isDragging ? "z-20" : ""
+                isDragging ? "z-20" : "",
+                index === 0 ? "click-project-step" : ""
             )}
             onClick={() => {handleEditClick(milestone.nodeId)}}
         >
