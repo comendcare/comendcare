@@ -544,44 +544,6 @@ export default function EditConditionProfileDialog() {
                         )}
                     />
 
-                    <FormField
-                        control={conditionProfileForm.control}
-                        name="modalities"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Modalities</FormLabel>
-                                <FormDescription className="flex items-center">
-                                    {`The treatment modalities of interest by your organization.`}
-                                    <Tooltip delayDuration={0}>
-                                        <TooltipTrigger>
-                                            <Info
-                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>
-                                                {`This will help us match you with the experts of your particular modality.`}
-                                            </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </FormDescription>
-                                <FormControl>
-                                    <MultipleSelector
-                                        {...field}
-                                        defaultOptions={OPTIONS}
-                                        placeholder="Select modalities you like..."
-                                        hidePlaceholderWhenSelected={true}
-                                        emptyIndicator={
-                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                no results found.
-                                            </p>
-                                        }
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
                     <div className="flex flex-col">
                         <FormField
                             control={conditionProfileForm.control}
