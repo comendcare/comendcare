@@ -18,8 +18,8 @@ const badgeVariants = cva(
                     "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
                 positive: "border-transparent bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20",
                 outline: "text-foreground",
-                milestoneType: "border-transparent bg-blue-light text-blue-dark",
-                certification: "border-transparent bg-emerald-100 text-emerald-700"
+                blue: "border-transparent bg-blue-light text-blue-dark hover:bg-blue-light",
+                green: "border-transparent bg-emerald-100 text-emerald-700 hover:bg-emerald-100"
             },
             size: {
                 default: "px-2.5 py-0.5 text-md",
