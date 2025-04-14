@@ -141,9 +141,11 @@ const editMilestoneForm = z.object({
 
 export function EditMilestoneForm({
     milestoneData,
+    orgIsPublished,
     onClose
 }: {
     milestoneData: Milestone
+    orgIsPublished: boolean
     onClose: () => void
 }) {
     const { setMilestone } = useRoadmapStore(useShallow(selector))
@@ -151,7 +153,7 @@ export function EditMilestoneForm({
     const { initialized: notificationsInitialized, notifications, addNotification, setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
-    const [orgIsPublished, setOrgIsPublished] = useState(false)
+    // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
@@ -319,10 +321,10 @@ export function EditMilestoneForm({
     useEffect(() => {
         const init = async () => {
             if (session?.user.organizationId) {
-                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
+                // const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                // if (response.success && response.data) {
+                //     setOrgIsPublished(response.data.published)
+                // }
 
                 const assetsResponse = await getAssets(session.user.organizationId)
                 if (assetsResponse.success && assetsResponse.data) {
