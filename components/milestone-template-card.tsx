@@ -62,6 +62,12 @@ export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedMiles
                     <CardDescription>
                         {researchPlanData.description}
                     </CardDescription>
+
+                    <ol className="list-decimal pl-4">
+                        {researchPlanData.milestones.map((milestone: any) => (
+                            <li>{milestone.title}</li>
+                        ))}
+                    </ol>
                 </CardContent>
             </Card>
         </button>
