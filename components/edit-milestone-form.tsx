@@ -697,7 +697,7 @@ export function EditMilestoneForm({
                                             <FormItem className="w-full mt-2">
                                                 <FormControl>
                                                     <MultipleSelector
-                                                        value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title}))}
+                                                        value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
                                                         onChange={field.onChange}
                                                         defaultOptions={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
                                                         options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
@@ -724,10 +724,10 @@ export function EditMilestoneForm({
                                             <FormItem className="w-full">
                                                 <FormControl>
                                                     <MultipleSelector
-                                                        value={field.value?.map(rfp => ({...rfp, value: rfp.id, label: rfp.title}))}
+                                                        value={field.value?.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as Option))}
                                                         onChange={field.onChange}
-                                                        defaultOptions={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as any))}
-                                                        options={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as any))}
+                                                        defaultOptions={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as Option))}
+                                                        options={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as Option))}
                                                         hidePlaceholderWhenSelected={true}
                                                         showHoverCard={false}
                                                         placeholder="Link RFPs"
