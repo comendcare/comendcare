@@ -53,7 +53,7 @@ export function DataTableRowActions<TData extends Asset>({row}: DataTableRowActi
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <DialogContent>
+            {/* <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
                         Edit an Asset
@@ -62,8 +62,8 @@ export function DataTableRowActions<TData extends Asset>({row}: DataTableRowActi
                         {`Edit your Asset here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={{...row.original}} closeDialog={closeDialog}/>
-            </DialogContent>
+                <EditAssetForm assetData={{...row.original}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+            </DialogContent> */}
         </Dialog>
     )
 }
