@@ -4,11 +4,11 @@ import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import { ScrollArea} from "./ui/scroll-area";
 import { SetStateAction, useState } from "react";
-import { templateMilestones } from '@/lib/templates'
+import { templateMilestones, templateResearchPlans } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect } from "./milestone-template-card";
+import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
@@ -121,25 +121,20 @@ export const MilestoneTemplates = ({ selectedMilestonesTemplate, setSelectedMile
     )
 }
 
-export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, createEmpty, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, createEmpty: () => void, inDialog?: boolean}) => {
-    const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
+export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
+    // const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
     
     return(
         <div className="h-[50vh] max-h-[50vh]">
         <ScrollArea type="always" className="h-full">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                {/* {allCategories.map((category, index) => (
-                    <>
-                        <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
-                        {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
-                            <MilestoneTemplateCardMultiSelect 
-                                milestoneData={milestoneData}
-                                selectedMilestones={selectedMilestonesTemplate}
-                                setSelectedMilestones={setSelectedMilestonesTemplate}
-                            />
-                        ))}
-                    </>
-                ))} */}
+                {templateResearchPlans.map(template => (
+                    <ResearchPlanTemplateCardSelect 
+                        researchPlanData={template}
+                        selectedMilestones={selectedMilestonesTemplate}
+                        setSelectedMilestones={setSelectedMilestonesTemplate}
+                    />
+                ))}
             </div>
         </ScrollArea>
         </div>

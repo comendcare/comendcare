@@ -1,19 +1,14 @@
 import { useEffect, useRef, useState } from "react"
-import RoadmapTemplates, { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
+import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { useStoreApi } from "@xyflow/react"
 import { getMilestoneTypes } from "@/lib/fetchers"
-import { NODE_TYPE_OPTIONS, NodeType } from "@/lib/types"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
-import { Info, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
-import { ScrollArea } from "./ui/scroll-area"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -23,9 +18,9 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     const { 
         addMilestones,
     } = useRoadmapStore(useShallow(selector))
-    const store = useStoreApi()
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
+    const [tab, setTab] = useState('projects')
     const dialogRef = useRef<HTMLDivElement>(null);
 
     // Allow update once form is initialized
@@ -41,6 +36,10 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         init()
     }, []);
 
+    useEffect(() => {
+        setSelectedMilestonesTemplate([])
+    }, [tab])
+
     return (
         <Dialog open={open} onOpenChange={(open: boolean) => {
             if (!open) {
@@ -50,7 +49,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         }}>
             <DialogContent 
                 ref={dialogRef}
-                className="outline-none min-w-[80vw] min-h-[80vh] w-[80vw] flex flex-col justify-start gap-4" 
+                className="outline-none min-w-[80vw] w-[80vw] flex flex-col justify-start gap-4" 
                 onOpenAutoFocus={(e) => {
                     e.preventDefault(); // Prevent default autofocus
                     setTimeout(() => dialogRef.current?.focus(), 0); // Focus the dialog
@@ -66,7 +65,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                         </DialogDescription>
                     </DialogHeader>
 
-                    <Tabs defaultValue="projects">
+                    <Tabs value={tab} onValueChange={(newTab => setTab(newTab))}>
                         <TabsList>
                             <TabsTrigger value="projects">Project Templates</TabsTrigger>
                             <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
@@ -82,20 +81,9 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             />
                         </TabsContent>
                         <TabsContent value="research-plans" className="h-full">
-                            {/* <MilestoneTemplates
-                                selectedMilestonesTemplate={selectedMilestonesTemplate}
-                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
-                                createEmpty={() => {
-                                    // addMilestones([{name: 'New Milestone'}])
-                                }}
-                                inDialog={true}
-                            /> */}
                             <ResearchPlanTemplates
                                 selectedMilestonesTemplate={selectedMilestonesTemplate}
                                 setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
-                                createEmpty={() => {
-                                    // addMilestones([{name: 'New Milestone'}])
-                                }}
                                 inDialog={true}
                             />
                         </TabsContent>
@@ -134,7 +122,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                 }}
                             >
                                 <Plus />
-                                Create selected project
+                                {tab === 'projects' ? `Create selected projects` : `Create selected research plan`}
                             </Button>
                         </DialogClose>
                     </DialogFooter>
