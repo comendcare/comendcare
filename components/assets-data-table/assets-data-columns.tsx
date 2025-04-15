@@ -5,6 +5,9 @@ import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Asset } from "@/lib/types"
+import { Button } from "../ui/button"
+import { Pin } from "lucide-react"
+import { createOrUpdateAsset } from "@/lib/actions"
 
 interface CustomColumnMeta {
     name?: string;
@@ -104,6 +107,19 @@ export const columns: ColumnDef<Asset>[] = [
         ),
         enableHiding: true,
         meta: { name: "Links" }
+    },
+    {
+        accessorKey: "asset.pinned",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Pinned"/>
+        ),
+        cell: ({ row }) => (
+            <>
+                {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
+            </>
+        ),
+        enableHiding: true,
+        meta: { name: "Pinned" }
     },
     // {
     //     id: "actions",

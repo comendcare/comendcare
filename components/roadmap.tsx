@@ -39,6 +39,7 @@ import Loading from "@/app/loading"
 import { MilestoneType } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
+import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -50,6 +51,10 @@ const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
     saveState: state.saveState,
     addMilestones: state.addMilestones
+})
+
+const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
+    step: state.step
 })
 
 export function Roadmap() {
@@ -66,6 +71,7 @@ export function Roadmap() {
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
+    const { step } = useResearchPlanOnbordaStore(useShallow(onbordaSelector))
     const {data: session} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -77,6 +83,14 @@ export function Roadmap() {
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
+    const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
+    const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
+
+    useEffect(() => {
+        if (step === ".onborda-select-a-template" && isOnbordaVisible) {
+            setNewMilestoneIsOpen(true)
+        }
+    }, [step])
 
     useEffect(() => {
         const init = async () => {
@@ -90,6 +104,7 @@ export function Roadmap() {
                 let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
                 if (orgData.success && orgData.data) {
                     setOrgSubdomain(orgData.data.subdomain || undefined)
+                    setOrgIsPublished(orgData.data.published || false)
                 }
             }
         }
@@ -223,40 +238,41 @@ export function Roadmap() {
                                 </div>
                             )}
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button 
-                                        size={"icon"} 
-                                        variant={"cta"} 
-                                        className="research-plan-tour-step1" 
-                                        onClick={() => setNewMilestoneIsOpen(true)}
-                                    >
-                                        <Plus />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Create a project`}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <span className="onborda-create-a-project flex flex-row items-center gap-x-1">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            size={"icon"} 
+                                            variant={"cta"}  
+                                            onClick={() => setNewMilestoneIsOpen(true)}
+                                        >
+                                            <Plus />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80">
+                                        <p>{`Create a project`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button 
-                                        disabled={milestoneTypes.length === 0}
-                                        onClick={() => {
-                                            console.log("Bulk import triggered")
-                                            setBulkImportIsOpen(true)
-                                        }} 
-                                        size={"icon"} 
-                                        variant={"ghost"}
-                                    >
-                                        <Import />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Import projects from .csv`}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            disabled={milestoneTypes.length === 0}
+                                            onClick={() => {
+                                                console.log("Bulk import triggered")
+                                                setBulkImportIsOpen(true)
+                                            }} 
+                                            size={"icon"} 
+                                            variant={"ghost"}
+                                        >
+                                            <Import />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80">
+                                        <p>{`Import projects from .csv`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </span>
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -364,6 +380,7 @@ export function Roadmap() {
                                         milestone.nodeId === selectedNodeId
                                 )}
                                 handlePanelChange={handleMilestonePanelChange}
+                                orgIsPublished={orgIsPublished}
                             />
                         </ResizablePanel>
                     </>
@@ -444,10 +461,12 @@ export function Roadmap() {
 const MilestoneDetailsPanel = ({
     remountKey,
     milestone,
+    orgIsPublished,
     handlePanelChange
 }: {
     remountKey: number,
     milestone: Milestone | undefined
+    orgIsPublished: boolean,
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
@@ -472,6 +491,7 @@ const MilestoneDetailsPanel = ({
             <EditMilestoneForm
                 key={milestoneRemountKey}
                 milestoneData={milestone}
+                orgIsPublished={orgIsPublished}
                 onClose={handleClose}
             />
         )

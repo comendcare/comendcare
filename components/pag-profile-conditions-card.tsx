@@ -132,36 +132,6 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
 
                                     <div className="flex flex-row items-center justify-between w-full">
                                         <h4 className="scroll-m-20 text-base font-semibold">
-                                            Interested modalities
-                                        </h4>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
-                                        {(() => {
-
-                                            if (condition?.interestedModalities.length === 0) {
-                                                return (
-                                                    <p className="text-gray-400">
-                                                        {`No relevant badges.`}
-                                                    </p>
-                                                );
-                                            }
-
-                                            return (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {condition?.interestedModalities.map((item, index) => (
-                                                        <span key={index}>
-                                                            <Badge className="text-sm inline">
-                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                            </Badge>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
-
-                                    <div className="flex flex-row items-center justify-between w-full">
-                                        <h4 className="scroll-m-20 text-base font-semibold">
                                             Causal genes
                                         </h4>
                                     </div>
@@ -209,36 +179,6 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
                                             return (
                                                 <div className="flex flex-wrap gap-1">
                                                     {condition?.associatedGenes.map((item, index) => (
-                                                        <span key={index}>
-                                                            <Badge className="text-sm inline">
-                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                            </Badge>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
-
-                                    <div className="flex flex-row items-center justify-between w-full">
-                                        <h4 className="scroll-m-20 text-base font-semibold">
-                                            Therapeutics in development
-                                        </h4>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
-                                        {(() => {
-
-                                            if (condition?.therapeuticsInDevelopment.length === 0) {
-                                                return (
-                                                    <p className="text-gray-400">
-                                                        {`No relevant badges.`}
-                                                    </p>
-                                                );
-                                            }
-
-                                            return (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {condition?.therapeuticsInDevelopment.map((item, index) => (
                                                         <span key={index}>
                                                             <Badge className="text-sm inline">
                                                                 {item.charAt(0).toUpperCase() + item.slice(1)}

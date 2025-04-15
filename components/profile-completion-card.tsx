@@ -37,8 +37,8 @@ interface Condition {
     associatedSystems: string[];
     associatedGenes: string[];
     causalGenes: string[];
-    interestedModalities: string[];
-    therapeuticsInDevelopment: string[];
+    // interestedModalities: string[];
+    // therapeuticsInDevelopment: string[];
     diseaseCategories: string[];
     prevalenceNumerator: number | null;
     prevalenceDenominator: number | null;
@@ -102,8 +102,8 @@ export async function ProfileCompletionCard() {
                 condition.associatedSystems.length > 0 &&
                 condition.associatedGenes.length > 0 &&
                 condition.causalGenes.length > 0 &&
-                condition.interestedModalities.length > 0 &&
-                condition.therapeuticsInDevelopment.length > 0 &&
+                // condition.interestedModalities.length > 0 &&
+                // condition.therapeuticsInDevelopment.length > 0 &&
                 condition.diseaseCategories.length > 0 &&
                 condition.prevalenceNumerator !== null &&
                 condition.prevalenceDenominator !== null &&
