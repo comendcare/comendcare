@@ -651,7 +651,7 @@ export function EditMilestoneForm({
                                 )}
                                 </FormItem> */}
 
-                                <div className="w-full grid grid-cols-[100px_auto] gap-x-2 items-center">
+                                <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                     <FormLabel>Visibility</FormLabel>
                                     <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
 
@@ -662,7 +662,7 @@ export function EditMilestoneForm({
                                             <>
                                             <FormLabel >{`Description`}</FormLabel>
                                             <div className="flex flex-col gap-2">
-                                                <FormControl className="mt-2">
+                                                <FormControl>
                                                     <Textarea
                                                         id="description"
                                                         placeholder={`Enter a description...`}
@@ -694,7 +694,7 @@ export function EditMilestoneForm({
                                         control={form.control}
                                         name="assets"
                                         render={({field}) => (
-                                            <FormItem className="w-full mt-2">
+                                            <FormItem className="w-full">
                                                 <FormControl>
                                                     <MultipleSelector
                                                         value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
@@ -871,7 +871,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                 control={form.control}
                 name="types"
                 render={({field}) => (
-                    <FormItem className="w-full mt-2">
+                    <FormItem className="w-full">
                         <FormControl>
                             <MultipleSelector
                                 {...field}
@@ -1088,6 +1088,7 @@ export const StatusFormField = ({form}: { form: any }) => {
 export const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
+            className="-mt-2"
             form={form}
             name="budget"
         />
@@ -1111,7 +1112,7 @@ export const TimelineFormField = ({
                 render={({field}) => (
                     <>
                     <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex gap-2">
                         <Select
                             defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                             onValueChange={(value) => {
@@ -1165,7 +1166,7 @@ export const TimelineFormField = ({
                     <>
                     <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
                     <div className="flex flex-col gap-2">
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex gap-2">
                         <Select
                             defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                             onValueChange={(value) => {
@@ -1267,7 +1268,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
                             onValueChange={
                                 field.onChange
                             }
-                            className="w-fit flex flex-wrap gap-2 justify-start mt-2"
+                            className="w-fit flex flex-wrap gap-2 justify-start"
                         >
                             {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
                                 <ToggleGroupItem
