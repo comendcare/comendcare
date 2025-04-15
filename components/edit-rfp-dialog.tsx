@@ -8,7 +8,7 @@ import { EditRFPForm } from "./edit-rfp-form";
 import { RFP } from "@/lib/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
+export const NewRFPDialog = ({iconOnly = false, numRFPsPinned}: {iconOnly?: boolean, numRFPsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -43,13 +43,13 @@ export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
                         {`Create your RFP here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditRFPForm rfpData={{}} closeDialog={closeDialog}/>
+                <EditRFPForm rfpData={{}} closeDialog={closeDialog} numRFPsPinned={numRFPsPinned}/>
             </DialogContent>
         </Dialog>
     )
 }
 
-export const EditRFPDialog = ({children, data}: {children: ReactNode, data: Partial<RFP>}) => {
+export const EditRFPDialog = ({children, data, numRFPsPinned}: {children: ReactNode, data: Partial<RFP>, numRFPsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -71,7 +71,7 @@ export const EditRFPDialog = ({children, data}: {children: ReactNode, data: Part
                         {`Edit your RFP here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditRFPForm rfpData={data} closeDialog={closeDialog}/>
+                <EditRFPForm rfpData={data} closeDialog={closeDialog} numRFPsPinned={numRFPsPinned}/>
             </DialogContent>
         </Dialog>
     )

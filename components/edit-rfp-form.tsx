@@ -53,6 +53,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -129,9 +130,11 @@ const editRFPForm = z.object({
 
 export function EditRFPForm({
     rfpData,
+    numRFPsPinned,
     closeDialog
 }: {
     rfpData: Partial<RFP>,
+    numRFPsPinned: number,
     closeDialog?: () => void
 }) {
     const router = useRouter()
@@ -391,32 +394,42 @@ export function EditRFPForm({
                     </FormItem>
 
                     {formData.isPrivate === false && (
-                        <FormField 
-                            control={form.control}
-                            name="isPinned"
-                            render={({field}) => (
-                                <FormItem className="flex gap-2 items-center">
-                                    <div>
-                                    <FormLabel>{`Pinned to profile`}</FormLabel>
-                                    <FormDescription>
-                                        {`Pinning an RFP to your profile highlights it in the RFPs section of your organization profile.`}
-                                    </FormDescription>
-                                    </div>
-                                    <FormControl className="justify-self-end">
-                                        <Button 
-                                            variant="ghost" 
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                form.setValue("isPinned", !field.value, {shouldValidate: true})
-                                            }}
-                                        >
-                                            {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                        </Button>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
+                        <Tooltip>
+                            <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                                <FormField 
+                                    control={form.control}
+                                    name="isPinned"
+                                    render={({field}) => (
+                                        <FormItem className="flex gap-2 items-center text-left">
+                                            <div>
+                                            <FormLabel>{`Pinned to profile`}</FormLabel>
+                                            <FormDescription>
+                                                {`Pinning an RFP to your profile highlights it in the RFPs section of your organization profile.`}
+                                            </FormDescription>
+                                            </div>
+                                            <FormControl className="justify-self-end">
+                                                <Button 
+                                                    disabled={!rfpData.pinned && numRFPsPinned >= 5}
+                                                    variant="ghost" 
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        form.setValue("isPinned", !field.value, {shouldValidate: true})
+                                                    }}
+                                                >
+                                                    {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                                </Button>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </TooltipTrigger>
+                            {!rfpData.pinned && numRFPsPinned >= 5 && (
+                                <TooltipContent className="max-w-[200px]">
+                                    <p>{`Pinning is limited to 5 RFPs. You already have 5 RFPs pinned. Please unpin another RFP before pinning this RFP.`}</p>
+                                </TooltipContent>
                             )}
-                        />
+                        </Tooltip>
                     )}
 
                     <FormField
