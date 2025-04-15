@@ -36,7 +36,7 @@ import {cn} from "@/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "./ui/calendar"
 import MultipleSelector from "./ui/multiple-selector"
-import { Calendar as CalendarIcon, Pencil } from "lucide-react"
+import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateRFP, deleteRFP } from "@/lib/actions"
@@ -112,6 +112,7 @@ const editRFPForm = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
@@ -148,6 +149,7 @@ export function EditRFPForm({
             title: rfpData?.title || "",
             description: rfpData?.description || "",
             attachments: rfpData?.attachments || undefined,
+            isPinned: rfpData?.pinned || false,
             isPrivate: rfpData?.private !== undefined ? rfpData?.private : true,
             contacts: rfpData?.contacts || undefined,
             openTo: rfpData?.openTo || [],
@@ -162,6 +164,7 @@ export function EditRFPForm({
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
+        isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo"),
@@ -177,6 +180,7 @@ export function EditRFPForm({
             title,
             description,
             attachments,
+            isPinned,
             isPrivate,
             contacts,
             openTo,
@@ -189,6 +193,7 @@ export function EditRFPForm({
             ...rfpData,
             headerImage,
             title,
+            pinned: isPinned || false,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
@@ -373,13 +378,44 @@ export function EditRFPForm({
                         )}
                     />
 
-                    <FormItem>
+                    <FormItem className="flex gap-4 items-center">
+                        <div className="grow">
                         <FormLabel>Visibility</FormLabel>
                         <FormDescription>
-                            {`Changing the visiblity of your RFP allows you show or hide it from your organization profile.`}
+                            {`Private RFPs will not be shown to people outside of your organization.`}
                         </FormDescription>
+                        </div>
+                        <div className="w-[90px]">
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                        </div>
                     </FormItem>
+
+                    <FormField 
+                        control={form.control}
+                        name="isPinned"
+                        render={({field}) => (
+                            <FormItem className="flex gap-2 items-center">
+                                <div>
+                                <FormLabel>{`Pinned to profile`}</FormLabel>
+                                <FormDescription>
+                                    {`Pinning an RFP to your profile highlights it in the assets section of your organization profile.`}
+                                </FormDescription>
+                                </div>
+                                <FormControl className="justify-self-end">
+                                    <Button 
+                                        variant="ghost" 
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            form.setValue("isPinned", !field.value, {shouldValidate: true})
+                                        }}
+                                    >
+                                        {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                    </Button>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
                     <FormField
                         control={form.control}

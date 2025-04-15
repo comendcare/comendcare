@@ -248,18 +248,30 @@ export function EditAssetForm({
                         )}
                     />
 
+                    <FormItem className="flex gap-4 items-center">
+                        <div className="grow">
+                        <FormLabel>Visibility</FormLabel>
+                        <FormDescription>
+                            {`Private assets will not be shown to people outside of your organization.`}
+                        </FormDescription>
+                        </div>
+                        <div className="w-[90px]">
+                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                        </div>
+                    </FormItem>
+
                     <FormField 
                         control={form.control}
                         name="isPinned"
                         render={({field}) => (
-                            <FormItem className="flex justify-between items-center">
+                            <FormItem className="flex gap-2 items-center">
                                 <div>
-                                    <FormLabel>{`Pinned to profile`}</FormLabel>
-                                    <FormDescription>
-                                        {`Pinning an asset to your profile highlights it in the assets section of your organization profile.`}
-                                    </FormDescription>
+                                <FormLabel>{`Pinned to profile`}</FormLabel>
+                                <FormDescription>
+                                    {`Pinning an asset to your profile highlights it in the assets section of your organization profile.`}
+                                </FormDescription>
                                 </div>
-                                <FormControl>
+                                <FormControl className="justify-self-end">
                                     <Button 
                                         variant="ghost" 
                                         onClick={(e) => {
@@ -270,19 +282,10 @@ export function EditAssetForm({
                                         {field.value ? <Pin fill="currentColor"/> : <Pin />}
                                     </Button>
                                 </FormControl>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
-
-                    <FormItem className="flex justify-between items-center">
-                        <div>
-                            <FormLabel>Visibility</FormLabel>
-                            <FormDescription>
-                                {`Changing the visiblity of your asset allows you show or hide it from people outside your organization.`}
-                            </FormDescription>
-                        </div>
-                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                    </FormItem>
 
                     <FormField
                         control={form.control}
