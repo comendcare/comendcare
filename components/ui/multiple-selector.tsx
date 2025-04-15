@@ -499,7 +499,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                             {...inputProps}
                             ref={inputRef}
                             value={inputValue}
-                            disabled={disabled}
+                            disabled={maxSelected ? disabled || selected.length >= maxSelected : disabled}
                             onValueChange={(value) => {
                                 setInputValue(value);
                                 inputProps?.onValueChange?.(value);
