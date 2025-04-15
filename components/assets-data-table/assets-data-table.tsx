@@ -87,7 +87,10 @@ export function AssetsDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <EditAssetDialog data={{...row.original} as Partial<Asset>}>
+                                <EditAssetDialog 
+                                    data={{...row.original} as Partial<Asset>} 
+                                    numAssetsPinned={table.getRowModel().rows.filter(asset => ({...asset.original} as Partial<Asset>).pinned).length}
+                                >
                                     <TableRow
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}

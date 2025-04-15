@@ -41,7 +41,7 @@ export default async function AssetsPage() {
         return (
             <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
                 <div className="flex gap-2 w-full justify-end">
-                        <NewAssetDialog iconOnly={true}/>
+                        <NewAssetDialog iconOnly={true} numAssetsPinned={assets.filter(asset => asset.pinned).length}/>
                     <AssetBulkImportDialog />
                 </div>
 
@@ -57,7 +57,7 @@ export default async function AssetsPage() {
                         <p className="text-lg text-stone-500">
                             An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                         </p>
-                        <NewAssetDialog />
+                        <NewAssetDialog numAssetsPinned={assets.filter(asset => asset.pinned).length}/>
                     </div>
                 )}
                 {assets.length > 0 && (
