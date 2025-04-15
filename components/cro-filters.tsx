@@ -155,7 +155,7 @@ export function CROFilters() {
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
-                                        badgeClassName={badgeVariants({variant: "milestoneType"})}
+                                        badgeClassName={badgeVariants({variant: "blue"})}
                                         defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select associated milestone types..."
@@ -224,7 +224,7 @@ export function CROFilters() {
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
-                                        badgeClassName={badgeVariants({variant: "certification"})}
+                                        badgeClassName={badgeVariants({variant: "blue"})}
                                         defaultOptions={CRO_CERTIFICATIONS}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select relevant certifications..."

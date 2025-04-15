@@ -6,7 +6,6 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Building, FileText, GraduationCap, Link, Plus, Star, User } from "lucide-react";
-import { EditRFPForm } from "@/components/edit-rfp-form";
 import { RFPBulkImportDialog } from "@/components/rfp-bulk-import-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +48,7 @@ export default async function RFPsPage() {
         return (
             <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
                 <div className="flex gap-2 w-full justify-end">
-                    <NewRFPDialog iconOnly={true}/>
+                    <NewRFPDialog iconOnly={true} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
                     <RFPBulkImportDialog />
                 </div>
 
@@ -65,13 +64,13 @@ export default async function RFPsPage() {
                         <p className="text-lg text-stone-500">
                             An RFP is a milestone you want to support through funding and/or other resources. 
                         </p>
-                        <NewRFPDialog />
+                        <NewRFPDialog numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
                     </div>
                 )}
                 {rfps.length > 0 && (
                     <div className={"w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"}>
                         {rfps.map((rfp) => (
-                            <EditRFPDialog data={rfp}>
+                            <EditRFPDialog data={rfp} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}>
                                 <RFPCard rfp={rfp} />
                             </EditRFPDialog>
                         ))}

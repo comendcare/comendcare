@@ -83,6 +83,7 @@ export function Roadmap() {
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
+    const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
     const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
 
     useEffect(() => {
@@ -103,6 +104,7 @@ export function Roadmap() {
                 let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
                 if (orgData.success && orgData.data) {
                     setOrgSubdomain(orgData.data.subdomain || undefined)
+                    setOrgIsPublished(orgData.data.published || false)
                 }
             }
         }
@@ -378,6 +380,7 @@ export function Roadmap() {
                                         milestone.nodeId === selectedNodeId
                                 )}
                                 handlePanelChange={handleMilestonePanelChange}
+                                orgIsPublished={orgIsPublished}
                             />
                         </ResizablePanel>
                     </>
@@ -458,10 +461,12 @@ export function Roadmap() {
 const MilestoneDetailsPanel = ({
     remountKey,
     milestone,
+    orgIsPublished,
     handlePanelChange
 }: {
     remountKey: number,
     milestone: Milestone | undefined
+    orgIsPublished: boolean,
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
@@ -486,6 +491,7 @@ const MilestoneDetailsPanel = ({
             <EditMilestoneForm
                 key={milestoneRemountKey}
                 milestoneData={milestone}
+                orgIsPublished={orgIsPublished}
                 onClose={handleClose}
             />
         )
