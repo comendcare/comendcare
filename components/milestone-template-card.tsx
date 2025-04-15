@@ -40,6 +40,40 @@ export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilest
     )
 }
 
+export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedMilestones, setSelectedMilestones }: {researchPlanData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
+    const [isChecked, setIsChecked] = useState(false)
+
+    useEffect(() => {
+        if (isChecked) {
+            setSelectedMilestones(researchPlanData.milestones)
+        } else {
+            setSelectedMilestones([])
+        }
+    }, [isChecked])
+
+    return (
+        <button onClick={() => {setIsChecked(prev => !prev)}}>
+            <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+                <CardHeader>
+                    <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2 overflow-visible">
+                    <CardTitle>{`Modality: ${researchPlanData.modalities.map((modalityOption: any)=> modalityOption.label).join(', ')}`}</CardTitle>
+                    <CardDescription>
+                        {researchPlanData.description}
+                    </CardDescription>
+
+                    <ol className="list-decimal pl-4">
+                        {researchPlanData.milestones.map((milestone: any) => (
+                            <li>{milestone.title}</li>
+                        ))}
+                    </ol>
+                </CardContent>
+            </Card>
+        </button>
+    )
+}
+
 export function MilestoneTemplateCardSingleSelect({ milestoneData, selectedMilestoneTemplate, setSelectedMilestoneTemplate, className }: {milestoneData: any, selectedMilestoneTemplate: any, setSelectedMilestoneTemplate: (value: SetStateAction<any>) => void, className?: string}) {
     const handleCheck = () => {
         if (milestoneData.title !== selectedMilestoneTemplate?.title) {
