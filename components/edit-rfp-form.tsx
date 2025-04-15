@@ -193,7 +193,7 @@ export function EditRFPForm({
             ...rfpData,
             headerImage,
             title,
-            pinned: isPinned || false,
+            pinned: (isPrivate === false && isPinned) || false, // only save pinned if rfp is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
@@ -390,32 +390,34 @@ export function EditRFPForm({
                         </div>
                     </FormItem>
 
-                    <FormField 
-                        control={form.control}
-                        name="isPinned"
-                        render={({field}) => (
-                            <FormItem className="flex gap-2 items-center">
-                                <div>
-                                <FormLabel>{`Pinned to profile`}</FormLabel>
-                                <FormDescription>
-                                    {`Pinning an RFP to your profile highlights it in the assets section of your organization profile.`}
-                                </FormDescription>
-                                </div>
-                                <FormControl className="justify-self-end">
-                                    <Button 
-                                        variant="ghost" 
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            form.setValue("isPinned", !field.value, {shouldValidate: true})
-                                        }}
-                                    >
-                                        {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                    </Button>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {formData.isPrivate === false && (
+                        <FormField 
+                            control={form.control}
+                            name="isPinned"
+                            render={({field}) => (
+                                <FormItem className="flex gap-2 items-center">
+                                    <div>
+                                    <FormLabel>{`Pinned to profile`}</FormLabel>
+                                    <FormDescription>
+                                        {`Pinning an RFP to your profile highlights it in the RFPs section of your organization profile.`}
+                                    </FormDescription>
+                                    </div>
+                                    <FormControl className="justify-self-end">
+                                        <Button 
+                                            variant="ghost" 
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                form.setValue("isPinned", !field.value, {shouldValidate: true})
+                                            }}
+                                        >
+                                            {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                        </Button>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
 
                     <FormField
                         control={form.control}
