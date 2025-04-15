@@ -8,7 +8,7 @@ import { ReactNode, useState } from "react";
 import { Asset } from "@/lib/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export const NewAssetDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
+export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: boolean, numAssetsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -43,13 +43,13 @@ export const NewAssetDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
                         {`Create your Asset here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={{}} closeDialog={closeDialog}/>
+                <EditAssetForm assetData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
             </DialogContent>
         </Dialog>
     )
 }
 
-export const EditAssetDialog = ({children, data}: {children: ReactNode, data: Partial<Asset>}) => {
+export const EditAssetDialog = ({children, data, numAssetsPinned}: {children: ReactNode, data: Partial<Asset>, numAssetsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -71,7 +71,7 @@ export const EditAssetDialog = ({children, data}: {children: ReactNode, data: Pa
                         {`Edit your Asset here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={data} closeDialog={closeDialog}/>
+                <EditAssetForm assetData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
             </DialogContent>
         </Dialog>
     )

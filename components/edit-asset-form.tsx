@@ -38,6 +38,8 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateAsset, deleteAsset } from "@/lib/actions"
 import { Option } from "@/lib/types"
+import { Pin } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -62,6 +64,7 @@ const editAssetForm = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional()
@@ -69,9 +72,11 @@ const editAssetForm = z.object({
 
 export function EditAssetForm({
     assetData,
+    numAssetsPinned,
     closeDialog
 }: {
     assetData: Partial<Asset>,
+    numAssetsPinned: number,
     closeDialog?: () => void
 }) {
     const router = useRouter()
@@ -87,6 +92,7 @@ export function EditAssetForm({
             title: assetData?.title || "",
             description: assetData?.description || "",
             attachments: assetData?.attachments || undefined,
+            isPinned: assetData?.pinned || false,
             isPrivate: assetData?.private !== undefined ? assetData?.private : true,
             contacts: assetData?.contacts || undefined,
             milestones: (assetData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
@@ -97,6 +103,7 @@ export function EditAssetForm({
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
+        isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         milestones: form.watch("milestones")
@@ -108,6 +115,7 @@ export function EditAssetForm({
             title,
             description,
             attachments,
+            isPinned,
             isPrivate,
             contacts,
             milestones,
@@ -118,6 +126,7 @@ export function EditAssetForm({
         const updateData: Partial<Asset> = {
             ...assetData,
             title,
+            pinned: (isPrivate === false && isPinned) || false, // only save pinned if asset is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
@@ -200,7 +209,7 @@ export function EditAssetForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
+            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
@@ -242,13 +251,58 @@ export function EditAssetForm({
                         )}
                     />
 
-                    <FormItem>
+                    <FormItem className="flex gap-4 items-center">
+                        <div className="grow">
                         <FormLabel>Visibility</FormLabel>
                         <FormDescription>
-                            {`Changing the visiblity of your asset allows you show or hide it from your organization profile.`}
+                            {`Private assets will not be shown to people outside of your organization.`}
                         </FormDescription>
+                        </div>
+                        <div className="w-[90px]">
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                        </div>
                     </FormItem>
+
+                    {formData.isPrivate === false && (
+                        <Tooltip>
+                            <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                                <FormField 
+                                    control={form.control}
+                                    name="isPinned"
+                                    render={({field}) => (
+                                        <FormItem className="flex gap-2 items-center text-left">
+                                            <div>
+                                            <FormLabel>{`Pinned to profile`}</FormLabel>
+                                            <FormDescription>
+                                                {`Pinning an asset to your profile highlights it in the assets section of your organization profile.`}
+                                            </FormDescription>
+                                            </div>
+                                            <FormControl className="justify-self-end">
+                                                <Button 
+                                                    disabled={!assetData.pinned && numAssetsPinned >= 5}
+                                                    variant="ghost" 
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        form.setValue("isPinned", !field.value)
+                                                    }}
+                                                >
+                                                    {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                                </Button>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </TooltipTrigger>
+                            {!assetData.pinned && numAssetsPinned >= 5 && (
+                                <TooltipContent className="max-w-[200px]">
+                                    <p>{`Pinning is limited to 5 assets. You already have 5 assets pinned.
+                                    
+                                    Please unpin another asset before pinning this asset.`}</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                    )}
 
                     <FormField
                         control={form.control}

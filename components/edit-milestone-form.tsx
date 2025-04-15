@@ -930,19 +930,19 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                 control={form.control}
                 name="isPrivate"
                 render={({field}) => (
-                    <span className="h-full items-center flex flex-row justify-end gap-4">
+                    <div className="h-full items-center flex flex-row justify-end gap-4">
                         <FormControl>
                          <Tooltip>
                             <TooltipTrigger>
                                 <RadioGroup
                                     onValueChange={(value)=> {
-                                        form.setValue("isPrivate", value === "PRIVATE")
+                                        form.setValue("isPrivate", value === "PRIVATE", {shouldValidate: true})
                                     }}
                                     defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-                                    className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
+                                    className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50": "")}
                                     disabled={disabled}
                                 >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormItem className="flex items-center space-y-0">
                                         <FormControl>
                                             <span className="flex gap-2">
                                                 <RadioGroupItem value="PRIVATE" />
@@ -962,7 +962,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                             </span>
                                         </FormControl>
                                     </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormItem className="flex items-center space-y-0">
                                         <FormControl>
                                             <span className="flex gap-2">
                                                 <RadioGroupItem value="PUBLIC" />
@@ -992,7 +992,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                         </Tooltip>
                         </FormControl>
                         <FormMessage/>
-                    </span>
+                    </div>
                 )}
             />
         )
@@ -1010,10 +1010,10 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                 form.setValue("isPrivate", value === "PRIVATE")
                             }}
                             defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-                            className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
+                            className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50": "")}
                             disabled={disabled}
                         >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormItem className="flex items-center space-y-0">
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PRIVATE" />
@@ -1033,7 +1033,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                     </span>
                                 </FormControl>
                             </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormItem className="flex items-center space-y-0">
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PUBLIC" />
