@@ -1762,6 +1762,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                     }))
                 },
                 private: assetData.private || false,
+                pinned: assetData.pinned || false,
             },
             create: {
                 title: assetData.title || "",
@@ -1792,6 +1793,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                     }))
                 },
                 private: assetData.private || false,
+                pinned: assetData.pinned || false,
                 organization: { connect: {id: organizationId} }
             },
         })

@@ -38,6 +38,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateAsset, deleteAsset } from "@/lib/actions"
 import { Option } from "@/lib/types"
+import { Pin } from "lucide-react"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -62,6 +63,7 @@ const editAssetForm = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional()
@@ -87,6 +89,7 @@ export function EditAssetForm({
             title: assetData?.title || "",
             description: assetData?.description || "",
             attachments: assetData?.attachments || undefined,
+            isPinned: assetData?.pinned || false,
             isPrivate: assetData?.private !== undefined ? assetData?.private : true,
             contacts: assetData?.contacts || undefined,
             milestones: (assetData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
@@ -97,6 +100,7 @@ export function EditAssetForm({
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
+        isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         milestones: form.watch("milestones")
@@ -108,6 +112,7 @@ export function EditAssetForm({
             title,
             description,
             attachments,
+            isPinned,
             isPrivate,
             contacts,
             milestones,
@@ -118,6 +123,7 @@ export function EditAssetForm({
         const updateData: Partial<Asset> = {
             ...assetData,
             title,
+            pinned: isPinned || false,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
@@ -200,7 +206,7 @@ export function EditAssetForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
+            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
@@ -242,11 +248,39 @@ export function EditAssetForm({
                         )}
                     />
 
-                    <FormItem>
-                        <FormLabel>Visibility</FormLabel>
-                        <FormDescription>
-                            {`Changing the visiblity of your asset allows you show or hide it from your organization profile.`}
-                        </FormDescription>
+                    <FormField 
+                        control={form.control}
+                        name="isPinned"
+                        render={({field}) => (
+                            <FormItem className="flex justify-between items-center">
+                                <div>
+                                    <FormLabel>{`Pinned to profile`}</FormLabel>
+                                    <FormDescription>
+                                        {`Pinning an asset to your profile highlights it in the assets section of your organization profile.`}
+                                    </FormDescription>
+                                </div>
+                                <FormControl>
+                                    <Button 
+                                        variant="ghost" 
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            form.setValue("isPinned", !field.value)
+                                        }}
+                                    >
+                                        {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                    </Button>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormItem className="flex justify-between items-center">
+                        <div>
+                            <FormLabel>Visibility</FormLabel>
+                            <FormDescription>
+                                {`Changing the visiblity of your asset allows you show or hide it from people outside your organization.`}
+                            </FormDescription>
+                        </div>
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                     </FormItem>
 
