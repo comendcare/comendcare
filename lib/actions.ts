@@ -1853,6 +1853,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                     }
                 },
                 private: rfpData.private || false,
+                pinned: rfpData.pinned || false,
                 openTo: rfpData.openTo || [],
                 startDate: rfpData.startDate,
                 endDate: rfpData.endDate,
@@ -1888,6 +1889,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                     }
                 },
                 private: rfpData.private || false,
+                pinned: rfpData.pinned || false,
                 openTo: rfpData.openTo || [],
                 startDate: rfpData.startDate,
                 endDate: rfpData.endDate,

@@ -41,11 +41,11 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <TabsTrigger value="assets">Assets</TabsTrigger>
                         </TabsList>
                         <TabsContent value="rfps">
-                            {rfps.length > 0 && (
+                            {rfps.filter(rfp => rfp.pinned).length > 0 && (
                                 <div className="w-full px-8">
                                     <Carousel className="w-full" opts={{loop: true, align: "start"}}>
                                         <CarouselContent>
-                                            {rfps.map((rfp, index) => (
+                                            {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
                                                 <CarouselItem key={index} className="lg:basis-1/2">
                                                     <Dialog>
                                                         <DialogTrigger className="w-full h-full">
@@ -64,7 +64,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </div>
                             )}
                             {rfps.length <= 0 && (
-                                <p>{`No RFPs (Requests for Proposals) to show`}</p>
+                                <p>{`This organization does not have any pinned RFPs.`}</p>
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
