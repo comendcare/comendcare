@@ -2,14 +2,14 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PrivateBadge } from "@/components/private-badge";
 import { DateView } from "@/components/miletone-date-view";
-import { Calendar, User } from "lucide-react";
+import { Calendar, Pin, User } from "lucide-react";
 import { PropertyBadge } from "./property-badge";
 
 export const RFPCard = ({rfp}: {rfp: any}) => {
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
-                <div className="bg-blue-light h-[40px] -mt-6 -mx-6 rounded-t-md overflow-hidden">
+                <div className="relative bg-blue-light h-[40px] -mt-6 -mx-6 rounded-t-md overflow-hidden">
                     {rfp.headerImage && (
                         <img
                             src={rfp.headerImage}
@@ -21,6 +21,7 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
                             }}
                         />
                     )}
+                    {rfp.pinned && <Pin fill="current-color" className="absolute top-0 right-0 h-4 w-4 m-2"/>}
                 </div>
                 <CardTitle>{rfp.title} {rfp.private && <PrivateBadge iconOnly className="ml-auto pl-auto"/>}</CardTitle>
                 <CardDescription className="line-clamp-3">{rfp.description}</CardDescription>

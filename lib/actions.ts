@@ -1762,6 +1762,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                     }))
                 },
                 private: assetData.private || false,
+                pinned: assetData.pinned || false,
             },
             create: {
                 title: assetData.title || "",
@@ -1792,6 +1793,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                     }))
                 },
                 private: assetData.private || false,
+                pinned: assetData.pinned || false,
                 organization: { connect: {id: organizationId} }
             },
         })
@@ -1851,6 +1853,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                     }
                 },
                 private: rfpData.private || false,
+                pinned: rfpData.pinned || false,
                 openTo: rfpData.openTo || [],
                 startDate: rfpData.startDate,
                 endDate: rfpData.endDate,
@@ -1886,6 +1889,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                     }
                 },
                 private: rfpData.private || false,
+                pinned: rfpData.pinned || false,
                 openTo: rfpData.openTo || [],
                 startDate: rfpData.startDate,
                 endDate: rfpData.endDate,

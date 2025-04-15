@@ -265,6 +265,7 @@ model Asset {
   contacts    ExternalContact[]
   attachments ExternalAttachment[]
   private     Boolean              @default(true)
+  pinned      Boolean              @default(false)
 
   organizationId String?
   organization   Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -297,6 +298,7 @@ model RFP {
   budget      Int?
   private     Boolean              @default(true)
   headerImage String?              @db.Text
+  pinned      Boolean              @default(false)
 
   organizationId String?
   organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
