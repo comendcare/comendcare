@@ -23,7 +23,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Building, Calendar, FileText, GraduationCap, Link as LinkIcon, User } from "lucide-react";
+import { Building, Calendar, FileText, GraduationCap, Link as LinkIcon, Pin, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
 import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
@@ -68,19 +68,18 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
-                            {assets.length > 0 && (
+                            {assets.filter(asset => asset.pinned).length > 0 && (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
                                         <TableHead>Title</TableHead>
                                         <TableHead>Description</TableHead>
-                                        {/* <TableHead>Linked Projects</TableHead> */}
                                         <TableHead>Contacts</TableHead>
-                                        {/* <TableHead>Links</TableHead> */}
+                                        <TableHead></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {assets.map((asset) => (
+                                        {assets.filter(asset => asset.pinned).map((asset) => (
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <TableRow key={asset.id} className="cursor-pointer">
@@ -94,15 +93,6 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                                 {asset.description}
                                                             </div>
                                                         </TableCell>
-                                                        {/* <TableCell>
-                                                            <ul className="flex flex-col gap-2">
-                                                                {asset.milestones.map((milestone: any, index: number) => (
-                                                                    <li key={index} className="line-clamp-2">
-                                                                        {milestone.milestone?.title || undefined}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </TableCell> */}
                                                         <TableCell>
                                                             <ul className="flex flex-col gap-2">
                                                                 {asset.contacts.map((contact: any, index: number) => (
@@ -112,15 +102,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                                 ))}
                                                             </ul>
                                                         </TableCell>
-                                                        {/* <TableCell>
-                                                            <ul className="flex flex-col gap-2">
-                                                                {asset.attachments.map((attachment: any, index: number) => (
-                                                                    <li key={index} className="line-clamp-2">
-                                                                        {attachment.name || attachment.link}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </TableCell> */}
+                                                        <TableCell>
+                                                            <Pin fill="current-color" className="h-4 w-4"/>
+                                                        </TableCell>
                                                     </TableRow>
                                                 </DialogTrigger>
                                                 <DialogContent>
@@ -131,8 +115,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     </TableBody>
                                 </Table>
                             )}
-                            {assets.length <= 0 && (
-                                <p>{`No assets to show`}</p>
+                            {assets.filter(asset => asset.pinned).length <= 0 && (
+                                <p>{`This organization does not have any pinned assets.`}</p>
                             )}
                         </TabsContent>
                     </Tabs>
