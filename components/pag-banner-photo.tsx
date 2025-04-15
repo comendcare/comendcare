@@ -13,7 +13,7 @@ import {Form} from "@/components/ui/form";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageCropper} from "@/components/edit-pag-profile-page-dialog";
+import {FormImageCropper} from "@/components/form-image-cropper";
 import {FileWithPreview} from "@/components/image-cropper";
 import {toast} from "sonner";
 import {handleImageUpload} from "@/lib/upload";

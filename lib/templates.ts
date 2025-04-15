@@ -1,4 +1,5 @@
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options"
+import { MODALITIES } from "./types"
 
 // export const templateMilestones = [
 //     {
@@ -88,6 +89,26 @@ export const templateMilestones = MILESTONE_TYPE_OPTIONS.map(typeData => ({
     types: [typeData.id],
     categories: typeData.categories
 }))
+
+export const templateResearchPlans = [
+    {
+        title: 'ASO Research Plan',
+        description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
+        milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
+            'NATURALHISTORYSTUDY', 
+            'BASICSCIENCE', 
+            'MOUSEMODEL', 
+            'PATIENTDERIVEDCELLLINE', 
+            'TOXICOLOGYSTUDY'
+        ].includes(option.id)).map(typeData => ({
+            title: typeData.label,
+            description: typeData.description,
+            types: [typeData.id],
+            categories: typeData.categories
+        })),
+        modalities: MODALITIES.filter(modality => ['ANTISENSE_OLIGONUCLEOTIDE'].includes(modality.value))
+    }
+]
 
 export const templateRoadmaps = [
     {

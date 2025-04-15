@@ -2,14 +2,14 @@ import { CircleCheck, Flower, Sprout } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function CertificationBadge({ certificationName }: { certificationName: string }) {
-    let badgeClass = "bg-blue-100 text-blue-700";
+    let badgeClass = "bg-blue-100 text-blue-900";
     let Icon = CircleCheck;
 
     if (certificationName === "Woman-Owned Business") {
-        badgeClass = "bg-pink-100 text-pink-700";
+        badgeClass = "bg-pink-100 text-pink-900";
         Icon = Flower;
     } else if (certificationName === "Eco-Friendly Business") {
-        badgeClass = "bg-green-100 text-green-700";
+        badgeClass = "bg-emerald-100 text-emerald-900";
         Icon = Sprout;
     }
 

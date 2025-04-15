@@ -19,8 +19,6 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { EditAssetForm } from "../edit-asset-form"
 import { Asset } from "@/lib/types"
 import { EditAssetDialog } from "../edit-asset-dialog"
 
@@ -89,7 +87,10 @@ export function AssetsDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <EditAssetDialog data={{...row.original} as Partial<Asset>}>
+                                <EditAssetDialog 
+                                    data={{...row.original} as Partial<Asset>} 
+                                    numAssetsPinned={table.getRowModel().rows.filter(asset => ({...asset.original} as Partial<Asset>).pinned).length}
+                                >
                                     <TableRow
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}
