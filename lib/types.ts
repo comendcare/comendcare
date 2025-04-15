@@ -270,7 +270,7 @@ export const ASSOCIATED_SYSTEMS: Option[] = [
     {
         id: '1',
         label: 'Neurological',
-        value: 'NEURO',
+        value: 'NEUROLOGICAL',
         description: 'Associated with neurological systems, including the brain, spinal cord, and peripheral nerves.',
         strengths: 'Focuses on diseases and conditions affecting neural pathways and cognitive functions.',
     },
