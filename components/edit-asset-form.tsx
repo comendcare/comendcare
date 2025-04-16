@@ -39,7 +39,7 @@ import { useRouter } from "next/navigation"
 import { Option } from "@/lib/types"
 import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { AssetState, useAssetStore } from "@/state/assets/assetStore"
+import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -166,13 +166,17 @@ export function EditAssetForm({
         try {
             if (assetData.id) {
                 await updateAsset(updateData, session.user.organizationId)
+                toast.success(
+                    "Asset updated successfully!",
+                    {position: "bottom-left"}
+                )
             } else {
                 await createAsset(updateData, session.user.organizationId)
+                toast.success(
+                    "Asset created successfully!",
+                    {position: "bottom-left"}
+                )
             }
-            toast.success(
-                "Asset created or updated successfully!",
-                {position: "bottom-left"}
-            )
             if (closeDialog) closeDialog()
         } catch (error) {
             console.error("Error creating or updating asset:", error);
@@ -207,12 +211,12 @@ export function EditAssetForm({
                 <div className="flex flex-col gap-2 w-full">
                     <span className="flex justify-between items-center">
                         <p className="font-semibold text-gray-900">
-                            {`Project Deleted`}
+                            {`Asset Deleted`}
                         </p>
                         <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
                     </span>
                     <p className="text-sm text-gray-500">
-                        {`Your project had been deleted successfully.`}
+                        {`Your asset had been deleted successfully.`}
                     </p>
                 </div>,
                 {position: "bottom-left", duration: 20000, id: "undo-toast"}

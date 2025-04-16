@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { AssetState, useAssetStore } from "@/state/assets/assetStore"
+import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import { NewAssetDialog } from "./edit-asset-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"

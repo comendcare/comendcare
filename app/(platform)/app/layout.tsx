@@ -18,10 +18,11 @@ import {
     getKanbanFromOrganizationId,
     getMilestoneTypes,
     getNodesEdgesAndMilestones,
+    getRFPs,
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeAssetsStore, initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeAssetsStore, initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban, createRoadmap } from "@/lib/actions";
@@ -222,7 +223,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(response.error)
             }
 
-            // init assets store
+            // init asset store
             let assetResponse = await getAssets(session.user.organizationId)
             if (assetResponse.success) {
                 initializeAssetsStore(assetResponse.data || [])
@@ -230,6 +231,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             } else {
                 console.error(assetResponse.error)
                 toast.error(assetResponse.error)
+            }
+
+            // init rfp store
+            let rfpResponse = await getRFPs(session.user.organizationId)
+            if (rfpResponse.success) {
+                initializeRFPStore(rfpResponse.data || [])
+                console.log(`RFPs initialized...`)
+            } else {
+                console.error(rfpResponse.error)
+                toast.error(rfpResponse.error)
             }
 
             console.log(`Initialization completed successfully!`)

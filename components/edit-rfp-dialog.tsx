@@ -59,7 +59,7 @@ export const EditRFPDialog = ({children, data, numRFPsPinned}: {children: ReactN
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild className="cursor-pointer">
-                {children}
+                <button className="cursor-pointer">{children}</button>
             </DialogTrigger>
 
             <DialogContent className="overflow-hidden">

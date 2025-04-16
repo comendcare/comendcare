@@ -8,8 +8,9 @@ import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
-import { Asset } from '@/lib/types';
-import { useAssetStore } from "@/state/assets/assetStore";
+import { Asset, RFP } from '@/lib/types';
+import { useAssetStore } from "@/state/asset/assetStore";
+import { useRFPStore } from "@/state/rfp/rfpStore";
 
 export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
@@ -76,5 +77,14 @@ export function initializeAssetsStore(assets: Asset[]) {
 
         // Call Zustand's initState directly
         initAssetState(assets)
+    }
+}
+
+export function initializeRFPStore(rfps: RFP[]) {
+    if (typeof window !== "undefined") {
+        const initRFPState = useRFPStore.getState().initState;
+
+            // Call Zustand's initState directly
+            initRFPState(rfps)
     }
 }

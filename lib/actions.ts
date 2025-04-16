@@ -1830,6 +1830,15 @@ export const deleteRFP = async (rfpId: string) => {
     try {
         const response = await prisma.rFP.delete({
             where: { id: rfpId },
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {
+                        milestone: true
+                    }
+                }
+            },
         })
 
         return response
@@ -1848,6 +1857,15 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
         const response = await prisma.rFP.upsert({
             where: {
                 id: rfpData.id || nanoid()
+            },
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {
+                        milestone: true
+                    }
+                }
             },
             update: {
                 headerImage: rfpData.headerImage,
@@ -1888,6 +1906,9 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 },
             },
             create: {
+                // create with the given id if it's available. This is useful for situations like 'undo'
+                // where we're re-creating a pre-existing rfp, and the id should match the id in our zustand state
+                ...(rfpData.id ? {id: rfpData.id} : undefined),
                 headerImage: rfpData.headerImage,
                 title: rfpData.title || "",
                 description: rfpData.description,
@@ -2552,6 +2573,50 @@ export async function syncDBAssets({assets}: {assets: Asset[]}) {
         // }).map(asset => )
 
         return {success: true, data: updateAssets}
+    } catch (e) {
+        return {success: false, error: e}
+    }
+}
+
+export async function syncDBRFPs({rfps}: {rfps: RFP[]}) {
+    try {
+        let updateRfps: RFP[] = []
+        const session = await getSession()
+
+        if (!session?.user.organizationId) throw new Error("No session available")
+
+        await Promise.all(
+            rfps.map(async (rfp: RFP) => {
+                const previousRfp: RFP | null = await prisma.rFP.findUnique({
+                    where: {id: rfp.id},
+                    include: {
+                        contacts: true,
+                        attachments: true,
+                        milestones: {
+                            include: {
+                                milestone: true
+                            }
+                        }
+                    },
+                })
+
+                if (!previousRfp) {
+                    // if the RFP does not exist, re-create it
+                    const r = await createOrUpdateRFP(rfp, session.user.organizationId)
+                    updateRfps = [...updateRfps, r]
+                } else {
+                    // if the asset does exist, update it's properties
+                    updateRfps = [...updateRfps, previousRfp]
+                }
+            })
+        )
+
+        // delete any RFPs that no longer exist
+        // const dbRfpIds = await prisma.rfp.findMany({
+        //     where: {organizationId: session.user.organizationId}
+        // }).map(rfp => )
+
+        return {success: true, data: updateRfps}
     } catch (e) {
         return {success: false, error: e}
     }

@@ -524,7 +524,8 @@ export async function getRFPs(organizationId: string | undefined) {
                         milestone: true
                     }
                 }
-            }
+            },
+            orderBy: [{ createdAt: "desc" }]
         })
 
         if (!fetchedRFPs) {
