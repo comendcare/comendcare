@@ -296,9 +296,7 @@ export function EditAssetForm({
                             </TooltipTrigger>
                             {!assetData.pinned && numAssetsPinned >= 5 && (
                                 <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is limited to 5 assets. You already have 5 assets pinned.
-                                    
-                                    Please unpin another asset before pinning this asset.`}</p>
+                                    <p>{`Pinning is limited to 5 assets. You already have 5 assets pinned. Please unpin another asset before pinning this asset.`}</p>
                                 </TooltipContent>
                             )}
                         </Tooltip>
