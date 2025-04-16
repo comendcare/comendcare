@@ -402,9 +402,9 @@ export function EditRFPForm({
                                     render={({field}) => (
                                         <FormItem className="flex gap-2 items-center text-left">
                                             <div>
-                                            <FormLabel>{`Pinned to profile`}</FormLabel>
+                                            <FormLabel>{`Pinned to Profile`}</FormLabel>
                                             <FormDescription>
-                                                {`Pinning an RFP to your profile highlights it in the RFPs section of your organization profile.`}
+                                                {`Showcase this RFP at the top of your organization’s RFPs section so it's easy to find and stands out.`}
                                             </FormDescription>
                                             </div>
                                             <FormControl className="justify-self-end">
