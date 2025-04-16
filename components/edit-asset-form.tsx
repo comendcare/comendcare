@@ -36,13 +36,11 @@ import MultipleSelector from "./ui/multiple-selector"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-// import { createOrUpdateAsset, deleteAsset } from "@/lib/actions"
 import { Option } from "@/lib/types"
 import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { AssetState, useAssetStore } from "@/state/assets/assetStore"
 import { useShallow } from "zustand/react/shallow"
-
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -88,7 +86,6 @@ export function EditAssetForm({
     numAssetsPinned: number,
     closeDialog?: () => void
 }) {
-    const router = useRouter()
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
@@ -175,14 +172,14 @@ export function EditAssetForm({
             toast.success(
                 "Asset created or updated successfully!",
                 {position: "bottom-left"}
-            );
-            // router.refresh();
+            )
+            if (closeDialog) closeDialog()
         } catch (error) {
             console.error("Error creating or updating asset:", error);
             toast.error(
                 "Failed to create or update asset.",
                 {position: "bottom-left"}
-            );
+            )
         }
     }
 
