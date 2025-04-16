@@ -29,7 +29,7 @@ import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import React from "react";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
-import {MessageCircle, PencilIcon, Share2} from "lucide-react";
+import {Mail, Share2} from "lucide-react";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -181,7 +181,7 @@ export default async function OrganizationHomePage({
                     },
                     {
                         title: "Contact patient group",
-                        icon: <MessageCircle />,
+                        icon: <Mail />,
                         dialog: <ContactPAGDialog organization={organization}/>
                     },
                     // {

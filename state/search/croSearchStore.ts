@@ -111,7 +111,7 @@ function generateFiltersString(filters: FiltersType): string {
     if (filters?.types && filters.types.length > 0) {
         const typeFilter = filters.types
             .map(type => `companyType:=${escapeValue(type.value)}`)
-            .join(" && ");
+            .join(" || ");
         filtersList.push(`(${typeFilter})`);
     }
 
