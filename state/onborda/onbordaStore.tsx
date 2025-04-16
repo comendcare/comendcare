@@ -146,7 +146,7 @@ export interface ResearchPlanOnbordaState {
     decrementCurrentStep: () => Selector | undefined // changes state to previous step, and returns the previous step
 }
 
-export const useResearchPlanOnbordaStore = create<ResearchPlanOnbordaState>()(
+export const useOnbordaStore = create<ResearchPlanOnbordaState>()(
     temporal((set, get) => ({
             activeTour: undefined,
             setActiveTour: (tour: string | undefined) => {

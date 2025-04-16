@@ -9,6 +9,7 @@ import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 import { Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { ScrollArea } from "./ui/scroll-area"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -65,28 +66,36 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                         </DialogDescription>
                     </DialogHeader>
 
-                    <Tabs value={tab} onValueChange={(newTab => setTab(newTab))}>
-                        <TabsList>
+                    <Tabs value={tab} onValueChange={(newTab => setTab(newTab))} className="flex h-full flex-col">
+                        <TabsList className="w-fit">
                             <TabsTrigger value="projects">Project Templates</TabsTrigger>
                             <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
                         </TabsList>
+
+                        <div className="flex-1 min-h-0">
                         <TabsContent value="projects" className="h-full">
-                            <MilestoneTemplates
-                                selectedMilestonesTemplate={selectedMilestonesTemplate}
-                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
-                                createEmpty={() => {
-                                    // addMilestones([{name: 'New Milestone'}])
-                                }}
-                                inDialog={true}
-                            />
+                            <ScrollArea className="h-full">
+                                <MilestoneTemplates
+                                    className="h-[50vh] max-h-[50vh]"
+                                    selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                    createEmpty={() => {
+                                        // addMilestones([{name: 'New Milestone'}])
+                                    }}
+                                    inDialog={true}
+                                />
+                            </ScrollArea>
                         </TabsContent>
                         <TabsContent value="research-plans" className="h-full">
-                            <ResearchPlanTemplates
-                                selectedMilestonesTemplate={selectedMilestonesTemplate}
-                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
-                                inDialog={true}
-                            />
+                            <ScrollArea className="h-full">
+                                <ResearchPlanTemplates
+                                    selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                    inDialog={true}
+                                />
+                            </ScrollArea>
                         </TabsContent>
+                        </div>
                     </Tabs>
 
                     <DialogFooter>

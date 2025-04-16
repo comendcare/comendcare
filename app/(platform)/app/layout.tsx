@@ -13,14 +13,16 @@ import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation
 import Loading from "@/app/loading";
 import {
     getAllNotifications,
+    getAssets,
     getColumns,
     getKanbanFromOrganizationId,
     getMilestoneTypes,
     getNodesEdgesAndMilestones,
+    getRFPs,
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeAssetsStore, initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban, createRoadmap } from "@/lib/actions";
@@ -58,20 +60,6 @@ export default function AppLayout({children}: AppLayoutProps) {
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
     const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
-
-    useEffect(() => {
-        // Handle loading state for the session
-        if (status === "loading") {
-            setIsLoading(true);
-        } else {
-            // setIsLoading(false);
-
-            // Redirect if unauthenticated
-            if (status === "unauthenticated") {
-                redirect("/login");
-            }
-        }
-    }, [status])
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
         shallow: true,
@@ -113,6 +101,20 @@ export default function AppLayout({children}: AppLayoutProps) {
         clearOnDefault: true,
     })
 
+    useEffect(() => {
+        // Handle loading state for the session
+        if (status === "loading") {
+            setIsLoading(true);
+        } else {
+            // setIsLoading(false);
+
+            // Redirect if unauthenticated
+            if (status === "unauthenticated") {
+                redirect("/login");
+            }
+        }
+    }, [status])
+
     const handleSessionUpdate = async () => {
         console.log(`session changed`, session)
         if (session) {
@@ -125,9 +127,10 @@ export default function AppLayout({children}: AppLayoutProps) {
                 return
             }
 
+            // Init relevant Zustand stores
             console.log(`Start initialization... for org ${session.user.organizationId}`)
 
-            // Init Notifications Store
+            // Init notifications
             let notifications = await getAllNotifications()
             if (notifications.success && notifications.data) {
                 initializeNotificationsState({
@@ -139,7 +142,7 @@ export default function AppLayout({children}: AppLayoutProps) {
             }
             console.log(`Notificaions initialized...`)
 
-            // Init CRO Search Store
+            // init CRO Search store
             const milestoneTypes = await getMilestoneTypes()
             const parsedCROFilters = {
                 categories: parseQuery(queryCategories),
@@ -159,11 +162,7 @@ export default function AppLayout({children}: AppLayoutProps) {
             initializeCROSearch(parsedCROFilters)
             console.log(`CRO search initialized...`)
 
-            // Init Milestone Search Store
-            // initializeMilestoneSearch()
-            // console.log(`Milestone search initialized...`)
-
-            // Init Organization/PAG Search Store
+            // init organization/PAG search store
             const parsedPAGFilters = {
                 systems: parseQuery(querySystems).map(query => {
                     const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
@@ -184,7 +183,7 @@ export default function AppLayout({children}: AppLayoutProps) {
             initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
 
-            // Init Research Plan Store
+            // init roadmap/research plan store
             let response = await getRoadmapId(session.user.organizationId)
             if (response.success) {
                 // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
@@ -194,7 +193,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                     console.log(`roadmap`, roadmap)
                     response = await getRoadmapId(session.user.organizationId)
                 }
-
+        
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
                 const urlNode = searchParams.get("milestone")
                 const urlView = searchParams.get("view")
@@ -222,6 +221,26 @@ export default function AppLayout({children}: AppLayoutProps) {
             } else {
                 console.error(response.error)
                 toast.error(response.error)
+            }
+
+            // init asset store
+            let assetResponse = await getAssets(session.user.organizationId)
+            if (assetResponse.success) {
+                initializeAssetsStore(assetResponse.data || [])
+                console.log(`Assets initialized...`)
+            } else {
+                console.error(assetResponse.error)
+                toast.error(assetResponse.error)
+            }
+
+            // init rfp store
+            let rfpResponse = await getRFPs(session.user.organizationId)
+            if (rfpResponse.success) {
+                initializeRFPStore(rfpResponse.data || [])
+                console.log(`RFPs initialized...`)
+            } else {
+                console.error(rfpResponse.error)
+                toast.error(rfpResponse.error)
             }
 
             console.log(`Initialization completed successfully!`)

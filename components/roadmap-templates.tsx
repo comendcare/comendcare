@@ -96,28 +96,36 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
     )
 }
 
-export const MilestoneTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, createEmpty, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, createEmpty: () => void, inDialog?: boolean}) => {
+export const MilestoneTemplates = ({ 
+    selectedMilestonesTemplate, 
+    setSelectedMilestonesTemplate, 
+    createEmpty, 
+    inDialog = false, 
+    className 
+}: {
+    selectedMilestonesTemplate: any, 
+    setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, 
+    createEmpty: () => void, 
+    inDialog?: boolean,
+    className?: string
+}) => {
     const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
     
     return(
-        <div className="h-[50vh] max-h-[50vh]">
-        <ScrollArea type="always" className="h-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                {allCategories.map((category, index) => (
-                    <>
-                        <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
-                        {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
-                            <MilestoneTemplateCardMultiSelect 
-                                className={index === 0 ? "onborda-select-a-template": ""}
-                                milestoneData={milestoneData}
-                                selectedMilestones={selectedMilestonesTemplate}
-                                setSelectedMilestones={setSelectedMilestonesTemplate}
-                            />
-                        ))}
-                    </>
-                ))}
-            </div>
-        </ScrollArea>
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2", className)}>
+            {allCategories.map((category, index) => (
+                <>
+                    <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
+                    {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
+                        <MilestoneTemplateCardMultiSelect 
+                            className={index === 0 ? "onborda-select-a-template": ""}
+                            milestoneData={milestoneData}
+                            selectedMilestones={selectedMilestonesTemplate}
+                            setSelectedMilestones={setSelectedMilestonesTemplate}
+                        />
+                    ))}
+                </>
+            ))}
         </div>
     )
 }
