@@ -23,7 +23,8 @@ export const useRFPStore = create<RFPState>()(
             createRFP: async (rfp: Partial<RFP>, orgId: string) => {
                 const newRfp: RFP = await createOrUpdateRFP(rfp, orgId)
                 console.log(`new rfp`, newRfp)
-                set({ rfps: [...get().rfps, newRfp]})
+                // new RFP first, because RFPs are displayed in decending order by creation date
+                set({ rfps: [newRfp, ...get().rfps]})
             },
             updateRFP: async (rfp: Partial<RFP>, orgId: string) => {
                 const updatedRfp: RFP = await createOrUpdateRFP(rfp, orgId)

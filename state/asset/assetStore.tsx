@@ -23,7 +23,8 @@ export const useAssetStore = create<AssetState>()(
             createAsset: async (asset: Partial<Asset>, orgId: string) => {
                 const newAsset: Asset = await createOrUpdateAsset(asset, orgId)
                 console.log(`new asset`, newAsset)
-                set({ assets: [...get().assets, newAsset]})
+                // new Asset first, because Assets are displayed in decending order by creation date
+                set({ assets: [newAsset, ...get().assets]})
             },
             updateAsset: async (asset: Partial<Asset>, orgId: string) => {
                 const updatedAsset: Asset = await createOrUpdateAsset(asset, orgId)

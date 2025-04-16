@@ -291,9 +291,9 @@ export function EditRFPForm({
                 {position: "bottom-left", duration: 20000, id: "undo-toast"}
             )
         } catch (error) {
-            console.error("Error updating organization:", error);
+            console.error("Error deleting RFP:", error);
             toast.error(
-                "Failed to update organization profile.",
+                "Failed to delete RFP.",
                 {position: "bottom-left"}
             );
         }
