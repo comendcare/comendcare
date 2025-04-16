@@ -402,13 +402,13 @@ export const ASSOCIATED_CATEGORIES: { id: string; label: string; value: string; 
 export const BUSINESS_TYPES: { id: string; label: string; value: string; description: string }[] = [
     {
         id: '1',
-        label: 'Mid-Sized Business (10-100M TTM Revenue)',
+        label: 'Mid-Sized Business',
         value: 'Mid-Sized Business (10-100M TTM Revenue)',
         description: 'Businesses with total trailing twelve-month revenue between $10M and $100M.',
     },
     {
         id: '2',
-        label: 'Small Business (1-10M TTM Revenue)',
+        label: 'Small Business',
         value: 'Small Business (1-10M TTM Revenue)',
         description: 'Businesses with total trailing twelve-month revenue between $1M and $10M.',
     },
@@ -420,25 +420,25 @@ export const BUSINESS_TYPES: { id: string; label: string; value: string; descrip
     },
     {
         id: '4',
-        label: 'New Startup (0-1M TTM Revenue)',
+        label: 'New Startup',
         value: 'New Startup (0-1M TTM Revenue)',
         description: 'Early-stage companies with total trailing twelve-month revenue below $1M.',
     },
     {
         id: '5',
-        label: 'Consultant (5 or more employees)',
+        label: 'Consultant',
         value: 'Consultant (5 or more employees)',
         description: 'Consulting firms with at least five employees providing specialized services.',
     },
     {
         id: '6',
-        label: 'Large Business (>100M TTM Revenue)',
+        label: 'Large Business',
         value: 'Large Business (>100M TTM Revenue)',
         description: 'Businesses with total trailing twelve-month revenue exceeding $100M.',
     },
     {
         id: '7',
-        label: 'Consultant (<5 employees)',
+        label: 'Consultant',
         value: 'Consultant (<5 employees)',
         description: 'Independent consultants or small consulting firms with fewer than five employees.',
     },
