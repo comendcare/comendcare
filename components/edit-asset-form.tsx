@@ -36,10 +36,12 @@ import MultipleSelector from "./ui/multiple-selector"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { createOrUpdateAsset, deleteAsset } from "@/lib/actions"
+// import { createOrUpdateAsset, deleteAsset } from "@/lib/actions"
 import { Option } from "@/lib/types"
 import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { AssetState, useAssetStore } from "@/state/assets/assetStore"
+import { useShallow } from "zustand/react/shallow"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -70,6 +72,13 @@ const editAssetForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional()
 })
 
+const assetSelector = (state: AssetState) => ({
+    createAsset: state.createAsset,
+    updateAsset: state.updateAsset,
+    deleteAsset: state.deleteAsset,
+    saveState: state.saveState
+})
+
 export function EditAssetForm({
     assetData,
     numAssetsPinned,
@@ -84,6 +93,14 @@ export function EditAssetForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+    const { createAsset, updateAsset, deleteAsset, saveState } = useAssetStore(useShallow(assetSelector))
+    const { undo } = useAssetStore.temporal.getState()
+
+    const handleUndo = () => {
+        undo()
+        saveState()
+        toast.dismiss("undo-toast")
+    }
 
     const form = useForm<z.infer<typeof editAssetForm>>({
         mode: "onChange",
@@ -142,39 +159,73 @@ export function EditAssetForm({
         console.log(`updateData`, updateData)
 
         if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.");
+            toast.error(
+                "You're not signed into an organization right now.",
+                {position: "bottom-left"}
+            );
             return;
         }
 
         try {
-            await createOrUpdateAsset(updateData, session.user.organizationId);
-            toast.success("Asset created or updated successfully!");
-            router.refresh();
+            if (assetData.id) {
+                await updateAsset(updateData, session.user.organizationId)
+            } else {
+                await createAsset(updateData, session.user.organizationId)
+            }
+            toast.success(
+                "Asset created or updated successfully!",
+                {position: "bottom-left"}
+            );
+            // router.refresh();
         } catch (error) {
             console.error("Error creating or updating asset:", error);
-            toast.error("Failed to create or update asset.");
+            toast.error(
+                "Failed to create or update asset.",
+                {position: "bottom-left"}
+            );
         }
     }
 
     const handleDeleteAsset = async () => {
         if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.")
+            toast.error(
+                "You're not signed into an organization right now.",
+                {position: "bottom-left"}
+            )
             return
         }
 
         if (!assetData.id) {
-            toast.error("This asset does not have an id.")
+            toast.error(
+                "This asset does not have an id.",
+                {position: "bottom-left"}
+            )
             return
         }
 
         try {
             await deleteAsset(assetData.id)
             if (closeDialog) closeDialog()
-            toast.success("Asset deleted successfully!");
-            router.refresh();
+            toast(
+                <div className="flex flex-col gap-2 w-full">
+                    <span className="flex justify-between items-center">
+                        <p className="font-semibold text-gray-900">
+                            {`Project Deleted`}
+                        </p>
+                        <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
+                    </span>
+                    <p className="text-sm text-gray-500">
+                        {`Your project had been deleted successfully.`}
+                    </p>
+                </div>,
+                {position: "bottom-left", duration: 20000, id: "undo-toast"}
+            )
         } catch (error) {
             console.error("Error deleting asset:", error);
-            toast.error("Failed to delete asset.");
+            toast.error(
+                "Failed to delete asset.",
+                {position: "bottom-left"}
+            );
         }
     }
 
