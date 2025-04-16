@@ -34,6 +34,7 @@ export function DeleteMilestoneDialogContent({
         undo()
         undo()
         saveState()
+        toast.dismiss("undo-toast")
     }
 
     const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
@@ -52,7 +53,7 @@ export function DeleteMilestoneDialogContent({
                     {`Your project had been deleted successfully.`}
                 </p>
             </div>,
-            {position: "bottom-left", duration: 20000}
+            {position: "bottom-left", duration: 20000, id: "undo-toast"}
         )
     }
 
