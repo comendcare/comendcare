@@ -108,6 +108,7 @@ export const MilestoneTemplates = ({ selectedMilestonesTemplate, setSelectedMile
                         <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
                         {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
                             <MilestoneTemplateCardMultiSelect 
+                                className={index === 0 ? "onborda-select-a-template": ""}
                                 milestoneData={milestoneData}
                                 selectedMilestones={selectedMilestonesTemplate}
                                 setSelectedMilestones={setSelectedMilestonesTemplate}
