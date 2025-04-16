@@ -14,7 +14,7 @@ import Image from "next/image"
 import { FeedbackSheet } from "@/components/feedback"
 import { Suspense } from "react"
 import Loading from "./loading";
-import { onbordaTours } from "@/state/onborda/researchPlanOnbordaStore";
+import { onbordaTours } from "@/state/onborda/onbordaStore";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({

@@ -39,7 +39,7 @@ import Loading from "@/app/loading"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
-import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
+import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
 import { ScrollArea } from "./ui/scroll-area"
 
@@ -73,7 +73,7 @@ export function Roadmap() {
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const { step } = useResearchPlanOnbordaStore(useShallow(onbordaSelector))
+    const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
