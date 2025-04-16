@@ -272,9 +272,9 @@ export function EditAssetForm({
                                     render={({field}) => (
                                         <FormItem className="flex gap-2 items-center text-left">
                                             <div>
-                                            <FormLabel>{`Pinned to profile`}</FormLabel>
+                                            <FormLabel>{`Pinned to Profile`}</FormLabel>
                                             <FormDescription>
-                                                {`Pinning an asset to your profile highlights it in the assets section of your organization profile.`}
+                                                {`Showcase this Asset at the top of your organization’s Asset section so it's easy to find and stands out.`}
                                             </FormDescription>
                                             </div>
                                             <FormControl className="justify-self-end">
