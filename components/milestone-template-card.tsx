@@ -7,8 +7,9 @@ import {
     CardTitle
 } from "./ui/card"
 import { CheckBubble } from "./check-bubble"
+import { cn } from "@/lib/utils";
 
-export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilestones, setSelectedMilestones }: {milestoneData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
+export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilestones, setSelectedMilestones, className }: {milestoneData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void, className?: string}) {
     const [isChecked, setIsChecked] = useState(false);
 
     useEffect(() => {
@@ -23,7 +24,7 @@ export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilest
     }, [isChecked])
     
     return (
-        <button onClick={() => {setIsChecked(prev => !prev)}}>
+        <button onClick={() => {setIsChecked(prev => !prev)}} className={cn(className)}>
             <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
                 <CardHeader>
                     <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
