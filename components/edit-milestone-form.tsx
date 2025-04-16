@@ -75,7 +75,6 @@ import { badgeVariants } from "./ui/badge"
 import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
 import { useOnborda } from "./onborda/OnbordaContext"
 
-
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
@@ -438,7 +437,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className="onborda-editing-project-details onborda-recommendations px-8 pb-4 h-full">
+            <ScrollArea className="px-8 pb-4 h-full">
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
