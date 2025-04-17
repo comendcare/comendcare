@@ -9,14 +9,15 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogDescription,
+    DialogClose,
 } from "@/components/ui/dialog";
 import {Form} from "@/components/ui/form";
 import {cn} from "@/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageCropper} from "@/components/form-image-cropper";
-import {FileWithPreview} from "@/components/image-cropper";
+import {FormImageSelector} from "@/components/form-image-selector";
+import {FileWithPreview} from "@/components/image-selector";
 import {toast} from "sonner";
 import {handleImageUpload} from "@/lib/upload";
 import {updateOrganization} from "@/lib/actions";
@@ -78,6 +79,11 @@ export function ProfilePhoto({
             }
         }
 
+        if (!selectedFileProfile) {
+            // no file selected, set profile image to null, allow deleting profile photo
+            formData.set("image", "")
+        }
+
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
@@ -128,7 +134,7 @@ export function ProfilePhoto({
 
                         <Form {...editOrgForm}>
                             <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                                <FormImageCropper
+                                <FormImageSelector
                                     form={editOrgForm}
                                     name="image"
                                     title=""
@@ -138,9 +144,7 @@ export function ProfilePhoto({
                                     setSelectedFile={setSelectedFileProfile}
                                     className="mx-auto"
                                 />
-                                <Button type="submit" className="w-fit">
-                                    Save
-                                </Button>
+                                <Button type="submit" className="w-fit">Save</Button>
                             </form>
                         </Form>
                     </DialogContent>

@@ -23,7 +23,7 @@ import {AddressType, MODALITIES, Option} from "@/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Bold, Info, Italic} from "lucide-react";
-import {FileWithPreview} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-selector";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@/lib/utils";
@@ -868,16 +868,6 @@ export default function OrganizationOnboardingForm(
                                 {/*            <FormMessage/>*/}
                                 {/*        </FormItem>*/}
                                 {/*    )}*/}
-                                {/*/>*/}
-
-                                {/*<FormImageCropper*/}
-                                {/*    form={newOrgForm}*/}
-                                {/*    name="image"*/}
-                                {/*    title={"Organization Logo"}*/}
-                                {/*    description={"This will be used as your organization profile's image."}*/}
-                                {/*    aspect={1}*/}
-                                {/*    selectedFile={selectedFile}*/}
-                                {/*    setSelectedFile={setSelectedFile}*/}
                                 {/*/>*/}
 
                                 {/*<FormField*/}

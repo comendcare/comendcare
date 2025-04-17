@@ -13,8 +13,8 @@ import {Form} from "@/components/ui/form";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageCropper} from "@/components/form-image-cropper";
-import {FileWithPreview} from "@/components/image-cropper";
+import {FormImageSelector} from "@/components/form-image-selector";
+import {FileWithPreview} from "@/components/image-selector";
 import {toast} from "sonner";
 import {handleImageUpload} from "@/lib/upload";
 import {updateOrganization} from "@/lib/actions";
@@ -116,7 +116,7 @@ export function PAGBannerPhoto({
 
                         <Form {...editOrgForm}>
                             <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                                <FormImageCropper
+                                <FormImageSelector
                                     form={editOrgForm}
                                     name="headerImage"
                                     title=""
