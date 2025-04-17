@@ -72,9 +72,8 @@ import { NotificationsState, useNotificationsStore } from "@/state/notifications
 import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
 import { toast } from "sonner"
 import { badgeVariants } from "./ui/badge"
-import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
+import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { useOnborda } from "./onborda/OnbordaContext"
-
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -159,7 +158,7 @@ export function EditMilestoneForm({
     const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
-    const { step } = useResearchPlanOnbordaStore(useShallow(onbordaSelector))
+    const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -438,7 +437,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className="onborda-editing-project-details onborda-recommendations px-8 pb-4 h-full">
+            <ScrollArea className="px-8 pb-4 h-full">
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}

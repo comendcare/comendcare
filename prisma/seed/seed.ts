@@ -830,7 +830,7 @@ async function createConditions(organizationIds: string[]) {
             prevalenceRatio: 1/1000000,
             numberOfPatientsEngaged: 37,
             relevantDiseaseMechanisms: ["HAPLOINSUFFICIENCY"],
-            associatedSystems: ["NEURO", "MUSCULOSKELETAL"],
+            associatedSystems: ["NEUROLOGICAL", "MUSCULOSKELETAL"],
             associatedGenes: ["GEL3", "M4SF"],
             associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
             existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
