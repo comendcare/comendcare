@@ -105,7 +105,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                     <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                         {(() => {
 
-                            if (organization?.therapeuticsOfInterest.length === 0) {
+                            if (organization?.therapeuticsOfInterest?.length === 0) {
                                 return (
                                     <p className="text-gray-400">
                                         {`No relevant badges.`}
