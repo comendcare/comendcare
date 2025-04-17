@@ -12,14 +12,14 @@ import {
     DialogClose,
 } from "@/components/ui/dialog";
 import {Form} from "@/components/ui/form";
-import {cn} from "@/lib/utils";
+import {cn, getPublicFile} from "@/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {FormImageSelector} from "@/components/form-image-selector";
 import {FileWithPreview} from "@/components/image-selector";
 import {toast} from "sonner";
-import {handleImageUpload} from "@/lib/upload";
+import {handleImageDelete, handleImageUpload} from "@/lib/upload";
 import {updateOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
@@ -82,6 +82,11 @@ export function ProfilePhoto({
         if (!selectedFileProfile) {
             // no file selected, set profile image to null, allow deleting profile photo
             formData.set("image", "")
+        }
+
+        if (values.image !== img && img) {
+            // if the image is being changed, delete the old image in our google cloud storage bucket
+            await handleImageDelete(img)
         }
 
         try {

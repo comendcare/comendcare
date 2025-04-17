@@ -16,7 +16,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {FormImageSelector} from "@/components/form-image-selector";
 import {FileWithPreview} from "@/components/image-selector";
 import {toast} from "sonner";
-import {handleImageUpload} from "@/lib/upload";
+import {handleImageDelete, handleImageUpload} from "@/lib/upload";
 import {updateOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
@@ -72,6 +72,16 @@ export function PAGBannerPhoto({
                 toast.error("Image upload failed.");
                 return;
             }
+        }
+
+        if (!selectedFileHeader) {
+            // no file selected, set profile image to null, allow deleting profile photo
+            formData.set("headerImage", "")
+        }
+
+        if (values.image !== img && img) {
+            // if the image is being changed, delete the old image in our google cloud storage bucket
+            await handleImageDelete(img)
         }
 
         try {
