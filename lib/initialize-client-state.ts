@@ -8,6 +8,9 @@ import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
+import { Asset, RFP } from '@/lib/types';
+import { useAssetStore } from "@/state/asset/assetStore";
+import { useRFPStore } from "@/state/rfp/rfpStore";
 
 export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
@@ -68,18 +71,20 @@ export function initializeNotificationsState(initData: {
     }
 }
 
-// export function initializeKanbanState(initData: {
-//     kanbanId: string | undefined,
-//     columns: ColumnType[]
-// }) {
-//     const { clear } = useKanbanStore.temporal.getState()
+export function initializeAssetsStore(assets: Asset[]) {
+    if (typeof window !== "undefined") {
+        const initAssetState = useAssetStore.getState().initState;
 
-//     if (typeof window !== "undefined") {
-//         const initKanbanState = useKanbanStore.getState().initState;
-//         const { columns, kanbanId } = initData;
+        // Call Zustand's initState directly
+        initAssetState(assets)
+    }
+}
 
-//         // Call Zustand's initState directly
-//         initKanbanState(columns, columns.flatMap(column => column.tasks) || [], kanbanId)
-//         clear() // clear first/uninitialized state from history, so undo doesn't apply the un-initialized state
-//     }
-// }
+export function initializeRFPStore(rfps: RFP[]) {
+    if (typeof window !== "undefined") {
+        const initRFPState = useRFPStore.getState().initState;
+
+            // Call Zustand's initState directly
+            initRFPState(rfps)
+    }
+}
