@@ -30,7 +30,6 @@ export async function generateMetadata({
     const title = organizationData?.name || "Default Title" // Use a fallback title
     const description = organizationData?.description || "Default description" // Use a fallback description
 
-    console.log("organizationData", organizationData)
     if (!organizationData) {
         return {
             title: "Page Not Found",
