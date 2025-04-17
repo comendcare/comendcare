@@ -787,6 +787,17 @@ export async function deleteOrganization(organization: Organization) {
             where: {id: organization.id},
         });
 
+        // For now, delete the condition too when organization is deleted
+        const deleteConditions = prisma.condition.deleteMany({
+            where: {
+                organizations: {
+                    some: {
+                        id: organization.id
+                    }
+                }
+            }
+        });
+
         const deleteTypeSense = deleteTypeSenseDocument(
             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             (
@@ -799,7 +810,7 @@ export async function deleteOrganization(organization: Organization) {
         );
 
         // Run both deletions concurrently
-        const [response] = await Promise.all([deleteOrganization, deleteTypeSense])
+        const [response] = await Promise.all([deleteOrganization, deleteConditions, deleteTypeSense])
 
         await revalidateTag(
             `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
