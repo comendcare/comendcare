@@ -13,7 +13,7 @@ import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
 import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { Building2, Calendar, HandCoins, PencilIcon } from "lucide-react"
+import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 
 export async function generateMetadata({
@@ -274,32 +274,24 @@ export default async function OrganizationRoadmapPage({
 
                         <FloatingDock
                             items={[
-                                // {
-                                //     title: "Post on feed",
-                                //     icon: <IconShare2/>,
-                                //     href: "/app/feed",
-                                // },
                                 {
                                     title: "Share on social media",
-                                    icon: <IconShare/>,
-                                    dialog: <ShareDialog
-                                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
+                                    icon: <Share />,
+                                    dialog: (
+                                        <ShareDialog
+                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                        />
+                                    ),
                                 },
-                                {
-                                    title: "Contact patient group",
-                                    icon: <PencilIcon/>,
-                                    dialog: <ContactPAGDialog organization={organization}/>
-                                },
-                                // {
-                                //     title: "Report an issue",
-                                //     icon: <IconFlag/>,
-                                //     sheet: <>
-                                //         <SheetHeader>
-                                //             <SheetTitle>Send Feedback</SheetTitle>
-                                //         </SheetHeader>
-                                //         <FeedbackForm/>
-                                //     </>
-                                // }
+                                ...(organization.contactEmail
+                                    ? [
+                                        {
+                                            title: "Contact patient group",
+                                            icon: <Mail/>,
+                                            dialog: <ContactPAGDialog organization={organization} />,
+                                        },
+                                    ]
+                                    : []),
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"

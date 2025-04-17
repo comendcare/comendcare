@@ -9,7 +9,6 @@ import {ProfilePhoto} from "@/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {Post} from "@/app/condition/[slug]/page";
 import {FloatingDock} from "@/components/floating-dock";
-import {IconFlag, IconShare} from "@tabler/icons-react";
 import {
     DialogDescription,
     DialogFooter,
@@ -21,7 +20,7 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {PublicRoadmapContent} from "@/components/public-roadmap-content";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
-import { Building2, Calendar, HandCoins, PencilIcon } from "lucide-react";
+import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 
 export async function generateMetadata({
@@ -282,43 +281,24 @@ export default async function OrganizationRoadmapPage({
 
                         <FloatingDock
                             items={[
-                                // {
-                                //     title: "Post on feed",
-                                //     icon: <IconShare2/>,
-                                //     href: "/app/feed",
-                                // },
                                 {
                                     title: "Share on social media",
-                                    icon: <IconShare/>,
-                                    dialog: <ShareDialog
-                                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
+                                    icon: <Share />,
+                                    dialog: (
+                                        <ShareDialog
+                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                        />
+                                    ),
                                 },
-                                {
-                                    title: "Contact patient group",
-                                    icon: <PencilIcon/>,
-                                    dialog: <ContactPAGDialog organization={organization}/>
-                                },
-                                // {
-                                //     title: "Report an issue",
-                                //     icon: <IconFlag/>,
-                                //     dialog: (
-                                //         <>
-                                //             <DialogHeader>
-                                //                 <DialogTitle>Edit profile</DialogTitle>
-                                //                 <DialogDescription>
-                                //                     {`Make changes to your profile here. Click save when you're done.`}
-                                //                 </DialogDescription>
-                                //             </DialogHeader>
-                                //             <div className="grid gap-4 py-4">
-                                //                 <Label htmlFor="name">Name</Label>
-                                //                 <Input id="name" defaultValue="John Doe"/>
-                                //             </div>
-                                //             <DialogFooter>
-                                //                 <Button type="submit">Save changes</Button>
-                                //             </DialogFooter>
-                                //         </>
-                                //     ),
-                                // }
+                                ...(organization.contactEmail
+                                    ? [
+                                        {
+                                            title: "Contact patient group",
+                                            icon: <Mail/>,
+                                            dialog: <ContactPAGDialog organization={organization} />,
+                                        },
+                                    ]
+                                    : []),
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"
