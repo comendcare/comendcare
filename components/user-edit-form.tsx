@@ -21,12 +21,12 @@ import {editUser} from "@/lib/actions";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AddressType} from "@/lib/types";
 import {useCallback, useEffect, useState} from "react";
-import {FileWithPreview} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
 import { handleImageUpload } from "@/lib/upload";
-import { FormImageCropper } from "./form-image-cropper";
+import { FormImageSelector } from "./form-image-selector";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -249,47 +249,7 @@ export default function UserEditForm() {
                 {/*    )}*/}
                 {/*/>*/}
 
-                {/* <FormField
-                    control={form.control}
-                    name="image"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Profile Image</FormLabel>
-                            <FormControl>
-                                <div className="flex flex-col items-start space-y-4">
-                                    {selectedFile ? (
-                                        <ImageCropper
-                                            aspect={1}
-                                            dialogOpen={isDialogOpen}
-                                            setDialogOpen={setDialogOpen}
-                                            selectedFile={selectedFile}
-                                            setSelectedFile={(file: any) => {
-                                                if (file == null) setSelectedFile(null)
-                                                field.onChange(file?.preview); // Update form field value
-                                            }}
-                                        />
-                                    ) : (
-                                        <Avatar
-                                            {...getRootProps()}
-                                            className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                        >
-                                            <input {...getInputProps()} />
-                                            <AvatarFallback
-                                                className="text-center flex flex-col justify-center gap-y-4">
-                                                <Upload />
-                                                Click or drop!
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    )}
-                                </div>
-                            </FormControl>
-                            <FormDescription>Your profile image.</FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                /> */}
-
-                <FormImageCropper 
+                <FormImageSelector 
                     form={form}
                     name="image"
                     title="Profile Image"
