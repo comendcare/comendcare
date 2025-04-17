@@ -247,7 +247,7 @@ export function abbreviateNumber(num: number | null | undefined) {
 }
 
 export const formatMoney = (moneyRaised: number | undefined) => {
-    if (moneyRaised === undefined) return "$0";
+    if (moneyRaised === undefined) return "0";
 
     const formatNumber = (num: number, divisor: number, suffix: string) => {
         const formatted = (num / divisor).toFixed(1);
