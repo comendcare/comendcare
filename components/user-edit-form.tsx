@@ -25,7 +25,7 @@ import {FileWithPreview} from "@/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
-import { handleImageUpload } from "@/lib/upload";
+import { handleImageDelete, handleImageUpload } from "@/lib/upload";
 import { FormImageSelector } from "./form-image-selector";
 
 const userFormSchema = z.object({
@@ -171,6 +171,11 @@ export default function UserEditForm() {
             if (selectedFile && values.image && values.image !== defaultValues?.image) {
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                 values.image = imgUrl || undefined
+            }
+
+            if (values.image !== defaultValues?.image && defaultValues?.image) {
+                // if the image is being changed, delete the old image in our google cloud storage bucket
+                await handleImageDelete(defaultValues.image)
             }
 
             for (const [key, value] of Object.entries(values)) {

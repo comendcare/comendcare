@@ -3,6 +3,35 @@
 
 import { Storage } from "@google-cloud/storage"
 
+export async function deleteImg(image: {
+    name: string
+}) {
+    try {
+        const keyFileJson = JSON.parse(
+            process.env.G_CLOUD_KEY || ''
+        )
+        const storage = new Storage({
+            projectId: keyFileJson.project_id,
+            credentials: {
+                client_email: keyFileJson.client_email,
+                private_key: keyFileJson.private_key
+            }
+        }) 
+
+        const bucket = process.env.NEXT_PUBLIC_NODE_ENV === "production" 
+            ? storage.bucket('comend-app-public') // bucket for production images, images users are uploading
+            : storage.bucket('comend-app-development-public') // bucket for development and preview, images used for internal testing
+        const deleteOptions = {
+            // ifGenerationMatch: generationMatchPrecondition,
+        }
+
+        await storage.bucket(bucket.name).file(image.name).delete(deleteOptions)
+        console.log(`successfully deleted file`)
+    } catch (e) {
+        console.error("Failed to delete image:", e)
+    }
+}
+
 export async function uploadImg(image: {
     name: string
     type: string
@@ -33,6 +62,7 @@ export async function uploadImg(image: {
 
         // public url
         const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`
+        console.log(`successfully uploaded file`, imageUrl)
 
         return imageUrl
     } catch (e) {
