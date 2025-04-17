@@ -295,6 +295,7 @@ export default function UserEditForm() {
                     title="Profile Image"
                     description=""
                     aspect={1}
+                    img={defaultValues?.image}
                     selectedFile={selectedFile}
                     setSelectedFile={setSelectedFile}
                 />

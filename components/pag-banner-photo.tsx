@@ -122,6 +122,7 @@ export function PAGBannerPhoto({
                                     title=""
                                     description=""
                                     aspect={16 / 4}
+                                    img={img}
                                     selectedFile={selectedFileHeader}
                                     setSelectedFile={setSelectedFileHeader}
                                     className="rounded h-[100px] w-[400px] mx-auto"
