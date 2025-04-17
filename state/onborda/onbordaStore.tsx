@@ -12,7 +12,7 @@ export const onbordaTours: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Create a Project",
-                content: <>{`Create a project from a template or import multiple projects at a time.`}</>,
+                content: <>{`Create a project from a Template or import multiple projects simultaneously.`}</>,
                 selector: ".onborda-create-a-project",
                 side: "bottom-right" as any,
                 showControls: true,
@@ -22,27 +22,17 @@ export const onbordaTours: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Select a template",
-                content: <>{`Pick one of our project templates to get started. You will be able to edit the title and description.`}</>,
+                content: <>{`To get started, select one of our project templates. You can edit the title and description.`}</>,
                 selector: ".onborda-select-a-template",
                 side:  "bottom-right" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Editing Projects",
-            //     content: <>{`Once you've created a project, select it to edit the project details.`}</>,
-            //     selector: ".click-project-step",
-            //     side:  "bottom-right" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // },
             {
                 icon: <>⭐</>,
                 title: "Editing Project Details",
-                content: <>{`Once you've created a project you can view and edit the details in the project side panel.`}</>,
+                content: <>{`Once you’ve created a project, you can view and edit its details in the project side panel. Click the save button to submit your changes.`}</>,
                 selector: ".onborda-editing-project-details",
                 side:  "left" as any,
                 showControls: true,
@@ -51,37 +41,24 @@ export const onbordaTours: Tour[] = [
             },
             {
                 icon: <>⭐</>,
-                title: "Saving a Project",
-                content: <>{`Click the save button to submit your changes.`}</>,
-                selector: ".onborda-save-project",
-                side:  "top-right" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
                 title: "View marketplace recommendations",
-                content: <>{`Once you've added some details to your project, check out our marketplace recommendations. Marketplace recommendations include results that may be relevant to the contents or goals of your project.`}</>,
+                content: <>{`Once you’ve added some details to your project, check out our marketplace recommendations. Marketplace recommendations include results that may be relevant to your project's contents or goals.`}</>,
                 selector: ".onborda-recommendations",
                 side:  "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Connecting Milestones",
-            //     content: <>
-            //         {`Once you've created more than one milestone, you can create relationships between them by clicking and dragging from the + icon. You can remove relationships by clicking the trash icon.`}
-            //         <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
-            //     </>,                
-            //     selector: ".research-plan-tour-step5",
-            //     side:  "bottom-right" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // }
+            {
+                icon: <>⭐</>,
+                title: "Save service providers",
+                content: <>{`Select and save service providers to your shortlist and associate them with your project to stay organized.`}</>,
+                selector: ".onborda-save-service-provider",
+                side:  "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            }
         ]
     },
     {
@@ -169,7 +146,7 @@ export interface ResearchPlanOnbordaState {
     decrementCurrentStep: () => Selector | undefined // changes state to previous step, and returns the previous step
 }
 
-export const useResearchPlanOnbordaStore = create<ResearchPlanOnbordaState>()(
+export const useOnbordaStore = create<ResearchPlanOnbordaState>()(
     temporal((set, get) => ({
             activeTour: undefined,
             setActiveTour: (tour: string | undefined) => {

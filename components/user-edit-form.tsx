@@ -21,12 +21,12 @@ import {editUser} from "@/lib/actions";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AddressType} from "@/lib/types";
 import {useCallback, useEffect, useState} from "react";
-import {FileWithPreview} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
-import { handleImageUpload } from "@/lib/upload";
-import { FormImageCropper } from "./form-image-cropper";
+import { handleImageDelete, handleImageUpload } from "@/lib/upload";
+import { FormImageSelector } from "./form-image-selector";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -173,6 +173,11 @@ export default function UserEditForm() {
                 values.image = imgUrl || undefined
             }
 
+            if (values.image !== defaultValues?.image && defaultValues?.image) {
+                // if the image is being changed, delete the old image in our google cloud storage bucket
+                await handleImageDelete(defaultValues.image)
+            }
+
             for (const [key, value] of Object.entries(values)) {
                 if (key === "image" && !value) {
                     // special case for images - in case the user wants to remove the image
@@ -249,52 +254,13 @@ export default function UserEditForm() {
                 {/*    )}*/}
                 {/*/>*/}
 
-                {/* <FormField
-                    control={form.control}
-                    name="image"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Profile Image</FormLabel>
-                            <FormControl>
-                                <div className="flex flex-col items-start space-y-4">
-                                    {selectedFile ? (
-                                        <ImageCropper
-                                            aspect={1}
-                                            dialogOpen={isDialogOpen}
-                                            setDialogOpen={setDialogOpen}
-                                            selectedFile={selectedFile}
-                                            setSelectedFile={(file: any) => {
-                                                if (file == null) setSelectedFile(null)
-                                                field.onChange(file?.preview); // Update form field value
-                                            }}
-                                        />
-                                    ) : (
-                                        <Avatar
-                                            {...getRootProps()}
-                                            className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                        >
-                                            <input {...getInputProps()} />
-                                            <AvatarFallback
-                                                className="text-center flex flex-col justify-center gap-y-4">
-                                                <Upload />
-                                                Click or drop!
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    )}
-                                </div>
-                            </FormControl>
-                            <FormDescription>Your profile image.</FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                /> */}
-
-                <FormImageCropper 
+                <FormImageSelector 
                     form={form}
                     name="image"
                     title="Profile Image"
                     description=""
                     aspect={1}
+                    img={defaultValues?.image}
                     selectedFile={selectedFile}
                     setSelectedFile={setSelectedFile}
                 />

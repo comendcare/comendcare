@@ -21,7 +21,7 @@ import {editUser} from "@/lib/actions";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AddressType} from "@/lib/types";
 import {useEffect, useState} from "react";
-import {FileWithPreview} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-selector";
 import {getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
@@ -258,56 +258,6 @@ export default function UserOnboardingForm() {
                                 </FormItem>
                             )}
                         />
-
-                        {/* <FormField
-                            control={form.control}
-                            name="image"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Profile Image</FormLabel>
-                                    <FormDescription>Your profile image.</FormDescription>
-                                    <FormControl>
-                                        <div className="flex flex-col items-start space-y-4">
-                                            {selectedFile ? (
-                                                <ImageCropper
-                                                    aspect={1}
-                                                    dialogOpen={isDialogOpen}
-                                                    setDialogOpen={setDialogOpen}
-                                                    selectedFile={selectedFile}
-                                                    setSelectedFile={(file: any) => {
-                                                        if (file == null) setSelectedFile(null)
-                                                        field.onChange(file?.preview); // Update form field value
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Avatar
-                                                    {...getRootProps()}
-                                                    className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                                >
-                                                    <input {...getInputProps()} />
-                                                    <AvatarFallback
-                                                        className="text-center flex flex-col justify-center gap-y-4">
-                                                        <Upload />
-                                                        Click or drop!
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                            )}
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        /> */}
-
-                        {/*<FormImageCropper*/}
-                        {/*    form={form}*/}
-                        {/*    name="image"*/}
-                        {/*    title={"Profile Image"}*/}
-                        {/*    description={"Your profile image."}*/}
-                        {/*    aspect={1}*/}
-                        {/*    selectedFile={selectedFile}*/}
-                        {/*    setSelectedFile={setSelectedFile}*/}
-                        {/*/>*/}
 
                         <div className="space-y-2">
                             <FormField

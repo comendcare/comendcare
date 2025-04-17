@@ -36,10 +36,12 @@ import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Milestone, NodeType } from "@/lib/types"
 import Loading from "@/app/loading"
-import { MilestoneType } from "@prisma/client"
+import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
-import { ResearchPlanOnbordaState, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore"
+import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
+import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
+import { ScrollArea } from "./ui/scroll-area"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -71,7 +73,7 @@ export function Roadmap() {
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const { step } = useResearchPlanOnbordaStore(useShallow(onbordaSelector))
+    const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -371,7 +373,7 @@ export function Roadmap() {
                         <ResizablePanel
                             defaultSize={40}
                             minSize={25}
-                            className="bg-white h-full flex flex-col min-w-[400px]"
+                            className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
                         >
                             <MilestoneDetailsPanel
                                 remountKey={milestoneRemountKey}
@@ -502,39 +504,128 @@ const MilestoneDetailsPanel = ({
 
 const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
     const pathname = usePathname()
-    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { setSelectedNodeId, addMilestones } = useRoadmapStore(useShallow(selector))
+    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const { startOnborda } = useOnborda()
 
+    const [tab, setTab] = useState("research-plans")
+    const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
+
+    // Allow update once form is initialized
+    useEffect(() => {
+        const init = async () => {    
+            // get milestone types from database
+            const response = await getMilestoneTypes()
+            if (response.success && response.data) {
+                setMilestoneTypes(response.data || [])
+            }
+        }
+
+        init()
+    }, []);
+
     return (
-        <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
-            <h1 className="font-cal text-4xl">You do not have any Projects</h1>
-            <Image
-                alt="No projects"
-                src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                width={300}
-                height={300}
-            />
-            <p className="text-lg text-stone-500 max-w-xl">
-                A project is a milestone that is being planned or developed. You may attach Assets and RFPs to Projects. 
-            </p>
-            <span className="flex gap-4">
-            <Button 
-                variant={"secondary"}
-                onClick={() => {
-                    if (pathname.includes('app/research-plan')) {
-                        setSelectedNodeId(null)
-                        startOnborda('research-plan-tour')
-                    }
-                }}
-        >
-                <Wand2 aria-hidden={true} />
-                Take a tour
-            </Button>
-            <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
-                <Plus />
-                Create a project
-            </Button>
-            </span>
+        // <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
+        //     <h1 className="font-cal text-4xl">You do not have any Projects</h1>
+        //     <Image
+        //         alt="No projects"
+        //         src="https://illustrations.popsy.co/gray/graphic-design.svg"
+        //         width={300}
+        //         height={300}
+        //     />
+        //     <p className="text-lg text-stone-500 max-w-xl">
+        //         A project is a milestone that is being planned or developed. You may attach Assets and RFPs to Projects. 
+        //     </p>
+        //     <span className="flex gap-4">
+        //     <Button 
+        //         variant={"secondary"}
+        //         onClick={() => {
+        //             if (pathname.includes('app/research-plan')) {
+        //                 setSelectedNodeId(null)
+        //                 startOnborda('research-plan-tour')
+        //             }
+        //         }}
+        // >
+        //         <Wand2 aria-hidden={true} />
+        //         Take a tour
+        //     </Button>
+        //     <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
+        //         <Plus />
+        //         Create a project
+        //     </Button>
+        //     </span>
+        // </div>
+
+        <div className="flex justify-center items-center">
+            <div className="flex flex-col gap-4 min-h-0 mt-0 pt-0 h-[calc(100vh-18rem)] max-w-7xl p-10 max-h-7xl">
+                <h1 className="text-2xl">You have no projects in your research plan!</h1>
+                <p>Select projects from a research plan template to get started quickly with a curated set of projects, or select the individual projects you would like to add to your research plan.</p>
+
+                <Tabs value={tab} onValueChange={(newTab => setTab(newTab))} className="flex h-full flex-col">
+                    <TabsList className="w-fit">
+                        <TabsTrigger value="projects">Project Templates</TabsTrigger>
+                        <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
+                    </TabsList>
+
+                    <div className="flex-1 min-h-0">
+                    <TabsContent value="projects" className="h-full">
+                        <ScrollArea className="h-full">
+                            <MilestoneTemplates
+                                selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                createEmpty={() => {
+                                    // addMilestones([{name: 'New Milestone'}])
+                                }}
+                                inDialog={true}
+                            />
+                        </ScrollArea>
+                    </TabsContent>
+                    <TabsContent value="research-plans" className="h-full">
+                        <ScrollArea className="h-full">
+                            <ResearchPlanTemplates
+                                selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                inDialog={true}
+                            />
+                        </ScrollArea>
+                    </TabsContent>
+                    </div>
+                </Tabs>
+
+                <div className="w-full flex items-center justify-end gap-2 pt-4">
+                    <Button variant="secondary" type="button">
+                        Cancel
+                    </Button>
+
+                    <Button
+                        disabled={selectedMilestonesTemplate.length === 0 || milestoneTypes.length === 0}
+                        type="button"
+                        variant={"cta"}
+                        onClick={() => {
+                            console.log(`add milestone`, selectedMilestonesTemplate)
+                            addMilestones(selectedMilestonesTemplate.map((template: any) => {
+                                return ({
+                                    nodeType: "PROJECT",
+                                    title: template?.title,
+                                    description: template?.description,
+                                    types: template?.types.map((type: string) => {
+                                        const milestoneType = milestoneTypes.find(t => t.id === type)
+                                        if (!milestoneType) return // milestone type not found, don't add it to created milestone
+                                        return ({ 
+                                            milestoneTypeId: type,
+                                            milestoneType
+                                        })
+                                    }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
+                                    status: template?.status,
+                                })
+                            }))
+                        }}
+                    >
+                        <Plus />
+                        {tab === 'projects' ? `Create selected projects` : `Create selected research plan`}
+                    </Button>
+                </div>
+            </div>
         </div>
     )
 }

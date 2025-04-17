@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {Asset} from "@/lib/types";
-import { EditAssetForm } from "../edit-asset-form";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>

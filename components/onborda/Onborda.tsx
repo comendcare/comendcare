@@ -7,7 +7,7 @@ import { Portal } from "@radix-ui/react-portal";
 
 // Types
 import { OnbordaProps } from "./types";
-import { ResearchPlanOnbordaState, Selector, useResearchPlanOnbordaStore } from "@/state/onborda/researchPlanOnbordaStore";
+import { ResearchPlanOnbordaState, Selector, useOnbordaStore } from "@/state/onborda/onbordaStore";
 import { useShallow } from "zustand/react/shallow";
 import { sleep } from "@/lib/utils";
 import { init } from "mixpanel-browser";
@@ -44,7 +44,7 @@ const Onborda: React.FC<OnbordaProps> = ({
   const isInView = useInView(observeRef);
   const offset = 20;
 
-  const { activeTour, setActiveTour, setStep } = useResearchPlanOnbordaStore(useShallow(selector))
+  const { activeTour, setActiveTour, setStep } = useOnbordaStore(useShallow(selector))
 
   // - -
   // Route Changes
