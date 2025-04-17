@@ -1,13 +1,14 @@
 "use client"
 
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import React, {useCallback, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {toast} from "sonner";
-import {acceptedFiletypes, cn, sleep} from "@/lib/utils";
+import {acceptedFiletypes, cn, getPublicFile, sleep} from "@/lib/utils";
 import { Upload } from "lucide-react";
+import { difference } from "lodash";
 
 export const FormImageCropper = ({
                                      className = "",
@@ -16,6 +17,7 @@ export const FormImageCropper = ({
                                      title,
                                      description,
                                      aspect,
+                                     img,
                                      selectedFile,
                                      setSelectedFile
                                  }: {
@@ -25,6 +27,7 @@ export const FormImageCropper = ({
     title: string,
     description?: string,
     aspect: number,
+    img: string | undefined | null,
     selectedFile: FileWithPreview | null,
     setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
 }) => {
@@ -86,6 +89,26 @@ export const FormImageCropper = ({
 
         fileInputRef.current?.click() // Open file dialog
     };
+
+    useEffect(() => {
+        const init = async () => {
+            if (img) {
+                try {
+                    const userPhoto: File = await getPublicFile(img)
+                    if (userPhoto) {
+                        const fileWithPreview = Object.assign(userPhoto, {
+                            preview: URL.createObjectURL(userPhoto),
+                        })
+                        setSelectedFile(fileWithPreview)
+                    }
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+        }
+
+        init()
+    }, [])
 
     return (
         <FormField
