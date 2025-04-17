@@ -19,7 +19,9 @@ export async function uploadImg(image: {
                 private_key: keyFileJson.private_key
             }
         })
-        const bucket = storage.bucket('comend-app-public')
+        const bucket = process.env.NEXT_PUBLIC_NODE_ENV === "production" 
+            ? storage.bucket('comend-app-public') // bucket for production images, images users are uploading
+            : storage.bucket('comend-app-development-public') // bucket for development and preview, images used for internal testing
 
         const filename = `${Date.now()}-${image.name}`
         const file = bucket.file(filename)
