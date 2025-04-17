@@ -126,7 +126,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                     <Pencil />
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>
                     <DialogDescription>
