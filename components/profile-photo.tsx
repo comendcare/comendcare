@@ -133,6 +133,7 @@ export function ProfilePhoto({
                                     name="image"
                                     title=""
                                     aspect={1}
+                                    img={img}
                                     selectedFile={selectedFileProfile}
                                     setSelectedFile={setSelectedFileProfile}
                                     className="mx-auto"

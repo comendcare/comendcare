@@ -39,21 +39,18 @@ import MultipleSelector from "./ui/multiple-selector"
 import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { createOrUpdateRFP, deleteRFP } from "@/lib/actions"
 import { Option } from "@/lib/types"
 import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
+import { useShallow } from "zustand/react/shallow"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -128,6 +125,13 @@ const editRFPForm = z.object({
     }
 )
 
+const rfpSelector = (state: RFPState) => ({
+    createRFP: state.createRFP,
+    updateRFP: state.updateRFP,
+    deleteRFP: state.deleteRFP,
+    saveState: state.saveState
+})
+
 export function EditRFPForm({
     rfpData,
     numRFPsPinned,
@@ -142,6 +146,14 @@ export function EditRFPForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+    const { createRFP, updateRFP, deleteRFP, saveState } = useRFPStore(useShallow(rfpSelector))
+    const { undo } = useRFPStore.temporal.getState()
+
+    const handleUndo = () => {
+        undo()
+        saveState()
+        toast.dismiss("undo-toast")
+    }
 
     const form = useForm<z.infer<typeof editRFPForm>>({
         mode: "onChange",
@@ -213,39 +225,77 @@ export function EditRFPForm({
         }
 
         if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.");
+            toast.error(
+                "You're not signed into an organization right now.",
+                {position: "bottom-left"}
+            );
             return;
         }
 
         try {
-            await createOrUpdateRFP(updateData, session.user.organizationId);
-            toast.success("RFP created or updated successfully!");
-            router.refresh();
+            if (rfpData.id) {
+                await updateRFP(updateData, session.user.organizationId)
+                toast.success(
+                    "RFP updated successfully!",
+                    {position: "bottom-left"}
+                )
+            } else {
+                await createRFP(updateData, session.user.organizationId)
+                toast.success(
+                    "RFP created successfully!",
+                    {position: "bottom-left"}
+                )
+            }
+            if (closeDialog) closeDialog()
         } catch (error) {
             console.error("Error updating or createing RFP:", error);
-            toast.error("Failed to update or create RFP.");
+            toast.error(
+                "Failed to update or create RFP.",
+                {position: "bottom-left"}
+            )
         }
     }
 
     const handleDeleteRFP = async () => {
         if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.")
+            toast.error(
+                "You're not signed into an organization right now.",
+                {position: "bottom-left"}
+            )
             return
         }
 
         if (!rfpData.id) {
-            toast.error("This RFP does not have an id.")
+            toast.error(
+                "This RFP does not have an id.",
+                {position: "bottom-left"}
+            )
             return
         }
 
         try {
             await deleteRFP(rfpData.id)
             if (closeDialog) closeDialog()
-            toast.success("Organization profile updated successfully!");
-            router.refresh();
+            toast(
+                <div className="flex flex-col gap-2 w-full">
+                    <span className="flex justify-between items-center">
+                        <p className="font-semibold text-gray-900">
+                            {`RFP Deleted`}
+                        </p>
+                        <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
+                    </span>
+                    <p className="text-sm text-gray-500">
+                        {`Your RFP had been deleted successfully.`}
+                    </p>
+                </div>,
+                {position: "bottom-left", duration: 20000, id: "undo-toast"}
+            )
         } catch (error) {
-            console.error("Error updating organization:", error);
-            toast.error("Failed to update organization profile.");
+            console.error("Error deleting RFP:", error);
+            toast.error(
+                "Failed to delete RFP.",
+                {position: "bottom-left"}
+            );
         }
     }
 
