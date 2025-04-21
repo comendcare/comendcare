@@ -59,7 +59,7 @@ export default async function ProfilePage() {
                 <main className="col-span-4 flex flex-col items-center">
                     <ScrollArea id="profile-scroll-area" className="w-full flex flex-col mx-4 space-y-2">
                         <div className="w-full h-fit flex flex-col space-y-4">
-                            <Card className="pb-4">
+                            <Card className="pb-4 flex flex-col gap-4">
                                 <PAGBannerPhoto
                                     img={organization.headerImage}
                                     name={organization.headerImage}
@@ -67,85 +67,52 @@ export default async function ProfilePage() {
                                     editable={true}
                                 />
 
-                                <div
-                                    className="flex flex-row justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 gap-x-4">
-                                    <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-                                        <div className="flex bg-white rounded-full">
-                                            {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                        src={getOrgPhoto(organization)}
-                                        alt=""/> */}
-                                            <ProfilePhoto
-                                                img={organization.image}
-                                                name={organization.name}
-                                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                                textSize="large"
-                                                editable={true}
-                                            />
-                                        </div>
-
-                                        <div
-                                            className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
-                                            <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                                <div
-                                                    className="flex flex-col xl:flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-3xl font-bold text-gray-900 gap-x-2">
-                                                    <HoverCard openDelay={0} closeDelay={0}>
-                                                        <HoverCardTrigger asChild>
-                                                            <h1 className="truncate w-4/5">
-                                                                {organization?.name}
-                                                            </h1>
-                                                        </HoverCardTrigger>
-                                                        <HoverCardContent
-                                                            side="top"
-                                                            className="w-fit"
-                                                        >
-                                                            <div className="space-y-2">
-                                                                <h4 className="text-lg font-semibold">
-                                                                    {organization?.name}
-                                                                </h4>
-                                                            </div>
-                                                        </HoverCardContent>
-                                                    </HoverCard>
-
-                                                    {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
-
-                                                    <EditPAGProfileHeaderDialog organization={organization}/>
-
-                                                </div>
-                                                <div
-                                                    className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                                    {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
-                                                        <div className="mt-2 flex items-center text-gray-500">
-                                                            <HandCoins
-                                                                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                                aria-hidden="true"
-                                                            />
-                                                            {formatMoney(organization?.moneyRaised)} raised
-                                                        </div>
-                                                    }
-                                                    {organization?.yearFounded && (
-                                                        <div className="mt-2 flex items-center text-gray-500">
-                                                            <Calendar
-                                                                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                                aria-hidden="true"/>
-                                                            Founded
-                                                            in {standardizeYear(organization?.yearFounded ?? "")}
-                                                        </div>
-                                                    )}
-                                                    {organization?.incorporationStatus === "YES" &&
-                                                        <div className="mt-2 flex items-center text-gray-500">
-                                                            <Building2
-                                                                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                                aria-hidden="true"/>
-                                                            {`501(c)(3)`}
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
+                                    <div className="h-fit w-fit -mt-16">
+                                        <ProfilePhoto
+                                            img={organization.image}
+                                            name={organization.name}
+                                            className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                            textSize="large"
+                                            editable={true}
+                                        />
                                     </div>
-
-                                    <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                                        <h1 className="truncate text-2xl font-bold text-gray-900">{organization?.name}</h1>
+                                    <div className="flex flex-col">
+                                        <div className="flex gap-4 justify-between">
+                                            <h1 className="text-wrap text-2xl lg:text-3xl font-semibold">
+                                                {organization?.name}
+                                            </h1>
+                                            {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
+                                            <EditPAGProfileHeaderDialog organization={organization}/>
+                                        </div>
+                                        <div className="w-full flex flex-wrap gap-x-6">
+                                            {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <HandCoins
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+                                                    {formatMoney(organization?.moneyRaised)} raised
+                                                </div>
+                                            }
+                                            {organization?.yearFounded && (
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <Calendar
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"/>
+                                                    Founded
+                                                    in {standardizeYear(organization?.yearFounded ?? "")}
+                                                </div>
+                                            )}
+                                            {organization?.incorporationStatus === "YES" &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <Building2
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"/>
+                                                    {`501(c)(3)`}
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </Card>
