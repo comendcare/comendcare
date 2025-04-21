@@ -180,7 +180,7 @@ export default async function OrganizationHomePage({
                         icon: <Share />,
                         dialog: (
                             <ShareDialog
-                                url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}}`}
                             />
                         ),
                     },
