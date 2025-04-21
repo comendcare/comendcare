@@ -29,6 +29,8 @@ import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
 import { ScrollArea } from "./ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
+import NoPinnedAssets from "./no-pinned-assets";
+import NoPinnedRFPs from "./no-pinned-rfps";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -64,7 +66,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </div>
                             )}
                             {rfps.length <= 0 && (
-                                <p>{`This organization does not have any pinned RFPs.`}</p>
+                                <NoPinnedRFPs />
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
@@ -116,7 +118,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </Table>
                             )}
                             {assets.filter(asset => asset.pinned).length <= 0 && (
-                                <p>{`This organization does not have any pinned assets.`}</p>
+                                <NoPinnedAssets />
                             )}
                         </TabsContent>
                     </Tabs>
