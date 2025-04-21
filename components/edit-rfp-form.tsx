@@ -345,7 +345,7 @@ export function EditRFPForm({
                 control={form.control}
                 name="headerImage"
                 render={({field}) => (
-                    <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">
+                    <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light rounded-t-md">
                         <img
                             src={field.value}
                             style={{
@@ -354,7 +354,7 @@ export function EditRFPForm({
                                 objectFit: "cover",
                                 objectPosition: "center"
                             }}
-                            className="absolute w-full"
+                            className="absolute w-full rounded-t-md"
                         />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
