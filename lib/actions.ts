@@ -1915,6 +1915,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                         }
                     }))
                 },
+                budget: rfpData.budget
             },
             create: {
                 // create with the given id if it's available. This is useful for situations like 'undo'
@@ -1953,7 +1954,8 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                         }
                     }))
                 },
-                organization: { connect: {id: organizationId} }
+                organization: { connect: {id: organizationId} },
+                budget: rfpData.budget
             },
         })
 
