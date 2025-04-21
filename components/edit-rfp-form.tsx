@@ -388,19 +388,11 @@ export function EditRFPForm({
                 )}
             />
 
-            {/* <div className="h-[100px]"/> */}
-
-            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
+            <ScrollArea className={"max-h-[60vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
-                {/* <form
-                    onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1"
-                > */}
                 <div
-                    // onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1"
                 >
-
                     <FormField
                         control={form.control}
                         name="title"
@@ -585,7 +577,6 @@ export function EditRFPForm({
                             </Button>
                         </DialogClose>
                     </span>
-                {/* </form> */}
                 </div>
             </ScrollArea>
         </Form>
