@@ -13,7 +13,7 @@ import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
 import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { Building2, Calendar, HandCoins, PencilIcon } from "lucide-react"
+import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 
 export async function generateMetadata({
@@ -30,7 +30,6 @@ export async function generateMetadata({
     const title = organizationData?.name || "Default Title" // Use a fallback title
     const description = organizationData?.description || "Default description" // Use a fallback description
 
-    console.log("organizationData", organizationData)
     if (!organizationData) {
         return {
             title: "Page Not Found",
@@ -172,84 +171,55 @@ export default async function OrganizationRoadmapPage({
                             {/*    {roadmaps[0].title}*/}
                             {/*</h1>*/}
 
-                            <div className="w-full flex flex-col md:flex-row items-center justify-between space-y-4 md:space-x-4">
-
-                                <ProfilePhoto
-                                    img={organization?.image}
-                                    name={organization?.name}
-                                    className="rounded-full ring-4 ring-white h-16 w-16"
-                                    textSize="medium"
-                                />
-
-                                <div
-                                    className="flex min-w-0 flex-1 items-center justify-center space-x-6 pb-1"
-                                >
-                                    <div className="min-w-0 flex-1 sm:hidden md:block">
-                                        <div className="min-w-0 flex-1 text-4xl font-bold text-gray-900">
-                                            <HoverCard>
-                                                <HoverCardTrigger asChild>
-                                                    <h1 className="text-wrap md:truncate  cursor-pointer">
-                                                        {`${organization?.name}'s Research Plan`}
-                                                    </h1>
-                                                </HoverCardTrigger>
-                                                <HoverCardContent
-                                                    side="top"
-                                                    className="w-fit"
-                                                >
-                                                    <div className="space-y-2">
-                                                        <h4 className="text-lg font-semibold">
-                                                            {organization?.name}
-                                                        </h4>
-                                                    </div>
-                                                </HoverCardContent>
-                                            </HoverCard>
-                                        </div>
-                                        <div
-                                            className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                            {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
-                                                <div className="mt-2 flex items-center text-gray-500">
-                                                    <HandCoins
-                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                        aria-hidden="true"
-                                                    />
-                                                    {formatMoney(organization?.moneyRaised)} raised
-                                                </div>
-                                            }
-                                            {organization?.yearFounded && (
-                                                <div className="mt-2 flex items-center text-gray-500">
-                                                    <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                                aria-hidden="true"/>
-                                                    Founded in {standardizeYear(organization?.yearFounded ?? "")}
-                                                </div>
-                                            )}
-                                            {organization?.incorporationStatus === "YES" &&
-                                                <div className="mt-2 flex items-center text-gray-500">
-                                                    <Building2 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                            aria-hidden="true"/>
-                                                    {`501(c)(3)`}
-                                                </div>
-                                            }
-                                        </div>
+                            <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
+                                    <ProfilePhoto
+                                        img={organization.image}
+                                        name={organization.name}
+                                        className="h-16 w-16 rounded-full"
+                                        textSize="small"
+                                        editable={false}
+                                    />
+                                <div className="flex flex-col">
+                                    <div className="flex gap-4 justify-between">
+                                        <h1 className="text-wrap text-2xl md:text-3xl font-semibold">
+                                            {organization?.name}
+                                        </h1>
+                                        {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
+                                    </div>
+                                    <div className="w-full flex flex-wrap gap-x-6">
+                                        {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
+                                            <div className="mt-2 flex items-center text-gray-500">
+                                                <HandCoins
+                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    aria-hidden="true"
+                                                />
+                                                {formatMoney(organization?.moneyRaised)} raised
+                                            </div>
+                                        }
+                                        {organization?.yearFounded && (
+                                            <div className="mt-2 flex items-center text-gray-500">
+                                                <Calendar
+                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    aria-hidden="true"/>
+                                                Founded
+                                                in {standardizeYear(organization?.yearFounded ?? "")}
+                                            </div>
+                                        )}
+                                        {organization?.incorporationStatus === "YES" &&
+                                            <div className="mt-2 flex items-center text-gray-500">
+                                                <Building2
+                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    aria-hidden="true"/>
+                                                {`501(c)(3)`}
+                                            </div>
+                                        }
                                     </div>
                                 </div>
-
-                                {/*<div*/}
-                                {/*    className="flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">*/}
-                                {/*    <div className="flex flex-row space-x-2">*/}
-                                {/*        <Button*/}
-                                {/*            className="gap-x-2"*/}
-                                {/*        >*/}
-                                {/*            <Plus />*/}
-                                {/*            Follow*/}
-                                {/*        </Button>*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
-
                             </div>
 
-                            <p>
+                            {/* <p>
                                 {roadmaps[0].description}
-                            </p>
+                            </p> */}
 
                             {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
                             <PublicRoadmapContent 
@@ -275,32 +245,24 @@ export default async function OrganizationRoadmapPage({
 
                         <FloatingDock
                             items={[
-                                // {
-                                //     title: "Post on feed",
-                                //     icon: <IconShare2/>,
-                                //     href: "/app/feed",
-                                // },
                                 {
                                     title: "Share on social media",
-                                    icon: <IconShare/>,
-                                    dialog: <ShareDialog
-                                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
+                                    icon: <Share />,
+                                    dialog: (
+                                        <ShareDialog
+                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                        />
+                                    ),
                                 },
-                                {
-                                    title: "Contact patient group",
-                                    icon: <PencilIcon/>,
-                                    dialog: <ContactPAGDialog organization={organization}/>
-                                },
-                                // {
-                                //     title: "Report an issue",
-                                //     icon: <IconFlag/>,
-                                //     sheet: <>
-                                //         <SheetHeader>
-                                //             <SheetTitle>Send Feedback</SheetTitle>
-                                //         </SheetHeader>
-                                //         <FeedbackForm/>
-                                //     </>
-                                // }
+                                ...(organization.contactEmail
+                                    ? [
+                                        {
+                                            title: "Contact patient group",
+                                            icon: <Mail/>,
+                                            dialog: <ContactPAGDialog organization={organization} />,
+                                        },
+                                    ]
+                                    : []),
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"

@@ -40,7 +40,7 @@ import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Option } from "@/lib/types"
-import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
+import { AttachmentsFormField, BudgetFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -51,6 +51,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { useShallow } from "zustand/react/shallow"
+import MoneyInput from "./money-input"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -116,7 +117,8 @@ const editRFPForm = z.object({
     openTo: z.array(z.string()).optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
-    milestones: z.array(z.custom<Milestone>()).optional()
+    milestones: z.array(z.custom<Milestone>()).optional(),
+    budget: z.number().max(2147483647).min(0).optional(),
 }).refine(
     (rfp) => rfp.startDate && rfp.endDate ? rfp.startDate?.getTime() <= rfp.endDate?.getTime() : true, 
     {
@@ -171,6 +173,7 @@ export function EditRFPForm({
             startDate: rfpData?.startDate || undefined,
             endDate: rfpData?.endDate || undefined,
             milestones: (rfpData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+            budget: rfpData?.budget || undefined,
         }
     })
 
@@ -185,7 +188,8 @@ export function EditRFPForm({
         openTo: form.watch("openTo"),
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
-        milestones: form.watch("milestones")
+        milestones: form.watch("milestones"),
+        budget: form.watch("budget"),
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
@@ -201,7 +205,8 @@ export function EditRFPForm({
             openTo,
             startDate,
             endDate,
-            milestones
+            milestones,
+            budget
         } = values;
 
         const updateData: Partial<RFP> = {
@@ -221,7 +226,8 @@ export function EditRFPForm({
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
             ...(startDate ? {startDate} : undefined),
-            ...(endDate ? {endDate} : undefined)
+            ...(endDate ? {endDate} : undefined),
+            ...(budget ? {budget} : undefined),
         }
 
         if (!session?.user?.organizationId) {
@@ -339,7 +345,7 @@ export function EditRFPForm({
                 control={form.control}
                 name="headerImage"
                 render={({field}) => (
-                    <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">
+                    <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light rounded-t-md">
                         <img
                             src={field.value}
                             style={{
@@ -348,7 +354,7 @@ export function EditRFPForm({
                                 objectFit: "cover",
                                 objectPosition: "center"
                             }}
-                            className="absolute w-full"
+                            className="absolute w-full rounded-t-md"
                         />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -382,19 +388,11 @@ export function EditRFPForm({
                 )}
             />
 
-            {/* <div className="h-[100px]"/> */}
-
-            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
+            <ScrollArea className={"max-h-[60vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
-                {/* <form
-                    onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1"
-                > */}
                 <div
-                    // onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1"
                 >
-
                     <FormField
                         control={form.control}
                         name="title"
@@ -510,6 +508,14 @@ export function EditRFPForm({
                     />
 
                     <OpenToFormField form={form}/>
+                    <FormItem className="w-full mt-2">
+                        <FormLabel>{`Award Amount`}</FormLabel>
+                        <FormDescription>{`The total funding amount available for this research project award.`}</FormDescription>
+                        <MoneyInput 
+                            form={form}
+                            name="budget"
+                        />
+                    </FormItem>                    
                     <ProposalTimelineInput form={form}/>
 
                     <ContactsFormField form={form} />
@@ -571,7 +577,6 @@ export function EditRFPForm({
                             </Button>
                         </DialogClose>
                     </span>
-                {/* </form> */}
                 </div>
             </ScrollArea>
         </Form>

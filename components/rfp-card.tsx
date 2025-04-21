@@ -2,8 +2,9 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PrivateBadge } from "@/components/private-badge";
 import { DateView } from "@/components/miletone-date-view";
-import { Calendar, Pin, User } from "lucide-react";
+import { Calendar, CircleDollarSign, DollarSign, Pin, User } from "lucide-react";
 import { PropertyBadge } from "./property-badge";
+import { formatMoney } from "@/lib/utils";
 
 export const RFPCard = ({rfp}: {rfp: any}) => {
     return (
@@ -28,6 +29,13 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
             </CardHeader>
             <CardContent>
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                    {(rfp.budget) && (
+                        <li>
+                            <PropertyBadge icon={DollarSign}>
+                                <p>{formatMoney(rfp.budget)}</p>
+                            </PropertyBadge>
+                        </li>
+                    )}
                     {(rfp.startDate || rfp.endDate) && (
                         <li>
                             <PropertyBadge icon={Calendar}>

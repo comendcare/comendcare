@@ -23,12 +23,15 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Building, Calendar, FileText, GraduationCap, Link as LinkIcon, Pin, User } from "lucide-react";
+import { Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
 import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
 import { ScrollArea } from "./ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
+import NoPinnedAssets from "./no-pinned-assets";
+import NoPinnedRFPs from "./no-pinned-rfps";
+import { formatMoney } from "@/lib/utils";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -64,7 +67,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </div>
                             )}
                             {rfps.length <= 0 && (
-                                <p>{`This organization does not have any pinned RFPs.`}</p>
+                                <NoPinnedRFPs />
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
@@ -116,7 +119,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </Table>
                             )}
                             {assets.filter(asset => asset.pinned).length <= 0 && (
-                                <p>{`This organization does not have any pinned assets.`}</p>
+                                <NoPinnedAssets />
                             )}
                         </TabsContent>
                     </Tabs>
@@ -207,6 +210,14 @@ export const RFPDetails = ({rfp}: {rfp: any}) => {
                     </li>
                 )
             })}
+
+            {(rfp.budget) && (
+                <li>
+                    <PropertyBadge icon={DollarSign}>
+                        <p>{formatMoney(rfp.budget)}</p>
+                    </PropertyBadge>
+                </li>
+            )}
 
             {(rfp.startDate || rfp.endDate) && (
                 <li>

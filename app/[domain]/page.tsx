@@ -1,14 +1,20 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
 import BlogCard from "@/components/blog-card"
-import {getOrganizationData, getConditionsDataFromOrgId, getPublicRFPsForOrganization, getPublicAssetsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
+import {
+    getOrganizationData,
+    getConditionsDataFromOrgId,
+    getPublicRFPsForOrganization,
+    getPublicAssetsForOrganization,
+    getPublicRoadmapsForOrganization
+} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
 import {RoadmapCard, UnderDevelopmentCard} from "@/components/public-roadmap-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {FloatingDock} from "@/components/floating-dock";
-import {IconFlag, IconShare, IconShare2} from "@tabler/icons-react";
+import {Share1Icon, PaperPlaneIcon} from "@radix-ui/react-icons";
 import {
     DialogDescription,
     DialogFooter,
@@ -29,7 +35,7 @@ import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import React from "react";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
-import {Mail, Share2} from "lucide-react";
+import {Mail, Share} from "lucide-react";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -80,9 +86,9 @@ export default async function OrganizationHomePage({
             node: true,
             contacts: true,
             attachments: true,
-            types: { include: { milestoneType: true } },
-            assets: { include: { asset: true } },
-            rfps: { include: { rfp: true } }
+            types: {include: {milestoneType: true}},
+            assets: {include: {asset: true}},
+            rfps: {include: {rfp: true}}
         }
     })
 
@@ -144,7 +150,7 @@ export default async function OrganizationHomePage({
                                     isPublic={true}
                                     externalLinks={true}
                                 />
-                                : <UnderDevelopmentCard isPublic={true} />
+                                : <UnderDevelopmentCard isPublic={true}/>
                             }
                         </div>
                     </div>
@@ -169,31 +175,24 @@ export default async function OrganizationHomePage({
 
             <FloatingDock
                 items={[
-                    // {
-                    //     title: "Post on feed",
-                    //     icon: <IconShare2/>,
-                    //     href: "/app/feed",
-                    // },
                     {
                         title: "Share on social media",
-                        icon: <Share2 />,
-                        dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}/>
+                        icon: <Share />,
+                        dialog: (
+                            <ShareDialog
+                                url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                            />
+                        ),
                     },
-                    {
-                        title: "Contact patient group",
-                        icon: <Mail />,
-                        dialog: <ContactPAGDialog organization={organization}/>
-                    },
-                    // {
-                    //     title: "Report an issue",
-                    //     icon: <IconFlag/>,
-                    //     sheet: <>
-                    //         <SheetHeader>
-                    //             <SheetTitle>Send Feedback</SheetTitle>
-                    //         </SheetHeader>
-                    //         <FeedbackForm/>
-                    //     </>
-                    // }
+                    ...(organization.contactEmail
+                        ? [
+                            {
+                                title: "Contact patient group",
+                                icon: <Mail/>,
+                                dialog: <ContactPAGDialog organization={organization}/>,
+                            },
+                        ]
+                        : []),
                 ]}
                 orientation="vertical"
                 desktopClassName="right-4"

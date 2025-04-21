@@ -190,6 +190,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                                     no results found.
                                                 </p>
                                             }
+                                            showHoverCard={false}
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -242,6 +243,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                                     no results found.
                                                 </p>
                                             }
+                                            showHoverCard={false}
                                         />
                                     </FormControl>
                                     <FormMessage/>
