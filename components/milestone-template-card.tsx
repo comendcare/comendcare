@@ -11,6 +11,7 @@ import { cn, setTemplatesShown } from "@/lib/utils";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { MilestoneTypeOnMilestone } from "@prisma/client";
+import { Plus } from "lucide-react";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -53,12 +54,11 @@ export function EmptyResearchPlanCard() {
         <button onClick={() => {
             setTemplatesShown()
         }}>
-            <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
-                <CardContent className="flex flex-col gap-2 overflow-visible">
-                    <CardHeader>
-                        <CardTitle>{"Start from scratch"}</CardTitle>
-                    </CardHeader>
-                    <CardDescription>Create an empty research plan</CardDescription>
+            <Card className="h-full relative bg-white shadow-sm rounded-lg text-left hover:bg-secondary cursor-pointer pt-6">
+                <CardContent className="h-full flex flex-col justify-center items-center gap-2">
+                    <CardTitle>{"Start from scratch"}</CardTitle>
+                    <Plus className="h-20 w-20"/>
+                    <CardDescription>{`Create an empty research plan`}</CardDescription>
                 </CardContent>
             </Card>
         </button>
