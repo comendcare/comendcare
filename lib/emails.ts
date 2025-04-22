@@ -264,6 +264,7 @@ export async function sendMemberRequestCreatedEmail(params: {
 export async function sendMemberRequestApprovedEmail(params: {
     name: string | null | undefined
     email: string | null | undefined
+    image: string | null | undefined
     organizationName: string | undefined
     organizationImage: string | undefined
 }) {
@@ -271,7 +272,7 @@ export async function sendMemberRequestApprovedEmail(params: {
         memberRequestApprovedEmail(
             {
                 userName: params.name,
-                userEmail: params.email,
+                userImage: params.image,
                 organizationName: params.organizationName,
                 organizationImage: params.organizationImage,
             }
@@ -294,6 +295,7 @@ export async function sendMemberRequestApprovedEmail(params: {
 export async function sendMemberRequestDeniedEmail(params: {
     name: string | null | undefined
     email: string | null | undefined
+    image: string | null | undefined
     organizationName: string | undefined
     organizationImage: string | undefined
 }) {
@@ -301,7 +303,7 @@ export async function sendMemberRequestDeniedEmail(params: {
         memberRequestDeniedEmail(
             {
                 userName: params.name,
-                userEmail: params.email,
+                userImage: params.image,
                 organizationName: params.organizationName,
                 organizationImage: params.organizationImage,
             }
