@@ -36,13 +36,13 @@ export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilest
     
     return (
         <button onClick={() => {setIsChecked(prev => !prev)}} className={cn(className)}>
-            <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+            <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
                 <CardHeader>
                     <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
                     {/* <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.value || "PROJECT"}/> */}
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2 overflow-visible">
-                    <CardTitle>{milestoneData.title}</CardTitle>
+                    <CardTitle className="text-xl font-semibold">{milestoneData.title}</CardTitle>
                     <CardDescription>
                         {milestoneData.description}
                     </CardDescription>
