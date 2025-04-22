@@ -7,21 +7,22 @@ import {FileWithPreview, ImageSelector} from "@/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {toast} from "sonner";
 import {acceptedFiletypes, cn, getPublicFile, sleep} from "@/lib/utils";
-import { Pencil, Trash2Icon, Upload } from "lucide-react";
-import { difference } from "lodash";
-import { Button } from "./ui/button";
+import {Pencil, Trash2Icon, Upload} from "lucide-react";
+import {difference} from "lodash";
+import {Button} from "./ui/button";
 
 export const FormImageSelector = ({
-                                     className = "",
-                                     form,
-                                     name,
-                                     title,
-                                     description,
-                                     aspect,
-                                     img,
-                                     selectedFile,
-                                     setSelectedFile
-                                 }: {
+                                      className = "",
+                                      form,
+                                      name,
+                                      title,
+                                      description,
+                                      aspect,
+                                      img,
+                                      selectedFile,
+                                      setSelectedFile,
+                                      onCropped
+                                  }: {
     className?: string,
     form: any,
     name: string,
@@ -30,7 +31,8 @@ export const FormImageSelector = ({
     aspect: number,
     img: string | undefined | null,
     selectedFile: FileWithPreview | null,
-    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
+    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>,
+    onCropped?: () => void
 }) => {
 
     useEffect(() => {
@@ -74,12 +76,13 @@ export const FormImageSelector = ({
                                 selectedFile={selectedFile}
                                 setSelectedFile={(file: FileWithPreview | null) => {
                                     if (!file) {
-                                        setSelectedFile(null)
+                                        setSelectedFile(null);
+                                        field.onChange(null);
                                     } else {
-                                        setSelectedFile(file)
+                                        setSelectedFile(file);
+                                        field.onChange(file.preview);
+                                        onCropped?.();  // Notify parent that cropping happened
                                     }
-
-                                    field.onChange(file?.preview) // Update form field value
                                 }}
                                 className={className}
                             />
