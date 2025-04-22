@@ -6,13 +6,39 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
+import {ImportField} from "@/lib/types";
 import Papa from "papaparse";
 
-export type ImportField = {
-    key: string,
-    required: boolean,
-    defaultValue: any,
-    isValid: (value: any) => boolean
+export const getDates = (milestone: any) => {
+    if (milestone.startDate && milestone.endDate) {
+        return (
+            `${new Date(milestone.startDate).toLocaleString('en-US', {
+                month: 'short',
+                year: 'numeric'
+            })} - ${new Date(milestone.endDate).toLocaleString('en-US', {
+                month: 'short',
+                year: 'numeric'
+            })}`
+        )
+    }
+
+    if (milestone.startDate) {
+        return (
+            `${new Date(milestone.startDate).toLocaleString('en-US', {
+                month: 'short',
+                year: 'numeric'
+            })}`
+        )
+    }
+
+    if (milestone.endDate) {
+        return (
+            `${new Date(milestone.endDate).toLocaleString('en-US', {
+                month: 'short',
+                year: 'numeric'
+            })}`
+        )
+    }
 }
 
 export const validateImport = (entry: any, expectedValues: ImportField[]) => {
