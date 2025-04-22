@@ -71,36 +71,72 @@ export const NewMemberRequestEmail = ({
                             >
                                 {requestedByUserEmail}
                             </Link>
-                            ) is requesting to join<strong>{organizationName}</strong> on{" "}
+                            ) is requesting to join <strong>{organizationName}</strong> on{" "}
                             <strong>Comend</strong>.
                         </Text>
                         <Section>
                             <Row>
                                 <Column align="right">
-                                    {organizationImage &&
+                                    {requestedByUserImage ? (
+                                        <Img
+                                            className="rounded-full"
+                                            src={requestedByUserImage}
+                                            width="64"
+                                            height="64"
+                                        />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: "64px",
+                                                height: "64px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "24px",
+                                                fontWeight: "bold",
+                                                color: "#374151", // Tailwind gray-700
+                                            }}
+                                        >
+                                            {requestedByUserName?.[0] ?? "?"}
+                                        </div>
+                                    )}
+                                </Column>
+                                <Column align="center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" className="lucide lucide-arrow-big-right-dash">
+                                        <path d="M5 9v6"/>
+                                        <path d="M9 9h3V5l7 7-7 7v-4H9V9z"/>
+                                    </svg>
+                                </Column>
+                                <Column align="left">
+                                    {organizationImage ? (
                                         <Img
                                             className="rounded-full"
                                             src={organizationImage}
                                             width="64"
                                             height="64"
                                         />
-                                    }
-                                </Column>
-                                <Column align="center">
-                                    <Img
-                                        src={`${baseUrl}/static/vercel-arrow.png`}
-                                        width="12"
-                                        height="9"
-                                        alt="asking to join"
-                                    />
-                                </Column>
-                                <Column align="left">
-                                    <Img
-                                        className="rounded-full"
-                                        src={organizationImage}
-                                        width="64"
-                                        height="64"
-                                    />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: "64px",
+                                                height: "64px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "24px",
+                                                fontWeight: "bold",
+                                                color: "#374151", // Tailwind gray-700
+                                            }}
+                                        >
+                                            {organizationName?.[0] ?? "?"}
+                                        </div>
+                                    )}
                                 </Column>
                             </Row>
                         </Section>
@@ -121,12 +157,12 @@ export const NewMemberRequestEmail = ({
 
 NewMemberRequestEmail.PreviewProps = {
     requestedByUserName: "Not Flawnson",
-    userImage: `${baseUrl}/static/vercel-user.png`,
+    userImage: ``,
     requestedByUserEmail: "flawnsontong1@gmail.com",
     adminName: "Flawnson",
     adminEmail: "flawnson@comendcare.com",
     organizationName: "Test org",
-    organizationImage: `${baseUrl}/static/vercel-team.png`,
+    organizationImage: ``,
 } as NewMemberRequestEmailProps;
 
 export default NewMemberRequestEmail;

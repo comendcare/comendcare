@@ -1260,6 +1260,7 @@ export async function approveMemberRequestAndCreateMember(
                 {
                     name: memberRequest.user.name,
                     email: memberRequest.email,
+                    image: memberRequest.user.image,
                     organizationName: organization.name || "",
                     organizationImage: organization.image || "",
                 }
@@ -1314,6 +1315,7 @@ export async function deleteMemberRequest(
             await sendMemberRequestDeniedEmail({
                 name: memberRequest.user.name,
                 email: memberRequest.email,
+                image: memberRequest.user.image,
                 organizationName: organization.name || "",
                 organizationImage: organization.image || "",
             });

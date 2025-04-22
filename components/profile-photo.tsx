@@ -24,11 +24,11 @@ import {updateOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import {Pencil} from "lucide-react";
 
 const editOrgProfileImageSchema = z.object({
-    image: z.string().optional(),
-    headerImage: z.string().optional(),
+    image: z.string().nullable().optional(),
+    headerImage: z.string().nullable().optional(),
 });
 
 export function ProfilePhoto({
@@ -51,6 +51,8 @@ export function ProfilePhoto({
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
+    const [hasCropped, setHasCropped] = useState(false);
+
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
@@ -92,6 +94,7 @@ export function ProfilePhoto({
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
+            setHasCropped(false);
             setOpen(false);
             router.refresh();
         } catch (error) {
@@ -148,8 +151,17 @@ export function ProfilePhoto({
                                     selectedFile={selectedFileProfile}
                                     setSelectedFile={setSelectedFileProfile}
                                     className="mx-auto"
+                                    onCropped={() => setHasCropped(true)}
                                 />
-                                <Button type="submit" className="w-fit">Save</Button>
+                                <Button
+                                    type="submit"
+                                    className="w-fit"
+                                    disabled={
+                                        !editOrgForm.formState.isDirty || (!!editOrgForm.watch("image") && !hasCropped)
+                                    }
+                                >
+                                    Save
+                                </Button>
                             </form>
                         </Form>
                     </DialogContent>
