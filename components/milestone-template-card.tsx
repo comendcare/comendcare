@@ -48,6 +48,23 @@ export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilest
     )
 }
 
+export function EmptyResearchPlanCard() {
+    return (
+        <button onClick={() => {
+            setTemplatesShown()
+        }}>
+            <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+                <CardContent className="flex flex-col gap-2 overflow-visible">
+                    <CardHeader>
+                        <CardTitle>{"Start from scratch"}</CardTitle>
+                    </CardHeader>
+                    <CardDescription>Create an empty research plan</CardDescription>
+                </CardContent>
+            </Card>
+        </button>
+    )
+}
+
 export function ResearchPlanTemplateCardSelect({ researchPlanData, milestoneTypes }: {researchPlanData: any, milestoneTypes: any[]}) {
     const { addMilestones } = useRoadmapStore(useShallow(selector))
 

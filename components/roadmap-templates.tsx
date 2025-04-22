@@ -8,7 +8,7 @@ import { templateMilestones, templateResearchPlans } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import { MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
+import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
@@ -133,6 +133,7 @@ export const MilestoneTemplates = ({
 export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
     return(
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+            <EmptyResearchPlanCard />
             {templateResearchPlans.map(template => (
                 <ResearchPlanTemplateCardSelect
                     milestoneTypes={milestoneTypes} 
