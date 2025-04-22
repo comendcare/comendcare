@@ -1,7 +1,7 @@
 "use client"
 
 import React, {ReactNode} from "react"
-import {getDates} from "./pag-profile-research-plan-card"
+import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import {cn} from "@/lib/utils"
 import {Card, CardContent} from "./ui/card"
