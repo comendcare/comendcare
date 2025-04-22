@@ -113,7 +113,7 @@ export const MilestoneTemplates = ({
     const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
     
     return(
-        <div className={cn("grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2", className)}>
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-5 pt-2", className)}>
             {/* {allCategories.map((category, index) => (
                 <>
                     <h3 key={`category-title-${index}`} className="col-span-full text-2xl font-semibold">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
