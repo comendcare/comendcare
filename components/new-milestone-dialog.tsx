@@ -73,7 +73,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
                         <div className="flex-1 min-h-0">
                         <TabsContent value="projects" className="h-full">
-                            <ScrollArea className="h-full">
+                            <ScrollArea className="h-full" type="always">
                                 <MilestoneTemplates
                                     className="h-[50vh] max-h-[50vh]"
                                     selectedMilestonesTemplate={selectedMilestonesTemplate}
