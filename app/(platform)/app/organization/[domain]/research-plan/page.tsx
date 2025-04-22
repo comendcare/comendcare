@@ -179,7 +179,6 @@ export default async function OrganizationRoadmapPage({
                             {/*    {roadmaps[0].title}*/}
                             {/*</h1>*/}
 
-
                             <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
                                     <ProfilePhoto
                                         img={organization.image}
