@@ -8,11 +8,12 @@ import { templateMilestones, templateResearchPlans } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
+import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -112,11 +113,28 @@ export const MilestoneTemplates = ({
     const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
     
     return(
-        <div className={cn("grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2", className)}>
-            {allCategories.map((category, index) => (
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-5 pt-2", className)}>
+            {/* {allCategories.map((category, index) => (
                 <>
-                    <h3 key={`category-title-${index}`} className="col-span-full text-lg">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
+                    <h3 key={`category-title-${index}`} className="col-span-full text-2xl font-semibold">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
+                    {ASSOCIATED_CATEGORIES.find(c => c.label === category) && <p>{ASSOCIATED_CATEGORIES.find(c => c.label === category)?.description}</p>}
                     {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
+                        <MilestoneTemplateCardMultiSelect 
+                            className={index === 0 ? "onborda-select-a-template": ""}
+                            milestoneData={milestoneData}
+                            selectedMilestones={selectedMilestonesTemplate}
+                            setSelectedMilestones={setSelectedMilestonesTemplate}
+                        />
+                    ))}
+                </>
+            ))} */}
+            {ASSOCIATED_CATEGORIES.map((categoryData, index) => (
+                <>
+                    <div className={cn("col-span-full", index !== 0 ? "mt-8" : "")}>
+                    <h3 key={`category-title-${index}`} className="text-2xl font-semibold">{categoryData.label}</h3>
+                    <p>{categoryData.description}</p>
+                    </div>
+                    {templateMilestones.filter(milestone => milestone.categories.includes(categoryData.value)).map((milestoneData, index) => (
                         <MilestoneTemplateCardMultiSelect 
                             className={index === 0 ? "onborda-select-a-template": ""}
                             milestoneData={milestoneData}
@@ -130,22 +148,16 @@ export const MilestoneTemplates = ({
     )
 }
 
-export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
-    // const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
-    
+export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
     return(
-        <div className="h-[50vh] max-h-[50vh]">
-        <ScrollArea type="always" className="h-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                {templateResearchPlans.map(template => (
-                    <ResearchPlanTemplateCardSelect 
-                        researchPlanData={template}
-                        selectedMilestones={selectedMilestonesTemplate}
-                        setSelectedMilestones={setSelectedMilestonesTemplate}
-                    />
-                ))}
-            </div>
-        </ScrollArea>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+            <EmptyResearchPlanCard />
+            {templateResearchPlans.map(template => (
+                <ResearchPlanTemplateCardSelect
+                    milestoneTypes={milestoneTypes} 
+                    researchPlanData={template}
+                />
+            ))}
         </div>
     )
 }
