@@ -20,7 +20,7 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
     return (
-        <ScrollArea className="h-[70vh]">
+        <ScrollArea className="h-min max-h-[70vh]">
             <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                 {roadmap?.milestones?.sort((a: any, b: any) => {
                     // sort by custom order

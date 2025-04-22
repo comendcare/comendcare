@@ -19,7 +19,7 @@ import * as React from "react";
 
 interface MemberRequestApprovedEmailProps {
     userName?: string | null
-    userEmail?: string | null
+    userImage?: string | null
     organizationName?: string;
     organizationImage?: string;
 }
@@ -31,7 +31,7 @@ const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const MemberRequestApprovedEmail = ({
                                                userName,
-                                               userEmail,
+                                               userImage,
                                                organizationName,
                                                organizationImage,
                                            }: MemberRequestApprovedEmailProps) => {
@@ -62,14 +62,72 @@ export const MemberRequestApprovedEmail = ({
                             Your request to join <strong>{organizationName}</strong> on Comend has been approved by the
                             organization admins.
                         </Text>
-                        {organizationImage &&
-                            <Img
-                                className="rounded-full"
-                                src={organizationImage}
-                                width="64"
-                                height="64"
-                            />
-                        }
+                        <Section>
+                            <Row>
+                                <Column align="right">
+                                    {userImage ? (
+                                        <Img
+                                            className="rounded-full"
+                                            src={userImage}
+                                            width="64"
+                                            height="64"
+                                        />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: "64px",
+                                                height: "64px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "24px",
+                                                fontWeight: "bold",
+                                                color: "#374151", // Tailwind gray-700
+                                            }}
+                                        >
+                                            {userName?.[0] ?? "?"}
+                                        </div>
+                                    )}
+                                </Column>
+                                <Column align="center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" className="lucide lucide-arrow-big-right-dash">
+                                        <path d="M5 9v6"/>
+                                        <path d="M9 9h3V5l7 7-7 7v-4H9V9z"/>
+                                    </svg>
+                                </Column>
+                                <Column align="left">
+                                    {organizationImage ? (
+                                        <Img
+                                            className="rounded-full"
+                                            src={organizationImage}
+                                            width="64"
+                                            height="64"
+                                        />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: "64px",
+                                                height: "64px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "24px",
+                                                fontWeight: "bold",
+                                                color: "#374151", // Tailwind gray-700
+                                            }}
+                                        >
+                                            {organizationName?.[0] ?? "?"}
+                                        </div>
+                                    )}
+                                </Column>
+                            </Row>
+                        </Section>
                         <Text className="text-black text-[14px] leading-[24px]">
                             {`You can sign in again to start using Comend.`}
                         </Text>
@@ -90,13 +148,13 @@ export const MemberRequestApprovedEmail = ({
 };
 
 MemberRequestApprovedEmail.PreviewProps = {
-    userName: "Not Flawnson",
-    userImage: `${baseUrl}/static/vercel-user.png`,
+    userName: "Flawnson",
+    userImage: ``,
     userEmail: "flawnsontong1@gmail.com",
     adminName: "Flawnson",
     adminEmail: "flawnson@comendcare.com",
     organizationName: "Test org",
-    organizationImage: `${baseUrl}/static/vercel-team.png`,
+    organizationImage: ``,
 } as MemberRequestApprovedEmailProps;
 
 export default MemberRequestApprovedEmail;
