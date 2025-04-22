@@ -64,11 +64,11 @@ export function OrganizationSwitcher({
             organizationId: membership.organizationId,
             membership: membership,
         });
-        if (pathname === "/app/profile" || pathname === "/app/settings") {
-            router.refresh()
+        if (pathname === "/app/profile") {
+            router.refresh(); // Stay and refresh
+        } else {
+            router.push("/app/profile"); // Navigate if not already there
         }
-
-        router.push("/app/profile")
     };
 
     return (

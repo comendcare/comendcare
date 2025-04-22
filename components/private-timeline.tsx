@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import {getDates} from "./pag-profile-research-plan-card"
+import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import { cn, formatMoney } from "@/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"

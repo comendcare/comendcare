@@ -17,6 +17,13 @@ import {
     RFP as DBRFP
 } from "@prisma/client";
 
+export type ImportField = {
+    key: string,
+    required: boolean,
+    defaultValue: any,
+    isValid: (value: any) => boolean
+}
+
 export type Asset = Omit<Prisma.AssetGetPayload<{
     include: {
         contacts: true,

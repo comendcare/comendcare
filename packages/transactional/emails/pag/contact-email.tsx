@@ -16,7 +16,7 @@ interface ContactEmailProps {
     receivingEmail?: string | null;
 }
 
-export default function PAGContactEmail({ name, message, sendingEmail, receivingEmail }: ContactEmailProps) {
+function PAGContactEmail({ name, message, sendingEmail, receivingEmail }: ContactEmailProps) {
     return (
         <Html>
             <Head />
@@ -53,3 +53,12 @@ export default function PAGContactEmail({ name, message, sendingEmail, receiving
         </Html>
     );
 }
+
+PAGContactEmail.PreviewProps = {
+    name: "Flawnson Tong",
+    message: "Flawnson Tong is testing sending a message to this PAG",
+    sendingEmail: "flawnsontong1@gmail.com",
+    receivingEmail: "therealflawnsontong@gmail.com",
+} as ContactEmailProps;
+
+export default PAGContactEmail;

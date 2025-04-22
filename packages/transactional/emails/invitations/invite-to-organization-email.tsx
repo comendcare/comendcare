@@ -44,7 +44,7 @@ export const InviteToOrganizationEmail = ({
                                           inviteLink,
                                           inviteFromIp,
                                       }: InviteToOrganizationEmailProps) => {
-    const previewText = `Join ${invitedByUsername} on Vercel`;
+    const previewText = `Join ${invitedByUsername} on Comend`;
 
     return (
         <Html>
@@ -80,14 +80,31 @@ export const InviteToOrganizationEmail = ({
                         <Section>
                             <Row>
                                 <Column align="right">
-                                    {userImage &&
+                                    {userImage ? (
                                         <Img
                                             className="rounded-full"
                                             src={userImage}
                                             width="64"
                                             height="64"
                                         />
-                                    }
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: "64px",
+                                                height: "64px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "24px",
+                                                fontWeight: "bold",
+                                                color: "#374151", // Tailwind gray-700
+                                            }}
+                                        >
+                                            {invitedByUsername?.[0] ?? "?"}
+                                        </div>
+                                    )}
                                 </Column>
                                 <Column align="center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -98,12 +115,31 @@ export const InviteToOrganizationEmail = ({
                                     </svg>
                                 </Column>
                                 <Column align="left">
-                                    <Img
-                                        className="rounded-full"
-                                        src={organizationImage}
-                                        width="64"
-                                        height="64"
-                                    />
+                                    {organizationImage ? (
+                                        <Img
+                                            className="rounded-full"
+                                            src={organizationImage}
+                                            width="64"
+                                            height="64"
+                                        />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                width: "64px",
+                                                height: "64px",
+                                                borderRadius: "9999px",
+                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "24px",
+                                                fontWeight: "bold",
+                                                color: "#374151", // Tailwind gray-700
+                                            }}
+                                        >
+                                            {organizationName?.[0] ?? "?"}
+                                        </div>
+                                    )}
                                 </Column>
                             </Row>
                         </Section>
@@ -140,9 +176,9 @@ export const InviteToOrganizationEmail = ({
 
 InviteToOrganizationEmail.PreviewProps = {
     username: "alanturing",
-    userImage: `${baseUrl}/static/vercel-user.png`,
+    userImage: ``,
     organizationName: "Test organization name",
-    organizationImage: `${baseUrl}/static/vercel-user.png`,
+    organizationImage: ``,
     invitedByUsername: "Alan",
     invitedByEmail: "alan.turing@example.com",
     inviteLink: "https://vercel.com/teams/invite/foo",
