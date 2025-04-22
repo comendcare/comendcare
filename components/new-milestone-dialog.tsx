@@ -62,15 +62,14 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             Create projects
                         </DialogTitle>
                         <DialogDescription>
-                            Select projects from a research plan template to get started quickly with a curated set of projects, or select the individual projects you would like to add to your research plan.
+                            Select projects you would like to add to your research plan.
                         </DialogDescription>
                     </DialogHeader>
 
                     <Tabs value={tab} onValueChange={(newTab => setTab(newTab))} className="flex h-full flex-col">
-                        <TabsList className="w-fit">
+                        {/* <TabsList className="w-fit">
                             <TabsTrigger value="projects">Project Templates</TabsTrigger>
-                            <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
-                        </TabsList>
+                        </TabsList> */}
 
                         <div className="flex-1 min-h-0">
                         <TabsContent value="projects" className="h-full">
@@ -82,15 +81,6 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                     createEmpty={() => {
                                         // addMilestones([{name: 'New Milestone'}])
                                     }}
-                                    inDialog={true}
-                                />
-                            </ScrollArea>
-                        </TabsContent>
-                        <TabsContent value="research-plans" className="h-full">
-                            <ScrollArea className="h-full">
-                                <ResearchPlanTemplates
-                                    selectedMilestonesTemplate={selectedMilestonesTemplate}
-                                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
                                     inDialog={true}
                                 />
                             </ScrollArea>

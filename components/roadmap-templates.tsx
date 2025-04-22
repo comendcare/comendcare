@@ -8,7 +8,7 @@ import { templateMilestones, templateResearchPlans } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
+import { MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
@@ -130,22 +130,15 @@ export const MilestoneTemplates = ({
     )
 }
 
-export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
-    // const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
-    
+export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
     return(
-        <div className="h-[50vh] max-h-[50vh]">
-        <ScrollArea type="always" className="h-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                {templateResearchPlans.map(template => (
-                    <ResearchPlanTemplateCardSelect 
-                        researchPlanData={template}
-                        selectedMilestones={selectedMilestonesTemplate}
-                        setSelectedMilestones={setSelectedMilestonesTemplate}
-                    />
-                ))}
-            </div>
-        </ScrollArea>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+            {templateResearchPlans.map(template => (
+                <ResearchPlanTemplateCardSelect
+                    milestoneTypes={milestoneTypes} 
+                    researchPlanData={template}
+                />
+            ))}
         </div>
     )
 }
