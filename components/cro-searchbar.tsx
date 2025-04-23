@@ -1,10 +1,11 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Input} from "@/components/ui/input";
 import {useShallow} from "zustand/react/shallow"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
 import {CROSearchState, useCROSearchStore, ViewType} from "@/state/search/croSearchStore";
+import { debounce } from "lodash";
 
 const selector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -30,11 +31,15 @@ export default function CROSearchBar() {
         setSearchTerm("") // initial fetch on page load
     }, [])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const search = e.target.value
-        setQuery(search)
-        setSearchTerm(search)
-    };
+    const handleInputChangeCallback = useCallback(
+        (search: string) => setSearchTerm(search),
+        [setSearchTerm]
+    )
+
+    const debounceHandleInputChange = useMemo(
+        () => debounce(handleInputChangeCallback, 500), 
+        []
+    )
 
     return (
         <div className="w-full h-full flex flex-col gap-4">
@@ -44,7 +49,11 @@ export default function CROSearchBar() {
                         className="w-full h-full"
                         placeholder="Search"
                         value={query}
-                        onChange={handleInputChange}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const search: string = e.target.value
+                            setQuery(search)
+                            debounceHandleInputChange(search)
+                        }}
                     />
                 </div>
 
