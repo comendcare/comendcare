@@ -15,9 +15,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {toast} from "sonner";
 
 const invitationFormSchema = z.object({
-    email: z.string().min(2, {
-        message: "Email must be at least 2 characters."
-    })
+    email: z.string().email({ message: "Please enter a valid email address." }),
 })
 
 export default function InvitationForm() {
