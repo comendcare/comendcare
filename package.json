@@ -133,7 +133,7 @@
     "lru-cache": "^11.0.2",
     "lucide-react": "^0.439.0",
     "mini-svg-data-uri": "^1.4.4",
-    "mixpanel": "^0.18.0",
+    "mixpanel": "^0.18.1",
     "mixpanel-browser": "^2.55.1",
     "nanoid": "^4.0.2",
     "next": "^14.2.18",
