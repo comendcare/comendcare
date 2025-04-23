@@ -26,8 +26,9 @@ import {
     logError,
     sleep,
     toKebabCase,
-    updateTypeSenseDocument, validateEmailDomain
+    updateTypeSenseDocument
 } from "@/lib/utils";
+import {validateEmailDomain} from "@/lib/server-utils";
 import {Session} from "next-auth";
 import {
     sendInviteEmail,

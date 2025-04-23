@@ -1,6 +1,7 @@
-import { CloudUpload, Users } from "lucide-react";
+import {CloudUpload, Users} from "lucide-react";
 import Image from "next/image";
 import researchPlanner from "@/public/screenshots/research-planner.png";
+import {motion} from "framer-motion"
 
 const features = [
     {
@@ -19,9 +20,15 @@ const features = [
 
 export default function FeatureResearchPlan() {
     return (
-        <div className="overflow-hidden bg-white py-24 sm:py-32">
+        <motion.section
+            initial={{opacity: 0, y: 50}}
+            animate={{opacity: 1, y: [50, -10, 0]}}
+            transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
+            className="overflow-hidden bg-white py-24 sm:py-32"
+        >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+                <div
+                    className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                     {/* Left-aligned image */}
                     <div className="flex items-start justify-end lg:order-first">
                         <Image
@@ -42,7 +49,8 @@ export default function FeatureResearchPlan() {
                                 Build your research plan
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Map out your efforts intuitively, with your team. Showcase your assets and funding opportunities to
+                                Map out your efforts intuitively, with your team. Showcase your assets and funding
+                                opportunities to
                                 prospective researchers.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
@@ -54,7 +62,8 @@ export default function FeatureResearchPlan() {
                                                 className="absolute left-1 top-1 size-5 text-blue-dark"
                                             />
                                             {feature.name}
-                                        </dt>{" "}
+                                        </dt>
+                                        {" "}
                                         <dd className="inline">{feature.description}</dd>
                                     </div>
                                 ))}
@@ -63,6 +72,6 @@ export default function FeatureResearchPlan() {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.section>
     );
 }

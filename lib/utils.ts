@@ -8,17 +8,6 @@ import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 import {ImportField} from "@/lib/types";
 import Papa from "papaparse";
-import dns from 'dns/promises';
-
-export async function validateEmailDomain(email: string) {
-    const domain = email.split('@')[1];
-    try {
-        const mxRecords = await dns.resolveMx(domain);
-        return mxRecords && mxRecords.length > 0;
-    } catch {
-        return false;
-    }
-}
 
 export const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {
