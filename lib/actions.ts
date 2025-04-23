@@ -11,7 +11,8 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
-    Review
+    Review,
+    SavedCompany
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -3378,7 +3379,11 @@ export async function saveCRO(croId: string, milestoneId: string) {
     const session = await getSession()
 
     try {
-        const response = prisma.savedCompany.create({
+        const response = await prisma.savedCompany.create({
+            include: {
+                company: true,
+                milestone: { include: { types: true } }
+            },
             data: {
                 company: {
                     connect: {
@@ -3403,6 +3408,8 @@ export async function saveCRO(croId: string, milestoneId: string) {
             console.error("Error saving company.")
             return {success: false, error: "Database error. please try again later."}
         }
+
+        console.log(`response`, response)
 
         return {success: true, data: response}
     } catch (error: any) {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
 import { customerIOIdentify } from "@/lib/customer-io"
+import { getOrganizationFromOrganizationId } from "@/lib/fetchers"
 
 const MixpanelContext = createContext<any>(null)
 
@@ -69,21 +70,40 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
     }, [])
 
     useEffect(() => {
-        if (isMixpanelInitialized && session?.user?.email && session?.user?.id) {
-            if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
-            else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
-
-            mixpanel.people.set({
-                $name: session.user.name,
-                $email: session.user.email
-            })
-            
-            const distinctId = mixpanel.get_distinct_id()
-            setMixpanelContext({ distinctId })
-
-            // console.log(`identify user: `, distinctId)
-            if (session.user.email) customerIOIdentify(distinctId, session)
+        const identifyUser = async () => {
+            if (isMixpanelInitialized && session?.user?.email && session?.user?.id) {
+                if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
+                else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+    
+                let currentOrg = undefined
+                if (session?.user?.organizationId) currentOrg = await getOrganizationFromOrganizationId(session?.user?.organizationId)
+    
+                // add super properties that will apply to all tracked events
+                mixpanel.register({
+                    "Environment": process.env.NEXT_PUBLIC_NODE_ENV,
+                    ...(currentOrg?.success && currentOrg?.data 
+                        ? {
+                            "Organization ID": currentOrg.data.id,
+                            "Organization Name": currentOrg.data.name
+                        } 
+                        : undefined)
+                })
+    
+                mixpanel.people.set({
+                    $name: session.user.name,
+                    $email: session.user.email,
+                    // environment: process.env.NEXT_PUBLIC_NODE_ENV
+                })
+    
+                const distinctId = mixpanel.get_distinct_id()
+                setMixpanelContext({ distinctId })
+    
+                // console.log(`identify user: `, distinctId)
+                if (session.user.email) customerIOIdentify(distinctId, session)
+            }
         }
+
+        identifyUser()
     }, [isMixpanelInitialized, session])
 
     // we can use Mixpanel's built in automatic page tracking instead of tracking manually

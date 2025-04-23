@@ -17,13 +17,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { getMilestones, getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
+import { getCROData, getMilestones, getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
 import va from "@vercel/analytics"
 import {saveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
+import mixpanel from "mixpanel-browser";
+import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -41,7 +43,7 @@ const engagementOptions = [
     { id: "COLLABORATED", label: "Previously Worked With" },
 ];
 
-export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, type: "card" | "page", milestone?: Milestone }) {
+export default function SaveCRODialog({ cro, type, milestone, location }: { cro: Company, type: "card" | "page", milestone?: Milestone, location?: string }) {
     const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,10 +84,19 @@ export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, 
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await saveCRO(cro.id, data.milestoneId);
+            const response = await saveCRO(cro.id, data.milestoneId)
 
-            if (response.success) {
+            if (response.success && response.data) {
                 va.track("Shortlisted CRO");
+                mixpanel.track("Service Provider Saved", {
+                    "Location": location,
+                    "Service Provider Name": response.data.company.title,
+                    "Service Provider ID": response.data.company.id,
+                    "Milestone Title": response.data.milestone.title,
+                    "Milestone ID": response.data.milestone.id,
+                    "Milestone Type": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.value === type.id).label || type.id),
+                    "Milestone Budget": response.data.milestone.budget
+                })
                 router.refresh();
                 toast.success("Successfully saved cro!");
                 setOpen(false)
