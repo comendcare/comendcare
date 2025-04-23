@@ -42,6 +42,7 @@ import { useOnborda } from "./onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
 import { ScrollArea } from "./ui/scroll-area"
+import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -447,6 +448,12 @@ export function Roadmap() {
 
                                         addMilestones(result.values.map(milestone => {
                                             const foundType = milestoneTypes.find(type => type.label === milestone.type)
+
+                                            mixpanel.track("Project Created", {
+                                                "Creation Method": "Import",
+                                                "Title": milestone.title,
+                                                "Types": foundType ? [foundType.label] : []
+                                            })
 
                                             return {
                                                 title: milestone.title, 

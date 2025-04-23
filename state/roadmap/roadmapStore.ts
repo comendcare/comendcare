@@ -14,6 +14,7 @@ import { nanoid } from "nanoid"
 import { Milestone, NodeType, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { MilestoneTypeOnMilestone } from "@prisma/client"
+import mixpanel from "mixpanel-browser"
 
 export type RoadmapState = {
     initialized: boolean,

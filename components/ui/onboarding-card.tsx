@@ -12,6 +12,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { types } from "node:util"
+import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,
@@ -70,6 +71,11 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                     title: `Basic Science`,
                     status: "PLANNED",
                 }])
+                mixpanel.track("Project Created", {
+                    "Creation Method": "Onborda Tutorial",
+                    "Title": `Basic Science`,
+                    "Types": []
+                })
                 onboardingNodeId = newNode?.[0]?.id
             }
 
