@@ -1736,7 +1736,9 @@ export const deleteAsset = async (assetId: string) => {
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
@@ -1764,7 +1766,9 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },

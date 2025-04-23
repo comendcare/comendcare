@@ -227,10 +227,6 @@ export function EditMilestoneForm({
             notes
         } = values;
 
-        console.log(`types`, types)
-        console.log(`assets`, assets)
-        console.log(`rfps`, rfps)
-
         const updateData: Milestone = {
             ...milestoneData,
             nodeType,
