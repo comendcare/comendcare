@@ -36,8 +36,8 @@ export type RoadmapState = {
     onConnect: (connection: Connection) => Promise<Edge[] | void>
     setNodes: (nodes: Node[]) => Promise<Node[] | void>
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
-    addMilestones: (milestones: Partial<Milestone>[]) => Promise<Node[] | void>
-    addNodes: (node: Node[]) => Promise<Node[] | void>
+    addMilestones: (milestones: Partial<Milestone>[], creationMethod?: string) => Promise<Node[] | void>
+    addNodes: (node: Node[], creationMethod?: string) => Promise<Node[] | void>
     deleteNode: (nodeId: string) => Promise<void>
     saveState: () => void
 }
@@ -189,7 +189,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating Flow Edges`, response?.error)
             }
         },
-        addMilestones: async (milestones: Partial<Milestone>[]) => {
+        addMilestones: async (milestones: Partial<Milestone>[], creationMethod?: string) => {
             console.log(`add milestones`, milestones)
             const newNodes: Node[] = []
     
@@ -244,10 +244,10 @@ export const useRoadmapStore = create<RoadmapState>()(
                 newNodes.push(newNode)
             })
     
-            const nodes = await get().addNodes(newNodes)
+            const nodes = await get().addNodes(newNodes, creationMethod)
             return nodes
         },
-        addNodes: async (nodes: Node[]) => {
+        addNodes: async (nodes: Node[], creationMethod?: string) => {
             console.log(`add nodes`)
             set({ 
                 nodes: [...get().nodes, ...nodes], 
@@ -257,6 +257,13 @@ export const useRoadmapStore = create<RoadmapState>()(
             // update DB Nodes
             const response = await createNodes({ roadmapId: get().roadmapId, nodes })
             if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
+                response.data.milestones.forEach(milestone => {
+                    mixpanel.track("Project Created", {
+                        "Creation Method": creationMethod,
+                        "Title": milestone.title,
+                        "Types": milestone.types.map((type: any) => type.milestoneType.label || type.miletoneType.id)
+                    })
+                })
                 return response.data.nodes
             } else {
                 console.error(`Error adding nodes`, response?.error)

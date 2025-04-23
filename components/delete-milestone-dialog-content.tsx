@@ -14,6 +14,7 @@ import {
 } from "./ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { toast } from "sonner"
+import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,
@@ -39,19 +40,22 @@ export function DeleteMilestoneDialogContent({
 
     const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`, milestoneData?.nodeId)
+        mixpanel.track("Project Deleted", {
+            "ID": milestoneData?.id,
+            "Title": milestoneData?.title,
+            "Types": (milestoneData.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),
+            "Status": milestoneData.status,
+            "Budget": milestoneData.budget
+        })
+
         await setSelectedNodeId(null)
         await deleteNode(milestoneData?.nodeId)
         toast(
-            <div className="flex flex-col gap-2 w-full">
-                <span className="flex justify-between items-center">
-                    <p className="font-semibold text-gray-900">
-                        {`Project Deleted`}
-                    </p>
-                    <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
-                </span>
-                <p className="text-sm text-gray-500">
-                    {`Your project had been deleted successfully.`}
+            <div className="flex justify-between items-center w-full">
+                <p className="font-semibold text-gray-900">
+                    {`Project Deleted`}
                 </p>
+                <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
             </div>,
             {position: "bottom-left", duration: 20000, id: "undo-toast"}
         )
@@ -64,7 +68,7 @@ export function DeleteMilestoneDialogContent({
                     Are you absolutely sure?
                 </DialogTitle>
                 <DialogDescription>
-                    {`This action cannot be undone. This will permanently delete your milestone and it's data.`}
+                    {`This action cannot be undone. This will permanently delete your project and it's data.`}
                 </DialogDescription>
                 <DialogFooter>
                     <DialogClose>
