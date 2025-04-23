@@ -26,7 +26,7 @@ import {
     logError,
     sleep,
     toKebabCase,
-    updateTypeSenseDocument
+    updateTypeSenseDocument, validateEmailDomain
 } from "@/lib/utils";
 import {Session} from "next-auth";
 import {
@@ -1060,6 +1060,11 @@ export async function inviteUser(
         }
 
         const lowerCaseEmail = email.toLowerCase()
+
+        const isDomainValid = await validateEmailDomain(lowerCaseEmail);
+        if (!isDomainValid) {
+            return { success: false, error: "Email domain is invalid or cannot receive emails." };
+        }
 
         // Check if the user is already a member of the organization
         const existingMember = await prisma.member.findFirst({
