@@ -1,6 +1,7 @@
 import {Lock, Megaphone} from "lucide-react";
 import Image from "next/image"
 import publicProfile from "@/public/screenshots/public-profile.png"
+import {motion} from "framer-motion"
 
 const features = [
     {
@@ -19,7 +20,12 @@ const features = [
 
 export default function FeaturePublicPages() {
     return (
-        <div className="overflow-hidden bg-white py-24 sm:py-32">
+        <motion.section
+            initial={{opacity: 0, y: 50}}
+            animate={{opacity: 1, y: [50, -10, 0]}}
+            transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
+            className="overflow-hidden bg-white py-24 sm:py-32"
+        >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                     <div className="lg:pr-8 lg:pt-4">
@@ -57,6 +63,6 @@ export default function FeaturePublicPages() {
                     />
                 </div>
             </div>
-        </div>
+        </motion.section>
     );
 }

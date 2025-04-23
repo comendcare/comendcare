@@ -1,6 +1,7 @@
 import {Bookmark, Star} from "lucide-react";
 import Image from "next/image"
 import marketplace from "@/public/screenshots/marketplace.png"
+import {motion} from "framer-motion"
 
 const features = [
     {
@@ -19,16 +20,23 @@ const features = [
 
 export default function FeatureResearchMarketplace() {
     return (
-        <div className="overflow-hidden bg-white py-24 sm:py-32 mt-16">
+        <motion.section
+            initial={{opacity: 0, y: 50}}
+            animate={{opacity: 1, y: [50, -10, 0]}}
+            transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
+            className="overflow-hidden bg-white py-24 sm:py-32 mt-16"
+        >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+                <div
+                    className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                     <div className="lg:pr-8 lg:pt-4">
                         <div className="lg:max-w-lg">
                             <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
                                 Discover partners
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Discover synergies with other patient groups. Search and filter for relevant Service Providers, or browse recommended service providers based on your research plan.
+                                Discover synergies with other patient groups. Search and filter for relevant Service
+                                Providers, or browse recommended service providers based on your research plan.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (
@@ -39,7 +47,8 @@ export default function FeatureResearchMarketplace() {
                                                 className="absolute left-1 top-1 size-5 text-blue-dark"
                                             />
                                             {feature.name}
-                                        </dt>{" "}
+                                        </dt>
+                                        {" "}
                                         <dd className="inline">{feature.description}</dd>
                                     </div>
                                 ))}
@@ -57,6 +66,6 @@ export default function FeatureResearchMarketplace() {
                     />
                 </div>
             </div>
-        </div>
+        </motion.section>
     );
 }
