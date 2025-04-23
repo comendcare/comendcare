@@ -28,10 +28,12 @@ export const useAssetStore = create<AssetState>()(
                 mixpanel.track("Asset Created", {
                     "ID": newAsset.id,
                     "Asset Name": newAsset.title,
-                    "Linked Milestones": newAsset.milestones.map(({ milestone }) => ({
-                        "ID": milestone?.id,
-                        "Types": milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
-                    }))
+                    "Linked Milestones": newAsset.milestones.map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Milestone Types": newAsset.milestones.flatMap(({ milestone }) =>
+                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
                 })
 
                 // new Asset first, because Assets are displayed in decending order by creation date
@@ -44,10 +46,12 @@ export const useAssetStore = create<AssetState>()(
                 mixpanel.track("Asset Updated", {
                     "ID": updatedAsset.id,
                     "Asset Name": updatedAsset.title,
-                    "Linked Milestones": updatedAsset.milestones.map(({ milestone }) => ({
-                        "ID": milestone?.id,
-                        // "Types": milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
-                    }))
+                    "Linked Milestones": updatedAsset.milestones.map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Milestone Types": updatedAsset.milestones.flatMap(({ milestone }) =>
+                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
                 })
                 set({ assets: get().assets.map(asset => asset.id === updatedAsset.id ? updatedAsset : asset) })
             },
@@ -58,10 +62,12 @@ export const useAssetStore = create<AssetState>()(
                 mixpanel.track("Asset Deleted", {
                     "ID": deletedAsset.id,
                     "Asset Name": deletedAsset.title,
-                    "Linked Milestones": deletedAsset.milestones.map(({ milestone }) => ({
-                        "ID": milestone?.id,
-                        // "Types": milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
-                    }))
+                    "Linked Milestones": deletedAsset.milestones.map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Milestone Types": deletedAsset.milestones.flatMap(({ milestone }) =>
+                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
                 })
                 set({ assets: get().assets.filter(asset => asset.id !== deletedAsset.id) })
             },
