@@ -6,6 +6,7 @@ import {useShallow} from "zustand/react/shallow"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
 import {CROSearchState, useCROSearchStore, ViewType} from "@/state/search/croSearchStore";
 import { debounce } from "lodash";
+import mixpanel from "mixpanel-browser";
 
 const selector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -13,6 +14,7 @@ const selector = (state: CROSearchState) => ({
     setSortBy: state.setSortBy,
     view: state.view,
     setView: state.setView,
+    filters: state.filters,
     totalResults: state.totalResults
 })
 
@@ -24,6 +26,7 @@ export default function CROSearchBar() {
         setSortBy,
         view,
         setView,
+        filters,
         totalResults,
     } = useCROSearchStore(useShallow(selector))
 
@@ -32,7 +35,17 @@ export default function CROSearchBar() {
     }, [])
 
     const handleInputChangeCallback = useCallback(
-        (search: string) => setSearchTerm(search),
+        (search: string) => {
+            setSearchTerm(search)
+            // mixpanel.track("Search", {
+            //     "Search Term": search,
+            //     "Filters": {
+            //         "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
+            //         "Business Types": filters.types.map(filter => filter.label),
+            //         "Certifications": filters.types.map(filter => filter.label)
+            //     }
+            // })
+        },
         [setSearchTerm]
     )
 

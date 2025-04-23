@@ -834,7 +834,7 @@ export function EditMilestoneForm({
                                         <div className={cn("w-full grid gap-4 grid-cols-1")}>
                                             {(recommendations || []).map((result: Recommendation, index) => (
                                                 // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
-                                                <CROMarketplaceCard cro={result.content} key={index} milestone={milestoneData}/>
+                                                <CROMarketplaceCard cro={result.content} key={index} milestone={milestoneData} location={"Research Planner"}/>
                                             ))}
                                         </div>
                                     </>

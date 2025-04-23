@@ -155,7 +155,7 @@ export default async function CROPageHeader({id}: { id: string }) {
                     <ExternalLink className="h-4 w-4"/>
                     Visit website
                 </Link>
-                <SaveCRODialog cro={cro} type={"page"}/>
+                <SaveCRODialog cro={cro} type={"page"} location={"Service Provider Profile"}/>
             </div>
         </div>
     )
