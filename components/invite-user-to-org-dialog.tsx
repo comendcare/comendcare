@@ -31,9 +31,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import { UserPlus } from "lucide-react";
 
 const invitationFormSchema = z.object({
-    email: z.string().min(3, {
-        message: "Email must be at least 3 characters.",
-    }),
+    email: z.string().email({ message: "Please enter a valid email address." }),
     role: z.enum(["member", "owner"], { message: "Role must be either Member or Owner." }),
 })
 
