@@ -186,13 +186,7 @@ export const PrivateFlowView = ({
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
 
-                addNodes([newNode])
-
-                mixpanel.track("Project Created", {
-                    "Creation Method": "Flow Connection",
-                    "Title": newNode.data.title,
-                    "Types": newNode.data.types || []
-                })
+                addNodes([newNode], "Flow Connection")
 
                 // Handle connection direction based on the dragged handle
                 const source = connectionState.fromHandle?.position === "left" 
@@ -257,12 +251,7 @@ export const PrivateFlowView = ({
                         description: milestone.description,
                         types: milestone.types || [],
                         status: milestone.status
-                    }])
-                    mixpanel.track("Project Created", {
-                        "Creation Method": "Duplicate",
-                        "Title": milestone.title,
-                        "Types": milestone.types.map(type => type?.milestoneType?.label || type?.milestoneType?.id || undefined).filter(type => type !== undefined)
-                    })
+                    }], "Duplicate")
                 }
             },
             // last node is the onboarding node, localNodes are sorted by their creation date

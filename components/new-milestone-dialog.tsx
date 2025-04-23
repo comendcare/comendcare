@@ -145,14 +145,22 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             status: template?.status,
                                         })
                                     })
-                                    addMilestones(newMilestones)
-                                    newMilestones.forEach((milestone: any) => {
-                                        mixpanel.track("Project Created", {
-                                            "Creation Method": tab === "projects" ? "Project Template" : "Resarch Plan Template",
-                                            "Title": milestone.title,
-                                            "Types": milestone.types.map((type: any) => type.milestoneType.label || type.miletoneType.id)
+                                    addMilestones(selectedMilestonesTemplate.map((template: any) => {
+                                        return ({
+                                            nodeType: "PROJECT",
+                                            title: template?.title,
+                                            description: template?.description,
+                                            types: template?.types.map((type: string) => {
+                                                const milestoneType = milestoneTypes.find(t => t.id === type)
+                                                if (!milestoneType) return // milestone type not found, don't add it to created milestone
+                                                return ({ 
+                                                    milestoneTypeId: type,
+                                                    milestoneType
+                                                })
+                                            }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
+                                            status: template?.status,
                                         })
-                                    })
+                                    }), tab === "projects" ? "Project Template" : "Resarch Plan Template")
                                 }}
                             >
                                 <Plus />

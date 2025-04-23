@@ -70,12 +70,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 const newNode = await addMilestones([{
                     title: `Basic Science`,
                     status: "PLANNED",
-                }])
-                mixpanel.track("Project Created", {
-                    "Creation Method": "Onborda Tutorial",
-                    "Title": `Basic Science`,
-                    "Types": []
-                })
+                }], "Onborda Tutorial")
                 onboardingNodeId = newNode?.[0]?.id
             }
 

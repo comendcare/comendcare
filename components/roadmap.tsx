@@ -449,19 +449,13 @@ export function Roadmap() {
                                         addMilestones(result.values.map(milestone => {
                                             const foundType = milestoneTypes.find(type => type.label === milestone.type)
 
-                                            mixpanel.track("Project Created", {
-                                                "Creation Method": "Import",
-                                                "Title": milestone.title,
-                                                "Types": foundType ? [foundType.label] : []
-                                            })
-
                                             return {
                                                 title: milestone.title, 
                                                 description: milestone.description, 
                                                 types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
                                                 nodeType: "PROJECT"
                                             }
-                                        }))
+                                        }), "Import")
                                     } catch (e) {
                                         toast('Error!', {
                                             position: "bottom-left",
