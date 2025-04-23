@@ -10,6 +10,7 @@ import { Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { ScrollArea } from "./ui/scroll-area"
+import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -128,7 +129,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                 variant={"cta"}
                                 onClick={() => {
                                     console.log(`add milestone`, selectedMilestonesTemplate)
-                                    addMilestones(selectedMilestonesTemplate.map((template: any) => {
+                                    const newMilestones = selectedMilestonesTemplate.map((template: any) => {
                                         return ({
                                             nodeType: "PROJECT",
                                             title: template?.title,
@@ -143,7 +144,15 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
                                             status: template?.status,
                                         })
-                                    }))
+                                    })
+                                    addMilestones(newMilestones)
+                                    newMilestones.forEach((milestone: any) => {
+                                        mixpanel.track("Project Created", {
+                                            "Creation Method": tab === "projects" ? "Project Template" : "Resarch Plan Template",
+                                            "Title": milestone.title,
+                                            "Types": milestone.types.map((type: any) => type.milestoneType.label || type.miletoneType.id)
+                                        })
+                                    })
                                 }}
                             >
                                 <Plus />

@@ -23,6 +23,7 @@ import { toast } from "sonner"
 import { isOnboarded, setOnboarded} from "@/lib/utils"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
+import mixpanel from "mixpanel-browser"
 
 const proOptions = { hideAttribution: true }
 
@@ -187,6 +188,12 @@ export const PrivateFlowView = ({
 
                 addNodes([newNode])
 
+                mixpanel.track("Project Created", {
+                    "Creation Method": "Flow Connection",
+                    "Title": newNode.data.title,
+                    "Types": newNode.data.types || []
+                })
+
                 // Handle connection direction based on the dragged handle
                 const source = connectionState.fromHandle?.position === "left" 
                     ? id
@@ -251,6 +258,11 @@ export const PrivateFlowView = ({
                         types: milestone.types || [],
                         status: milestone.status
                     }])
+                    mixpanel.track("Project Created", {
+                        "Creation Method": "Duplicate",
+                        "Title": milestone.title,
+                        "Types": milestone.types.map(type => type?.milestoneType?.label || type?.milestoneType?.id || undefined).filter(type => type !== undefined)
+                    })
                 }
             },
             // last node is the onboarding node, localNodes are sorted by their creation date
