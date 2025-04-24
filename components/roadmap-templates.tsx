@@ -148,16 +148,36 @@ export const MilestoneTemplates = ({
     )
 }
 
-export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
+// export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
+//     return(
+//         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+//             <EmptyResearchPlanCard />
+//             {templateResearchPlans.map(template => (
+//                 <ResearchPlanTemplateCardSelect
+//                     milestoneTypes={milestoneTypes} 
+//                     researchPlanData={template}
+//                 />
+//             ))}
+//         </div>
+//     )
+// }
+
+export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
+    // const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
+    
     return(
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-            <EmptyResearchPlanCard />
-            {templateResearchPlans.map(template => (
-                <ResearchPlanTemplateCardSelect
-                    milestoneTypes={milestoneTypes} 
-                    researchPlanData={template}
-                />
-            ))}
+        <div className="h-[50vh] max-h-[50vh]">
+        <ScrollArea type="always" className="h-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                {templateResearchPlans.map(template => (
+                    <ResearchPlanTemplateCardSelect 
+                        researchPlanData={template}
+                        selectedMilestones={selectedMilestonesTemplate}
+                        setSelectedMilestones={setSelectedMilestonesTemplate}
+                    />
+                ))}
+            </div>
+        </ScrollArea>
         </div>
     )
 }
