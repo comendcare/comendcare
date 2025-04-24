@@ -108,40 +108,40 @@ export const templateResearchPlans = [
         })),
         modalities: MODALITIES.filter(modality => ['ANTISENSE_OLIGONUCLEOTIDE'].includes(modality.value))
     },
-    {
-        title: 'ASO Research Plan',
-        description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
-        milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
-            'NATURALHISTORYSTUDY', 
-            'BASICSCIENCE', 
-            'MOUSEMODEL', 
-            'PATIENTDERIVEDCELLLINE', 
-            'TOXICOLOGYSTUDY'
-        ].includes(option.id)).map(typeData => ({
-            title: typeData.label,
-            description: typeData.description,
-            types: [typeData.id],
-            categories: typeData.categories
-        })),
-        modalities: MODALITIES.filter(modality => ['ANTISENSE_OLIGONUCLEOTIDE'].includes(modality.value))
-    },
-    {
-        title: 'ASO Research Plan',
-        description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
-        milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
-            'NATURALHISTORYSTUDY', 
-            'BASICSCIENCE', 
-            'MOUSEMODEL', 
-            'PATIENTDERIVEDCELLLINE', 
-            'TOXICOLOGYSTUDY'
-        ].includes(option.id)).map(typeData => ({
-            title: typeData.label,
-            description: typeData.description,
-            types: [typeData.id],
-            categories: typeData.categories
-        })),
-        modalities: MODALITIES.filter(modality => ['ANTISENSE_OLIGONUCLEOTIDE'].includes(modality.value))
-    }
+    // {
+    //     title: 'ASO Research Plan 2 test',
+    //     description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
+    //     milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
+    //         'NATURALHISTORYSTUDY', 
+    //         'BASICSCIENCE', 
+    //         'MOUSEMODEL', 
+    //         'PATIENTDERIVEDCELLLINE', 
+    //         'TOXICOLOGYSTUDY'
+    //     ].includes(option.id)).map(typeData => ({
+    //         title: typeData.label,
+    //         description: typeData.description,
+    //         types: [typeData.id],
+    //         categories: typeData.categories
+    //     })),
+    //     modalities: MODALITIES.filter(modality => ['ANTISENSE_OLIGONUCLEOTIDE'].includes(modality.value))
+    // },
+    // {
+    //     title: 'ASO Research Plan 3 test',
+    //     description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
+    //     milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
+    //         'NATURALHISTORYSTUDY', 
+    //         'BASICSCIENCE', 
+    //         'MOUSEMODEL', 
+    //         'PATIENTDERIVEDCELLLINE', 
+    //         'TOXICOLOGYSTUDY'
+    //     ].includes(option.id)).map(typeData => ({
+    //         title: typeData.label,
+    //         description: typeData.description,
+    //         types: [typeData.id],
+    //         categories: typeData.categories
+    //     })),
+    //     modalities: MODALITIES.filter(modality => ['ANTISENSE_OLIGONUCLEOTIDE'].includes(modality.value))
+    // }
 ]
 
 export const templateRoadmaps = [
