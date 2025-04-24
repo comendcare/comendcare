@@ -114,21 +114,11 @@ export function EmptyResearchPlanCard() {
 //     )
 // }
 
-export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedMilestones, setSelectedMilestones }: {researchPlanData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
-    const [isChecked, setIsChecked] = useState(false)
-
-    useEffect(() => {
-        if (isChecked) {
-            setSelectedMilestones(researchPlanData.milestones)
-        } else {
-            setSelectedMilestones([])
-        }
-    }, [isChecked])
-
+export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedResearchPlanId, setSelectedResearchPlanId }: {researchPlanData: any, selectedResearchPlanId: string | undefined, setSelectedResearchPlanId: (value: SetStateAction<string | undefined>) => void}) {
     return (
-        <button onClick={() => {setIsChecked(prev => !prev)}}>
+        <button onClick={() => {selectedResearchPlanId !== researchPlanData.title ? setSelectedResearchPlanId(researchPlanData.title) : setSelectedResearchPlanId(undefined)}}>
             <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
-                <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
+                <CheckBubble isChecked={selectedResearchPlanId === researchPlanData.title} onCheckedChanged={() => {}}/>
                 <CardHeader>
                     <CardTitle className="text-lg font-semibold">
                         {`${researchPlanData.modalities.map((modalityOption: any)=> modalityOption.label).join(', ')}`}
