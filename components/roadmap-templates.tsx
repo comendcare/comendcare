@@ -163,7 +163,18 @@ export const MilestoneTemplates = ({
 // }
 
 export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
-    // const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
+    const [selectedResearchPlanId, setSelectedResearchPlanId] = useState<string | undefined>(undefined)
+
+    const handleSetSelectedResearchPlan = (researchPlanData: any) => {
+        console.log(`handle set selected research plan`, researchPlanData)
+        if (researchPlanData) {
+            setSelectedResearchPlanId(researchPlanData.title)
+            setSelectedMilestonesTemplate(researchPlanData.milestones)
+        } else {
+            setSelectedResearchPlanId(undefined)
+            setSelectedMilestonesTemplate([])
+        }
+    }
     
     return(
         <div className="h-[50vh] max-h-[50vh]">
@@ -172,8 +183,8 @@ export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedM
                 {templateResearchPlans.map(template => (
                     <ResearchPlanTemplateCardSelect 
                         researchPlanData={template}
-                        selectedMilestones={selectedMilestonesTemplate}
-                        setSelectedMilestones={setSelectedMilestonesTemplate}
+                        selectedResearchPlanId={selectedResearchPlanId}
+                        setSelectedResearchPlanId={(id) => id === template.title ? handleSetSelectedResearchPlan(template) : handleSetSelectedResearchPlan(undefined)}
                     />
                 ))}
             </div>
