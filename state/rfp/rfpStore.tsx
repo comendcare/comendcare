@@ -2,6 +2,7 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { RFP } from '@/lib/types';
 import { createOrUpdateRFP, deleteRFP, syncDBRFPs } from '@/lib/actions';
+import mixpanel from 'mixpanel-browser';
 
 export interface RFPState {
     rfps: RFP[],
@@ -21,19 +22,58 @@ export const useRFPStore = create<RFPState>()(
                 set({rfps, initialized: true})
             },
             createRFP: async (rfp: Partial<RFP>, orgId: string) => {
-                const newRfp: RFP = await createOrUpdateRFP(rfp, orgId)
+                const newRfp = await createOrUpdateRFP(rfp, orgId)
                 console.log(`new rfp`, newRfp)
+
+                mixpanel.track("RFP Created", {
+                    "ID": newRfp.id,
+                    "Name": newRfp.title,
+                    "Budget": newRfp.budget,
+                    "Linked Milestones": newRfp.milestones.map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Milestone Types": newRfp.milestones.flatMap(({ milestone }) =>
+                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
+                
                 // new RFP first, because RFPs are displayed in decending order by creation date
                 set({ rfps: [newRfp, ...get().rfps]})
             },
             updateRFP: async (rfp: Partial<RFP>, orgId: string) => {
-                const updatedRfp: RFP = await createOrUpdateRFP(rfp, orgId)
+                const updatedRfp = await createOrUpdateRFP(rfp, orgId)
                 console.log(`updated rfp`, updatedRfp)
+
+                mixpanel.track("RFP Updated", {
+                    "ID": updatedRfp.id,
+                    "Name": updatedRfp.title,
+                    "Budget": updatedRfp.budget,
+                    "Linked Milestones": updatedRfp.milestones.map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Milestone Types": updatedRfp.milestones.flatMap(({ milestone }) =>
+                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
+
                 set({ rfps: get().rfps.map(rfp => rfp.id === updatedRfp.id ? updatedRfp : rfp) })
             },
             deleteRFP: async (rfpId: string) => {
-                const deletedRfp: RFP = await deleteRFP(rfpId)
+                const deletedRfp = await deleteRFP(rfpId)
                 console.log(`deleted rfp`, deletedRfp)
+
+                mixpanel.track("RFP Deleted", {
+                    "ID": deletedRfp.id,
+                    "Name": deletedRfp.title,
+                    "Budget": deletedRfp.budget,
+                    "Linked Milestones": deletedRfp.milestones.map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Milestone Types": deletedRfp.milestones.flatMap(({ milestone }) =>
+                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
+
                 set({ rfps: get().rfps.filter(rfp => rfp.id !== deletedRfp.id) })
             },
             saveState: () => {

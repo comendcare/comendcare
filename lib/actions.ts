@@ -1859,7 +1859,9 @@ export const deleteRFP = async (rfpId: string) => {
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
@@ -1887,7 +1889,9 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
