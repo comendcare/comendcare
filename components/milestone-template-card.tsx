@@ -9,7 +9,7 @@ import {
     CardTitle
 } from "./ui/card"
 import { CheckBubble } from "./check-bubble"
-import { cn, setTemplatesShown } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { MilestoneTypeOnMilestone } from "@prisma/client";
@@ -61,7 +61,6 @@ export function EmptyResearchPlanCard() {
 
     return (
         <button onClick={() => {
-            setTemplatesShown()
             router.refresh()
         }}>
             <Card className="h-full relative bg-white shadow-sm rounded-lg text-left hover:bg-secondary cursor-pointer pt-6">
@@ -75,43 +74,87 @@ export function EmptyResearchPlanCard() {
     )
 }
 
-export function ResearchPlanTemplateCardSelect({ researchPlanData, milestoneTypes }: {researchPlanData: any, milestoneTypes: any[]}) {
-    const { addMilestones } = useRoadmapStore(useShallow(selector))
+// export function ResearchPlanTemplateCardSelect({ researchPlanData, milestoneTypes }: {researchPlanData: any, milestoneTypes: any[]}) {
+//     const { addMilestones } = useRoadmapStore(useShallow(selector))
+
+//     return (
+//         <button onClick={() => {
+//             console.log(`add milestones`, researchPlanData.milestones)
+//             addMilestones(researchPlanData.milestones.map((template: any) => {
+//                 return ({
+//                     nodeType: "PROJECT",
+//                     title: template?.title,
+//                     description: template?.description,
+//                     types: template?.types.map((type: string) => {
+//                         const milestoneType = milestoneTypes.find(t => t.id === type)
+//                         if (!milestoneType) return // milestone type not found, don't add it to created milestone
+//                         return ({ 
+//                             milestoneTypeId: type,
+//                             milestoneType
+//                         })
+//                     }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
+//                     status: template?.status,
+//                 })
+//             }))
+//         }}>
+//             <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+//                 <CardContent className="flex flex-col gap-2 overflow-visible">
+//                     <CardHeader>
+//                         <CardTitle>{researchPlanData.title}</CardTitle>
+//                     </CardHeader>
+
+//                     <ol className="list-decimal pl-4">
+//                         {researchPlanData.milestones.map((milestone: any) => (
+//                             <li>{milestone.title}</li>
+//                         ))}
+//                     </ol>
+//                 </CardContent>
+//             </Card>
+//         </button>
+//     )
+// }
+
+export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedMilestones, setSelectedMilestones }: {researchPlanData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
+    const [isChecked, setIsChecked] = useState(false)
+
+    useEffect(() => {
+        if (isChecked) {
+            setSelectedMilestones(researchPlanData.milestones)
+        } else {
+            setSelectedMilestones([])
+        }
+    }, [isChecked])
 
     return (
-        <button onClick={() => {
-            console.log(`add milestones`, researchPlanData.milestones)
-            addMilestones(researchPlanData.milestones.map((template: any) => {
-                return ({
-                    nodeType: "PROJECT",
-                    title: template?.title,
-                    description: template?.description,
-                    types: template?.types.map((type: string) => {
-                        const milestoneType = milestoneTypes.find(t => t.id === type)
-                        if (!milestoneType) return // milestone type not found, don't add it to created milestone
-                        return ({ 
-                            milestoneTypeId: type,
-                            milestoneType
-                        })
-                    }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
-                    status: template?.status,
-                })
-            }))
-            setTemplatesShown()
-        }}>
-            <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+        <button onClick={() => {setIsChecked(prev => !prev)}}>
+            <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+                <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
+                <CardHeader>
+                    <CardTitle className="text-lg font-semibold">
+                        {`${researchPlanData.modalities.map((modalityOption: any)=> modalityOption.label).join(', ')}`}
+                    </CardTitle>
+                    <CardDescription>
+                        <ol className="list-decimal pl-4">
+                            {researchPlanData.milestones.map((milestone: any) => (
+                                <li>{milestone.title}</li>
+                            ))}
+                        </ol>
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+            {/* <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+                <CardHeader>
+                    <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
+                </CardHeader>
                 <CardContent className="flex flex-col gap-2 overflow-visible">
-                    <CardHeader>
-                        <CardTitle>{researchPlanData.title}</CardTitle>
-                    </CardHeader>
-
+                    <CardTitle>{`Modality: ${researchPlanData.modalities.map((modalityOption: any)=> modalityOption.label).join(', ')}`}</CardTitle>
                     <ol className="list-decimal pl-4">
                         {researchPlanData.milestones.map((milestone: any) => (
                             <li>{milestone.title}</li>
                         ))}
                     </ol>
                 </CardContent>
-            </Card>
+            </Card> */}
         </button>
     )
 }
