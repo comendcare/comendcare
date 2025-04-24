@@ -27,7 +27,7 @@ export const useAssetStore = create<AssetState>()(
 
                 mixpanel.track("Asset Created", {
                     "ID": newAsset.id,
-                    "Asset Name": newAsset.title,
+                    "Name": newAsset.title,
                     "Linked Milestones": newAsset.milestones.map(({ milestone }) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
