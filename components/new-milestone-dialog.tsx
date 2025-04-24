@@ -15,13 +15,15 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
 })
 
-export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen: (open: boolean) => void}) => {
+export type TabType = 'projects' | 'research-plans'
+
+export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: boolean, setOpen: (open: boolean) => void, tab: TabType, setTab: (tab: TabType) => void}) => {
     const { 
         addMilestones,
     } = useRoadmapStore(useShallow(selector))
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
-    const [tab, setTab] = useState('projects')
+    // const [tab, setTab] = useState<TabType>(defaultTab)
     const dialogRef = useRef<HTMLDivElement>(null);
 
     // Allow update once form is initialized
@@ -58,18 +60,32 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                 tabIndex={-1} // Make it focusable
             >
                     <DialogHeader>
-                        <DialogTitle className="text-2xl">
-                            Create projects
-                        </DialogTitle>
-                        <DialogDescription>
-                            Select projects you would like to add to your research plan.
-                        </DialogDescription>
+                        {tab === 'projects' ? (
+                            <>
+                                <DialogTitle className="text-2xl">
+                                    Project Templates
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Select the individual project templates you would like to add to your research plan.
+                                </DialogDescription>
+                            </>
+                        ): (
+                            <>
+                                <DialogTitle className="text-2xl">
+                                    Research Plan Templates
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Select a research plan template to add a curated set of projects to your existing resarch plan.
+                                </DialogDescription>
+                            </>
+                        )}
                     </DialogHeader>
 
-                    <Tabs value={tab} onValueChange={(newTab => setTab(newTab))} className="flex h-full flex-col">
-                        {/* <TabsList className="w-fit">
+                    <Tabs value={tab} onValueChange={(newTab => setTab(newTab as TabType))} className="flex h-full flex-col">
+                        <TabsList className="w-fit">
                             <TabsTrigger value="projects">Project Templates</TabsTrigger>
-                        </TabsList> */}
+                            <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
+                        </TabsList>
 
                         <div className="flex-1 min-h-0">
                         <TabsContent value="projects" className="h-full">
@@ -78,9 +94,19 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                     className="h-[50vh] max-h-[50vh]"
                                     selectedMilestonesTemplate={selectedMilestonesTemplate}
                                     setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
-                                    createEmpty={() => {
-                                        // addMilestones([{name: 'New Milestone'}])
-                                    }}
+                                    createEmpty={() => {}}
+                                    inDialog={true}
+                                />
+                            </ScrollArea>
+                        </TabsContent>
+                        </div>
+
+                        <div className="flex-1 min-h-0">
+                        <TabsContent value="research-plans" className="h-full">
+                            <ScrollArea className="h-full" type="always">
+                                <ResearchPlanTemplates 
+                                    selectedMilestonesTemplate={selectedMilestonesTemplate}
+                                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
                                     inDialog={true}
                                 />
                             </ScrollArea>
@@ -121,7 +147,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                 }}
                             >
                                 <Plus />
-                                {tab === 'projects' ? `Create selected projects` : `Create selected research plan`}
+                                {tab === 'projects' ? `Add selected projects` : `Add projects from selected template`}
                             </Button>
                         </DialogClose>
                     </DialogFooter>

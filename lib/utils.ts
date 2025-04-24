@@ -310,15 +310,6 @@ export const setOnboarded = (tutorialName: string) => {
     localStorage.setItem(tutorialName, "true")
 }
 
-export const templatesShown = () => {
-    const templatesShown = localStorage.getItem("research-plan-template-shown")
-    return !(templatesShown === null)
-}
-
-export const setTemplatesShown = () => {
-    localStorage.setItem("research-plan-template-shown", "true")
-}
-
 type DraggableData = ColumnDragData | TaskDragData
 
 export function hasDraggableData<T extends Active | Over>(
