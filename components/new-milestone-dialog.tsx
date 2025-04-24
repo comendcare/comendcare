@@ -60,12 +60,25 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                 tabIndex={-1} // Make it focusable
             >
                     <DialogHeader>
-                        <DialogTitle className="text-2xl">
-                            Add projects from a template
-                        </DialogTitle>
-                        <DialogDescription>
-                            Select projects individually or select a resarch plan template to add a curated set of projects to your existing resarch plan.
-                        </DialogDescription>
+                        {tab === 'projects' ? (
+                            <>
+                                <DialogTitle className="text-2xl">
+                                    Project Templates
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Select the individual project templates you would like to add to your research plan.
+                                </DialogDescription>
+                            </>
+                        ): (
+                            <>
+                                <DialogTitle className="text-2xl">
+                                    Research Plan Templates
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Select a research plan template to add a curated set of projects to your existing resarch plan.
+                                </DialogDescription>
+                            </>
+                        )}
                     </DialogHeader>
 
                     <Tabs value={tab} onValueChange={(newTab => setTab(newTab as TabType))} className="flex h-full flex-col">
