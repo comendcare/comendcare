@@ -559,6 +559,7 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
                 onClick={() => {
                     if (pathname.includes('app/research-plan')) {
                         setSelectedNodeId(null)
+                        setTab('projects')
                         startOnborda('research-plan-tour')
                     }
                 }}
