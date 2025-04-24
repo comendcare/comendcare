@@ -550,8 +550,7 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
             <p className="text-lg text-stone-500 max-w-xl">
                 {`
                     Your research plan doesn't have any projects!
-                    A project is a milestone in your research plan that is being planned or developed. You may attach Assets and RFPs to Projects. 
-                    Get started quickly by adding projects from our curated research plan templates to your research plan.
+                    A project is a milestone in your research plan that is being planned or developed. You may attach Assets and RFPs to projects. 
                 `} 
             </p>
             <span className="flex gap-4">
