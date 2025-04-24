@@ -18,7 +18,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
-import { cn, parseCSV, sleep, templatesShown } from "@/lib/utils"
+import { cn, parseCSV } from "@/lib/utils"
 import Link from "next/link"
 import {
     Dialog,
@@ -32,7 +32,7 @@ import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
 import Image from "next/image"
-import { NewMilestoneDialogForm } from "./new-milestone-dialog"
+import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Milestone, NodeType } from "@/lib/types"
 import Loading from "@/app/loading"
@@ -78,9 +78,11 @@ export function Roadmap() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
-    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
-    const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
+    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
+    const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
+    // controllig tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
+    const [tab, setTab] = useState<TabType>('projects')
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
@@ -90,6 +92,7 @@ export function Roadmap() {
 
     useEffect(() => {
         if (step === ".onborda-select-a-template" && isOnbordaVisible) {
+            setTab('projects')
             setNewMilestoneIsOpen(true)
         }
     }, [step])
@@ -188,12 +191,6 @@ export function Roadmap() {
         )
     }
 
-    // if the user is new & has no projects show the templates
-    // if the research plan has projects we can't show templates (another member of the org may have added these projects)
-    if (!templatesShown() && milestones.length <= 0) {
-        return <MilestoneTemplatesCard milestoneTypes={milestoneTypes}/>
-    }
-
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
@@ -247,29 +244,35 @@ export function Roadmap() {
                             )}
 
                             <span className="onborda-create-a-project flex flex-row items-center gap-x-1">
+                                <Button 
+                                    variant={"cta"}  
+                                    onClick={() => {
+                                        setTab('projects')
+                                        setNewMilestoneIsOpen(true)
+                                    }}
+                                >
+                                    Templates
+                                </Button>
+
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button 
-                                            variant={"cta"}  
-                                            onClick={() => setNewMilestoneIsOpen(true)}
-                                            className="relative"
-                                            style={
-                                                {
-                                                    "--pulse-color": "#0096ff",
-                                                    // "--pulse-color": "#dcebfe", // light blue
-                                                    "--duration": "1.5s",
-                                                } as React.CSSProperties
-                                            }
+                                            disabled={milestoneTypes.length === 0}
+                                            onClick={() => {
+                                                console.log("Add an empty project triggered")
+                                                addMilestones([{
+                                                        nodeType: "PROJECT",
+                                                        title: 'New Project',
+                                                }])
+                                            }} 
+                                            variant={"secondary"}
                                         >
-                                            <div className="relative z-10 flex gap-2 items-center">
-                                                <Plus />
-                                                Create a project
-                                            </div>
-                                            <div className={cn(milestones.length <= 0 ? "absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit" : "")} />
+                                            <Plus />
+                                            Add an empty project
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80">
-                                        <p>{`Create a project`}</p>
+                                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
                                     </TooltipContent>
                                 </Tooltip>
 
@@ -288,7 +291,7 @@ export function Roadmap() {
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80">
-                                        <p>{`Import projects from .csv`}</p>
+                                        <p>{`Import projects from a .csv file`}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </span>
@@ -364,7 +367,7 @@ export function Roadmap() {
                                     width={defaultLayout[0]}
                                 />
                             ): (
-                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
                             )}
                         </TabsContent>
                         
@@ -376,7 +379,7 @@ export function Roadmap() {
                             {milestones.length > 0 ? (
                                 <PrivateTimelineView sortBy={sortBy}/>
                             ): (
-                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
                             )}
                         </TabsContent>
 
@@ -471,6 +474,8 @@ export function Roadmap() {
                 <NewMilestoneDialogForm 
                     open={newMilestoneIsOpen}
                     setOpen={setNewMilestoneIsOpen}
+                    tab={tab}
+                    setTab={setTab}
                 />
             </ResizablePanelGroup>
         </TooltipProvider>
@@ -519,23 +524,23 @@ const MilestoneDetailsPanel = ({
     return <Loading />
 }
 
-const MilestoneTemplatesCard = ({milestoneTypes}: {milestoneTypes: MilestoneType[]}) => {
-    return (
-        <div className="p-20 flex flex-col gap-8 justify-center items-center">
-            <h1 className="text-2xl">Select a research plan template to get started</h1>
-            <ResearchPlanTemplates milestoneTypes={milestoneTypes}/>
-        </div>
-    )
-}
+// const MilestoneTemplatesCard = ({milestoneTypes}: {milestoneTypes: MilestoneType[]}) => {
+//     return (
+//         <div className="p-20 flex flex-col gap-8 justify-center items-center">
+//             <h1 className="text-2xl">Select a research plan template to get started</h1>
+//             <ResearchPlanTemplates milestoneTypes={milestoneTypes}/>
+//         </div>
+//     )
+// }
 
-const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
+const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpen: (val: boolean) => void, setTab: (val: TabType) => void}) => {
     const pathname = usePathname()
     const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
     const { startOnborda } = useOnborda()
 
     return (
         <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
-            <h1 className="font-cal text-4xl">You do not have any Projects</h1>
+            <h1 className="font-cal text-4xl">Your research plan is empty!</h1>
             <Image
                 alt="No projects"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
@@ -543,7 +548,11 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val:
                 height={300}
             />
             <p className="text-lg text-stone-500 max-w-xl">
-                A project is a milestone that is being planned or developed. You may attach Assets and RFPs to Projects. 
+                {`
+                    Your research plan doesn't have any projects!
+                    A project is a milestone in your research plan that is being planned or developed. You may attach Assets and RFPs to Projects. 
+                    Get started quickly by adding projects from our curated research plan templates to your research plan.
+                `} 
             </p>
             <span className="flex gap-4">
             <Button 
@@ -558,9 +567,26 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val:
                 <Wand2 aria-hidden={true} />
                 Take a tour
             </Button>
-            <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
-                <Plus />
-                Create a project
+
+            <Button 
+                variant={"cta"}  
+                onClick={() => {
+                    setTab('research-plans')
+                    setNewMilestoneIsOpen(true)
+                }}
+                className="relative"
+                style={
+                    {
+                        "--pulse-color": "#0096ff",
+                        // "--pulse-color": "#dcebfe", // light blue
+                        "--duration": "1.5s",
+                    } as React.CSSProperties
+                }
+            >
+                <div className="relative z-10 flex gap-2 items-center">
+                    Add Projects
+                </div>
+                <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit")} />
             </Button>
             </span>
         </div>
