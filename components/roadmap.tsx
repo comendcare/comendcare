@@ -264,7 +264,7 @@ export function Roadmap() {
                                                 addMilestones([{
                                                         nodeType: "PROJECT",
                                                         title: 'New Project',
-                                                }])
+                                                }], "Create Empty Button")
                                             }} 
                                             variant={"secondary"}
                                         >
