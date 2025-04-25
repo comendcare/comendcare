@@ -1416,6 +1416,7 @@ export async function updateMember(
             where: {
                 id: membershipId
             },
+            include: {user: true},
             data
         })
 
