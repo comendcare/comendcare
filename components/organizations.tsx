@@ -14,7 +14,7 @@ export default async function Organizations({ limit }: { limit?: number }) {
         orderBy: {
             createdAt: "asc"
         },
-        // ...(limit ? { take: limit } : {})
+        ...(limit ? { take: limit } : {})
     })
 
     return organizations.length > 0 ? (

@@ -6,14 +6,13 @@ import {
     BarChart3,
     Edit3,
     Globe,
-    Layout,
+    FlaskConical,
     LayoutDashboard,
-    Megaphone,
     Menu,
     Newspaper,
     Settings,
-    FileCode,
-    Github
+    ChartArea,
+    Users
 } from "lucide-react"
 import {
     useParams,
@@ -26,41 +25,11 @@ import {getOrganizationFromRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
 
 const externalLinks: any[] = [
-    // {
-    //     name: "Read announcement",
-    //     href: "https://vercel.com/blog/platforms-starter-kit",
-    //     icon: <Megaphone width={18}/>,
-    // },
-    // {
-    //     name: "Star on GitHub",
-    //     href: "https://github.com/vercel/platforms",
-    //     icon: <Github width={18}/>,
-    // },
-    // {
-    //     name: "Read the guide",
-    //     href: "https://vercel.com/guides/nextjs-multi-tenant-application",
-    //     icon: <FileCode width={18}/>,
-    // },
-    // {
-    //     name: "View demo organization",
-    //     href: "https://demo.vercel.pub",
-    //     icon: <Layout width={18}/>,
-    // },
-    // {
-    //     name: "Deploy your own",
-    //     href: "https://vercel.com/templates/next.js/platforms-starter-kit",
-    //     icon: (
-    //         <svg
-    //             width={18}
-    //             viewBox="0 0 76 76"
-    //             fill="none"
-    //             xmlns="http://www.w3.org/2000/svg"
-    //             className="py-1 text-black dark:text-white"
-    //         >
-    //             <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
-    //         </svg>
-    //     ),
-    // },
+    {
+        name: "Mixpanel Analytics",
+        href: "https://mixpanel.com/project/3419552/view/3923844/app/home",
+        icon: <ChartArea width={18}/>,
+    },
 ]
 
 export default function AdminNav({ children }: { children: ReactNode }) {
@@ -142,10 +111,22 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                 icon: <LayoutDashboard width={18} />
             },
             {
+                name: "Users",
+                href: "/admin/users",
+                isActive: segments[0] === "users",
+                icon: <Users width={18} />
+            },
+            {
                 name: "Organizations",
                 href: "/admin/organizations",
                 isActive: segments[0] === "organizations",
                 icon: <Globe width={18} />
+            },
+            {
+                name: "Research Plans",
+                href: "/admin/research-plans",
+                isActive: segments[0] === "research-plans",
+                icon: <FlaskConical width={18} />
             },
             {
                 name: "Settings",
