@@ -29,8 +29,8 @@ export default function ShareDialog({
     }
 
     const trackMixpanelEvent = (socialOption: string) => {
-        mixpanel.track(`User shared url`, {
-            platform: socialOption
+        mixpanel.track(`Organization Profile Shared`, {
+            "Platform": socialOption
         })
     }
 
