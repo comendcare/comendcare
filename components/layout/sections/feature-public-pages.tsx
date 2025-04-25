@@ -7,7 +7,7 @@ const features = [
     {
         name: "Privacy controls.",
         description:
-            "Publish or unpublish your organization and tune your research plan projects to be public or private.",
+            "Publish or un-publish your profile and tune your research plan projects to be public or private.",
         icon: Lock,
     },
     {
@@ -27,14 +27,16 @@ export default function FeaturePublicPages() {
             className="overflow-hidden bg-white py-24 sm:py-32"
         >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+                <div
+                    className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                     <div className="lg:pr-8 lg:pt-4">
                         <div className="lg:max-w-lg">
                             <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
                                 Share your progress
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Easily keep your profile up-to-date and share it with your community, donors, biopharma, and more.
+                                Easily keep your profile up-to-date and share it with your community, donors, biopharma,
+                                and more.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (
@@ -45,7 +47,8 @@ export default function FeaturePublicPages() {
                                                 className="absolute left-1 top-1 size-5 text-blue-dark"
                                             />
                                             {feature.name}
-                                        </dt>{" "}
+                                        </dt>
+                                        {" "}
                                         <dd className="inline">{feature.description}</dd>
                                     </div>
                                 ))}
