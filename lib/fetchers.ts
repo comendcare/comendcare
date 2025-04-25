@@ -118,8 +118,11 @@ export async function getPublicAssetsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true},
-                where: {milestone: {private: {equals: false}}}
+                include: {
+                    milestone: {
+                        include: { types: { include: { milestoneType: true } } }
+                    }
+                }
             }
         },
         orderBy: [{createdAt: "desc"}]
