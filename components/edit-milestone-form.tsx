@@ -312,6 +312,17 @@ export function EditMilestoneForm({
         [handleMilestoneFormSubmitCallback]
     )
 
+    const debounceMixpanelTrackBudget = useMemo(() => 
+        debounce((updatedBudget) => {
+            mixpanel.track("Project Budget Updated", {
+                "ID": milestoneData.id,
+                "Title": formData.title,
+                "Budget": updatedBudget
+            })
+        }, 500), 
+        []
+    )
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -469,186 +480,26 @@ export function EditMilestoneForm({
                                     }
                                 </TabsTrigger>
                             </TabsList>
-                            {/* <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="font-semibold h-8 text-sm flex justify-center gap-2 border-none text-blue-dark bg-blue-light hover:bg-blue-light rounded-full">
-                                        {formData.nodeType === "ASSET" && (
-                                            <>
-                                                <Star />
-                                                {"Asset"}
-                                            </>
-                                        )}
-                                        {formData.nodeType === "PROJECT" && (
-                                            <>
-                                                <FileText />
-                                                {"Project"}
-                                            </>
-                                        )}
-                                        {formData.nodeType === "RFP" && (
-                                            <>
-                                                <Megaphone />
-                                                {"RFP"}
-                                            </>
-                                        )}
-                                        <ChevronDown />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <FormField 
-                                        control={form.control}
-                                        name="nodeType"
-                                        render={({field}) => (
-                                            <>
-                                            {field.value !== "ASSET" && (
-                                                <DropdownMenuItem
-                                                    onSelect={async (e) => {
-                                                        setIsMigrating(true)
-                                                        await sleep(1000)
-                                                        field.onChange("ASSET")
-                                                        setIsMigrating(false)
-                                                    }}
-                                                >
-                                                    <TypeBadge type="ASSET" iconOnly={true} className="w-8"/>
-                                                    Migrate to asset
-                                                    <Tooltip>
-                                                        <TooltipTrigger className="ml-auto">
-                                                            <Info className="h-4 w-4"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                                            {NODE_TYPE_OPTIONS.find(option => option.value === "ASSET")?.description}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </DropdownMenuItem>
-                                            )}
-                                            {field.value !== "PROJECT" && (
-                                                <DropdownMenuItem
-                                                    onSelect={async (e) => {
-                                                        setIsMigrating(true)
-                                                        await sleep(1000)
-                                                        field.onChange("PROJECT")
-                                                        setIsMigrating(false)
-                                                    }}
-                                                >
-                                                    <TypeBadge type="PROJECT" iconOnly={true} className="w-8"/>
-                                                    Migrate to project
-                                                    <Tooltip>
-                                                        <TooltipTrigger className="ml-auto">
-                                                            <Info className="h-4 w-4"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                                            {NODE_TYPE_OPTIONS.find(option => option.value === "PROJECT")?.description}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </DropdownMenuItem>
-                                            )}
-                                            {field.value !== "RFP" && (
-                                                <DropdownMenuItem
-                                                    onSelect={async (e) => {
-                                                        setIsMigrating(true)
-                                                        await sleep(1000)
-                                                        field.onChange("RFP")
-                                                        setIsMigrating(false)
-                                                    }}
-                                                >
-                                                    <TypeBadge type="RFP" iconOnly={true} className="w-8"/>
-                                                    Migrate to RFP
-                                                    <Tooltip>
-                                                        <TooltipTrigger className="ml-auto">
-                                                            <Info className="h-4 w-4"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                                            {NODE_TYPE_OPTIONS.find(option => option.value === "RFP")?.description}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </DropdownMenuItem>
-                                            )}
-                                            </>
-                                        )}
-                                    />
-                                </DropdownMenuContent>
-                            </DropdownMenu> */}
                         </div>
                         {isMigrating ? (
                             <Loading />
                         ): (
                             <>
                             <TabsContent value="edit" className="space-y-6 w-full h-full">
-                                {/* <FormItem>
-
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                                    <FormLabel className="text-md mt-2">Visibility</FormLabel>
-                                    <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                                </FormItem>
-
-                                <FormField
-                                    control={form.control}
-                                    name="description"
-                                    render={({field}) => (
-                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                            <FormLabel className="text-md mt-2">
-                                                {`Description`}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Textarea
-                                                    id="description"
-                                                    placeholder={`Enter a description...`}
-                                                    // defaultValue={field.value}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                                    <div>
-                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
-                                    {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
-                                    </div>
-                                    <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
-
-                                    {formData.nodeType === "ASSET" && (
-                                        <>
-                                            <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
-                                            <BudgetFormField form={form}/>
-                                        </>
-                                    )}
-
-                                    {formData.nodeType === "PROJECT" && (
-                                        <>
-                                            <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                            <StatusFormField form={form}/>
-
-                                            <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                            <span className="mt-2"><BudgetFormField form={form}/></span>
-                                        </>
-                                    )}
-
-                                    {formData.nodeType === "RFP" && (
-                                        <>
-                                            <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                            <BudgetFormField form={form}/>
-
-                                            <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                            <OpenToFormField form={form}/>
-                                        </>
-                                    )}
-                                </div>
-
-                                {formData.nodeType === "PROJECT" && (
-                                    <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
-                                )}
-
-                                {formData.nodeType === "RFP" && (
-                                    <TimelineFormField form={form} startLabel={"Request Opens"}
-                                                    endLabel={"Deadline for Proposals"}/>
-                                )}
-                                </FormItem> */}
-
                                 <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                     <FormLabel>Visibility</FormLabel>
-                                    <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                                    <PrivatePublicFormField 
+                                        form={form} 
+                                        formData={formData} 
+                                        disabled={!orgIsPublished}
+                                        mixpanelTrackCallback={(updatedIsPrivate) => {
+                                            mixpanel.track("Project Visibility Updated", {
+                                                "ID": milestoneData.id,
+                                                "Title": formData.title,
+                                                "Visibility": updatedIsPrivate ? "Private" : "Public"
+                                            })
+                                        }}
+                                    />
 
                                     <FormField
                                         control={form.control}
@@ -677,10 +528,24 @@ export function EditMilestoneForm({
                                     <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
 
                                     <FormLabel>{`Project Status`}</FormLabel>
-                                    <StatusFormField form={form}/>
+                                    <StatusFormField 
+                                        form={form}
+                                        mixpanelTrackCallback={(updatedStatus) => {
+                                            mixpanel.track("Project Status Updated", {
+                                                "ID": milestoneData.id,
+                                                "Title": formData.title,
+                                                "Status": updatedStatus
+                                            })
+                                        }}
+                                    />
 
                                     <FormLabel>{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form}/>
+                                    <BudgetFormField 
+                                        form={form}
+                                        mixpanelTrackCallback={(updatedBudget) => 
+                                            debounceMixpanelTrackBudget(updatedBudget)
+                                        }
+                                    />
 
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
 
@@ -918,7 +783,17 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
     )
 }
 
-export const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any, formData: any, disabled?: boolean }) => {
+export const PrivatePublicFormField = ({
+    form, 
+    formData, 
+    disabled = false, 
+    mixpanelTrackCallback
+}: { 
+    form: any, 
+    formData: any, 
+    disabled?: boolean, 
+    mixpanelTrackCallback?: (isPrivate: boolean) => void 
+}) => {
     if (disabled) {
         return (
             <FormField
@@ -931,6 +806,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                             <TooltipTrigger>
                                 <RadioGroup
                                     onValueChange={(value)=> {
+                                        if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
                                         form.setValue("isPrivate", value === "PRIVATE", {shouldValidate: true})
                                     }}
                                     defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
@@ -941,19 +817,10 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                         <FormControl>
                                             <span className="flex gap-2">
                                                 <RadioGroupItem value="PRIVATE" />
-                                                {/* <Tooltip disableHoverableContent={disabled}>
-                                                    <TooltipTrigger disabled={disabled} asChild> */}
-                                                        <FormLabel className="font-normal flex gap-1 items-center">
-                                                            <Lock className="h-4 w-4"/>
-                                                            {`Private`}
-                                                        </FormLabel>
-                                                    {/* </TooltipTrigger>
-                                                    {!disabled && (
-                                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                                            {`Private projects are only visible to your team.`}
-                                                        </TooltipContent>
-                                                    )}
-                                                </Tooltip> */}
+                                                    <FormLabel className="font-normal flex gap-1 items-center">
+                                                        <Lock className="h-4 w-4"/>
+                                                        {`Private`}
+                                                    </FormLabel>
                                             </span>
                                         </FormControl>
                                     </FormItem>
@@ -961,19 +828,10 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                         <FormControl>
                                             <span className="flex gap-2">
                                                 <RadioGroupItem value="PUBLIC" />
-                                                {/* <Tooltip disableHoverableContent={disabled}>
-                                                <TooltipTrigger disabled={disabled} asChild> */}
-                                                    <FormLabel className="font-normal flex gap-1 items-center">
-                                                        <Globe className="h-4 w-4"/>
-                                                        {`Public`}
-                                                    </FormLabel>
-                                                {/* </TooltipTrigger>
-                                                {!disabled && (
-                                                    <TooltipContent className="max-w-80 text-wrap text-left">
-                                                        {`Public projects are visible on your profile and discoverable in the marketplace.`}
-                                                    </TooltipContent>
-                                                )}
-                                            </Tooltip> */}
+                                                <FormLabel className="font-normal flex gap-1 items-center">
+                                                    <Globe className="h-4 w-4"/>
+                                                    {`Public`}
+                                                </FormLabel>
                                             </span>
                                         </FormControl>
                                     </FormItem>
@@ -1002,6 +860,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                 <FormControl>
                         <RadioGroup
                             onValueChange={(value)=> {
+                                if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
                                 form.setValue("isPrivate", value === "PRIVATE")
                             }}
                             defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
@@ -1057,7 +916,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
     )
 }
 
-export const StatusFormField = ({form}: { form: any }) => {
+const StatusFormField = ({form, mixpanelTrackCallback}: { form: any, mixpanelTrackCallback?: (newValue: string) => void }) => {
     return (
         <FormField
             control={form.control}
@@ -1070,7 +929,10 @@ export const StatusFormField = ({form}: { form: any }) => {
                             status={
                                 field?.value as StatusType
                             }
-                            onStatusChange={field.onChange}
+                            onStatusChange={(status) => {
+                                if (mixpanelTrackCallback) mixpanelTrackCallback(status)
+                                field.onChange(status)
+                            }}
                         />
                     </FormControl>
                     <FormMessage/>
@@ -1080,12 +942,19 @@ export const StatusFormField = ({form}: { form: any }) => {
     )
 }
 
-export const BudgetFormField = ({form}: { form: any }) => {
+export const BudgetFormField = ({
+    form,
+    mixpanelTrackCallback
+}: { 
+    form: any,
+    mixpanelTrackCallback?: (budget: number) => void
+}) => {
     return (
         <MoneyInput
             className="-mt-2"
             form={form}
             name="budget"
+            mixpanelTrackCallback={mixpanelTrackCallback}
         />
     )
 }
