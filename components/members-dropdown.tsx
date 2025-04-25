@@ -21,9 +21,9 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useEffect, useState} from "react";
-import {getAllMembershipsFromUserId} from "@/lib/fetchers";
+import {getAllMembershipsFromUserId, getMembers} from "@/lib/fetchers";
 import {MembershipWithOrganization} from "@/lib/types";
-import { Ellipsis, Pencil, UserX } from "lucide-react";
+import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
 
 const formSchema = z.object({
@@ -51,7 +51,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
         async function fetchOrgData() {
             if (session) {
                 try {
-                    const response = await getAllMembershipsFromUserId(session.user.id);
+                    const response = await getMembers(session.user.organizationId);
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
@@ -178,14 +178,14 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
-                    <Ellipsis />
+                    <Ellipsis/>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
                         (session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner") && (
                             <DialogTrigger asChild>
                                 <DropdownMenuItem>
-                                    <Pencil />
+                                    <Pencil/>
                                     Edit membership
                                 </DropdownMenuItem>
                             </DialogTrigger>
@@ -199,7 +199,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                 onClick={handleLeaveOrganization}
                                 className="text-red-600 hover:text-red-800"
                             >
-                                <UserX />
+                                <UserX/>
                                 Leave organization
                             </DropdownMenuItem>
                         ) : session?.user?.membership?.role === "owner" ? (
@@ -208,7 +208,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                 onClick={() => revokeMembership(member)}
                                 className="text-red-600 hover:text-red-800"
                             >
-                                <UserX />
+                                <UserX/>
                                 Remove membership
                             </DropdownMenuItem>
                         ) : null // Case 3: The user is neither the owner nor the same user, show nothing
@@ -248,27 +248,47 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                 <FormField
                                     control={form.control}
                                     name="role"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Role</FormLabel>
                                             <FormDescription>
                                                 {isLastOwner
                                                     ? "You cannot change your role because you are the last owner. Every organization must have at least one owner."
-                                                    : <>Choose the role for this organization member. <strong>The user will be signed out and will have to sign back in.</strong></>}
+                                                    : <>Choose the role for this organization member. <strong>The user
+                                                        will be signed out and will have to sign back in.</strong></>}
 
                                             </FormDescription>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLastOwner}>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}
+                                                    disabled={isLastOwner}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a role" />
+                                                        {field.value ? (
+                                                            <span>{field.value === "owner" ? "Owner" : "Member"}</span>
+                                                        ) : (
+                                                            <span className="text-muted-foreground">Select a role</span>
+                                                        )}
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="member">Member</SelectItem>
-                                                    <SelectItem value="owner">Owner</SelectItem>
+                                                    <SelectItem value="member">
+                                                        <p>
+                                                            Member
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Can view and edit.
+                                                        </p>
+                                                    </SelectItem>
+                                                    <SelectItem value="owner">
+                                                        <p>
+                                                            Owner
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Can view, edit, and manage organization members.
+                                                        </p>
+                                                    </SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
