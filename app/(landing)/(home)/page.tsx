@@ -19,9 +19,9 @@ import MoreFeaturesSection from "@/components/layout/sections/more-features-sect
 import {PartneredWithLogoCloud} from "@/components/layout/sections/partnered-with-logo-cloud";
 import {ClientsLogoCloud} from "@/components/layout/sections/clients-logo-cloud";
 import ContactSection from "@/components/layout/sections/contact";
-import FeatureResearchPlan from "@/components/layout/sections/feature-research-plan";
-import FeaturePublicPages from "@/components/layout/sections/feature-public-pages";
 import FeatureResearchMarketplace from "@/components/layout/sections/feature-research-marketplace";
+import FeaturePublicPages from "@/components/layout/sections/feature-public-pages";
+import FeatureResearchPlan from "@/components/layout/sections/feature-research-plan";
 
 export default function App() {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
@@ -48,8 +48,8 @@ export default function App() {
             {/*/>*/}
             {/*<HowItWorks/>*/}
             {/*<ClientsLogoCloud />*/}
-            <FeatureResearchMarketplace />
             <FeatureResearchPlan />
+            <FeatureResearchMarketplace  />
             <FeaturePublicPages />
             {/*<TabsFeaturesSection />*/}
             {/*<MoreFeaturesSection />*/}
