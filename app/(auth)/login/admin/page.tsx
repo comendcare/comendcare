@@ -6,6 +6,7 @@ import {Suspense, useEffect} from "react";
 import logo from "@/public/logos/comend-logo.png"
 import {useSearchParams} from "next/navigation";
 import {toast} from "sonner";
+import AdminLoginForm from "@/components/admin-login-form";
 
 export default function AdminLoginPage() {
     const searchParams = useSearchParams();
@@ -45,7 +46,7 @@ export default function AdminLoginPage() {
                             className="my-2 h-10 w-full rounded-md border border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-800"/>
                     }
                 >
-                    <LoginForm callback="/admin" />
+                    <AdminLoginForm callback="/admin" />
                 </Suspense>
             </div>
         </div>
