@@ -448,7 +448,7 @@ async function getMdxSource(roadmapContents: string) {
     return mdxSource
 }
 
-export async function getMembers(organizationId: string | undefined) {
+export async function getMembers(organizationId: string | null | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
     }
