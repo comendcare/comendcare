@@ -702,6 +702,8 @@ model Company {
   categories               String[]
   milestoneTypes           String[]
   savedByOrganizations     SavedCompany[]
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
 }
 
 model SavedCompany {

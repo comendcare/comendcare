@@ -1329,3 +1329,54 @@ export async function getOrganizationAnalytics() {
         growthRate,
     };
 }
+
+export async function getCompanyAnalytics() {
+    const now = new Date();
+    const startOfCurrentMonth = startOfMonth(now);
+    const startOfLastMonth = startOfMonth(subMonths(now, 1));
+
+    // Total companies
+    const totalCompanies = await prisma.company.count();
+
+    // New companies this month
+    const newCompaniesThisMonth = await prisma.company.count({
+        where: {
+            // Assuming companies use createdAt like orgs/users
+            createdAt: {
+                gte: startOfCurrentMonth,
+            },
+        },
+    });
+
+    // New companies last month
+    const newCompaniesLastMonth = await prisma.company.count({
+        where: {
+            createdAt: {
+                gte: startOfLastMonth,
+                lt: startOfCurrentMonth,
+            },
+        },
+    });
+
+    // Active companies (updated in last 30 days)
+    const activeCompanies = await prisma.company.count({
+        where: {
+            updatedAt: {
+                gte: subMonths(now, 1),
+            },
+        },
+    });
+
+    const growthRate =
+        newCompaniesLastMonth === 0
+            ? 100
+            : ((newCompaniesThisMonth - newCompaniesLastMonth) / newCompaniesLastMonth) * 100;
+
+    return {
+        totalCompanies,
+        newCompaniesThisMonth,
+        newCompaniesLastMonth,
+        activeCompanies,
+        growthRate,
+    };
+}
