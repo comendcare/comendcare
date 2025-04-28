@@ -3,15 +3,13 @@ import Organizations from "@/components/organizations"
 import PlaceholderCard from "@/components/placeholder-card"
 import CreateOrganizationButton from "@/components/create-organization-button"
 import CreateOrganizationModal from "@/components/modal/create-organization"
+import {AdminOrganizationsAnalyticsCards} from "@/components/admin-organizations-analytics-cards";
 
-export default function AllOrganizations({
-    params
-}: {
-    params: { id: string }
-}) {
+export default function AllOrganizations() {
     return (
         <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
+                <AdminOrganizationsAnalyticsCards />
                 <div className="flex items-center justify-between">
                     <h1 className="font-cal text-3xl font-bold dark:text-white">
                         All Organizations
