@@ -94,7 +94,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                     "Service Provider ID": response.data.company.id,
                     "Milestone Title": response.data.milestone.title,
                     "Milestone ID": response.data.milestone.id,
-                    "Milestone Type": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.value === type.id).label || type.id),
+                    "Milestone Types": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
                     "Milestone Budget": response.data.milestone.budget
                 })
                 router.refresh();

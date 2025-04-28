@@ -47,6 +47,8 @@ import {StarRatingSelector} from "@/components/star-rating-selector";
 import {getMilestones} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";
+import mixpanel from "mixpanel-browser";
+import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 
 export const reviewForm = z.object({
     title: z
@@ -107,15 +109,30 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                 }
             });
 
-            createReview(cro.id, formData).then((res: any) => {
+            await createReview(cro.id, formData).then((res: any) => {
                 if (res.error) {
                     toast.error(res.error);
                 } else {
-                    va.track("Created review");
-                    router.refresh();
+                    va.track("Created review")
+                    console.log(`response`, res)
+                    const milestone = res?.milestones?.[0]?.milestone
+                    console.log(`milestone`, milestone)
+                    mixpanel.track("Service Provider Review Submtited", {
+                        "Service Provider ID": cro.id,
+                        "Service Provider Name": cro.title,
+                        "Title": res.data.title,
+                        "Description": res.data.body,
+                        "Rating": res.data.rating,
+                        "Milestone Title": milestone?.title,
+                        "Milestone ID": milestone?.id,
+                        "Milestone Types": (milestone?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
+                        "Milestone Budget": milestone?.budget
+                    })
+
+                    // router.refresh();
                     toast.success("Successfully published review!");
                 }
-            });
+            })
         } catch (error) {
             toast.error("An error occurred while creating your review.");
         } finally {
