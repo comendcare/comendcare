@@ -50,6 +50,13 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
         toast.success(`Your message to ${organization.name} has been sent!`);
         form.reset();
         try {
+            mixpanel.track("Organization Contacted", {
+                "Organization ID": organization.id,
+                "Organization Name": organization.name,
+                "Organization Email": organization.contactEmail,
+                "Contacter Name": values.name,
+                "Contacter Email": values.email
+            })
             await sendPAGContactEmail({
                 name: values.name,
                 email: values.email,
