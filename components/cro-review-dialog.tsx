@@ -117,7 +117,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                     console.log(`response`, res)
                     const milestone = res?.milestones?.[0]?.milestone
                     console.log(`milestone`, milestone)
-                    mixpanel.track("Service Provider Review Submtited", {
+                    mixpanel.track("Service Provider Review Submitted", {
                         "Service Provider ID": cro.id,
                         "Service Provider Name": cro.title,
                         "Title": res.data.title,

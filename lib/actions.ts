@@ -3449,6 +3449,10 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
             where: {
                 id: savedCROId // Make sure to specify the ID of the saved company you want to update
             },
+            include: {
+                company: true,
+                milestone: { include: { types: true } }
+            },
             data: {
                 milestone: {
                     connect: {
@@ -3473,8 +3477,12 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
 
 export async function unsaveCRO(savedCompanyId: string) {
     try {
-        const response = prisma.savedCompany.delete({
+        const response = await prisma.savedCompany.delete({
             where: {id: savedCompanyId},
+            include: {
+                company: true,
+                milestone: { include: { types: true } }
+            },
         });
 
         if (!response) {
