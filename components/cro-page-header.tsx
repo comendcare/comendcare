@@ -20,6 +20,9 @@ import Link from "next/link";
 import React from "react";
 import {companyTypeMap} from "@/components/marketplace-cro-card";
 import {buttonVariants} from "@/components/ui/button";
+import mixpanel from "mixpanel-browser";
+import { Button } from "./plate-ui/button";
+import { ServiceProviderWebsiteButton } from "./service-provider-website-button";
 
 
 const companyTypeIcons: Record<string, JSX.Element> = {
@@ -147,14 +150,7 @@ export default async function CROPageHeader({id}: { id: string }) {
                 )}
             </div>
             <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
-                <Link
-                    href={cro.url || ""}
-                    className={cn(buttonVariants({variant: "secondary"}), "w-fit")}
-                    target="_blank"
-                >
-                    <ExternalLink className="h-4 w-4"/>
-                    Visit website
-                </Link>
+                <ServiceProviderWebsiteButton cro={cro} />
                 <SaveCRODialog cro={cro} type={"page"} location={"Service Provider Profile"}/>
             </div>
         </div>

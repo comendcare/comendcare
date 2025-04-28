@@ -43,6 +43,11 @@ import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
 
+export const getSessionInfo = async () => {
+    const session = await getSession()
+    return session
+}
+
 export type Node = Prisma.NodeGetPayload<{}>
 
 export type Edge = Prisma.EdgeGetPayload<{}>
@@ -3238,6 +3243,15 @@ export const createReview = async (companyId: string, formData: FormData): Promi
         const result = await prisma.$transaction(async (tx) => {
             // Create the review
             const review = await tx.review.create({
+                include: {
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: true}
+                            }
+                        }
+                    }
+                },
                 data: {
                     title,
                     body,

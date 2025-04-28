@@ -6,6 +6,7 @@ import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
 import { customerIOIdentify } from "@/lib/customer-io"
 import { getOrganizationFromOrganizationId } from "@/lib/fetchers"
+import { getSessionInfo } from "@/lib/actions"
 
 const MixpanelContext = createContext<any>(null)
 
