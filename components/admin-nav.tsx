@@ -12,7 +12,8 @@ import {
     Newspaper,
     Settings,
     ChartArea,
-    Users
+    Users,
+    Building
 } from "lucide-react"
 import {
     useParams,
@@ -127,6 +128,12 @@ export default function AdminNav({children}: { children: ReactNode }) {
                 href: "/admin/research-plans",
                 isActive: segments[0] === "research-plans",
                 icon: <FlaskConical width={18}/>
+            },
+            {
+                name: "Companies",
+                href: "/admin/companies",
+                isActive: segments[0] === "companies",
+                icon: <Building width={18}/>
             },
             {
                 name: "Settings",
