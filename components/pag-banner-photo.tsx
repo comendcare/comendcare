@@ -46,6 +46,7 @@ export function PAGBannerPhoto({
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
+    const [isCropping, setIsCropping] = useState(false)
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
@@ -87,6 +88,7 @@ export function PAGBannerPhoto({
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
+            setIsCropping(false)
             setOpen(false);
             router.refresh();
         } catch (error) {
@@ -136,8 +138,13 @@ export function PAGBannerPhoto({
                                     selectedFile={selectedFileHeader}
                                     setSelectedFile={setSelectedFileHeader}
                                     className="rounded h-[100px] w-[400px] mx-auto"
+                                    setIsCropping={setIsCropping}
                                 />
-                                <Button type="submit" className="w-fit">
+                                <Button 
+                                    type="submit" 
+                                    className="w-fit"
+                                    disabled={isCropping}
+                                >
                                     Save
                                 </Button>
                             </form>
