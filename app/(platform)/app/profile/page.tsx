@@ -123,11 +123,13 @@ export default async function ProfilePage() {
                                         <PagProfileAboutCard
                                             organization={organization}
                                             editable={true}
+                                            isPrivate={true}
                                         />
                                         <PAGProfileConditionsCard
                                             conditions={conditions}
                                             organization={organization}
                                             showEditDialog={true}
+                                            isPrivate={true}
                                         />
                                     </div>
                                     {/*<PAGProfileAssetsCard/>*/}

@@ -66,7 +66,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     </Carousel>
                                 </div>
                             )}
-                            {rfps.length <= 0 && (
+                            {rfps.filter(rfp => rfp.pinned).length <= 0&& (
                                 <NoPinnedRFPs />
                             )}
                         </TabsContent>
