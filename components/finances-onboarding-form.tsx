@@ -10,6 +10,7 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 import MoneyInput from "@/components/money-input";
+import mixpanel from "mixpanel-browser";
 
 export const financesFormSchema = z.object({
     // raising: z.enum(["yes", "no-but", "no"]).optional(),
@@ -64,6 +65,7 @@ export default function FinancesOnboardingForm(
 
         try {
             const response = await updateOrganization(formData, session.data.user.organizationId);
+            mixpanel.track("Onboarding Completed")
             toast.success("Organization updated successfully!");
             router.push("/app/marketplace/service-providers");
         } catch (error) {

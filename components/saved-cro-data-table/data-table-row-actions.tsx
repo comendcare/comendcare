@@ -33,6 +33,8 @@ import va from "@vercel/analytics"
 import {editSavedCRO, unsaveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {SavedCompanyData} from "@/lib/types";
+import mixpanel from "mixpanel-browser";
+import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -100,8 +102,16 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
         try {
             const response = await editSavedCRO(row.original.id, data.milestoneId);
 
-            if (response.success) {
+            if (response.success && response.data) {
                 va.track("Edited saved CRO");
+                mixpanel.track("Service Provider Save Edited", {
+                    "Service Provider Name": response.data.company.title,
+                    "Service Provider ID": response.data.company.id,
+                    "Milestone Title": response.data.milestone.title,
+                    "Milestone ID": response.data.milestone.id,
+                    "Milestone Types": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
+                    "Milestone Budget": response.data.milestone.budget
+                })
                 router.refresh();
                 toast.success("Successfully edited saved cro!");
             } else {
@@ -119,10 +129,18 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
 
     const handleUnsaveCRO = async () => {
         try {
-            await signOut()
             const response = await unsaveCRO(row.original.id)
 
-            if (response.success) {
+            if (response.success && response.data) {
+                mixpanel.track("Service Provider Unsaved", {
+                    "Service Provider Name": response.data.company.title,
+                    "Service Provider ID": response.data.company.id,
+                    "Milestone Title": response.data.milestone.title,
+                    "Milestone ID": response.data.milestone.id,
+                    "Milestone Types": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
+                    "Milestone Budget": response.data.milestone.budget
+                })
+                router.refresh()
                 toast.success("Unsaved company successfully.");
             } else {
                 toast.error("Failed to unsave company. Please try again.");

@@ -42,6 +42,7 @@ import { useOnborda } from "./onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
 import { ScrollArea } from "./ui/scroll-area"
+import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -263,7 +264,7 @@ export function Roadmap() {
                                                 addMilestones([{
                                                         nodeType: "PROJECT",
                                                         title: 'New Project',
-                                                }])
+                                                }], "Create Empty Button")
                                             }} 
                                             variant={"secondary"}
                                         >
@@ -454,7 +455,7 @@ export function Roadmap() {
                                                 types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
                                                 nodeType: "PROJECT"
                                             }
-                                        }))
+                                        }), "Import")
                                     } catch (e) {
                                         toast('Error!', {
                                             position: "bottom-left",

@@ -11,6 +11,7 @@ import {TypeBadge} from "./type-badge"
 import {TimelineCardContents} from "./private-timeline"
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {ExternalLink} from "lucide-react"
+import mixpanel from "mixpanel-browser";
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -69,6 +70,15 @@ const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {
                         `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${item?.id}&view=timeline` :
                         ''
                 }
+                onClick={() => {
+                    mixpanel.track("Project Details Viewed", {
+                        "ID": item?.id,
+                        "Title": item?.title,
+                        "Types": (item?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),
+                        "Status": item?.status,
+                        "Budget": item?.budget
+                    })
+                }}
                 className={cn("group", item.private ? "pointer-events-none" : "")}
                 target="_blank"
             >
@@ -92,6 +102,14 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
             <button
                 className={cn("hover:cursor-pointer text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
                 onClick={() => {
+                    mixpanel.track("Project Details Viewed", {
+                        "ID": item?.id,
+                        "Title": item?.title,
+                        "Types": (item?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),
+                        "Status": item?.status,
+                        "Budget": item?.budget
+                    })
+                    
                     if (setUrlMilestone !== undefined) {
                         setUrlMilestone(item.id)
                     }

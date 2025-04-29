@@ -14,6 +14,7 @@ import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
+import { MilestoneType } from "@prisma/client";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,

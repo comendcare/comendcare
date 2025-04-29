@@ -9,6 +9,7 @@ import { getSession } from "@/lib/auth";
 import { getConditionsFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers";
 import {PrivateBadge} from "@/components/private-badge";
 import { Banknote, File, Globe, Image, Map } from "lucide-react";
+import { ProfileCompletionMixpanelTrack } from "./profile-completion-track";
 
 // Define the possible milestone keys explicitly
 type MilestoneKey =
@@ -139,6 +140,7 @@ export async function ProfileCompletionCard() {
                 <PrivateBadge/>
             </CardHeader>
             <CardContent className="flex flex-col space-y-4">
+                <ProfileCompletionMixpanelTrack completionPercentage={completionPercentage}/>
                 <ol className="flex items-center w-full">
                     {orderedMilestones.map((milestone, index) => (
                         <li
