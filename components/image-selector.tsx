@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import ReactCrop, {
     centerCrop,
     makeAspectCrop,
@@ -31,6 +31,7 @@ interface ImageSelectorProps {
     setSelectedFile: (file: FileWithPreview | null) => void,
     aspect: number,
     className?: string,
+    setParentIsCropping: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function ImageSelector({
@@ -38,6 +39,7 @@ export function ImageSelector({
     setSelectedFile,
     aspect,
     className = "",
+    setParentIsCropping
 }: ImageSelectorProps) {
     const imgRef = React.useRef<HTMLImageElement | null>(null)
     const fileInputRef = React.useRef<HTMLInputElement | null>(null)
@@ -47,6 +49,10 @@ export function ImageSelector({
     const [croppedImage, setCroppedImage] = React.useState<string>("")
     const [isCropping, setIsCropping] = React.useState<boolean>(false)
     const [cropFile, setCropFile] = React.useState<FileWithPreview | null>(selectedFile)
+
+    useEffect(() => {
+        setParentIsCropping(isCropping)
+    }, [isCropping])
 
     const handleClick = async () => {
         // setSelectedFile(null) // de-select any previously selected file
