@@ -37,14 +37,6 @@ export default function CROSearchBar() {
     const handleInputChangeCallback = useCallback(
         (search: string) => {
             setSearchTerm(search)
-            // mixpanel.track("Search", {
-            //     "Search Term": search,
-            //     "Filters": {
-            //         "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
-            //         "Business Types": filters.types.map(filter => filter.label),
-            //         "Certifications": filters.types.map(filter => filter.label)
-            //     }
-            // })
         },
         [setSearchTerm]
     )
