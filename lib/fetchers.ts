@@ -1330,25 +1330,16 @@ export async function getOrganizationAnalytics() {
     };
 }
 
-export async function getCompanyAnalytics() {
+export async function getCompanyAndReviewAnalytics() {
     const now = new Date();
     const startOfCurrentMonth = startOfMonth(now);
     const startOfLastMonth = startOfMonth(subMonths(now, 1));
 
-    // Total companies
+    // Companies
     const totalCompanies = await prisma.company.count();
-
-    // New companies this month
     const newCompaniesThisMonth = await prisma.company.count({
-        where: {
-            // Assuming companies use createdAt like orgs/users
-            createdAt: {
-                gte: startOfCurrentMonth,
-            },
-        },
+        where: { createdAt: { gte: startOfCurrentMonth } },
     });
-
-    // New companies last month
     const newCompaniesLastMonth = await prisma.company.count({
         where: {
             createdAt: {
@@ -1358,26 +1349,24 @@ export async function getCompanyAnalytics() {
         },
     });
 
-    // Active companies (updated in last 30 days)
-    const activeCompanies = await prisma.company.count({
-        where: {
-            updatedAt: {
-                gte: subMonths(now, 1),
-            },
-        },
-    });
-
-    const growthRate =
+    const companyGrowthRate =
         newCompaniesLastMonth === 0
             ? 100
             : ((newCompaniesThisMonth - newCompaniesLastMonth) / newCompaniesLastMonth) * 100;
+
+    // Reviews
+    const totalReviews = await prisma.review.count();
+    const newReviewsThisMonth = await prisma.review.count({
+        where: { createdAt: { gte: startOfCurrentMonth } },
+    });
 
     return {
         totalCompanies,
         newCompaniesThisMonth,
         newCompaniesLastMonth,
-        activeCompanies,
-        growthRate,
+        companyGrowthRate,
+        totalReviews,
+        newReviewsThisMonth,
     };
 }
 
@@ -1410,4 +1399,25 @@ export async function getUserChartAnalytics() {
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     return chartData;
+}
+
+export async function getUserWhitelist() {
+    try {
+        const whitelist = await prisma.whitelist.findMany({
+            orderBy: { createdAt: "desc" },
+        })
+
+
+        if (!whitelist) {
+            return {success: false, error: "User whitelist not found"};
+        }
+
+        return {
+            success: true,
+            data: whitelist
+        };
+    } catch (error: any) {
+        logError("Error fetching whitelisted users", error);
+        return {success: false, error: "Internal server error"};
+    }
 }

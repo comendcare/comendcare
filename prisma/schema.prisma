@@ -829,3 +829,9 @@ model ReportOnReply {
   reply       Reply                   @relation(fields: [replyId], references: [id], onDelete: Cascade)
   createdAt   DateTime                @default(now())
 }
+
+model Whitelist {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
