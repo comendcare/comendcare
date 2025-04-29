@@ -4,31 +4,33 @@ import { useEffect, useState } from "react";
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {getCompanyAnalytics} from "@/lib/fetchers";
+import { getCompanyAndReviewAnalytics } from "@/lib/fetchers";
 
 interface AnalyticsData {
     totalCompanies: number;
     newCompaniesThisMonth: number;
     newCompaniesLastMonth: number;
-    activeCompanies: number;
-    growthRate: number;
+    companyGrowthRate: number;
+    totalReviews: number;
+    newReviewsThisMonth: number;
 }
 
 export function AdminCompaniesAnalyticsCards() {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getCompanyAnalytics()
+        getCompanyAndReviewAnalytics()
             .then((res) => res)
             .then(setData);
     }, []);
 
     if (!data) return null; // Or a skeleton
 
-    const growthPositive = data.growthRate >= 0;
+    const growthPositive = data.companyGrowthRate >= 0;
 
     return (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 px-4 lg:px-6">
+            {/* Total Companies */}
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Total Companies</CardDescription>
@@ -38,10 +40,12 @@ export function AdminCompaniesAnalyticsCards() {
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">
-                        Cumulative user accounts
+                        Cumulative company accounts
                     </div>
                 </CardFooter>
             </Card>
+
+            {/* New Companies This Month */}
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>New Companies This Month</CardDescription>
@@ -53,12 +57,12 @@ export function AdminCompaniesAnalyticsCards() {
                             {growthPositive ? (
                                 <>
                                     <TrendingUpIcon className="size-3" />
-                                    +{data.growthRate.toFixed(1)}%
+                                    +{data.companyGrowthRate.toFixed(1)}%
                                 </>
                             ) : (
                                 <>
                                     <TrendingDownIcon className="size-3" />
-                                    {data.growthRate.toFixed(1)}%
+                                    {data.companyGrowthRate.toFixed(1)}%
                                 </>
                             )}
                         </Badge>
@@ -70,15 +74,33 @@ export function AdminCompaniesAnalyticsCards() {
                     </div>
                 </CardFooter>
             </Card>
+
+            {/* Total Reviews */}
             <Card className="@container/card">
                 <CardHeader className="relative">
-                    <CardDescription>Active Accounts</CardDescription>
+                    <CardDescription>Total Reviews</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.activeCompanies.toLocaleString()} </CardTitle>
+                        {data.totalReviews.toLocaleString()}
+                    </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">
-                        Companies active in the last 30 days
+                        Cumulative reviews across companies
+                    </div>
+                </CardFooter>
+            </Card>
+
+            {/* New Reviews This Month */}
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>New Reviews This Month</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.newReviewsThisMonth.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Reviews created this month
                     </div>
                 </CardFooter>
             </Card>
