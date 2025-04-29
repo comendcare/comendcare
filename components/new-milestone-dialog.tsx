@@ -10,6 +10,7 @@ import { Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { ScrollArea } from "./ui/scroll-area"
+import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -128,6 +129,22 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                 variant={"cta"}
                                 onClick={() => {
                                     console.log(`add milestone`, selectedMilestonesTemplate)
+                                    const newMilestones = selectedMilestonesTemplate.map((template: any) => {
+                                        return ({
+                                            nodeType: "PROJECT",
+                                            title: template?.title,
+                                            description: template?.description,
+                                            types: template?.types.map((type: string) => {
+                                                const milestoneType = milestoneTypes.find(t => t.id === type)
+                                                if (!milestoneType) return // milestone type not found, don't add it to created milestone
+                                                return ({ 
+                                                    milestoneTypeId: type,
+                                                    milestoneType
+                                                })
+                                            }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
+                                            status: template?.status,
+                                        })
+                                    })
                                     addMilestones(selectedMilestonesTemplate.map((template: any) => {
                                         return ({
                                             nodeType: "PROJECT",
@@ -143,7 +160,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
                                             status: template?.status,
                                         })
-                                    }))
+                                    }), tab === "projects" ? "Project Template" : "Resarch Plan Template")
                                 }}
                             >
                                 <Plus />
