@@ -129,6 +129,7 @@ export default async function ProfilePage() {
                                             conditions={conditions}
                                             organization={organization}
                                             showEditDialog={true}
+                                            isPrivate={true}
                                         />
                                     </div>
                                     {/*<PAGProfileAssetsCard/>*/}
