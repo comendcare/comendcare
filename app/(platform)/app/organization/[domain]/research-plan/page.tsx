@@ -258,6 +258,7 @@ export default async function OrganizationRoadmapPage({
                                     dialog: (
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                            organization={organization}
                                         />
                                     ),
                                 },

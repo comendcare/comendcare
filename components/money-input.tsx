@@ -20,6 +20,7 @@ type TextInputProps = {
     description?: string;
     placeholder?: string;
     cents?: boolean;
+    mixpanelTrackCallback?: (budget: number) => void
 };
 
 // U.S. currency config
@@ -57,7 +58,10 @@ export default function MoneyInput(props: TextInputProps & {className?: string})
             name={name}
             render={({field}) => {
                 field.value = value;
-                const _change = field.onChange;
+                const _change = (value: number) => {
+                    if (props.mixpanelTrackCallback) props.mixpanelTrackCallback(value)
+                    field.onChange(value)
+                };
 
                 return (
                     <FormItem>

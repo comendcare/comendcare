@@ -52,6 +52,7 @@ import { reviewForm } from "./cro-review-dialog";
 import {Button} from "@/components/ui/button";
 import {ReviewWithAuthor} from "@/lib/types";
 import { EllipsisVertical, Flag, Link2Off, Pencil, Trash } from "lucide-react";
+import mixpanel from "mixpanel-browser";
 
 
 export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Company }) => {
@@ -170,7 +171,11 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
         }
 
         try {
-            const response = await submitFeedback(review.id, session.user.id, isHelpful);
+            const response = await submitFeedback(review.id, session.user.id, isHelpful)
+
+            // mixpanel.track("Service Provider Review Submitted", {
+            //     "Title": 
+            // })
 
             if (response.success) {
                 toast.success("Thanks for your feedback!");

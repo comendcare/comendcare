@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Loading from "@/app/loading";
+import { useEffect } from "react";
+import mixpanel from "mixpanel-browser";
 
 export default function OnboardingWelcomePage() {
     const { data: session, status } = useSession();
@@ -13,6 +15,10 @@ export default function OnboardingWelcomePage() {
     if (status === "loading") {
         return <Loading />;
     }
+
+    useEffect(() => {
+        mixpanel.track("Onboarding Started")
+    }, [])
 
     return (
         <main className="flex flex-col space-y-8 w-full max-w-7xl mx-auto">

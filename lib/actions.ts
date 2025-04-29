@@ -11,7 +11,8 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
-    Review
+    Review,
+    SavedCompany
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -41,6 +42,11 @@ import {
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
+
+export const getSessionInfo = async () => {
+    const session = await getSession()
+    return session
+}
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -1415,6 +1421,7 @@ export async function updateMember(
             where: {
                 id: membershipId
             },
+            include: {user: true},
             data
         })
 
@@ -1735,7 +1742,9 @@ export const deleteAsset = async (assetId: string) => {
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
@@ -1763,7 +1772,9 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
@@ -1854,7 +1865,9 @@ export const deleteRFP = async (rfpId: string) => {
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
@@ -1882,7 +1895,9 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: { types: { include: { milestoneType: true } } }
+                        }
                     }
                 }
             },
@@ -3228,6 +3243,15 @@ export const createReview = async (companyId: string, formData: FormData): Promi
         const result = await prisma.$transaction(async (tx) => {
             // Create the review
             const review = await tx.review.create({
+                include: {
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: true}
+                            }
+                        }
+                    }
+                },
                 data: {
                     title,
                     body,
@@ -3378,7 +3402,11 @@ export async function saveCRO(croId: string, milestoneId: string) {
     const session = await getSession()
 
     try {
-        const response = prisma.savedCompany.create({
+        const response = await prisma.savedCompany.create({
+            include: {
+                company: true,
+                milestone: { include: { types: true } }
+            },
             data: {
                 company: {
                     connect: {
@@ -3404,6 +3432,8 @@ export async function saveCRO(croId: string, milestoneId: string) {
             return {success: false, error: "Database error. please try again later."}
         }
 
+        console.log(`response`, response)
+
         return {success: true, data: response}
     } catch (error: any) {
         console.error("Error saving company:", error)
@@ -3418,6 +3448,10 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
         const response = await prisma.savedCompany.update({
             where: {
                 id: savedCROId // Make sure to specify the ID of the saved company you want to update
+            },
+            include: {
+                company: true,
+                milestone: { include: { types: true } }
             },
             data: {
                 milestone: {
@@ -3443,8 +3477,12 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
 
 export async function unsaveCRO(savedCompanyId: string) {
     try {
-        const response = prisma.savedCompany.delete({
+        const response = await prisma.savedCompany.delete({
             where: {id: savedCompanyId},
+            include: {
+                company: true,
+                milestone: { include: { types: true } }
+            },
         });
 
         if (!response) {
