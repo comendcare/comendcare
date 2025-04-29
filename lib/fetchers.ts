@@ -1380,3 +1380,34 @@ export async function getCompanyAnalytics() {
         growthRate,
     };
 }
+
+export async function getUserChartAnalytics() {
+    const users = await prisma.user.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(),
+            },
+        },
+        select: {
+            createdAt: true,
+        },
+    });
+
+    // Aggregate by date
+    const countsByDate: Record<string, number> = {};
+
+    for (const user of users) {
+        const dateStr = user.createdAt.toISOString().split("T")[0]; // "2024-06-28"
+        countsByDate[dateStr] = (countsByDate[dateStr] || 0) + 1;
+    }
+
+    // Convert to array sorted by date
+    const chartData = Object.entries(countsByDate)
+        .map(([date, count]) => ({
+            date,
+            users: count,
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return chartData;
+}
