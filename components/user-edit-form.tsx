@@ -50,6 +50,7 @@ export default function UserEditForm() {
     // const [searchInput, setSearchInput] = useState("");
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [isCropping, setIsCropping] = useState(false)
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -263,6 +264,7 @@ export default function UserEditForm() {
                     img={defaultValues?.image}
                     selectedFile={selectedFile}
                     setSelectedFile={setSelectedFile}
+                    setIsCropping={setIsCropping}
                 />
 
                 <div className="space-y-2">
@@ -313,7 +315,7 @@ export default function UserEditForm() {
                     />
                 </div>
 
-                <Button type="submit">Save</Button>
+                <Button disabled={isCropping} type="submit">Save</Button>
             </form>
         </Form>
     );
