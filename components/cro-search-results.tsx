@@ -78,7 +78,7 @@ export function CROSearchResults() {
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((cro, index) => (
-                            <CROMarketplaceCard cro={cro} key={index} />
+                            <CROMarketplaceCard cro={cro} key={index} location={"Marketplace"}/>
                         ))}
                     </div>
                 )}

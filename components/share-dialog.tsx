@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/dialog"
 import mixpanel from "mixpanel-browser"
 import {toast} from "sonner";
+import { Organization } from "@prisma/client";
 
 export default function ShareDialog({
-                                        url,
-                                    }: {
-    url: string
+    url,
+    organization
+}: {
+    url: string,
+    organization?: Organization
 }) {
 
     const handleCopyResourceLinkToClipboard = async () => {
@@ -29,8 +32,12 @@ export default function ShareDialog({
     }
 
     const trackMixpanelEvent = (socialOption: string) => {
-        mixpanel.track(`User shared url`, {
-            platform: socialOption
+        mixpanel.track(`Organization Profile Shared`, {
+            "Platform": socialOption,
+            ...(organization ? {
+                "Organization ID": organization.id,
+                "Organization Name": organization.name
+            } : undefined)
         })
     }
 

@@ -41,6 +41,7 @@ import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
+import mixpanel from "mixpanel-browser"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>

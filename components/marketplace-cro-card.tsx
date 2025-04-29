@@ -42,7 +42,7 @@ const companyTypeIcons: Record<string, JSX.Element> = {
     "Consultant (<5 employees)": <Briefcase className="size-4 text-gray-500 dark:text-gray-400"/>,
 };
 
-export function CRORecommendationCard({cro, milestone}: { cro: Company, milestone: any }) {
+export function CRORecommendationCard({cro, milestone, location}: { cro: Company, milestone: any, location?: string }) {
     const {id} = cro;
 
     return (
@@ -63,7 +63,7 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
                         {milestone.title}
                     </CardDescription>
                     <Separator className="my-2"/>
-                    <CROCardHeaderContents cro={cro}/>
+                    <CROCardHeaderContents cro={cro} location={location}/>
                 </CardHeader>
                 <CROCardContents cro={cro}/>
             </Card>
@@ -71,20 +71,20 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
     );
 }
 
-export function CROMarketplaceCard({cro, milestone}: { cro: Company, milestone?: Milestone }) {
+export function CROMarketplaceCard({cro, milestone, location}: { cro: Company, milestone?: Milestone, location?: string }) {
     const {id} = cro;
 
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
-                <CROCardHeaderContents cro={cro} milestone={milestone}/>
+                <CROCardHeaderContents cro={cro} milestone={milestone} location={location}/>
             </CardHeader>
             <CROCardContents cro={cro}/>
         </Card>
     )
 }
 
-export function CROCardHeaderContents({cro, milestone}: { cro: Company, milestone?: Milestone }) {
+export function CROCardHeaderContents({cro, milestone, location}: { cro: Company, milestone?: Milestone, location?: string}) {
     const {id, title, description, companyType, avgRating} = cro;
 
     return (
@@ -101,7 +101,7 @@ export function CROCardHeaderContents({cro, milestone}: { cro: Company, mileston
                         {title}
                     </CardTitle>
                 </Link>
-                <SaveCRODialog cro={cro} type={"card"} milestone={milestone}/>
+                <SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>
             </div>
             <Link
                 href={

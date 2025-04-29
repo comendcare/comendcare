@@ -1,4 +1,5 @@
 import {typesense} from '@/lib/typesense';
+import mixpanel from 'mixpanel-browser';
 import {temporal} from 'zundo';
 import {create} from 'zustand';
 
@@ -177,6 +178,21 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
                 }, true)
+
+                if (newSearch.length > 0) {
+                    // only track searches if the user has entered text in the searchbar
+                    const filters = get().filters
+                    mixpanel.track("Search Organizations", {
+                        "Search Term": newSearch,
+                        "Results": total,
+                        "Filters": {
+                            "Mechanisms of Action": filters.mechanisms.map(filter => filter.label),
+                            "Associated Systems": filters.systems.map(filter => filter.label),
+                            "Modalities of Interest": filters.modalities.map(filter => filter.label)
+                        }
+                    })
+                }
+
                 set({
                     searchTerm: newSearch,
                     searchResults: newSearchResults,
@@ -218,6 +234,16 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     filters: newFilters,
                     lastFetchedPage: 1,
                 }, true)
+
+                mixpanel.track("Marketplace Organization Filters Selected", {
+                    "Results": total,
+                    "Filters": {
+                        "Mechanisms of Action": newFilters.mechanisms.map(filter => filter.label),
+                        "Associated Systems": newFilters.systems.map(filter => filter.label),
+                        "Modalities of Interest": newFilters.modalities.map(filter => filter.label)
+                    }
+                })
+
                 set({
                     filters: newFilters,
                     lastFetchedPage: 1,

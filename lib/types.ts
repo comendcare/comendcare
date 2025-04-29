@@ -30,7 +30,9 @@ export type Asset = Omit<Prisma.AssetGetPayload<{
         attachments: true,
         milestones: {
             include: {
-                milestone: true
+                milestone: {
+                    include: { types: true }
+                }
             }
         }
     }
@@ -49,7 +51,9 @@ export type RFP = Omit<Prisma.RFPGetPayload<{
         attachments: true,
         milestones: {
             include: {
-                milestone: true
+                milestone: {
+                    include: { types: true }
+                }
             }
         }
     }
