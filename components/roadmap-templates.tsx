@@ -298,22 +298,3 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof 
         </button>
     )
 }
-
-export function ResearchPlanCard({ researchPlan }: { researchPlan: any }) {
-    const router = useRouter()
-    
-    return (
-        <Link
-            href={`/app/research-plan/${researchPlan.id}`}
-        >
-            <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
-                {/* <CheckBubble isChecked={selectedResearchPlanId === researchPlanData.title} onCheckedChanged={() => {}}/> */}
-                {/* Add Pin checkbox here! */}
-                <CardHeader>
-                    <CardTitle className="text-xl font-normal">{researchPlan.title || 'Untitled Research Plan'}</CardTitle>
-                    <CardDescription>{researchPlan.description}</CardDescription>
-                </CardHeader>
-            </Card>
-        </Link>
-    )
-}
