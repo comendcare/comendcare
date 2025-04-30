@@ -118,8 +118,11 @@ export async function getPublicAssetsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true},
-                where: {milestone: {private: {equals: false}}}
+                include: {
+                    milestone: {
+                        include: { types: { include: { milestoneType: true } } }
+                    }
+                }
             }
         },
         orderBy: [{createdAt: "desc"}]
@@ -550,7 +553,7 @@ export async function getMilestones(organizationId: string | undefined) {
     try {
         const fetchedMilestones = await prisma?.milestone.findMany({
             // include: {user: true},
-            where: {organizationId}
+            where: {organizationId},
         })
 
         if (!fetchedMilestones) {

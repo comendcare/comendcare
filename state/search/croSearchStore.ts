@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
+import mixpanel from 'mixpanel-browser';
 
 export const sampleCROs: any[] = [
     {
@@ -269,14 +270,29 @@ export const useCROSearchStore = create<CROSearchState>()(
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
-                }, true);
+                }, true)
+
+                if (newSearch.length > 0) {
+                    // only track searches if the user has entered text in the searchbar
+                    const filters = get().filters
+                    mixpanel.track("Search Service Providers", {
+                        "Search Term": newSearch,
+                        "Results": total,
+                        "Filters": {
+                            "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
+                            "Business Types": filters.types.map(filter => filter.label),
+                            "Certifications": filters.certifications.map(filter => filter.label),
+                            "Categories": filters.categories.map(filter => filter.label)
+                        }
+                    })
+                }
 
                 set({
                     searchTerm: newSearch,
                     searchResults: results,
                     lastFetchedPage: 1,
                     totalResults: total,
-                });
+                })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
@@ -312,6 +328,16 @@ export const useCROSearchStore = create<CROSearchState>()(
                     filters: newFilters,
                     lastFetchedPage: 1,
                 }, true)
+
+                mixpanel.track("Marketplace Service Provider Filters Selected", {
+                    "Results": total,
+                    "Filters": {
+                        "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
+                        "Business Types": newFilters.types.map(filter => filter.label),
+                        "Certifications": newFilters.certifications.map(filter => filter.label),
+                        "Categories": newFilters.categories.map(filter => filter.label)
+                    }
+                })
 
                 set({
                     filters: newFilters,

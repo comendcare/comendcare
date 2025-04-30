@@ -32,6 +32,7 @@ import { PropertyBadge } from "./property-badge";
 import NoPinnedAssets from "./no-pinned-assets";
 import NoPinnedRFPs from "./no-pinned-rfps";
 import { formatMoney } from "@/lib/utils";
+import mixpanel from "mixpanel-browser";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -51,7 +52,19 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                             {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
                                                 <CarouselItem key={index} className="lg:basis-1/2">
                                                     <Dialog>
-                                                        <DialogTrigger className="w-full h-full">
+                                                        <DialogTrigger className="w-full h-full" onClick={() => {
+                                                            mixpanel.track("RFP Details Viewed", {
+                                                                "ID": rfp.id,
+                                                                "Name": rfp.title,
+                                                                "Budget": rfp.budget,
+                                                                "Linked Milestones": rfp.milestones.map(({ milestone }: any) => milestone),
+                                                                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                                // we flatten them into a single list that can be parsed
+                                                                "Linked Milestone Types": rfp.milestones.flatMap(({ milestone }: any) =>
+                                                                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                                )
+                                                            })
+                                                        }}>
                                                             <RFPCard rfp={rfp} />
                                                         </DialogTrigger>
                                                         <DialogContent className="overflow-hidden">
@@ -66,7 +79,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     </Carousel>
                                 </div>
                             )}
-                            {rfps.length <= 0 && (
+                            {rfps.filter(rfp => rfp.pinned).length <= 0&& (
                                 <NoPinnedRFPs />
                             )}
                         </TabsContent>
@@ -84,7 +97,18 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     <TableBody>
                                         {assets.filter(asset => asset.pinned).map((asset) => (
                                             <Dialog>
-                                                <DialogTrigger asChild>
+                                                <DialogTrigger asChild onClick={() => {
+                                                    mixpanel.track("Asset Details Viewed", {
+                                                        "ID": asset.id,
+                                                        "Asset Name": asset.title,
+                                                        "Linked Milestones": asset.milestones.map(({ milestone }: any) => milestone),
+                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                        // we flatten them into a single list that can be parsed
+                                                        "Linked Milestone Types": asset.milestones.flatMap(({ milestone }: any) =>
+                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                        )
+                                                    })
+                                                }}>
                                                     <TableRow key={asset.id} className="cursor-pointer">
                                                         <TableCell>
                                                             <div>

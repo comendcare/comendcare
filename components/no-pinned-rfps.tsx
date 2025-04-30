@@ -2,7 +2,7 @@ import Image from "next/image"
 
 export default function NoPinnedRFPs() {
     return (
-        <div className="h-full flex items-center justify-center gap-8 flex-col xl:flex-row">
+        <div className="h-full flex items-center justify-center gap-8 flex-col md:flex-row">
             <Image
                 alt="No pinned RFPs"
                 src="https://illustrations.popsy.co/gray/shaking-hands.svg"

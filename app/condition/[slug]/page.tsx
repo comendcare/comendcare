@@ -527,7 +527,9 @@ export default async function ConditionPage({
                     {
                         title: "Share on social media",
                         icon: <IconShare/>,
-                        dialog: <ShareDialog url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`}/>
+                        dialog: <ShareDialog 
+                            url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`}
+                        />
                     },
                     {
                         title: "Report an issue",
