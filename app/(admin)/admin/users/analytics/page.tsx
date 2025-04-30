@@ -7,9 +7,9 @@ import {AdminUsersAnalyticsChart} from "@/components/admin-users-analytics-chart
 export default function AdminUsersAnalyticsPage() {
 
     return (
-        <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
+        <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
+            <AdminUsersNav/>
             <div className="flex flex-col space-y-6">
-                <AdminUsersNav/>
                 <Suspense
                     fallback={
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
