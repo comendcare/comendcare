@@ -93,7 +93,7 @@ export const templateMilestones = MILESTONE_TYPE_OPTIONS.map(typeData => ({
 export const templateResearchPlans = [
     {
         title: 'ASO Research Plan',
-        description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
+        description: 'Outlines each stage of developing an ASO therapy, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
         milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
             'NATURALHISTORYSTUDY', 
             'BASICSCIENCE', 

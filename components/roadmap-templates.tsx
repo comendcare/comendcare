@@ -11,13 +11,14 @@ import ComendLoadingSpinner from "./comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
-import { Plus, Router } from "lucide-react";
+import { Plus, Router, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@/lib/actions";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -236,13 +237,43 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
 }
 
 export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
+    const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
+
+    if (isHidden) {
+        return (
+            <div className="w-full flex justify-end">
+                <Button variant={"link"} onClick={() => {
+                    localStorage.removeItem("isHidden")
+                    setIsHidden(false)
+                }}>Show Research Plan Templates</Button>
+            </div>
+        )
+    }
+
     return (
         <Card className="w-full bg-gray-50">
-            <CardHeader>
+            <CardHeader className="relative">
                 <CardTitle>
                     Research Plan Templates
                 </CardTitle>
                 <CardDescription>Create a research plan from one of our curated templates.</CardDescription>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            variant={"ghost"} 
+                            className="absolute top-0 right-0 hover:bg-transparent" 
+                            onClick={() => {
+                                localStorage.setItem("isHidden", "true")
+                                setIsHidden(true)
+                            }}
+                        >
+                            <X />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{`Hide Research Plan Templates`}</p>
+                    </TooltipContent>
+                </Tooltip>
             </CardHeader>
             <CardContent className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                 <CreateEmptyResearchPlanCard orgId={orgId} />
