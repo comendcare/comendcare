@@ -11,11 +11,12 @@ import ComendLoadingSpinner from "./comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, Router } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@/lib/actions";
+import Link from "next/link";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -291,11 +292,28 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof 
             <Card className="text-left h-full">
                 <CardHeader>
                     <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
-                    <CardDescription>
-                        {plan.description}
-                    </CardDescription>
+                    <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
             </Card>
         </button>
+    )
+}
+
+export function ResearchPlanCard({ researchPlan }: { researchPlan: any }) {
+    const router = useRouter()
+    
+    return (
+        <Link
+            href={`/app/research-plan/${researchPlan.id}`}
+        >
+            <Card className="h-full relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+                {/* <CheckBubble isChecked={selectedResearchPlanId === researchPlanData.title} onCheckedChanged={() => {}}/> */}
+                {/* Add Pin checkbox here! */}
+                <CardHeader>
+                    <CardTitle className="text-xl font-normal">{researchPlan.title || 'Untitled Research Plan'}</CardTitle>
+                    <CardDescription>{researchPlan.description}</CardDescription>
+                </CardHeader>
+            </Card>
+        </Link>
     )
 }
