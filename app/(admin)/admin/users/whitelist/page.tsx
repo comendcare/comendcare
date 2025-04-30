@@ -16,7 +16,7 @@ import {
     flexRender,
     ColumnFiltersState,
     SortingState,
-    VisibilityState,
+    VisibilityState, Row,
 } from "@tanstack/react-table"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
@@ -28,11 +28,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import {ChevronDown} from "lucide-react"
+import {ChevronDown, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
-    DropdownMenuContent,
+    DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {getUserWhitelist} from "@/lib/fetchers"
@@ -51,6 +51,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
+import {DotsHorizontalIcon} from "@radix-ui/react-icons";
+import {WhitelistDialog} from "@/components/whitelist-dialog";
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
@@ -82,6 +84,12 @@ const columns: ColumnDef<Whitelist>[] = [
             const date = new Date(row.getValue("createdAt"))
             return date.toLocaleDateString()
         },
+    },
+    {
+        id: "actions",
+        cell: ({ row }) => <div className="justify-self-end">
+            <WhitelistDataTableRowActions row={row} />
+        </div>,
     },
 ]
 
@@ -159,6 +167,35 @@ export function WhitelistDataTablePagination<TData>({
                 </div>
             </div>
         </div>
+    )
+}
+
+interface DataTableRowActionsProps<TData> {
+    row: Row<TData>
+}
+
+export function WhitelistDataTableRowActions<TData>({
+                                               row,
+                                           }: DataTableRowActionsProps<TData>) {
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="ghost"
+                    className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                >
+                    <DotsHorizontalIcon className="h-4 w-4" />
+                    <span className="sr-only">Open menu</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[160px]">
+                <DropdownMenuItem>
+                    <Trash/>
+                    Delete
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }
 
@@ -296,9 +333,7 @@ export default function AdminUserWhitelist({
                     <h1 className="font-cal text-3xl font-bold dark:text-white">
                         All Whitelisted Emails
                     </h1>
-                    <CreateOrganizationButton>
-                        <CreateOrganizationModal/>
-                    </CreateOrganizationButton>
+                    <WhitelistDialog />
                 </div>
                 <Suspense
                     fallback={
