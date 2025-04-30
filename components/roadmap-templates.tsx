@@ -17,6 +17,7 @@ import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@/lib/actions";
 import Link from "next/link";
+import { Badge } from "./ui/badge";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -236,7 +237,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
 
 export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
     return (
-        <Card className="w-full">
+        <Card className="w-full bg-gray-50">
             <CardHeader>
                 <CardTitle>
                     Research Plan Templates
@@ -294,6 +295,16 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof 
                     <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
                     <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                    {/* <ol>
+                        {plan.milestones.map(milestone => (
+                            <li>{milestone.title}</li>
+                        ))}
+                    </ol> */}
+                    {plan.milestones.map(milestone => (
+                        <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
+                    ))}
+                </CardContent>
             </Card>
         </button>
     )

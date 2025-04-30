@@ -2023,7 +2023,14 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                private: milestone.private || true
+                                private: milestone.private || true,
+                                types: {
+                                    create: (milestone.types || []).map((type: any) => ({
+                                        milestoneType: {
+                                            connect: {id: type}
+                                        }
+                                    }))
+                                },
                             }
                         }
                     }
