@@ -1743,7 +1743,7 @@ export const deleteAsset = async (assetId: string) => {
                 milestones: {
                     include: {
                         milestone: {
-                            include: { types: { include: { milestoneType: true } } }
+                            include: {types: {include: {milestoneType: true}}}
                         }
                     }
                 }
@@ -1773,7 +1773,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 milestones: {
                     include: {
                         milestone: {
-                            include: { types: { include: { milestoneType: true } } }
+                            include: {types: {include: {milestoneType: true}}}
                         }
                     }
                 }
@@ -1866,7 +1866,7 @@ export const deleteRFP = async (rfpId: string) => {
                 milestones: {
                     include: {
                         milestone: {
-                            include: { types: { include: { milestoneType: true } } }
+                            include: {types: {include: {milestoneType: true}}}
                         }
                     }
                 }
@@ -1896,7 +1896,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 milestones: {
                     include: {
                         milestone: {
-                            include: { types: { include: { milestoneType: true } } }
+                            include: {types: {include: {milestoneType: true}}}
                         }
                     }
                 }
@@ -3405,7 +3405,7 @@ export async function saveCRO(croId: string, milestoneId: string) {
         const response = await prisma.savedCompany.create({
             include: {
                 company: true,
-                milestone: { include: { types: true } }
+                milestone: {include: {types: true}}
             },
             data: {
                 company: {
@@ -3451,7 +3451,7 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
             },
             include: {
                 company: true,
-                milestone: { include: { types: true } }
+                milestone: {include: {types: true}}
             },
             data: {
                 milestone: {
@@ -3481,7 +3481,7 @@ export async function unsaveCRO(savedCompanyId: string) {
             where: {id: savedCompanyId},
             include: {
                 company: true,
-                milestone: { include: { types: true } }
+                milestone: {include: {types: true}}
             },
         });
 
@@ -3573,6 +3573,71 @@ export async function removeEmailFromWhitelist(email: string) {
         return {success: true, data: response};
     } catch (error: any) {
         console.error("Error removing email to whitelist:", error);
+        return {success: false, error: "Database error. Please try again later."};
+    }
+}
+
+export const createCompany = async (formData: FormData) => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        return {
+            error: "Not authenticated"
+        }
+    }
+
+    const name = formData.get("orgName") as string;
+    const description = formData.get("description") as string;
+    const subdomain = formData.get("subdomain") as string;
+    const website = formData.get("website") as string
+    const contactEmail = formData.get("contactEmail") as string | null;
+    const title = formData.get("title") as string
+    const founded = formData.get("founded") as string
+    const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
+    const address1 = formData.get("address1") as string | null;
+    const address2 = formData.get("address2") as string | null;
+    const formattedAddress = formData.get("formattedAddress") as string | null;
+    const city = formData.get("city") as string | null;
+    const region = formData.get("region") as string | null;
+    const postalCode = formData.get("postalCode") as string | null;
+    const country = formData.get("country") as string | null;
+    const lat = formData.get("lat") as string | null;
+    const lng = formData.get("lng") as string | null;
+    const image = formData.get("image") as string | null;
+    const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
+        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
+        : [];
+    const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
+        ? (formData.get("therapeuticsOfInterest") as string).split(",")
+        : [];
+
+    try {
+        const company = await prisma.company.create({
+            data: {
+                title,
+                description,
+                yearEstablished: parseInt(founded),
+                url: website,
+            },
+        });
+
+        await addTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
+            company,
+            'organizations'
+        );
+
+        await revalidateTag(
+            `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+        )
+
+        return {success: true, data: company};
+    } catch (error: any) {
+        console.error("Error creating company:", error);
         return {success: false, error: "Database error. Please try again later."};
     }
 }
