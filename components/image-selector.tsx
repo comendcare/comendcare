@@ -3,6 +3,7 @@
 import React, { useEffect } from "react"
 import ReactCrop, {
     centerCrop,
+    convertToPixelCrop,
     makeAspectCrop,
     type Crop,
     type PixelCrop,
@@ -71,7 +72,15 @@ export function ImageSelector({
     function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
         if (aspect) {
             const { width, height } = e.currentTarget
-            setCrop(centerAspectCrop(width, height, aspect))
+            const newCrop = centerAspectCrop(width, height, aspect)
+            setCrop(newCrop)
+
+            const pixelCrop = convertToPixelCrop(newCrop, width, height)
+
+            if (imgRef.current && pixelCrop.width && pixelCrop.height) {
+                const croppedImageUrl = getCroppedImg(imgRef.current, pixelCrop)
+                setCroppedImageUrl(croppedImageUrl)
+            }
         }
     }
 
