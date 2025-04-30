@@ -53,6 +53,7 @@ import {
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
 import {WhitelistDialog} from "@/components/whitelist-dialog";
+import {removeEmailFromWhitelist} from "@/lib/actions";
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
@@ -177,6 +178,22 @@ interface DataTableRowActionsProps<TData> {
 export function WhitelistDataTableRowActions<TData>({
                                                row,
                                            }: DataTableRowActionsProps<TData>) {
+    const email = (row.original as { email: string }).email;
+
+    const onDeleteClick = async () => {
+        try {
+            const response = await removeEmailFromWhitelist(email);
+
+            if (response.success) {
+                toast.success("Successfully deleted email from whitelist");
+            } else {
+                toast.error(response.error || "An error occurred while deleting email.");
+            }
+        } catch (error) {
+            console.error("Whitelist deletion error:", error);
+            toast.error("An error occurred while deleting email.");
+        }
+    };
 
     return (
         <DropdownMenu>
@@ -190,7 +207,9 @@ export function WhitelistDataTableRowActions<TData>({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={onDeleteClick}
+                >
                     <Trash/>
                     Delete
                 </DropdownMenuItem>
@@ -326,7 +345,7 @@ export default function AdminUserWhitelist({
     params: { id: string }
 }) {
     return (
-        <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
+        <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
             <AdminUsersNav/>
             <div className="flex flex-col space-y-6">
                 <div className="flex items-center justify-between">
