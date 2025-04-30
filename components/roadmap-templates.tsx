@@ -233,6 +233,25 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
     )
 }
 
+export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
+    return (
+        <Card className="w-full">
+            <CardHeader>
+                <CardTitle>
+                    Research Plan Templates
+                </CardTitle>
+                <CardDescription>Create a research plan from one of our curated templates.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                <CreateEmptyResearchPlanCard orgId={orgId} />
+                {templateResearchPlans.map(plan => (
+                    <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId}/>
+                ))}
+            </CardContent>
+        </Card>
+    )
+}
+
 export const CreateEmptyResearchPlanCard = ({orgId}: {orgId: string}) => {
     const router = useRouter()
 

@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 import { templateResearchPlans } from "@/lib/templates";
 import { createRoadmap } from "@/lib/actions";
 import { useSession } from "next-auth/react";
-import { CreateEmptyResearchPlanCard, CreateResearchPlanFromTemplateCard } from "@/components/roadmap-templates";
+import { CreateEmptyResearchPlanCard, CreateResearchPlanFromTemplateCard, ResearchPlanTemplatesCard } from "@/components/roadmap-templates";
 
 export default async function RoadmapPage() {
     const session = await getSession();
@@ -46,24 +46,5 @@ export default async function RoadmapPage() {
                 )}
             </div>
         </main>
-    )
-}
-
-export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
-    return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>
-                    Research Plan Templates
-                </CardTitle>
-                <CardDescription>Create a research plan from one of our curated templates.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                <CreateEmptyResearchPlanCard orgId={orgId} />
-                {templateResearchPlans.map(plan => (
-                    <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId}/>
-                ))}
-            </CardContent>
-        </Card>
     )
 }
