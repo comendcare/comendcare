@@ -186,9 +186,10 @@ export function Roadmap() {
 
     if (!roadmapId || !initialized) {
         return (
-            <div className="w-full h-full flex justify-center items-center">
-                <p>Research plan is not intialized... please refresh the page</p>
-            </div>
+            // <div className="w-full h-full flex justify-center items-center">
+            //     <p>Research plan is not intialized... please refresh the page</p>
+            // </div>
+            <Loading />
         )
     }
 

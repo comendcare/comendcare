@@ -158,6 +158,8 @@ export async function getPublicRFPsForOrganization(domain: string) {
     return rfps
 }
 
+
+
 export async function getPublicRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
@@ -674,7 +676,7 @@ export async function getUser(userId: string) {
     }
 }
 
-export async function getRoadmapId(orgId: string | null | undefined) {
+export async function getRoadmaps(orgId: string | null | undefined) {
     if (!orgId) {
         return {success: false, error: "No organization id provided."};
     }
@@ -693,7 +695,7 @@ export async function getRoadmapId(orgId: string | null | undefined) {
 
         return {
             success: true,
-            data: organization?.roadmaps && organization?.roadmaps?.length > 0 ? organization?.roadmaps[0].id : undefined
+            data: organization?.roadmaps
         };
     } catch (error: any) {
         logError("Error fetching roadmap id", error);
@@ -701,9 +703,13 @@ export async function getRoadmapId(orgId: string | null | undefined) {
     }
 }
 
-export async function getRoadmap(orgId: string | null | undefined) {
+export async function getRoadmap(orgId: string | null | undefined, roadmapId: string | null | undefined) {
     if (!orgId) {
-        return {success: false, error: "No organization id provided."};
+        return {success: false, error: "No organization id provided."}
+    }
+
+    if (!roadmapId) {
+        return {success: false, error: "No roadmap id provided"}
     }
 
     try {
@@ -721,7 +727,10 @@ export async function getRoadmap(orgId: string | null | undefined) {
         }
 
         const roadmap = await prisma.roadmap.findFirst({
-            where: {organizationId: organization.id},
+            where: {
+                organizationId: organization.id,
+                id: roadmapId
+            },
             include: {
                 nodes: {
                     orderBy: [{ createdAt: "desc" }]

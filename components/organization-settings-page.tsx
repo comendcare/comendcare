@@ -1,7 +1,7 @@
 "use client"
 
 import {useState} from "react";
-import {getRoadmapId} from "@/lib/fetchers";
+import {getRoadmaps} from "@/lib/fetchers";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -61,11 +61,11 @@ export default function OrganizationSettingsPage({organization}: { organization:
         try {
             if (!session?.user?.organizationId) throw new Error('Organization id is not defined')
 
-            const {success, data: roadmapId} = await getRoadmapId(session?.user?.organizationId)
+            const {success, data: roadmaps} = await getRoadmaps(session?.user?.organizationId)
 
-            if (!success || !roadmapId) throw new Error('Could not find research plan')
+            if (!success || !roadmaps || roadmaps.length <= 0) throw new Error('Could not find research plan for organzation')
 
-            const response = await deleteOrgRoadmap(roadmapId, session?.user?.organizationId)
+            const response = await deleteOrgRoadmap(roadmaps[0].id, session?.user?.organizationId)
 
             mixpanelTrack("Research Plan Deleted")
 

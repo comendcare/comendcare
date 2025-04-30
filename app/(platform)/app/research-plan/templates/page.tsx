@@ -1,6 +1,6 @@
 import NewRoadmapForm from "@/components/new-roadmap"
 import RoadmapTemplates from "@/components/roadmap-templates"
-import {getRoadmapData, getRoadmapId} from "@/lib/fetchers"
+import {getRoadmapData, getRoadmaps} from "@/lib/fetchers"
 import {getSession} from "@/lib/auth"
 import NoOrganization from "@/components/no-organization";
 
@@ -15,8 +15,8 @@ export default async function TemplatesPage() {
     }
 
     // check if this organization has an existing roadmap
-    const response = await getRoadmapId(orgId);
-    if (response.success && typeof response.data === 'string') {
+    const response = await getRoadmaps(orgId)
+    if (response.success && response?.data && response.data.length > 0) {
         return (
             <main className="flex flex-col items-center h-full mx-auto">
                 <RoadmapTemplates/>
