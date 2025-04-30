@@ -1993,6 +1993,8 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
         data: {
+            title: roadmapTemplate.title,
+            description: roadmapTemplate.description,
             organization: {
                 connect: {id: organizationId}
             }
