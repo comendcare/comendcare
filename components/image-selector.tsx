@@ -199,14 +199,14 @@ export function ImageSelector({
         <>
         {isCropping ? (
             // user is currently cropping the image, show cropping UI
-            <div className="p-0 gap-0 max-h-[90vh] overflow-hidden">
-                <div className="p-6 size-full max-h-full">
+            <div className="p-0 gap-0 overflow-hidden w-full">
+                <div className="p-6 size-full max-h-full w-full">
                     <ReactCrop
                         crop={crop}
                         onComplete={(c) => onCropComplete(c)}
                         onChange={(_, percentCrop) => setCrop(percentCrop)}
                         aspect={aspect}
-                        className="w-full max-h-[40vh]"
+                        className="w-full"
                     >
                         <img
                             className="w-full object-cover"
