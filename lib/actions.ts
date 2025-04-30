@@ -3515,7 +3515,26 @@ export async function addEmailToWhitelist(email: string) {
 
         return {success: true, data: response};
     } catch (error: any) {
-        console.error("Error submitting feedback:", error);
+        console.error("Error adding email to whitelist:", error);
+        return {success: false, error: "Database error. Please try again later."};
+    }
+}
+
+export async function removeEmailFromWhitelist(email: string) {
+    try {
+        // Check if the user has already provided feedback for this review
+        // Otherwise, create new feedback
+        const response = await prisma.whitelist.delete({
+            where: {
+                email: email
+            }
+        });
+
+        revalidatePath("/admin/users/whitelist")
+
+        return {success: true, data: response};
+    } catch (error: any) {
+        console.error("Error removing email to whitelist:", error);
         return {success: false, error: "Database error. Please try again later."};
     }
 }
