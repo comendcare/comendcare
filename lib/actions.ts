@@ -1064,7 +1064,7 @@ export async function inviteUser(
 
         const isDomainValid = await validateEmailDomain(lowerCaseEmail);
         if (!isDomainValid) {
-            return { success: false, error: "Email domain is invalid or cannot receive emails." };
+            return {success: false, error: "Email domain is invalid or cannot receive emails."};
         }
 
         // Check if the user is already a member of the organization
@@ -1729,7 +1729,7 @@ export async function updateCondition(formData: FormData, organizationId: string
 export const deleteAsset = async (assetId: string) => {
     try {
         const response = await prisma.asset.delete({
-            where: { id: assetId },
+            where: {id: assetId},
             include: {
                 contacts: true,
                 attachments: true,
@@ -1834,7 +1834,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 },
                 private: assetData.private || false,
                 pinned: assetData.pinned || false,
-                organization: { connect: {id: organizationId} }
+                organization: {connect: {id: organizationId}}
             },
         })
 
@@ -1848,7 +1848,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
 export const deleteRFP = async (rfpId: string) => {
     try {
         const response = await prisma.rFP.delete({
-            where: { id: rfpId },
+            where: {id: rfpId},
             include: {
                 contacts: true,
                 attachments: true,
@@ -1962,7 +1962,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                         }
                     }))
                 },
-                organization: { connect: {id: organizationId} },
+                organization: {connect: {id: organizationId}},
                 budget: rfpData.budget
             },
         })
@@ -2071,8 +2071,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
-                    assets: { include: { asset: true } },
-                    rfps: { include: { rfp: true } }
+                    assets: {include: {asset: true}},
+                    rfps: {include: {rfp: true}}
                 }
             },
             nodes: true,
@@ -2241,8 +2241,8 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 contacts: true,
                 attachments: true,
                 types: {include: {milestoneType: true}},
-                assets: { include: { asset: true } },
-                rfps: { include: { rfp: true } }
+                assets: {include: {asset: true}},
+                rfps: {include: {rfp: true}}
             },
             where: {roadmapId}
         })
@@ -2442,8 +2442,8 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 contacts: true,
                 attachments: true,
                 types: {include: {milestoneType: true}},
-                assets: { include: { asset: true } },
-                rfps: { include: { rfp: true } }
+                assets: {include: {asset: true}},
+                rfps: {include: {rfp: true}}
             },
             where: {roadmapId}
         })
@@ -2555,7 +2555,7 @@ export async function updateEdges({roadmapId, edges}: { roadmapId: string | null
 }
 
 /* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
-export async function syncDBAssets({assets}: {assets: Asset[]}) {
+export async function syncDBAssets({assets}: { assets: Asset[] }) {
     try {
         let updateAssets: Asset[] = []
         const session = await getSession()
@@ -2599,7 +2599,7 @@ export async function syncDBAssets({assets}: {assets: Asset[]}) {
     }
 }
 
-export async function syncDBRFPs({rfps}: {rfps: RFP[]}) {
+export async function syncDBRFPs({rfps}: { rfps: RFP[] }) {
     try {
         let updateRfps: RFP[] = []
         const session = await getSession()
@@ -3482,7 +3482,7 @@ export async function submitFeedback(reviewId: string, userId: string, isHelpful
                 },
             });
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         } else {
             // Otherwise, create new feedback
             const response = await prisma.reviewFeedback.create({
@@ -3493,10 +3493,29 @@ export async function submitFeedback(reviewId: string, userId: string, isHelpful
                 },
             });
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         }
     } catch (error: any) {
         console.error("Error submitting feedback:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
+    }
+}
+
+export async function addEmailToWhitelist(email: string) {
+    try {
+        // Check if the user has already provided feedback for this review
+        // Otherwise, create new feedback
+        const response = await prisma.whitelist.create({
+            data: {
+                email: email
+            },
+        });
+
+        revalidatePath("/admin/users/whitelist")
+
+        return {success: true, data: response};
+    } catch (error: any) {
+        console.error("Error submitting feedback:", error);
+        return {success: false, error: "Database error. Please try again later."};
     }
 }
