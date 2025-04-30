@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 import { templateResearchPlans } from "@/lib/templates";
 import { createRoadmap } from "@/lib/actions";
 import { useSession } from "next-auth/react";
-import { CreateEmptyResearchPlanCard, CreateResearchPlanFromTemplateCard, ResearchPlanCard, ResearchPlanTemplatesCard } from "@/components/roadmap-templates";
+import { CreateEmptyResearchPlanCard, CreateResearchPlanFromTemplateCard, ResearchPlanTemplatesCard } from "@/components/roadmap-templates";
 import { ResearchPlansDataTable } from "@/components/research-plans-data-table/research-plans-data-table";
 import { columns } from "@/components/research-plans-data-table/research-plans-data-columns"
 import NoResearchPlans from "@/components/no-research-plans";
