@@ -8,7 +8,17 @@ import React from "react";
 import EditPAGProfileConditionCardDialog from "@/components/edit-pag-profile-condition-card-dialog";
 import { Info } from "lucide-react";
 
-export const PAGProfileConditionsCard = ({conditions, organization, showEditDialog}: { conditions: Condition[] | null, organization: Organization, showEditDialog: boolean }) => {
+export const PAGProfileConditionsCard = ({
+    conditions, 
+    organization, 
+    showEditDialog, 
+    isPrivate = false
+}: { 
+    conditions: Condition[] | null, 
+    organization: Organization, 
+    showEditDialog: boolean,
+    isPrivate?: boolean
+}) => {
 
     if (conditions) {
         return (
@@ -100,95 +110,107 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
 
 
                                 <div className="space-y-2">
-                                    <div className="flex flex-row items-center justify-between w-full">
-                                        <h4 className="scroll-m-20 text-base font-semibold">
-                                            Disease categories
-                                        </h4>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
-                                        {(() => {
-
-                                            if (condition?.diseaseCategories.length === 0) {
+                                    {(isPrivate || (!isPrivate && condition?.diseaseCategories && condition.diseaseCategories.length > 0)) && (
+                                        <>
+                                        <div className="flex flex-row items-center justify-between w-full">
+                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                                Disease categories
+                                            </h4>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
+                                            {(() => {
+    
+                                                if (condition?.diseaseCategories.length === 0) {
+                                                    return (
+                                                        <p className="text-gray-400">
+                                                            {`No relevant badges.`}
+                                                        </p>
+                                                    );
+                                                }
+    
                                                 return (
-                                                    <p className="text-gray-400">
-                                                        {`No relevant badges.`}
-                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {condition?.diseaseCategories.map((item, index) => (
+                                                            <span key={index}>
+                                                                <Badge className="text-sm inline">
+                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                                </Badge>
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 );
-                                            }
+                                            })()}
+                                        </div>
+                                        </>
+                                    )}
 
-                                            return (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {condition?.diseaseCategories.map((item, index) => (
-                                                        <span key={index}>
-                                                            <Badge className="text-sm inline">
-                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                            </Badge>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
+                                    {(isPrivate || (!isPrivate && condition?.causalGenes && condition.causalGenes.length > 0)) && (
+                                        <>
+                                        <div className="flex flex-row items-center justify-between w-full">
+                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                                Causal genes
+                                            </h4>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
+                                            {(() => {
 
-                                    <div className="flex flex-row items-center justify-between w-full">
-                                        <h4 className="scroll-m-20 text-base font-semibold">
-                                            Causal genes
-                                        </h4>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
-                                        {(() => {
+                                                if (condition?.causalGenes.length === 0) {
+                                                    return (
+                                                        <p className="text-gray-400">
+                                                            {`No relevant badges.`}
+                                                        </p>
+                                                    );
+                                                }
 
-                                            if (condition?.causalGenes.length === 0) {
                                                 return (
-                                                    <p className="text-gray-400">
-                                                        {`No relevant badges.`}
-                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {condition?.causalGenes.map((item, index) => (
+                                                            <span key={index}>
+                                                                <Badge className="text-sm inline">
+                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                                </Badge>
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 );
-                                            }
+                                            })()}
+                                        </div>
+                                        </>
+                                    )}
 
-                                            return (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {condition?.causalGenes.map((item, index) => (
-                                                        <span key={index}>
-                                                            <Badge className="text-sm inline">
-                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                            </Badge>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
+                                    {(isPrivate || (!isPrivate && condition?.associatedGenes && condition.associatedGenes.length > 0)) && (
+                                        <>
+                                        <div className="flex flex-row items-center justify-between w-full">
+                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                                Associated genes
+                                            </h4>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
+                                            {(() => {
 
-                                    <div className="flex flex-row items-center justify-between w-full">
-                                        <h4 className="scroll-m-20 text-base font-semibold">
-                                            Associated genes
-                                        </h4>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
-                                        {(() => {
+                                                if (condition?.associatedGenes.length === 0) {
+                                                    return (
+                                                        <p className="text-gray-400">
+                                                            {`No relevant badges.`}
+                                                        </p>
+                                                    );
+                                                }
 
-                                            if (condition?.associatedGenes.length === 0) {
                                                 return (
-                                                    <p className="text-gray-400">
-                                                        {`No relevant badges.`}
-                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {condition?.associatedGenes.map((item, index) => (
+                                                            <span key={index}>
+                                                                <Badge className="text-sm inline">
+                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                                </Badge>
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 );
-                                            }
-
-                                            return (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {condition?.associatedGenes.map((item, index) => (
-                                                        <span key={index}>
-                                                            <Badge className="text-sm inline">
-                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                            </Badge>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
+                                            })()}
+                                        </div>
+                                        </>
+                                    )}
                                 </div>
 
                             </div>

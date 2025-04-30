@@ -21,7 +21,7 @@ export const FormImageSelector = ({
                                       img,
                                       selectedFile,
                                       setSelectedFile,
-                                      onCropped
+                                      setIsCropping
                                   }: {
     className?: string,
     form: any,
@@ -32,7 +32,7 @@ export const FormImageSelector = ({
     img: string | undefined | null,
     selectedFile: FileWithPreview | null,
     setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>,
-    onCropped?: () => void
+    setIsCropping: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 
     useEffect(() => {
@@ -81,10 +81,10 @@ export const FormImageSelector = ({
                                     } else {
                                         setSelectedFile(file);
                                         field.onChange(file.preview);
-                                        onCropped?.();  // Notify parent that cropping happened
                                     }
                                 }}
                                 className={className}
+                                setParentIsCropping={setIsCropping}
                             />
                         </div>
                     </FormControl>
