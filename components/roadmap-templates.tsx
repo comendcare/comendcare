@@ -290,12 +290,7 @@ export const CreateEmptyResearchPlanCard = ({orgId}: {orgId: string}) => {
 
     return (
         <button
-            onClick={async () => {
-                const roadmap =  await createRoadmap(orgId, {})
-                if (roadmap && roadmap.id) {
-                    router.push(`/app/research-plan/${roadmap.id}`)
-                }
-            }}
+            onClick={() => router.push(`/app/research-plan/create`)}
             className="hover:cursor-pointer"
         >
             <Card className="h-full">
