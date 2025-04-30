@@ -9,12 +9,13 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
-import { Card, CardContent, CardTitle } from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
+import { createRoadmap } from "@/lib/actions";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -229,5 +230,53 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
                 </CardContent>
             </Card>
         </Button>
+    )
+}
+
+export const CreateEmptyResearchPlanCard = ({orgId}: {orgId: string}) => {
+    const router = useRouter()
+
+    return (
+        <button
+            onClick={async () => {
+                const roadmap =  await createRoadmap(orgId, {})
+                if (roadmap && roadmap.id) {
+                    router.push(`/app/research-plan/${roadmap.id}`)
+                }
+            }}
+            className="hover:cursor-pointer"
+        >
+            <Card className="h-full">
+                <CardContent className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                    <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
+                    <Plus />
+                </CardContent>
+            </Card>
+        </button>
+    )
+}
+
+export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof templateResearchPlans[0], orgId: string}) => {
+    const router = useRouter()
+
+    return (
+        <button
+            onClick={async () => {
+                const roadmap =  await createRoadmap(orgId, plan)
+                if (roadmap && roadmap.id) {
+                    router.push(`/app/research-plan/${roadmap.id}`)
+                }
+            }}
+            className="hover:cursor-pointer"
+        >
+            <Card className="text-left h-full">
+                <CardHeader>
+                    <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
+                    <CardDescription>
+                        {plan.description}
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+        </button>
     )
 }
