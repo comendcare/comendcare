@@ -18,9 +18,11 @@ import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {useSession} from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { createRoadmap } from "@/lib/actions"
+import { createRoadmap, updateRoadmap } from "@/lib/actions"
 import { Roadmap } from "@prisma/client"
 import { ScrollArea } from "./ui/scroll-area"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
 
 const editMilestoneForm = z.object({
     nodeType: z.string(),
@@ -36,9 +38,20 @@ const editMilestoneForm = z.object({
         .optional()
 })
 
-export function EditResearchPlanForm({researchPlanData}: {researchPlanData?: Partial<Roadmap>}) {
+const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
+    details: state.details,
+    setDetails: state.setDetails
+})
+
+export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchPlanData?: Partial<Roadmap>, closeDialog?: () => void}) {
     const router = useRouter()
     const {data: session} = useSession()
+        const { 
+            roadmapId,
+            details,
+            setDetails
+        } = useRoadmapStore(useShallow(selector))
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -49,11 +62,6 @@ export function EditResearchPlanForm({researchPlanData}: {researchPlanData?: Par
         }
     })
 
-    const formData = {
-        title: form.watch("title"),
-        description: form.watch("description")
-    }
-
     const handleFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
@@ -62,7 +70,11 @@ export function EditResearchPlanForm({researchPlanData}: {researchPlanData?: Par
 
         if (researchPlanData?.id) {
             // if the research plan already exists, just update it
-            
+            await setDetails({
+                title: values.title,
+                description: values.description
+            })
+            if (closeDialog) closeDialog()
         } else {
             // if the research plan doesn't exist yet, create it
             const roadmap =  await createRoadmap(session.user.organizationId, {

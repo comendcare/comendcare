@@ -863,7 +863,7 @@ export async function deleteOrganization(organization: Organization) {
 // )
 
 // creating a separate function for this because we're not using FormData
-export const updateRoadmap = async (data: Roadmap) => {
+export const updateRoadmap = async (data: Partial<Roadmap>) => {
     const session = await getSession()
     if (!session?.user.id) {
         return {
@@ -878,11 +878,9 @@ export const updateRoadmap = async (data: Roadmap) => {
             organization: true
         }
     })
-    if (!roadmap || roadmap.userId !== session.user.id) {
-        return {
-            error: "Roadmap not found"
-        }
-    }
+
+    if (!roadmap) return { error: "Roadmap not found"}
+    
     try {
         const response = await prisma.roadmap.update({
             where: {
