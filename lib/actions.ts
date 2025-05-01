@@ -3580,64 +3580,50 @@ export async function removeEmailFromWhitelist(email: string) {
 export const createCompany = async (formData: FormData) => {
     const session = await getSession()
     if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        }
+        return { error: "Not authenticated" }
     }
 
-    const name = formData.get("orgName") as string;
-    const description = formData.get("description") as string;
-    const subdomain = formData.get("subdomain") as string;
-    const website = formData.get("website") as string
-    const contactEmail = formData.get("contactEmail") as string | null;
-    const title = formData.get("title") as string
-    const founded = formData.get("founded") as string
-    const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
-    const address1 = formData.get("address1") as string | null;
-    const address2 = formData.get("address2") as string | null;
-    const formattedAddress = formData.get("formattedAddress") as string | null;
-    const city = formData.get("city") as string | null;
-    const region = formData.get("region") as string | null;
-    const postalCode = formData.get("postalCode") as string | null;
-    const country = formData.get("country") as string | null;
-    const lat = formData.get("lat") as string | null;
-    const lng = formData.get("lng") as string | null;
-    const image = formData.get("image") as string | null;
-    const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
-        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
-        : [];
-    const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
-        ? (formData.get("therapeuticsOfInterest") as string).split(",")
-        : [];
+    const title = formData.get("orgName") as string
+    const description = formData.get("description") as string
+    const yearEstablished = parseInt(formData.get("founded") as string)
+    const companyType = formData.get("type") as string
+    const url = formData.get("website") as string
+    const servicesRaw = formData.get("services") as string // comma-separated labels
 
     try {
         const company = await prisma.company.create({
             data: {
                 title,
                 description,
-                yearEstablished: parseInt(founded),
-                url: website,
+                yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
+                companyType,
+                url,
+                services: servicesRaw
+                    ? {
+                        create: servicesRaw
+                            .split(",")
+                            .map((name) => ({ name: name.trim() }))
+                    }
+                    : undefined,
             },
-        });
+            include: { services: true },
+        })
 
         await addTypeSenseDocument(
             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            (
-                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                    : process.env.TYPESENSE_ADMIN_API_KEY
-            )!,
+            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
+                : process.env.TYPESENSE_ADMIN_API_KEY!,
             company,
-            'organizations'
-        );
-
-        await revalidateTag(
-            `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            "organizations"
         )
 
-        return {success: true, data: company};
+        // Optional: trigger revalidation
+        await revalidateTag(`${company.id}-company-metadata`)
+
+        return { success: true, data: company }
     } catch (error: any) {
-        console.error("Error creating company:", error);
-        return {success: false, error: "Database error. Please try again later."};
+        console.error("Error creating company:", error)
+        return { success: false, error: "Database error. Please try again later." }
     }
 }
