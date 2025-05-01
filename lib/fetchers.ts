@@ -1373,6 +1373,37 @@ export async function getCompanyAndReviewAnalytics() {
     };
 }
 
+export async function getCompanyChartAnalytics() {
+    const companies = await prisma.company.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(),
+            },
+        },
+        select: {
+            createdAt: true,
+        },
+    });
+
+    // Aggregate by date
+    const countsByDate: Record<string, number> = {};
+
+    for (const company of companies) {
+        const dateStr = company.createdAt.toISOString().split("T")[0]; // "YYYY-MM-DD"
+        countsByDate[dateStr] = (countsByDate[dateStr] || 0) + 1;
+    }
+
+    // Convert to array sorted by date
+    const chartData = Object.entries(countsByDate)
+        .map(([date, count]) => ({
+            date,
+            companies: count,
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return chartData;
+}
+
 export async function getUserChartAnalytics() {
     const users = await prisma.user.findMany({
         where: {
