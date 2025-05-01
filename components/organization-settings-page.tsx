@@ -93,47 +93,6 @@ export default function OrganizationSettingsPage({organization}: { organization:
                 </div>
 
                 <div className={`${session?.user?.membership?.role !== "owner" ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
-                    <div className={`border rounded-md p-8 border-red-200 flex items-center justify-between `}>
-                        <span className="flex flex-grow flex-col">
-                            <span className="text-sm font-medium leading-6 text-gray-900">
-                                Delete Organization Research Plan
-                            </span>
-                            <span className="text-sm text-gray-500">
-                                {`The research plan for your organization will be deleted.`}
-                            </span>
-                        </span>
-
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild disabled={session?.user?.membership?.role !== "owner"}>
-                                <Button variant="destructive">
-                                    Delete research plan
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete
-                                        your account and remove your data from our servers.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction asChild>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={handleDeleteRoadmap}
-                                        >
-                                            {"Continue"}
-                                        </Button>
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </div>
-
                     <div
                         className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
                         <span className="flex flex-grow flex-col">

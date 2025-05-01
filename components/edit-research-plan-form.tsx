@@ -18,11 +18,13 @@ import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {useSession} from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { createRoadmap, updateRoadmap } from "@/lib/actions"
+import { createRoadmap, deleteRoadmap, updateRoadmap } from "@/lib/actions"
 import { Roadmap } from "@prisma/client"
 import { ScrollArea } from "./ui/scroll-area"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
+import { sleep } from "@/lib/utils"
 
 const editMilestoneForm = z.object({
     nodeType: z.string(),
@@ -133,7 +135,62 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                     )}
                 />
 
-                <div className="flex justify-end">
+                <div className="flex gap-2 justify-end">
+                    {researchPlanData?.id ? (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button type="button" variant="destructive">
+                                    Delete Research Plan
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Are you absolutely sure?
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {`This action cannot be undone. This will permanently delete your Resarch Plan and it's data.`}
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <Button type="button">
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
+                                        <DialogClose>
+                                            <Button
+                                                type="button"
+                                                variant={"destructive"}
+                                                onClick={async () => {
+                                                    // delete research plan, and reroute the user back to the research plans page
+                                                    if (researchPlanData?.id) {
+                                                        await deleteRoadmap(new FormData(), researchPlanData.id, null)
+                                                        router.push('/app/research-plan')
+                                                        router.refresh()
+                                                    }
+                                                }}
+                                            >
+                                                Delete Research Plan
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    ) : (
+                        <Button
+                            type="submit"
+                            variant={"secondary"}
+                            className="w-fit"
+                            onClick={() => {
+                                // reroute the user back to the research plans page
+                                router.push('/app/research-plan')
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                    )}
+                    
                     <Button
                         // disabled={!form.formState.isValid}
                         type="submit"
