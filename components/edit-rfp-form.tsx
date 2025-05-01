@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
-import {Milestone, RFP} from "@/lib/types"
+import {RFP} from "@/lib/types"
 import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -133,6 +133,8 @@ const rfpSelector = (state: RFPState) => ({
     deleteRFP: state.deleteRFP,
     saveState: state.saveState
 })
+
+export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditRFPForm({
     rfpData,
@@ -488,10 +490,10 @@ export function EditRFPForm({
                                 <FormLabel >{`Linked Projects`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
-                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title})) as Option[]}
+                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title})) as Option[]}
                                         onChange={field.onChange}
-                                        defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
-                                        options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
+                                        defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
+                                        options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
                                         placeholder="Link projects"
@@ -500,6 +502,7 @@ export function EditRFPForm({
                                                 no results found.
                                             </p>
                                         }
+                                        groupBy="roadmapTitle"
                                     />
                                 </FormControl>
                                 <FormMessage className="text-primary"/>
