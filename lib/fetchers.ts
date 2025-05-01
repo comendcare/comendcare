@@ -557,6 +557,7 @@ export async function getMilestones(organizationId: string | undefined) {
         const fetchedMilestones = await prisma?.milestone.findMany({
             // include: {user: true},
             where: {organizationId},
+            include: {roadmap: true}
         })
 
         if (!fetchedMilestones) {
