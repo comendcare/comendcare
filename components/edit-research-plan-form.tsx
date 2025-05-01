@@ -19,6 +19,8 @@ import {Button} from "./ui/button"
 import {useSession} from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { createRoadmap } from "@/lib/actions"
+import { Roadmap } from "@prisma/client"
+import { ScrollArea } from "./ui/scroll-area"
 
 const editMilestoneForm = z.object({
     nodeType: z.string(),
@@ -34,13 +36,17 @@ const editMilestoneForm = z.object({
         .optional()
 })
 
-export function CreateResearchPlanForm() {
+export function EditResearchPlanForm({researchPlanData}: {researchPlanData?: Partial<Roadmap>}) {
     const router = useRouter()
     const {data: session} = useSession()
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
+        defaultValues: {
+            title: researchPlanData?.title || undefined,
+            description: researchPlanData?.description || undefined
+        }
     })
 
     const formData = {
@@ -49,24 +55,30 @@ export function CreateResearchPlanForm() {
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
-        // if form state is not valid, don't submit
-
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
             return
         }
 
-        const roadmap =  await createRoadmap(session.user.organizationId, {
-            title: values.title,
-            description: values.description
-        })
-        if (roadmap && roadmap.id) {
-            router.push(`/app/research-plan/${roadmap.id}`)
+        if (researchPlanData?.id) {
+            // if the research plan already exists, just update it
+            
+        } else {
+            // if the research plan doesn't exist yet, create it
+            const roadmap =  await createRoadmap(session.user.organizationId, {
+                title: values.title,
+                description: values.description
+            })
+
+            if (roadmap && roadmap.id) {
+                router.push(`/app/research-plan/${roadmap.id}`)
+            }
         }
     }
 
     return (
         <Form {...form}>
+            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 w-full"} type={"always"}>
             <form
                 onSubmit={form.handleSubmit(handleFormSubmit)}
                 className="w-full max-w-xl flex flex-col gap-4 mt-2 px-1"
@@ -120,11 +132,12 @@ export function CreateResearchPlanForm() {
                             handleFormSubmit(form.getValues())
                         }}
                     >
-                        Create Research Plan
+                        {researchPlanData?.id ? `Save` : `Create Research Plan`}
                     </Button>
                 </div>
 
             </form>
+            </ScrollArea>
         </Form>
     )
 }

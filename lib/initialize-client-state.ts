@@ -1,6 +1,6 @@
 "use client";
 
-import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { ResearchPlanDetails, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { PlatformNotification, Prisma } from "@prisma/client";
 import { useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { useCROSearchStore } from "@/state/search/croSearchStore";
@@ -41,6 +41,7 @@ export function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType)
 
 export function initializeRoadmapState(initData: {
     roadmapId: string | null | undefined
+    details: ResearchPlanDetails,
     nodes: any[]
     edges: any[]
     milestones: any[],
@@ -51,10 +52,10 @@ export function initializeRoadmapState(initData: {
 
     if (typeof window !== "undefined") {
         const initRoadmapState = useRoadmapStore.getState().initState;
-        const { roadmapId, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
+        const { roadmapId, details, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
 
         // Call Zustand's initState directly
-        initRoadmapState(nodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "")
+        initRoadmapState(details, nodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "")
         clear() // clear first/uninitialized state from history, so undo doesn't apply the un-initialized state
     }
 }

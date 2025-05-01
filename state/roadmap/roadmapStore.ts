@@ -17,9 +17,25 @@ import { MilestoneTypeOnMilestone } from "@prisma/client"
 import mixpanel from "mixpanel-browser"
 import { mixpanelTrack } from "@/app/mixpanel"
 
+export type ResearchPlanDetails = {
+    title: string,
+    description: string
+}
+
 export type RoadmapState = {
     initialized: boolean,
-    initState: (nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void,
+    initState: (
+        details: ResearchPlanDetails, 
+        nodes: Node[], 
+        edges: Edge[], 
+        milestones: Milestone[], 
+        selectedView: string | null, 
+        selectedNodeId: string | null, 
+        selectedTaskId: string | null, 
+        roadmapId: string
+    ) => void,
+    details: ResearchPlanDetails,
+    setDetails: (details: ResearchPlanDetails) => Promise<void>
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -46,13 +62,20 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (details: ResearchPlanDetails, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
             }))
-            set({ initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
+            set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
+        },
+        details: {
+            title: '',
+            description: ''
+        },
+        setDetails: async (details: ResearchPlanDetails) => {
+            // update research plan details here...
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {

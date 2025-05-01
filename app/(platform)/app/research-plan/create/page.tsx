@@ -1,4 +1,4 @@
-import { CreateResearchPlanForm } from "@/components/create-research-plan-form"
+import { EditResearchPlanForm } from "@/components/edit-research-plan-form"
 import { Separator } from "@/components/ui/separator"
 
 export default async function CreateResearchPlanPage() {
@@ -11,7 +11,7 @@ export default async function CreateResearchPlanPage() {
                 </p>
             </div>
             <Separator/>
-            <CreateResearchPlanForm />
+            <EditResearchPlanForm />
         </div>
     )
 }

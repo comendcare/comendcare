@@ -753,7 +753,7 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
 
         return {
             success: true,
-            data: organization?.roadmaps && organization?.roadmaps?.length > 0 && roadmap ? roadmap : undefined
+            data: roadmap
         };
     } catch (error: any) {
         logError("Error fetching roadmap", error);

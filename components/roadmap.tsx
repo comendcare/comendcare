@@ -26,26 +26,26 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "./ui/dialog"
-import { ExternalLink, Import, Info, Plus, Redo2, Undo2, Wand2, WandSparkles } from "lucide-react"
+import { ArrowLeft, ExternalLink, Import, Info, Pencil, Plus, Redo2, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
-import Papa from "papaparse"
 import { toast } from "sonner"
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { Milestone, NodeType } from "@/lib/types"
+import { Milestone } from "@/lib/types"
 import Loading from "@/app/loading"
-import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
+import { MilestoneType, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
-import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
-import { ScrollArea } from "./ui/scroll-area"
-import mixpanel from "mixpanel-browser"
+import { Separator } from "@radix-ui/react-separator"
+import { EditResearchPlanForm } from "./edit-research-plan-form"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
+    details: state.details,
     initialized: state.initialized,
     selectedView: state.selectedView,
     setSelectedView: state.setSelectedView,
@@ -65,6 +65,7 @@ export function Roadmap() {
     const { defaultLayout } = useSidebarStore()
     const { 
         roadmapId,
+        details,
         initialized,
         selectedView,
         setSelectedView,
@@ -199,9 +200,20 @@ export function Roadmap() {
                 direction="horizontal"
                 className="h-full items-stretch"
             >
-                <ResizablePanel>
+                <ResizablePanel className="p-2 flex flex-col gap-2">
+                    <RoadmapHeader 
+                        researchPlanDetails={{
+                            id: roadmapId,
+                            ...details
+                        }}
+                        setTab={setTab}
+                        setNewMilestoneIsOpen={setNewMilestoneIsOpen}
+                        addMilestones={addMilestones}
+                        milestoneTypes={milestoneTypes}
+                        setBulkImportIsOpen={setBulkImportIsOpen}
+                    />
                     <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
-                        <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
+                        <div className="flex flex-row items-center gap-x-1 justify-start">
                             <TabsList className="mr-auto">
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 <TabsTrigger value="flow" className="flex gap-2">
@@ -244,59 +256,6 @@ export function Roadmap() {
                                     </Select>
                                 </div>
                             )}
-
-                            <span className="onborda-create-a-project flex flex-row items-center gap-x-1">
-                                <Button 
-                                    variant={"cta"}  
-                                    onClick={() => {
-                                        setTab('projects')
-                                        setNewMilestoneIsOpen(true)
-                                    }}
-                                >
-                                    Templates
-                                </Button>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button 
-                                            disabled={milestoneTypes.length === 0}
-                                            onClick={() => {
-                                                console.log("Add an empty project triggered")
-                                                addMilestones([{
-                                                        nodeType: "PROJECT",
-                                                        title: 'New Project',
-                                                }], "Create Empty Button")
-                                            }} 
-                                            variant={"secondary"}
-                                        >
-                                            <Plus />
-                                            Add an empty project
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80">
-                                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button 
-                                            disabled={milestoneTypes.length === 0}
-                                            onClick={() => {
-                                                console.log("Bulk import triggered")
-                                                setBulkImportIsOpen(true)
-                                            }} 
-                                            variant={"secondary"}
-                                        >
-                                            <Import />
-                                            Import projects
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80">
-                                        <p>{`Import projects from a .csv file`}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </span>
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -591,6 +550,152 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
                 <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit")} />
             </Button>
             </span>
+        </div>
+    )
+}
+
+const RoadmapHeader = ({
+    researchPlanDetails, 
+    setTab, 
+    setNewMilestoneIsOpen, 
+    addMilestones, 
+    milestoneTypes, 
+    setBulkImportIsOpen
+}: {
+    researchPlanDetails: Partial<RoadmapType>, 
+    setTab: any, 
+    setNewMilestoneIsOpen: any, 
+    addMilestones: any, 
+    milestoneTypes: any, 
+    setBulkImportIsOpen: any
+}) => {
+    const parentRef = useRef<HTMLDivElement>(null)
+    const [parentWidth, setParentWidth] = useState(0)
+    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 768)
+    const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
+
+    useEffect(() => {
+    const el = parentRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (entry?.contentRect) {
+        setParentWidth(entry.contentRect.width);
+        }
+    });
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        setIsCollapsed(parentWidth <= 768)
+    }, [parentWidth])
+
+    return (
+        <div ref={parentRef} className="flex p-2 justify-between items-center bg-gray-100 rounded-md">
+            <span className="flex flex-row items-center gap-x-1">
+                <h1 className="text-2xl font-semibold text-wrap line-clamp-2">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+                {/* <Dialog>
+                    <DialogTrigger asChild> */}
+                        {/* <Button variant={"ghost"} size={"icon"}>
+                            <Pencil />
+                        </Button> */}
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    onClick={() => setEditResearchPlanIsOpen(true)} 
+                                    variant={"secondary"}
+                                    size={isCollapsed ? "icon" : "default"}
+                                    className="w-16"
+                                >
+                                    <Pencil />
+                                    {!isCollapsed && <p>{``}</p>}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-80">
+                                <p>{`Edit the details of your research plan, like the title and description.`}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    {/* </DialogTrigger>
+                    <DialogContent>
+                        <EditResearchPlanForm researchPlanData={researchPlanDetails}/>
+                    </DialogContent>
+                </Dialog> */}
+            </span>
+
+            <span className="onborda-create-a-project flex flex-row items-center gap-x-1 justify-end">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            disabled={milestoneTypes.length === 0}
+                            onClick={() => {
+                                console.log("Add an empty project triggered")
+                                addMilestones([{
+                                        nodeType: "PROJECT",
+                                        title: 'New Project',
+                                }], "Create Empty Button")
+                            }} 
+                            variant={"secondary"}
+                            size={isCollapsed ? "icon" : "default"}
+                        >
+                            <Plus />
+                            {/* If the header is < size MD, collapse the button to just the icon (hide text) */}
+                            {!isCollapsed && <p>{`Add an empty project`}</p>}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            disabled={milestoneTypes.length === 0}
+                            onClick={() => {
+                                console.log("Bulk import triggered")
+                                setBulkImportIsOpen(true)
+                            }} 
+                            variant={"secondary"}
+                            size={isCollapsed ? "icon" : "default"}
+                        >
+                            <Import />
+                            {/* If the header is < size MD, collapse the button to just the icon (hide text) */}
+                            {!isCollapsed && <p>{`Import projects`}</p>}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`Import projects from a .csv file`}</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Button 
+                    variant={"cta"}  
+                    onClick={() => {
+                        setTab('projects')
+                        setNewMilestoneIsOpen(true)
+                    }}
+                >
+                    Templates
+                </Button>
+            </span>
+
+            <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Edit Research Plan Details
+                        </DialogTitle>
+                        <DialogDescription>
+                            {`Edit details like the name and description of your Research Plan. Click save when you're done.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditResearchPlanForm researchPlanData={researchPlanDetails}/>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

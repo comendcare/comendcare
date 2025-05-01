@@ -36,9 +36,11 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
                     const nodesResponse = await getNodesEdgesAndMilestones(params.id)
                     const urlNode = searchParams.get("milestone")
                     const urlView = searchParams.get("view")
+                    console.log(`roadmap details`, response.data)
                     if (nodesResponse.success) {
                         initializeRoadmapState({
                             roadmapId: params.id,
+                            details: {title: response.data.title || '', description: response.data.description || ''},
                             nodes: nodesResponse.data.nodes,
                             edges: nodesResponse.data.edges,
                             milestones: nodesResponse.data.milestones,
@@ -49,6 +51,7 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
                         // init state, but research plan has not been created yet
                         initializeRoadmapState({
                             roadmapId: null,
+                            details: {title: response.data.title || '', description: response.data.description || ''},
                             nodes: [],
                             edges: [],
                             milestones: [],
