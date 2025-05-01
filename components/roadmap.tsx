@@ -211,6 +211,7 @@ export function Roadmap() {
                         addMilestones={addMilestones}
                         milestoneTypes={milestoneTypes}
                         setBulkImportIsOpen={setBulkImportIsOpen}
+                        orgSubdomain={orgSubdomain}
                     />
                     <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center gap-x-1 justify-start">
@@ -296,24 +297,6 @@ export function Roadmap() {
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
                                     <p>{`Redo (⌘+Shift+Z)`}</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                                <TooltipTrigger asChild disabled={!orgSubdomain}>
-                                    <Link
-                                        href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
-                                        className={cn(
-                                            buttonVariants({ variant: "ghost" }),
-                                            "flex items-center w-[40px]"
-                                        )}
-                                        target={"_blank"}
-                                    >
-                                        <ExternalLink className="h-4 w-4"/>
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`View public research plan`}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </div>
@@ -560,14 +543,16 @@ const RoadmapHeader = ({
     setNewMilestoneIsOpen, 
     addMilestones, 
     milestoneTypes, 
-    setBulkImportIsOpen
+    setBulkImportIsOpen,
+    orgSubdomain
 }: {
     researchPlanDetails: Partial<RoadmapType>, 
     setTab: any, 
     setNewMilestoneIsOpen: any, 
     addMilestones: any, 
     milestoneTypes: any, 
-    setBulkImportIsOpen: any
+    setBulkImportIsOpen: any,
+    orgSubdomain: string | undefined
 }) => {
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
@@ -595,38 +580,28 @@ const RoadmapHeader = ({
     }, [parentWidth])
 
     return (
-        <div ref={parentRef} className="flex p-2 justify-between items-center bg-gray-100 rounded-md">
-            <span className="flex flex-row items-center gap-x-1">
-                <h1 className="text-2xl font-semibold text-wrap line-clamp-2">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
-                {/* <Dialog>
-                    <DialogTrigger asChild> */}
-                        {/* <Button variant={"ghost"} size={"icon"}>
+        <div ref={parentRef} className="flex p-2 justify-between items-start bg-gray-100 rounded-md">
+            <span className="flex flex-row items-start gap-x-1">
+                <h1 className="h-full my-auto text-2xl font-semibold text-wrap line-clamp-2">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            onClick={() => setEditResearchPlanIsOpen(true)} 
+                            variant={"secondary"}
+                            size={isCollapsed ? "icon" : "default"}
+                            className="w-16"
+                        >
                             <Pencil />
-                        </Button> */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    onClick={() => setEditResearchPlanIsOpen(true)} 
-                                    variant={"secondary"}
-                                    size={isCollapsed ? "icon" : "default"}
-                                    className="w-16"
-                                >
-                                    <Pencil />
-                                    {!isCollapsed && <p>{``}</p>}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-80">
-                                <p>{`Edit the details of your research plan, like the title and description.`}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    {/* </DialogTrigger>
-                    <DialogContent>
-                        <EditResearchPlanForm researchPlanData={researchPlanDetails}/>
-                    </DialogContent>
-                </Dialog> */}
+                            {!isCollapsed && <p>{``}</p>}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`Edit the details of your research plan, like the title and description.`}</p>
+                    </TooltipContent>
+                </Tooltip>
             </span>
 
-            <span className="onborda-create-a-project flex flex-row items-center gap-x-1 justify-end">
+            <span className="onborda-create-a-project flex flex-row items-start gap-x-1 justify-end">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
@@ -681,6 +656,24 @@ const RoadmapHeader = ({
                 >
                     Templates
                 </Button>
+
+                <Tooltip>
+                    <TooltipTrigger asChild disabled={!orgSubdomain}>
+                        <Link
+                            href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                            className={cn(
+                                buttonVariants({ variant: "ghost" }),
+                                "flex items-center w-[40px]"
+                            )}
+                            target={"_blank"}
+                        >
+                            <ExternalLink className="h-4 w-4"/>
+                        </Link>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`View public research plan`}</p>
+                    </TooltipContent>
+                </Tooltip>
             </span>
 
             <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>
