@@ -4,7 +4,7 @@ import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
 import { useIsMobile } from "@/lib/hooks/use-mobile"
-import {getUserChartAnalytics} from "@/lib/fetchers";
+import {getCompanyChartAnalytics} from "@/lib/fetchers";
 import {
     Card,
     CardContent,
@@ -31,8 +31,8 @@ import {
 } from "@/components/ui/toggle-group"
 
 const chartConfig = {
-    users: {
-        label: "Users",
+    companies: {
+        label: "Companies",
         color: "hsl(var(--chart-1))",
     },
 } satisfies ChartConfig
@@ -40,7 +40,7 @@ const chartConfig = {
 export function AdminCompaniesAnalyticsChart() {
     const isMobile = useIsMobile()
     const [timeRange, setTimeRange] = React.useState("30d")
-    const [chartData, setChartData] = React.useState<{ date: string; users: number }[]>([])
+    const [chartData, setChartData] = React.useState<{ date: string; companies: number }[]>([])
 
     React.useEffect(() => {
         if (isMobile) {
@@ -49,7 +49,7 @@ export function AdminCompaniesAnalyticsChart() {
     }, [isMobile])
 
     React.useEffect(() => {
-        getUserChartAnalytics().then(setChartData)
+        getCompanyChartAnalytics().then(setChartData)
     }, [])
 
     const filteredData = chartData.filter((item) => {
@@ -69,7 +69,7 @@ export function AdminCompaniesAnalyticsChart() {
     return (
         <Card className="@container/card">
             <CardHeader className="relative">
-                <CardTitle>Total Users</CardTitle>
+                <CardTitle>Total Companies</CardTitle>
                 <CardDescription>
                     <span className="@[540px]/card:block hidden">
                         Total for selected range
@@ -118,9 +118,9 @@ export function AdminCompaniesAnalyticsChart() {
                 >
                     <AreaChart data={filteredData}>
                         <defs>
-                            <linearGradient id="fillUsers" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-users)" stopOpacity={0.8} />
-                                <stop offset="95%" stopColor="var(--color-users)" stopOpacity={0.1} />
+                            <linearGradient id="fillCompanies" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="var(--color-companies)" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="var(--color-companies)" stopOpacity={0.1} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid vertical={false} />
@@ -153,10 +153,10 @@ export function AdminCompaniesAnalyticsChart() {
                             }
                         />
                         <Area
-                            dataKey="users"
+                            dataKey="companies"
                             type="natural"
-                            fill="url(#fillUsers)"
-                            stroke="var(--color-users)"
+                            fill="url(#fillCompanies)"
+                            stroke="var(--color-companies)"
                             strokeWidth={2}
                         />
                     </AreaChart>
