@@ -6,66 +6,36 @@ import {
     BarChart3,
     Edit3,
     Globe,
-    Layout,
+    FlaskConical,
     LayoutDashboard,
-    Megaphone,
     Menu,
     Newspaper,
     Settings,
-    FileCode,
-    Github
+    ChartArea,
+    Users,
+    Building
 } from "lucide-react"
 import {
     useParams,
     usePathname,
     useSelectedLayoutSegments
 } from "next/navigation"
-import { ReactNode, useEffect, useMemo, useState } from "react"
+import {ReactNode, useEffect, useMemo, useState} from "react"
 import Image from "next/image"
 import {getOrganizationFromRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
 
 const externalLinks: any[] = [
-    // {
-    //     name: "Read announcement",
-    //     href: "https://vercel.com/blog/platforms-starter-kit",
-    //     icon: <Megaphone width={18}/>,
-    // },
-    // {
-    //     name: "Star on GitHub",
-    //     href: "https://github.com/vercel/platforms",
-    //     icon: <Github width={18}/>,
-    // },
-    // {
-    //     name: "Read the guide",
-    //     href: "https://vercel.com/guides/nextjs-multi-tenant-application",
-    //     icon: <FileCode width={18}/>,
-    // },
-    // {
-    //     name: "View demo organization",
-    //     href: "https://demo.vercel.pub",
-    //     icon: <Layout width={18}/>,
-    // },
-    // {
-    //     name: "Deploy your own",
-    //     href: "https://vercel.com/templates/next.js/platforms-starter-kit",
-    //     icon: (
-    //         <svg
-    //             width={18}
-    //             viewBox="0 0 76 76"
-    //             fill="none"
-    //             xmlns="http://www.w3.org/2000/svg"
-    //             className="py-1 text-black dark:text-white"
-    //         >
-    //             <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
-    //         </svg>
-    //     ),
-    // },
+    {
+        name: "Mixpanel Analytics",
+        href: "https://mixpanel.com/project/3419552/view/3923844/app/home",
+        icon: <ChartArea width={18}/>,
+    },
 ]
 
-export default function AdminNav({ children }: { children: ReactNode }) {
+export default function AdminNav({children}: { children: ReactNode }) {
     const segments = useSelectedLayoutSegments()
-    const { id } = useParams() as { id?: string }
+    const {id} = useParams() as { id?: string }
 
     const [organizationId, setOrganizationId] = useState<string | null>()
 
@@ -90,25 +60,25 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                 {
                     name: "Back to All Organizations",
                     href: "/admin/organizations",
-                    icon: <ArrowLeft width={18} />
+                    icon: <ArrowLeft width={18}/>
                 },
                 {
                     name: "Roadmaps",
                     href: `/admin/organization/${id}`,
                     isActive: segments.length === 2,
-                    icon: <Newspaper width={18} />
+                    icon: <Newspaper width={18}/>
                 },
                 {
                     name: "Analytics",
                     href: `/admin/organization/${id}/analytics`,
                     isActive: segments.includes("analytics"),
-                    icon: <BarChart3 width={18} />
+                    icon: <BarChart3 width={18}/>
                 },
                 {
                     name: "Settings",
                     href: `/admin/organization/${id}/settings`,
                     isActive: segments.includes("settings"),
-                    icon: <Settings width={18} />
+                    icon: <Settings width={18}/>
                 }
             ]
         } else if (segments[0] === "roadmap" && id) {
@@ -118,19 +88,19 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                     href: organizationId
                         ? `/admin/organization/${organizationId}`
                         : "/organizations",
-                    icon: <ArrowLeft width={18} />
+                    icon: <ArrowLeft width={18}/>
                 },
                 {
                     name: "Editor",
                     href: `/admin/research-plan/${id}`,
                     isActive: segments.length === 2,
-                    icon: <Edit3 width={18} />
+                    icon: <Edit3 width={18}/>
                 },
                 {
                     name: "Settings",
                     href: `/admin/research-plan/${id}/settings`,
                     isActive: segments.includes("settings"),
-                    icon: <Settings width={18} />
+                    icon: <Settings width={18}/>
                 }
             ]
         }
@@ -139,19 +109,37 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                 name: "Overview",
                 href: "/admin",
                 isActive: segments.length === 0,
-                icon: <LayoutDashboard width={18} />
+                icon: <LayoutDashboard width={18}/>
+            },
+            {
+                name: "Users",
+                href: "/admin/users",
+                isActive: segments[0] === "users",
+                icon: <Users width={18}/>
             },
             {
                 name: "Organizations",
                 href: "/admin/organizations",
                 isActive: segments[0] === "organizations",
-                icon: <Globe width={18} />
+                icon: <Globe width={18}/>
+            },
+            {
+                name: "Research Plans",
+                href: "/admin/research-plans",
+                isActive: segments[0] === "research-plans",
+                icon: <FlaskConical width={18}/>
+            },
+            {
+                name: "Companies",
+                href: "/admin/companies",
+                isActive: segments[0] === "companies",
+                icon: <Building width={18}/>
             },
             {
                 name: "Settings",
                 href: "/admin/settings",
                 isActive: segments[0] === "settings",
-                icon: <Settings width={18} />
+                icon: <Settings width={18}/>
             }
         ]
     }, [segments, id, organizationId])
@@ -178,50 +166,23 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                 } sm:hidden`}
                 onClick={() => setShowSidebar(!showSidebar)}
             >
-                <Menu width={20} />
+                <Menu width={20}/>
             </button>
             <div
                 className={`transform ${
                     showSidebar ? "w-full translate-x-0" : "-translate-x-full"
                 } fixed z-10 flex h-full flex-col justify-between border-r border-stone-200 bg-stone-100 p-4 transition-all dark:border-stone-700 dark:bg-stone-900 sm:w-60 sm:translate-x-0`}
             >
-                <div className="grid gap-2">
-                    <div className="flex items-center space-x-2 rounded-lg px-2 py-1.5">
-                        <a
-                            href="https://vercel.com/templates/next.js/platforms-starter-kit"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-lg p-1.5 hover:bg-stone-200 dark:hover:bg-stone-700"
-                        >
-                            <svg
-                                width="26"
-                                viewBox="0 0 76 65"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="text-black dark:text-white"
-                            >
-                                <path
-                                    d="M37.5274 0L75.0548 65H0L37.5274 0Z"
-                                    fill="currentColor"
-                                />
-                            </svg>
-                        </a>
-                        <div className="h-6 rotate-[30deg] border-l border-stone-400 dark:border-stone-500" />
-                        <Link
-                            href="/"
-                            className="rounded-lg p-2 hover:bg-stone-200 dark:hover:bg-stone-700"
-                        >
-                            <Image
-                                src="/logo.png"
-                                width={24}
-                                height={24}
-                                alt="Logo"
-                                className="dark:scale-110 dark:rounded-full dark:border dark:border-stone-400"
-                            />
-                        </Link>
-                    </div>
+                <div className="grid gap-2 space-y-2">
+                    <Image
+                        src="/Comend Admin Full logo.png"
+                        width={100}
+                        height={100}
+                        alt="Logo"
+                        className="w-full"
+                    />
                     <div className="grid gap-1">
-                        {tabs.map(({ name, href, isActive, icon }) => (
+                        {tabs.map(({name, href, isActive, icon}) => (
                             <Link
                                 key={name}
                                 href={href}
@@ -241,7 +202,7 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                 </div>
                 <div>
                     <div className="grid gap-1">
-                        {externalLinks.map(({ name, href, icon }) => (
+                        {externalLinks.map(({name, href, icon}) => (
                             <a
                                 key={name}
                                 href={href}
@@ -259,7 +220,7 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                             </a>
                         ))}
                     </div>
-                    <div className="my-2 border-t border-stone-200 dark:border-stone-700" />
+                    <div className="my-2 border-t border-stone-200 dark:border-stone-700"/>
                     {children}
                 </div>
             </div>

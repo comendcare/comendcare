@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-export default function OldPage() {
+export default function SignInPage() {
     // Redirect to the target page immediately
     redirect('/login');
 
