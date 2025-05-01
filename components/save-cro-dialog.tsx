@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Company, Milestone, SavedCompany } from "@prisma/client";
+import { Company, Prisma, SavedCompany } from "@prisma/client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
     Dialog,
@@ -27,12 +27,19 @@ import { Bookmark, BookmarkCheck } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 import { mixpanelTrack } from "@/app/mixpanel";
+import MultipleSelector from "./ui/multiple-selector";
+import { Option } from "@/lib/types"
+
+export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
     //     errorMap: () => ({ message: "Select a valid engagement type" })
     // }),
-    milestoneId: z.string().min(1, "Please select a project"),
+    // milestoneId: z.string().min(1, "Please select a project"),
+    milestones: z.array(z.custom<Milestone>())
+        .min(1, "Please select a project")
+        .max(1, "Cannot select more than one project")
 });
 
 type SaveCROFormData = z.infer<typeof formSchema>;
@@ -56,9 +63,10 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
     const form = useForm<SaveCROFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            milestoneId: milestone ? milestone.id : undefined
+            // milestoneId: milestone ? milestone.id : undefined
+            milestones: milestone ? [milestone] : []
         }
-    });
+    })
 
     useEffect(() => {
         async function fetchData() {
@@ -80,12 +88,18 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
         }
 
         fetchData();
-    }, [session?.user?.organizationId, cro.id]);
+    }, [session?.user?.organizationId, cro.id])
 
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await saveCRO(cro.id, data.milestoneId)
+            // const response = await saveCRO(cro.id, data.milestoneId)
+            if (data.milestones.length !== 1) {
+                console.error(`Error: incorrect number of milestones selected`)
+                return
+            }
+
+            const response = await saveCRO(cro.id, data.milestones[0].id)
 
             if (response.success && response.data) {
                 va.track("Shortlisted CRO");
@@ -156,7 +170,8 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
 
                         <FormField
                             control={form.control}
-                            name="milestoneId"
+                            // name="milestoneId"
+                            name="milestones"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Project</FormLabel>
@@ -164,7 +179,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                                         For which project would you like to connect with this company?
                                     </FormDescription>
                                     <FormControl>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        {/* <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select a project" />
                                             </SelectTrigger>
@@ -175,7 +190,23 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
-                                        </Select>
+                                        </Select> */}
+                                        <MultipleSelector
+                                            value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
+                                            onChange={field.onChange}
+                                            defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
+                                            options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
+                                            hidePlaceholderWhenSelected={true}
+                                            showHoverCard={false}
+                                            placeholder="Link projects"
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                            groupBy="roadmapTitle"
+                                            maxSelected={1}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

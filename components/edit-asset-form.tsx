@@ -243,7 +243,6 @@ export function EditAssetForm({
             }
 
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
-            console.log(`milestones`, milestonesResponse)
             if (milestonesResponse.success) {
                 setFetchedMilestones(milestonesResponse?.data as Milestone[])
             } else {
