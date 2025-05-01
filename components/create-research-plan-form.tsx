@@ -69,7 +69,7 @@ export function CreateResearchPlanForm() {
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(handleFormSubmit)}
-                className="flex flex-col gap-4 mt-2 px-1"
+                className="w-full max-w-xl flex flex-col gap-4 mt-2 px-1"
             >
                 <FormField
                     control={form.control}
