@@ -85,6 +85,18 @@ export function CreateCompanyDialog() {
             formData.set("founded", values.yearFounded)
             formData.set("type", values.yearFounded)
 
+            // Map form values into FormData
+            const data = {
+                services: values.services?.map((service) => service.label).join(",") || "",
+            };
+
+            // Append data to FormData
+            Object.entries(data).forEach(([key, value]) => {
+                if (value) {
+                    formData.append(key, value)
+                }
+            });
+
             const response = await createCompany(formData)
 
             if (response.success) {
