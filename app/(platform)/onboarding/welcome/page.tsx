@@ -12,13 +12,13 @@ export default function OnboardingWelcomePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
 
-    if (status === "loading") {
-        return <Loading />;
-    }
-
     useEffect(() => {
         mixpanel.track("Onboarding Started")
     }, [])
+
+    if (status === "loading") {
+        return <Loading />;
+    }
 
     return (
         <main className="flex flex-col space-y-8 w-full max-w-7xl mx-auto">
