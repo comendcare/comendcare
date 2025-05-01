@@ -304,7 +304,7 @@ export function Roadmap() {
                         {/* Flow View */}
                         <TabsContent
                             value="flow"
-                            className="m-0 h-[calc(100vh-6rem)]"
+                            className="m-0 h-[calc(100vh-10rem)]"
                         >
                             {milestones.length > 0 ? (
                                 <PrivateFlowView
@@ -318,7 +318,7 @@ export function Roadmap() {
                         {/* Timeline view */}
                         <TabsContent
                             value="timeline"
-                            className="mt-0 h-[calc(100vh-6rem)]"
+                            className="mt-0 h-[calc(100vh-12rem)]"
                         >
                             {milestones.length > 0 ? (
                                 <PrivateTimelineView sortBy={sortBy}/>
