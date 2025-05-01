@@ -4,8 +4,9 @@ import { notFound, redirect } from "next/navigation"
 import Roadmaps from "@/components/roadmaps"
 import CreateRoadmapButton from "@/components/create-roadmap-button"
 import {VerifyOrganizationSwitch} from "@/components/verify-organization-switch";
+import OrganizationRoadmaps from "@/components/organization-roadmaps";
 
-export default async function OrganizationRoadmaps({
+export default async function AdminOrganizationPage({
     params
 }: {
     params: { id: string }
@@ -49,7 +50,7 @@ export default async function OrganizationRoadmaps({
                 </div>
                 <CreateRoadmapButton />
             </div>
-            <Roadmaps organizationId={decodeURIComponent(params.id)} />
+            <OrganizationRoadmaps organizationId={decodeURIComponent(params.id)} />
         </>
     )
 }
