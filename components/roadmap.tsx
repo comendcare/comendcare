@@ -468,15 +468,6 @@ const MilestoneDetailsPanel = ({
     return <Loading />
 }
 
-// const MilestoneTemplatesCard = ({milestoneTypes}: {milestoneTypes: MilestoneType[]}) => {
-//     return (
-//         <div className="p-20 flex flex-col gap-8 justify-center items-center">
-//             <h1 className="text-2xl">Select a research plan template to get started</h1>
-//             <ResearchPlanTemplates milestoneTypes={milestoneTypes}/>
-//         </div>
-//     )
-// }
-
 const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpen: (val: boolean) => void, setTab: (val: TabType) => void}) => {
     const pathname = usePathname()
     const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
@@ -686,7 +677,7 @@ const RoadmapHeader = ({
                             {`Edit details like the name and description of your Research Plan. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditResearchPlanForm researchPlanData={researchPlanDetails}/>
+                    <EditResearchPlanForm researchPlanData={researchPlanDetails} closeDialog={() => setEditResearchPlanIsOpen(false)}/>
                 </DialogContent>
             </Dialog>
         </div>

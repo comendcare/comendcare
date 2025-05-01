@@ -8,18 +8,18 @@ import {
     EdgeChange,
     Connection
 } from "@xyflow/react"
-import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
+import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@/lib/actions"
 import { toast } from "sonner"
 import { nanoid } from "nanoid"
 import { Milestone, NodeType, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
-import { MilestoneTypeOnMilestone } from "@prisma/client"
+import { MilestoneTypeOnMilestone, Roadmap } from "@prisma/client"
 import mixpanel from "mixpanel-browser"
 import { mixpanelTrack } from "@/app/mixpanel"
 
 export type ResearchPlanDetails = {
     title: string,
-    description: string
+    description: string | undefined
 }
 
 export type RoadmapState = {
@@ -76,6 +76,26 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         setDetails: async (details: ResearchPlanDetails) => {
             // update research plan details here...
+            // if (id !== get().roadmapId) {
+            //     console.error(`Error: Given resarch plan ID does not match the active research plan. Could not update research plan.`)
+            //     return
+            // }
+            const id = get().roadmapId
+
+            if (!id) {
+                console.error(`Error: no active research plan!`)
+                return
+            }
+
+            const roadmap = await updateRoadmap({
+                id,
+                title: details.title,
+                description: details.description || null
+            })
+
+            if (roadmap) {
+                set({ details })
+            }
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {
