@@ -547,7 +547,7 @@ const RoadmapHeader = ({
 }) => {
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
-    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 768)
+    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
 
     useEffect(() => {
@@ -567,7 +567,7 @@ const RoadmapHeader = ({
     }, []);
 
     useEffect(() => {
-        setIsCollapsed(parentWidth <= 768)
+        setIsCollapsed(parentWidth <= 1024)
     }, [parentWidth])
 
     return (
