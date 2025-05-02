@@ -29,6 +29,7 @@ import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 import { mixpanelTrack } from "@/app/mixpanel";
 import MultipleSelector from "./ui/multiple-selector";
 import { Option } from "@/lib/types"
+import ProjectMultipleSelector from "./project-multiple-selector";
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -170,7 +171,6 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
 
                         <FormField
                             control={form.control}
-                            // name="milestoneId"
                             name="milestones"
                             render={({ field }) => (
                                 <FormItem>
@@ -179,34 +179,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                                         For which project would you like to connect with this company?
                                     </FormDescription>
                                     <FormControl>
-                                        {/* <Select onValueChange={field.onChange} value={field.value}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a project" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {fetchedMilestones.map((milestone) => (
-                                                    <SelectItem key={milestone.id} value={milestone.id}>
-                                                        {milestone.title}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select> */}
-                                        <MultipleSelector
-                                            value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
-                                            onChange={field.onChange}
-                                            defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
-                                            options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
-                                            hidePlaceholderWhenSelected={true}
-                                            showHoverCard={false}
-                                            placeholder="Link projects"
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                            groupBy="roadmapTitle"
-                                            maxSelected={1}
-                                        />
+                                        <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
