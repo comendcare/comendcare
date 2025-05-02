@@ -14,7 +14,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
     return (
         <div className="w-full flex flex-col space-y-8">
             <div>
-                <div className="relative">
+                {/* <div className="relative">
                     {showBackButton && <BackButton/>}
                     {organization?.headerImage ? (
                         <img className="h-32 w-full object-cover lg:h-48"
@@ -24,7 +24,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                     ): (
                         <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
                     )}
-                </div>
+                </div> */}
 
                 <div className="pb-4 flex flex-col gap-4">
                     <PAGBannerPhoto
