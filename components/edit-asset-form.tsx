@@ -41,6 +41,8 @@ import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
+import mixpanel from "mixpanel-browser"
+import ProjectMultipleSelector from "./project-multiple-selector"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -363,21 +365,7 @@ export function EditAssetForm({
                             <FormItem className="w-full mt-2">
                                 <FormLabel >{`Linked Projects`}</FormLabel>
                                 <FormControl>
-                                    <MultipleSelector
-                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
-                                        onChange={field.onChange}
-                                        defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
-                                        options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
-                                        hidePlaceholderWhenSelected={true}
-                                        showHoverCard={false}
-                                        placeholder="Link projects"
-                                        emptyIndicator={
-                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                no results found.
-                                            </p>
-                                        }
-                                        groupBy="roadmapTitle"
-                                    />
+                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
                                 <FormMessage className="text-primary"/>
                             </FormItem>
