@@ -10,7 +10,7 @@ import {Command, CommandGroup, CommandItem, CommandList} from '@/components/ui/c
 import {cn, sleep} from '@/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {ScrollArea} from './scroll-area';
-import { keyBy } from 'lodash';
+import { keyBy, remove } from 'lodash';
 
 export interface Option {
     value: string;
@@ -124,10 +124,12 @@ function transToGroupOption(options: Option[], groupBy?: string) {
         }
         groupOption[key].push(option);
     });
+    console.log(`group option`, groupOption)
     return groupOption;
 }
 
 function removePickedOption(groupOption: GroupOption, picked: Option[]) {
+    console.log(`remove picked option...`)
     const cloneOption = JSON.parse(JSON.stringify(groupOption)) as GroupOption;
 
     for (const [key, value] of Object.entries(cloneOption)) {
@@ -416,10 +418,17 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             [options, selected],
         );
 
-        console.log(`selectables`, selectables)
+        // console.log(`selectables`, selectables)
+        // console.log(`options`, options)
+        // console.log(`selected`, selected)
+
+        // useEffect(() => {
+        //     console.log(`selectables`, selectables)
+        // }, [selectables])
 
         /** Avoid Creatable Selector freezing or lagging when paste a long string. */
         const commandFilter = React.useCallback(() => {
+            console.log(`filter`, commandProps)
             if (commandProps?.filter) {
                 return commandProps.filter;
             }
@@ -560,11 +569,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                         {isLoading ? (
                                             <>{loadingIndicator}</>
                                         ) : Object.entries(selectables).flatMap(value => value[1]).length > 0 ? (
-                                            <CommandGroup className="h-full">
-                                                <>
+                                            <>
                                                 {Object.entries(selectables).map(([key, values]) => (
-                                                    <>
-                                                        {groupBy && <p className="p-2 text-sm font-semibold">{key}</p>}
+                                                    <CommandGroup className="h-full" heading={groupBy ? key : undefined}>
                                                         {values.map((framework, index) => (
                                                             <HoverCard openDelay={0} closeDelay={0} key={index}>
                                                                 <HoverCardTrigger>
@@ -609,54 +616,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 )}
                                                             </HoverCard>
                                                         ))}
-                                                    </>
+                                                    </CommandGroup>
                                                 ))}
-                                                {/* {Object.entries(selectables).flatMap(value => value[1]).map((framework, index) => (
-                                                    <HoverCard openDelay={0} closeDelay={0} key={index}>
-                                                        <HoverCardTrigger>
-                                                            <CommandItem
-                                                                key={framework.value}
-                                                                onMouseDown={(e) => {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                }}
-                                                                onSelect={(value) => {
-                                                                    setInputValue("");
-                                                                    setSelected((prev) => {
-                                                                        const closeDropdown = async () => {
-                                                                            await sleep(100) // sleep to delay setOpen, and avoid rendering errors
-                                                                            setOpen(false)
-                                                                        }
-
-                                                                        if (selected.length + 1 >= maxSelected) closeDropdown()
-                                                                        onChange?.([...prev, framework]);
-                                                                        return [...prev, framework];
-                                                                    });
-                                                                }}
-                                                                className={"cursor-pointer multiselect-item"}
-                                                            >
-                                                                {framework.label}
-                                                                <p className="hidden">{framework.value}</p>
-                                                            </CommandItem>
-                                                        </HoverCardTrigger>
-                                                        {showHoverCard && (
-                                                            <HoverCardContent side="left" align="start" className="min-h-[280px]">
-                                                                <div className="grid gap-2">
-                                                                    <h4 className="font-medium leading-none">{framework.label}</h4>
-                                                                    <div className="text-sm text-muted-foreground">{framework.description}</div>
-                                                                    {framework.strengths && (
-                                                                        <div className="mt-4 grid gap-2">
-                                                                            <h5 className="text-sm font-medium leading-none">Strengths</h5>
-                                                                            <ul className="text-sm text-muted-foreground">{framework.strengths}</ul>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </HoverCardContent>
-                                                        )}
-                                                    </HoverCard>
-                                                ))} */}
-                                                </>
-                                            </CommandGroup>
+                                            </>
                                         ) : (
                                             <CommandGroup className="h-full">
                                                 <CommandItem value="-" disabled>
