@@ -14,25 +14,25 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
     return (
         <div className="w-full flex flex-col space-y-8">
             <div>
-                {/* <div className="relative">
+                <div className="relative">
                     {showBackButton && <BackButton/>}
                     {organization?.headerImage ? (
-                        <img className="h-32 w-full object-cover lg:h-48"
+                        <img className="h-42 w-full object-cover lg:h-64"
                             src={organization.headerImage}
                             alt=""
                         />
                     ): (
                         <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
                     )}
-                </div> */}
+                </div>
 
-                <div className="pb-4 flex flex-col gap-4">
-                    <PAGBannerPhoto
+                <div className="pt-2 pb-4 flex flex-col gap-4">
+                    {/* <PAGBannerPhoto
                         img={organization.headerImage}
                         name={organization.headerImage}
                         className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                         editable={false}
-                    />
+                    /> */}
 
                     <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
                         <div className="h-fit w-fit -mt-16">
