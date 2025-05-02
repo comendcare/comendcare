@@ -126,6 +126,7 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {
         node: true,
         contacts: true,
+        roadmap: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
         assets: { include: { asset: true, assetId: true, milestoneId: true } },
