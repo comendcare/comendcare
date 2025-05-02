@@ -3615,7 +3615,7 @@ export const createCompany = async (formData: FormData) => {
                 ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
                 : process.env.TYPESENSE_ADMIN_API_KEY!,
             company,
-            "organizations"
+            "companies"
         )
 
         // Optional: trigger revalidation
