@@ -124,12 +124,10 @@ function transToGroupOption(options: Option[], groupBy?: string) {
         }
         groupOption[key].push(option);
     });
-    console.log(`group option`, groupOption)
     return groupOption;
 }
 
 function removePickedOption(groupOption: GroupOption, picked: Option[]) {
-    console.log(`remove picked option...`)
     const cloneOption = JSON.parse(JSON.stringify(groupOption)) as GroupOption;
 
     for (const [key, value] of Object.entries(cloneOption)) {
@@ -418,17 +416,8 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             [options, selected],
         );
 
-        // console.log(`selectables`, selectables)
-        // console.log(`options`, options)
-        // console.log(`selected`, selected)
-
-        // useEffect(() => {
-        //     console.log(`selectables`, selectables)
-        // }, [selectables])
-
         /** Avoid Creatable Selector freezing or lagging when paste a long string. */
         const commandFilter = React.useCallback(() => {
-            console.log(`filter`, commandProps)
             if (commandProps?.filter) {
                 return commandProps.filter;
             }

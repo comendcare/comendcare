@@ -2322,6 +2322,7 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
                         node: true,
                         contacts: true,
                         attachments: true,
+                        roadmap: true,
                         types: {include: {milestoneType: true}},
                         assets: {include: {asset: true}},
                         rfps: {include: {rfp: true}}
@@ -2717,6 +2718,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
+                        roadmap: true,
                         types: {include: {milestoneType: true}},
                         assets: {include: {asset: true}},
                         rfps: {include: {rfp: true}}
