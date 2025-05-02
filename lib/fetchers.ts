@@ -1333,6 +1333,35 @@ export async function getOrganizationAnalytics() {
     };
 }
 
+export async function getOrganizationChartAnalytics() {
+    const organizations = await prisma.organization.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(),
+            },
+        },
+        select: {
+            createdAt: true,
+        },
+    });
+
+    const countsByDate: Record<string, number> = {};
+
+    for (const org of organizations) {
+        const dateStr = org.createdAt.toISOString().split("T")[0]; // "YYYY-MM-DD"
+        countsByDate[dateStr] = (countsByDate[dateStr] || 0) + 1;
+    }
+
+    const chartData = Object.entries(countsByDate)
+        .map(([date, count]) => ({
+            date,
+            organizations: count,
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return chartData;
+}
+
 export async function getCompanyAndReviewAnalytics() {
     const now = new Date();
     const startOfCurrentMonth = startOfMonth(now);
