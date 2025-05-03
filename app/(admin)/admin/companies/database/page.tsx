@@ -5,6 +5,7 @@ import CROSearchBar from "@/components/cro-searchbar";
 import {CROSearchResults} from "@/components/cro-search-results";
 import {CreateCompanyDialog} from "@/components/create-company-dialog";
 import {AdminCompaniesNav} from "@/components/admin-companies-nav";
+import {AdminCROSearchResults} from "@/components/admin-cro-search-results";
 
 export default function AdminCompaniesPage() {
     return (
@@ -27,7 +28,7 @@ export default function AdminCompaniesPage() {
                     }
                 >
                     <CROSearchBar />
-                    <CROSearchResults />
+                    <AdminCROSearchResults />
                 </Suspense>
             </div>
         </div>
