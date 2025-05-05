@@ -1,7 +1,11 @@
+import { mechanisms } from '@/components/edit-condition-profile-dialog';
 import {typesense} from '@/lib/typesense';
+import { Filter } from 'customerio-node/dist/lib/types';
 import mixpanel from 'mixpanel-browser';
 import {temporal} from 'zundo';
 import {create} from 'zustand';
+import type { Option } from '@/lib/types';
+import { getExclusiveToFirstGroup } from '@/lib/utils';
 
 export type ViewType = 'grid' | 'list'
 
@@ -229,20 +233,46 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     ...get().filters,
                     ...updatedFilters
                 }
+
                 const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
                 }, true)
 
-                mixpanel.track("Marketplace Organization Filters Selected", {
-                    "Results": total,
-                    "Filters": {
-                        "Mechanisms of Action": newFilters.mechanisms.map(filter => filter.label),
-                        "Associated Systems": newFilters.systems.map(filter => filter.label),
-                        "Modalities of Interest": newFilters.modalities.map(filter => filter.label)
-                    }
-                })
+                const recentlySelected = {
+                    mechanisms: getExclusiveToFirstGroup(newFilters, get().filters, 'mechanisms'),
+                    systems: getExclusiveToFirstGroup(newFilters, get().filters, 'systems'),
+                    modalities: getExclusiveToFirstGroup(newFilters, get().filters, 'modalities')
+                }
+
+                const recentlyRemoved = {
+                    mechanisms: getExclusiveToFirstGroup(get().filters, newFilters, 'mechanisms'),
+                    systems: getExclusiveToFirstGroup(get().filters, newFilters, 'systems'),
+                    modalities: getExclusiveToFirstGroup(get().filters, newFilters, 'modalities')
+                }
+
+                if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
+                    // only track in mixpanel if something in the filters has been updated
+                    mixpanel.track("Marketplace Organization Filters Selected", {
+                        "Results": total,
+                        "Filters": {
+                            "Mechanisms of Action": newFilters.mechanisms.map(filter => filter.label),
+                            "Associated Systems": newFilters.systems.map(filter => filter.label),
+                            "Modalities of Interest": newFilters.modalities.map(filter => filter.label)
+                        },
+                        "Added": {
+                            "Mechanisms of Action": recentlySelected.mechanisms.map(filter => filter.label),
+                            "Associated Systems": recentlySelected.systems.map(filter => filter.label),
+                            "Modalities of Interest": recentlySelected.modalities.map(filter => filter.label)
+                        },
+                        "Removed": {
+                            "Mechanisms of Action": recentlyRemoved.mechanisms.map(filter => filter.label),
+                            "Associated Systems": recentlyRemoved.systems.map(filter => filter.label),
+                            "Modalities of Interest": recentlyRemoved.modalities.map(filter => filter.label)
+                        },
+                    })
+                }
 
                 set({
                     filters: newFilters,

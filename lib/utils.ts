@@ -8,6 +8,12 @@ import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 import {ImportField} from "@/lib/types";
 import Papa from "papaparse";
+import type { Option } from "@/lib/types";
+
+// get the items that are in group A but NOT in group B
+export const getExclusiveToFirstGroup = (a: {[key]: Option[]}, b: {[key]: Option[]}, key: string) => {
+    return (a?.[key] || [])?.filter((optionA: Option) => (!(b?.[key] || []).map(optionB => optionB.value).includes(optionA.value)))
+}
 
 export const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {
