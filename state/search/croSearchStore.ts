@@ -4,6 +4,7 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
 import mixpanel from 'mixpanel-browser';
+import { getExclusiveToFirstGroup } from '@/lib/utils';
 
 export const sampleCROs: any[] = [
     {
@@ -329,15 +330,44 @@ export const useCROSearchStore = create<CROSearchState>()(
                     lastFetchedPage: 1,
                 }, true)
 
-                mixpanel.track("Marketplace Service Provider Filters Selected", {
-                    "Results": total,
-                    "Filters": {
-                        "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
-                        "Business Types": newFilters.types.map(filter => filter.label),
-                        "Certifications": newFilters.certifications.map(filter => filter.label),
-                        "Categories": newFilters.categories.map(filter => filter.label)
-                    }
-                })
+                const recentlySelected = {
+                    categories: getExclusiveToFirstGroup(newFilters, get().filters, 'categories'),
+                    milestoneTypes: getExclusiveToFirstGroup(newFilters, get().filters, 'milestoneTypes'),
+                    types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
+                    certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications')
+                }
+
+                const recentlyRemoved = {
+                    categories: getExclusiveToFirstGroup(get().filters, newFilters, 'categories'),
+                    milestoneTypes: getExclusiveToFirstGroup(get().filters, newFilters, 'milestoneTypes'),
+                    types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
+                    certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications')
+                }
+
+                if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
+                    // if something has been added or removed, track as a mixpanel event
+                    mixpanel.track("Marketplace Service Provider Filters Selected", {
+                        "Results": total,
+                        "Filters": {
+                            "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
+                            "Business Types": newFilters.types.map(filter => filter.label),
+                            "Certifications": newFilters.certifications.map(filter => filter.label),
+                            "Categories": newFilters.categories.map(filter => filter.label)
+                        },
+                        "Added": {
+                            "Milestone Types": recentlySelected.milestoneTypes.map(filter => filter.label),
+                            "Business Types": recentlySelected.types.map(filter => filter.label),
+                            "Certifications": recentlySelected.certifications.map(filter => filter.label),
+                            "Categories": recentlySelected.categories.map(filter => filter.label)
+                        },
+                        "Removed": {
+                            "Milestone Types": recentlyRemoved.milestoneTypes.map(filter => filter.label),
+                            "Business Types": recentlyRemoved.types.map(filter => filter.label),
+                            "Certifications": recentlyRemoved.certifications.map(filter => filter.label),
+                            "Categories": recentlyRemoved.categories.map(filter => filter.label)
+                        },
+                    })
+                }
 
                 set({
                     filters: newFilters,
