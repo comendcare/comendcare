@@ -254,6 +254,15 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // },
 ]
 
+export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
+    {
+        id: '1',
+        label: 'Exploratory Research',
+        value: 'EXPLORATORY_RESEARCH',
+        // description: 'A therapeutic approach using adeno-associated viruses (AAV) to deliver genetic material into cells, often to correct or replace defective genes.',
+    },
+]
+
 export const MODALITIES: Option[] = [
     {
         id: '1',
@@ -340,6 +349,8 @@ export const MODALITIES: Option[] = [
         strengths: 'Flexibility to incorporate novel, interdisciplinary methods and adaptability to unique challenges.',
     },
 ]
+
+export const RESEARCH_PLAN_TYPES: Option[] = MODALITIES.concat(ADDITIONAL_RESEARCH_PLAN_TYPES)
 
 export const ASSOCIATED_SYSTEMS: Option[] = [
     {
