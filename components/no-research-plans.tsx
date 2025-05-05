@@ -64,10 +64,10 @@ export function PrivateNoResearchPlansColumn() {
     )
 }
 
-export function PublicNoResearchPlans({organizationName}: {organizationName: string | null | undefined}) {
+export function PublicNoResearchPlans({organizationName}: {organizationName?: string | null | undefined}) {
     return (
         <div className="flex flex-col items-center justify-center space-x-4 space-y-4 my-8">
-            <h1 className="font-cal text-4xl">No research plan yet</h1>
+            <h1 className="font-cal text-4xl">No research plans yet</h1>
             <Image
                 alt="No research plans"
                 src="https://illustrations.popsy.co/gray/studying.svg"
