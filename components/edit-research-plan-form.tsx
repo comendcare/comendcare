@@ -26,7 +26,7 @@ import { useShallow } from "zustand/react/shallow"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { sleep } from "@/lib/utils"
 import MultipleSelector from "./ui/multiple-selector"
-import { MODALITIES, optionSchema } from "@/lib/types"
+import { optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
 
 const editMilestoneForm = z.object({
     nodeType: z.string(),
@@ -67,7 +67,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
         defaultValues: {
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
-            modalities: MODALITIES.filter(modality => (researchPlanData?.modalities || []).includes(modality.value))
+            modalities: RESEARCH_PLAN_TYPES.filter(modality => (researchPlanData?.modalities || []).includes(modality.value))
         }
     })
 
@@ -151,7 +151,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={MODALITIES}
+                                    defaultOptions={RESEARCH_PLAN_TYPES}
                                     placeholder="Select a type..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
@@ -163,6 +163,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                     showHoverCard={false}
                                 />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />

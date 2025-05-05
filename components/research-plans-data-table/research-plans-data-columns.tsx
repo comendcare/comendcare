@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Asset, MODALITIES } from "@/lib/types"
+import { RESEARCH_PLAN_TYPES } from "@/lib/types"
 import { Button } from "../ui/button"
 import { Pin } from "lucide-react"
 import { createOrUpdateAsset } from "@/lib/actions"
@@ -53,7 +53,7 @@ export const columns: ColumnDef<Roadmap>[] = [
         ),
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">
-                {MODALITIES.filter(modality => row.original.modalities.includes(modality.value)).map(modality => (
+                {RESEARCH_PLAN_TYPES.filter(modality => row.original.modalities.includes(modality.value)).map(modality => (
                     <li>
                         <Badge variant={"secondary"}>{modality.label}</Badge>
                     </li>
