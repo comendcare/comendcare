@@ -4,14 +4,13 @@ import { useEffect, useState } from "react"
 import { RoadmapCard } from "./public-roadmap-card"
 import { PublicMilestoneDetails } from "./public-milestone-details"
 import { usePathname, useSearchParams } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) {
     const searchParams = useSearchParams()
     const pathname = usePathname()
     const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("project") || undefined)
     const [view, setView] = useState<string | undefined>(searchParams.get("view") || undefined)
-
-    console.log(`original milestone`, milestone)
 
     useEffect(() => {
         console.log(`milestone changed`, milestone)
@@ -29,7 +28,7 @@ export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdom
     
     return (
         <div className="flex flex-col-reverse md:grid md:grid-cols-2 m-auto w-full gap-4">
-            <div className="">
+            <div className={cn(!(roadmap.milestones && roadmap.milestones.length > 0) ? "col-span-full" : "")}>
                 <RoadmapCard
                     roadmap={roadmap}
                     subdomain={subdomain || undefined}
@@ -41,12 +40,14 @@ export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdom
                     setUrlView={setView}
                 />
             </div>
-            <div className="col-span-1">
-                <PublicMilestoneDetails 
-                    roadmap={roadmap}
-                    urlMilestone={milestone || null}
-                />
-            </div>
+            {roadmap.milestones && roadmap.milestones.length > 0 && (
+                <div className="col-span-1">
+                    <PublicMilestoneDetails 
+                        roadmap={roadmap}
+                        urlMilestone={milestone || null}
+                    />
+                </div>
+            )}
         </div>
     )
 }

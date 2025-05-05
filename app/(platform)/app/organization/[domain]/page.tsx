@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
 import {getOrganizationData, getConditionsDataFromOrgId, getRFPs, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapCard, RoadmapsCard} from "@/components/public-roadmap-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
@@ -12,6 +12,7 @@ import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-ass
 import Link from "next/link";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
+import { PublicNoResearchPlans } from "@/components/no-research-plans";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -125,30 +126,7 @@ export default async function OrganizationHomePage({
                                     rfps={rfps}
                                 />
                             )}
-                            {roadmaps.length > 0 ?
-                                <RoadmapCard
-                                    roadmap={roadmaps?.[0]}
-                                    subdomain={organization?.subdomain || undefined}
-                                    isPublic={true}
-                                    externalLinks={true}
-                                />
-                                : <Card>
-                                    <CardContent>
-                                        <div className="flex flex-col items-center justify-center space-x-4 my-8">
-                                            <h1 className="font-cal text-4xl">No research plan yet</h1>
-                                            <Image
-                                                alt="missing roadmap"
-                                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                                width={300}
-                                                height={300}
-                                            />
-                                            <p className="text-lg text-stone-500">
-                                                {`${organization.name} doesn't have a roadmap yet.`}
-                                            </p>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            }
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
                     </div>
 
