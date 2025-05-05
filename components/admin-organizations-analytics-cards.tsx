@@ -12,6 +12,7 @@ interface AnalyticsData {
     newOrganizationsLastMonth: number;
     activeOrganizations: number;
     growthRate: number;
+    completedProfiles: number;
 }
 
 export function AdminOrganizationsAnalyticsCards() {
@@ -79,6 +80,18 @@ export function AdminOrganizationsAnalyticsCards() {
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">
                         Organizations active in the last 30 days
+                    </div>
+                </CardFooter>
+            </Card>
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Complete Organizations</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.completedProfiles.toLocaleString()} </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Organizations completed
                     </div>
                 </CardFooter>
             </Card>

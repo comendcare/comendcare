@@ -4,10 +4,11 @@ import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse} from "@/lib/types";
-import {logError} from "@/lib/utils";
+import {ApiResponse, CustomOrganization} from "@/lib/types";
+import {getProfileCompletionChecks, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
+import {Condition} from "@prisma/client";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -1324,12 +1325,31 @@ export async function getOrganizationAnalytics() {
             ? 100
             : ((newOrganizationsThisMonth - newOrganizationsLastMonth) / newOrganizationsLastMonth) * 100;
 
+    const allOrganizations = await prisma.organization.findMany({
+        include: {
+            condition: true,
+            roadmaps: true,
+        },
+    });
+
+    let completedProfiles = 0;
+
+    for (const org of allOrganizations) {
+        let conditions: Condition[] = [];
+        const condResponse = await getConditionsFromOrganizationId(org.id);
+        if (condResponse.success) conditions = (condResponse.data ?? []) as Condition[];
+        const checks = getProfileCompletionChecks(org as any, conditions as any);
+        const isComplete = Object.values(checks).every(Boolean);
+        if (isComplete) completedProfiles++;
+    }
+
     return {
         totalOrganizations,
         newOrganizationsThisMonth,
         newOrganizationsLastMonth,
         activeOrganizations,
         growthRate,
+        completedProfiles
     };
 }
 

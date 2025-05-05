@@ -6,8 +6,41 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
-import {ImportField} from "@/lib/types";
+import {Condition, CustomOrganization, ImportField, MilestoneKey} from "@/lib/types";
 import Papa from "papaparse";
+
+export function getProfileCompletionChecks(
+    organization: CustomOrganization | null,
+    conditions: Condition[]
+): Record<MilestoneKey, boolean> {
+    return {
+        "Add website and description": Boolean(organization?.website && organization?.description),
+        "Provide financial & incorporation details": Boolean(
+            organization?.yearFounded &&
+            organization?.incorporationStatus === "YES" &&
+            typeof organization?.moneyRaised === "number" &&
+            typeof organization?.moneyDeployed === "number" &&
+            typeof organization?.researchBudget === "number"
+        ),
+        "Complete condition data": conditions.length > 0 && conditions.every(condition =>
+            Boolean(
+                condition.associatedSystems.length > 0 &&
+                condition.associatedGenes.length > 0 &&
+                condition.causalGenes.length > 0 &&
+                condition.diseaseCategories.length > 0 &&
+                condition.prevalenceNumerator !== null &&
+                condition.prevalenceDenominator !== null &&
+                condition.numberOfPatientsEngaged !== null &&
+                condition.nationalEstimatedPopulation !== null &&
+                condition.globalEstimatedPopulation !== null
+            )
+        ),
+        "Upload profile image": Boolean(organization?.image?.trim()),
+        "Upload header image": Boolean(organization?.headerImage?.trim()),
+        "Add roadmap": Array.isArray(organization?.roadmaps) && organization.roadmaps.length > 0,
+    };
+}
+
 
 export const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {
