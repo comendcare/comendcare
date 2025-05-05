@@ -181,7 +181,7 @@ export default async function ProfilePage() {
                 </main>
                 <Card className="col-span-1 flex flex-col space-y-4 h-fit">
                     <CardHeader className="flex flex-col gap-4 pb-0">
-                        <PublishOrganizationSwitch organization={organization}/>
+                        {/*<PublishOrganizationSwitch organization={organization}/>*/}
                         <BiopharmaConsentSwitch organization={organization} />
 
                         <div className="flex flex-col gap-2 pb-0">
