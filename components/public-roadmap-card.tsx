@@ -12,9 +12,15 @@ import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
 import { ExternalLink, Pencil, Plus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { columns } from "@/components/research-plans-data-table/research-plans-data-columns"
+import { ResearchPlansDataTable } from "./research-plans-data-table/research-plans-data-table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { RESEARCH_PLAN_TYPES } from "@/lib/types";
+import { Badge } from "./ui/badge";
+import { Separator } from "./ui/separator";
 
 export const RoadmapCard = ({
-    roadmap, 
+    roadmaps, 
     urlMilestone, 
     setUrlMilestone, 
     urlView,
@@ -23,7 +29,7 @@ export const RoadmapCard = ({
     isPublic,
     externalLinks
 }: { 
-    roadmap: any, 
+    roadmaps: any[], 
     urlMilestone?: string | undefined,
     setUrlMilestone?: (id: string | undefined) => void,
     urlView?: string | undefined,
@@ -35,13 +41,13 @@ export const RoadmapCard = ({
     const router = useRouter()
     const pathname = usePathname()
 
-    if (!roadmap) {
+    if (!roadmaps || roadmaps.length <= 0) {
         return <NoResearchPlanCard isPublic={isPublic} />
     }
 
-    if (roadmap?.milestones && roadmap.milestones.length <= 0) {
-        return <UnderDevelopmentCard isPublic={isPublic} />
-    }
+    // if (roadmaps?.milestones && roadmap.milestones.length <= 0) {
+    //     return <UnderDevelopmentCard isPublic={isPublic} />
+    // }
 
     return (
         <Tabs
@@ -66,18 +72,18 @@ export const RoadmapCard = ({
                             </Button>
                         }
                     </div>
-                    <TabsList className="w-min">
+                    {/* <TabsList className="w-min">
                         <TabsTrigger value="timeline">
                             Timeline View
                         </TabsTrigger>
                         <TabsTrigger value="flow">
                             Flow View
                         </TabsTrigger>
-                    </TabsList>
+                    </TabsList> */}
                 </CardHeader>
 
                 <CardContent className="px-8">
-                    <TabsContent value="timeline" className="space-y-4 w-full">
+                    {/* <TabsContent value="timeline" className="space-y-4 w-full">
                         <PublicTimelineView 
                             roadmap={roadmap} 
                             subdomain={subdomain}
@@ -96,7 +102,42 @@ export const RoadmapCard = ({
                                 externalLinks={externalLinks}
                             />
                         </div>
-                    </TabsContent>
+                    </TabsContent> */}
+                    {/* <ResearchPlansDataTable data={roadmaps} columns={columns}/> */}
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="pointer-events-none">
+                            <TableHead>Title</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead>Type</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {roadmaps.map((roadmap) => (
+                                <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => router.push(`http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`)}>
+                                    <TableCell>
+                                        <div>
+                                            {roadmap.title || 'Untitled Research Plan'}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="line-clamp-3">
+                                            {roadmap.description}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                    <ul className="flex flex-col gap-2">
+                                        {RESEARCH_PLAN_TYPES.filter(modality => roadmap.modalities.includes(modality.value)).map(modality => (
+                                            <li>
+                                                <Badge variant={"secondary"}>{modality.label}</Badge>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </Tabs>

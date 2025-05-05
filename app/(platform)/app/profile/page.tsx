@@ -142,7 +142,7 @@ export default async function ProfilePage() {
                                             rfps={rfps}
                                         />
                                         <RoadmapCard
-                                            roadmap={roadmaps[0]}
+                                            roadmaps={roadmaps}
                                             subdomain={organization?.subdomain || undefined}
                                             isPublic={false}
                                             externalLinks={true}
