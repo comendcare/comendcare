@@ -156,10 +156,11 @@ export default async function OrganizationRoadmapPage({
     }
 
     const roadmap = roadmaps.find(roadmap => roadmap.id === params.id)
+    console.log(`roadmap`, roadmap)
 
     return (
         <>
-            {roadmaps.length > 0 ? (
+            {roadmap ? (
                     <>
                         <div
                             className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left p-2"
@@ -168,11 +169,6 @@ export default async function OrganizationRoadmapPage({
                                 organization={organization}
                                 roadmap={roadmap}
                             />
-
-                            {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
-                            {/*    {roadmaps[0].title}*/}
-                            {/*</h1>*/}
-
                             <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
                                     <ProfilePhoto
                                         img={organization.image}
@@ -219,30 +215,10 @@ export default async function OrganizationRoadmapPage({
                                 </div>
                             </div>
 
-                            {/* <p>
-                                {roadmaps[0].description}
-                            </p> */}
-
-                            {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
                             <PublicRoadmapContent 
                                 roadmap={roadmap}
                                 subdomain={organization?.subdomain || undefined}
                             />
-
-                            {/*<div className="mt-8 w-full space-y-8">*/}
-                            {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}
-                            {/*        Recent activity*/}
-                            {/*    </h2>*/}
-                            {/*    <Carousel>*/}
-                            {/*        <CarouselContent className="p-4 gap-4">*/}
-                            {/*            {posts.map((post, index) => (*/}
-                            {/*                <ConditionProfileRecentActivityCard post={post} key={index}/>*/}
-                            {/*            ))}*/}
-                            {/*        </CarouselContent>*/}
-                            {/*        <CarouselPrevious/>*/}
-                            {/*        <CarouselNext/>*/}
-                            {/*    </Carousel>*/}
-                            {/*</div>*/}
                         </div>
 
                         <FloatingDock

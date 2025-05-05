@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 import { CreateEmptyResearchPlanCard, CreateResearchPlanFromTemplateCard, ResearchPlanTemplatesCard } from "@/components/roadmap-templates";
 import { ResearchPlansDataTable } from "@/components/research-plans-data-table/research-plans-data-table";
 import { columns } from "@/components/research-plans-data-table/research-plans-data-columns"
-import NoResearchPlans from "@/components/no-research-plans";
+import { PrivateNoResearchPlansRow } from "@/components/no-research-plans";
 
 export default async function RoadmapPage() {
     const session = await getSession();
@@ -37,7 +37,7 @@ export default async function RoadmapPage() {
                     <ResearchPlansDataTable data={roadmaps} columns={columns}/>
                 )}
                 {roadmaps.length === 0 && (
-                    <NoResearchPlans />
+                    <PrivateNoResearchPlansRow />
                 )}
             </div>
         </main>

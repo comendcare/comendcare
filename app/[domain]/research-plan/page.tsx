@@ -217,30 +217,10 @@ export default async function OrganizationRoadmapPage({
                                 </div>
                             </div>
 
-                            {/* <p>
-                                {roadmaps[0].description}
-                            </p> */}
-
-                            {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
                             <PublicRoadmapContent 
                                 roadmap={roadmaps[0]}
                                 subdomain={organization?.subdomain || undefined}
                             />
-
-                            {/*<div className="mt-8 w-full space-y-8">*/}
-                            {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}
-                            {/*        Recent activity*/}
-                            {/*    </h2>*/}
-                            {/*    <Carousel>*/}
-                            {/*        <CarouselContent className="p-4 gap-4">*/}
-                            {/*            {posts.map((post, index) => (*/}
-                            {/*                <ConditionProfileRecentActivityCard post={post} key={index}/>*/}
-                            {/*            ))}*/}
-                            {/*        </CarouselContent>*/}
-                            {/*        <CarouselPrevious/>*/}
-                            {/*        <CarouselNext/>*/}
-                            {/*    </Carousel>*/}
-                            {/*</div>*/}
                         </div>
 
                         <FloatingDock
