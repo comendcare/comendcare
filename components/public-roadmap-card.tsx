@@ -17,6 +17,7 @@ import { RESEARCH_PLAN_TYPES } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Organization } from "@prisma/client";
 import { PrivateNoResearchPlansColumn, PublicNoResearchPlans } from "./no-research-plans";
+import { NoProjects } from "./no-projects";
 
 export const RoadmapsCard = ({
     roadmaps,
@@ -81,11 +82,11 @@ export const RoadmapCard = ({
     externalLinks: boolean
 }) => {
     if (!roadmap) {
-        return <NoResearchPlanCard isPublic={isPublic} />
+        return <PublicNoResearchPlans />
     }
 
     if (roadmap?.milestones && roadmap.milestones.length <= 0) {
-        return <UnderDevelopmentCard isPublic={isPublic} />
+        return <NoProjectsCard isPublic={isPublic} />
     }
 
     return (
@@ -138,40 +139,7 @@ export const RoadmapCard = ({
     );
 };
 
-export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
-    return (
-        <Card className="organization-profile-tour-step4">
-            <CardContent>
-                <div className="flex flex-col items-center justify-center space-x-4 my-8">
-                    <h1 className="font-cal text-4xl">No research plan yet</h1>
-                    <Image
-                        alt="missing roadmap"
-                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                        width={300}
-                        height={300}
-                    />
-                    <p className="text-lg text-stone-500">
-                        You do not have a research plan yet. Create one to get started.
-                    </p>
-                    {!isPublic && (
-                        <a 
-                            href={"/app/research-plan"}
-                            className={cn(
-                                buttonVariants({ variant: "default" }),
-                                "h-10 mt-4"
-                            )}
-                        >
-                                <Plus />
-                                Create a research plan
-                        </a>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
-export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
+export const NoProjectsCard = ({isPublic}: {isPublic: Boolean}) => {
     const router = useRouter()
     
     return (
@@ -195,33 +163,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
             </CardHeader>
 
             <CardContent className="px-8">
-                <div className="flex flex-col items-center justify-center space-x-4 my-8 gap-2">
-                    <h1 className="font-cal text-4xl text-center">This research plan is under development</h1>
-                    <Image
-                        alt="missing roadmap"
-                        src="https://illustrations.popsy.co/gray/creative-work.svg"
-                        width={400}
-                        height={400}
-                    />
-                    <p className="text-lg text-stone-500">
-                        {isPublic 
-                            ? "This research plan does not have any public projects."
-                            : "Your research plan does not have any public projects."
-                        }
-                    </p>
-                    {!isPublic && (
-                        <Link 
-                            href={"/app/research-plan"}
-                            className={cn(
-                                buttonVariants({ variant: "default" }),
-                                "h-10"
-                            )}
-                        >
-                                <Plus />
-                                Create a project
-                        </Link>
-                    )}
-                </div>
+                <NoProjects />
             </CardContent>
         </Card>
     )

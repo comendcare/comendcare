@@ -8,7 +8,7 @@ import {
     getPublicRoadmapsForOrganization
 } from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapCard, RoadmapsCard, UnderDevelopmentCard} from "@/components/public-roadmap-card";
+import {RoadmapsCard} from "@/components/public-roadmap-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {FloatingDock} from "@/components/floating-dock";

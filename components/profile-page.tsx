@@ -11,7 +11,7 @@ import { PagProfileAboutCard } from "./pag-profile-about-card";
 import { PAGProfileConditionsCard } from "./pag-profile-conditions-card";
 // import { ProfileCompletionCard } from "./profile-completion-card";
 import { PAGProfileAssetsAndRFPsHoverableCard } from "./pag-profile-assets-and-projects-hoverable-card";
-import { NoResearchPlanCard, RoadmapCard, RoadmapsCard } from "./public-roadmap-card";
+import { RoadmapsCard } from "./public-roadmap-card";
 import { PublishOrganizationSwitch } from "./publish-organization-switch";
 import { BiopharmaConsentSwitch } from "./biopharma-consent-switch";
 import EditPagProfileSubdomainDialog from "./edit-pag-profile-subdomain-dialog";
