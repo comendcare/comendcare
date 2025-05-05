@@ -15,6 +15,7 @@ import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
+import { RoadmapsCard } from "@/components/public-roadmap-card"
 
 export async function generateMetadata({
                                            params
@@ -164,7 +165,7 @@ export default async function OrganizationRoadmapPage({
                         >
                             <PAGPublicRoadmapBreadcrumb
                                 organization={organization}
-                                roadmap={roadmaps[0]}
+                                roadmap={undefined}
                             />
 
                             {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
@@ -217,10 +218,7 @@ export default async function OrganizationRoadmapPage({
                                 </div>
                             </div>
 
-                            <PublicRoadmapContent 
-                                roadmap={roadmaps[0]}
-                                subdomain={organization?.subdomain || undefined}
-                            />
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
 
                         <FloatingDock

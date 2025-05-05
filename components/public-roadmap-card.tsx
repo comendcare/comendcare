@@ -34,7 +34,7 @@ export const RoadmapsCard = ({
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                     <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                        Research Plan
+                        Research Plans
                     </CardTitle>
                     {pathname === "/app/profile" &&
                         <Button
