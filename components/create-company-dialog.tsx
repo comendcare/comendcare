@@ -56,6 +56,7 @@ type CreateCompanyFormValues = z.infer<typeof formSchema>
 
 export function CreateCompanyDialog() {
     const [loading, setLoading] = useState(false)
+    const [open, setOpen] = useState(false)
 
     const handleAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/services?search=${encodeURIComponent(query || "")}`);
@@ -102,6 +103,7 @@ export function CreateCompanyDialog() {
             if (response.success) {
                 toast.success("Company created successfully")
                 form.reset()
+                setOpen(false)
             } else {
                 toast.error(response.error || "An error occurred while creating the company.")
             }
@@ -114,7 +116,7 @@ export function CreateCompanyDialog() {
     }
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>Create New Company</Button>
             </DialogTrigger>

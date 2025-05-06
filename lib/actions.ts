@@ -12,7 +12,7 @@ import {
     TaskStakeholder, Invitation,
     PlatformNotification,
     Review,
-    SavedCompany
+    SavedCompany, Company
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -3615,7 +3615,7 @@ export const createCompany = async (formData: FormData) => {
                 ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
                 : process.env.TYPESENSE_ADMIN_API_KEY!,
             company,
-            "organizations"
+            "companies"
         )
 
         // Optional: trigger revalidation
@@ -3625,5 +3625,37 @@ export const createCompany = async (formData: FormData) => {
     } catch (error: any) {
         console.error("Error creating company:", error)
         return { success: false, error: "Database error. Please try again later." }
+    }
+}
+
+export async function deleteCompany(company: Company) {
+    try {
+        const deleteCompany = prisma.company.delete({
+            where: {id: company.id},
+        });
+
+        const deleteTypeSense = deleteTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
+            company.id,
+            'companies'
+        );
+
+        // Run both deletions concurrently
+        const [response] = await Promise.all([deleteCompany, deleteTypeSense])
+
+        if (!response) {
+            console.error("Error deleting company.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error deleting company:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }

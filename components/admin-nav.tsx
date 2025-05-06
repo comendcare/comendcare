@@ -123,12 +123,12 @@ export default function AdminNav({children}: { children: ReactNode }) {
                 isActive: segments[0] === "organizations",
                 icon: <Globe width={18}/>
             },
-            {
-                name: "Research Plans",
-                href: "/admin/research-plans",
-                isActive: segments[0] === "research-plans",
-                icon: <FlaskConical width={18}/>
-            },
+            // {
+            //     name: "Research Plans",
+            //     href: "/admin/research-plans",
+            //     isActive: segments[0] === "research-plans",
+            //     icon: <FlaskConical width={18}/>
+            // },
             {
                 name: "Companies",
                 href: "/admin/companies",
