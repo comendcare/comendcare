@@ -23,9 +23,8 @@ export const useAssetStore = create<AssetState>()(
             },
             createAsset: async (asset: Partial<Asset>, orgId: string) => {
                 const newAsset = await createOrUpdateAsset(asset, orgId)
-                console.log(`new asset`, newAsset)
 
-                mixpanel.track("Asset Created", {
+                mixpanel.track("Tool Created", {
                     "ID": newAsset.id,
                     "Name": newAsset.title,
                     "Linked Milestones": (newAsset?.milestones || []).map(({ milestone }) => milestone),
@@ -36,16 +35,16 @@ export const useAssetStore = create<AssetState>()(
                     )
                 })
 
-                // new Asset first, because Assets are displayed in decending order by creation date
+                // new Tool first, because Tools are displayed in decending order by creation date
                 set({ assets: [newAsset, ...get().assets]})
             },
             updateAsset: async (asset: Partial<Asset>, orgId: string) => {
                 const updatedAsset = await createOrUpdateAsset(asset, orgId)
                 console.log(`updated asset`, updatedAsset)
 
-                mixpanel.track("Asset Updated", {
+                mixpanel.track("Tool Updated", {
                     "ID": updatedAsset.id,
-                    "Asset Name": updatedAsset.title,
+                    "Tool Name": updatedAsset.title,
                     "Linked Milestones": (updatedAsset?.milestones || []).map(({ milestone }) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
@@ -57,11 +56,10 @@ export const useAssetStore = create<AssetState>()(
             },
             deleteAsset: async (assetId: string) => {
                 const deletedAsset = await deleteAsset(assetId)
-                console.log(`deleted asset`, deletedAsset)
 
-                mixpanel.track("Asset Deleted", {
+                mixpanel.track("Tool Deleted", {
                     "ID": deletedAsset.id,
-                    "Asset Name": deletedAsset.title,
+                    "Tool Name": deletedAsset.title,
                     "Linked Milestones": (deletedAsset?.milestones || []).map(({ milestone }) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed

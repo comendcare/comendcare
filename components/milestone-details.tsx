@@ -113,7 +113,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 {milestone.assets && milestone.assets.length > 0 && (
                     <div className="flex flex-col gap-4">
                         <Separator/>
-                        <h2 className="font-semibold text-xl">{`Assets`}</h2>
+                        <h2 className="font-semibold text-xl">{`Tools`}</h2>
                         <Table>
                             <TableHeader>
                                 <TableRow>

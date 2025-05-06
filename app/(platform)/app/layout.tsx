@@ -227,7 +227,7 @@ export default function AppLayout({children}: AppLayoutProps) {
             let assetResponse = await getAssets(session.user.organizationId)
             if (assetResponse.success) {
                 initializeAssetsStore(assetResponse.data || [])
-                console.log(`Assets initialized...`)
+                console.log(`Tools initialized...`)
             } else {
                 console.error(assetResponse.error)
                 toast.error(assetResponse.error)

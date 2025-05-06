@@ -498,7 +498,7 @@ export async function getAssets(organizationId: string | undefined) {
         })
 
         if (!fetchedAssets) {
-            return {success: false, error: "assets not found"}
+            return {success: false, error: "tools not found"}
         }
 
         return {
@@ -506,7 +506,7 @@ export async function getAssets(organizationId: string | undefined) {
             data: fetchedAssets
         }
     } catch (error: any) {
-        logError("Error fetching assets", error);
+        logError("Error fetching tools", error);
         return {success: false, error: "Internal server error"};
     }
 }

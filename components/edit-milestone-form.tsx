@@ -549,7 +549,7 @@ export function EditMilestoneForm({
 
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
 
-                                    <FormLabel>Linked Assets</FormLabel>
+                                    <FormLabel>Linked Tools</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="assets"
@@ -563,7 +563,7 @@ export function EditMilestoneForm({
                                                         options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
                                                         hidePlaceholderWhenSelected={true}
                                                         showHoverCard={false}
-                                                        placeholder="Link assets"
+                                                        placeholder="Link tools"
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                 no results found.
