@@ -241,8 +241,8 @@ model Milestone {
   timelineOrder    Int                        @default(0)
   nodeType         String                     @default("PROJECT")
 
-  assets AssetToMilestone[]
-  rfps   RFPToMilestone[]
+  tools ToolToMilestone[]
+  rfps  RFPToMilestone[]
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -255,12 +255,12 @@ model Milestone {
   savedCompanies SavedCompany[]
 }
 
-model Asset {
+model Tool {
   id        String   @id @unique @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  title       String               @default("Untitled Asset")
+  title       String               @default("Untitled Tool")
   description String?
   contacts    ExternalContact[]
   attachments ExternalAttachment[]
@@ -268,19 +268,19 @@ model Asset {
   pinned      Boolean              @default(false)
 
   organizationId String?
-  organization   Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  milestones     AssetToMilestone[]
+  organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones     ToolToMilestone[]
 }
 
-model AssetToMilestone {
+model ToolToMilestone {
   id          String @id @default(uuid())
-  assetId     String
+  toolId      String
   milestoneId String
 
-  asset     Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  tool      Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
   milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
 
-  @@unique([assetId, milestoneId])
+  @@unique([toolId, milestoneId])
 }
 
 model RFP {
@@ -418,8 +418,8 @@ model ExternalAttachment {
   name String?
   link String
 
-  assetId     String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
+  toolId      String?
+  Tool        Tool?      @relation(fields: [toolId], references: [id])
   RFPId       String?
   RFP         RFP?       @relation(fields: [RFPId], references: [id])
   milestoneId String?
@@ -433,8 +433,8 @@ model ExternalContact {
   email       String
   affiliation String?
 
-  assetId     String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
+  toolId      String?
+  Tool        Tool?      @relation(fields: [toolId], references: [id])
   RFPId       String?
   RFP         RFP?       @relation(fields: [RFPId], references: [id])
   milestoneId String?
@@ -501,7 +501,7 @@ model Organization {
   PlatformNotification      PlatformNotification[]
   reviews                   Review[]
   savedCompanies            SavedCompany[]
-  Asset                     Asset[]
+  Tool                      Tool[]
   RFP                       RFP[]
 
   @@index([userId])
@@ -536,7 +536,7 @@ model Condition {
   associatedSystems           String[]
   associatedSignsAndSymptoms  String[]
   existingDatabasesAndStudies String[]
-  assetsUnderDevelopment      String[]
+  toolsUnderDevelopment       String[]
   createdAt                   DateTime                  @default(now())
   updatedAt                   DateTime                  @updatedAt
   gardURL                     String?
@@ -555,7 +555,7 @@ model ConditionToOrganization {
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([conditionId, organizationId])
 }

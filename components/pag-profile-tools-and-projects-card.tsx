@@ -95,7 +95,7 @@ const milestones = [
     // {text: "FDA orphan drug status approved"}
 ]
 
-export const PAGProfileAssetsAndProjectsCard = () => {
+export const PAGProfileToolsAndProjectsCard = () => {
     faker.seed(123)
     const router = useRouter();
 
@@ -119,7 +119,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                 <div className="flex flex-col space-y-4">
                     <span className="flex gap-2">
                         <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                            {`Assets`}
+                            {`Tools`}
                         </h3>
                         {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
                             <Tooltip>

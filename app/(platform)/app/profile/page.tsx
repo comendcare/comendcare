@@ -4,9 +4,9 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Link from "next/link";
 import prisma from "@/lib/prisma"
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId, getPublicToolsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
-import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import { PAGProfileToolsAndRFPsHoverableCard } from "@/components/pag-profile-tools-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PAGBannerPhoto} from "@/components/pag-banner-photo";
 import {NoResearchPlanCard, RoadmapCard} from "@/components/public-roadmap-card";
@@ -47,9 +47,9 @@ export default async function ProfilePage() {
     }
 
     if (organization && organization?.subdomain) {
-        const [roadmaps, assets, rfps] = await Promise.all([
+        const [roadmaps, tools, rfps] = await Promise.all([
             getPublicRoadmapsForOrganization(organization.subdomain),
-            getPublicAssetsForOrganization(organization.subdomain),
+            getPublicToolsForOrganization(organization.subdomain),
             getPublicRFPsForOrganization(organization.subdomain)
         ])
 
@@ -132,28 +132,13 @@ export default async function ProfilePage() {
                                             isPrivate={true}
                                         />
                                     </div>
-                                    {/*<PAGProfileAssetsCard/>*/}
-                                    {/*<PAGProfileOpenRFPsCard/>*/}
                                 </div>
                                 <div className="col-span-4 space-y-4">
-                                    {/*<Tabs defaultValue="roadmap" className="w-full">*/}
-                                    {/*    <TabsList className="grid w-full grid-cols-2">*/}
-                                    {/*        <TabsTrigger value="roadmap">*/}
-                                    {/*            Roadmap*/}
-                                    {/*        </TabsTrigger>*/}
-                                    {/*        <TabsTrigger*/}
-                                    {/*            value="activity"*/}
-                                    {/*            className="organization-profile-tour-step6"*/}
-                                    {/*        >*/}
-                                    {/*            Activity*/}
-                                    {/*        </TabsTrigger>*/}
-                                    {/*    </TabsList>*/}
-                                    {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
                                     <ProfileCompletionCard/>
                                     <div className="flex flex-col gap-4 relative">
-                                        <PAGProfileAssetsAndRFPsHoverableCard
+                                        <PAGProfileToolsAndRFPsHoverableCard
                                             isPrivate={true}
-                                            assets={assets}
+                                            tools={tools}
                                             rfps={rfps}
                                         />
                                         <RoadmapCard

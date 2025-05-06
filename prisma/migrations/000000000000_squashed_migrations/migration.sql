@@ -179,7 +179,7 @@ CREATE TABLE "Milestone" (
     "type" TEXT NOT NULL DEFAULT 'NOTYPE',
     "otherTypeDetails" TEXT,
     "RFPId" TEXT,
-    "assetId" TEXT,
+    "toolId" TEXT,
     "organizationId" TEXT NOT NULL,
 
     CONSTRAINT "Milestone_pkey" PRIMARY KEY ("id")
@@ -268,14 +268,14 @@ CREATE TABLE "RFP" (
 );
 
 -- CreateTable
-CREATE TABLE "Asset" (
+CREATE TABLE "Tool" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Asset_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Tool_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -284,7 +284,7 @@ CREATE TABLE "ExternalAttachment" (
     "name" TEXT,
     "link" TEXT NOT NULL,
     "rFPId" TEXT,
-    "assetId" TEXT,
+    "toolId" TEXT,
     "milestoneId" TEXT,
 
     CONSTRAINT "ExternalAttachment_pkey" PRIMARY KEY ("id")
@@ -297,7 +297,7 @@ CREATE TABLE "ExternalContact" (
     "role" TEXT,
     "email" TEXT NOT NULL,
     "rFPId" TEXT,
-    "assetId" TEXT,
+    "toolId" TEXT,
 
     CONSTRAINT "ExternalContact_pkey" PRIMARY KEY ("id")
 );
@@ -382,7 +382,7 @@ CREATE TABLE "Condition" (
     "associatedSystems" TEXT[],
     "associatedSignsAndSymptoms" TEXT[],
     "existingDatabasesAndStudies" TEXT[],
-    "assetsUnderDevelopment" TEXT[],
+    "toolsUnderDevelopment" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "gardURL" TEXT,
@@ -578,7 +578,7 @@ CREATE UNIQUE INDEX "ChecklistItem_id_key" ON "ChecklistItem"("id");
 CREATE UNIQUE INDEX "RFP_id_key" ON "RFP"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Asset_id_key" ON "Asset"("id");
+CREATE UNIQUE INDEX "Tool_id_key" ON "Tool"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ExternalAttachment_id_key" ON "ExternalAttachment"("id");
@@ -662,7 +662,7 @@ ALTER TABLE "Node" ADD CONSTRAINT "Node_roadmapId_fkey" FOREIGN KEY ("roadmapId"
 ALTER TABLE "Milestone" ADD CONSTRAINT "Milestone_RFPId_fkey" FOREIGN KEY ("RFPId") REFERENCES "RFP"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Milestone" ADD CONSTRAINT "Milestone_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Milestone" ADD CONSTRAINT "Milestone_toolId_fkey" FOREIGN KEY ("toolId") REFERENCES "Tool"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Milestone" ADD CONSTRAINT "Milestone_nodeId_fkey" FOREIGN KEY ("nodeId") REFERENCES "Node"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -695,7 +695,7 @@ ALTER TABLE "TaskStakeholder" ADD CONSTRAINT "TaskStakeholder_userId_fkey" FOREI
 ALTER TABLE "ChecklistItem" ADD CONSTRAINT "ChecklistItem_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ExternalAttachment" ADD CONSTRAINT "ExternalAttachment_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ExternalAttachment" ADD CONSTRAINT "ExternalAttachment_toolId_fkey" FOREIGN KEY ("toolId") REFERENCES "Tool"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ExternalAttachment" ADD CONSTRAINT "ExternalAttachment_milestoneId_fkey" FOREIGN KEY ("milestoneId") REFERENCES "Milestone"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -704,7 +704,7 @@ ALTER TABLE "ExternalAttachment" ADD CONSTRAINT "ExternalAttachment_milestoneId_
 ALTER TABLE "ExternalAttachment" ADD CONSTRAINT "ExternalAttachment_rFPId_fkey" FOREIGN KEY ("rFPId") REFERENCES "RFP"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ExternalContact" ADD CONSTRAINT "ExternalContact_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ExternalContact" ADD CONSTRAINT "ExternalContact_toolId_fkey" FOREIGN KEY ("toolId") REFERENCES "Tool"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ExternalContact" ADD CONSTRAINT "ExternalContact_rFPId_fkey" FOREIGN KEY ("rFPId") REFERENCES "RFP"("id") ON DELETE SET NULL ON UPDATE CASCADE;

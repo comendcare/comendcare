@@ -126,7 +126,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 associatedSystems: values.systems?.map((item) => item.label) || [],
                 associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
                 existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
-                assetsUnderDevelopment: values.assets?.map((item) => item.label) || [],
+                toolsUnderDevelopment: values.tools?.map((item) => item.label) || [],
             };
 
             // Add mapped data to FormData

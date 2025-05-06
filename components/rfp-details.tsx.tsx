@@ -12,7 +12,7 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
         contacts: true,
         attachments: true,
         types: { include: { milestoneType: true } }
-        assets: { include: { asset: true } },
+        tools: { include: { tool: true } },
         rfps: { include: { rfp: true } }
     }
 }>
@@ -83,18 +83,18 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic?: b
         // <>
         //     <Card>
         //         <CardHeader>
-        //             <CardTitle>{asset.name}</CardTitle>
-        //             <CardDescription>{asset.description}</CardDescription>
+        //             <CardTitle>{tool.name}</CardTitle>
+        //             <CardDescription>{tool.description}</CardDescription>
         //         </CardHeader>
 
         //         <CardContent className="flex flex-col gap-4">
 
-        //             {asset.contacts && asset.contacts.length > 0 && (
+        //             {tool.contacts && tool.contacts.length > 0 && (
         //                 <div className="flex flex-col gap-4">
         //                     <Separator />
         //                     <h2 className="font-semibold text-xl">{`Contacts`}</h2>
         //                     <ol>
-        //                         {asset.contacts.map((contact: any, index: number) => (
+        //                         {tool.contacts.map((contact: any, index: number) => (
         //                             <li>
         //                                 {`${index + 1}. ${contact.name || contact.email}`}
         //                             </li>
@@ -103,12 +103,12 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic?: b
         //                 </div>
         //             )}
 
-        //             {asset.attachments && asset.attachments.length > 0 && (
+        //             {tool.attachments && tool.attachments.length > 0 && (
         //                 <div className="flex flex-col gap-4">
         //                     <Separator />
         //                     <h2 className="font-semibold text-xl">{`Attachments`}</h2>
         //                     <ol>
-        //                         {asset.attachments.map((attachment: any, index: number) => (
+        //                         {tool.attachments.map((attachment: any, index: number) => (
         //                             <li>
         //                                 <a
         //                                     href={attachment.link}

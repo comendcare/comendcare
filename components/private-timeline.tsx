@@ -347,10 +347,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         )
                     }
                 })}
-                {(milestoneData?.assets || []).map((asset, index) => (
+                {(milestoneData?.tools || []).map((tool, index) => (
                     <li key={index}>
                         <PropertyBadge icon={Star}>
-                            <p>{asset.asset?.title}</p>
+                            <p>{tool.tool?.title}</p>
                         </PropertyBadge>
                     </li>
                 ))}

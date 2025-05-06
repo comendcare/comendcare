@@ -15,7 +15,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
             {/* {type === "ASSET" && (
                 <>
                     <Star className="h-5 w-5"/>
-                    {!iconOnly && "Asset"}
+                    {!iconOnly && "Tool"}
                 </>
             )}
             {type === "PROJECT" && (

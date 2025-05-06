@@ -18,13 +18,13 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {Asset} from "@/lib/types";
+import {Tool} from "@/lib/types";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>
 }
 
-export function DataTableRowActions<TData extends Asset>({row}: DataTableRowActionsProps<TData>) {
+export function DataTableRowActions<TData extends Tool>({row}: DataTableRowActionsProps<TData>) {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -55,13 +55,13 @@ export function DataTableRowActions<TData extends Asset>({row}: DataTableRowActi
             {/* <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Edit an Asset
+                        Edit an Tool
                     </DialogTitle>
                     <DialogDescription>
-                        {`Edit your Asset here. Click save when you're done.`}
+                        {`Edit your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={{...row.original}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditToolForm toolData={{...row.original}} closeDialog={closeDialog} numToolsPinned={numToolsPinned}/>
             </DialogContent> */}
         </Dialog>
     )

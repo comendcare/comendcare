@@ -80,9 +80,9 @@ const config: Config = {
     				DEFAULT: 'hsl(var(--highlight))',
     				foreground: 'hsl(var(--highlight-foreground))'
     			},
-				asset: {
-    				DEFAULT: 'hsl(var(--asset))',
-    				foreground: 'hsl(var(--asset-foreground))'
+				tool: {
+    				DEFAULT: 'hsl(var(--tool))',
+    				foreground: 'hsl(var(--tool-foreground))'
     			},
 				project: {
     				DEFAULT: 'hsl(var(--project))',

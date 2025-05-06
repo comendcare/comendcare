@@ -28,12 +28,12 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     const nodeTypeCount = countPublicNodeTypes(organization.Milestone)
     // const nodeTypeCount = {
     //     "PROJECT": (organization.Milestone || []).filter((item: any) => !item.private).length,
-    //     "ASSET": (organization.Asset || []).filter((item: any) => !item.private).length,
+    //     "ASSET": (organization.Tool || []).filter((item: any) => !item.private).length,
     //     "RFP": (organization.RFP || []).filter((item: any) => !item.private).length
     // }
 
     const nodeTypeLabels = [
-        {key: "ASSET", icon: Star, label: "Asset"},
+        {key: "ASSET", icon: Star, label: "Tool"},
         {key: "RFP", icon: Megaphone, label: "RFP"},
         {key: "PROJECT", icon: FileText, label: "Project"}
     ];

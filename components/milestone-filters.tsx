@@ -36,7 +36,7 @@ const filtersFormSchema = z.object({
     milestoneStatus: z.array(z.string()),
     nodeType: z.array(z.string())
     // hasProject: z.boolean(),
-    // hasAsset: z.boolean()
+    // hasTool: z.boolean()
 })
 
 export function MilestoneFilters() {

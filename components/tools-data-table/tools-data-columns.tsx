@@ -4,10 +4,10 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Asset } from "@/lib/types"
+import { Tool } from "@/lib/types"
 import { Button } from "../ui/button"
 import { Pin } from "lucide-react"
-import { createOrUpdateAsset } from "@/lib/actions"
+import { createOrUpdateTool } from "@/lib/actions"
 
 interface CustomColumnMeta {
     name?: string;
@@ -17,9 +17,9 @@ declare module "@tanstack/react-table" {
     interface ColumnMeta<TData, TValue> extends CustomColumnMeta {}
 }
 
-export const columns: ColumnDef<Asset>[] = [
+export const columns: ColumnDef<Tool>[] = [
     {
-        accessorKey: "asset.title",
+        accessorKey: "tool.title",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Name" />
         ),
@@ -32,7 +32,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Name" }
     },
     {
-        accessorKey: "asset.description",
+        accessorKey: "tool.description",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Description" />
         ),
@@ -45,7 +45,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Description" }
     },
     {
-        accessorKey: "asset.private",
+        accessorKey: "tool.private",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Visibility" />
         ),
@@ -58,7 +58,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Private" }
     },
     {
-        accessorKey: "asset.milestones",
+        accessorKey: "tool.milestones",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Linked Projects" />
         ),
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Linked Projects" }
     },
     {
-        accessorKey: "asset.contacts",
+        accessorKey: "tool.contacts",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Contacts" />
         ),
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Contacts" }
     },
     {
-        accessorKey: "asset.links",
+        accessorKey: "tool.links",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Links" />
         ),
@@ -109,7 +109,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Links" }
     },
     {
-        accessorKey: "asset.pinned",
+        accessorKey: "tool.pinned",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Pinned"/>
         ),

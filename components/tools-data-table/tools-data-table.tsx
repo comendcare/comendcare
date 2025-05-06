@@ -19,15 +19,15 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import { Asset } from "@/lib/types"
-import { EditAssetDialog } from "../edit-asset-dialog"
+import { Tool } from "@/lib/types"
+import { EditToolDialog } from "../edit-tool-dialog"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
 
-export function AssetsDataTable<TData, TValue>({
+export function ToolsDataTable<TData, TValue>({
                                              columns,
                                              data,
                                          }: DataTableProps<TData, TValue>) {
@@ -87,9 +87,9 @@ export function AssetsDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <EditAssetDialog 
-                                    data={{...row.original} as Partial<Asset>} 
-                                    numAssetsPinned={table.getRowModel().rows.filter(asset => ({...asset.original} as Partial<Asset>).pinned).length}
+                                <EditToolDialog 
+                                    data={{...row.original} as Partial<Tool>} 
+                                    numToolsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Tool>).pinned).length}
                                 >
                                     <TableRow
                                         key={row.id}
@@ -104,7 +104,7 @@ export function AssetsDataTable<TData, TValue>({
                                             </TableCell>
                                         ))}
                                     </TableRow>
-                                </EditAssetDialog>
+                                </EditToolDialog>
                             ))
                         ) : (
                             <TableRow>

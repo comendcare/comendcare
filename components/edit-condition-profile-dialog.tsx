@@ -59,7 +59,7 @@ export const optionSchema = z.object({
 //     biomarkers: z.array(optionSchema).optional(),
 //     symptoms: z.array(optionSchema).optional(),
 //     studies: z.array(optionSchema).optional(),
-//     assets: z.array(optionSchema).optional(),
+//     tools: z.array(optionSchema).optional(),
 // })
 
 export const CONDITION_MECHANISM_OPTIONS: Option[] = [
@@ -282,7 +282,7 @@ export const MILESTONE_STATUS_OPTIONS: string[] = [
 
 export const MILESTONE_OUTCOME_OPTIONS: string[] = [
     'Publication',
-    'Asset',
+    'Tool',
     'Data',
     'Decision',
 ]
@@ -763,16 +763,16 @@ export default function EditConditionProfileDialog() {
 
                     <FormField
                         control={conditionProfileForm.control}
-                        name="assets"
+                        name="tools"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Assets under development</FormLabel>
-                                <FormDescription>{`Does your disorder have any existing or assets under development?`}</FormDescription>
+                                <FormLabel>Tools under development</FormLabel>
+                                <FormDescription>{`Does your disorder have any existing or tools under development?`}</FormDescription>
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
                                         defaultOptions={OPTIONS}
-                                        placeholder="Select the assets that apply to you..."
+                                        placeholder="Select the tools that apply to you..."
                                         hidePlaceholderWhenSelected={true}
                                         creatable
                                         emptyIndicator={

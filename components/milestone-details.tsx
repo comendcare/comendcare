@@ -29,7 +29,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { PrivateBadge } from "./private-badge"
-import { AssetDetails, RFPDetails } from "./pag-profile-assets-and-projects-hoverable-card"
+import { ToolDetails, RFPDetails } from "./pag-profile-tools-and-projects-hoverable-card"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
@@ -110,10 +110,10 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     </div>
                 )}
 
-                {milestone.assets && milestone.assets.length > 0 && (
+                {milestone.tools && milestone.tools.length > 0 && (
                     <div className="flex flex-col gap-4">
                         <Separator/>
-                        <h2 className="font-semibold text-xl">{`Assets`}</h2>
+                        <h2 className="font-semibold text-xl">{`Tools`}</h2>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -123,23 +123,23 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {milestone.assets?.map((asset: any) => asset.asset)?.map((asset: any) => (
+                                {milestone.tools?.map((tool: any) => tool.tool)?.map((tool: any) => (
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <TableRow key={asset.id} className="cursor-pointer">
+                                            <TableRow key={tool.id} className="cursor-pointer">
                                                 <TableCell>
                                                     <div>
-                                                        {asset.title} {asset.private && <PrivateBadge iconOnly={true} />}
+                                                        {tool.title} {tool.private && <PrivateBadge iconOnly={true} />}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="line-clamp-3">
-                                                        {asset.description}
+                                                        {tool.description}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
                                                     <ul className="flex flex-col gap-2">
-                                                        {asset.contacts?.map((contact: any, index: number) => (
+                                                        {tool.contacts?.map((contact: any, index: number) => (
                                                             <li key={index}>
                                                                 {contact.name || contact.email || contact.affiliation}
                                                             </li>
@@ -149,7 +149,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                                             </TableRow>
                                         </DialogTrigger>
                                         <DialogContent>
-                                            <AssetDetails asset={asset} />
+                                            <ToolDetails tool={tool} />
                                         </DialogContent>
                                     </Dialog>
                                 ))}
