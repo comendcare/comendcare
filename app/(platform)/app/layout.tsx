@@ -8,21 +8,19 @@ import {useEffect, useRef} from "react";
 import Image from "next/image"
 import logo from "@/public/logo-square.png"
 import {useState} from "react";
-import {Member, Milestone, MilestoneType, Organization} from "@prisma/client";
-import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
+import {Member, Organization} from "@prisma/client";
+import {redirect, usePathname, useSearchParams} from "next/navigation";
 import Loading from "@/app/loading";
 import {
     getAllNotifications,
     getAssets,
-    getColumns,
-    getKanbanFromOrganizationId,
     getMilestoneTypes,
     getNodesEdgesAndMilestones,
     getRFPs,
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeAssetsStore, initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban, createRoadmap } from "@/lib/actions";
@@ -195,7 +193,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 }
         
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
-                const urlNode = searchParams.get("milestone")
+                const urlNode = searchParams.get("project")
                 const urlView = searchParams.get("view")
                 if (nodesResponse.success) {
                     initializeRoadmapState({

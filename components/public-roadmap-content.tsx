@@ -8,7 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) {
     const searchParams = useSearchParams()
     const pathname = usePathname()
-    const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("milestone") || undefined)
+    const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("project") || undefined)
     const [view, setView] = useState<string | undefined>(searchParams.get("view") || undefined)
 
     console.log(`original milestone`, milestone)
@@ -18,9 +18,9 @@ export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdom
         const params = new URLSearchParams(searchParams.toString())
 
         params.delete("view")
-        params.delete("milestone")
+        params.delete("project")
         if (view) params.set("view", view)
-        if (milestone) params.set("milestone", milestone)
+        if (milestone) params.set("project", milestone)
 
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`

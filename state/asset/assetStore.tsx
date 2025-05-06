@@ -27,10 +27,10 @@ export const useAssetStore = create<AssetState>()(
                 mixpanel.track("Tool Created", {
                     "ID": newAsset.id,
                     "Name": newAsset.title,
-                    "Linked Milestones": (newAsset?.milestones || []).map(({ milestone }) => milestone),
+                    "Linked Projects": (newAsset?.milestones || []).map(({ milestone }) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
-                    "Linked Milestone Types": (newAsset?.milestones || []).flatMap(({ milestone }) =>
+                    "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }) =>
                         (milestone?.types || []).map(type => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
@@ -45,10 +45,10 @@ export const useAssetStore = create<AssetState>()(
                 mixpanel.track("Tool Updated", {
                     "ID": updatedAsset.id,
                     "Tool Name": updatedAsset.title,
-                    "Linked Milestones": (updatedAsset?.milestones || []).map(({ milestone }) => milestone),
+                    "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
-                    "Linked Milestone Types": (updatedAsset?.milestones || []).flatMap(({ milestone }) =>
+                    "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }) =>
                         (milestone?.types || []).map(type => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
@@ -60,10 +60,10 @@ export const useAssetStore = create<AssetState>()(
                 mixpanel.track("Tool Deleted", {
                     "ID": deletedAsset.id,
                     "Tool Name": deletedAsset.title,
-                    "Linked Milestones": (deletedAsset?.milestones || []).map(({ milestone }) => milestone),
+                    "Linked Projects": (deletedAsset?.milestones || []).map(({ milestone }) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
-                    "Linked Milestone Types": (deletedAsset?.milestones || []).flatMap(({ milestone }) =>
+                    "Linked Project Types": (deletedAsset?.milestones || []).flatMap(({ milestone }) =>
                         (milestone?.types || []).map(type => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
