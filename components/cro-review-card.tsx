@@ -173,10 +173,6 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
         try {
             const response = await submitFeedback(review.id, session.user.id, isHelpful)
 
-            // mixpanel.track("Service Provider Review Submitted", {
-            //     "Title": 
-            // })
-
             if (response.success) {
                 toast.success("Thanks for your feedback!");
             } else {

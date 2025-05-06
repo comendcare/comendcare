@@ -12,6 +12,7 @@ import {TimelineCardContents} from "./private-timeline"
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {ExternalLink} from "lucide-react"
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -71,7 +72,7 @@ const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {
                         ''
                 }
                 onClick={() => {
-                    mixpanel.track("Project Details Viewed", {
+                    mixpanelTrack("Project Details Viewed", {
                         "ID": item?.id,
                         "Title": item?.title,
                         "Types": (item?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),
@@ -102,7 +103,7 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
             <button
                 className={cn("hover:cursor-pointer text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
                 onClick={() => {
-                    mixpanel.track("Project Details Viewed", {
+                    mixpanelTrack("Project Details Viewed", {
                         "ID": item?.id,
                         "Title": item?.title,
                         "Types": (item?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),

@@ -76,7 +76,7 @@ export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPubl
                                 </div>
                             ): (
                                 <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                    <p>No contacts provided for this asset</p>
+                                    <p>No contacts provided for this tool</p>
                                 </div>
                             )}
                         </div>

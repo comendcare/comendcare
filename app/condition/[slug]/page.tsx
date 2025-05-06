@@ -417,7 +417,7 @@ export default async function ConditionPage({
 
                 <div className="w-full space-y-8">
                     <h2 className="text-center text-3xl md:text-4xl font-bold">
-                        Associated Assets
+                        Associated Tools
                     </h2>
                     <Carousel>
                         <CarouselContent className="p-4">
@@ -426,9 +426,9 @@ export default async function ConditionPage({
                                     <CardContent
                                         className="flex flex-col items-center justify-center p-6 text-center">
                                         <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
-                                        <h3 className="text-lg font-semibold mb-2">No assets</h3>
+                                        <h3 className="text-lg font-semibold mb-2">No tools</h3>
                                         <p className="text-sm text-gray-500">
-                                            {`We don't have any assets yet.`}
+                                            {`We don't have any tools yet.`}
                                         </p>
                                     </CardContent>
                                 </Card> :

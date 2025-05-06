@@ -10,6 +10,7 @@ import { getConditionsFromOrganizationId, getOrganizationFromOrganizationId } fr
 import {PrivateBadge} from "@/components/private-badge";
 import { Banknote, File, Globe, Image, Map } from "lucide-react";
 import { ProfileCompletionMixpanelTrack } from "./profile-completion-track";
+import {getProfileCompletionChecks} from "@/lib/utils";
 
 // Define the possible milestone keys explicitly
 type MilestoneKey =
@@ -88,35 +89,7 @@ export async function ProfileCompletionCard() {
         if (condResponse.success) conditions = (condResponse.data ?? []) as Condition[];
     }
 
-    const checks: Record<MilestoneKey, boolean> = {
-        "Add website and description": Boolean(organization?.website && organization?.description),
-        "Provide financial & incorporation details": Boolean(
-            organization?.yearFounded &&
-            organization?.incorporationStatus === "YES" &&
-            typeof organization?.moneyRaised === "number" &&
-            typeof organization?.moneyDeployed === "number" &&
-            typeof organization?.researchBudget === "number"
-        ),
-        "Complete condition data": conditions.length > 0 && conditions.every(condition =>
-            Boolean(
-                // condition.description &&
-                condition.associatedSystems.length > 0 &&
-                condition.associatedGenes.length > 0 &&
-                condition.causalGenes.length > 0 &&
-                // condition.interestedModalities.length > 0 &&
-                // condition.therapeuticsInDevelopment.length > 0 &&
-                condition.diseaseCategories.length > 0 &&
-                condition.prevalenceNumerator !== null &&
-                condition.prevalenceDenominator !== null &&
-                condition.numberOfPatientsEngaged !== null &&
-                condition.nationalEstimatedPopulation !== null &&
-                condition.globalEstimatedPopulation !== null
-            )
-        ),
-        "Upload profile image": Boolean(organization?.image?.trim()),
-        "Upload header image": Boolean(organization?.headerImage?.trim()),
-        "Add roadmap": Array.isArray(organization?.roadmaps) && organization.roadmaps.length > 0,
-    };
+    const checks = getProfileCompletionChecks(organization, conditions);
 
     const completedMilestones = (Object.keys(checks) as MilestoneKey[]).filter(key => checks[key]);
     const incompleteMilestones = (Object.keys(checks) as MilestoneKey[]).filter(key => !checks[key]);

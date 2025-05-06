@@ -16,6 +16,7 @@ import {Button} from "@/components/ui/button";
 import {deleteOrganization} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
+import { mixpanelTrack } from "@/app/mixpanel"
 
 export default async function AdminOrganizationPage({
     params
@@ -44,7 +45,7 @@ export default async function AdminOrganizationPage({
             await deleteOrganization(data)
                 .then(async res => {
                     if (res.success) {
-                        mixpanel.track("Organization Deleted", {
+                        mixpanelTrack("Organization Deleted", {
                             "ID": res?.data?.id,
                             "Name": res?.data?.name,
                         })
