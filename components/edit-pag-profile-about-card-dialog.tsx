@@ -26,6 +26,7 @@ import MultipleSelector from "@/components/ui/multiple-selector";
 import {MODALITIES} from "@/lib/types";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),
