@@ -6,6 +6,7 @@ import { ExternalLink } from "lucide-react"
 import mixpanel from "mixpanel-browser"
 import Link from "next/link"
 import { buttonVariants } from "./ui/button"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 export const ServiceProviderWebsiteButton = ({
     cro
@@ -14,7 +15,7 @@ export const ServiceProviderWebsiteButton = ({
 }) => {
     return (
         <Link
-            onClick={() => mixpanel.track("Service Provider Website Visited", {
+            onClick={() => mixpanelTrack("Service Provider Website Visited", {
                 "Service Provider ID": cro.id,
                 "Service Provider Name": cro.title,
                 "URL": cro.url,

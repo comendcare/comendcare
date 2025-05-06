@@ -107,7 +107,7 @@ export const onbordaTours: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Your miletones",
-                content: <>{`Highlight your assets (ex/ data and models) and requests for proposals (ex/ funding opportunities) to potential partners. We recommend starting here!`}</>,
+                content: <>{`Highlight your tools (ex/ data and models) and requests for proposals (ex/ funding opportunities) to potential partners. We recommend starting here!`}</>,
                 selector: ".organization-profile-tour-step5",
                 side: "left" as any,
                 showControls: true,

@@ -26,6 +26,7 @@ import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -88,7 +89,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
 
             if (response.success && response.data) {
                 va.track("Shortlisted CRO");
-                mixpanel.track("Service Provider Saved", {
+                mixpanelTrack("Service Provider Saved", {
                     "Location": location,
                     "Service Provider Name": response.data.company.title,
                     "Service Provider ID": response.data.company.id,

@@ -26,6 +26,7 @@ import {MembershipWithOrganization} from "@/lib/types";
 import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
@@ -88,7 +89,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 const isSelf = session.user.id === member.user.id;
                 toast.success(`Successfully updated ${isSelf ? "your" : `${member.user.name}'s`} membership.`);
 
-                mixpanel.track("Membership Updated", {
+                mixpanelTrack("Membership Updated", {
                     "Member Name": response.data.user.name,
                     "Member Email": response.data.user.email,
                     "Title": response.data.title,
@@ -122,7 +123,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             const response = await deleteMember(member.id)
 
             if (response.success && response.data) {
-                mixpanel.track("Membership Revoked", {
+                mixpanelTrack("Membership Revoked", {
                     "Member Name": response.data.user.name,
                     "Member Email": response.data.user.email,
                     "Title": response.data.title,

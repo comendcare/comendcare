@@ -12,29 +12,8 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
 
     return (
         <Badge variant="outline" className={cn(iconOnly ? "w-8 p-2 rounded-full" : "", style, className)}>
-            {/* {type === "ASSET" && (
-                <>
-                    <Star className="h-5 w-5"/>
-                    {!iconOnly && "Asset"}
-                </>
-            )}
-            {type === "PROJECT" && (
-                <>
-                    <FileText className="h-5 w-5"/>
-                    {!iconOnly && "Project"}
-                </>
-            )}
-            {type === "RFP" && (
-                <>
-                    <Megaphone className="h-5 w-5"/>
-                    {!iconOnly && "RFP"}
-                </>
-            )} */}
-
-            <>
-                <FileText className="h-5 w-5"/>
-                {!iconOnly && "Project"}
-            </>
+            <FileText className="h-5 w-5"/>
+            {!iconOnly && "Project"}
         </Badge>
     )
 }

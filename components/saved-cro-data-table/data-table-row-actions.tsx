@@ -35,6 +35,7 @@ import {useRouter} from "next/navigation";
 import {SavedCompanyData} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -104,7 +105,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
 
             if (response.success && response.data) {
                 va.track("Edited saved CRO");
-                mixpanel.track("Service Provider Save Edited", {
+                mixpanelTrack("Service Provider Save Edited", {
                     "Service Provider Name": response.data.company.title,
                     "Service Provider ID": response.data.company.id,
                     "Milestone Title": response.data.milestone.title,
@@ -132,7 +133,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
             const response = await unsaveCRO(row.original.id)
 
             if (response.success && response.data) {
-                mixpanel.track("Service Provider Unsaved", {
+                mixpanelTrack("Service Provider Unsaved", {
                     "Service Provider Name": response.data.company.title,
                     "Service Provider ID": response.data.company.id,
                     "Milestone Title": response.data.milestone.title,

@@ -49,6 +49,7 @@ import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const reviewForm = z.object({
     title: z
@@ -117,7 +118,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                     console.log(`response`, res)
                     const milestone = res?.milestones?.[0]?.milestone
                     console.log(`milestone`, milestone)
-                    mixpanel.track("Service Provider Review Submitted", {
+                    mixpanelTrack("Service Provider Review Submitted", {
                         "Service Provider ID": cro.id,
                         "Service Provider Name": cro.title,
                         "Title": res.data.title,

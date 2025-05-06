@@ -17,6 +17,40 @@ import {
     RFP as DBRFP
 } from "@prisma/client";
 
+export type MilestoneKey =
+    | "Add website and description"
+    | "Provide financial & incorporation details"
+    | "Complete condition data"
+    | "Upload profile image"
+    | "Upload header image"
+    | "Add roadmap";
+
+export interface CustomOrganization {
+    website?: string;
+    description?: string;
+    yearFounded?: number;
+    incorporationStatus?: string;
+    moneyRaised?: number;
+    moneyDeployed?: number;
+    researchBudget?: number;
+    image?: string;
+    headerImage?: string;
+    roadmaps?: any[];
+}
+
+export interface Condition {
+    description?: string;
+    associatedSystems: string[];
+    associatedGenes: string[];
+    causalGenes: string[];
+    diseaseCategories: string[];
+    prevalenceNumerator: number | null;
+    prevalenceDenominator: number | null;
+    numberOfPatientsEngaged: number | null;
+    nationalEstimatedPopulation: number | null;
+    globalEstimatedPopulation: number | null;
+}
+
 export type ImportField = {
     key: string,
     required: boolean,
@@ -559,9 +593,9 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 
 export const NODE_TYPE_OPTIONS: Option[] = [
     { 
-        label: 'Asset', 
+        label: 'Tool', 
         value: 'ASSET',
-        description: 'An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+        description: 'A tool is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
     },
     { 
         label: 'Project', 

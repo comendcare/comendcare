@@ -62,7 +62,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import { StatusType } from "@/lib/types"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
-const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
+const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV === "development"
 
 const optionSchema = z.object({
     label: z.string(),
