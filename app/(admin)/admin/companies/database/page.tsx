@@ -5,12 +5,9 @@ import CROSearchBar from "@/components/cro-searchbar";
 import {CROSearchResults} from "@/components/cro-search-results";
 import {CreateCompanyDialog} from "@/components/create-company-dialog";
 import {AdminCompaniesNav} from "@/components/admin-companies-nav";
+import {AdminCROSearchResults} from "@/components/admin-cro-search-results";
 
-export default function AdminCompaniesPage({
-                                               params
-                                           }: {
-    params: { id: string }
-}) {
+export default function AdminCompaniesPage() {
     return (
         <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
@@ -31,7 +28,7 @@ export default function AdminCompaniesPage({
                     }
                 >
                     <CROSearchBar />
-                    <CROSearchResults />
+                    <AdminCROSearchResults />
                 </Suspense>
             </div>
         </div>

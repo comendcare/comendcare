@@ -32,7 +32,8 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
     })
 
     useEffect(() => {
-        if (process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV && process.env.NEXT_PUBLIC_NODE_ENV !== "production") {
+        if (process.env.NEXT_PUBLIC_NODE_ENV == "preview" || process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+            if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV) throw new Error('Mixpanel dev token not found.')
             try {
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, {
                     debug: true,
@@ -49,7 +50,8 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             } catch (error) {
                 console.error("Mixpanel (dev) initialization failed:", error)
             }
-        } else if (process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) {
+        } else if (process.env.NEXT_PUBLIC_NODE_ENV == "production") {
+            if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) throw new Error('Mixpanel token not found.')
             try {
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
                     debug: false,
@@ -66,7 +68,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                 console.error("Mixpanel initialization failed:", error)
             }
         } else {
-            console.error("Mixpanel token is not defined")
+            console.error("Error initializing mixpanel. Node environment must be 'prouction', 'preview' or 'development'")
         }
     }, [])
 
