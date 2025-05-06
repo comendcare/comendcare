@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { EditAssetForm } from "@/components/edit-asset-form";
+import { EditToolForm } from "@/components/edit-tool-form";
 import { ReactNode, useState } from "react";
-import { Asset } from "@/lib/types";
+import { Tool } from "@/lib/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: boolean, numAssetsPinned: number}) => {
+export const NewToolDialog = ({iconOnly = false, numToolsPinned}: {iconOnly?: boolean, numToolsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -25,31 +25,31 @@ export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: 
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        Create an asset
+                        Create a tool
                     </TooltipContent>
                 </Tooltip>
             ) : (
                 <Button variant={"cta"} onClick={() => setIsOpen(true)}>
                     <Plus />
-                    {`Create an asset`}
+                    {`Create a tool`}
                 </Button>
             )}
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Create an Asset
+                        Create a Tool
                     </DialogTitle>
                     <DialogDescription>
-                        {`Create your Asset here. Click save when you're done.`}
+                        {`Create your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditToolForm toolData={{}} closeDialog={closeDialog} numToolsPinned={numToolsPinned}/>
             </DialogContent>
         </Dialog>
     )
 }
 
-export const EditAssetDialog = ({children, data, numAssetsPinned}: {children: ReactNode, data: Partial<Asset>, numAssetsPinned: number}) => {
+export const EditToolDialog = ({children, data, numToolsPinned}: {children: ReactNode, data: Partial<Tool>, numToolsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -65,13 +65,13 @@ export const EditAssetDialog = ({children, data, numAssetsPinned}: {children: Re
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Edit an Asset
+                        Edit a Tool
                     </DialogTitle>
                     <DialogDescription>
-                        {`Edit your Asset here. Click save when you're done.`}
+                        {`Edit your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditToolForm toolData={data} closeDialog={closeDialog} numToolsPinned={numToolsPinned}/>
             </DialogContent>
         </Dialog>
     )

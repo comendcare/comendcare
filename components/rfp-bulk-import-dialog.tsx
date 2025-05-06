@@ -37,7 +37,7 @@ export function RFPBulkImportDialog() {
                         duration: 6000,
                         description: `Missing fields in import file: A title is required for each RFP. Edit the RFP to add title.`
                     })
-                    console.error("Error: imported assets are missing required fields", result.errors)
+                    console.error("Error: imported tools are missing required fields", result.errors)
                 }
     
                 await Promise.all(result.values.map(async (rfp) => {
@@ -49,7 +49,7 @@ export function RFPBulkImportDialog() {
                     duration: 6000,
                     description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                 })
-                console.error("Error: failed to import assets", e)
+                console.error("Error: failed to import tools", e)
             }
         } else {
             console.error("Please upload a valid CSV file.");

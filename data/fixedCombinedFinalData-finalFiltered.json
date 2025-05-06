@@ -7902,7 +7902,7 @@
     "url": "http://www.genecorner.ugent.be/",
     "scientistDotComURL": "https://app.scientist.com/providers/university-of-ghent-ugent",
     "title": "BCCM/GeneCorner",
-    "description": "BCCM/GeneCorner, located in Technologiepark-Zwijnaarde, Gent, Belgium, stands as a unique plasmid repository in Europe, evolving through funding from the Belgian Science Policy (Belspo). The company provides a broad range of services such as Bacterial Cell Culture, Bacterial Expression, Cell Transfection, Fusion Proteins, Genome Editing, Mammalian Expression, Microbiology, and more. Its remarkable service includes accepting and distributing plasmids to researchers globally. BCCM/GeneCorner not only offers public deposit and distribution of plasmids and host strains but also facilitates patent deposit of plasmids, host strains, and cell lines. Furthermore, it provides the private backup of plasmids, host strains, and cell lines, with optional quality controls and custom scientific services related to plasmids. The company's unique approach and comprehensive services make it a valuable asset to the scientific research community.",
+    "description": "BCCM/GeneCorner, located in Technologiepark-Zwijnaarde, Gent, Belgium, stands as a unique plasmid repository in Europe, evolving through funding from the Belgian Science Policy (Belspo). The company provides a broad range of services such as Bacterial Cell Culture, Bacterial Expression, Cell Transfection, Fusion Proteins, Genome Editing, Mammalian Expression, Microbiology, and more. Its remarkable service includes accepting and distributing plasmids to researchers globally. BCCM/GeneCorner not only offers public deposit and distribution of plasmids and host strains but also facilitates patent deposit of plasmids, host strains, and cell lines. Furthermore, it provides the private backup of plasmids, host strains, and cell lines, with optional quality controls and custom scientific services related to plasmids. The company's unique approach and comprehensive services make it a valuable tool to the scientific research community.",
     "yearEstablished": "1977",
     "website": "genecorner.ugent.be",
     "headquarters": "Gent, Oost-Vlaanderen, BE",
@@ -13260,7 +13260,7 @@
       },
       {
         "name": "Lonza",
-        "address": "NW 3rd St Cohasset, MN, 55721 United States"
+        "address": "NW 3rd St Cohtool, MN, 55721 United States"
       },
       {
         "name": "Lonza",
@@ -17185,7 +17185,7 @@
         "description": "Work with consultants who provide expert advice in various areas of research and technology."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -22400,7 +22400,7 @@
     "url": "http://www.aigora.de/",
     "scientistDotComURL": "https://app.scientist.com/providers/aigora-gmbh",
     "title": "Aigora GmbH",
-    "description": "Aigora GmbH, located at Franz-Joseph-Str. 39 München, 80801 Germany, specializes in the field of Big Data, Clinical Data Registry, and Data - COVID-19 among others. Their scope of services extends to a wide range of data analytics including Electronic Medical Record (EMR), Genomics, Oncology, Rare Diseases, Real-World Data, and Evidence. They also offer solutions for Data Asset Validation, Data Curation, Data Merging, Machine Learning, and AI. Aigora GmbH's expertise lies in their ability to make high-quality medical image datasets readily available to AI researchers and developers. By leveraging their extensive network of medical imaging centers, pathology labs, and clinics, they are able to provide diverse datasets for algorithm training and testing.",
+    "description": "Aigora GmbH, located at Franz-Joseph-Str. 39 München, 80801 Germany, specializes in the field of Big Data, Clinical Data Registry, and Data - COVID-19 among others. Their scope of services extends to a wide range of data analytics including Electronic Medical Record (EMR), Genomics, Oncology, Rare Diseases, Real-World Data, and Evidence. They also offer solutions for Data Tool Validation, Data Curation, Data Merging, Machine Learning, and AI. Aigora GmbH's expertise lies in their ability to make high-quality medical image datasets readily available to AI researchers and developers. By leveraging their extensive network of medical imaging centers, pathology labs, and clinics, they are able to provide diverse datasets for algorithm training and testing.",
     "yearEstablished": null,
     "website": "aigora.de",
     "headquarters": "München, , DE",
@@ -22446,7 +22446,7 @@
         "description": "Data from patients with rare diseases, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -33363,7 +33363,7 @@
     "url": "https://www.domaintherapeutics.ca/",
     "scientistDotComURL": "https://app.scientist.com/providers/domain-therapeutics",
     "title": "Domain Therapeutics",
-    "description": "Domain Therapeutics, located in St. Laurent, Quebec, Canada, and Strasbourg, France, focuses on drug target assays, G-Protein Coupled Receptor (GPCR) assays, HTS assay development, high throughput screening, structure activity relationship (SAR), and target identification. The company employs BRET-based bioSensAllTM biosensor technology, providing detailed signaling profiling of GPCRs, RTKs, and their ligands. This technology allows for real-time monitoring of receptor proximal events linked to transmembrane receptor activity, such as G protein activation and β-arrestin coupling for GPCRs, and SH2-domain proteins for RTKs. Domain Therapeutics' assays offer a comprehensive fingerprint of any GPCR/RTK ligand and facilitate the study of receptor mutations' impact on their signaling. Its corporate strategy emphasizes technology validation through partnerships, generation of a pipeline of 1st in class drug candidates for high unmet needs in CNS and oncology, and valuation of preclinical assets through spin-out vehicles.",
+    "description": "Domain Therapeutics, located in St. Laurent, Quebec, Canada, and Strasbourg, France, focuses on drug target assays, G-Protein Coupled Receptor (GPCR) assays, HTS assay development, high throughput screening, structure activity relationship (SAR), and target identification. The company employs BRET-based bioSensAllTM biosensor technology, providing detailed signaling profiling of GPCRs, RTKs, and their ligands. This technology allows for real-time monitoring of receptor proximal events linked to transmembrane receptor activity, such as G protein activation and β-arrestin coupling for GPCRs, and SH2-domain proteins for RTKs. Domain Therapeutics' assays offer a comprehensive fingerprint of any GPCR/RTK ligand and facilitate the study of receptor mutations' impact on their signaling. Its corporate strategy emphasizes technology validation through partnerships, generation of a pipeline of 1st in class drug candidates for high unmet needs in CNS and oncology, and valuation of preclinical tools through spin-out vehicles.",
     "yearEstablished": null,
     "website": "domaintherapeutics.ca",
     "headquarters": "St. Laurent, Quebec, CA",
@@ -54007,7 +54007,7 @@
         "description": "Conduct clinical research to ensure the safety and efficacy of consumer healthcare products used for oral care, skin care, nutrition, and hair care."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -87151,7 +87151,7 @@
     "url": "https://enterosys.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/enterosys-sas",
     "title": "ENTEROSYS SAS",
-    "description": "ENTEROSYS SAS, based in Labège, France, is a leading company that specializes in the quantification of nitric oxide (NO) and hydrogen peroxide (H2O2) via real-time amperometry. This cutting-edge technology enables the accurate measurement of these two primary biomarkers of oxidative stress across various biological models such as primary cell cultures, cell lines in 2D or 3D, organs, and anesthetized animals. The company offers several applications including the evaluation of antioxidant capacities of assets like chemical molecules, natural extracts, and formulations. Additionally, ENTEROSYS SAS conducts comparative studies of asset efficacy against existing market standards or bioactive molecules, and develops stress models with an innovative approach intended for the creation of new cosmetic lines. Services include Antioxidant Assays, Biomarker Services, In Vivo Apoptosis Detection, Nitric Oxide Synthase Assays, OECD 431: In Vitro Skin Corrosion: Human Skin Model Test, Predictive Biomarkers Discovery, Protein/Enzyme Targets, and Target Gene Expression.",
+    "description": "ENTEROSYS SAS, based in Labège, France, is a leading company that specializes in the quantification of nitric oxide (NO) and hydrogen peroxide (H2O2) via real-time amperometry. This cutting-edge technology enables the accurate measurement of these two primary biomarkers of oxidative stress across various biological models such as primary cell cultures, cell lines in 2D or 3D, organs, and anesthetized animals. The company offers several applications including the evaluation of antioxidant capacities of tools like chemical molecules, natural extracts, and formulations. Additionally, ENTEROSYS SAS conducts comparative studies of tool efficacy against existing market standards or bioactive molecules, and develops stress models with an innovative approach intended for the creation of new cosmetic lines. Services include Antioxidant Assays, Biomarker Services, In Vivo Apoptosis Detection, Nitric Oxide Synthase Assays, OECD 431: In Vitro Skin Corrosion: Human Skin Model Test, Predictive Biomarkers Discovery, Protein/Enzyme Targets, and Target Gene Expression.",
     "yearEstablished": "2017",
     "website": "enterosys.com",
     "headquarters": null,
@@ -99079,7 +99079,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -103260,7 +103260,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -106459,7 +106459,7 @@
     "url": "http://www.sciencepod.net/",
     "scientistDotComURL": "https://app.scientist.com/providers/sciencepod",
     "title": "SciencePOD",
-    "description": "SciencePOD, located at 6/9 Trinity Street Dublin 2 Dublin, Ireland, is a company specializing in creating summarized digital content assets for educational and marketing purposes. They transform complex information from technology, research, and innovation into clear, concise digital stories designed to engage and be shared. Their clients range from science publishers, R&D corporates, NGOs, to charities, using the digital content for educational, informational, and marketing purposes. \n\nSciencePOD offers digital content assets in text, podcast, video, and infographic formats, all subject to rigorous quality checks to ensure compliance with regulations. Their content creation platform is an efficient tool that automates the editorial process, combining authoring with workflow management. \n\nThey also feature an AI module that can summarise clinical research papers or academic book chapters into summaries and highlights. Additionally, they provide the ScioWIre research newsfeed widget, delivering customized newsfeeds of AI-generated summaries of the latest clinical research studies.",
+    "description": "SciencePOD, located at 6/9 Trinity Street Dublin 2 Dublin, Ireland, is a company specializing in creating summarized digital content tools for educational and marketing purposes. They transform complex information from technology, research, and innovation into clear, concise digital stories designed to engage and be shared. Their clients range from science publishers, R&D corporates, NGOs, to charities, using the digital content for educational, informational, and marketing purposes. \n\nSciencePOD offers digital content tools in text, podcast, video, and infographic formats, all subject to rigorous quality checks to ensure compliance with regulations. Their content creation platform is an efficient tool that automates the editorial process, combining authoring with workflow management. \n\nThey also feature an AI module that can summarise clinical research papers or academic book chapters into summaries and highlights. Additionally, they provide the ScioWIre research newsfeed widget, delivering customized newsfeeds of AI-generated summaries of the latest clinical research studies.",
     "yearEstablished": "2014",
     "website": "sciencepod.net",
     "headquarters": "Dublin, - None -, IE",
@@ -114492,7 +114492,7 @@
         "description": "Data from oncology patients, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -119499,7 +119499,7 @@
     "url": "https://keystonemab.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/keystonemab-b-v",
     "title": "Keystonemab B.V.",
-    "description": "Keystonemab B.V., located in Utrecht, Netherlands, offers a diverse range of services that support the pharmaceutical industry. Their offerings include API physical characteristics and manufacturing process development, bi-specific antibodies, and Chemistry, Manufacturing, and Controls (CMC) consulting. They also provide data and text mining, discovery biomarker analytics, and drug formulation services. In addition, they assist with Investigational Medicinal Product Dossier (IMPD) and Investigational New Drug (IND) dossier, as well as large molecule drug development consulting. Keystonemab B.V. is also involved in market access, marketing, and commercialization. They have a specialized sector for men's products - formulation, and provide personal care product development. Their expertise extends to pharmaceutical research chemicals, pharmacodynamic biomarkers discovery, pharmacology consulting, protein targets, and small molecule drug development consulting. The company stands out for their AI-driven data analysis platform, which studies data from millions of scientific and clinical trial documents to identify synergistic drug combinations and new uses for existing or unsuccessful drugs. They not only identify new uses for assets but also develop formulations of these products to supply finished products to customers, thereby helping businesses to unlock the untapped potential within their assets.",
+    "description": "Keystonemab B.V., located in Utrecht, Netherlands, offers a diverse range of services that support the pharmaceutical industry. Their offerings include API physical characteristics and manufacturing process development, bi-specific antibodies, and Chemistry, Manufacturing, and Controls (CMC) consulting. They also provide data and text mining, discovery biomarker analytics, and drug formulation services. In addition, they assist with Investigational Medicinal Product Dossier (IMPD) and Investigational New Drug (IND) dossier, as well as large molecule drug development consulting. Keystonemab B.V. is also involved in market access, marketing, and commercialization. They have a specialized sector for men's products - formulation, and provide personal care product development. Their expertise extends to pharmaceutical research chemicals, pharmacodynamic biomarkers discovery, pharmacology consulting, protein targets, and small molecule drug development consulting. The company stands out for their AI-driven data analysis platform, which studies data from millions of scientific and clinical trial documents to identify synergistic drug combinations and new uses for existing or unsuccessful drugs. They not only identify new uses for tools but also develop formulations of these products to supply finished products to customers, thereby helping businesses to unlock the untapped potential within their tools.",
     "yearEstablished": "2020",
     "website": "keystonemab.com",
     "headquarters": "Utrecht, FLAVOLAND, NL",
@@ -130162,7 +130162,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -130540,7 +130540,7 @@
         "description": "Develop study-related protocols, case report forms (CRFs) and database tools for records management."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -130774,7 +130774,7 @@
         "description": "Develop study-related protocols, case report forms (CRFs) and database tools for records management."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -137648,7 +137648,7 @@
         "description": "Work with consultants who provide expert advice in various areas of research and technology."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -142310,7 +142310,7 @@
         "description": "Develop a coordinated competitive intelligence program which contains a systematic collection and analysis of information from multiple sources about a specific business's industry."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -145434,7 +145434,7 @@
         "description": "Obtain phenotypic data and observations on patients such as the clinical manifestation of the disease, clinical and behavioral parameters, symptoms, and laboratory test results."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -146108,7 +146108,7 @@
     "url": "http://www.fiecon.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/fiecon",
     "title": "FIECON  Ltd",
-    "description": "FIECON Ltd, based in Hodgkin Huxley house at 30 Farringdon Lane, London, is a dedicated consultancy poised to launch products that transform lives. They offer a wide range of services, including Cost Benefit Analysis, Data Asset Validation, and Decision Analytic Modeling. Their expertise spans the product lifecycle, aiding biotech, pharmaceutical, and medical technology companies worldwide. FIECON's team delivers systematic reviews, meta-analyses, and patient-level data analyses with unmatched accuracy. Their economic modeling service develops robust health models, and they excel in delivering successful Health Technology Assessment submissions. FIECON effectively communicates product value in a logical and insightful manner, and they partner with clients to develop global pricing and reimbursement strategies. Their innovative products, including Model Builder and Value Platform, automate design and development processes, optimize product pricing, and increase team efficiency. FIECON is known for challenging conventions and providing game-changing solutions to meet commercial needs.",
+    "description": "FIECON Ltd, based in Hodgkin Huxley house at 30 Farringdon Lane, London, is a dedicated consultancy poised to launch products that transform lives. They offer a wide range of services, including Cost Benefit Analysis, Data Tool Validation, and Decision Analytic Modeling. Their expertise spans the product lifecycle, aiding biotech, pharmaceutical, and medical technology companies worldwide. FIECON's team delivers systematic reviews, meta-analyses, and patient-level data analyses with unmatched accuracy. Their economic modeling service develops robust health models, and they excel in delivering successful Health Technology Assessment submissions. FIECON effectively communicates product value in a logical and insightful manner, and they partner with clients to develop global pricing and reimbursement strategies. Their innovative products, including Model Builder and Value Platform, automate design and development processes, optimize product pricing, and increase team efficiency. FIECON is known for challenging conventions and providing game-changing solutions to meet commercial needs.",
     "yearEstablished": "2015",
     "website": "fiecon.com",
     "headquarters": "London, , GB",
@@ -146126,7 +146126,7 @@
         "description": "Economic evaluation in which costs and benefits (outcomes) are expressed in monetary units, to determine if the benefits of an intervention outweigh the costs."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -148374,7 +148374,7 @@
     "url": "https://www.inaphaea.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/inaphaea-biolabs",
     "title": "Inaphaea BioLabs",
-    "description": "Inaphaea BioLabs, headquartered in Nottingham, UK, is an emerging pharmaceutical services organization with a focus on oncology and women's health. Their offerings encompass a variety of cell-based assays, like efficacy and selectivity of activity against cancer cells, mechanistic and binding assays, and measurements of cell markers and hormones production. They have recently announced a service collaboration with Physiomics, providing advanced statistical analyses, machine learning techniques, data handling and visualization, and biological modelling. \n\nMoreover, Inaphaea BioLabs has acquired the assets of Imagen therapeutics, including a biobank of patient-derived cells and data from Imagen's in-house screening program. This acquisition enables them to offer more relevant cancer cell models for cell assay screening and facilitate the development of personalized cancer models. \n\nOriginating from ValiRx PLC, the team at Inaphaea BioLabs brings a rich background in preclinical and clinical drug development, understanding the commercial and scientific needs of the service users from both sides.",
+    "description": "Inaphaea BioLabs, headquartered in Nottingham, UK, is an emerging pharmaceutical services organization with a focus on oncology and women's health. Their offerings encompass a variety of cell-based assays, like efficacy and selectivity of activity against cancer cells, mechanistic and binding assays, and measurements of cell markers and hormones production. They have recently announced a service collaboration with Physiomics, providing advanced statistical analyses, machine learning techniques, data handling and visualization, and biological modelling. \n\nMoreover, Inaphaea BioLabs has acquired the tools of Imagen therapeutics, including a biobank of patient-derived cells and data from Imagen's in-house screening program. This acquisition enables them to offer more relevant cancer cell models for cell assay screening and facilitate the development of personalized cancer models. \n\nOriginating from ValiRx PLC, the team at Inaphaea BioLabs brings a rich background in preclinical and clinical drug development, understanding the commercial and scientific needs of the service users from both sides.",
     "yearEstablished": "2023",
     "website": "inaphaea.com",
     "headquarters": null,
@@ -151162,7 +151162,7 @@
     "url": "http://www.initiateconsultancy.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/initiate-consultancy",
     "title": "Initiate Consultancy",
-    "description": "Initiate Consultancy, located at The Hayloft, Pury Hill Business Park Alderton Road Northampton, United Kingdom, is a global leader in Market Access and Health Economics and Outcomes Research (HEOR). The company offers comprehensive services such as Comparative Effectiveness, Cost Benefit Analysis, and Disease Simulation Modeling, among others. This full-service consultancy firm is an expert in various domains including Value Communication and Launch Preparation, Payer and Reimbursement Insights, Pricing, Reimbursement, and Health Technology Assessment Submissions (HTAs). Additionally, they specialize in Health Economics and Data Analytics, and Asset Evaluation. Initiate Consultancy effectively identifies emerging market opportunities, providing value-based agreements or outcomes-based contracts. With a forte in life cycle management, they excel in HTA evidence preparation and strategy dossier development. Their systematic literature review and meta-analysis expertise make them a preferred choice for businesses seeking to optimize their market access strategy.",
+    "description": "Initiate Consultancy, located at The Hayloft, Pury Hill Business Park Alderton Road Northampton, United Kingdom, is a global leader in Market Access and Health Economics and Outcomes Research (HEOR). The company offers comprehensive services such as Comparative Effectiveness, Cost Benefit Analysis, and Disease Simulation Modeling, among others. This full-service consultancy firm is an expert in various domains including Value Communication and Launch Preparation, Payer and Reimbursement Insights, Pricing, Reimbursement, and Health Technology Assessment Submissions (HTAs). Additionally, they specialize in Health Economics and Data Analytics, and Tool Evaluation. Initiate Consultancy effectively identifies emerging market opportunities, providing value-based agreements or outcomes-based contracts. With a forte in life cycle management, they excel in HTA evidence preparation and strategy dossier development. Their systematic literature review and meta-analysis expertise make them a preferred choice for businesses seeking to optimize their market access strategy.",
     "yearEstablished": "2019",
     "website": "initiateconsultancy.com",
     "headquarters": "Northampton, , GB",
@@ -157170,7 +157170,7 @@
     "url": "https://avalerehealth.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/prma-consulting-ltd",
     "title": "PRMA Consulting Ltd.",
-    "description": "PRMA Consulting Ltd. is a global leader in providing integrated offerings from early pipeline to patient access within the healthcare industry. With locations in the United Kingdom and Greece, they offer a wide array of services including clinical data registry, clinical trial risk management, health economics and outcomes research, and many more. They are industry-certified, holding the International Organization for Standards 27001 (ISO 27001).\n\nTheir services span from early-stage development to product launch, with a focus on robust analytics and evidence-based strategic insights. They support the value of healthcare assets, guiding what healthcare should be provided, how, and to whom. They are trusted by clients worldwide to optimize access and demonstrate the full value of their innovative products to payers.\n\nFurthermore, PRMA Consulting Ltd. excels in the development of value-driven strategies and communication, simplifying complex concepts and engaging stakeholders. Their team of healthcare policy, regulatory, and legislative experts navigates clients through federal and state healthcare policies and prepares them for potential changes. With a deep understanding of industry risks, opportunities, and trends, they deliver customized, data-driven analysis to inform financial models and potential goal achievement. They help clients connect patients with life-changing therapies, accelerating innovation and improving lives.",
+    "description": "PRMA Consulting Ltd. is a global leader in providing integrated offerings from early pipeline to patient access within the healthcare industry. With locations in the United Kingdom and Greece, they offer a wide array of services including clinical data registry, clinical trial risk management, health economics and outcomes research, and many more. They are industry-certified, holding the International Organization for Standards 27001 (ISO 27001).\n\nTheir services span from early-stage development to product launch, with a focus on robust analytics and evidence-based strategic insights. They support the value of healthcare tools, guiding what healthcare should be provided, how, and to whom. They are trusted by clients worldwide to optimize access and demonstrate the full value of their innovative products to payers.\n\nFurthermore, PRMA Consulting Ltd. excels in the development of value-driven strategies and communication, simplifying complex concepts and engaging stakeholders. Their team of healthcare policy, regulatory, and legislative experts navigates clients through federal and state healthcare policies and prepares them for potential changes. With a deep understanding of industry risks, opportunities, and trends, they deliver customized, data-driven analysis to inform financial models and potential goal achievement. They help clients connect patients with life-changing therapies, accelerating innovation and improving lives.",
     "yearEstablished": "2001",
     "website": "avalerehealth.com",
     "headquarters": "London, , GB",
@@ -157224,7 +157224,7 @@
         "description": "Compare alternative treatments that lead to similar health outcomes."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -177109,7 +177109,7 @@
     "url": "http://www.bitrial.hu/",
     "scientistDotComURL": "https://app.scientist.com/providers/bitrial-cro",
     "title": "BiTrial CRO",
-    "description": "BiTrial CRO is a comprehensive contract research organization primarily based in Central and Eastern Europe, with its headquarters nestled in the heart of Budapest, Hungary. The organization specializes in a multitude of clinical trial services, assisting both medical device developers and pharmaceutical companies. These services range from Bioequivalence Studies, Clinical Protocol Design & Development, Patient Recruitment to Clinical Trial Risk Management, and Post-Marketing (Phase 4) Studies. BiTrial CRO excels in aiding its partners in making informed decisions and notably decreasing their product development time. Its expertise lies in facilitating all aspects of clinical trial processes, including Site Monitoring, Investigator Meeting Planning & Execution, and Study/Site Feasibility Study, among others. The company's unique competence makes it an invaluable asset in the realm of clinical research.",
+    "description": "BiTrial CRO is a comprehensive contract research organization primarily based in Central and Eastern Europe, with its headquarters nestled in the heart of Budapest, Hungary. The organization specializes in a multitude of clinical trial services, assisting both medical device developers and pharmaceutical companies. These services range from Bioequivalence Studies, Clinical Protocol Design & Development, Patient Recruitment to Clinical Trial Risk Management, and Post-Marketing (Phase 4) Studies. BiTrial CRO excels in aiding its partners in making informed decisions and notably decreasing their product development time. Its expertise lies in facilitating all aspects of clinical trial processes, including Site Monitoring, Investigator Meeting Planning & Execution, and Study/Site Feasibility Study, among others. The company's unique competence makes it an invaluable tool in the realm of clinical research.",
     "yearEstablished": "2002",
     "website": "bitrial.hu",
     "headquarters": "Budapest, Budapest, HU",
@@ -185592,7 +185592,7 @@
         "description": "Data from patients with rare diseases, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -201846,7 +201846,7 @@
     "url": "https://www.bcrs.eu/",
     "scientistDotComURL": "https://app.scientist.com/providers/bcrs-ltd",
     "title": "BCRS Ltd.",
-    "description": "BCRS Ltd. is a full-service SRO based in Sofia, Bulgaria, specializing in drug development and the procurement of human biospecimens for research. Their offerings include a wide range of services such as clinical research, clinical trial design and recruitment, discovery compound screening analytics, and quality control, among others. They also conduct bioequivalence studies and clinical pathology. The company's products, including fresh or frozen tissues, FFPE tissue cassettes, and blood products offer detailed clinical, pathological, and demographic data. BCRS Ltd. has grown since its inception in 2012, with offices in Belgrade and Skopje, and partnering companies across Europe supporting their efforts. With a core team of 19 professionals including pathologists, cell biologists, and medical doctors, BCRS Ltd. has amassed a significant number of biospecimens in their bank over the years, ensuring quality through their strict control program.",
+    "description": "BCRS Ltd. is a full-service SRO based in Sofia, Bulgaria, specializing in drug development and the procurement of human biospecimens for research. Their offerings include a wide range of services such as clinical research, clinical trial design and recruitment, discovery compound screening analytics, and quality control, among others. They also conduct bioequivalence studies and clinical pathology. The company's products, including fresh or frozen tissues, FFPE tissue ctooltes, and blood products offer detailed clinical, pathological, and demographic data. BCRS Ltd. has grown since its inception in 2012, with offices in Belgrade and Skopje, and partnering companies across Europe supporting their efforts. With a core team of 19 professionals including pathologists, cell biologists, and medical doctors, BCRS Ltd. has amassed a significant number of biospecimens in their bank over the years, ensuring quality through their strict control program.",
     "yearEstablished": "Incorporated as BCRS in 2012",
     "website": "bcrs.eu",
     "headquarters": "Sofia, BG",
@@ -206021,7 +206021,7 @@
     "url": "http://purebiologics.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/pure-biologics",
     "title": "Pure Biologics",
-    "description": "Pure Biologics is a prominent biotech firm based in Poland, with its main office located at Legnicka 48E building E, Wrocław, 54-202. This company, established in 2010 and listed on the Warsaw Stock Exchange, is one of the largest biotech entities in Poland. They specialize in bispecific and fusion antibodies, as well as aptamers, with a primary focus on developing potential immunooncology candidates for colorectal, breast, and lung cancers, and treatments for neurological diseases like neuromyelitis optica and myasthenia gravis. Pure Biologics also offers a variety of specialized services such as Antibody Conjugation and Purification, Protein Expression, Recombinant Proteins and more. They are not only a contract research organization and service provider but also serve as professional consultants and R&D partners. Their clientele ranges from academic collaborations to pharma and biotech companies. They aim to out-license their early-stage assets and collaborate with partners that require complex biotechnological solutions.",
+    "description": "Pure Biologics is a prominent biotech firm based in Poland, with its main office located at Legnicka 48E building E, Wrocław, 54-202. This company, established in 2010 and listed on the Warsaw Stock Exchange, is one of the largest biotech entities in Poland. They specialize in bispecific and fusion antibodies, as well as aptamers, with a primary focus on developing potential immunooncology candidates for colorectal, breast, and lung cancers, and treatments for neurological diseases like neuromyelitis optica and myasthenia gravis. Pure Biologics also offers a variety of specialized services such as Antibody Conjugation and Purification, Protein Expression, Recombinant Proteins and more. They are not only a contract research organization and service provider but also serve as professional consultants and R&D partners. Their clientele ranges from academic collaborations to pharma and biotech companies. They aim to out-license their early-stage tools and collaborate with partners that require complex biotechnological solutions.",
     "yearEstablished": "2010",
     "website": "purebiologics.com",
     "headquarters": "Wrocław, , PL",
@@ -210246,7 +210246,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -212494,7 +212494,7 @@
         "description": "Data from patients with rare diseases, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -212741,7 +212741,7 @@
         "description": "Recruitment, enrollment and retention of patients for clinical trials."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -219732,7 +219732,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -220200,7 +220200,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -265503,7 +265503,7 @@
     "url": "http://avalere.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/avalere-health",
     "title": "Avalere Health",
-    "description": "Avalere Health, based at 1201 New York Ave NW Suite 1000 Washington, District of Columbia, is a versatile player in the healthcare sector. As the industry continues to develop and the needs of businesses change, Avalere Health offers tailored, high-impact strategies and practical tools to address challenges. The company's services include Claims Data & Database Analysis, Data Asset Validation, Emerging Market Opportunities, and more. They specialize in Health Economics and Outcomes Research (HEOR), Real World Evidence (RWE) Studies, and Value-Based Agreements or Outcomes-Based Contracts. Combining real-world data with extensive industry and policy knowledge, Avalere Health ensures that every stakeholder and influencer in healthcare achieves outcomes.",
+    "description": "Avalere Health, based at 1201 New York Ave NW Suite 1000 Washington, District of Columbia, is a versatile player in the healthcare sector. As the industry continues to develop and the needs of businesses change, Avalere Health offers tailored, high-impact strategies and practical tools to address challenges. The company's services include Claims Data & Database Analysis, Data Tool Validation, Emerging Market Opportunities, and more. They specialize in Health Economics and Outcomes Research (HEOR), Real World Evidence (RWE) Studies, and Value-Based Agreements or Outcomes-Based Contracts. Combining real-world data with extensive industry and policy knowledge, Avalere Health ensures that every stakeholder and influencer in healthcare achieves outcomes.",
     "yearEstablished": null,
     "website": "avalere.com",
     "headquarters": "Washington, District of Columbia, US",
@@ -265521,7 +265521,7 @@
         "description": "Analysis of care cost and quality."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -268444,7 +268444,7 @@
     "url": "http://www.parexel.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/paraxel",
     "title": "Parexel",
-    "description": "Parexel is a global company with a presence in various locations across the United States, Europe, Asia, and South America. Its offices are strategically located in cities like Los Angeles, San Diego, Houston, Paris, Budapest, and Moscow, among others. Parexel offers a comprehensive suite of services that spans the entire drug development process. These services include bioequivalence studies, bioinformatics consulting, biomarker clinical validation, and clinical research, extending from Phase I to Phase III trials. Additionally, it offers specialized services such as dietary exposure and intake assessments, data asset validation, GMP synthesis, and health economics and outcomes research (HEOR). Recognized for its commitment to sustainability, Parexel is certified by SBTI - Near/Long Term Target Set and SBTI - Net Zero Committed. In essence, Parexel is a distinguished provider of critical services in the drug development sector, with a vast global reach and a commitment to quality and sustainability.",
+    "description": "Parexel is a global company with a presence in various locations across the United States, Europe, Asia, and South America. Its offices are strategically located in cities like Los Angeles, San Diego, Houston, Paris, Budapest, and Moscow, among others. Parexel offers a comprehensive suite of services that spans the entire drug development process. These services include bioequivalence studies, bioinformatics consulting, biomarker clinical validation, and clinical research, extending from Phase I to Phase III trials. Additionally, it offers specialized services such as dietary exposure and intake assessments, data tool validation, GMP synthesis, and health economics and outcomes research (HEOR). Recognized for its commitment to sustainability, Parexel is certified by SBTI - Near/Long Term Target Set and SBTI - Net Zero Committed. In essence, Parexel is a distinguished provider of critical services in the drug development sector, with a vast global reach and a commitment to quality and sustainability.",
     "yearEstablished": "1982",
     "website": "parexel.com",
     "headquarters": "Uxbridge, Middlesex, GB",
@@ -268738,7 +268738,7 @@
         "description": "Conduct clinical research to ensure the safety and efficacy of consumer healthcare products used for oral care, skin care, nutrition, and hair care."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -270723,7 +270723,7 @@
         "description": "Work with consultants who provide expert advice in various areas of research and technology."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -278318,7 +278318,7 @@
         "description": "Develop study-related protocols, case report forms (CRFs) and database tools for records management."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -280210,7 +280210,7 @@
       },
       {
         "name": "Lonza",
-        "address": "NW 3rd St Cohasset, MN, 55721 United States"
+        "address": "NW 3rd St Cohtool, MN, 55721 United States"
       },
       {
         "name": "Lonza",
@@ -284259,7 +284259,7 @@
     "url": "https://attentivescience.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/attentive-science-llc",
     "title": "Attentive Science, LLC",
-    "description": "Attentive Science, LLC, a dynamic nonclinical Contract Research Organization (CRO), is known for its provision of in-vivo services. The company is a valuable asset to various industries such as Biotechnology, Pharmaceutical, Animal Health, and Agrochemical industry. With its principal site at 17745 Metcalf Avenue Bldg #4, Stilwell, KS, 66085, United States, the organization offers a wide array of services. These include Cardiovascular Toxicology, Cell and Tissue Histology, General Toxicology, Mammalian Toxicology, and Oral Toxicology among others. The company's services also extend to various studies involving dogs, rats, mice, minipigs, and other species. Attentive Science, LLC is recognized for its credibility and is certified by the United States Department of Agriculture (USDA).",
+    "description": "Attentive Science, LLC, a dynamic nonclinical Contract Research Organization (CRO), is known for its provision of in-vivo services. The company is a valuable tool to various industries such as Biotechnology, Pharmaceutical, Animal Health, and Agrochemical industry. With its principal site at 17745 Metcalf Avenue Bldg #4, Stilwell, KS, 66085, United States, the organization offers a wide array of services. These include Cardiovascular Toxicology, Cell and Tissue Histology, General Toxicology, Mammalian Toxicology, and Oral Toxicology among others. The company's services also extend to various studies involving dogs, rats, mice, minipigs, and other species. Attentive Science, LLC is recognized for its credibility and is certified by the United States Department of Agriculture (USDA).",
     "yearEstablished": "2020",
     "website": "attentivescience.com",
     "headquarters": null,
@@ -292921,7 +292921,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -295741,7 +295741,7 @@
     "url": "https://www.cellsciences.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/cell-sciences",
     "title": "Cell Sciences",
-    "description": "Cell Sciences is a distinguished company located at 65 Parker Street Unit 11, Newburyport, MA, 01950, United States. The firm is renowned for its wide-ranging services which include the synthesis of genes and oligos. Furthermore, it provides an assortment of niche specialties such as recombinant cytokines, cytokine receptors, kinase, and phosphatase. Cell Sciences also stands out for its proficiency in offering ELISA, antibody, and assay services. Its unique quality lies in the synthesis and examination of biological elements, making it an invaluable asset in the biotechnology field.",
+    "description": "Cell Sciences is a distinguished company located at 65 Parker Street Unit 11, Newburyport, MA, 01950, United States. The firm is renowned for its wide-ranging services which include the synthesis of genes and oligos. Furthermore, it provides an assortment of niche specialties such as recombinant cytokines, cytokine receptors, kinase, and phosphatase. Cell Sciences also stands out for its proficiency in offering ELISA, antibody, and assay services. Its unique quality lies in the synthesis and examination of biological elements, making it an invaluable tool in the biotechnology field.",
     "yearEstablished": "2000",
     "website": "cellsciences.com",
     "headquarters": "Newburyport, MA, US",
@@ -296062,7 +296062,7 @@
         "description": "Recruitment, enrollment and retention of patients for clinical trials."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -296999,7 +296999,7 @@
         "description": "Data from patients with rare diseases, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -298953,7 +298953,7 @@
     "url": "https://clarivate.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/decision-resources-group",
     "title": "Decision Resources Group (DRG)",
-    "description": "Decision Resources Group (DRG) is a prominent provider of healthcare analytics, data, and insight products and services. With a prime location at 70 St. Mary Axe London, EC3A 8BE United Kingdom, DRG offers a broad range of services. These include Clinical Outcome Assessments that are non-patient reported, Clinical Trial Recruitment, Competitive Intelligence, Data Asset Validation, Data Merging, Health & Pharmacoeconomics, Health Economics and Outcomes Research (HEOR), Life Cycle Assessment (LCA), and Market Access. They also specialize in Market Research & Business Intelligence, Marketing and Commercialization, Medical Writing and Editing, Patient-Reported Outcome Studies, Publication Writing, RWE/HEOR/Market Access Data Analytics, Real World Evidence (RWE) Studies, Real-World Data, Real-World Evidence, and the Trial Insights: Clinical Trials Intelligence Dashboard. DRG is a trusted partner for the world's leading pharmaceutical, biotech, and medical technology companies.",
+    "description": "Decision Resources Group (DRG) is a prominent provider of healthcare analytics, data, and insight products and services. With a prime location at 70 St. Mary Axe London, EC3A 8BE United Kingdom, DRG offers a broad range of services. These include Clinical Outcome Assessments that are non-patient reported, Clinical Trial Recruitment, Competitive Intelligence, Data Tool Validation, Data Merging, Health & Pharmacoeconomics, Health Economics and Outcomes Research (HEOR), Life Cycle Assessment (LCA), and Market Access. They also specialize in Market Research & Business Intelligence, Marketing and Commercialization, Medical Writing and Editing, Patient-Reported Outcome Studies, Publication Writing, RWE/HEOR/Market Access Data Analytics, Real World Evidence (RWE) Studies, Real-World Data, Real-World Evidence, and the Trial Insights: Clinical Trials Intelligence Dashboard. DRG is a trusted partner for the world's leading pharmaceutical, biotech, and medical technology companies.",
     "yearEstablished": "1990",
     "website": "clarivate.com",
     "headquarters": "London, , GB",
@@ -298983,7 +298983,7 @@
         "description": "Develop a coordinated competitive intelligence program which contains a systematic collection and analysis of information from multiple sources about a specific business's industry."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -301057,7 +301057,7 @@
         "description": "Obtain phenotypic data and observations on patients such as the clinical manifestation of the disease, clinical and behavioral parameters, symptoms, and laboratory test results."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -309769,7 +309769,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -310724,7 +310724,7 @@
     "url": "http://www.panalgo.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/boston-health-economics",
     "title": "Panalgo, LLC",
-    "description": "Panalgo, LLC, located at 265 Franklin Street Suite 1101, Boston, MA, is a distinguished independent health analytics firm. With a history spanning over two decades, they specialize in designing and executing research that evaluates the value of medical technologies. Panalgo's broad range of services includes Biostatistical Design, Data Asset Validation, Health & Pharmacoeconomics, and Real-World Evidence Studies, among many others. They are renowned for providing superior healthcare and technology expertise, cutting-edge database sources, and rigorous study designs that yield results impactful for decision-making. Their client-focused culture and innovative custom research projects, backed by their HIPAA certification, make them a reliable partner in the field. Panalgo's unique offerings also encompass early and late-stage model development, burden of illness analyses, and strategic services like value messaging and methodological advice.",
+    "description": "Panalgo, LLC, located at 265 Franklin Street Suite 1101, Boston, MA, is a distinguished independent health analytics firm. With a history spanning over two decades, they specialize in designing and executing research that evaluates the value of medical technologies. Panalgo's broad range of services includes Biostatistical Design, Data Tool Validation, Health & Pharmacoeconomics, and Real-World Evidence Studies, among many others. They are renowned for providing superior healthcare and technology expertise, cutting-edge database sources, and rigorous study designs that yield results impactful for decision-making. Their client-focused culture and innovative custom research projects, backed by their HIPAA certification, make them a reliable partner in the field. Panalgo's unique offerings also encompass early and late-stage model development, burden of illness analyses, and strategic services like value messaging and methodological advice.",
     "yearEstablished": "1996",
     "website": "panalgo.com",
     "headquarters": "Boston, MA, US",
@@ -310782,7 +310782,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -317578,7 +317578,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -325574,7 +325574,7 @@
     "url": "http://www.cardinalhealth.com/en/services/manufacturer/pharma-manufacturer/cardinal-health-specialty-solutions/business-solutions/healthcare-analytics/health-economics-and-outcomes-research.html/",
     "scientistDotComURL": "https://app.scientist.com/providers/cardinal-health",
     "title": "Cardinal Health",
-    "description": "Cardinal Health, located at 7000 Cardinal Place, Dublin, OH, is a leading provider of specialized services in the healthcare sector. This includes Data Asset Validation, Data Merging, Environmental Fate and Ecotoxicology Data Review, and Health Economics and Outcomes Research (HEOR). They also offer expertise in Market Access, Medical Writing and Editing, Patient-Reported Outcome Studies, Pricing Strategy, and RWE/HEOR/Market Access Data Analytics. Cardinal Health stands out in the field with its unique approach to Real-World Data and Evidence, and Product Registries. Their dedicated HEOR Oncology Team has the in-house experience and knowledge to conduct comprehensive HEOR studies, supported by their Chief Medical Officers, Clinical Oncology Nurse, and Oncology Staff. They distinguish themselves by utilizing their Oncology Provider Network, Oncology Practice Network, and conducting a variety of studies and reviews. Cardinal Health is also SBTI certified for setting near and long-term targets.",
+    "description": "Cardinal Health, located at 7000 Cardinal Place, Dublin, OH, is a leading provider of specialized services in the healthcare sector. This includes Data Tool Validation, Data Merging, Environmental Fate and Ecotoxicology Data Review, and Health Economics and Outcomes Research (HEOR). They also offer expertise in Market Access, Medical Writing and Editing, Patient-Reported Outcome Studies, Pricing Strategy, and RWE/HEOR/Market Access Data Analytics. Cardinal Health stands out in the field with its unique approach to Real-World Data and Evidence, and Product Registries. Their dedicated HEOR Oncology Team has the in-house experience and knowledge to conduct comprehensive HEOR studies, supported by their Chief Medical Officers, Clinical Oncology Nurse, and Oncology Staff. They distinguish themselves by utilizing their Oncology Provider Network, Oncology Practice Network, and conducting a variety of studies and reviews. Cardinal Health is also SBTI certified for setting near and long-term targets.",
     "yearEstablished": "1971",
     "website": "cardinalhealth.com/en/services/manufacturer/pharma-manufacturer/cardinal-health-specialty-solutions/business-solutions/healthcare-analytics/health-economics-and-outcomes-research.html",
     "headquarters": "Dublin, OH, US",
@@ -325588,7 +325588,7 @@
     ],
     "services": [
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -327525,7 +327525,7 @@
     "url": "http://www.yecuris.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/yecuris",
     "title": "Yecuris",
-    "description": "Yecuris, based at 15055 Sw Sequoia Parkway Suite 130 in Tigard, Oregon, offers a wide range of services including Adherent Cell Culture, Cell Transfection, Comparative Pharmacology, and various toxicity assays. Their specialty lies in providing researchers with unique and customizable in vivo and in vitro tools, such as their FRG® KO humanized liver animal technologies. These tools have proven to be time-saving assets during the research discovery cycle. They also offer HepaCur cell products, available fresh or frozen as per the researchers' needs. Since its inception in 2007, Yecuris has been at the forefront of liver-targeted drug development and toxicology, constantly innovating and assisting customers with their complex liver-targeted and toxicology queries.",
+    "description": "Yecuris, based at 15055 Sw Sequoia Parkway Suite 130 in Tigard, Oregon, offers a wide range of services including Adherent Cell Culture, Cell Transfection, Comparative Pharmacology, and various toxicity assays. Their specialty lies in providing researchers with unique and customizable in vivo and in vitro tools, such as their FRG® KO humanized liver animal technologies. These tools have proven to be time-saving tools during the research discovery cycle. They also offer HepaCur cell products, available fresh or frozen as per the researchers' needs. Since its inception in 2007, Yecuris has been at the forefront of liver-targeted drug development and toxicology, constantly innovating and assisting customers with their complex liver-targeted and toxicology queries.",
     "yearEstablished": "2007",
     "website": "yecuris.com",
     "headquarters": "Tigard, OR, US",
@@ -328747,7 +328747,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -330015,7 +330015,7 @@
     "url": "http://www.healthverity.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/healthverity",
     "title": "HealthVerity",
-    "description": "HealthVerity is a distinguished firm based in Philadelphia, PA, which operates from 1818 Market St. Suite 700. Specializing in the healthcare sector, HealthVerity offers a comprehensive suite of services including Adherence Studies, Claims Data - Medical, Clinical Outcomes, Comparative Effectiveness, and Cost Effectiveness Analysis. The firm's services extend to Electronic Medical Record (EMR) Data, Data Asset Validation, Data Merging, and Exploratory Study. HealthVerity's prowess in Formulary & Reimbursement Strategy, Health Economics, and Outcomes Research (HEOR) is well-regarded. The company also offers a proprietary Health Data Platform and conducts Non-Comparative Studies. Other noteworthy services include Patient Recruitment, Patient Treatment Patterns, Real World Evidence (RWE) Studies, and Real-World Data. HealthVerity is also adept in Resource Utilization, Feasibility Studies, Therapy Switch services, and specializes in Value-Based Agreements or Outcomes-Based Contracts. The company's platform serves as a solid foundation for the rapid creation, exchange, and management of healthcare and consumer data. By utilizing its state-of-the-art identity resolution and matching capabilities, HealthVerity promotes increased transparency and interoperability across the enterprise.",
+    "description": "HealthVerity is a distinguished firm based in Philadelphia, PA, which operates from 1818 Market St. Suite 700. Specializing in the healthcare sector, HealthVerity offers a comprehensive suite of services including Adherence Studies, Claims Data - Medical, Clinical Outcomes, Comparative Effectiveness, and Cost Effectiveness Analysis. The firm's services extend to Electronic Medical Record (EMR) Data, Data Tool Validation, Data Merging, and Exploratory Study. HealthVerity's prowess in Formulary & Reimbursement Strategy, Health Economics, and Outcomes Research (HEOR) is well-regarded. The company also offers a proprietary Health Data Platform and conducts Non-Comparative Studies. Other noteworthy services include Patient Recruitment, Patient Treatment Patterns, Real World Evidence (RWE) Studies, and Real-World Data. HealthVerity is also adept in Resource Utilization, Feasibility Studies, Therapy Switch services, and specializes in Value-Based Agreements or Outcomes-Based Contracts. The company's platform serves as a solid foundation for the rapid creation, exchange, and management of healthcare and consumer data. By utilizing its state-of-the-art identity resolution and matching capabilities, HealthVerity promotes increased transparency and interoperability across the enterprise.",
     "yearEstablished": "2015",
     "website": "healthverity.com",
     "headquarters": null,
@@ -330053,7 +330053,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -356238,7 +356238,7 @@
         "description": "Data from oncology patients, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -369854,7 +369854,7 @@
     "url": "http://www.nashville.bio/",
     "scientistDotComURL": "https://app.scientist.com/providers/nashville-biosciences",
     "title": "Nashville Biosciences",
-    "description": "Nashville Biosciences, located in Nashville, Tennessee, is an innovative company that specializes in the application of big data and advanced analytics in the life sciences industry. The core of their operation is a massive genetic database named BioVU, sourced from Vanderbilt University Medical Center, which is linked to de-identified electronic medical records (EMRs) complete with years of longitudinal clinical data. This unique asset is one of the most extensive and high-quality databases of its kind, offering unique opportunities to guide research and development in biopharma, diagnostics, medical devices, and other life sciences applications.\n\nThe company offers a wide array of services, including adherence studies, bioinformatics consulting, data analysis, clinical data science and modeling, health economics and outcomes research (HEOR), and real-world evidence (RWE) studies, among others. These services, built on Vanderbilt University Innovation, aim to reduce costs, expedite activity, and enhance success across the research and development pipeline.\n\nNashville Biosciences is actively engaged in strategic relationships, utilizing their unique offerings and datasets and is open to potential partnerships that could further benefit from their resources.",
+    "description": "Nashville Biosciences, located in Nashville, Tennessee, is an innovative company that specializes in the application of big data and advanced analytics in the life sciences industry. The core of their operation is a massive genetic database named BioVU, sourced from Vanderbilt University Medical Center, which is linked to de-identified electronic medical records (EMRs) complete with years of longitudinal clinical data. This unique tool is one of the most extensive and high-quality databases of its kind, offering unique opportunities to guide research and development in biopharma, diagnostics, medical devices, and other life sciences applications.\n\nThe company offers a wide array of services, including adherence studies, bioinformatics consulting, data analysis, clinical data science and modeling, health economics and outcomes research (HEOR), and real-world evidence (RWE) studies, among others. These services, built on Vanderbilt University Innovation, aim to reduce costs, expedite activity, and enhance success across the research and development pipeline.\n\nNashville Biosciences is actively engaged in strategic relationships, utilizing their unique offerings and datasets and is open to potential partnerships that could further benefit from their resources.",
     "yearEstablished": "2018",
     "website": "nashbio.com",
     "headquarters": "Nashville, TN, US",
@@ -370887,7 +370887,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -371670,7 +371670,7 @@
     "url": "http://www.precisionheor.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/precision-health-economics",
     "title": "Precision Health Economics",
-    "description": "Precision Health Economics, located at 11100 Santa Monica Boulevard in Los Angeles, California, provides a wide range of services designed to support the growth and marketability of innovative healthcare developments. Their offerings include Biomarker Clinical Utility and Validation, Claims Data & Database Analysis, Comparative Effectiveness, Cost-Benefit and Effectiveness Analysis, Data Asset Validation, Health Economics and Outcomes Research (HEOR), and Real World Evidence (RWE) Studies, among others. The multidisciplinary team at Precision Health Economics combines their extensive knowledge in economic modeling, evidence synthesis, and real-world data analysis to deliver academic insights at an industry pace. Their strategic guidance aims to meet the needs of all stakeholders, from payers to policymakers.",
+    "description": "Precision Health Economics, located at 11100 Santa Monica Boulevard in Los Angeles, California, provides a wide range of services designed to support the growth and marketability of innovative healthcare developments. Their offerings include Biomarker Clinical Utility and Validation, Claims Data & Database Analysis, Comparative Effectiveness, Cost-Benefit and Effectiveness Analysis, Data Tool Validation, Health Economics and Outcomes Research (HEOR), and Real World Evidence (RWE) Studies, among others. The multidisciplinary team at Precision Health Economics combines their extensive knowledge in economic modeling, evidence synthesis, and real-world data analysis to deliver academic insights at an industry pace. Their strategic guidance aims to meet the needs of all stakeholders, from payers to policymakers.",
     "yearEstablished": "2005",
     "website": "precisionheor.com",
     "headquarters": "Los Angeles, CA, US",
@@ -371724,7 +371724,7 @@
         "description": "Digital version of a patient's medical or health chart containing demographic, clinical, medical, and other treatment information."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -387196,7 +387196,7 @@
     "url": "https://www.mayo.edu/research/core-resources/metabolomics-core/overview",
     "scientistDotComURL": "https://app.scientist.com/providers/mayo-foundation-for-medical-education-and-research",
     "title": "Mayo Foundation for Medical Education and Research",
-    "description": "The Mayo Foundation for Medical Education and Research is a non-profit entity with $116 million in managed assets, specializing in advancing medical research and education. With headquarters in Rochester, Minnesota, the foundation operates through several subsidiaries, including Mayo Clinic Rochester, Mayo Clinic Jacksonville, Mayo Foundation For Medical Education and Research, Mayo Group Practices, and Mayo Health System. \n\nThe foundation's Mayo Clinic Metabolomics Core extends support to medical researchers by offering advanced mass spectrometry and nuclear magnetic resonance spectroscopy techniques for the detection and quantification of metabolites found in biological fluids and tissue extracts. Housing 14 mass spectrometry systems and four NMR systems, the Core offers standardized metabolomics screening and in vivo measurements. It operates as a fee-for-service laboratory, providing both internal and external investigators with metabolomics quantification, analysis, and research support spanning four major categories: Untargeted Metabolomics, Targeted Metabolite Quantitation, Isotope Ratio Measurements, and Nuclear Magnetic Resonance Specialties.",
+    "description": "The Mayo Foundation for Medical Education and Research is a non-profit entity with $116 million in managed tools, specializing in advancing medical research and education. With headquarters in Rochester, Minnesota, the foundation operates through several subsidiaries, including Mayo Clinic Rochester, Mayo Clinic Jacksonville, Mayo Foundation For Medical Education and Research, Mayo Group Practices, and Mayo Health System. \n\nThe foundation's Mayo Clinic Metabolomics Core extends support to medical researchers by offering advanced mass spectrometry and nuclear magnetic resonance spectroscopy techniques for the detection and quantification of metabolites found in biological fluids and tissue extracts. Housing 14 mass spectrometry systems and four NMR systems, the Core offers standardized metabolomics screening and in vivo measurements. It operates as a fee-for-service laboratory, providing both internal and external investigators with metabolomics quantification, analysis, and research support spanning four major categories: Untargeted Metabolomics, Targeted Metabolite Quantitation, Isotope Ratio Measurements, and Nuclear Magnetic Resonance Specialties.",
     "yearEstablished": "1984",
     "website": "mayo.edu/research/core-resources/metabolomics-core/overview",
     "headquarters": "Rochester, MN, US",
@@ -401699,7 +401699,7 @@
     "url": "https://www.covance.com/services/health-economics-and-market-access/covance-market-access.html",
     "scientistDotComURL": "https://app.scientist.com/providers/covance-market-access",
     "title": "Covance Market Access",
-    "description": "Covance Market Access, a prominent global contract research organization (CRO), stands as one of the most comprehensive drug development companies in the world. Located on the 9th floor at 9801 Washingtonian Blvd, Gaithersburg, MD, this business is a subsidiary of LabCorp®. Covance Market Access is wholeheartedly dedicated to advancing healthcare and offering tangible solutions. Their services extend from validating data assets and merging data, to identifying emerging market opportunities and developing effective pricing strategies. They are experts in creating product registries, crafting value-based agreements or outcomes-based contracts, and developing value dossiers.",
+    "description": "Covance Market Access, a prominent global contract research organization (CRO), stands as one of the most comprehensive drug development companies in the world. Located on the 9th floor at 9801 Washingtonian Blvd, Gaithersburg, MD, this business is a subsidiary of LabCorp®. Covance Market Access is wholeheartedly dedicated to advancing healthcare and offering tangible solutions. Their services extend from validating data tools and merging data, to identifying emerging market opportunities and developing effective pricing strategies. They are experts in creating product registries, crafting value-based agreements or outcomes-based contracts, and developing value dossiers.",
     "yearEstablished": "1988",
     "website": "covance.com/services/health-economics-and-market-access/covance-market-access.html",
     "headquarters": "Gaithersburg, MD, US",
@@ -401713,7 +401713,7 @@
     ],
     "services": [
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -403042,7 +403042,7 @@
     "url": "https://www.inovalon.com/solutions/insights/",
     "scientistDotComURL": "https://app.scientist.com/providers/inovalon-insights-llc",
     "title": "Inovalon Insights, LLC",
-    "description": "Inovalon Insights, LLC, strategically located at 4321 Collington Road Bowie, MD, United States, is a distinguished assembly of health analytics, commercial, clinical, and economic specialists. They possess extensive experience across various therapeutic arenas and unique data sources. As a trusted analytics partner, Inovalon Insights can offer unparalleled access to rich data assets. The company is renowned for its client-centric approach, delivering data-driven solutions at all stages - pre, peri, and post-product approval. Their work has been recognized and published in numerous peer-reviewed journals and presented at significant conferences. With a robust foundation of the industry's largest primary sourced data, drawn from over 160 health plans and spanning Commercial, Managed Medicaid, Medicare Advantage, and Medicare FFS lives, they develop custom analytics and tailored products. Their key services include Consulting Services, Data Lineage & Quality, Health Economics and Outcomes Research (HEOR), Value-Based Agreements or Outcomes-Based Contracts, and Value Dossiers Development.",
+    "description": "Inovalon Insights, LLC, strategically located at 4321 Collington Road Bowie, MD, United States, is a distinguished assembly of health analytics, commercial, clinical, and economic specialists. They possess extensive experience across various therapeutic arenas and unique data sources. As a trusted analytics partner, Inovalon Insights can offer unparalleled access to rich data tools. The company is renowned for its client-centric approach, delivering data-driven solutions at all stages - pre, peri, and post-product approval. Their work has been recognized and published in numerous peer-reviewed journals and presented at significant conferences. With a robust foundation of the industry's largest primary sourced data, drawn from over 160 health plans and spanning Commercial, Managed Medicaid, Medicare Advantage, and Medicare FFS lives, they develop custom analytics and tailored products. Their key services include Consulting Services, Data Lineage & Quality, Health Economics and Outcomes Research (HEOR), Value-Based Agreements or Outcomes-Based Contracts, and Value Dossiers Development.",
     "yearEstablished": "1998",
     "website": "inovalon.com/solutions/insights",
     "headquarters": "Bowie, MD, US",
@@ -405140,7 +405140,7 @@
     "url": "http://www.stageanalytics.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/monument-analytics",
     "title": "Monument Analytics",
-    "description": "Monument Analytics, based in Baltimore, MD, is a renowned consulting firm dedicated to advancing healthcare through the provision of superior quality analytical solutions. The company takes great pride in its work and places high value on human life, demonstrating a deep-rooted passion for assisting others. Driven by a commitment to integrity, innovation, and making a difference, Monument Analytics consistently incorporates these values into every decision. The firm offers a wide array of services, including Cost Effectiveness Analysis, Data Asset Validation, Data Merging, and Decision Analytic Modeling among others. It also specializes in various research areas such as Health Economics and Outcomes Research (HEOR), Real World Evidence (RWE) Studies, and Systematic Literature Review. Monument Analytics believes in fostering an inclusive environment that promotes collaboration and respect for all, aiming to enhance the health and well-being of individuals worldwide.",
+    "description": "Monument Analytics, based in Baltimore, MD, is a renowned consulting firm dedicated to advancing healthcare through the provision of superior quality analytical solutions. The company takes great pride in its work and places high value on human life, demonstrating a deep-rooted passion for assisting others. Driven by a commitment to integrity, innovation, and making a difference, Monument Analytics consistently incorporates these values into every decision. The firm offers a wide array of services, including Cost Effectiveness Analysis, Data Tool Validation, Data Merging, and Decision Analytic Modeling among others. It also specializes in various research areas such as Health Economics and Outcomes Research (HEOR), Real World Evidence (RWE) Studies, and Systematic Literature Review. Monument Analytics believes in fostering an inclusive environment that promotes collaboration and respect for all, aiming to enhance the health and well-being of individuals worldwide.",
     "yearEstablished": "2017",
     "website": "stageanalytics.com",
     "headquarters": "Baltimore, MD, US",
@@ -405158,7 +405158,7 @@
         "description": "Compare alternative treatments that lead to similar health outcomes."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -411878,7 +411878,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -427724,7 +427724,7 @@
     "url": "http://www.pearlriverlabs.com/",
     "scientistDotComURL": "https://app.scientist.com/providers/pearl-river-laboratories-inc",
     "title": "Pearl River Laboratories Inc",
-    "description": "Pearl River Laboratories Inc., situated at 401 N. Middletown Rd. Pearl River, NY, is a multifaceted research organization with a wealth of experience in the field of conjugated biologics. The company specializes in the development of robust, scalable, and purpose-driven processes for characterization and GMP-analytics, ultimately facilitating the clinical trials and registration of biologic products. With a deep understanding of asset chemistry, they pre-emptively address development issues, ensuring a smoother, more seamless production process. Their wide spectrum of services includes, but is not limited to, API Physical Characteristics, Antibody Conjugation, Capillary Electrophoresis, Clinical Chemistry, Compound Integrity, Discovery Computational Chemistry, Microbial Testing, Protein Conjugation, Quality Control, and Structural Chemistry.",
+    "description": "Pearl River Laboratories Inc., situated at 401 N. Middletown Rd. Pearl River, NY, is a multifaceted research organization with a wealth of experience in the field of conjugated biologics. The company specializes in the development of robust, scalable, and purpose-driven processes for characterization and GMP-analytics, ultimately facilitating the clinical trials and registration of biologic products. With a deep understanding of tool chemistry, they pre-emptively address development issues, ensuring a smoother, more seamless production process. Their wide spectrum of services includes, but is not limited to, API Physical Characteristics, Antibody Conjugation, Capillary Electrophoresis, Clinical Chemistry, Compound Integrity, Discovery Computational Chemistry, Microbial Testing, Protein Conjugation, Quality Control, and Structural Chemistry.",
     "yearEstablished": "2019",
     "website": "pearlriverlabs.com",
     "headquarters": null,
@@ -431572,7 +431572,7 @@
         "description": "Data from patients with rare diseases, can include clinical treatment, diagnosis, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -434930,7 +434930,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {
@@ -434990,7 +434990,7 @@
         "description": "Data gathered from sources including pedometers, mobile devices, smart watches, among others."
       },
       {
-        "name": "Data Asset Validation",
+        "name": "Data Tool Validation",
         "description": "Tools for validating that patient data and source has been accurately recorded."
       },
       {

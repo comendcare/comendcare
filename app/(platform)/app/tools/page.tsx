@@ -2,9 +2,9 @@ import React from "react"
 import NoOrganization from "@/components/no-organization"
 import {getSession} from "@/lib/auth"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
-import { PrivateAssetsPage } from "@/components/private-assets-page"
+import { PrivateToolsPage } from "@/components/private-tools-page"
 
-export default async function AssetsPage() {
+export default async function ToolsPage() {
     const session = await getSession()
 
     let organization = null
@@ -17,6 +17,6 @@ export default async function AssetsPage() {
         }
     }
 
-    if (organization) return <PrivateAssetsPage />
+    if (organization) return <PrivateToolsPage />
     return <NoOrganization/>
 }

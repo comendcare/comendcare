@@ -5,7 +5,7 @@ import { PrivateBadge } from "./private-badge"
 import { TypeBadge } from "./type-badge"
 import { PublicBadge } from "./public-badge"
 
-type AssetType = Prisma.AssetGetPayload<{ 
+type ToolType = Prisma.ToolGetPayload<{ 
     include: { 
         contacts: { 
             select: { name: true, email: true } 
@@ -15,43 +15,43 @@ type AssetType = Prisma.AssetGetPayload<{
         }
     } 
 }>
-type ContactType = AssetType['contacts'][0]
-type AttachmentType = AssetType['attachments'][0]
+type ContactType = ToolType['contacts'][0]
+type AttachmentType = ToolType['attachments'][0]
 type MilestoneType = Prisma.MilestoneGetPayload<{
     include: {
         node: true,
         contacts: true,
         attachments: true,
         types: { include: { milestoneType: true } }
-        assets: { include: { asset: true } },
+        tools: { include: { tool: true } },
         rfps: { include: { rfp: true } }
     }
 }>
 
-export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPublic?: boolean }) {
+export function ToolDetails({ tool, isPublic }: { tool: MilestoneType, isPublic?: boolean }) {
     return (
         <HoverCard
-            key={asset?.id}
+            key={tool?.id}
             openDelay={0}
             closeDelay={0}
         >
             {/* <HoverCardTrigger asChild> */}
-                <a href={isPublic ? `/research-plan?milestone=${asset?.id}` : `/app/research-plan?milestone=${asset?.nodeId || asset?.node?.id}`}>
+                <a href={isPublic ? `/research-plan?milestone=${tool?.id}` : `/app/research-plan?milestone=${tool?.nodeId || tool?.node?.id}`}>
                     <li
-                        key={asset?.id}
+                        key={tool?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2"
                     >
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                             <div className="flex items-center gap-x-3 w-full">
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
-                                    {asset?.title}
+                                    {tool?.title}
                                 </h2>
-                                {asset?.private ? <PrivateBadge iconOnly={true}/> : (!isPublic ? <PublicBadge iconOnly={true}/> : undefined)}
+                                {tool?.private ? <PrivateBadge iconOnly={true}/> : (!isPublic ? <PublicBadge iconOnly={true}/> : undefined)}
                             </div>
-                            {asset?.contacts && asset.contacts.length > 0 ? (
+                            {tool?.contacts && tool.contacts.length > 0 ? (
                                 <div className={"w-full mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
-                                    <ul className={cn("w-full", asset.contacts.length > 1 ? "list-disc pl-6": "")}>
-                                        {asset.contacts.map((contact, index) => {
+                                    <ul className={cn("w-full", tool.contacts.length > 1 ? "list-disc pl-6": "")}>
+                                        {tool.contacts.map((contact, index) => {
                                             if (contact.name && contact.email) {
                                                 return (
                                                     <li key={index} className="w-full">
@@ -76,26 +76,12 @@ export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPubl
                                 </div>
                             ): (
                                 <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                    <p>No contacts provided for this asset</p>
+                                    <p>No contacts provided for this tool</p>
                                 </div>
                             )}
                         </div>
                     </li>
                 </a>
-            {/* </HoverCardTrigger> */}
-            {/* <HoverCardContent
-                side="top"
-                className="w-80"
-            >
-                <div className="w-full flex justify-between space-x-4">
-                    <div className="w-full space-y-1">
-                        <h4 className="text-sm font-semibold">{asset?.title}</h4>
-                        <p className="w-full text-sm text-wrap break-words">
-                            {asset?.description}
-                        </p>
-                    </div>
-                </div>
-            </HoverCardContent> */}
         </HoverCard>
     )
 }

@@ -13,7 +13,7 @@ const features = [
     {
         name: "Bulk imports.",
         description:
-            "Effortlessly import and manage your assets, projects, and RFPs.",
+            "Effortlessly import and manage your tools, projects, and RFPs.",
         icon: CloudUpload,
     },
 ];
@@ -35,7 +35,7 @@ export default function FeatureResearchPlan() {
                                 Build your research plan
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Map out your efforts intuitively, with your team. Showcase your assets and funding
+                                Map out your efforts intuitively, with your team. Showcase your tools and funding
                                 opportunities to prospective researchers. </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (

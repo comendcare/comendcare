@@ -35,9 +35,9 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
-import {AssetToMilestone, MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
-import {getAssets, getOrganizationFromOrganizationId, getRFPs} from "@/lib/fetchers"
+import {Tool, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
+import {ToolToMilestone, MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {getTools, getOrganizationFromOrganizationId, getRFPs} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
@@ -127,7 +127,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
-    assets: z.array(z.custom<Asset>()).optional(),
+    tools: z.array(z.custom<Tool>()).optional(),
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
 }).refine(
@@ -155,7 +155,7 @@ export function EditMilestoneForm({
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
-    const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
+    const [fetchedTools, setFetchedTools] = useState<Tool[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
     const { step } = useOnbordaStore(useShallow(onbordaSelector))
@@ -178,7 +178,7 @@ export function EditMilestoneForm({
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || [],
-            assets: (milestoneData?.assets || []).map((asset: any) => asset.asset) || [],
+            tools: (milestoneData?.tools || []).map((tool: any) => tool.tool) || [],
             rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
@@ -198,7 +198,7 @@ export function EditMilestoneForm({
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo"),
-        assets: form.watch("assets"),
+        tools: form.watch("tools"),
         rfps: form.watch("rfps"),
         notes: form.watch("notes")
     }
@@ -222,7 +222,7 @@ export function EditMilestoneForm({
             isPrivate,
             contacts,
             openTo,
-            assets,
+            tools,
             rfps,
             notes
         } = values;
@@ -248,13 +248,13 @@ export function EditMilestoneForm({
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
-            assets: (assets || []).map((asset) => {
+            tools: (tools || []).map((tool) => {
                 return ({
                     milestoneId: milestoneData.id,
-                    assetId: asset.id,
-                    asset: asset
+                    toolId: tool.id,
+                    tool: tool
                 })
-            }).filter((asset) => asset !== undefined),
+            }).filter((tool) => tool !== undefined),
             rfps: (rfps || []).map((rfp) => {
                 return ({
                     milestoneId: milestoneData.id,
@@ -332,9 +332,9 @@ export function EditMilestoneForm({
                 //     setOrgIsPublished(response.data.published)
                 // }
 
-                const assetsResponse = await getAssets(session.user.organizationId)
-                if (assetsResponse.success && assetsResponse.data) {
-                    setFetchedAssets(assetsResponse.data || [])
+                const toolsResponse = await getTools(session.user.organizationId)
+                if (toolsResponse.success && toolsResponse.data) {
+                    setFetchedTools(toolsResponse.data || [])
                 }
 
                 const rfpsResponse = await getRFPs(session.user.organizationId)
@@ -549,21 +549,21 @@ export function EditMilestoneForm({
 
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
 
-                                    <FormLabel>Linked Assets</FormLabel>
+                                    <FormLabel>Linked Tools</FormLabel>
                                     <FormField
                                         control={form.control}
-                                        name="assets"
+                                        name="tools"
                                         render={({field}) => (
                                             <FormItem className="w-full">
                                                 <FormControl>
                                                     <MultipleSelector
-                                                        value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
+                                                        value={field.value?.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
                                                         onChange={field.onChange}
-                                                        defaultOptions={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
-                                                        options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
+                                                        defaultOptions={fetchedTools.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
+                                                        options={fetchedTools.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
                                                         hidePlaceholderWhenSelected={true}
                                                         showHoverCard={false}
-                                                        placeholder="Link assets"
+                                                        placeholder="Link tools"
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                 no results found.

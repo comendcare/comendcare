@@ -13,7 +13,7 @@ import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation
 import Loading from "@/app/loading";
 import {
     getAllNotifications,
-    getAssets,
+    getTools,
     getColumns,
     getKanbanFromOrganizationId,
     getMilestoneTypes,
@@ -22,7 +22,7 @@ import {
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeAssetsStore, initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeToolsStore, initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban, createRoadmap } from "@/lib/actions";
@@ -223,14 +223,14 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(response.error)
             }
 
-            // init asset store
-            let assetResponse = await getAssets(session.user.organizationId)
-            if (assetResponse.success) {
-                initializeAssetsStore(assetResponse.data || [])
-                console.log(`Assets initialized...`)
+            // init Tool store
+            let toolResponse = await getTools(session.user.organizationId)
+            if (toolResponse.success) {
+                initializeToolsStore(toolResponse.data || [])
+                console.log(`Tools initialized...`)
             } else {
-                console.error(assetResponse.error)
-                toast.error(assetResponse.error)
+                console.error(toolResponse.error)
+                toast.error(toolResponse.error)
             }
 
             // init rfp store

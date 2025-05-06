@@ -10,7 +10,7 @@ import { formatMoney, standardizeYear } from "@/lib/utils";
 import { PagProfileAboutCard } from "./pag-profile-about-card";
 import { PAGProfileConditionsCard } from "./pag-profile-conditions-card";
 // import { ProfileCompletionCard } from "./profile-completion-card";
-import { PAGProfileAssetsAndRFPsHoverableCard } from "./pag-profile-assets-and-projects-hoverable-card";
+import { PAGProfileToolsAndRFPsHoverableCard } from "./pag-profile-tools-and-projects-hoverable-card";
 import { NoResearchPlanCard, RoadmapCard } from "./public-roadmap-card";
 import { PublishOrganizationSwitch } from "./publish-organization-switch";
 import { BiopharmaConsentSwitch } from "./biopharma-consent-switch";
@@ -19,7 +19,7 @@ import Link from "next/link";
 import EditPAGContactEmailDialog from "./edit-pag-contact-email-dialog";
 import { Building2, Calendar, ExternalLink, HandCoins } from "lucide-react";
 
-export function ProfilePageClient({organization, conditions, roadmaps, assets, rfps}: {organization: any, conditions: any[] | null, roadmaps: any[], assets: any[], rfps: any[]}) {
+export function ProfilePageClient({organization, conditions, roadmaps, tools, rfps}: {organization: any, conditions: any[] | null, roadmaps: any[], tools: any[], rfps: any[]}) {
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
         <main className="col-span-4 flex flex-col items-center">
@@ -172,7 +172,7 @@ export function ProfilePageClient({organization, conditions, roadmaps, assets, r
                                     showEditDialog={true}
                                 />
                             </div>
-                            {/*<PAGProfileAssetsCard/>*/}
+                            {/*<PAGProfileToolsCard/>*/}
                             {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
                         <div className="col-span-4 space-y-4">
@@ -191,9 +191,9 @@ export function ProfilePageClient({organization, conditions, roadmaps, assets, r
                             {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
                             {/* <ProfileCompletionCard/> */}
                             <div className="flex flex-col gap-4 relative">
-                                <PAGProfileAssetsAndRFPsHoverableCard
+                                <PAGProfileToolsAndRFPsHoverableCard
                                     isPrivate={true}
-                                    assets={assets}
+                                    tools={tools}
                                     rfps={rfps}
                                 />
                                 <RoadmapCard

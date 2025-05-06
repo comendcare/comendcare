@@ -102,12 +102,12 @@ export async function getCROData(id: string) {
     })
 }
 
-export async function getPublicAssetsForOrganization(domain: string) {
+export async function getPublicToolsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
-    const assets = await prisma.asset.findMany({
+    const tools = await prisma.tool.findMany({
         where: {
             organization: {
                 subdomain: subdomain
@@ -128,7 +128,7 @@ export async function getPublicAssetsForOrganization(domain: string) {
         orderBy: [{createdAt: "desc"}]
     })
 
-    return assets
+    return tools
 }
 
 export async function getPublicRFPsForOrganization(domain: string) {
@@ -189,9 +189,9 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             contacts: true,
                             attachments: true,
                             types: { include: { milestoneType: true } },
-                            assets: { 
+                            tools: { 
                                 include: { 
-                                    asset: {
+                                    tool: {
                                         include: { 
                                             milestones: {
                                                 include: {
@@ -209,7 +209,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                                     }, 
                                 }, 
                                 where: { 
-                                    asset: {
+                                    tool: {
                                         private: {
                                             equals: false
                                         }
@@ -261,9 +261,9 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                     contacts: true,
                     attachments: true,
                     types: { include: { milestoneType: true } },
-                    assets: { 
+                    tools: { 
                         include: { 
-                            asset: {
+                            tool: {
                                 include: { 
                                     milestones: {
                                         include: {
@@ -281,7 +281,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             }, 
                         }, 
                         where: { 
-                            asset: {
+                            tool: {
                                 private: {
                                     equals: false
                                 }
@@ -477,13 +477,13 @@ export async function getMembers(organizationId: string | null | undefined) {
     }
 }
 
-export async function getAssets(organizationId: string | undefined) {
+export async function getTools(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
     }
 
     try {
-        const fetchedAssets = await prisma?.asset.findMany({
+        const fetchedTools = await prisma?.tool.findMany({
             where: {organizationId},
             include: {
                 contacts: true,
@@ -497,16 +497,16 @@ export async function getAssets(organizationId: string | undefined) {
             orderBy: [{ createdAt: "desc" }]
         })
 
-        if (!fetchedAssets) {
-            return {success: false, error: "assets not found"}
+        if (!fetchedTools) {
+            return {success: false, error: "tools not found"}
         }
 
         return {
             success: true,
-            data: fetchedAssets
+            data: fetchedTools
         }
     } catch (error: any) {
-        logError("Error fetching assets", error);
+        logError("Error fetching tools", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -731,7 +731,7 @@ export async function getRoadmap(orgId: string | null | undefined) {
                         contacts: true,
                         attachments: true,
                         types: { include: { milestoneType: true } },
-                        assets: { include: { asset: true } },
+                        tools: { include: { tool: true } },
                         rfps: { include: { rfp: true } }
                     },
                     orderBy: [{ createdAt: "desc" }]
@@ -957,9 +957,9 @@ export async function getPublicMilestoneDetails(id: string) {
                 contacts: true,
                 attachments: true,
                 types: { include: { milestoneType: true } },
-                assets: { 
+                tools: { 
                     include: { 
-                        asset: {
+                        tool: {
                             include: { 
                                 milestones: {
                                     include: {
@@ -977,7 +977,7 @@ export async function getPublicMilestoneDetails(id: string) {
                         }, 
                     }, 
                     where: { 
-                        asset: {
+                        tool: {
                             private: {
                                 equals: false
                             }
@@ -1088,7 +1088,7 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                     contacts: true,
                     attachments: true,
                     types: { include: { milestoneType: true } },
-                    assets: {include: {asset: true}},
+                    tools: {include: {tool: true}},
                     rfps: {include: {rfp: true}}
                 },
                 orderBy: [{ createdAt: "desc" }]

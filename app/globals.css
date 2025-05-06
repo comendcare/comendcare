@@ -187,8 +187,8 @@ h6 {
         --sidebar-accent-foreground: 240 5.9% 10%;
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
-        --asset: 136 50% 96%;
-        --asset-foreground: 144 68% 20%;
+        --tool: 136 50% 96%;
+        --tool-foreground: 144 68% 20%;
         --project: 323 60% 97%;
         --project-foreground: 325 33% 44%;
         --rfp: 33, 100%, 96%;

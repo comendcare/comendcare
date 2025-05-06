@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
-import {Asset, Milestone} from "@/lib/types"
+import {Tool, Milestone} from "@/lib/types"
 import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -39,7 +39,7 @@ import { useRouter } from "next/navigation"
 import { Option } from "@/lib/types"
 import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { AssetState, useAssetStore } from "@/state/asset/assetStore"
+import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import mixpanel from "mixpanel-browser"
 
@@ -53,7 +53,7 @@ export const optionSchema = z.object({
     // disable: z.boolean().optional(),
 });
 
-const editAssetForm = z.object({
+const editToolForm = z.object({
     title: z
         .string({
             required_error: "Please provide a title"
@@ -71,28 +71,28 @@ const editAssetForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional()
 })
 
-const assetSelector = (state: AssetState) => ({
-    createAsset: state.createAsset,
-    updateAsset: state.updateAsset,
-    deleteAsset: state.deleteAsset,
+const toolSelector = (state: ToolState) => ({
+    createTool: state.createTool,
+    updateTool: state.updateTool,
+    deleteTool: state.deleteTool,
     saveState: state.saveState
 })
 
-export function EditAssetForm({
-    assetData,
-    numAssetsPinned,
+export function EditToolForm({
+    toolData,
+    numToolsPinned,
     closeDialog
 }: {
-    assetData: Partial<Asset>,
-    numAssetsPinned: number,
+    toolData: Partial<Tool>,
+    numToolsPinned: number,
     closeDialog?: () => void
 }) {
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
-    const { createAsset, updateAsset, deleteAsset, saveState } = useAssetStore(useShallow(assetSelector))
-    const { undo } = useAssetStore.temporal.getState()
+    const { createTool, updateTool, deleteTool, saveState } = useToolStore(useShallow(toolSelector))
+    const { undo } = useToolStore.temporal.getState()
 
     const handleUndo = () => {
         undo()
@@ -100,17 +100,17 @@ export function EditAssetForm({
         toast.dismiss("undo-toast")
     }
 
-    const form = useForm<z.infer<typeof editAssetForm>>({
+    const form = useForm<z.infer<typeof editToolForm>>({
         mode: "onChange",
-        resolver: zodResolver(editAssetForm),
+        resolver: zodResolver(editToolForm),
         defaultValues: {
-            title: assetData?.title || "",
-            description: assetData?.description || "",
-            attachments: assetData?.attachments || undefined,
-            isPinned: assetData?.pinned || false,
-            isPrivate: assetData?.private !== undefined ? assetData?.private : true,
-            contacts: assetData?.contacts || undefined,
-            milestones: (assetData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+            title: toolData?.title || "",
+            description: toolData?.description || "",
+            attachments: toolData?.attachments || undefined,
+            isPinned: toolData?.pinned || false,
+            isPrivate: toolData?.private !== undefined ? toolData?.private : true,
+            contacts: toolData?.contacts || undefined,
+            milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
         }
     })
 
@@ -124,7 +124,7 @@ export function EditAssetForm({
         milestones: form.watch("milestones")
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editToolForm>) => {
         console.log(`handle form submit`, values)
         const {
             title,
@@ -138,15 +138,15 @@ export function EditAssetForm({
 
         console.log(`save`, values)
 
-        const updateData: Partial<Asset> = {
-            ...assetData,
+        const updateData: Partial<Tool> = {
+            ...toolData,
             title,
-            pinned: (isPrivate === false && isPinned) || false, // only save pinned if asset is public
+            pinned: (isPrivate === false && isPinned) || false, // only save pinned if tool is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
                     milestoneId: milestone.id,
-                    assetId: assetData.id  || '',
+                    toolId: toolData.id  || '',
                 })
             }),
             ...(description !== undefined && description !== null ? {description} : undefined),
@@ -165,30 +165,30 @@ export function EditAssetForm({
         }
 
         try {
-            if (assetData.id) {
-                await updateAsset(updateData, session.user.organizationId)
+            if (toolData.id) {
+                await updateTool(updateData, session.user.organizationId)
                 toast.success(
-                    "Asset updated successfully!",
+                    "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
             } else {
-                await createAsset(updateData, session.user.organizationId)
+                await createTool(updateData, session.user.organizationId)
                 toast.success(
-                    "Asset created successfully!",
+                    "Tool created successfully!",
                     {position: "bottom-left"}
                 )
             }
             if (closeDialog) closeDialog()
         } catch (error) {
-            console.error("Error creating or updating asset:", error);
+            console.error("Error creating or updating tool:", error);
             toast.error(
-                "Failed to create or update asset.",
+                "Failed to create or update tool.",
                 {position: "bottom-left"}
             )
         }
     }
 
-    const handleDeleteAsset = async () => {
+    const handleDeleteTool = async () => {
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -197,35 +197,35 @@ export function EditAssetForm({
             return
         }
 
-        if (!assetData.id) {
+        if (!toolData.id) {
             toast.error(
-                "This asset does not have an id.",
+                "This tool does not have an id.",
                 {position: "bottom-left"}
             )
             return
         }
 
         try {
-            await deleteAsset(assetData.id)
+            await deleteTool(toolData.id)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">
                     <span className="flex justify-between items-center">
                         <p className="font-semibold text-gray-900">
-                            {`Asset Deleted`}
+                            {`Tool Deleted`}
                         </p>
                         <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
                     </span>
                     <p className="text-sm text-gray-500">
-                        {`Your asset had been deleted successfully.`}
+                        {`Your tool had been deleted successfully.`}
                     </p>
                 </div>,
                 {position: "bottom-left", duration: 20000, id: "undo-toast"}
             )
         } catch (error) {
-            console.error("Error deleting asset:", error);
+            console.error("Error deleting tool:", error);
             toast.error(
-                "Failed to delete asset.",
+                "Failed to delete tool.",
                 {position: "bottom-left"}
             );
         }
@@ -248,8 +248,8 @@ export function EditAssetForm({
                 console.error(milestonesResponse.error)
             }
 
-            // trigger a form validation if we're editing an asset, if the imported data is not valid, let the user know right away
-            if (Object.keys(assetData).length > 0) form.trigger()
+            // trigger a form validation if we're editing , if the imported data is not valid, let the user know right away
+            if (Object.keys(toolData).length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -308,7 +308,7 @@ export function EditAssetForm({
                         <div className="grow">
                         <FormLabel>Visibility</FormLabel>
                         <FormDescription>
-                            {`Private assets will not be shown to people outside of your organization.`}
+                            {`Private tools will not be shown to people outside of your organization.`}
                         </FormDescription>
                         </div>
                         <div className="w-[90px]">
@@ -327,12 +327,12 @@ export function EditAssetForm({
                                             <div>
                                             <FormLabel>{`Pinned to Profile`}</FormLabel>
                                             <FormDescription>
-                                                {`Showcase this Asset at the top of your organization’s Asset section so it's easy to find and stands out.`}
+                                                {`Showcase this Tool at the top of your organization’s Tool section so it's easy to find and stands out.`}
                                             </FormDescription>
                                             </div>
                                             <FormControl className="justify-self-end">
                                                 <Button 
-                                                    disabled={!assetData.pinned && numAssetsPinned >= 5}
+                                                    disabled={!toolData.pinned && numToolsPinned >= 5}
                                                     variant="ghost" 
                                                     onClick={(e) => {
                                                         e.preventDefault()
@@ -347,9 +347,9 @@ export function EditAssetForm({
                                     )}
                                 />
                             </TooltipTrigger>
-                            {!assetData.pinned && numAssetsPinned >= 5 && (
+                            {!toolData.pinned && numToolsPinned >= 5 && (
                                 <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is limited to 5 assets. You already have 5 assets pinned. Please unpin another asset before pinning this asset.`}</p>
+                                    <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
                                 </TooltipContent>
                             )}
                         </Tooltip>
@@ -395,9 +395,9 @@ export function EditAssetForm({
                             </Button>
                         </DialogClose>
                         <Dialog>
-                            <DialogTrigger asChild className={cn(assetData.id ? "" : "hidden")}>
+                            <DialogTrigger asChild className={cn(toolData.id ? "" : "hidden")}>
                                 <Button type="button" variant="destructive">
-                                    Delete Asset
+                                    Delete Tool
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
@@ -406,7 +406,7 @@ export function EditAssetForm({
                                         Are you absolutely sure?
                                     </DialogTitle>
                                     <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your Asset and it's data.`}
+                                        {`This action cannot be undone. This will permanently delete your Tool and it's data.`}
                                     </DialogDescription>
                                     <DialogFooter>
                                         <DialogClose>
@@ -418,9 +418,9 @@ export function EditAssetForm({
                                             <Button
                                                 type="button"
                                                 variant={"destructive"}
-                                                onClick={handleDeleteAsset}
+                                                onClick={handleDeleteTool}
                                             >
-                                                Delete Asset
+                                                Delete Tool
                                             </Button>
                                         </DialogClose>
                                     </DialogFooter>

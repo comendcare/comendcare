@@ -13,7 +13,7 @@ export type FiltersType = {
     milestoneStatus: string[],
     nodeType: string[],
     // hasProject: boolean,
-    // hasAsset: boolean
+    // hasTool: boolean
 }
 
 export const defaultFilters = {
@@ -21,7 +21,7 @@ export const defaultFilters = {
     milestoneStatus: [],
     nodeType: []
     // hasProject: false,
-    // hasAsset: false
+    // hasTool: false
 }
 
 function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
@@ -65,9 +65,9 @@ function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
     //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}RFPId_exists:=true`)
     // }
 
-    // if (filters.hasAsset) {
-    //     filtersList.push(`assetId_exists:=true`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}assetId_exists:=true`)
+    // if (filters.hasTool) {
+    //     filtersList.push(`toolId_exists:=true`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}toolId_exists:=true`)
     // }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")

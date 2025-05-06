@@ -5,7 +5,7 @@ import {
     getOrganizationData,
     getConditionsDataFromOrgId,
     getPublicRFPsForOrganization,
-    getPublicAssetsForOrganization,
+    getPublicToolsForOrganization,
     getPublicRoadmapsForOrganization
 } from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
@@ -28,7 +28,7 @@ import ShareDialog from "@/components/share-dialog";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import {Card, CardContent} from "@/components/ui/card";
 import Image from "next/image";
-import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import { PAGProfileToolsAndRFPsHoverableCard } from "@/components/pag-profile-tools-and-projects-hoverable-card";
 import {FeedbackSheet} from "@/components/feedback";
 import FeedbackForm from "@/components/feedback-form";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
@@ -68,10 +68,10 @@ export default async function OrganizationHomePage({
     params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const [organization, roadmaps, assets, rfps] = await Promise.all([
+    const [organization, roadmaps, tools, rfps] = await Promise.all([
         getOrganizationData(domain),
         getPublicRoadmapsForOrganization(domain),
-        getPublicAssetsForOrganization(domain),
+        getPublicToolsForOrganization(domain),
         getPublicRFPsForOrganization(domain)
     ])
 
@@ -87,7 +87,7 @@ export default async function OrganizationHomePage({
             contacts: true,
             attachments: true,
             types: {include: {milestoneType: true}},
-            assets: {include: {asset: true}},
+            tools: {include: {tool: true}},
             rfps: {include: {rfp: true}}
         }
     })
@@ -138,9 +138,9 @@ export default async function OrganizationHomePage({
                         </div>
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
-                            <PAGProfileAssetsAndRFPsHoverableCard
+                            <PAGProfileToolsAndRFPsHoverableCard
                                 isPrivate={false}
-                                assets={assets}
+                                tools={tools}
                                 rfps={rfps}
                             />
                             {roadmaps.length > 0 ?

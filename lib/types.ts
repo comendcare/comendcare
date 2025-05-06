@@ -13,7 +13,7 @@ import {
     ExternalAttachment,
     ReviewFeedback, Service,
     Milestone as DBMilestone,
-    Asset as DBAsset,
+    Tool as DBTool,
     RFP as DBRFP
 } from "@prisma/client";
 
@@ -24,7 +24,7 @@ export type ImportField = {
     isValid: (value: any) => boolean
 }
 
-export type Asset = Omit<Prisma.AssetGetPayload<{
+export type Tool = Omit<Prisma.ToolGetPayload<{
     include: {
         contacts: true,
         attachments: true,
@@ -38,8 +38,8 @@ export type Asset = Omit<Prisma.AssetGetPayload<{
     }
 }>, "milestones"> & {
     milestones: Array<{
-        asset?: DBAsset,
-        assetId: string,
+        tool?: DBTool,
+        toolId: string,
         milestone?: DBMilestone,
         milestoneId: string,
     }>
@@ -71,19 +71,19 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         contacts: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
-        assets: { include: { asset: true, assetId: true, milestoneId: true } },
+        tools: { include: { tool: true, toolId: true, milestoneId: true } },
         rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
     }
-}>, ("types" | "assets" | "rfps")> & {
+}>, ("types" | "tools" | "rfps")> & {
     types: Array<{
         milestoneType?: MilestoneType; // Optional
         milestoneId?: string; // Optional
         milestoneTypeId: string; // Required
     }>,
-    assets: Array<{
-        asset?: DBAsset,
+    tools: Array<{
+        tool?: DBTool,
         milestoneId?: string,
-        assetId: string
+        toolId: string
     }>,
     rfps: Array<{
         rfp?: DBRFP,
@@ -103,8 +103,8 @@ export interface Option {
     [key: string]: any;
 }
 
-export type AssetTableData = Asset & {
-    asset: Asset
+export type ToolTableData = Tool & {
+    tool: Tool
 }
 
 export type SavedCompanyData = SavedCompany & {
@@ -559,9 +559,9 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 
 export const NODE_TYPE_OPTIONS: Option[] = [
     { 
-        label: 'Asset', 
+        label: 'Tool', 
         value: 'ASSET',
-        description: 'An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+        description: 'An tool is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
     },
     { 
         label: 'Project', 

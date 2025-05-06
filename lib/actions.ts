@@ -40,7 +40,7 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
+import {ApiResponse, Tool, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
 
 export const getSessionInfo = async () => {
@@ -191,8 +191,8 @@ export const createCondition = async (formData: FormData) => {
     const existingDatabasesAndStudies = formData.get("existingDatabasesAndStudies")
         ? (formData.get("existingDatabasesAndStudies") as string).split(",")
         : [];
-    const assetsUnderDevelopment = formData.get("assetsUnderDevelopment")
-        ? (formData.get("assetsUnderDevelopment") as string).split(",")
+    const toolsUnderDevelopment = formData.get("toolsUnderDevelopment")
+        ? (formData.get("toolsUnderDevelopment") as string).split(",")
         : [];
 
     try {
@@ -213,7 +213,7 @@ export const createCondition = async (formData: FormData) => {
                 associatedSystems,
                 associatedSignsAndSymptoms,
                 existingDatabasesAndStudies,
-                assetsUnderDevelopment,
+                toolsUnderDevelopment,
             }
         });
 
@@ -1733,10 +1733,10 @@ export async function updateCondition(formData: FormData, organizationId: string
     }
 }
 
-export const deleteAsset = async (assetId: string) => {
+export const deleteTool = async (toolId: string) => {
     try {
-        const response = await prisma.asset.delete({
-            where: {id: assetId},
+        const response = await prisma.tool.delete({
+            where: {id: toolId},
             include: {
                 contacts: true,
                 attachments: true,
@@ -1752,20 +1752,20 @@ export const deleteAsset = async (assetId: string) => {
 
         return response
     } catch (error: any) {
-        console.error("Error deleting asset:", error.message);
-        throw new Error(error.message || "Failed to delete asset.");
+        console.error("Error deleting tool:", error.message);
+        throw new Error(error.message || "Failed to delete tool.");
     }
 }
 
-export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizationId: string | undefined | null) => {
+export const createOrUpdateTool = async (toolData: Partial<Tool>, organizationId: string | undefined | null) => {
     try {
         if (!organizationId) {
             throw new Error("No organization id provided.")
         }
 
-        const response = await prisma.asset.upsert({
+        const response = await prisma.tool.upsert({
             where: {
-                id: assetData.id || nanoid()
+                id: toolData.id || nanoid()
             },
             include: {
                 contacts: true,
@@ -1779,12 +1779,12 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 }
             },
             update: {
-                title: assetData.title,
-                description: assetData.description,
+                title: toolData.title,
+                description: toolData.description,
                 attachments: {
                     deleteMany: {}, // clear all existing attachments
                     createMany: {
-                        data: (assetData?.attachments || []).map((attachment: any) => ({
+                        data: (toolData?.attachments || []).map((attachment: any) => ({
                             link: attachment.link,
                             ...(attachment.name ? {name: attachment.name} : undefined)
                         }))
@@ -1793,7 +1793,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 contacts: {
                     deleteMany: {},
                     createMany: {
-                        data: (assetData?.contacts || []).map((contact: any) => ({
+                        data: (toolData?.contacts || []).map((contact: any) => ({
                             name: contact.name,
                             email: contact.email,
                             ...(contact.role ? {role: contact.role} : undefined),
@@ -1803,24 +1803,24 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 },
                 milestones: {
                     deleteMany: {},
-                    create: (assetData.milestones || []).map((milestone: any) => ({
+                    create: (toolData.milestones || []).map((milestone: any) => ({
                         milestone: {
                             connect: {id: milestone.milestoneId}
                         }
                     }))
                 },
-                private: assetData.private || false,
-                pinned: assetData.pinned || false,
+                private: toolData.private || false,
+                pinned: toolData.pinned || false,
             },
             create: {
                 // create with the given id if it's available. This is useful for situations like 'undo'
-                // where we're re-creating a pre-existing asset, and the id should match the id in our zustand state
-                ...(assetData.id ? {id: assetData.id} : undefined),
-                title: assetData.title || "",
-                description: assetData.description,
+                // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                ...(toolData.id ? {id: toolData.id} : undefined),
+                title: toolData.title || "",
+                description: toolData.description,
                 attachments: {
                     createMany: {
-                        data: (assetData?.attachments || []).map((attachment: any) => ({
+                        data: (toolData?.attachments || []).map((attachment: any) => ({
                             link: attachment.link,
                             ...(attachment.name ? {name: attachment.name} : undefined)
                         }))
@@ -1828,7 +1828,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 },
                 contacts: {
                     createMany: {
-                        data: (assetData?.contacts || []).map((contact: any) => ({
+                        data: (toolData?.contacts || []).map((contact: any) => ({
                             name: contact.name,
                             email: contact.email,
                             ...(contact.role ? {role: contact.role} : undefined),
@@ -1837,22 +1837,22 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                     }
                 },
                 milestones: {
-                    create: (assetData.milestones || []).map((milestone: any) => ({
+                    create: (toolData.milestones || []).map((milestone: any) => ({
                         milestone: {
                             connect: {id: milestone.milestoneId}
                         }
                     }))
                 },
-                private: assetData.private || false,
-                pinned: assetData.pinned || false,
+                private: toolData.private || false,
+                pinned: toolData.pinned || false,
                 organization: {connect: {id: organizationId}}
             },
         })
 
         return response
     } catch (error: any) {
-        console.error("Error creating or updating asset:", error.message);
-        throw new Error(error.message || "Failed to create or update asset.");
+        console.error("Error creating or updating tool:", error.message);
+        throw new Error(error.message || "Failed to create or update tool.");
     }
 }
 
@@ -2086,7 +2086,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
-                    assets: {include: {asset: true}},
+                    tools: {include: {tool: true}},
                     rfps: {include: {rfp: true}}
                 }
             },
@@ -2256,7 +2256,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 contacts: true,
                 attachments: true,
                 types: {include: {milestoneType: true}},
-                assets: {include: {asset: true}},
+                tools: {include: {tool: true}},
                 rfps: {include: {rfp: true}}
             },
             where: {roadmapId}
@@ -2297,7 +2297,7 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
                         contacts: true,
                         attachments: true,
                         types: {include: {milestoneType: true}},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     data: {
@@ -2316,10 +2316,10 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
                                 }
                             }))
                         },
-                        assets: {
-                            create: (milestone?.assets || []).map((asset: any) => ({
-                                asset: {
-                                    connect: {id: asset.assetId}
+                        tools: {
+                            create: (milestone?.tools || []).map((tool: any) => ({
+                                tool: {
+                                    connect: {id: tool.toolId}
                                 }
                             }))
                         },
@@ -2457,7 +2457,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 contacts: true,
                 attachments: true,
                 types: {include: {milestoneType: true}},
-                assets: {include: {asset: true}},
+                tools: {include: {tool: true}},
                 rfps: {include: {rfp: true}}
             },
             where: {roadmapId}
@@ -2471,7 +2471,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         //         const document = response.map((r: any) => ({
         //             ...r,
         //             RFPId_exists: response.RFP ? true : false,
-        //             assetId_exists: response.asset ? true : false
+        //             toolId_exists: response.tool ? true : false
         //         }))
         //         console.log(`Add typesense document`, document)
         //         await addTypeSenseDocument(
@@ -2570,17 +2570,17 @@ export async function updateEdges({roadmapId, edges}: { roadmapId: string | null
 }
 
 /* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
-export async function syncDBAssets({assets}: { assets: Asset[] }) {
+export async function syncDBTools({tools}: { tools: Tool[] }) {
     try {
-        let updateAssets: Asset[] = []
+        let updateTools: Tool[] = []
         const session = await getSession()
 
         if (!session?.user.organizationId) throw new Error("No session available")
 
         await Promise.all(
-            assets.map(async (asset: Asset) => {
-                const previousAsset: Asset | null = await prisma.asset.findUnique({
-                    where: {id: asset.id},
+            tools.map(async (tool: Tool) => {
+                const previousTool: Tool | null = await prisma.tool.findUnique({
+                    where: {id: tool.id},
                     include: {
                         contacts: true,
                         attachments: true,
@@ -2592,23 +2592,23 @@ export async function syncDBAssets({assets}: { assets: Asset[] }) {
                     }
                 })
 
-                if (!previousAsset) {
-                    // if the asset does not exist, re-create it
-                    const a = await createOrUpdateAsset(asset, session.user.organizationId)
-                    updateAssets = [...updateAssets, a]
+                if (!previousTool) {
+                    // if the tool does not exist, re-create it
+                    const a = await createOrUpdateTool(tool, session.user.organizationId)
+                    updateTools = [...updateTools, a]
                 } else {
-                    // if the asset does exist, update it's properties
-                    updateAssets = [...updateAssets, previousAsset]
+                    // if the tool does exist, update it's properties
+                    updateTools = [...updateTools, previousTool]
                 }
             })
         )
 
-        // delete any assets that no longer exist
-        // const dbAssetIds = await prisma.asset.findMany({
+        // delete any tools that no longer exist
+        // const dbToolIds = await prisma.tool.findMany({
         //     where: {organizationId: session.user.organizationId}
-        // }).map(asset => )
+        // }).map(tool => )
 
-        return {success: true, data: updateAssets}
+        return {success: true, data: updateTools}
     } catch (e) {
         return {success: false, error: e}
     }
@@ -2641,7 +2641,7 @@ export async function syncDBRFPs({rfps}: { rfps: RFP[] }) {
                     const r = await createOrUpdateRFP(rfp, session.user.organizationId)
                     updateRfps = [...updateRfps, r]
                 } else {
-                    // if the asset does exist, update it's properties
+                    // if the tool does exist, update it's properties
                     updateRfps = [...updateRfps, previousRfp]
                 }
             })
@@ -2674,7 +2674,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         contacts: true,
                         attachments: true,
                         types: {include: {milestoneType: true}},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     }
                 })
@@ -2692,7 +2692,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         contacts: true,
                         attachments: true,
                         types: {include: {milestoneType: true}},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     data: {
@@ -2705,11 +2705,11 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }
                             }))
                         },
-                        assets: {
+                        tools: {
                             deleteMany: {},
-                            create: (milestone.assets || []).map((asset: any) => ({
-                                asset: {
-                                    connect: {id: asset.assetId || asset.asset.id}
+                            create: (milestone.tools || []).map((tool: any) => ({
+                                tool: {
+                                    connect: {id: tool.toolId || tool.tool.id}
                                 }
                             }))
                         },
@@ -2767,7 +2767,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         //         const document = response.map((r: any) => ({
         //             ...r,
         //             RFPId_exists: response.RFP ? true : false,
-        //             assetId_exists: response.asset ? true : false
+        //             toolId_exists: response.tool ? true : false
         //         }))
         //         console.log(`Update typesense document`, document)
         //         await updateTypeSenseDocument(
