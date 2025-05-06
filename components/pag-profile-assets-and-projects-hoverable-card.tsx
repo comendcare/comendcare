@@ -57,10 +57,10 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                                 "ID": rfp.id,
                                                                 "Name": rfp.title,
                                                                 "Budget": rfp.budget,
-                                                                "Linked Milestones": rfp.milestones.map(({ milestone }: any) => milestone),
+                                                                "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
                                                                 // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                                 // we flatten them into a single list that can be parsed
-                                                                "Linked Milestone Types": rfp.milestones.flatMap(({ milestone }: any) =>
+                                                                "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
                                                                     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                                                                 )
                                                             })
@@ -101,10 +101,10 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     mixpanel.track("Tool Details Viewed", {
                                                         "ID": asset.id,
                                                         "Tool Name": asset.title,
-                                                        "Linked Milestones": asset.milestones.map(({ milestone }: any) => milestone),
+                                                        "Linked Projects": asset.milestones.map(({ milestone }: any) => milestone),
                                                         // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                         // we flatten them into a single list that can be parsed
-                                                        "Linked Milestone Types": asset.milestones.flatMap(({ milestone }: any) =>
+                                                        "Linked Project Types": asset.milestones.flatMap(({ milestone }: any) =>
                                                             (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                                                         )
                                                     })

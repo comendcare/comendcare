@@ -26,6 +26,7 @@ import {getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { getPublicFile } from "@/lib/utils";
+import mixpanel from "mixpanel-browser";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -199,6 +200,20 @@ export default function UserOnboardingForm() {
         setLoading(true);
 
         try {
+            // handle mixpanel opt-in/opt-out
+            if (values.consentSettings) {
+                console.log(`mixpanel opt-in`)
+                if (session?.user?.id && session?.user?.email) {
+                    // identify the user if we can, to ensure we have the proper distinct ID
+                    if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
+                    else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+                }
+                mixpanel.opt_in_tracking()
+            } else if (!values.consentSettings) {
+                console.log(`mixpanel opt-out`)
+                mixpanel.opt_out_tracking()
+            }
+
             // handle image upload, only upload if the current image is not the same as the previous image
             if (selectedFile && values.image && values.image !== defaultValues?.image) {
                 console.log(`selectedFile`, selectedFile)
@@ -215,7 +230,6 @@ export default function UserOnboardingForm() {
             }
 
             toast.success("Successfully updated user profile!");
-            router.refresh();
             if (hasInvitations) {
                 router.push("/app/profile");
             } else {
