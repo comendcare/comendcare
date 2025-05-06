@@ -55,6 +55,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import UserEditForm from "@/components/user-edit-form";
 import UserSettings from "@/components/user-settings";
 import {MembershipWithOrganization} from "@/lib/types";
+import mixpanel from "mixpanel-browser";
+import { mixpanelReset, mixpanelTrack } from "@/app/mixpanel";
 
 
 export function NavUser() {
@@ -318,7 +320,11 @@ export function NavUser() {
                                         </DialogTrigger>
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator/>
-                                    <DropdownMenuItem onClick={() => signOut()}>
+                                    <DropdownMenuItem onClick={() => {
+                                        mixpanelTrack('User Logout')
+                                        mixpanelReset()
+                                        signOut()
+                                    }}>
                                         <LogOut/>
                                         Log out
                                     </DropdownMenuItem>

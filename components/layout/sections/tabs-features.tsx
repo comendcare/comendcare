@@ -24,7 +24,7 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Map out your efforts intuitively, with your team. Showcase your assets and funding opportunities to prospective researchers.",
+        description: "Map out your efforts intuitively, with your team. Showcase your tools and funding opportunities to prospective researchers.",
     },
     marketplace: {
         title: "Discover partners",

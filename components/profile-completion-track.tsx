@@ -1,5 +1,6 @@
 "use client"
 
+import { mixpanelTrack } from "@/app/mixpanel"
 import mixpanel from "mixpanel-browser"
 import { useEffect } from "react"
 
@@ -12,7 +13,7 @@ export const ProfileCompletionMixpanelTrack = ({
     // weird reloading behaviour in the profile Server Components
     useEffect(() => {
         if (!localStorage.getItem("profile-complete") && completionPercentage) {
-            mixpanel.track("Organization Profile Completed")
+            mixpanelTrack("Organization Profile Completed")
             localStorage.setItem("profile-complete", "true")
         }
     }, [])

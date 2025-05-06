@@ -41,7 +41,6 @@ import { Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
-import mixpanel from "mixpanel-browser"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -168,21 +167,21 @@ export function EditAssetForm({
             if (assetData.id) {
                 await updateAsset(updateData, session.user.organizationId)
                 toast.success(
-                    "Asset updated successfully!",
+                    "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
             } else {
                 await createAsset(updateData, session.user.organizationId)
                 toast.success(
-                    "Asset created successfully!",
+                    "Tool created successfully!",
                     {position: "bottom-left"}
                 )
             }
             if (closeDialog) closeDialog()
         } catch (error) {
-            console.error("Error creating or updating asset:", error);
+            console.error("Error creating or updating tool:", error);
             toast.error(
-                "Failed to create or update asset.",
+                "Failed to create or update tool.",
                 {position: "bottom-left"}
             )
         }
@@ -199,7 +198,7 @@ export function EditAssetForm({
 
         if (!assetData.id) {
             toast.error(
-                "This asset does not have an id.",
+                "This tool does not have an id.",
                 {position: "bottom-left"}
             )
             return
@@ -212,20 +211,20 @@ export function EditAssetForm({
                 <div className="flex flex-col gap-2 w-full">
                     <span className="flex justify-between items-center">
                         <p className="font-semibold text-gray-900">
-                            {`Asset Deleted`}
+                            {`Tool Deleted`}
                         </p>
                         <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
                     </span>
                     <p className="text-sm text-gray-500">
-                        {`Your asset had been deleted successfully.`}
+                        {`Your tool had been deleted successfully.`}
                     </p>
                 </div>,
                 {position: "bottom-left", duration: 20000, id: "undo-toast"}
             )
         } catch (error) {
-            console.error("Error deleting asset:", error);
+            console.error("Error deleting tool:", error);
             toast.error(
-                "Failed to delete asset.",
+                "Failed to delete tool.",
                 {position: "bottom-left"}
             );
         }
@@ -308,7 +307,7 @@ export function EditAssetForm({
                         <div className="grow">
                         <FormLabel>Visibility</FormLabel>
                         <FormDescription>
-                            {`Private assets will not be shown to people outside of your organization.`}
+                            {`Private tools will not be shown to people outside of your organization.`}
                         </FormDescription>
                         </div>
                         <div className="w-[90px]">
@@ -327,7 +326,7 @@ export function EditAssetForm({
                                             <div>
                                             <FormLabel>{`Pinned to Profile`}</FormLabel>
                                             <FormDescription>
-                                                {`Showcase this Asset at the top of your organization’s Asset section so it's easy to find and stands out.`}
+                                                {`Showcase this Tool at the top of your organization’s Tool section so it's easy to find and stands out.`}
                                             </FormDescription>
                                             </div>
                                             <FormControl className="justify-self-end">
@@ -349,7 +348,7 @@ export function EditAssetForm({
                             </TooltipTrigger>
                             {!assetData.pinned && numAssetsPinned >= 5 && (
                                 <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is limited to 5 assets. You already have 5 assets pinned. Please unpin another asset before pinning this asset.`}</p>
+                                    <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
                                 </TooltipContent>
                             )}
                         </Tooltip>
@@ -397,7 +396,7 @@ export function EditAssetForm({
                         <Dialog>
                             <DialogTrigger asChild className={cn(assetData.id ? "" : "hidden")}>
                                 <Button type="button" variant="destructive">
-                                    Delete Asset
+                                    Delete Tool
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
@@ -406,7 +405,7 @@ export function EditAssetForm({
                                         Are you absolutely sure?
                                     </DialogTitle>
                                     <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your Asset and it's data.`}
+                                        {`This action cannot be undone. This will permanently delete your Tool and it's data.`}
                                     </DialogDescription>
                                     <DialogFooter>
                                         <DialogClose>
@@ -420,7 +419,7 @@ export function EditAssetForm({
                                                 variant={"destructive"}
                                                 onClick={handleDeleteAsset}
                                             >
-                                                Delete Asset
+                                                Delete Tool
                                             </Button>
                                         </DialogClose>
                                     </DialogFooter>

@@ -74,6 +74,7 @@ import { toast } from "sonner"
 import { badgeVariants } from "./ui/badge"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { useOnborda } from "./onborda/OnbordaContext"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -280,7 +281,7 @@ export function EditMilestoneForm({
         if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
             const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
 
-            mixpanel.track("Milestone has other type", {
+            mixpanelTrack("Project has other type", {
                 orgName: response?.data?.name || "Unknown Org",
                 milestoneTitle: title,
                 milestoneType: otherTypeDetails,
@@ -314,7 +315,7 @@ export function EditMilestoneForm({
 
     const debounceMixpanelTrackBudget = useMemo(() => 
         debounce((updatedBudget) => {
-            mixpanel.track("Project Budget Updated", {
+            mixpanelTrack("Project Budget Updated", {
                 "ID": milestoneData.id,
                 "Title": formData.title,
                 "Budget": updatedBudget
@@ -493,7 +494,7 @@ export function EditMilestoneForm({
                                         formData={formData} 
                                         disabled={!orgIsPublished}
                                         mixpanelTrackCallback={(updatedIsPrivate) => {
-                                            mixpanel.track("Project Visibility Updated", {
+                                            mixpanelTrack("Project Visibility Updated", {
                                                 "ID": milestoneData.id,
                                                 "Title": formData.title,
                                                 "Visibility": updatedIsPrivate ? "Private" : "Public"
@@ -531,7 +532,7 @@ export function EditMilestoneForm({
                                     <StatusFormField 
                                         form={form}
                                         mixpanelTrackCallback={(updatedStatus) => {
-                                            mixpanel.track("Project Status Updated", {
+                                            mixpanelTrack("Project Status Updated", {
                                                 "ID": milestoneData.id,
                                                 "Title": formData.title,
                                                 "Status": updatedStatus
@@ -549,7 +550,7 @@ export function EditMilestoneForm({
 
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
 
-                                    <FormLabel>Linked Assets</FormLabel>
+                                    <FormLabel>Linked Tools</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="assets"
@@ -563,7 +564,7 @@ export function EditMilestoneForm({
                                                         options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
                                                         hidePlaceholderWhenSelected={true}
                                                         showHoverCard={false}
-                                                        placeholder="Link assets"
+                                                        placeholder="Link tools"
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                 no results found.

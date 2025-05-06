@@ -20,6 +20,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -129,14 +130,14 @@ export default function ResearchOnboardingForm(
                         toast.success("Successfully created condition.")
 
                         if (otherCategories) {
-                            mixpanel.track("Org has other category", {
+                            mixpanelTrack("Org has other category", {
                                 orgName: organization?.name || "Unknown Org",
                                 looking: otherCategories,
                             });
                         }
 
                         if (otherSystem) {
-                            mixpanel.track("Org has other system", {
+                            mixpanelTrack("Org has other system", {
                                 orgName: organization?.name || "Unknown Org",
                                 looking: otherSystem,
                             });
