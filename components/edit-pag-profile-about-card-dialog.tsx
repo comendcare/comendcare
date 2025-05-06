@@ -103,7 +103,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
 
             // Mixpanel tracking for "Other" fields
             if (otherModality) {
-                mixpanel.track("Org has other modality", {
+                mixpanelTrack("Org has other modality", {
                     orgName: organization.name || "Unknown Org",
                     looking: otherModality,
                 });

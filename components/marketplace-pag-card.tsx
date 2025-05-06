@@ -33,7 +33,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     // }
 
     const nodeTypeLabels = [
-        {key: "ASSET", icon: Star, label: "Asset"},
+        {key: "ASSET", icon: Star, label: "Tool"},
         {key: "RFP", icon: Megaphone, label: "RFP"},
         {key: "PROJECT", icon: FileText, label: "Project"}
     ];

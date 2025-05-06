@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
 import mixpanel from 'mixpanel-browser';
 import { getExclusiveToFirstGroup } from '@/lib/utils';
+import { mixpanelTrack } from '@/app/mixpanel';
 
 export const sampleCROs: any[] = [
     {
@@ -276,7 +277,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                 if (newSearch.length > 0) {
                     // only track searches if the user has entered text in the searchbar
                     const filters = get().filters
-                    mixpanel.track("Search Service Providers", {
+                    mixpanelTrack("Search Service Providers", {
                         "Search Term": newSearch,
                         "Results": total,
                         "Filters": {
@@ -346,7 +347,7 @@ export const useCROSearchStore = create<CROSearchState>()(
 
                 if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
                     // if something has been added or removed, track as a mixpanel event
-                    mixpanel.track("Marketplace Service Provider Filters Selected", {
+                    mixpanelTrack("Marketplace Service Provider Filters Selected", {
                         "Results": total,
                         "Filters": {
                             "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),

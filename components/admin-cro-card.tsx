@@ -56,6 +56,7 @@ import {deleteCompany, deleteOrganization} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -116,7 +117,7 @@ export function CROCardHeaderContents({cro, milestone, location}: {
             await deleteCompany(cro)
                 .then(async res => {
                     if (res.success) {
-                        mixpanel.track("Company Deleted", {
+                        mixpanelTrack("Company Deleted", {
                             "ID": res?.data?.id,
                             "Name": res?.data?.title,
                         })

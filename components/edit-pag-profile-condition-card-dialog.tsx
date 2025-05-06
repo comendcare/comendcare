@@ -29,6 +29,7 @@ import {researchFormSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import { Info, Pencil } from "lucide-react";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Organization }) {
     const {data: session} = useSession()
@@ -148,21 +149,21 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
                 // Mixpanel tracking for "Other" fields
                 if (otherModality) {
-                    mixpanel.track("Org has other modality", {
+                    mixpanelTrack("Org has other modality", {
                         orgName: organization?.name || "Unknown Org",
                         looking: otherModality,
                     });
                 }
 
                 if (otherCategories) {
-                    mixpanel.track("Org has other category", {
+                    mixpanelTrack("Org has other category", {
                         orgName: organization?.name || "Unknown Org",
                         looking: otherCategories,
                     });
                 }
 
                 if (otherSystem) {
-                    mixpanel.track("Org has other system", {
+                    mixpanelTrack("Org has other system", {
                         orgName: organization?.name || "Unknown Org",
                         looking: otherSystem,
                     });

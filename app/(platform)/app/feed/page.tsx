@@ -10,7 +10,6 @@ export default async function FeedPage() {
     const session = await getSession()
 
     let organization = null
-    // let dbMilestones = []
     if (session?.user.organizationId) {
         const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
         if (response.success) {

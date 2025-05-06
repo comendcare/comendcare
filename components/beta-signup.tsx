@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form"
 import { sendBetaSignupEmail } from "@/lib/emails"
 import mixpanel from "mixpanel-browser"
 import { customerIOTrack } from "@/lib/customer-io"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 const betaSignupFormSchema = z.object({
     name: z
@@ -59,7 +60,7 @@ export function BetaSignup({
                 }
             })
 
-            mixpanel.track(`Beta signup`, {
+            mixpanelTrack(`Beta signup`, {
                 name: name,
                 email: email
             })

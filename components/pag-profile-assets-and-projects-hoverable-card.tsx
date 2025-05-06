@@ -33,6 +33,7 @@ import NoPinnedAssets from "./no-pinned-assets";
 import NoPinnedRFPs from "./no-pinned-rfps";
 import { formatMoney } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -42,7 +43,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     <Tabs defaultValue="rfps" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="rfps">Requests for Proposals</TabsTrigger>
-                            <TabsTrigger value="assets">Assets</TabsTrigger>
+                            <TabsTrigger value="assets">Tools</TabsTrigger>
                         </TabsList>
                         <TabsContent value="rfps">
                             {rfps.filter(rfp => rfp.pinned).length > 0 && (
@@ -53,14 +54,14 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 <CarouselItem key={index} className="lg:basis-1/2">
                                                     <Dialog>
                                                         <DialogTrigger className="w-full h-full" onClick={() => {
-                                                            mixpanel.track("RFP Details Viewed", {
+                                                            mixpanelTrack("RFP Details Viewed", {
                                                                 "ID": rfp.id,
                                                                 "Name": rfp.title,
                                                                 "Budget": rfp.budget,
-                                                                "Linked Milestones": rfp.milestones.map(({ milestone }: any) => milestone),
+                                                                "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
                                                                 // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                                 // we flatten them into a single list that can be parsed
-                                                                "Linked Milestone Types": rfp.milestones.flatMap(({ milestone }: any) =>
+                                                                "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
                                                                     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                                                                 )
                                                             })
@@ -98,13 +99,13 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                         {assets.filter(asset => asset.pinned).map((asset) => (
                                             <Dialog>
                                                 <DialogTrigger asChild onClick={() => {
-                                                    mixpanel.track("Asset Details Viewed", {
+                                                    mixpanelTrack("Tool Details Viewed", {
                                                         "ID": asset.id,
-                                                        "Asset Name": asset.title,
-                                                        "Linked Milestones": asset.milestones.map(({ milestone }: any) => milestone),
+                                                        "Tool Name": asset.title,
+                                                        "Linked Projects": asset.milestones.map(({ milestone }: any) => milestone),
                                                         // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                         // we flatten them into a single list that can be parsed
-                                                        "Linked Milestone Types": asset.milestones.flatMap(({ milestone }: any) =>
+                                                        "Linked Project Types": asset.milestones.flatMap(({ milestone }: any) =>
                                                             (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                                                         )
                                                     })

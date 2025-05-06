@@ -159,9 +159,9 @@ export function Roadmap() {
         const params = new URLSearchParams(searchParams.toString())
 
         if (selectedNodeId) {
-            params.set("milestone", selectedNodeId)
+            params.set("project", selectedNodeId)
         } else {
-            params.delete("milestone")
+            params.delete("project")
         }
 
         if (selectedView) {
@@ -462,7 +462,7 @@ export function Roadmap() {
                                             duration: 6000,
                                             description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                                         })
-                                        console.error("Error: failed to import assets", e)
+                                        console.error("Error: failed to import tools", e)
                                     }
                                 } else {
                                     console.error("Please upload a valid CSV file.");
@@ -551,7 +551,7 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
             <p className="text-lg text-stone-500 max-w-xl">
                 {`
                     Your research plan doesn't have any projects!
-                    A project is a milestone in your research plan that is being planned or developed. You may attach Assets and RFPs to projects. 
+                    A project is a milestone in your research plan that is being planned or developed. You may attach Tools and RFPs to projects. 
                 `} 
             </p>
             <span className="flex gap-4">

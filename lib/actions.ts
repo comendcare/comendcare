@@ -1752,8 +1752,8 @@ export const deleteAsset = async (assetId: string) => {
 
         return response
     } catch (error: any) {
-        console.error("Error deleting asset:", error.message);
-        throw new Error(error.message || "Failed to delete asset.");
+        console.error("Error deleting tool:", error.message);
+        throw new Error(error.message || "Failed to delete tool.");
     }
 }
 
@@ -1851,8 +1851,8 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
 
         return response
     } catch (error: any) {
-        console.error("Error creating or updating asset:", error.message);
-        throw new Error(error.message || "Failed to create or update asset.");
+        console.error("Error creating or updating tool:", error.message);
+        throw new Error(error.message || "Failed to create or update tool.");
     }
 }
 

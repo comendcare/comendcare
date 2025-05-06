@@ -2,12 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Asset } from "@/lib/types"
-import { Button } from "../ui/button"
 import { Pin } from "lucide-react"
-import { createOrUpdateAsset } from "@/lib/actions"
 
 interface CustomColumnMeta {
     name?: string;
