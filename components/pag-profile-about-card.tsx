@@ -14,6 +14,7 @@ import EditPagProfileAboutCardDialog from "@/components/edit-pag-profile-about-c
 import { ExternalLink } from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const PagProfileAboutCard = ({organization, editable, isPrivate = false}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
@@ -80,7 +81,7 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}
                         {(isPrivate || (!isPrivate && organization?.website)) && (
                             organization?.website ?
                                 <Link
-                                    onClick={() => mixpanel.track("Organization Website Visited", {
+                                    onClick={() => mixpanelTrack("Organization Website Visited", {
                                         "Website": organization.website
                                     })}
                                     href={organization.website.startsWith("http")

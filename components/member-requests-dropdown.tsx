@@ -8,6 +8,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {useSession} from "next-auth/react";
 import { Ellipsis, UserCheck, UserX } from "lucide-react";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default async function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
     const session = useSession()
@@ -17,7 +18,7 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
             const response = await approveMemberRequestAndCreateMember(memberRequest)
 
             if (response.success) {
-                mixpanel.track("Membership Request Approved", {
+                mixpanelTrack("Membership Request Approved", {
                     "Member Name": response.data.user.name,
                     "Member Email": response.data.user.email,
                     "Title": response.data.title,
@@ -37,7 +38,7 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
             const response = await deleteMemberRequest(memberRequest)
 
             if (response.success) {
-                mixpanel.track("Membership Request Denied", {
+                mixpanelTrack("Membership Request Denied", {
                     "Member Name": response.data.user.name,
                     "Member Email": response.data.user.email,
                     "Title": response.data.title,

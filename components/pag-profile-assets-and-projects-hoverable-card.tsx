@@ -33,6 +33,7 @@ import NoPinnedAssets from "./no-pinned-assets";
 import NoPinnedRFPs from "./no-pinned-rfps";
 import { formatMoney } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -53,7 +54,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 <CarouselItem key={index} className="lg:basis-1/2">
                                                     <Dialog>
                                                         <DialogTrigger className="w-full h-full" onClick={() => {
-                                                            mixpanel.track("RFP Details Viewed", {
+                                                            mixpanelTrack("RFP Details Viewed", {
                                                                 "ID": rfp.id,
                                                                 "Name": rfp.title,
                                                                 "Budget": rfp.budget,
@@ -98,7 +99,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                         {assets.filter(asset => asset.pinned).map((asset) => (
                                             <Dialog>
                                                 <DialogTrigger asChild onClick={() => {
-                                                    mixpanel.track("Tool Details Viewed", {
+                                                    mixpanelTrack("Tool Details Viewed", {
                                                         "ID": asset.id,
                                                         "Tool Name": asset.title,
                                                         "Linked Projects": asset.milestones.map(({ milestone }: any) => milestone),

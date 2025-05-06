@@ -19,6 +19,7 @@ import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {deleteOrganization, deleteOrgRoadmap} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session, update} = useSession()
@@ -39,7 +40,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
                             }
                         })
 
-                        mixpanel.track("Organization Deleted", {
+                        mixpanelTrack("Organization Deleted", {
                             "ID": res?.data?.id,
                             "Name": res?.data?.name,
                         })
@@ -66,7 +67,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
 
             const response = await deleteOrgRoadmap(roadmapId, session?.user?.organizationId)
 
-            mixpanel.track("Research Plan Deleted")
+            mixpanelTrack("Research Plan Deleted")
 
             if (!response.success) {
                 toast.error("An error occurred. Please try again later.")

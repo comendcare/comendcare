@@ -4,14 +4,15 @@ import { LogOut } from "lucide-react"
 import { signOut } from "next-auth/react"
 import {Button} from "@/components/ui/button";
 import mixpanel from "mixpanel-browser";
+import { mixpanelReset, mixpanelTrack } from "@/app/mixpanel";
 
 export default function LogoutButton() {
     return (
         <Button
             variant="ghost"
             onClick={() => {
-                mixpanel.track('User Logout')
-                mixpanel.reset()
+                mixpanelTrack('User Logout')
+                mixpanelReset()
                 signOut()
             }}
             className="transition-all duration-150 ease-in-out hover:bg-stone-200 active:bg-stone-300 dark:text-white dark:hover:bg-stone-700 dark:active:bg-stone-800"

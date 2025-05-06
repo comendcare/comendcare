@@ -42,6 +42,7 @@ import mixpanel from "mixpanel-browser";
 import {Member, Organization} from "@prisma/client";
 import {Calendar, Building2} from "lucide-react";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -346,7 +347,7 @@ export default function OrganizationOnboardingForm(
 
                     // Mixpanel tracking for "Other" fields
                     if (otherModality) {
-                        mixpanel.track("Org has other modality", {
+                        mixpanelTrack("Org has other modality", {
                             orgName: newOrgForm.watch("orgName") || "Unknown Org",
                             looking: otherModality,
                         });
@@ -355,7 +356,7 @@ export default function OrganizationOnboardingForm(
                     va.track("Created Organization")
 
                     if (newOrgForm.watch("looking")) {
-                        mixpanel.track(`User is looking for`, {
+                        mixpanelTrack(`User is looking for`, {
                             orgName: newOrgForm.watch("orgName"),
                             looking: newOrgForm.watch("looking")
                         })

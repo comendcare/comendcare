@@ -13,6 +13,7 @@ import mixpanel from "mixpanel-browser"
 import {toast} from "sonner";
 import { Organization } from "@prisma/client";
 import {Button} from "@/components/ui/button";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function ShareDialog({
     url,
@@ -33,7 +34,7 @@ export default function ShareDialog({
     }
 
     const trackMixpanelEvent = (socialOption: string) => {
-        mixpanel.track(`Organization Profile Shared`, {
+        mixpanelTrack(`Organization Profile Shared`, {
             "Platform": socialOption,
             ...(organization ? {
                 "Organization ID": organization.id,

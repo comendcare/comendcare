@@ -15,6 +15,7 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog"
 import { toast } from "sonner"
 import mixpanel from "mixpanel-browser"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,
@@ -40,7 +41,7 @@ export function DeleteMilestoneDialogContent({
 
     const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`, milestoneData?.nodeId)
-        mixpanel.track("Project Deleted", {
+        mixpanelTrack("Project Deleted", {
             "ID": milestoneData?.id,
             "Title": milestoneData?.title,
             "Types": (milestoneData.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),

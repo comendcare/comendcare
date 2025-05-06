@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { RFP } from '@/lib/types';
 import { createOrUpdateRFP, deleteRFP, syncDBRFPs } from '@/lib/actions';
 import mixpanel from 'mixpanel-browser';
+import { mixpanelTrack } from '@/app/mixpanel';
 
 export interface RFPState {
     rfps: RFP[],
@@ -25,7 +26,7 @@ export const useRFPStore = create<RFPState>()(
                 const newRfp = await createOrUpdateRFP(rfp, orgId)
                 console.log(`new rfp`, newRfp)
 
-                mixpanel.track("RFP Created", {
+                mixpanelTrack("RFP Created", {
                     "ID": newRfp.id,
                     "Name": newRfp.title,
                     "Budget": newRfp.budget,
@@ -44,7 +45,7 @@ export const useRFPStore = create<RFPState>()(
                 const updatedRfp = await createOrUpdateRFP(rfp, orgId)
                 console.log(`updated rfp`, updatedRfp)
 
-                mixpanel.track("RFP Updated", {
+                mixpanelTrack("RFP Updated", {
                     "ID": updatedRfp.id,
                     "Name": updatedRfp.title,
                     "Budget": updatedRfp.budget,
@@ -62,7 +63,7 @@ export const useRFPStore = create<RFPState>()(
                 const deletedRfp = await deleteRFP(rfpId)
                 console.log(`deleted rfp`, deletedRfp)
 
-                mixpanel.track("RFP Deleted", {
+                mixpanelTrack("RFP Deleted", {
                     "ID": deletedRfp.id,
                     "Name": deletedRfp.title,
                     "Budget": deletedRfp.budget,
