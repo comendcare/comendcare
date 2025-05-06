@@ -27,6 +27,7 @@ import {getUser} from "@/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
 import { handleImageDelete, handleImageUpload } from "@/lib/upload";
 import { FormImageSelector } from "./form-image-selector";
+import mixpanel from "mixpanel-browser";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -168,6 +169,21 @@ export default function UserEditForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
+            // handle mixpanel opt-in/opt-out
+            if (values.consentSettings) {
+                console.log(`mixpanel opt-in`)
+                if (session?.user?.id && session?.user?.email) {
+                    // identify the user if we can, to ensure we have the proper distinct ID
+                    if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
+                    else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+                }
+                mixpanel.opt_in_tracking()
+            } else if (!values.consentSettings) {
+                console.log(`mixpanel opt-out`)
+                mixpanel.opt_out_tracking()
+            }
+
+
             // only upload image if it is not the same as the previous one
             if (selectedFile && values.image && values.image !== defaultValues?.image) {
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
