@@ -95,7 +95,7 @@ export function parseCSV(file: File, expectedValues: ImportField[]): Promise<{va
                         }
                     })
                 } catch (e) {
-                    console.error("Error: failed to import assets", e)
+                    console.error("Error: failed to import tools", e)
                     reject(e)
                 }
 

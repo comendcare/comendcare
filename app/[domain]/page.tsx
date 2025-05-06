@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
-import BlogCard from "@/components/blog-card"
 import {
     getOrganizationData,
     getConditionsDataFromOrgId,
@@ -10,28 +9,12 @@ import {
 } from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
 import {RoadmapCard, UnderDevelopmentCard} from "@/components/public-roadmap-card";
-import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {FloatingDock} from "@/components/floating-dock";
-import {Share1Icon, PaperPlaneIcon} from "@radix-ui/react-icons";
-import {
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
-import {Button} from "@/components/ui/button"
 import ShareDialog from "@/components/share-dialog";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import {Card, CardContent} from "@/components/ui/card";
-import Image from "next/image";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
-import {FeedbackSheet} from "@/components/feedback";
-import FeedbackForm from "@/components/feedback-form";
-import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import React from "react";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
@@ -154,22 +137,6 @@ export default async function OrganizationHomePage({
                             }
                         </div>
                     </div>
-
-                    {/*{roadmaps?.length > 1 && (*/}
-                    {/*    <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">*/}
-                    {/*        <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">*/}
-                    {/*            More stories*/}
-                    {/*        </h2>*/}
-                    {/*        <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8">*/}
-                    {/*            {roadmaps*/}
-                    {/*                .slice(1)*/}
-                    {/*                .map((metadata: any, index: number) => (*/}
-                    {/*                    <BlogCard key={index} data={metadata} />*/}
-                    {/*                ))}*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
-
                 </div>
             </main>
 

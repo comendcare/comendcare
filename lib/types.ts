@@ -559,9 +559,9 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 
 export const NODE_TYPE_OPTIONS: Option[] = [
     { 
-        label: 'Asset', 
+        label: 'Tool', 
         value: 'ASSET',
-        description: 'An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+        description: 'A tool is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
     },
     { 
         label: 'Project', 

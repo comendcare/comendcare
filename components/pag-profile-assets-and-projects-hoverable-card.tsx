@@ -42,7 +42,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     <Tabs defaultValue="rfps" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="rfps">Requests for Proposals</TabsTrigger>
-                            <TabsTrigger value="assets">Assets</TabsTrigger>
+                            <TabsTrigger value="assets">Tools</TabsTrigger>
                         </TabsList>
                         <TabsContent value="rfps">
                             {rfps.filter(rfp => rfp.pinned).length > 0 && (
@@ -98,9 +98,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                         {assets.filter(asset => asset.pinned).map((asset) => (
                                             <Dialog>
                                                 <DialogTrigger asChild onClick={() => {
-                                                    mixpanel.track("Asset Details Viewed", {
+                                                    mixpanel.track("Tool Details Viewed", {
                                                         "ID": asset.id,
-                                                        "Asset Name": asset.title,
+                                                        "Tool Name": asset.title,
                                                         "Linked Milestones": asset.milestones.map(({ milestone }: any) => milestone),
                                                         // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                         // we flatten them into a single list that can be parsed

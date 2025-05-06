@@ -25,22 +25,22 @@ export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: 
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        Create an asset
+                        Create a tool
                     </TooltipContent>
                 </Tooltip>
             ) : (
                 <Button variant={"cta"} onClick={() => setIsOpen(true)}>
                     <Plus />
-                    {`Create an asset`}
+                    {`Create a tool`}
                 </Button>
             )}
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Create an Asset
+                        Create a Tool
                     </DialogTitle>
                     <DialogDescription>
-                        {`Create your Asset here. Click save when you're done.`}
+                        {`Create your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
                 <EditAssetForm assetData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
@@ -65,10 +65,10 @@ export const EditAssetDialog = ({children, data, numAssetsPinned}: {children: Re
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Edit an Asset
+                        Edit a Tool
                     </DialogTitle>
                     <DialogDescription>
-                        {`Edit your Asset here. Click save when you're done.`}
+                        {`Edit your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
                 <EditAssetForm assetData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
