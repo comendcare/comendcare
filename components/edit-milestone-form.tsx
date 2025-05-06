@@ -280,7 +280,7 @@ export function EditMilestoneForm({
         if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
             const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
 
-            mixpanel.track("Milestone has other type", {
+            mixpanel.track("Project has other type", {
                 orgName: response?.data?.name || "Unknown Org",
                 milestoneTitle: title,
                 milestoneType: otherTypeDetails,

@@ -159,9 +159,9 @@ export function Roadmap() {
         const params = new URLSearchParams(searchParams.toString())
 
         if (selectedNodeId) {
-            params.set("milestone", selectedNodeId)
+            params.set("project", selectedNodeId)
         } else {
-            params.delete("milestone")
+            params.delete("project")
         }
 
         if (selectedView) {
