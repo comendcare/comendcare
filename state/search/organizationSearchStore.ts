@@ -6,6 +6,7 @@ import {temporal} from 'zundo';
 import {create} from 'zustand';
 import type { Option } from '@/lib/types';
 import { getExclusiveToFirstGroup } from '@/lib/utils';
+import { mixpanelTrack } from '@/app/mixpanel';
 
 export type ViewType = 'grid' | 'list'
 
@@ -186,7 +187,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                 if (newSearch.length > 0) {
                     // only track searches if the user has entered text in the searchbar
                     const filters = get().filters
-                    mixpanel.track("Search Organizations", {
+                    mixpanelTrack("Search Organizations", {
                         "Search Term": newSearch,
                         "Results": total,
                         "Filters": {
@@ -254,7 +255,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
 
                 if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
                     // only track in mixpanel if something in the filters has been updated
-                    mixpanel.track("Marketplace Organization Filters Selected", {
+                    mixpanelTrack("Marketplace Organization Filters Selected", {
                         "Results": total,
                         "Filters": {
                             "Mechanisms of Action": newFilters.mechanisms.map(filter => filter.label),

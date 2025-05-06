@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { Asset } from '@/lib/types';
 import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@/lib/actions';
 import mixpanel from 'mixpanel-browser';
+import { mixpanelTrack } from '@/app/mixpanel';
 
 export interface AssetState {
     assets: Asset[],
@@ -24,7 +25,7 @@ export const useAssetStore = create<AssetState>()(
             createAsset: async (asset: Partial<Asset>, orgId: string) => {
                 const newAsset = await createOrUpdateAsset(asset, orgId)
 
-                mixpanel.track("Tool Created", {
+                mixpanelTrack("Tool Created", {
                     "ID": newAsset.id,
                     "Name": newAsset.title,
                     "Linked Projects": (newAsset?.milestones || []).map(({ milestone }) => milestone),
@@ -42,7 +43,7 @@ export const useAssetStore = create<AssetState>()(
                 const updatedAsset = await createOrUpdateAsset(asset, orgId)
                 console.log(`updated asset`, updatedAsset)
 
-                mixpanel.track("Tool Updated", {
+                mixpanelTrack("Tool Updated", {
                     "ID": updatedAsset.id,
                     "Tool Name": updatedAsset.title,
                     "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }) => milestone),
@@ -57,7 +58,7 @@ export const useAssetStore = create<AssetState>()(
             deleteAsset: async (assetId: string) => {
                 const deletedAsset = await deleteAsset(assetId)
 
-                mixpanel.track("Tool Deleted", {
+                mixpanelTrack("Tool Deleted", {
                     "ID": deletedAsset.id,
                     "Tool Name": deletedAsset.title,
                     "Linked Projects": (deletedAsset?.milestones || []).map(({ milestone }) => milestone),

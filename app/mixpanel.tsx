@@ -18,6 +18,30 @@ export const useMixpanelContext = () => {
     return context
 }
 
+export const mixpanelTrack = (name: string, properties?: Object) => {
+    if (process.env.NEXT_PUBLIC_NODE_ENV == 'production' || process.env.NEXT_PUBLIC_MIXPANEL_ENABLED == 'true') {
+        try {
+            mixpanel.track(name, properties)
+        } catch(e) {
+            console.error(`Error tracking mixpanel event: ${e}`)
+        }
+    } else {
+        console.log(`Mixpanel event not tracked: Mixpanel is currently not enabled in your pre-production environment. Update the NEXT_PUBLIC_MIXPANEL_ENABLED flag to enable/disable mixpanel tracking.`)
+    }
+}
+
+export const mixpanelReset = () => {
+    if (process.env.NEXT_PUBLIC_NODE_ENV == 'production' || process.env.NEXT_PUBLIC_MIXPANEL_ENABLED == 'true') {
+        try {
+            mixpanel.reset()
+        } catch(e) {
+            console.error(`Error tracking mixpanel event: ${e}`)
+        }
+    } else {
+        console.log(`Mixpanel event not tracked: Mixpanel is currently not enabled in your pre-production environment. Update the NEXT_PUBLIC_MIXPANEL_ENABLED flag to enable/disable mixpanel tracking.`)
+    }
+}
+
 export const MixpanelProvider = ({ children }: { children: any }) => {
     const { data: session, status } = useSession()
     const [isMixpanelInitialized, setIsMixpanelInitialized] = useState(false)
@@ -34,7 +58,13 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
 
     useEffect(() => {
         if (process.env.NEXT_PUBLIC_NODE_ENV == "preview" || process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+            if (process.env.NEXT_PUBLIC_MIXPANEL_ENABLED !== 'true') {
+                console.warn('Mixpanel is currently not enabled in your pre-production environment. Update the NEXT_PUBLIC_MIXPANEL_ENABLED flag to enable/disable mixpanel tracking.')
+                return
+            }
+
             if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV) throw new Error('Mixpanel dev token not found.')
+            
             try {
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, {
                     debug: true,
@@ -48,6 +78,13 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                 })
                 console.log("Mixpanel (dev) initialized")
                 setIsMixpanelInitialized(true)
+
+                if (process.env.NEXT_PUBLIC_MIXPANEL_ENABLED !== 'true') {
+                    // throw new Error('Mixpanel events are disabled in your pre-production environment. Update the MIXPANEL_ENABLED flag to enable event tracking.')
+                    console.warn('Mixpanel events are disabled in your pre-production environment. Update the MIXPANEL_ENABLED flag to enable event tracking.')
+                    // return
+                    mixpanel.disable()
+                }
             } catch (error) {
                 console.error("Mixpanel (dev) initialization failed:", error)
             }
@@ -80,7 +117,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                 if (userData.success && userData.data) {
 
                     // handle opt-opt in option
-                    const mixpanelPublicToken = process.env.NODE_ENV === 'production'
+                    const mixpanelPublicToken = process.env.NEXT_PUBLIC_NODE_ENV === 'production'
                         ? process.env.NEXT_PUBLIC_MIXPANEL_TOKEN
                         : process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV
                     

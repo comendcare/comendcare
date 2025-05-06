@@ -33,6 +33,7 @@ import {revalidatePath} from "next/cache";
 import { signOut } from "next-auth/react"
 import {getAllMembershipsFromUserId} from "@/lib/fetchers";
 import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function UserSettings() {
     const {data: session, update} = useSession()
@@ -90,7 +91,7 @@ export default function UserSettings() {
             await signOut()
             const response = await deleteUser(session)
 
-            mixpanel.track("User Account Deleted", {
+            mixpanelTrack("User Account Deleted", {
                 "Name": response?.data?.name,
                 "Email": response?.data?.email
             })

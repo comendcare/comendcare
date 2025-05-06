@@ -15,6 +15,7 @@ import { Milestone, NodeType, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { MilestoneTypeOnMilestone } from "@prisma/client"
 import mixpanel from "mixpanel-browser"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 export type RoadmapState = {
     initialized: boolean,
@@ -258,7 +259,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const response = await createNodes({ roadmapId: get().roadmapId, nodes })
             if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
                 response.data.milestones.forEach(milestone => {
-                    mixpanel.track("Project Created", {
+                    mixpanelTrack("Project Created", {
                         "Creation Method": creationMethod,
                         "Title": milestone.title,
                         "Types": milestone.types.map((type: any) => type.milestoneType.label || type.miletoneType.id)

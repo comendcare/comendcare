@@ -81,7 +81,7 @@ export default function InviteUserToOrgDialog() {
                 const invitation = response.data
                 setIsOpen(false)
 
-                mixpanel.track("Membership Invitation Sent", {
+                mixpanelTrack("Membership Invitation Sent", {
                     "Email": invitation.email,
                     "Role": invitation.role
                 })
