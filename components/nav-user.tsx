@@ -320,6 +320,7 @@ export function NavUser() {
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator/>
                                     <DropdownMenuItem onClick={() => {
+                                        mixpanel.track('User Logout')
                                         mixpanel.reset()
                                         signOut()
                                     }}>

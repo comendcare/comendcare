@@ -10,6 +10,7 @@ export default function LogoutButton() {
         <Button
             variant="ghost"
             onClick={() => {
+                mixpanel.track('User Logout')
                 mixpanel.reset()
                 signOut()
             }}
