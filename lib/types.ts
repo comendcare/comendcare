@@ -16,6 +16,7 @@ import {
     Asset as DBAsset,
     RFP as DBRFP
 } from "@prisma/client";
+import { z } from "zod";
 
 export type MilestoneKey =
     | "Add website and description"
@@ -57,6 +58,28 @@ export type ImportField = {
     defaultValue: any,
     isValid: (value: any) => boolean
 }
+
+export type Roadmap = Prisma.RoadmapGetPayload<{
+    include: {
+        nodes: {
+            include: {data: true},
+            orderBy: [{ createdAt: "desc" }]
+        },
+        milestones: {
+            include: {
+                node: true,
+                contacts: true,
+                attachments: true,
+                types: {include: { milestoneType: true }},
+                assets: {include: {asset: true}},
+                rfps: {include: {rfp: true}}
+            },
+            orderBy: [{ createdAt: "desc" }]
+        },
+        edges: true,
+        organization: true
+    }
+}>
 
 export type Asset = Omit<Prisma.AssetGetPayload<{
     include: {
@@ -136,6 +159,12 @@ export interface Option {
     /** Group the options by providing key. */
     [key: string]: any;
 }
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+})
 
 export type AssetTableData = Asset & {
     asset: Asset

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { templateResearchPlans } from "@/lib/templates";
-import { createRoadmap } from "@/lib/actions";
 import { useSession } from "next-auth/react";
 import { CreateEmptyResearchPlanCard, CreateResearchPlanFromTemplateCard, ResearchPlanTemplatesCard } from "@/components/roadmap-templates";
 import { ResearchPlansDataTable } from "@/components/research-plans-data-table/research-plans-data-table";

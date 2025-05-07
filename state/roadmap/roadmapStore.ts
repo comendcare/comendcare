@@ -11,21 +11,15 @@ import {
 import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@/lib/actions"
 import { toast } from "sonner"
 import { nanoid } from "nanoid"
-import { Milestone, NodeType, StatusType } from "@/lib/types"
+import { Milestone, NodeType, Roadmap, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
-import { MilestoneTypeOnMilestone, Roadmap } from "@prisma/client"
 import mixpanel from "mixpanel-browser"
 import { mixpanelTrack } from "@/app/mixpanel"
-
-export type ResearchPlanDetails = {
-    title: string,
-    description: string | undefined
-}
 
 export type RoadmapState = {
     initialized: boolean,
     initState: (
-        details: ResearchPlanDetails, 
+        details: Roadmap | undefined, 
         nodes: Node[], 
         edges: Edge[], 
         milestones: Milestone[], 
@@ -34,8 +28,8 @@ export type RoadmapState = {
         selectedTaskId: string | null, 
         roadmapId: string
     ) => void,
-    details: ResearchPlanDetails,
-    setDetails: (details: ResearchPlanDetails) => Promise<void>
+    details: Roadmap | undefined,
+    setDetails: (details: Partial<Roadmap>) => Promise<void>
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -62,7 +56,7 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (details: ResearchPlanDetails, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (details: Roadmap | undefined, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
@@ -70,16 +64,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             }))
             set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
         },
-        details: {
-            title: '',
-            description: ''
-        },
-        setDetails: async (details: ResearchPlanDetails) => {
-            // update research plan details here...
-            // if (id !== get().roadmapId) {
-            //     console.error(`Error: Given resarch plan ID does not match the active research plan. Could not update research plan.`)
-            //     return
-            // }
+        details: undefined,
+        setDetails: async (details: Partial<Roadmap> | undefined) => {
             const id = get().roadmapId
 
             if (!id) {
@@ -87,15 +73,19 @@ export const useRoadmapStore = create<RoadmapState>()(
                 return
             }
 
+            if (!details) {
+                console.error(`Error: research plan details are not intialized.`)
+                return
+            }
+
             const roadmap = await updateRoadmap({
                 id,
                 title: details.title,
-                description: details.description || null
+                description: details.description || null,
+                modalities: details.modalities || []
             })
 
-            if (roadmap) {
-                set({ details })
-            }
+            if (roadmap) set({ details: roadmap as Roadmap })
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {

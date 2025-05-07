@@ -1,6 +1,6 @@
 "use client";
 
-import { ResearchPlanDetails, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { PlatformNotification, Prisma } from "@prisma/client";
 import { useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { useCROSearchStore } from "@/state/search/croSearchStore";
@@ -8,7 +8,7 @@ import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
-import { Asset, RFP } from '@/lib/types';
+import { Asset, RFP, Roadmap } from '@/lib/types';
 import { useAssetStore } from "@/state/asset/assetStore";
 import { useRFPStore } from "@/state/rfp/rfpStore";
 
@@ -41,11 +41,11 @@ export function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType)
 
 export function initializeRoadmapState(initData: {
     roadmapId: string | null | undefined
-    details: ResearchPlanDetails,
+    details: Roadmap | undefined
     nodes: any[]
     edges: any[]
-    milestones: any[],
-    selectedView?: string | null,
+    milestones: any[]
+    selectedView?: string | null
     selectedNodeId: string | null
 }) {
     const { clear } = useRoadmapStore.temporal.getState()

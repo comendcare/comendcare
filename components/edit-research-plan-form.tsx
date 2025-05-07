@@ -25,6 +25,8 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { sleep } from "@/lib/utils"
+import MultipleSelector from "./ui/multiple-selector"
+import { MODALITIES, optionSchema } from "@/lib/types"
 
 const editMilestoneForm = z.object({
     nodeType: z.string(),
@@ -37,7 +39,11 @@ const editMilestoneForm = z.object({
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
-        .optional()
+        .optional(),
+    modalities: z.array(optionSchema)
+        .min(1, "Please select a type")
+        .max(1, "You can only select one type")
+        .optional(),
 })
 
 const selector = (state: RoadmapState) => ({
@@ -60,7 +66,8 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
             title: researchPlanData?.title || undefined,
-            description: researchPlanData?.description || undefined
+            description: researchPlanData?.description || undefined,
+            modalities: MODALITIES.filter(modality => (researchPlanData?.modalities || []).includes(modality.value))
         }
     })
 
@@ -74,14 +81,17 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             // if the research plan already exists, just update it
             await setDetails({
                 title: values.title,
-                description: values.description
+                description: values.description || null,
+                modalities: (values.modalities || []).map(modality => modality.value)
             })
             if (closeDialog) closeDialog()
         } else {
             // if the research plan doesn't exist yet, create it
             const roadmap =  await createRoadmap(session.user.organizationId, {
                 title: values.title,
-                description: values.description
+                description: values.description || '',
+                modalities: values.modalities || [],
+                milestones: [],
             })
 
             if (roadmap && roadmap.id) {
@@ -92,11 +102,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 w-full"} type={"always"}>
-            <form
-                onSubmit={form.handleSubmit(handleFormSubmit)}
-                className="w-full max-w-xl flex flex-col gap-4 mt-2 px-1"
-            >
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
                 <FormField
                     control={form.control}
                     name="title"
@@ -131,6 +137,32 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                 />
                             </FormControl>
                             <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField 
+                    control={form.control}
+                    name="modalities"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel >{`Type`}</FormLabel>
+                            <FormDescription>{`Select a type that represents the goal of your research plan.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={MODALITIES}
+                                    placeholder="Select a type..."
+                                    hidePlaceholderWhenSelected={true}
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    maxSelected={1}
+                                    showHoverCard={false}
+                                />
+                            </FormControl>
                         </FormItem>
                     )}
                 />
@@ -206,7 +238,6 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                 </div>
 
             </form>
-            </ScrollArea>
         </Form>
     )
 }

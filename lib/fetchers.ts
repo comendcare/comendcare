@@ -158,8 +158,6 @@ export async function getPublicRFPsForOrganization(domain: string) {
     return rfps
 }
 
-
-
 export async function getPublicRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
@@ -374,84 +372,6 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
     //         tags: [`${domain}-roadmaps`]
     //     }
     // )()
-}
-
-export async function getRoadmapData(domain: string, slug: string) {
-    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : null
-
-    return await unstable_cache(
-        async () => {
-            const data = await prisma.roadmap.findFirst({
-                where: {
-                    organization: subdomain
-                        ? {subdomain}
-                        : {customDomain: domain},
-                    slug,
-                    published: true
-                },
-                include: {
-                    organization: {
-                        include: {
-                            user: true
-                        }
-                    }
-                }
-            })
-
-            if (!data) return null
-
-            const [mdxSource, adjacentRoadmaps] = await Promise.all([
-                getMdxSource(data.content!),
-                prisma.roadmap.findMany({
-                    where: {
-                        organization: subdomain
-                            ? {subdomain}
-                            : {customDomain: domain},
-                        published: true,
-                        NOT: {
-                            id: data.id
-                        }
-                    },
-                    select: {
-                        slug: true,
-                        title: true,
-                        createdAt: true,
-                        description: true,
-                        image: true,
-                        // imageBlurhash: true
-                    }
-                })
-            ])
-
-            return {
-                ...data,
-                mdxSource,
-                adjacentRoadmaps
-            }
-        },
-        [`${domain}-${slug}`],
-        {
-            revalidate: 900, // 15 minutes
-            tags: [`${domain}-${slug}`]
-        }
-    )()
-}
-
-async function getMdxSource(roadmapContents: string) {
-    // transforms links like <link> to [link](link) as MDX doesn't support <link> syntax
-    // https://mdxjs.com/docs/what-is-mdx/#markdown
-    const content =
-        roadmapContents?.replaceAll(/<(https?:\/\/\S+)>/g, "[$1]($1)") ?? ""
-    // Serialize the content string into MDX
-    const mdxSource = await serialize(content, {
-        mdxOptions: {
-            remarkPlugins: [replaceTweets, () => replaceExamples(prisma)]
-        }
-    })
-
-    return mdxSource
 }
 
 export async function getMembers(organizationId: string | null | undefined) {
@@ -705,27 +625,16 @@ export async function getRoadmaps(orgId: string | null | undefined) {
 }
 
 export async function getRoadmap(orgId: string | null | undefined, roadmapId: string | null | undefined) {
-    if (!orgId) {
-        return {success: false, error: "No organization id provided."}
-    }
-
-    if (!roadmapId) {
-        return {success: false, error: "No roadmap id provided"}
-    }
+    if (!orgId) return {success: false, error: "No organization id provided."}
+    if (!roadmapId) return {success: false, error: "No roadmap id provided."}
 
     try {
         const organization = await prisma.organization.findUnique({
-            include: {
-                roadmaps: true
-            },
-            where: {
-                id: decodeURIComponent(orgId)
-            }
+            include: {roadmaps: true},
+            where: {id: decodeURIComponent(orgId)}
         })
 
-        if (!organization) {
-            return {success: false, error: "organization not found"};
-        }
+        if (!organization) return {success: false, error: "Organization not found."}
 
         const roadmap = await prisma.roadmap.findFirst({
             where: {
@@ -734,6 +643,7 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
             },
             include: {
                 nodes: {
+                    include: {data: true},
                     orderBy: [{ createdAt: "desc" }]
                 },
                 milestones: {
@@ -741,9 +651,9 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } },
-                        assets: { include: { asset: true } },
-                        rfps: { include: { rfp: true } }
+                        types: {include: { milestoneType: true }},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     },
                     orderBy: [{ createdAt: "desc" }]
                 },
@@ -752,13 +662,10 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
             }
         })
 
-        return {
-            success: true,
-            data: roadmap
-        };
+        return {success: true, data: roadmap}
     } catch (error: any) {
         logError("Error fetching roadmap", error);
-        return {success: false, error: "Internal server error"};
+        return {success: false, error: "Internal server error."};
     }
 }
 
@@ -1050,69 +957,6 @@ export async function getKanbanFromOrganizationId() {
         console.error("Database error finding task board details:", error)
         return {success: false, error: "Database error. please try again later."}
     }
-}
-
-export async function getNodesEdgesAndMilestones(roadmapId: string | null | undefined): Promise<ApiResponse<any>> {
-    if (roadmapId) {
-        try {
-            const dbNodes = await Promise.all(
-                (
-                    await prisma.node.findMany({
-                        where: {roadmapId: roadmapId},
-                        include: {data: true},
-                        orderBy: [{ createdAt: "desc" }]
-                    })
-                ).map(async node => {
-                    const {id, positionX, positionY, origin, createdAt, updatedAt} = node
-
-                    return {
-                        id,
-                        position: {
-                            x: positionX,
-                            y: positionY
-                        },
-                        origin,
-                        createdAt,
-                        updatedAt
-                    }
-                })
-            )
-
-            const dbEdges = await Promise.all(
-                (await prisma.edge.findMany({
-                    where: {roadmapId: roadmapId}
-                })).map(async edge => {
-                    const {id, source, target} = edge
-
-                    return {
-                        id,
-                        source,
-                        target
-                    }
-                })
-            )
-
-            const dbMilestones = await prisma.milestone.findMany({
-                where: {roadmapId: roadmapId},
-                include: {
-                    node: true,
-                    contacts: true,
-                    attachments: true,
-                    types: { include: { milestoneType: true } },
-                    assets: {include: {asset: true}},
-                    rfps: {include: {rfp: true}}
-                },
-                orderBy: [{ createdAt: "desc" }]
-            })
-
-            return {success: true, data: {nodes: dbNodes, edges: dbEdges, milestones: dbMilestones}}
-        } catch (error: any) {
-            console.error("Database error finding nodes, edges, and milestones details:", error)
-            return {success: false, error: "Database error. please try again later."}
-        }
-    }
-
-    return {success: false, error: "No roadmapId provided."}
 }
 
 export async function getColumns(orgId: string | null | undefined): Promise<ApiResponse<any>> {
