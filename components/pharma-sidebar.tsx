@@ -19,7 +19,7 @@ import {
     UsersIcon,
 } from "lucide-react"
 
-import { NavDocuments } from "@/components/nav-documents"
+import { NavProjects } from "@/components/nav-projects"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -51,9 +51,14 @@ const data = {
             icon: DatabaseIcon,
         },
         {
-            title: "Marketplace",
+            title: "Tools",
             url: "#",
             icon: ListIcon,
+        },
+        {
+            title: "Patient Groups",
+            url: "#",
+            icon: UsersIcon,
         },
     ],
     navSecondary: [
@@ -102,7 +107,7 @@ export function PharmaSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavDocuments items={data.documents} />
+                <NavProjects items={data.documents} />
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
