@@ -42,76 +42,18 @@ const data = {
     navMain: [
         {
             title: "Dashboard",
-            url: "#",
+            url: "/pharma/dashboard",
             icon: LayoutDashboardIcon,
         },
         {
-            title: "Lifecycle",
+            title: "BioRepo",
+            url: "#",
+            icon: DatabaseIcon,
+        },
+        {
+            title: "Marketplace",
             url: "#",
             icon: ListIcon,
-        },
-        {
-            title: "Analytics",
-            url: "#",
-            icon: BarChartIcon,
-        },
-        {
-            title: "Projects",
-            url: "#",
-            icon: FolderIcon,
-        },
-        {
-            title: "Team",
-            url: "#",
-            icon: UsersIcon,
-        },
-    ],
-    navClouds: [
-        {
-            title: "Capture",
-            icon: CameraIcon,
-            isActive: true,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Proposal",
-            icon: FileTextIcon,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Prompts",
-            icon: FileCodeIcon,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
         },
     ],
     navSecondary: [
@@ -125,27 +67,17 @@ const data = {
             url: "#",
             icon: HelpCircleIcon,
         },
-        {
-            title: "Search",
-            url: "#",
-            icon: SearchIcon,
-        },
     ],
     documents: [
         {
-            name: "Data Library",
+            name: "ASO for type 1 Arcadion",
             url: "#",
-            icon: DatabaseIcon,
+            icon: FolderIcon,
         },
         {
-            name: "Reports",
+            name: "AAV for Celocyn Syndrome",
             url: "#",
-            icon: ClipboardListIcon,
-        },
-        {
-            name: "Word Assistant",
-            url: "#",
-            icon: FileIcon,
+            icon: FolderIcon,
         },
     ],
 }

@@ -3,6 +3,7 @@
 import {
     FolderIcon,
     MoreHorizontalIcon,
+    Plus,
     ShareIcon,
     type LucideIcon,
 } from "lucide-react"
@@ -36,7 +37,7 @@ export function NavDocuments({
 
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Documents</SidebarGroupLabel>
+            <SidebarGroupLabel>Projects</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.name}>
@@ -75,8 +76,8 @@ export function NavDocuments({
                 ))}
                 <SidebarMenuItem>
                     <SidebarMenuButton className="text-sidebar-foreground/70">
-                        <MoreHorizontalIcon className="text-sidebar-foreground/70" />
-                        <span>More</span>
+                        <Plus className="text-sidebar-foreground/70" />
+                        <span>New project</span>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
