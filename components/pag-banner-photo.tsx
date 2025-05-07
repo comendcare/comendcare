@@ -101,9 +101,9 @@ export function PAGBannerPhoto({
         <div className="relative w-full">
             {/* Banner Image */}
             {img ? (
-                <img className="h-32 w-full object-cover lg:h-48" src={img || ""} alt=""/>
+                <img className="w-full object-cover" src={img || ""} alt=""/>
             ) : (
-                <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
+                <div className="w-full object-cover bg-secondary"></div>
             )}
 
             {/* Edit Button (Only if Editable) */}
