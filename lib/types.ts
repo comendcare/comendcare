@@ -254,6 +254,47 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // },
 ]
 
+export const TREATMENT_TYPE = [
+    {
+        label: 'Gene Therapy',
+        description: 'Fixes or replaces faulty genes',
+        modalities: ['GENE_THERAPY_AAV', 'GENE_EDITING']
+    },
+    {
+        id: '2',
+        label: 'RNA Therapy',
+        description: 'Targets how genes are read (e.g., ASOs)',
+        modalities: ['ANTISENSE_OLIGONUCLEOTIDE', 'OTHER_RNA_THERAPY']
+    },
+    {
+        id: '3',
+        label: 'Cell Therapy',
+        description: 'Uses modified or donor cells to treat disease',
+    },
+    {
+        id: '4',
+        label: 'Drug Therapy',
+        description: 'Uses small molecules or repurposed drugs',
+        modalities: ['DRUG_REPURPOSING_SCREENING']
+    },
+    {
+        id: '5',
+        label: 'Enzyme Therapy',
+        description: 'Replaces missing or faulty enzymes',
+        modalities: ['ENZYME_REPLACEMENT']
+    },
+    {
+        id: '6',
+        label: 'Protein Therapy',
+        description: 'Delivers helpful proteins to cells',
+    },
+    {
+        id: '7',
+        label: 'Other',
+        modalities: ['PATHWAY_MODULATORS', 'EXPLORATORY_RESEARCH']
+    },
+]
+
 export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
     {
         id: '1',
