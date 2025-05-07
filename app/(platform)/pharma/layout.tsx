@@ -274,7 +274,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     if (status === "authenticated" && session) {
         return (
             <SidebarProvider>
-                <PharmaSidebar variant="inset"/>
+                <PharmaSidebar/>
                 <SidebarInset>
                     <PharmaHeader/>
                     <div className="flex flex-1 flex-col">
