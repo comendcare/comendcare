@@ -42,6 +42,7 @@ import {
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
+import { templateResearchPlans } from "./templates"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -875,6 +876,22 @@ export const updateRoadmap = async (data: Partial<Roadmap>) => {
             id: data.id
         },
         include: {
+            nodes: {
+                include: {data: true},
+                orderBy: [{ createdAt: "desc" }]
+            },
+            milestones: {
+                include: {
+                    node: true,
+                    contacts: true,
+                    attachments: true,
+                    types: {include: { milestoneType: true }},
+                    assets: {include: {asset: true}},
+                    rfps: {include: {rfp: true}}
+                },
+                orderBy: [{ createdAt: "desc" }]
+            },
+            edges: true,
             organization: true
         }
     })
@@ -889,7 +906,8 @@ export const updateRoadmap = async (data: Partial<Roadmap>) => {
             data: {
                 title: data.title,
                 description: data.description,
-                content: data.content
+                content: data.content,
+                modalities: data.modalities
             }
         })
 
@@ -1988,14 +2006,15 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
 }
 
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
-export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
+export async function createRoadmap(organizationId: string, roadmapTemplate?: typeof templateResearchPlans[0] | undefined) {
     const roadmap = await prisma.roadmap.create({
         data: {
-            title: roadmapTemplate.title,
-            description: roadmapTemplate.description,
+            title: roadmapTemplate?.title,
+            description: roadmapTemplate?.description,
             organization: {
                 connect: {id: organizationId}
-            }
+            },
+            modalities: roadmapTemplate?.modalities.map(modality => modality.value)
         }
     })
 
