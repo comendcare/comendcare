@@ -16,6 +16,7 @@ import {
     Asset as DBAsset,
     RFP as DBRFP
 } from "@prisma/client";
+import { StaticImageData } from "next/image";
 
 export type MilestoneKey =
     | "Add website and description"
@@ -176,6 +177,17 @@ export type CommentWithUser = Prisma.CommentGetPayload<{
 export type PostWithAuthorAndComments = Post & {
     author: User
     comments: Comment[]
+}
+
+export type TagType = "start" | "contribute" | "rules" | "resource" | "guide" | "collections"
+
+export interface ArticleType {
+    prompt: string
+    description?: string
+    href: string
+    tags: TagType[]
+    thumbnailSrc?: StaticImageData
+    imgParams: string
 }
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
