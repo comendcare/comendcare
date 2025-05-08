@@ -40,8 +40,9 @@ import { MilestoneType, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
-import { Separator } from "@radix-ui/react-separator"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
+import { StageOfActivityBadge } from "./public-roadmap-card"
+import { Separator } from "./ui/separator"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -209,6 +210,7 @@ export function Roadmap() {
                         setTab={setTab}
                         setNewMilestoneIsOpen={setNewMilestoneIsOpen}
                         addMilestones={addMilestones}
+                        milestones={milestones}
                         milestoneTypes={milestoneTypes}
                         setBulkImportIsOpen={setBulkImportIsOpen}
                         orgSubdomain={orgSubdomain}
@@ -533,6 +535,7 @@ const RoadmapHeader = ({
     setTab, 
     setNewMilestoneIsOpen, 
     addMilestones, 
+    milestones,
     milestoneTypes, 
     setBulkImportIsOpen,
     orgSubdomain
@@ -541,6 +544,7 @@ const RoadmapHeader = ({
     setTab: any, 
     setNewMilestoneIsOpen: any, 
     addMilestones: any, 
+    milestones: any[]
     milestoneTypes: any, 
     setBulkImportIsOpen: any,
     orgSubdomain: string | undefined
@@ -571,25 +575,26 @@ const RoadmapHeader = ({
     }, [parentWidth])
 
     return (
-        <div ref={parentRef} className="flex p-2 justify-between items-start bg-gray-100 rounded-md">
-            <span className="flex flex-row items-start gap-x-1">
+        <>
+        <div ref={parentRef} className="flex p-x-2 justify-between items-start">
+            <span className="flex flex-row items-center gap-x-1">
                 <h1 className="h-full my-auto text-2xl font-semibold text-wrap line-clamp-2">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
                             onClick={() => setEditResearchPlanIsOpen(true)} 
-                            variant={"secondary"}
+                            variant={"ghost"}
                             size={isCollapsed ? "icon" : "default"}
-                            className="w-16"
+                            // className="w-16"
                         >
                             <Pencil />
-                            {!isCollapsed && <p>{``}</p>}
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
                         <p>{`Edit the details of your research plan, like the title and description.`}</p>
                     </TooltipContent>
                 </Tooltip>
+                <StageOfActivityBadge milestones={milestones} />
             </span>
 
             <span className="onborda-create-a-project flex flex-row items-start gap-x-1 justify-end">
@@ -604,7 +609,7 @@ const RoadmapHeader = ({
                                         title: 'New Project',
                                 }], "Create Empty Button")
                             }} 
-                            variant={"secondary"}
+                            variant={"ghost"}
                             size={isCollapsed ? "icon" : "default"}
                         >
                             <Plus />
@@ -625,7 +630,7 @@ const RoadmapHeader = ({
                                 console.log("Bulk import triggered")
                                 setBulkImportIsOpen(true)
                             }} 
-                            variant={"secondary"}
+                            variant={"ghost"}
                             size={isCollapsed ? "icon" : "default"}
                         >
                             <Import />
@@ -681,5 +686,7 @@ const RoadmapHeader = ({
                 </DialogContent>
             </Dialog>
         </div>
+        <Separator className="w-full" />
+        </>
     )
 }
