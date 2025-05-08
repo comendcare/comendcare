@@ -127,16 +127,24 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         return
                     }
 
-                    if (localStorage.getItem(`mp_${mixpanelPublicToken}_mixpanel`) === null) {
-                        // if the opt-in/opt-out token is not available in localstorage, pull user connsent data from database
-                        if (userData.data.consentSettings === true) {
-                            mixpanel.opt_in_tracking()
-                        } else {
-                            mixpanel.opt_out_tracking()
-                        }
-                    }
+                    // if (localStorage.getItem(`mp_${mixpanelPublicToken}_mixpanel`) === null) {
+                    //     // if the opt-in/opt-out token is not available in localstorage, pull user connsent data from database
+                    //     if (userData.data.consentSettings === true) {
+                    //         console.log(`mixpanel opt-in`)
+                    //         mixpanel.opt_in_tracking()
+                    //     } else {
+                    //         console.log(`mixpanel opt-out`)
+                    //         mixpanel.opt_out_tracking()
+                    //     }
+                    // }
+
+                    // if (localStorage.getItem(`mp_${mixpanelPublicToken}_mixpanel`) === 'false') {
+                    //     // if the user has not consented, opt them out (just in case they have been previously identified while logged out)
+                    //     console.log(`mixpanel opt-out`)
+                    //     mixpanel.opt_out_tracking()
+                    // }
  
-                    if (userData.data.consentSettings) {
+                    if (userData.data.consentSettings === true) {
                         // user has consented to data tracking, opt into mixpanel tracking
                         console.log(`mixpanel identify user`, userData)
                         if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
@@ -163,8 +171,19 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             
                         const distinctId = mixpanel.get_distinct_id()
                         setMixpanelContext({ distinctId })
+
+                        // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
+                        // set the user's 'opt-in' flag
+                        if (localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
+                            console.log(`mixpanel opt-in`)
+                            mixpanel.opt_in_tracking()
+                        }
             
                         if (session.user.email) customerIOIdentify(distinctId, session)
+                    } else {
+                        // if the user has not consented, make sure they are opted out of mixpanel tracking
+                        console.log(`mixpanel opt-out`)
+                        mixpanel.opt_out_tracking()
                     }
                 }
             }

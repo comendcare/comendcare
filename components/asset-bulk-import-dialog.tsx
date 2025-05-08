@@ -49,7 +49,7 @@ export function AssetBulkImportDialog() {
                     duration: 6000,
                     description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                 })
-                console.error("Error: failed to import assets", e)
+                console.error("Error: failed to import tools", e)
             }
         } else {
             console.error("Please upload a valid CSV file.");
@@ -72,7 +72,7 @@ export function AssetBulkImportDialog() {
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
-                        <p>{`Import assets from .csv`}</p>
+                        <p>{`Import tools from .csv`}</p>
                     </TooltipContent>
                 </Tooltip>
             </DialogTrigger>

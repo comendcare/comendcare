@@ -1,6 +1,6 @@
 "use client"
 
-import React, {ReactNode} from "react"
+import React, {ReactNode, useEffect, useRef, useState} from "react"
 import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import {cn} from "@/lib/utils"
@@ -21,8 +21,20 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     urlMilestone?: string | undefined,
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
+    const contentRef = useRef<HTMLDivElement>(null)
+    const [height, setHeight] = useState<number>()
+
+    useEffect(() => {
+      if (contentRef.current) {
+        const contentHeight = contentRef.current.scrollHeight
+        const maxHeight = window.innerHeight * 0.7
+        setHeight(Math.min(contentHeight, maxHeight))
+      }
+    }, [])
+
     return (
-        <ScrollArea className="h-min max-h-[70vh]">
+        <ScrollArea style={{ height }} className="pr-4">
+            <div ref={contentRef}>
             <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                 {roadmap?.milestones?.sort((a: any, b: any) => {
                     // sort by custom order
@@ -50,9 +62,10 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
                         ?
                         <TimelineElementLink key={index} subdomain={subdomain} item={item} urlMilestone={urlMilestone}/>
                         : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone}
-                                                 urlMilestone={urlMilestone}/>
+                                                    urlMilestone={urlMilestone}/>
                 ))}
             </ol>
+            </div>
         </ScrollArea>
     )
 }

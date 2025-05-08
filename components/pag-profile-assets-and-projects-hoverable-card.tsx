@@ -29,8 +29,8 @@ import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
 import { ScrollArea } from "./ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
-import NoPinnedAssets from "./no-pinned-assets";
-import NoPinnedRFPs from "./no-pinned-rfps";
+import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
+import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
 import { formatMoney } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
@@ -80,8 +80,10 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     </Carousel>
                                 </div>
                             )}
-                            {rfps.filter(rfp => rfp.pinned).length <= 0&& (
-                                <NoPinnedRFPs />
+                            {rfps.filter(rfp => rfp.pinned).length <= 0 && (
+                                isPrivate
+                                    ? <PrivateNoPinnedRFPs /> 
+                                    : <PublicNoPinnedRFPs />
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
@@ -144,7 +146,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </Table>
                             )}
                             {assets.filter(asset => asset.pinned).length <= 0 && (
-                                <NoPinnedAssets />
+                                isPrivate
+                                    ? <PrivateNoPinnedAssets /> 
+                                    : <PublicNoPinnedAssets />
                             )}
                         </TabsContent>
                     </Tabs>
