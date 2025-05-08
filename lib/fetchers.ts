@@ -604,7 +604,7 @@ export async function getRoadmaps(orgId: string | null | undefined) {
 
     try {
         const organization = await prisma.organization.findUnique({
-            include: {roadmaps: true},
+            include: {roadmaps: {include: {milestones: true}}},
             where: {
                 id: decodeURIComponent(orgId)
             }
