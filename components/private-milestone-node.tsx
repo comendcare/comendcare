@@ -88,6 +88,7 @@ const selector = (state: RoadmapState) => ({
 })
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
+    const [popoverIsOpen, setPopoverIsOpen] = useState(false)
     const {
         selectedNodeId,
     } = useRoadmapStore(useShallow(selector))
@@ -113,10 +114,13 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             <CardHeader>
                 <div className="flex flex-row align-center items-center justify-end gap-4">
                     {/* <TypeBadge type={props.type}/> */}
-                    <Popover>
+                    <Popover open={popoverIsOpen}>
                         <PopoverTrigger asChild>
                             <Button
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    setPopoverIsOpen(true)
+                                }}
                                 variant="ghost"
                                 className="p-2 h-auto justify-end h-full z-20"
                             >
@@ -126,22 +130,22 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                         <PopoverContent className="w-40 z-20">
                             <Card className="p-0 m-0">
                                 <CardContent className="p-2 m-0 flex flex-col gap-0">
-                                    <PopoverClose>
-                                        <Button
-                                            onClick={(e) => {
-                                                // e.stopPropagation()
-                                                handleEditClick()
-                                            }}
-                                            variant="ghost"
-                                            className="w-full h-full justify-start text-xl"
-                                        >
-                                            Edit
-                                        </Button>
-                                    </PopoverClose>
+                                    <Button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleEditClick()
+                                            setPopoverIsOpen(false)
+                                        }}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Edit
+                                    </Button>
                                     <Button
                                         onClick={(e) => {
                                             e.stopPropagation()
                                             handleDuplicate()
+                                            setPopoverIsOpen(false)
                                         }}
                                         variant="ghost"
                                         className="w-full h-full justify-start text-xl"
@@ -152,6 +156,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                                         onClick={(e) => {
                                             e.stopPropagation()
                                             handleDeleteClick()
+                                            setPopoverIsOpen(false)
                                         }}
                                         variant="ghost"
                                         className="w-full h-full justify-start text-xl"
