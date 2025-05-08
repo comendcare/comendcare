@@ -59,11 +59,11 @@ export default async function ProfilePage() {
                 <main className="col-span-4 flex flex-col items-center">
                     <ScrollArea id="profile-scroll-area" className="w-full flex flex-col mx-4 space-y-2">
                         <div className="w-full h-fit flex flex-col space-y-4">
-                            <Card className="pb-4 flex flex-col gap-4">
+                            <Card className="pb-4 flex flex-col gap-4 overflow-hidden">
                                 <PAGBannerPhoto
                                     img={organization.headerImage}
                                     name={organization.headerImage}
-                                    className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                    className="rounded-full ring-4 ring-white w-full"
                                     editable={true}
                                 />
 
