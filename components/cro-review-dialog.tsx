@@ -73,6 +73,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
     const initializing = useRef(true)
     const [loading, setLoading] = useState(false);
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+    const [open, setOpen] = useState(false);
 
     const form = useForm<z.infer<typeof reviewForm>>({
         mode: "onChange",
@@ -132,6 +133,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
 
                     // router.refresh();
                     toast.success("Successfully published review!");
+                    setOpen(false);
                 }
             })
         } catch (error) {
@@ -142,7 +144,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
     };
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {fetchedMilestones.length === 0 ?
                     <HoverCard openDelay={0}>

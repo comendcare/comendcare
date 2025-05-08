@@ -37,7 +37,7 @@ export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWit
                                     />
                                 </div>
                                 <div className="flex flex-col justify-center gap-4 items-start">
-                                    <h2 className="text-xl">{`No one's left a review for this CRO yet.`}</h2>
+                                    <h2 className="text-xl">{`No one's left a review for this service provider yet.`}</h2>
                                     <p className="text-md">
                                         {`You can be the first!`}
                                     </p>
