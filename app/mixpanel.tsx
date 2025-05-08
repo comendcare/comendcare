@@ -174,7 +174,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
 
                         // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
                         // set the user's 'opt-in' flag
-                        if (localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === null) {
+                        if (localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
                             console.log(`mixpanel opt-in`)
                             mixpanel.opt_in_tracking()
                         }

@@ -11,6 +11,7 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
 import { ExternalLink, Pencil, Plus } from "lucide-react";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 export const RoadmapCard = ({
     roadmap, 
