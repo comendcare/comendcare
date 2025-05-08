@@ -53,7 +53,12 @@ export const RoadmapsCard = ({
 
             <CardContent className="px-8">
                 {(roadmaps && roadmaps.length > 0) 
-                    ? <RoadmapsTable roadmaps={roadmaps} subdomain={organization.subdomain}/>
+                    ? <RoadmapsTable 
+                        roadmaps={roadmaps} 
+                        rowClickCallback={(roadmap) => 
+                            router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')
+                        }
+                    />
                     : (pathname === "/app/profile" 
                         ? <PrivateNoResearchPlansColumn />
                         : <PublicNoResearchPlans organizationName={organization.name}/>
@@ -171,7 +176,7 @@ export const NoProjectsCard = ({isPublic}: {isPublic: Boolean}) => {
     )
 }
 
-export const RoadmapsTable = ({roadmaps, subdomain}: {roadmaps: any[], subdomain: string | null | undefined}) => {
+export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], rowClickCallback: (roadmap: any) => void}) => {
     const router = useRouter()
 
     return (
@@ -193,7 +198,7 @@ export const RoadmapsTable = ({roadmaps, subdomain}: {roadmaps: any[], subdomain
                             colSpan={2}
                         >
                             {roadmapsForModality.map(roadmap => (
-                                <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => router.push(subdomain ? `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')}>
+                                <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
                                     <TableCell>
                                         <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                                         {roadmap.description && (
