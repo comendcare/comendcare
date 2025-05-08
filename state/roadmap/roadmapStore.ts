@@ -56,7 +56,7 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (details: Roadmap | undefined, nodes:[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (details: Roadmap | undefined, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
