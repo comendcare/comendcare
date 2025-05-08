@@ -11,7 +11,6 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
 import { ChevronsUpDown, Pencil, Plus } from "lucide-react";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { MODALITIES, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
 import { Badge } from "./ui/badge";
@@ -20,6 +19,8 @@ import { PrivateNoResearchPlansColumn, PublicNoResearchPlans } from "./no-resear
 import { NoProjects } from "./no-projects";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { FunctionComponent, ReactElement, useState } from "react";
+import { labels } from "@/lib/data";
+import { badgeVariants } from "./ui/badge";
 
 export const RoadmapsCard = ({
     roadmaps,
@@ -178,75 +179,36 @@ export const RoadmapsTable = ({roadmaps, subdomain}: {roadmaps: any[], subdomain
         <Table>
             <TableHeader>
                 <TableRow className="pointer-events-none">
-                <TableHead className="w-full">Title</TableHead>
+                <TableHead className="w-full">Title & Description</TableHead>
                 <TableHead className="w-fit text-nowrap">Stage of Activity</TableHead>
-                {/* <TableHead>Description</TableHead> */}
-                {/* <TableHead>Type</TableHead> */}
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {MODALITIES.map(modality => {
-                    const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(modality.value))
+                {RESEARCH_PLAN_TYPES.map(type => {
+                    const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(type.value))
                     if (roadmapsForModality.length <= 0) return <></>
 
                     return (
                         <CollapsibleTableGroup 
-                            label={modality.label}
+                            label={type.label}
                             colSpan={2}
                         >
                             {roadmapsForModality.map(roadmap => (
                                 <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => router.push(subdomain ? `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')}>
                                     <TableCell>
-                                        <p>{roadmap.title || 'Untitled Research Plan'}</p>
+                                        <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                                         {roadmap.description && (
                                             <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
                                         )}
                                     </TableCell>
                                     <TableCell className="flex justify-end items-center">
-                                        <Badge variant={"secondary"}>{`Discovery`}</Badge>
+                                        <StageOfActivityBadge roadmap={roadmap} />
                                     </TableCell>
-                                    {/* <TableCell>
-                                        <div className="line-clamp-3">
-                                            {roadmap.description}
-                                        </div>
-                                    </TableCell> */}
-                                    {/* <TableCell>
-                                    <ul className="flex flex-col gap-2">
-                                        {RESEARCH_PLAN_TYPES.filter(modality => roadmap.modalities.includes(modality.value)).map(modality => (
-                                            <li>
-                                                <Badge variant={"secondary"}>{modality.label}</Badge>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    </TableCell> */}
                                 </TableRow>
                             ))}
                         </CollapsibleTableGroup>
                     )
                 })}
-                {/* {roadmaps.map((roadmap) => (
-                    <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => router.push(subdomain ? `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')}>
-                        <TableCell>
-                            <div>
-                                {roadmap.title || 'Untitled Research Plan'}
-                            </div>
-                        </TableCell>
-                        <TableCell>
-                            <div className="line-clamp-3">
-                                {roadmap.description}
-                            </div>
-                        </TableCell>
-                        <TableCell>
-                        <ul className="flex flex-col gap-2">
-                            {RESEARCH_PLAN_TYPES.filter(modality => roadmap.modalities.includes(modality.value)).map(modality => (
-                                <li>
-                                    <Badge variant={"secondary"}>{modality.label}</Badge>
-                                </li>
-                            ))}
-                        </ul>
-                        </TableCell>
-                    </TableRow>
-                ))} */}
             </TableBody>
         </Table>
     )
@@ -262,8 +224,8 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string
                 className="!appearance-none cursor-pointer bg-gray-50"
                 onClick={() => setIsOpen(prev => !prev)}
             >
-                <TableCell colSpan={colSpan}>
-                    <div className="flex gap-2 justify-between">
+                <TableCell colSpan={colSpan} className="p-2">
+                    <div className="flex gap-2 justify-between items-center">
                         {label}
                         <ChevronsUpDown className="h-4 w-4"/>
                     </div>
@@ -271,5 +233,23 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string
             </TableRow>
             {isOpen && (children)}
         </>
+    )
+}
+
+export const getStage = (roadmap: Roadmap): {value: string, label: string, variant: string} => {
+    if (roadmap.milestones.length <= 2) return {value: 'IDEA', label: 'Idea Stage', variant: 'pink'}
+    if (roadmap.milestones.length <= 4) return {value: 'EARLY_RESEARCH', label: 'Early Research', variant: 'pink'}
+    if (roadmap.milestones.length <= 6) return {value: 'LAB_TESTING', label: 'Lab Testing', variant: 'pink'}
+    if (roadmap.milestones.length <= 8) return {value: 'TRIAL_READY', label: 'Trial Ready', variant: 'pink'}
+    if (roadmap.milestones.length <= 10) return {value: 'IN_TRIALS', label: 'In Trials', variant: 'pink'}
+    if (roadmap.milestones.length <= 12) return {value: 'POST_TRIAL', label: 'Post Trial', variant: 'pink'}
+    
+    return {value: 'UNKNOWN', label: 'Unknown Stage', variant: 'secondary'}
+}
+
+export const StageOfActivityBadge = ({roadmap}: {roadmap: Roadmap}) => {
+    const stage = getStage(roadmap)
+    return (
+        <Badge variant={stage.variant as any}>{stage.label}</Badge>
     )
 }
