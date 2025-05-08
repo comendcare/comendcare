@@ -11,12 +11,12 @@ export const ProfileCompletionMixpanelTrack = ({
 }) => {
     // mixpanel tracking for profile completion is in it's own client component, so it doesn't cause any 
     // weird reloading behaviour in the profile Server Components
-    useEffect(() => {
-        if (!localStorage.getItem("profile-complete") && completionPercentage) {
-            mixpanelTrack("Organization Profile Completed")
-            localStorage.setItem("profile-complete", "true")
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (!localStorage.getItem("profile-complete") && completionPercentage) {
+    //         mixpanelTrack("Organization Profile Completed")
+    //         localStorage.setItem("profile-complete", "true")
+    //     }
+    // }, [])
 
     return <></>
 }
