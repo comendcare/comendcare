@@ -55,9 +55,16 @@ export function initializeRoadmapState(initData: {
         const { roadmapId, details, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
 
         console.log(`init state nodes`, nodes)
+        const newNodes = nodes.map(node => ({
+            ...node,
+            position: {
+                x: node.positionX,
+                y: node.positionY
+            }
+        }))
 
         // Call Zustand's initState directly
-        initRoadmapState(details, nodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "")
+        initRoadmapState(details, newNodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "")
         clear() // clear first/uninitialized state from history, so undo doesn't apply the un-initialized state
     }
 }
