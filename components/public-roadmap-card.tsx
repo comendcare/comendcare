@@ -20,7 +20,6 @@ import { NoProjects } from "./no-projects";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { FunctionComponent, ReactElement, useState } from "react";
 import { labels } from "@/lib/data";
-import { badgeVariants } from "./ui/badge";
 
 export const RoadmapsCard = ({
     roadmaps,
@@ -202,7 +201,7 @@ export const RoadmapsTable = ({roadmaps, subdomain}: {roadmaps: any[], subdomain
                                         )}
                                     </TableCell>
                                     <TableCell className="flex justify-end items-center">
-                                        <StageOfActivityBadge roadmap={roadmap} />
+                                        <StageOfActivityBadge milestones={roadmap.milestones} />
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -236,19 +235,19 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string
     )
 }
 
-export const getStage = (roadmap: Roadmap): {value: string, label: string, variant: string} => {
-    if (roadmap.milestones.length <= 2) return {value: 'IDEA', label: 'Idea Stage', variant: 'pink'}
-    if (roadmap.milestones.length <= 4) return {value: 'EARLY_RESEARCH', label: 'Early Research', variant: 'pink'}
-    if (roadmap.milestones.length <= 6) return {value: 'LAB_TESTING', label: 'Lab Testing', variant: 'pink'}
-    if (roadmap.milestones.length <= 8) return {value: 'TRIAL_READY', label: 'Trial Ready', variant: 'pink'}
-    if (roadmap.milestones.length <= 10) return {value: 'IN_TRIALS', label: 'In Trials', variant: 'pink'}
-    if (roadmap.milestones.length <= 12) return {value: 'POST_TRIAL', label: 'Post Trial', variant: 'pink'}
+export const getStage = (milestones: any[]): {value: string, label: string, variant: string} => {
+    if (milestones.length <= 2) return {value: 'IDEA', label: 'Idea Stage', variant: 'amber'}
+    if (milestones.length <= 4) return {value: 'EARLY_RESEARCH', label: 'Early Research', variant: 'lime'}
+    if (milestones.length <= 6) return {value: 'LAB_TESTING', label: 'Lab Testing', variant: 'emerald'}
+    if (milestones.length <= 8) return {value: 'TRIAL_READY', label: 'Trial Ready', variant: 'cyan'}
+    if (milestones.length <= 10) return {value: 'IN_TRIALS', label: 'In Trials', variant: 'indigo'}
+    if (milestones.length <= 12) return {value: 'POST_TRIAL', label: 'Post Trial', variant: 'purple'}
     
     return {value: 'UNKNOWN', label: 'Unknown Stage', variant: 'secondary'}
 }
 
-export const StageOfActivityBadge = ({roadmap}: {roadmap: Roadmap}) => {
-    const stage = getStage(roadmap)
+export const StageOfActivityBadge = ({milestones}: {milestones: any[]}) => {
+    const stage = getStage(milestones)
     return (
         <Badge variant={stage.variant as any}>{stage.label}</Badge>
     )
