@@ -13,9 +13,9 @@ export default function OnboardingWelcomePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
 
-    useEffect(() => {
-        mixpanelTrack("Onboarding Started")
-    }, [])
+    // useEffect(() => {
+    //     mixpanelTrack("Onboarding Started")
+    // }, [])
 
     if (status === "loading") {
         return <Loading />;
