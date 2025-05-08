@@ -62,10 +62,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 ...edge,
                 style: { stroke: 'black' }
             }))
-            // const nodesWithPosition: Node = nodes.map(node => ({
-            //     ...node, 
-                
-            // }))
             set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
         },
         details: undefined,
