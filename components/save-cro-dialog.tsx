@@ -99,7 +99,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                     "Milestone Budget": response.data.milestone.budget
                 })
                 router.refresh();
-                toast.success("Successfully saved cro!");
+                toast.success("Successfully saved service provider!");
                 setOpen(false)
             } else {
                 toast.error(response.error);
