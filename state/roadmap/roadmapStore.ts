@@ -56,12 +56,16 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (details: Roadmap | undefined, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (details: Roadmap | undefined, nodes:[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
             }))
+            // const nodesWithPosition: Node = nodes.map(node => ({
+            //     ...node, 
+                
+            // }))
             set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
         },
         details: undefined,
@@ -243,7 +247,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestoneTypes = await getMilestoneTypes()
     
             const milestonesAlongXAxis = get().nodes.sort((a, b) => {
-                return a.position.x - b.position.x
+                return a?.position?.x - b?.position?.x
             })
             let centerX = milestonesAlongXAxis.length > 0 ? ((milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500): (0)
             let centerY = 0
