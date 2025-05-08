@@ -54,7 +54,6 @@ export function initializeRoadmapState(initData: {
         const initRoadmapState = useRoadmapStore.getState().initState;
         const { roadmapId, details, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
 
-        console.log(`init state nodes`, nodes)
         const newNodes = nodes.map(node => ({
             ...node,
             position: {
