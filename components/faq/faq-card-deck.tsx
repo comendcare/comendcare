@@ -1,9 +1,9 @@
+import { Book, Clipboard, Save } from "lucide-react"
 import FAQCard from "./faq-card"
-import { FaBookOpen, FaClipboardCheck, FaFloppyDisk, FaHandshakeSimple } from "react-icons/fa6"
 
 export const cards = [
     {
-        icon: <FaBookOpen />,
+        icon: <Book />,
         heading: "Using Librarey",
         description: "Guides on how to use the features on Librarey.",
         prompts: [
@@ -46,7 +46,7 @@ export const cards = [
         ]
     },
     {
-        icon: <FaClipboardCheck />,
+        icon: <Clipboard />,
         heading: "Rules and Policies",
         description: "Guidelines that users of Librarey should follow.",
         prompts: [
@@ -65,7 +65,7 @@ export const cards = [
         ]
     },
     {
-        icon: <FaFloppyDisk />,
+        icon: <Save />,
         heading: "Create Collection and Embed",
         description: "Create and add collection to your site",
         prompts: [

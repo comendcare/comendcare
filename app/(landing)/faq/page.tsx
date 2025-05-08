@@ -1,6 +1,16 @@
 "use client"
 
-<<<<<<< HEAD
+import React, { useState } from "react"
+import Link from "next/link"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import Questions from "@/components/faq/questions"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import PreviewCard from "@/components/faq/preview-card"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { ArticleType, TagType } from "@/lib/types"
+import { Lightbulb, Save, ThumbsUp } from "lucide-react"
+
 const FAQs = [
     // {
     //     question: "Where does our data come from?",
@@ -40,17 +50,6 @@ const FAQs = [
         contactLink: false,
     },
   ];
-=======
-import React, { useState } from "react"
-import Link from "next/link"
-import { buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import Questions from "@/components/faq/questions"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import PreviewCard from "@/components/faq/preview-card"
-import { FaClipboardCheck, FaFloppyDisk, FaLightbulb, FaThumbsUp } from "react-icons/fa6"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { ArticleType, TagType } from "@/lib/types"
 
 const articles: ArticleType[] = []
 const imgWidth = 400
@@ -73,7 +72,6 @@ export default function FAQ() {
 
         setFilterState(state)
     }
->>>>>>> 39f62649 (add basic Librarey fAQ styling)
 
     return (
         <div className="mx-auto space-y-16">
@@ -106,7 +104,7 @@ export default function FAQ() {
                         value="start"
                     >
                         <div className="flex flex-row items-center space-x-4">
-                            <FaLightbulb className="w-8 h-8" />
+                            <Lightbulb className="w-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-base font-semibold leading-6 text-gray-900">Getting Started</h3>
                                 <p className="mt-1 text-sm text-gray-500">Start from the beginning</p>
@@ -119,7 +117,7 @@ export default function FAQ() {
                         value="contribute"
                     >
                         <div className="flex flex-row items-center space-x-4">
-                            <FaThumbsUp className="w-8 h-8" />
+                            <ThumbsUp className="w-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-base font-semibold leading-6 text-gray-900">Uploading Resources</h3>
                                 <p className="mt-1 text-sm text-gray-500">How to start contributing</p>
@@ -132,7 +130,7 @@ export default function FAQ() {
                         value="collections"
                     >
                         <div className="flex flex-row items-center space-x-4">
-                            <FaFloppyDisk className="w-8 h-8" />
+                            <Save className="w-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-base font-semibold leading-6 text-gray-900">Create Collection and Embed</h3>
                                 <p className="mt-1 text-sm text-gray-500">{`Create and add collection to your site`}</p>
