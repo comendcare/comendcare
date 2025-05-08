@@ -24,6 +24,7 @@ import { EditAssetDialog } from "../edit-asset-dialog"
 import Link from "next/link"
 import { Roadmap } from "@prisma/client"
 import { useRouter } from "next/navigation"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -108,6 +109,22 @@ export function ResearchPlansDataTable<TData, TValue>({
                                         </TableCell>
                                     ))}
                                 </TableRow>
+                                // <Collapsible key={row.id} asChild>
+                                //     <>
+                                //     <CollapsibleTrigger asChild>
+                                //         <TableRow data-state={row.getIsSelected() && "selected"} className="!appearance-none">
+                                //         {row.getVisibleCells().map((cell) => (
+                                //             <TableCell key={cell.id}>
+                                //             {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                //             </TableCell>
+                                //         ))}
+                                //         </TableRow>
+                                //     </CollapsibleTrigger>
+                                //     <CollapsibleContent asChild>
+                                //         {/* <ExpandedContent dollars={[]} /> */}
+                                //     </CollapsibleContent>
+                                //     </>
+                                // </Collapsible>
                             ))
                         ) : (
                             <TableRow>
