@@ -213,6 +213,26 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                         </CollapsibleTableGroup>
                     )
                 })}
+                {roadmaps.filter(roadmap => roadmap.modalities.length === 0).length > 0 && (
+                    <CollapsibleTableGroup 
+                        label={'No type'}
+                        colSpan={2}
+                    >
+                        {roadmaps.filter(roadmap => roadmap.modalities.length === 0).map(roadmap => (
+                            <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
+                                <TableCell>
+                                    <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
+                                    {roadmap.description && (
+                                        <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
+                                    )}
+                                </TableCell>
+                                <TableCell className="flex justify-end items-center">
+                                    <StageOfActivityBadge milestones={roadmap.milestones} />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </CollapsibleTableGroup>
+                )}
             </TableBody>
         </Table>
     )
