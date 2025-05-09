@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Asset } from "@/lib/types"
 import { Pin } from "lucide-react"
+import { AssetActionsMenu } from "../tool-actions-menu"
 
 interface CustomColumnMeta {
     name?: string;
@@ -117,10 +118,10 @@ export const columns: ColumnDef<Asset>[] = [
         enableHiding: true,
         meta: { name: "Pinned" }
     },
-    // {
-    //     id: "actions",
-    //     cell: ({ row }) => <DataTableRowActions row={row} />,
-    //     enableHiding: false,
-    //     meta: { name: "Actions" }
-    // },
+    {
+        id: "actions",
+        cell: ({ row }) => <AssetActionsMenu asset={row.original}/>,
+        enableHiding: false,
+        meta: { name: "Actions" }
+    },
 ]
