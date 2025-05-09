@@ -202,7 +202,8 @@ const config: Config = {
                 }
             )
         },
-        require("tailwind-scrollbar-hide")
+        require("tailwind-scrollbar-hide"),
+		require("@tailwindcss/typography")
     ]
 }
 export default config
