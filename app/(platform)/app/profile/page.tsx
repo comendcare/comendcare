@@ -9,7 +9,7 @@ import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PAGBannerPhoto} from "@/components/pag-banner-photo";
-import {NoResearchPlanCard, RoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapsCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
@@ -141,18 +141,7 @@ export default async function ProfilePage() {
                                             assets={assets}
                                             rfps={rfps}
                                         />
-                                        <RoadmapCard
-                                            roadmap={roadmaps[0]}
-                                            subdomain={organization?.subdomain || undefined}
-                                            isPublic={false}
-                                            externalLinks={true}
-                                        />
-                                        {roadmaps.length <= 0 && (
-                                            <div
-                                                className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
-                                                <NoResearchPlanCard isPublic={false}/>
-                                            </div>
-                                        )}
+                                        <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     </div>
                                 </div>
                             </div>

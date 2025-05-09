@@ -8,7 +8,7 @@ import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
-import { Asset, RFP } from '@/lib/types';
+import { Asset, RFP, Roadmap } from '@/lib/types';
 import { useAssetStore } from "@/state/asset/assetStore";
 import { useRFPStore } from "@/state/rfp/rfpStore";
 
@@ -41,20 +41,29 @@ export function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType)
 
 export function initializeRoadmapState(initData: {
     roadmapId: string | null | undefined
+    details: Roadmap | undefined
     nodes: any[]
     edges: any[]
-    milestones: any[],
-    selectedView?: string | null,
+    milestones: any[]
+    selectedView?: string | null
     selectedNodeId: string | null
 }) {
     const { clear } = useRoadmapStore.temporal.getState()
 
     if (typeof window !== "undefined") {
         const initRoadmapState = useRoadmapStore.getState().initState;
-        const { roadmapId, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
+        const { roadmapId, details, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
+
+        const newNodes = nodes.map(node => ({
+            ...node,
+            position: {
+                x: node.positionX,
+                y: node.positionY
+            }
+        }))
 
         // Call Zustand's initState directly
-        initRoadmapState(nodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "")
+        initRoadmapState(details, newNodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "")
         clear() // clear first/uninitialized state from history, so undo doesn't apply the un-initialized state
     }
 }
