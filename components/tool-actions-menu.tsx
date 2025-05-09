@@ -85,7 +85,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                 >
                     Duplicate
                 </Button>
-                <Button
+                {/* <Button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete()
@@ -95,7 +95,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                     className="h-full justify-start"
                 >
                     Delete
-                </Button>
+                </Button> */}
             </PopoverContent>
         </Popover>
         {/* <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
