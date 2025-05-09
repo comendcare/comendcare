@@ -29,11 +29,15 @@ export const ProjectActionsMenu = ({milestone}: {milestone: Milestone}) => {
 
     const handleDuplicate = async () => {
         const milestones = await addMilestones([{
-            nodeType: milestone.nodeType || milestone.nodeType,
-            title: milestone.title,
-            description: milestone.description,
-            types: milestone.types || [],
-            status: milestone.status
+            // nodeType: milestone.nodeType || milestone.nodeType,
+            // title: milestone.title,
+            // description: milestone.description,
+            // types: milestone.types || [],
+            // status: milestone.status,
+            // assets: milestone.assets,
+            // rfps: milestone.rfps,
+            // contacts: milestone.contacts,
+            ...milestone
         }], "Duplicate")
         if (milestones && milestones.length > 0) setSelectedNodeId(milestones[0].id)
     }
