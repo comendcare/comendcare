@@ -25,7 +25,7 @@ const links = [
     // },
 ]
 
-interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MarketplaceNavProps extends React.HTMLAttributes<HTMLDivElement> {
     projectId: string
 }
 
@@ -33,7 +33,7 @@ export function MarketplaceNav({
                                className,
                                projectId,
                                ...props
-                           }: ExamplesNavProps) {
+                           }: MarketplaceNavProps) {
     const pathname = usePathname()
 
     return (

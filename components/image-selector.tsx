@@ -1,8 +1,9 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import ReactCrop, {
     centerCrop,
+    convertToPixelCrop,
     makeAspectCrop,
     type Crop,
     type PixelCrop,
@@ -31,6 +32,7 @@ interface ImageSelectorProps {
     setSelectedFile: (file: FileWithPreview | null) => void,
     aspect: number,
     className?: string,
+    setParentIsCropping: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function ImageSelector({
@@ -38,6 +40,7 @@ export function ImageSelector({
     setSelectedFile,
     aspect,
     className = "",
+    setParentIsCropping
 }: ImageSelectorProps) {
     const imgRef = React.useRef<HTMLImageElement | null>(null)
     const fileInputRef = React.useRef<HTMLInputElement | null>(null)
@@ -47,6 +50,10 @@ export function ImageSelector({
     const [croppedImage, setCroppedImage] = React.useState<string>("")
     const [isCropping, setIsCropping] = React.useState<boolean>(false)
     const [cropFile, setCropFile] = React.useState<FileWithPreview | null>(selectedFile)
+
+    useEffect(() => {
+        setParentIsCropping(isCropping)
+    }, [isCropping])
 
     const handleClick = async () => {
         // setSelectedFile(null) // de-select any previously selected file
@@ -65,7 +72,15 @@ export function ImageSelector({
     function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
         if (aspect) {
             const { width, height } = e.currentTarget
-            setCrop(centerAspectCrop(width, height, aspect))
+            const newCrop = centerAspectCrop(width, height, aspect)
+            setCrop(newCrop)
+
+            const pixelCrop = convertToPixelCrop(newCrop, width, height)
+
+            if (imgRef.current && pixelCrop.width && pixelCrop.height) {
+                const croppedImageUrl = getCroppedImg(imgRef.current, pixelCrop)
+                setCroppedImageUrl(croppedImageUrl)
+            }
         }
     }
 
@@ -184,14 +199,14 @@ export function ImageSelector({
         <>
         {isCropping ? (
             // user is currently cropping the image, show cropping UI
-            <div className="p-0 gap-0 max-h-[90vh] overflow-hidden">
-                <div className="p-6 size-full max-h-full">
+            <div className="p-0 gap-0 overflow-hidden w-full">
+                <div className="p-6 size-full max-h-full w-full">
                     <ReactCrop
                         crop={crop}
                         onComplete={(c) => onCropComplete(c)}
                         onChange={(_, percentCrop) => setCrop(percentCrop)}
                         aspect={aspect}
-                        className="w-full max-h-[40vh]"
+                        className="w-full"
                     >
                         <img
                             className="w-full object-cover"

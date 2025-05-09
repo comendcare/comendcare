@@ -11,11 +11,16 @@ import {
 } from "@/components/ui/dialog"
 import mixpanel from "mixpanel-browser"
 import {toast} from "sonner";
+import { Organization } from "@prisma/client";
+import {Button} from "@/components/ui/button";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function ShareDialog({
-                                        url,
-                                    }: {
-    url: string
+    url,
+    organization
+}: {
+    url: string,
+    organization?: Organization
 }) {
 
     const handleCopyResourceLinkToClipboard = async () => {
@@ -29,8 +34,12 @@ export default function ShareDialog({
     }
 
     const trackMixpanelEvent = (socialOption: string) => {
-        mixpanel.track(`User shared url`, {
-            platform: socialOption
+        mixpanelTrack(`Organization Profile Shared`, {
+            "Platform": socialOption,
+            ...(organization ? {
+                "Organization ID": organization.id,
+                "Organization Name": organization.name
+            } : undefined)
         })
     }
 
@@ -167,20 +176,20 @@ export default function ShareDialog({
                     <div>
                         <div className="flex flex-col md:flex-row gap-2">
                             <input
-                                type="email"
-                                name="email"
-                                id="email"
+                                type="text"
+                                name="text"
+                                id="text"
                                 defaultValue={url}
                                 disabled
                                 className="w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-md ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 placeholder={url}
                             />
-                            <button
-                                className={`rounded-md bg-blue-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700`}
+                            <Button
+                                variant="secondary"
                                 onClick={handleCopyResourceLinkToClipboard}
                             >
                                 Copy
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </DialogDescription>

@@ -2,6 +2,8 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { Asset } from '@/lib/types';
 import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@/lib/actions';
+import mixpanel from 'mixpanel-browser';
+import { mixpanelTrack } from '@/app/mixpanel';
 
 export interface AssetState {
     assets: Asset[],
@@ -21,19 +23,51 @@ export const useAssetStore = create<AssetState>()(
                 set({assets, initialized: true})
             },
             createAsset: async (asset: Partial<Asset>, orgId: string) => {
-                const newAsset: Asset = await createOrUpdateAsset(asset, orgId)
-                console.log(`new asset`, newAsset)
-                // new Asset first, because Assets are displayed in decending order by creation date
+                const newAsset = await createOrUpdateAsset(asset, orgId)
+
+                mixpanelTrack("Tool Created", {
+                    "ID": newAsset.id,
+                    "Name": newAsset.title,
+                    "Linked Projects": (newAsset?.milestones || []).map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }) =>
+                        (milestone?.types || []).map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
+
+                // new Tool first, because Tools are displayed in decending order by creation date
                 set({ assets: [newAsset, ...get().assets]})
             },
             updateAsset: async (asset: Partial<Asset>, orgId: string) => {
-                const updatedAsset: Asset = await createOrUpdateAsset(asset, orgId)
+                const updatedAsset = await createOrUpdateAsset(asset, orgId)
                 console.log(`updated asset`, updatedAsset)
+
+                mixpanelTrack("Tool Updated", {
+                    "ID": updatedAsset.id,
+                    "Tool Name": updatedAsset.title,
+                    "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }) =>
+                        (milestone?.types || []).map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
                 set({ assets: get().assets.map(asset => asset.id === updatedAsset.id ? updatedAsset : asset) })
             },
             deleteAsset: async (assetId: string) => {
-                const deletedAsset: Asset = await deleteAsset(assetId)
-                console.log(`deleted asset`, deletedAsset)
+                const deletedAsset = await deleteAsset(assetId)
+
+                mixpanelTrack("Tool Deleted", {
+                    "ID": deletedAsset.id,
+                    "Tool Name": deletedAsset.title,
+                    "Linked Projects": (deletedAsset?.milestones || []).map(({ milestone }) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Project Types": (deletedAsset?.milestones || []).flatMap(({ milestone }) =>
+                        (milestone?.types || []).map(type => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
                 set({ assets: get().assets.filter(asset => asset.id !== deletedAsset.id) })
             },
             saveState: () => {

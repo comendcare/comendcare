@@ -24,8 +24,8 @@ import {Button} from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 
 const editOrgProfileImageSchema = z.object({
-    image: z.string().optional(),
-    headerImage: z.string().optional(),
+    image: z.string().nullable().optional(),
+    headerImage: z.string().nullable().optional(),
 });
 
 export function PAGBannerPhoto({
@@ -46,6 +46,7 @@ export function PAGBannerPhoto({
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
+    const [isCropping, setIsCropping] = useState(false)
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
@@ -87,6 +88,7 @@ export function PAGBannerPhoto({
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
+            setIsCropping(false)
             setOpen(false);
             router.refresh();
         } catch (error) {
@@ -99,7 +101,7 @@ export function PAGBannerPhoto({
         <div className="relative w-full">
             {/* Banner Image */}
             {img ? (
-                <img className="h-32 w-full object-cover lg:h-48" src={img || ""} alt=""/>
+                <img className="w-full object-cover" src={img || ""} alt=""/>
             ) : (
                 <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
             )}
@@ -136,8 +138,13 @@ export function PAGBannerPhoto({
                                     selectedFile={selectedFileHeader}
                                     setSelectedFile={setSelectedFileHeader}
                                     className="rounded h-[100px] w-[400px] mx-auto"
+                                    setIsCropping={setIsCropping}
                                 />
-                                <Button type="submit" className="w-fit">
+                                <Button 
+                                    type="submit" 
+                                    className="w-fit"
+                                    disabled={isCropping}
+                                >
                                     Save
                                 </Button>
                             </form>

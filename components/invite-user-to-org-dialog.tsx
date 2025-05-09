@@ -29,6 +29,8 @@ import {
 import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import { UserPlus } from "lucide-react";
+import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
@@ -79,6 +81,12 @@ export default function InviteUserToOrgDialog() {
             if (response.success) {
                 const invitation = response.data
                 setIsOpen(false)
+
+                mixpanelTrack("Membership Invitation Sent", {
+                    "Email": invitation.email,
+                    "Role": invitation.role
+                })
+                
                 toast.success(`Invitation to ${invitation.email} sent successfully.`)
             } else {
                 console.error(response.error)

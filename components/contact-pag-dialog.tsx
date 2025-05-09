@@ -19,6 +19,7 @@ import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {sendPAGContactEmail} from "@/lib/emails";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 // Validation schema
 const contactSchema = z.object({
@@ -40,7 +41,7 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
 
     // Track event in Mixpanel
     const trackMixpanelEvent = () => {
-        mixpanel.track("User Contacted Organization", {
+        mixpanelTrack("User Contacted Organization", {
             organization: organization.name,
         });
     };
@@ -50,6 +51,13 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
         toast.success(`Your message to ${organization.name} has been sent!`);
         form.reset();
         try {
+            mixpanelTrack("Organization Contacted", {
+                "Organization ID": organization.id,
+                "Organization Name": organization.name,
+                "Organization Email": organization.contactEmail,
+                "Contacter Name": values.name,
+                "Contacter Email": values.email
+            })
             await sendPAGContactEmail({
                 name: values.name,
                 email: values.email,

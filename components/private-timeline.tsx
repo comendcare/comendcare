@@ -34,7 +34,7 @@ import {CircleDollarSign, GripVertical, Megaphone, Star, User} from "lucide-reac
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 
-const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
+const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,

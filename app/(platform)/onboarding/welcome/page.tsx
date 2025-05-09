@@ -5,10 +5,17 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Loading from "@/app/loading";
+import { useEffect } from "react";
+import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function OnboardingWelcomePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+
+    // useEffect(() => {
+    //     mixpanelTrack("Onboarding Started")
+    // }, [])
 
     if (status === "loading") {
         return <Loading />;

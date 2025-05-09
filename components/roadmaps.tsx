@@ -5,10 +5,8 @@ import RoadmapCard from "./roadmap-card"
 import Image from "next/image"
 
 export default async function Roadmaps({
-    organizationId,
     limit
 }: {
-    organizationId?: string
     limit?: number
 }) {
     const session = await getSession()
@@ -16,10 +14,6 @@ export default async function Roadmaps({
         redirect("/login")
     }
     const roadmaps = await prisma.roadmap.findMany({
-        where: {
-            userId: session.user.id as string,
-            ...(organizationId ? { organizationId } : {})
-        },
         orderBy: {
             updatedAt: "desc"
         },

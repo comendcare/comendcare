@@ -19,7 +19,7 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
 }) {
 
     const searchParams = useSearchParams();
-    const urlMilestone = searchParams.get("milestone");
+    const urlMilestone = searchParams.get("project");
     const [milestone, setMilestone] = useState<any>();
 
     useEffect(() => {

@@ -4,10 +4,11 @@ import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse} from "@/lib/types";
-import {logError} from "@/lib/utils";
+import {ApiResponse, CustomOrganization} from "@/lib/types";
+import {getProfileCompletionChecks, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
-import { equal } from "assert"
+import { subMonths, startOfMonth } from "date-fns";
+import {Condition} from "@prisma/client";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -118,8 +119,11 @@ export async function getPublicAssetsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true},
-                where: {milestone: {private: {equals: false}}}
+                include: {
+                    milestone: {
+                        include: { types: { include: { milestoneType: true } } }
+                    }
+                }
             }
         },
         orderBy: [{createdAt: "desc"}]
@@ -495,7 +499,7 @@ export async function getAssets(organizationId: string | undefined) {
         })
 
         if (!fetchedAssets) {
-            return {success: false, error: "assets not found"}
+            return {success: false, error: "tools not found"}
         }
 
         return {
@@ -503,7 +507,7 @@ export async function getAssets(organizationId: string | undefined) {
             data: fetchedAssets
         }
     } catch (error: any) {
-        logError("Error fetching assets", error);
+        logError("Error fetching tools", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -550,7 +554,7 @@ export async function getMilestones(organizationId: string | undefined) {
     try {
         const fetchedMilestones = await prisma?.milestone.findMany({
             // include: {user: true},
-            where: {organizationId}
+            where: {organizationId},
         })
 
         if (!fetchedMilestones) {
@@ -1226,6 +1230,277 @@ export async function getSavedCompaniesFromOrganizationId(organizationId: string
         };
     } catch (error: any) {
         logError("Error fetching saved companies", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getUserAnalytics() {
+    const now = new Date();
+    const startOfCurrentMonth = startOfMonth(now);
+    const startOfLastMonth = startOfMonth(subMonths(now, 1));
+
+    // Total users
+    const totalUsers = await prisma.user.count();
+
+    // New users this month
+    const newUsersThisMonth = await prisma.user.count({
+        where: {
+            createdAt: {
+                gte: startOfCurrentMonth,
+            },
+        },
+    });
+
+    // New users last month
+    const newUsersLastMonth = await prisma.user.count({
+        where: {
+            createdAt: {
+                gte: startOfLastMonth,
+                lt: startOfCurrentMonth,
+            },
+        },
+    });
+
+    // Active accounts (users updated in last 30 days)
+    const activeUsers = await prisma.user.count({
+        where: {
+            updatedAt: {
+                gte: subMonths(now, 1),
+            },
+        },
+    });
+
+    const growthRate =
+        newUsersLastMonth === 0
+            ? 100
+            : ((newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * 100;
+
+    return {
+        totalUsers,
+        newUsersThisMonth,
+        newUsersLastMonth,
+        activeUsers,
+        growthRate,
+    };
+}
+
+export async function getOrganizationAnalytics() {
+    const now = new Date();
+    const startOfCurrentMonth = startOfMonth(now);
+    const startOfLastMonth = startOfMonth(subMonths(now, 1));
+
+    // Total organizations
+    const totalOrganizations = await prisma.organization.count();
+
+    // New organizations this month
+    const newOrganizationsThisMonth = await prisma.organization.count({
+        where: {
+            createdAt: {
+                gte: startOfCurrentMonth,
+            },
+        },
+    });
+
+    // New organizations last month
+    const newOrganizationsLastMonth = await prisma.organization.count({
+        where: {
+            createdAt: {
+                gte: startOfLastMonth,
+                lt: startOfCurrentMonth,
+            },
+        },
+    });
+
+    // Active organizations (updated in last 30 days)
+    const activeOrganizations = await prisma.organization.count({
+        where: {
+            updatedAt: {
+                gte: subMonths(now, 1),
+            },
+        },
+    });
+
+    const growthRate =
+        newOrganizationsLastMonth === 0
+            ? 100
+            : ((newOrganizationsThisMonth - newOrganizationsLastMonth) / newOrganizationsLastMonth) * 100;
+
+    const allOrganizations = await prisma.organization.findMany({
+        include: {
+            condition: true,
+            roadmaps: true,
+        },
+    });
+
+    let completedProfiles = 0;
+
+    for (const org of allOrganizations) {
+        let conditions: Condition[] = [];
+        const condResponse = await getConditionsFromOrganizationId(org.id);
+        if (condResponse.success) conditions = (condResponse.data ?? []) as Condition[];
+        const checks = getProfileCompletionChecks(org as any, conditions as any);
+        const isComplete = Object.values(checks).every(Boolean);
+        if (isComplete) completedProfiles++;
+    }
+
+    return {
+        totalOrganizations,
+        newOrganizationsThisMonth,
+        newOrganizationsLastMonth,
+        activeOrganizations,
+        growthRate,
+        completedProfiles
+    };
+}
+
+export async function getOrganizationChartAnalytics() {
+    const organizations = await prisma.organization.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(),
+            },
+        },
+        select: {
+            createdAt: true,
+        },
+    });
+
+    const countsByDate: Record<string, number> = {};
+
+    for (const org of organizations) {
+        const dateStr = org.createdAt.toISOString().split("T")[0]; // "YYYY-MM-DD"
+        countsByDate[dateStr] = (countsByDate[dateStr] || 0) + 1;
+    }
+
+    const chartData = Object.entries(countsByDate)
+        .map(([date, count]) => ({
+            date,
+            organizations: count,
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return chartData;
+}
+
+export async function getCompanyAndReviewAnalytics() {
+    const now = new Date();
+    const startOfCurrentMonth = startOfMonth(now);
+    const startOfLastMonth = startOfMonth(subMonths(now, 1));
+
+    // Companies
+    const totalCompanies = await prisma.company.count();
+    const newCompaniesThisMonth = await prisma.company.count({
+        where: { createdAt: { gte: startOfCurrentMonth } },
+    });
+    const newCompaniesLastMonth = await prisma.company.count({
+        where: {
+            createdAt: {
+                gte: startOfLastMonth,
+                lt: startOfCurrentMonth,
+            },
+        },
+    });
+
+    const companyGrowthRate =
+        newCompaniesLastMonth === 0
+            ? 100
+            : ((newCompaniesThisMonth - newCompaniesLastMonth) / newCompaniesLastMonth) * 100;
+
+    // Reviews
+    const totalReviews = await prisma.review.count();
+    const newReviewsThisMonth = await prisma.review.count({
+        where: { createdAt: { gte: startOfCurrentMonth } },
+    });
+
+    return {
+        totalCompanies,
+        newCompaniesThisMonth,
+        newCompaniesLastMonth,
+        companyGrowthRate,
+        totalReviews,
+        newReviewsThisMonth,
+    };
+}
+
+export async function getCompanyChartAnalytics() {
+    const companies = await prisma.company.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(),
+            },
+        },
+        select: {
+            createdAt: true,
+        },
+    });
+
+    // Aggregate by date
+    const countsByDate: Record<string, number> = {};
+
+    for (const company of companies) {
+        const dateStr = company.createdAt.toISOString().split("T")[0]; // "YYYY-MM-DD"
+        countsByDate[dateStr] = (countsByDate[dateStr] || 0) + 1;
+    }
+
+    // Convert to array sorted by date
+    const chartData = Object.entries(countsByDate)
+        .map(([date, count]) => ({
+            date,
+            companies: count,
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return chartData;
+}
+
+export async function getUserChartAnalytics() {
+    const users = await prisma.user.findMany({
+        where: {
+            createdAt: {
+                lte: new Date(),
+            },
+        },
+        select: {
+            createdAt: true,
+        },
+    });
+
+    // Aggregate by date
+    const countsByDate: Record<string, number> = {};
+
+    for (const user of users) {
+        const dateStr = user.createdAt.toISOString().split("T")[0]; // "2024-06-28"
+        countsByDate[dateStr] = (countsByDate[dateStr] || 0) + 1;
+    }
+
+    // Convert to array sorted by date
+    const chartData = Object.entries(countsByDate)
+        .map(([date, count]) => ({
+            date,
+            users: count,
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    return chartData;
+}
+
+export async function getUserWhitelist() {
+    try {
+        const whitelist = await prisma.whitelist.findMany({
+            orderBy: { createdAt: "desc" },
+        })
+
+
+        if (!whitelist) {
+            return {success: false, error: "User whitelist not found"};
+        }
+
+        return {
+            success: true,
+            data: whitelist
+        };
+    } catch (error: any) {
+        logError("Error fetching whitelisted users", error);
         return {success: false, error: "Internal server error"};
     }
 }

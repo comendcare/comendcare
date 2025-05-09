@@ -118,11 +118,13 @@ export default async function OrganizationHomePage({
                         </div>
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
-                            <PAGProfileAssetsAndRFPsHoverableCard
-                                isPrivate={false}
-                                assets={assets}
-                                rfps={rfps}
-                            />
+                            {(assets.filter(a => a.pinned).length > 0 || rfps.filter(r => r.pinned).length > 0) && (
+                                <PAGProfileAssetsAndRFPsHoverableCard
+                                    isPrivate={false}
+                                    assets={assets}
+                                    rfps={rfps}
+                                />
+                            )}
                             {roadmaps.length > 0 ?
                                 <RoadmapCard
                                     roadmap={roadmaps?.[0]}

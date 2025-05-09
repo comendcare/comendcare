@@ -12,9 +12,9 @@ export default async function Organizations({ limit }: { limit?: number }) {
 
     const organizations = await prisma.organization.findMany({
         orderBy: {
-            createdAt: "asc"
+            createdAt: "desc"
         },
-        // ...(limit ? { take: limit } : {})
+        ...(limit ? { take: limit } : {})
     })
 
     return organizations.length > 0 ? (

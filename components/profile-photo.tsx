@@ -51,7 +51,7 @@ export function ProfilePhoto({
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
-    const [hasCropped, setHasCropped] = useState(false);
+    const [isCropping, setIsCropping] = useState(false)
 
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
@@ -94,7 +94,8 @@ export function ProfilePhoto({
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
-            setHasCropped(false);
+            // setHasCropped(false);
+            setIsCropping(false)
             setOpen(false);
             router.refresh();
         } catch (error) {
@@ -151,14 +152,12 @@ export function ProfilePhoto({
                                     selectedFile={selectedFileProfile}
                                     setSelectedFile={setSelectedFileProfile}
                                     className="mx-auto"
-                                    onCropped={() => setHasCropped(true)}
+                                    setIsCropping={setIsCropping}
                                 />
                                 <Button
                                     type="submit"
                                     className="w-fit"
-                                    disabled={
-                                        !editOrgForm.formState.isDirty || (!!editOrgForm.watch("image") && !hasCropped)
-                                    }
+                                    disabled={isCropping}
                                 >
                                     Save
                                 </Button>
