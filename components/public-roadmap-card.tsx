@@ -12,7 +12,7 @@ import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
 import { ChevronsUpDown, Pencil, Plus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { MODALITIES, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
+import { MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Organization } from "@prisma/client";
 import { PrivateNoResearchPlansColumn, PublicNoResearchPlans } from "./no-research-plans";
@@ -110,6 +110,11 @@ export const RoadmapCard = ({
                     <CardDescription>
                         {roadmap.description}
                     </CardDescription>
+                    <div className="flex gap-2">
+                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option) => <Badge variant={'secondary'} className="text-sm">{type.label}</Badge>)}
+                        <StageOfActivityBadge milestones={roadmap.milestones}/>
+                    </div>
+
                     <TabsList className="w-min">
                         <TabsTrigger value="timeline">
                             Timeline View
@@ -257,6 +262,6 @@ export const getStage = (milestones: any[]): {value: string, label: string, vari
 export const StageOfActivityBadge = ({milestones}: {milestones: any[]}) => {
     const stage = getStage(milestones)
     return (
-        <Badge variant={stage.variant as any}>{stage.label}</Badge>
+        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
     )
 }
