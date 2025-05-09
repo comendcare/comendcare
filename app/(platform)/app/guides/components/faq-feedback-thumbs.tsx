@@ -13,7 +13,7 @@ export default function FAQFeedbackThumbs({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{`Was this article helpful?`}</CardTitle>
+                <CardTitle className="font-normal">{`Was this article helpful?`}</CardTitle>
             </CardHeader>
             <CardContent className="flex gap-8 flex-col md:flex-row">
                 <Button
@@ -24,8 +24,8 @@ export default function FAQFeedbackThumbs({
                     className="p-8 grow flex flex-row items-center space-x-4"
                 >
                     <div className="flex flex-row items-center space-x-4">
-                        <ThumbsUp className="w-8 h-8" />
-                        <h3 className="text-base font-semibold leading-6 text-gray-900 m-0">
+                        <ThumbsUp className="w-12 h-12" />
+                        <h3 className="text-base leading-6 text-gray-900 m-0">
                             Yes
                         </h3>
                     </div>
@@ -38,7 +38,7 @@ export default function FAQFeedbackThumbs({
                     className="p-8 grow flex flex-row items-center space-x-4"
                 >
                     <div className="flex flex-row items-center space-x-4">
-                        <ThumbsDown className="w-8 h-8" />
+                        <ThumbsDown className="w-12 h-12" />
                         <h3 className="text-base font-semibold leading-6 text-gray-900 m-0">
                             No
                         </h3>

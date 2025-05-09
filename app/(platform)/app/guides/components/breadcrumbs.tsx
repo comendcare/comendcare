@@ -24,14 +24,14 @@ export default function Breadcrumbs() {
 
     return (
         <nav className="flex" aria-label="Breadcrumb">
-            <ol role="list" className="flex items-center space-x-4">
+            <ol role="list" className="flex items-center gap-4">
                 {pages.map((page, index) => (
                     <li key={page.name}>
-                        <div className="flex items-center">
-                            {index > 0 && <ChevronRight className="h-4 w-4 flex-shrink-0 text-gray-400" aria-hidden="true" />}
+                        <div className="flex items-center gap-4">
+                            {index > 0 && <ChevronRight className="h-4 w-4" aria-hidden="true" />}
                             <a
                                 href={page.href}
-                                className={`${page.current ? "font-semibold leading-7 text-blue-600" : "font-medium text-gray-500 hover:text-gray-700"} text-sm ml-4 `}
+                                className={`text-sm`}
                                 aria-current={page.current ? "page" : undefined}
                             >
                                 {page.name}

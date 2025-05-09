@@ -22,8 +22,9 @@ export default function FAQLayout({
     children: React.ReactNode
 }>) {
     return (
-        <main>
-            <div className="container relative grid grid-cols-1 lg:grid-cols-5 gap-8 bg-white mx-auto max-w-7xl px-6 py-4 sm:py-8 lg:px-8">
+        <main className="w-full h-full">
+            <div className="w-full container relative grid grid-cols-1 lg:grid-cols-5 gap-8 bg-white mx-auto max-w-7xl px-6 py-4 sm:py-8 lg:px-8">
+                <h1 className="col-span-full text-2xl md:text-3xl font-semibold">Comend Guides</h1>
                 <div className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 self-start">
                     {cards.map((card, index) => (
                         <div key={index}>
