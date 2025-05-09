@@ -1,5 +1,5 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {usePathname, useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
@@ -104,11 +104,12 @@ export const RoadmapCard = ({
         >
             <Card className="organization-profile-tour-step4">
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                            Research Plan
-                        </CardTitle>
-                    </div>
+                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                        {roadmap.title || 'Untitled Research Plan'}
+                    </CardTitle>
+                    <CardDescription>
+                        {roadmap.description}
+                    </CardDescription>
                     <TabsList className="w-min">
                         <TabsTrigger value="timeline">
                             Timeline View
@@ -151,25 +152,7 @@ export const NoProjectsCard = ({isPublic}: {isPublic: Boolean}) => {
     
     return (
         <Card className="organization-profile-tour-step4">
-            <CardHeader className="w-full pt-6 pb-2 space-y-4">
-                <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
-                        Research Plan
-                    </CardTitle>
-                    {!isPublic &&
-                        <Button
-                            variant="ghost"
-                            onClick={() => router.push("/app/research-plan")}
-                            className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                        >
-                            Edit research plan
-                            <Pencil />
-                        </Button>
-                    }
-                </div>
-            </CardHeader>
-
-            <CardContent className="px-8">
+            <CardContent className="px-8 pt-4">
                 <NoProjects />
             </CardContent>
         </Card>
