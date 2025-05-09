@@ -31,6 +31,8 @@ export default async function RoadmapPage() {
         roadmaps = response.data
     }
 
+    console.log(`roadmaps`, roadmaps)
+
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             <ResearchPlanTemplatesCard orgId={orgId} />
