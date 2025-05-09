@@ -65,7 +65,7 @@ export default async function ProfilePage() {
                                     name={organization.headerImage}
                                     className="rounded-full ring-4 ring-white w-full"
                                     editable={true}
-                                />
+                                /> 
 
                                 <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
                                     <div className="h-fit w-fit -mt-16">
