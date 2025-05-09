@@ -15,6 +15,7 @@ import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
+import { RoadmapsCard } from "@/components/public-roadmap-card"
 
 export async function generateMetadata({
                                            params
@@ -164,7 +165,7 @@ export default async function OrganizationRoadmapPage({
                         >
                             <PAGPublicRoadmapBreadcrumb
                                 organization={organization}
-                                roadmap={roadmaps[0]}
+                                roadmap={undefined}
                             />
 
                             {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
@@ -217,30 +218,7 @@ export default async function OrganizationRoadmapPage({
                                 </div>
                             </div>
 
-                            {/* <p>
-                                {roadmaps[0].description}
-                            </p> */}
-
-                            {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
-                            <PublicRoadmapContent 
-                                roadmap={roadmaps[0]}
-                                subdomain={organization?.subdomain || undefined}
-                            />
-
-                            {/*<div className="mt-8 w-full space-y-8">*/}
-                            {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}
-                            {/*        Recent activity*/}
-                            {/*    </h2>*/}
-                            {/*    <Carousel>*/}
-                            {/*        <CarouselContent className="p-4 gap-4">*/}
-                            {/*            {posts.map((post, index) => (*/}
-                            {/*                <ConditionProfileRecentActivityCard post={post} key={index}/>*/}
-                            {/*            ))}*/}
-                            {/*        </CarouselContent>*/}
-                            {/*        <CarouselPrevious/>*/}
-                            {/*        <CarouselNext/>*/}
-                            {/*    </Carousel>*/}
-                            {/*</div>*/}
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
 
                         <FloatingDock

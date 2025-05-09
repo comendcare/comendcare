@@ -115,7 +115,7 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     }
 
     return (
-        <ScrollArea className="w-full h-full p-10 pt-0">
+        <ScrollArea className="w-full h-full px-10 pt-0">
             <DndContext
                 accessibility={{
                     announcements

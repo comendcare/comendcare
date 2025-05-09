@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
-import {Milestone, RFP} from "@/lib/types"
+import {RFP} from "@/lib/types"
 import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -52,6 +52,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { useShallow } from "zustand/react/shallow"
 import MoneyInput from "./money-input"
+import ProjectMultipleSelector from "./project-multiple-selector"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -133,6 +134,8 @@ const rfpSelector = (state: RFPState) => ({
     deleteRFP: state.deleteRFP,
     saveState: state.saveState
 })
+
+export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditRFPForm({
     rfpData,
@@ -487,20 +490,7 @@ export function EditRFPForm({
                             <FormItem className="w-full mt-2">
                                 <FormLabel >{`Linked Projects`}</FormLabel>
                                 <FormControl>
-                                    <MultipleSelector
-                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title})) as Option[]}
-                                        onChange={field.onChange}
-                                        defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
-                                        options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
-                                        hidePlaceholderWhenSelected={true}
-                                        showHoverCard={false}
-                                        placeholder="Link projects"
-                                        emptyIndicator={
-                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                no results found.
-                                            </p>
-                                        }
-                                    />
+                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
                                 <FormMessage className="text-primary"/>
                             </FormItem>

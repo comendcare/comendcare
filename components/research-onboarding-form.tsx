@@ -18,7 +18,7 @@ import {faker} from "@faker-js/faker";
 import LoadingDots from "@/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
-import {MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
+import {MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
 
