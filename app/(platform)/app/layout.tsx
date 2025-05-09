@@ -15,15 +15,12 @@ import {
     getAllNotifications,
     getAssets,
     getMilestoneTypes,
-    getNodesEdgesAndMilestones,
     getRFPs,
-    getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
 import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
-import { createKanban, createRoadmap } from "@/lib/actions";
 import { FeedbackSheet } from "@/components/feedback";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
 import { Button } from "@/components/ui/button";
@@ -181,45 +178,45 @@ export default function AppLayout({children}: AppLayoutProps) {
             initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
 
-            // init roadmap/research plan store
-            let response = await getRoadmapId(session.user.organizationId)
-            if (response.success) {
-                // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
-                if (pathname === "/app/research-plan" && !response.data) {
-                    console.log(`research plan doesn't exist, create it`)
-                    const roadmap =  await createRoadmap(session.user.organizationId, {})
-                    console.log(`roadmap`, roadmap)
-                    response = await getRoadmapId(session.user.organizationId)
-                }
+            // // init roadmap/research plan store
+            // let response = await getRoadmapId(session.user.organizationId)
+            // if (response.success) {
+            //     // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
+            //     if (pathname === "/app/research-plan" && !response.data) {
+            //         console.log(`research plan doesn't exist, create it`)
+            //         const roadmap =  await createRoadmap(session.user.organizationId, {})
+            //         console.log(`roadmap`, roadmap)
+            //         response = await getRoadmapId(session.user.organizationId)
+            //     }
         
-                const nodesResponse = await getNodesEdgesAndMilestones(response.data)
-                const urlNode = searchParams.get("project")
-                const urlView = searchParams.get("view")
-                if (nodesResponse.success) {
-                    initializeRoadmapState({
-                        roadmapId: response.data,
-                        nodes: nodesResponse.data.nodes,
-                        edges: nodesResponse.data.edges,
-                        milestones: nodesResponse.data.milestones,
-                        selectedView: urlView,
-                        selectedNodeId: urlNode 
-                    })
-                } else {
-                    // init state, but research plan has not been created yet
-                    initializeRoadmapState({
-                        roadmapId: null,
-                        nodes: [],
-                        edges: [],
-                        milestones: [],
-                        selectedView: null,
-                        selectedNodeId: null 
-                    })
-                }
-                console.log(`Research Plan initialized...`)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
+            //     const nodesResponse = await getNodesEdgesAndMilestones(response.data)
+            //     const urlNode = searchParams.get("project")
+            //     const urlView = searchParams.get("view")
+            //     if (nodesResponse.success) {
+            //         initializeRoadmapState({
+            //             roadmapId: response.data,
+            //             nodes: nodesResponse.data.nodes,
+            //             edges: nodesResponse.data.edges,
+            //             milestones: nodesResponse.data.milestones,
+            //             selectedView: urlView,
+            //             selectedNodeId: urlNode 
+            //         })
+            //     } else {
+            //         // init state, but research plan has not been created yet
+            //         initializeRoadmapState({
+            //             roadmapId: null,
+            //             nodes: [],
+            //             edges: [],
+            //             milestones: [],
+            //             selectedView: null,
+            //             selectedNodeId: null 
+            //         })
+            //     }
+            //     console.log(`Research Plan initialized...`)
+            // } else {
+            //     console.error(response.error)
+            //     toast.error(response.error)
+            // }
 
             // init asset store
             let assetResponse = await getAssets(session.user.organizationId)
@@ -248,7 +245,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         // Only run if the session data has changed or the session has not yet been set up
-        console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
+        // console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
         if (
             // !isLoading &&
             status !== "authenticated" || 

@@ -9,12 +9,16 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
-import { Card, CardContent, CardTitle } from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, Router, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
+import { createRoadmap } from "@/lib/actions";
+import Link from "next/link";
+import { Badge } from "./ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -229,5 +233,105 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
                 </CardContent>
             </Card>
         </Button>
+    )
+}
+
+export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
+    const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
+
+    if (isHidden) {
+        return (
+            <div className="w-full flex justify-end">
+                <Button variant={"link"} onClick={() => {
+                    localStorage.removeItem("isHidden")
+                    setIsHidden(false)
+                }}>Show Research Plan Templates</Button>
+            </div>
+        )
+    }
+
+    return (
+        <Card className="w-full bg-gray-50">
+            <CardHeader className="relative">
+                <CardTitle>
+                    Research Plan Templates
+                </CardTitle>
+                <CardDescription>Create a research plan from one of our curated templates.</CardDescription>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            variant={"ghost"} 
+                            className="absolute top-0 right-0 hover:bg-transparent" 
+                            onClick={() => {
+                                localStorage.setItem("isHidden", "true")
+                                setIsHidden(true)
+                            }}
+                        >
+                            <X />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{`Hide Research Plan Templates`}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </CardHeader>
+            <CardContent className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                <CreateEmptyResearchPlanCard orgId={orgId} />
+                {templateResearchPlans.map(plan => (
+                    <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId}/>
+                ))}
+            </CardContent>
+        </Card>
+    )
+}
+
+export const CreateEmptyResearchPlanCard = ({orgId}: {orgId: string}) => {
+    const router = useRouter()
+
+    return (
+        <button
+            onClick={() => router.push(`/app/research-plan/create`)}
+            className="hover:cursor-pointer"
+        >
+            <Card className="h-full">
+                <CardContent className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                    <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
+                    <Plus />
+                </CardContent>
+            </Card>
+        </button>
+    )
+}
+
+export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof templateResearchPlans[0], orgId: string}) => {
+    const router = useRouter()
+
+    return (
+        <button
+            onClick={async () => {
+                const roadmap =  await createRoadmap(orgId, plan)
+                if (roadmap && roadmap.id) {
+                    router.push(`/app/research-plan/${roadmap.id}`)
+                }
+            }}
+            className="hover:cursor-pointer"
+        >
+            <Card className="text-left h-full">
+                <CardHeader>
+                    <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                    {/* <ol>
+                        {plan.milestones.map(milestone => (
+                            <li>{milestone.title}</li>
+                        ))}
+                    </ol> */}
+                    {plan.milestones.map(milestone => (
+                        <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
+                    ))}
+                </CardContent>
+            </Card>
+        </button>
     )
 }

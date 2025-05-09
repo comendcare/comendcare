@@ -316,10 +316,10 @@ export function withRoadmapAuth(action: any) {
                 id: roadmapId
             },
             include: {
-                organization: true
+                organization: true,
             }
         })
-        if (!roadmap || roadmap.userId !== session.user.id) {
+        if (!roadmap) {
             return {
                 error: "Roadmap not found"
             }

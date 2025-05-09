@@ -8,7 +8,7 @@ import {
     getPublicRoadmapsForOrganization
 } from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapCard, UnderDevelopmentCard} from "@/components/public-roadmap-card";
+import {RoadmapsCard} from "@/components/public-roadmap-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {FloatingDock} from "@/components/floating-dock";
@@ -128,15 +128,7 @@ export default async function OrganizationHomePage({
                                     rfps={rfps}
                                 />
                             )}
-                            {roadmaps.length > 0 ?
-                                <RoadmapCard
-                                    roadmap={roadmaps?.[0]}
-                                    subdomain={organization?.subdomain || undefined}
-                                    isPublic={true}
-                                    externalLinks={true}
-                                />
-                                : <UnderDevelopmentCard isPublic={true}/>
-                            }
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
                     </div>
                 </div>

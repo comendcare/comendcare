@@ -8,18 +8,28 @@ import {
     EdgeChange,
     Connection
 } from "@xyflow/react"
-import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
+import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@/lib/actions"
 import { toast } from "sonner"
 import { nanoid } from "nanoid"
-import { Milestone, NodeType, StatusType } from "@/lib/types"
+import { Milestone, NodeType, Roadmap, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
-import { MilestoneTypeOnMilestone } from "@prisma/client"
 import mixpanel from "mixpanel-browser"
 import { mixpanelTrack } from "@/app/mixpanel"
 
 export type RoadmapState = {
     initialized: boolean,
-    initState: (nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void,
+    initState: (
+        details: Roadmap | undefined, 
+        nodes: Node[], 
+        edges: Edge[], 
+        milestones: Milestone[], 
+        selectedView: string | null, 
+        selectedNodeId: string | null, 
+        selectedTaskId: string | null, 
+        roadmapId: string
+    ) => void,
+    details: Roadmap | undefined,
+    setDetails: (details: Partial<Roadmap>) => Promise<void>
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -46,13 +56,36 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (details: Roadmap | undefined, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
             }))
-            set({ initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
+            set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
+        },
+        details: undefined,
+        setDetails: async (details: Partial<Roadmap> | undefined) => {
+            const id = get().roadmapId
+
+            if (!id) {
+                console.error(`Error: no active research plan!`)
+                return
+            }
+
+            if (!details) {
+                console.error(`Error: research plan details are not intialized.`)
+                return
+            }
+
+            const roadmap = await updateRoadmap({
+                id,
+                title: details.title,
+                description: details.description || null,
+                modalities: details.modalities || []
+            })
+
+            if (roadmap) set({ details: roadmap as Roadmap })
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {
@@ -210,7 +243,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestoneTypes = await getMilestoneTypes()
     
             const milestonesAlongXAxis = get().nodes.sort((a, b) => {
-                return a.position.x - b.position.x
+                return a?.position?.x - b?.position?.x
             })
             let centerX = milestonesAlongXAxis.length > 0 ? ((milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500): (0)
             let centerY = 0
