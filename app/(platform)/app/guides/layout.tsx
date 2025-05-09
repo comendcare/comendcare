@@ -23,21 +23,19 @@ export default function FAQLayout({
 }>) {
     return (
         <main className="w-full h-full">
-            <div className="w-full container relative grid grid-cols-1 lg:grid-cols-5 gap-8 bg-white mx-auto max-w-7xl px-6 py-4 sm:py-8 lg:px-8">
-                <h1 className="col-span-full text-2xl md:text-3xl font-semibold">Comend Guides</h1>
-                <div className="hidden lg:block lg:col-span-1 lg:sticky lg:top-24 self-start">
+            <div className="w-full container relative flex gap-8 bg-white mx-auto max-w-8xl px-6 py-4 sm:py-8 lg:px-8">
+                <div className="hidden lg:block lg:sticky lg:top-4 self-start">
+                    <h1 className="col-span-full text-2xl md:text-3xl font-semibold min-w-fit text-nowrap">Comend Guides</h1>
                     {cards.map((card, index) => (
                         <div key={index}>
                             <Accordion type="single" collapsible className="w-full" defaultValue={card.heading}>
                                 <AccordionItem value={card.heading}>
                                     <AccordionTrigger className="p-2 flex flex-row text-left">
-                                        {/* <TextHover>{card.heading}</TextHover> */}
                                         {card.heading}
                                     </AccordionTrigger>
                                     <AccordionContent className="flex flex-col space-y-1 px-2">
                                         {card.prompts.map((prompt, index) => (
                                             <Link href={prompt.href} key={index}>
-                                                {/* <TextHover>{prompt.prompt}</TextHover> */}
                                                 {prompt.prompt}
                                             </Link>
                                         ))}
@@ -47,7 +45,7 @@ export default function FAQLayout({
                         </div>
                     ))}
                 </div>
-                <div className="col-span-1 lg:col-span-4">{children}</div>
+                <div>{children}</div>
             </div>
             {/* <Footer /> */}
         </main>
