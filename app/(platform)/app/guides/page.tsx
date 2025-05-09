@@ -51,14 +51,14 @@ export default function FAQ() {
 
     return (
         <div className="mx-auto space-y-16">
-            <div className="bg-blue-100 rounded-xl">
+            <div className="bg-blue-light rounded-xl">
                 <div className="mx-auto max-w-7xl px-6 py-8 sm:py-16 md:py-32 flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                        <h2 className="text-2xl tracking-tight text-gray-900 sm:text-3xl">
                             {`Frequently asked questions`}
                             <br />
                         </h2>
-                        <p className="mt-2 text-2xl text-gray-500">{`How can we help?`}</p>
+                        <p className="mt-2 text-xl text-gray-500">{`How can we help?`}</p>
                     </div>
                     <Link href="/contact" className={cn(buttonVariants({ variant: "cta" }), "w-fit")}>
                         {`Contact us`}
@@ -76,40 +76,47 @@ export default function FAQ() {
                 >
                     <ToggleGroupItem
                         variant="outline"
-                        className="px-10 py-4 h-full"
+                        className="p-4 h-full"
                         value="start"
                     >
-                        <div className="flex flex-row items-center space-x-4">
+                        <div className="flex flex-row items-center gap-4">
                             <Lightbulb className="w-8 h-8" />
                             <div className="flex flex-col items-start text-start">
-                                <h3 className="text-base font-semibold leading-6 text-gray-900">Getting Started</h3>
+                                <h3 className="text-lg">Getting Started</h3>
                                 <p className="mt-1 text-sm text-gray-500">Start from the beginning</p>
                             </div>
                         </div>
                     </ToggleGroupItem>
                     <ToggleGroupItem
                         variant="outline"
-                        className="px-10 py-4 h-full"
+                        className="p-4 h-full"
                         value="contribute"
                     >
-                        <div className="flex flex-row items-center space-x-4">
+                        <div className="flex flex-row items-center gap-4">
                             <ThumbsUp className="w-8 h-8" />
                             <div className="flex flex-col items-start text-start">
-                                <h3 className="text-base font-semibold leading-6 text-gray-900">Uploading Resources</h3>
+                                <h3 className="text-lg">Uploading Resources</h3>
                                 <p className="mt-1 text-sm text-gray-500">How to start contributing</p>
                             </div>
                         </div>
                     </ToggleGroupItem>
                     <ToggleGroupItem
                         variant="outline"
-                        className="px-10 py-4 h-full"
+                        className="p-4 h-full"
                         value="collections"
                     >
-                        <div className="flex flex-row items-center space-x-4">
+                        {/* <div className="flex flex-row items-center space-x-4">
                             <Save className="w-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-base font-semibold leading-6 text-gray-900">Create Collection and Embed</h3>
                                 <p className="mt-1 text-sm text-gray-500">{`Create and add collection to your site`}</p>
+                            </div>
+                        </div> */}
+                        <div className="flex flex-row items-center gap-4">
+                            <Save className="w-8 h-8" />
+                            <div className="flex flex-col items-start text-start">
+                                <h3 className="text-lg">Create Collection and Embed</h3>
+                                <p className="mt-1 text-sm text-gray-500">Create and add collection to your site</p>
                             </div>
                         </div>
                     </ToggleGroupItem>
@@ -128,7 +135,7 @@ export default function FAQ() {
                     </ToggleGroupItem> */}
                 </ToggleGroup>
 
-                <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">
+                <h2 className="text-2xl">
                     {filterState === "start" && `Getting Started`}
                     {filterState === "contribute" && `Uploading Resources`}
                     {filterState === "collections" && `Create Collection and Embed`}
@@ -149,7 +156,7 @@ export default function FAQ() {
                 </div>
             </div>
 
-            <Questions />
+            {/* <Questions /> */}
         </div>
     )
 }
