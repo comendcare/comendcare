@@ -1,56 +1,80 @@
 "use client"
 
-import { random } from "@/lib/utils"
-import { Card, Metric, Text, AreaChart, BadgeDelta, Flex } from "@tremor/react"
-import { useMemo } from "react"
+import {Card, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {useEffect, useState} from "react";
+import {getOverviewAnalytics} from "@/lib/fetchers";
+
+interface AnalyticsData {
+    totalUsers: number;
+    totalOrganizations: number;
+    totalCompanies: number;
+    totalProjects: number;
+}
 
 export default function OverviewStats() {
-    const data = useMemo(() => {
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
-        return [
-            ...months.map(month => ({
-                Month: `${month} 23`,
-                "Total Visitors": random(20000, 170418)
-            })),
-            {
-                Month: "Jul 23",
-                "Total Visitors": 170418
-            }
-        ]
-    }, [])
+    const [data, setData] = useState<AnalyticsData | null>(null);
+
+    useEffect(() => {
+        getOverviewAnalytics()
+            .then((res) => res)
+            .then(setData);
+    }, []);
+
+    if (!data) return null; // Or a skeleton
 
     return (
-        <div className="grid gap-6 sm:grid-cols-2">
-            <Card className="dark:!bg-stone-900">
-                <Text>Total Visitors</Text>
-                <Flex
-                    className="space-x-3 truncate"
-                    justifyContent="start"
-                    alignItems="baseline"
-                >
-                    <Metric className="font-cal">170,418</Metric>
-                    <BadgeDelta
-                        deltaType="moderateIncrease"
-                        className="dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400"
-                    >
-                        34.3%
-                    </BadgeDelta>
-                </Flex>
-                <AreaChart
-                    className="mt-6 h-28"
-                    data={data}
-                    index="Month"
-                    valueFormatter={(number: number) =>
-                        `${Intl.NumberFormat("us").format(number).toString()}`
-                    }
-                    categories={["Total Visitors"]}
-                    colors={["blue"]}
-                    showXAxis={true}
-                    showGridLines={false}
-                    startEndOnly={true}
-                    showYAxis={false}
-                    showLegend={false}
-                />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 px-4 lg:px-6">
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Organizations</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.totalOrganizations.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Cumulative organizations
+                    </div>
+                </CardFooter>
+            </Card>
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Users</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.totalUsers.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Cumulative user accounts
+                    </div>
+                </CardFooter>
+            </Card>
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Companies</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.totalCompanies.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Cumulative service providers
+                    </div>
+                </CardFooter>
+            </Card>
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Projects</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.totalProjects.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Cumulative projects across all organizations
+                    </div>
+                </CardFooter>
             </Card>
         </div>
     )

@@ -39,7 +39,7 @@ export function AdminOrganizationsAnalyticsCards() {
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">
-                        Cumulative user accounts
+                        Cumulative organizations
                     </div>
                 </CardFooter>
             </Card>
