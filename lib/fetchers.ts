@@ -1504,3 +1504,17 @@ export async function getUserWhitelist() {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function getOverviewAnalytics() {
+    const totalUsers = await prisma.user.count();
+    const totalOrganizations = await prisma.organization.count();
+    const totalCompanies = await prisma.company.count();
+    const totalProjects = await prisma.milestone.count();
+
+    return {
+        totalUsers,
+        totalOrganizations,
+        totalCompanies,
+        totalProjects,
+    };
+}
