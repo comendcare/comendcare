@@ -20,8 +20,6 @@ import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import { Asset } from "@/lib/types"
-import { EditAssetDialog } from "../edit-asset-dialog"
-import Link from "next/link"
 import { Roadmap } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
