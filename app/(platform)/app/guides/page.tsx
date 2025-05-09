@@ -79,8 +79,8 @@ export default function FAQ() {
                         className="p-4 h-full"
                         value="start"
                     >
-                        <div className="flex flex-row items-center gap-4">
-                            <Lightbulb className="w-8 h-8" />
+                        <div className="w-full flex flex-row items-center justify-start gap-4">
+                            <Lightbulb className="min-w-8 w-8 min-h-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-lg">Getting Started</h3>
                                 <p className="mt-1 text-sm text-gray-500">Start from the beginning</p>
@@ -92,8 +92,8 @@ export default function FAQ() {
                         className="p-4 h-full"
                         value="contribute"
                     >
-                        <div className="flex flex-row items-center gap-4">
-                            <ThumbsUp className="w-8 h-8" />
+                        <div className="w-full flex flex-row items-center justify-start gap-4">
+                            <ThumbsUp className="min-w-8 w-8 min-h-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-lg">Uploading Resources</h3>
                                 <p className="mt-1 text-sm text-gray-500">How to start contributing</p>
@@ -105,41 +105,20 @@ export default function FAQ() {
                         className="p-4 h-full"
                         value="collections"
                     >
-                        {/* <div className="flex flex-row items-center space-x-4">
-                            <Save className="w-8 h-8" />
-                            <div className="flex flex-col items-start text-start">
-                                <h3 className="text-base font-semibold leading-6 text-gray-900">Create Collection and Embed</h3>
-                                <p className="mt-1 text-sm text-gray-500">{`Create and add collection to your site`}</p>
-                            </div>
-                        </div> */}
-                        <div className="flex flex-row items-center gap-4">
-                            <Save className="w-8 h-8" />
+                        <div className="w-full flex flex-row items-center justify-start gap-4">
+                            <Save className="min-w-8 w-8 min-h-8 h-8" />
                             <div className="flex flex-col items-start text-start">
                                 <h3 className="text-lg">Create Collection and Embed</h3>
                                 <p className="mt-1 text-sm text-gray-500">Create and add collection to your site</p>
                             </div>
                         </div>
                     </ToggleGroupItem>
-                    {/* <ToggleGroupItem
-                        variant="outline"
-                        className="p-10"
-                        value="rules"
-                    >
-                        <div className="flex flex-row items-center space-x-4">
-                            <FaClipboardCheck className="w-8 h-8" />
-                            <div className="flex flex-col items-start text-start">
-                                <h3 className="text-base font-semibold leading-6 text-gray-900">Rules and Policies</h3>
-                                <p className="mt-1 text-sm text-gray-500">{`Learn about Librarey's rules`}</p>
-                            </div>
-                        </div>
-                    </ToggleGroupItem> */}
                 </ToggleGroup>
 
                 <h2 className="text-2xl">
                     {filterState === "start" && `Getting Started`}
                     {filterState === "contribute" && `Uploading Resources`}
                     {filterState === "collections" && `Create Collection and Embed`}
-                    {/* {filterState === "rules" && `Rules and Policies`} */}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {articles
@@ -155,8 +134,6 @@ export default function FAQ() {
                         ))}
                 </div>
             </div>
-
-            {/* <Questions /> */}
         </div>
     )
 }
