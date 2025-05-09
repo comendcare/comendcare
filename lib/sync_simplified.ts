@@ -7,7 +7,7 @@ process.on('SIGINT', () => {
 })
 
 const PULSE_API_KEY = (() => {
-    const key = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+    const key = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
         ? process.env.PREVIEW_PULSE_API_KEY
         : process.env.PRODUCTION_PULSE_API_KEY;
 

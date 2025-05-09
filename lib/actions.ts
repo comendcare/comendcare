@@ -11,7 +11,8 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
-    Review
+    Review,
+    SavedCompany, Company
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -41,6 +42,11 @@ import {
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
+
+export const getSessionInfo = async () => {
+    const session = await getSession()
+    return session
+}
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -1064,7 +1070,7 @@ export async function inviteUser(
 
         const isDomainValid = await validateEmailDomain(lowerCaseEmail);
         if (!isDomainValid) {
-            return { success: false, error: "Email domain is invalid or cannot receive emails." };
+            return {success: false, error: "Email domain is invalid or cannot receive emails."};
         }
 
         // Check if the user is already a member of the organization
@@ -1415,6 +1421,7 @@ export async function updateMember(
             where: {
                 id: membershipId
             },
+            include: {user: true},
             data
         })
 
@@ -1729,13 +1736,15 @@ export async function updateCondition(formData: FormData, organizationId: string
 export const deleteAsset = async (assetId: string) => {
     try {
         const response = await prisma.asset.delete({
-            where: { id: assetId },
+            where: {id: assetId},
             include: {
                 contacts: true,
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: {types: {include: {milestoneType: true}}}
+                        }
                     }
                 }
             },
@@ -1743,8 +1752,8 @@ export const deleteAsset = async (assetId: string) => {
 
         return response
     } catch (error: any) {
-        console.error("Error deleting asset:", error.message);
-        throw new Error(error.message || "Failed to delete asset.");
+        console.error("Error deleting tool:", error.message);
+        throw new Error(error.message || "Failed to delete tool.");
     }
 }
 
@@ -1763,7 +1772,9 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: {types: {include: {milestoneType: true}}}
+                        }
                     }
                 }
             },
@@ -1834,27 +1845,29 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                 },
                 private: assetData.private || false,
                 pinned: assetData.pinned || false,
-                organization: { connect: {id: organizationId} }
+                organization: {connect: {id: organizationId}}
             },
         })
 
         return response
     } catch (error: any) {
-        console.error("Error creating or updating asset:", error.message);
-        throw new Error(error.message || "Failed to create or update asset.");
+        console.error("Error creating or updating tool:", error.message);
+        throw new Error(error.message || "Failed to create or update tool.");
     }
 }
 
 export const deleteRFP = async (rfpId: string) => {
     try {
         const response = await prisma.rFP.delete({
-            where: { id: rfpId },
+            where: {id: rfpId},
             include: {
                 contacts: true,
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: {types: {include: {milestoneType: true}}}
+                        }
                     }
                 }
             },
@@ -1882,7 +1895,9 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 attachments: true,
                 milestones: {
                     include: {
-                        milestone: true
+                        milestone: {
+                            include: {types: {include: {milestoneType: true}}}
+                        }
                     }
                 }
             },
@@ -1962,7 +1977,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                         }
                     }))
                 },
-                organization: { connect: {id: organizationId} },
+                organization: {connect: {id: organizationId}},
                 budget: rfpData.budget
             },
         })
@@ -2071,8 +2086,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
-                    assets: { include: { asset: true } },
-                    rfps: { include: { rfp: true } }
+                    assets: {include: {asset: true}},
+                    rfps: {include: {rfp: true}}
                 }
             },
             nodes: true,
@@ -2241,8 +2256,8 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 contacts: true,
                 attachments: true,
                 types: {include: {milestoneType: true}},
-                assets: { include: { asset: true } },
-                rfps: { include: { rfp: true } }
+                assets: {include: {asset: true}},
+                rfps: {include: {rfp: true}}
             },
             where: {roadmapId}
         })
@@ -2442,8 +2457,8 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 contacts: true,
                 attachments: true,
                 types: {include: {milestoneType: true}},
-                assets: { include: { asset: true } },
-                rfps: { include: { rfp: true } }
+                assets: {include: {asset: true}},
+                rfps: {include: {rfp: true}}
             },
             where: {roadmapId}
         })
@@ -2555,7 +2570,7 @@ export async function updateEdges({roadmapId, edges}: { roadmapId: string | null
 }
 
 /* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
-export async function syncDBAssets({assets}: {assets: Asset[]}) {
+export async function syncDBAssets({assets}: { assets: Asset[] }) {
     try {
         let updateAssets: Asset[] = []
         const session = await getSession()
@@ -2599,7 +2614,7 @@ export async function syncDBAssets({assets}: {assets: Asset[]}) {
     }
 }
 
-export async function syncDBRFPs({rfps}: {rfps: RFP[]}) {
+export async function syncDBRFPs({rfps}: { rfps: RFP[] }) {
     try {
         let updateRfps: RFP[] = []
         const session = await getSession()
@@ -3228,6 +3243,15 @@ export const createReview = async (companyId: string, formData: FormData): Promi
         const result = await prisma.$transaction(async (tx) => {
             // Create the review
             const review = await tx.review.create({
+                include: {
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: true}
+                            }
+                        }
+                    }
+                },
                 data: {
                     title,
                     body,
@@ -3378,7 +3402,11 @@ export async function saveCRO(croId: string, milestoneId: string) {
     const session = await getSession()
 
     try {
-        const response = prisma.savedCompany.create({
+        const response = await prisma.savedCompany.create({
+            include: {
+                company: true,
+                milestone: {include: {types: true}}
+            },
             data: {
                 company: {
                     connect: {
@@ -3404,6 +3432,8 @@ export async function saveCRO(croId: string, milestoneId: string) {
             return {success: false, error: "Database error. please try again later."}
         }
 
+        console.log(`response`, response)
+
         return {success: true, data: response}
     } catch (error: any) {
         console.error("Error saving company:", error)
@@ -3418,6 +3448,10 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
         const response = await prisma.savedCompany.update({
             where: {
                 id: savedCROId // Make sure to specify the ID of the saved company you want to update
+            },
+            include: {
+                company: true,
+                milestone: {include: {types: true}}
             },
             data: {
                 milestone: {
@@ -3443,8 +3477,12 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string) {
 
 export async function unsaveCRO(savedCompanyId: string) {
     try {
-        const response = prisma.savedCompany.delete({
+        const response = await prisma.savedCompany.delete({
             where: {id: savedCompanyId},
+            include: {
+                company: true,
+                milestone: {include: {types: true}}
+            },
         });
 
         if (!response) {
@@ -3482,7 +3520,7 @@ export async function submitFeedback(reviewId: string, userId: string, isHelpful
                 },
             });
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         } else {
             // Otherwise, create new feedback
             const response = await prisma.reviewFeedback.create({
@@ -3493,10 +3531,131 @@ export async function submitFeedback(reviewId: string, userId: string, isHelpful
                 },
             });
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         }
     } catch (error: any) {
         console.error("Error submitting feedback:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
+    }
+}
+
+export async function addEmailToWhitelist(email: string) {
+    try {
+        // Check if the user has already provided feedback for this review
+        // Otherwise, create new feedback
+        const response = await prisma.whitelist.create({
+            data: {
+                email: email
+            },
+        });
+
+        revalidatePath("/admin/users/whitelist")
+
+        return {success: true, data: response};
+    } catch (error: any) {
+        console.error("Error adding email to whitelist:", error);
+        return {success: false, error: "Database error. Please try again later."};
+    }
+}
+
+export async function removeEmailFromWhitelist(email: string) {
+    try {
+        // Check if the user has already provided feedback for this review
+        // Otherwise, create new feedback
+        const response = await prisma.whitelist.delete({
+            where: {
+                email: email
+            }
+        });
+
+        revalidatePath("/admin/users/whitelist")
+
+        return {success: true, data: response};
+    } catch (error: any) {
+        console.error("Error removing email to whitelist:", error);
+        return {success: false, error: "Database error. Please try again later."};
+    }
+}
+
+export const createCompany = async (formData: FormData) => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        return { error: "Not authenticated" }
+    }
+
+    const title = formData.get("orgName") as string
+    const description = formData.get("description") as string
+    const yearEstablished = parseInt(formData.get("founded") as string)
+    const companyType = formData.get("type") as string
+    const url = formData.get("website") as string
+    const servicesRaw = formData.get("services") as string // comma-separated labels
+
+    try {
+        const company = await prisma.company.create({
+            data: {
+                title,
+                description,
+                yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
+                companyType,
+                url,
+                services: servicesRaw
+                    ? {
+                        create: servicesRaw
+                            .split(",")
+                            .map((name) => ({ name: name.trim() }))
+                    }
+                    : undefined,
+            },
+            include: { services: true },
+        })
+
+        await addTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
+                : process.env.TYPESENSE_ADMIN_API_KEY!,
+            company,
+            "companies"
+        )
+
+        // Optional: trigger revalidation
+        await revalidateTag(`${company.id}-company-metadata`)
+
+        return { success: true, data: company }
+    } catch (error: any) {
+        console.error("Error creating company:", error)
+        return { success: false, error: "Database error. Please try again later." }
+    }
+}
+
+export async function deleteCompany(company: Company) {
+    try {
+        const deleteCompany = prisma.company.delete({
+            where: {id: company.id},
+        });
+
+        const deleteTypeSense = deleteTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
+            company.id,
+            'companies'
+        );
+
+        // Run both deletions concurrently
+        const [response] = await Promise.all([deleteCompany, deleteTypeSense])
+
+        if (!response) {
+            console.error("Error deleting company.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error deleting company:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }

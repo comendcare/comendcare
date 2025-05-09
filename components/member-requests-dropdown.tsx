@@ -7,6 +7,8 @@ import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
 import { Ellipsis, UserCheck, UserX } from "lucide-react";
+import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default async function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
     const session = useSession()
@@ -16,6 +18,13 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
             const response = await approveMemberRequestAndCreateMember(memberRequest)
 
             if (response.success) {
+                mixpanelTrack("Membership Request Approved", {
+                    "Member Name": response.data.user.name,
+                    "Member Email": response.data.user.email,
+                    "Title": response.data.title,
+                    "Role": response.data.role
+                })
+                
                 toast.success(`Successfully approved member request and added ${response.data.user.name} as a member.`)
             } else {
                 console.error(response.error)
@@ -29,6 +38,13 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
             const response = await deleteMemberRequest(memberRequest)
 
             if (response.success) {
+                mixpanelTrack("Membership Request Denied", {
+                    "Member Name": response.data.user.name,
+                    "Member Email": response.data.user.email,
+                    "Title": response.data.title,
+                    "Role": response.data.role
+                })
+
                 toast.success(`Successfully deleted ${response.data.user.name}'s member request`)
             } else {
                 console.error(response.error)

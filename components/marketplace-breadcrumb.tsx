@@ -21,7 +21,7 @@ export default function MarketplaceBreadcrumb({ organization, roadmap, marketpla
 }) {
 
     const searchParams = useSearchParams();
-    const urlMilestone = searchParams.get("milestone");
+    const urlMilestone = searchParams.get("project");
     const [milestone, setMilestone] = useState<any>();
 
     useEffect(() => {

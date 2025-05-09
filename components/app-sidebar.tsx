@@ -48,10 +48,10 @@ const data = {
             url: `/app/research-plan`,
             subPages: [
                 {
-                    title: "Assets",
+                    title: "Tools",
                     icon: Star,
                     variant: "ghost",
-                    url: `/app/assets`,
+                    url: `/app/tools`,
                     subPages: []
                 },
                 {

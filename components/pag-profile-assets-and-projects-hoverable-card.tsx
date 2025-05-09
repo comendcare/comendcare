@@ -29,9 +29,11 @@ import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
 import { ScrollArea } from "./ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
-import NoPinnedAssets from "./no-pinned-assets";
-import NoPinnedRFPs from "./no-pinned-rfps";
+import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
+import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
 import { formatMoney } from "@/lib/utils";
+import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -41,7 +43,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     <Tabs defaultValue="rfps" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="rfps">Requests for Proposals</TabsTrigger>
-                            <TabsTrigger value="assets">Assets</TabsTrigger>
+                            <TabsTrigger value="assets">Tools</TabsTrigger>
                         </TabsList>
                         <TabsContent value="rfps">
                             {rfps.filter(rfp => rfp.pinned).length > 0 && (
@@ -51,7 +53,19 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                             {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
                                                 <CarouselItem key={index} className="lg:basis-1/2">
                                                     <Dialog>
-                                                        <DialogTrigger className="w-full h-full">
+                                                        <DialogTrigger className="w-full h-full" onClick={() => {
+                                                            mixpanelTrack("RFP Details Viewed", {
+                                                                "ID": rfp.id,
+                                                                "Name": rfp.title,
+                                                                "Budget": rfp.budget,
+                                                                "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
+                                                                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                                // we flatten them into a single list that can be parsed
+                                                                "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
+                                                                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                                )
+                                                            })
+                                                        }}>
                                                             <RFPCard rfp={rfp} />
                                                         </DialogTrigger>
                                                         <DialogContent className="overflow-hidden">
@@ -66,8 +80,10 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     </Carousel>
                                 </div>
                             )}
-                            {rfps.length <= 0 && (
-                                <NoPinnedRFPs />
+                            {rfps.filter(rfp => rfp.pinned).length <= 0 && (
+                                isPrivate
+                                    ? <PrivateNoPinnedRFPs /> 
+                                    : <PublicNoPinnedRFPs />
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
@@ -84,7 +100,18 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     <TableBody>
                                         {assets.filter(asset => asset.pinned).map((asset) => (
                                             <Dialog>
-                                                <DialogTrigger asChild>
+                                                <DialogTrigger asChild onClick={() => {
+                                                    mixpanelTrack("Tool Details Viewed", {
+                                                        "ID": asset.id,
+                                                        "Tool Name": asset.title,
+                                                        "Linked Projects": asset.milestones.map(({ milestone }: any) => milestone),
+                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                        // we flatten them into a single list that can be parsed
+                                                        "Linked Project Types": asset.milestones.flatMap(({ milestone }: any) =>
+                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                        )
+                                                    })
+                                                }}>
                                                     <TableRow key={asset.id} className="cursor-pointer">
                                                         <TableCell>
                                                             <div>
@@ -119,7 +146,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </Table>
                             )}
                             {assets.filter(asset => asset.pinned).length <= 0 && (
-                                <NoPinnedAssets />
+                                isPrivate
+                                    ? <PrivateNoPinnedAssets /> 
+                                    : <PublicNoPinnedAssets />
                             )}
                         </TabsContent>
                     </Tabs>

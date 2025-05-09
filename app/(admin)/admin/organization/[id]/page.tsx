@@ -4,8 +4,21 @@ import { notFound, redirect } from "next/navigation"
 import Roadmaps from "@/components/roadmaps"
 import CreateRoadmapButton from "@/components/create-roadmap-button"
 import {VerifyOrganizationSwitch} from "@/components/verify-organization-switch";
+import OrganizationRoadmaps from "@/components/organization-roadmaps";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import {Button} from "@/components/ui/button";
+import {deleteOrganization} from "@/lib/actions";
+import mixpanel from "mixpanel-browser";
+import {toast} from "sonner";
+import { mixpanelTrack } from "@/app/mixpanel"
 
-export default async function OrganizationRoadmaps({
+export default async function AdminOrganizationPage({
     params
 }: {
     params: { id: string }
@@ -25,6 +38,27 @@ export default async function OrganizationRoadmaps({
     }
 
     const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+
+    const handleDeleteOrganization = async () => {
+
+        try {
+            await deleteOrganization(data)
+                .then(async res => {
+                    if (res.success) {
+                        mixpanelTrack("Organization Deleted", {
+                            "ID": res?.data?.id,
+                            "Name": res?.data?.name,
+                        })
+                        toast.success(`Successfully deleted organization!`)
+                    } else {
+                        toast.error(res.error)
+                    }
+                })
+                .catch((err: Error) => toast.error(err.message))
+        } catch (error) {
+            toast.error("An error occurred. Please try again later.");
+        }
+    };
 
     return (
         <>
@@ -48,8 +82,38 @@ export default async function OrganizationRoadmaps({
                     <VerifyOrganizationSwitch organization={data}/>
                 </div>
                 <CreateRoadmapButton />
+                <AlertDialog>
+                    <AlertDialogTrigger asChild disabled={session?.user?.membership?.role !== "owner"}>
+                        <Button variant="destructive">
+                            Delete organization
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will remove all memberships
+                                from this organization, delete all associated roadmaps,
+                                then delete the organization.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction asChild>
+                                <Button
+                                    variant="destructive"
+                                    onClick={handleDeleteOrganization}
+                                >
+                                    Continue
+                                </Button>
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
-            <Roadmaps organizationId={decodeURIComponent(params.id)} />
+            <OrganizationRoadmaps organizationId={decodeURIComponent(params.id)} />
         </>
     )
 }

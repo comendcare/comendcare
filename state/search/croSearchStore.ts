@@ -3,6 +3,9 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
+import mixpanel from 'mixpanel-browser';
+import { getExclusiveToFirstGroup } from '@/lib/utils';
+import { mixpanelTrack } from '@/app/mixpanel';
 
 export const sampleCROs: any[] = [
     {
@@ -269,14 +272,29 @@ export const useCROSearchStore = create<CROSearchState>()(
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
-                }, true);
+                }, true)
+
+                if (newSearch.length > 0) {
+                    // only track searches if the user has entered text in the searchbar
+                    const filters = get().filters
+                    mixpanelTrack("Search Service Providers", {
+                        "Search Term": newSearch,
+                        "Results": total,
+                        "Filters": {
+                            "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
+                            "Business Types": filters.types.map(filter => filter.label),
+                            "Certifications": filters.certifications.map(filter => filter.label),
+                            "Categories": filters.categories.map(filter => filter.label)
+                        }
+                    })
+                }
 
                 set({
                     searchTerm: newSearch,
                     searchResults: results,
                     lastFetchedPage: 1,
                     totalResults: total,
-                });
+                })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
@@ -312,6 +330,45 @@ export const useCROSearchStore = create<CROSearchState>()(
                     filters: newFilters,
                     lastFetchedPage: 1,
                 }, true)
+
+                const recentlySelected = {
+                    categories: getExclusiveToFirstGroup(newFilters, get().filters, 'categories'),
+                    milestoneTypes: getExclusiveToFirstGroup(newFilters, get().filters, 'milestoneTypes'),
+                    types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
+                    certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications')
+                }
+
+                const recentlyRemoved = {
+                    categories: getExclusiveToFirstGroup(get().filters, newFilters, 'categories'),
+                    milestoneTypes: getExclusiveToFirstGroup(get().filters, newFilters, 'milestoneTypes'),
+                    types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
+                    certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications')
+                }
+
+                if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
+                    // if something has been added or removed, track as a mixpanel event
+                    mixpanelTrack("Marketplace Service Provider Filters Selected", {
+                        "Results": total,
+                        "Filters": {
+                            "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
+                            "Business Types": newFilters.types.map(filter => filter.label),
+                            "Certifications": newFilters.certifications.map(filter => filter.label),
+                            "Categories": newFilters.categories.map(filter => filter.label)
+                        },
+                        "Added": {
+                            "Milestone Types": recentlySelected.milestoneTypes.map(filter => filter.label),
+                            "Business Types": recentlySelected.types.map(filter => filter.label),
+                            "Certifications": recentlySelected.certifications.map(filter => filter.label),
+                            "Categories": recentlySelected.categories.map(filter => filter.label)
+                        },
+                        "Removed": {
+                            "Milestone Types": recentlyRemoved.milestoneTypes.map(filter => filter.label),
+                            "Business Types": recentlyRemoved.types.map(filter => filter.label),
+                            "Certifications": recentlyRemoved.certifications.map(filter => filter.label),
+                            "Categories": recentlyRemoved.categories.map(filter => filter.label)
+                        },
+                    })
+                }
 
                 set({
                     filters: newFilters,

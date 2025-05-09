@@ -18,6 +18,8 @@ import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {deleteOrganization, deleteOrgRoadmap} from "@/lib/actions";
+import mixpanel from "mixpanel-browser";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session, update} = useSession()
@@ -36,7 +38,12 @@ export default function OrganizationSettingsPage({organization}: { organization:
                                 organizationId: undefined,
                                 membership: undefined,
                             }
-                        });
+                        })
+
+                        mixpanelTrack("Organization Deleted", {
+                            "ID": res?.data?.id,
+                            "Name": res?.data?.name,
+                        })
                         toast.success(`Successfully deleted organization!`)
                     } else {
                         toast.error(res.error)
@@ -59,6 +66,8 @@ export default function OrganizationSettingsPage({organization}: { organization:
             if (!success || !roadmapId) throw new Error('Could not find research plan')
 
             const response = await deleteOrgRoadmap(roadmapId, session?.user?.organizationId)
+
+            mixpanelTrack("Research Plan Deleted")
 
             if (!response.success) {
                 toast.error("An error occurred. Please try again later.")

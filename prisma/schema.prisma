@@ -554,6 +554,9 @@ model ConditionToOrganization {
   condition    Condition?    @relation(fields: [conditionId], references: [id], onDelete: SetNull)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   @@unique([conditionId, organizationId])
 }
 
@@ -702,6 +705,8 @@ model Company {
   categories               String[]
   milestoneTypes           String[]
   savedByOrganizations     SavedCompany[]
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
 }
 
 model SavedCompany {
@@ -826,4 +831,10 @@ model ReportOnReply {
   user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   reply       Reply                   @relation(fields: [replyId], references: [id], onDelete: Cascade)
   createdAt   DateTime                @default(now())
+}
+
+model Whitelist {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

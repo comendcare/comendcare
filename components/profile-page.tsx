@@ -172,24 +172,8 @@ export function ProfilePageClient({organization, conditions, roadmaps, assets, r
                                     showEditDialog={true}
                                 />
                             </div>
-                            {/*<PAGProfileAssetsCard/>*/}
-                            {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
                         <div className="col-span-4 space-y-4">
-                            {/*<Tabs defaultValue="roadmap" className="w-full">*/}
-                            {/*    <TabsList className="grid w-full grid-cols-2">*/}
-                            {/*        <TabsTrigger value="roadmap">*/}
-                            {/*            Roadmap*/}
-                            {/*        </TabsTrigger>*/}
-                            {/*        <TabsTrigger*/}
-                            {/*            value="activity"*/}
-                            {/*            className="organization-profile-tour-step6"*/}
-                            {/*        >*/}
-                            {/*            Activity*/}
-                            {/*        </TabsTrigger>*/}
-                            {/*    </TabsList>*/}
-                            {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
-                            {/* <ProfileCompletionCard/> */}
                             <div className="flex flex-col gap-4 relative">
                                 <PAGProfileAssetsAndRFPsHoverableCard
                                     isPrivate={true}
@@ -209,11 +193,6 @@ export function ProfilePageClient({organization, conditions, roadmaps, assets, r
                                     </div>
                                 )}
                             </div>
-                            {/*    </TabsContent>*/}
-                            {/*    <TabsContent value="activity" className="mt-0">*/}
-                            {/*        <PAGProfileActivityCard/>*/}
-                            {/*    </TabsContent>*/}
-                            {/*</Tabs>*/}
                         </div>
                     </div>
                 </div>
@@ -221,7 +200,7 @@ export function ProfilePageClient({organization, conditions, roadmaps, assets, r
         </main>
         <Card className="col-span-1 flex flex-col space-y-4 h-fit">
             <CardHeader className="flex flex-col gap-4 pb-0">
-                <PublishOrganizationSwitch organization={organization}/>
+                {/*<PublishOrganizationSwitch organization={organization}/>*/}
                 <BiopharmaConsentSwitch organization={organization} />
 
                 <div className="flex flex-col gap-2 pb-0">
