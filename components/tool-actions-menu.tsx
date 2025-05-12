@@ -8,7 +8,7 @@ import { Asset } from "@/lib/types"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import { useSession } from "next-auth/react"
-import { Dialog, DialogContent } from "./ui/dialog"
+import { Dialog, DialogContent, DialogPortal } from "./ui/dialog"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 
 const assetSelector = (state: AssetState) => ({
@@ -85,7 +85,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                 >
                     Duplicate
                 </Button>
-                {/* <Button
+                <Button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete()
@@ -95,12 +95,17 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                     className="h-full justify-start"
                 >
                     Delete
-                </Button> */}
+                </Button>
             </PopoverContent>
         </Popover>
-        {/* <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+        {/* Contain dialog content isn a Dialog Portal, so any click events don't propogate and cause unexpected open/close behaviour in the EditAssetForm */}
+        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+        <DialogPortal>
+            <div onClick={(e) => e.stopPropagation()}>
             <DeleteAssetDialog assetId={asset.id} />
-        </Dialog> */}
+            </div>
+        </DialogPortal>
+        </Dialog>
         </>
     )
 }
