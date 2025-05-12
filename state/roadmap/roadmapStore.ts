@@ -260,6 +260,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                     },
                     origin: [0.0, 0.0],
                     data: {
+                        ...defaultData,
                         id: milestoneId,
                         nodeId: id,
                         private: true,

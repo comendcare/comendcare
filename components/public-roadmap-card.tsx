@@ -1,5 +1,5 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {usePathname, useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
 import { ChevronsUpDown, Pencil, Plus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { MODALITIES, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
+import { MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Organization } from "@prisma/client";
 import { PrivateNoResearchPlansColumn, PublicNoResearchPlans } from "./no-research-plans";
@@ -104,11 +104,17 @@ export const RoadmapCard = ({
         >
             <Card className="organization-profile-tour-step4">
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                            Research Plan
-                        </CardTitle>
+                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                        {roadmap.title || 'Untitled Research Plan'}
+                    </CardTitle>
+                    <CardDescription>
+                        {roadmap.description}
+                    </CardDescription>
+                    <div className="flex gap-2">
+                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option) => <Badge variant={'secondary'} className="text-sm">{type.label}</Badge>)}
+                        <StageOfActivityBadge milestones={roadmap.milestones}/>
                     </div>
+
                     <TabsList className="w-min">
                         <TabsTrigger value="timeline">
                             Timeline View
@@ -151,25 +157,7 @@ export const NoProjectsCard = ({isPublic}: {isPublic: Boolean}) => {
     
     return (
         <Card className="organization-profile-tour-step4">
-            <CardHeader className="w-full pt-6 pb-2 space-y-4">
-                <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
-                        Research Plan
-                    </CardTitle>
-                    {!isPublic &&
-                        <Button
-                            variant="ghost"
-                            onClick={() => router.push("/app/research-plan")}
-                            className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                        >
-                            Edit research plan
-                            <Pencil />
-                        </Button>
-                    }
-                </div>
-            </CardHeader>
-
-            <CardContent className="px-8">
+            <CardContent className="px-8 pt-4">
                 <NoProjects />
             </CardContent>
         </Card>
@@ -274,6 +262,6 @@ export const getStage = (milestones: any[]): {value: string, label: string, vari
 export const StageOfActivityBadge = ({milestones}: {milestones: any[]}) => {
     const stage = getStage(milestones)
     return (
-        <Badge variant={stage.variant as any}>{stage.label}</Badge>
+        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
     )
 }
