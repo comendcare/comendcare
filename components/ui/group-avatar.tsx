@@ -32,7 +32,7 @@ export interface GroupAvatarProps {
 export const GroupAvatar: React.FC<GroupAvatarProps> = ({
                                                             users = [],
                                                             maxDisplayed = 3,
-                                                            size = 'h-8 w-8', // Default size
+                                                            size = 'h-10 w-10', // Default size
                                                             className,
                                                         }) => {
     const displayedUsers = users.slice(0, maxDisplayed);

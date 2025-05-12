@@ -838,3 +838,10 @@ model Whitelist {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+model Project {
+  id        String   @id @default(uuid())
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
