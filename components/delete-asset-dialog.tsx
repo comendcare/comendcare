@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "./ui/button"
-import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
+import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "./ui/dialog"
 
 const assetSelector = (state: AssetState) => ({
     createAsset: state.createAsset,
