@@ -9,6 +9,10 @@ import {getProfileCompletionChecks, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition} from "@prisma/client";
+import {promises as fs} from "fs";
+import path from "path";
+import {z} from "zod";
+import {biosampleSchema, taskSchema} from "@/data/pharma-data/schema";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -1505,7 +1509,7 @@ export async function getUserWhitelist() {
     }
 }
 
-export async function getPharmaProjects () {
+export async function getPharmaProjects() {
     try {
         const projects = await prisma.project.findMany({
             orderBy: { createdAt: "desc" },
@@ -1517,6 +1521,26 @@ export async function getPharmaProjects () {
         };
     } catch (error: any) {
         logError("Error fetching pharma projects", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getBiosampleData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/biosamples.json")
+        )
+        console.log("FUCK")
+        console.log(data)
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(biosampleSchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching biosamples", error);
         return {success: false, error: "Internal server error"};
     }
 }

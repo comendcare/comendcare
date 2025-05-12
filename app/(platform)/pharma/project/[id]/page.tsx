@@ -13,16 +13,17 @@ import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {getCROData} from "@/lib/fetchers";
+import PharmaProjectBiosamplesTab from "@/components/pharma-project-biosamples-tab";
 
 export default function Example() {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const [selectedTab, setSelectedTab] = useState("services")
+    const [selectedTab, setSelectedTab] = useState("analytics")
     const [cro, setCRO] = useState<any | null>(null)
 
     useEffect(() => {
-        const tabFromUrl = searchParams.get("tab") || "services"
+        const tabFromUrl = searchParams.get("tab") || "analytics"
         setSelectedTab(tabFromUrl)
     }, [searchParams])
 
@@ -91,7 +92,7 @@ export default function Example() {
                     {/*<CROMarketplaceProfileServicesTab croServices={cro.services}/>*/}
                 </TabsContent>
                 <TabsContent value="biosamples" className="space-y-4 w-full">
-                    {/*<CROMarketplaceProfileReviewsTab cro={cro as CompanyWithReviewsAndServices}/>*/}
+                    <PharmaProjectBiosamplesTab/>
                 </TabsContent>
             </Tabs>
         </div>
