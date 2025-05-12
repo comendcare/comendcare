@@ -3,7 +3,6 @@
 import React, { useState } from "react"
 import { usePathname } from "next/navigation"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import mixpanel from "mixpanel-browser"
 import { articles } from "@/lib/articles"
 import FAQFeedbackRadioButtons, {
     FeedbackTypes
@@ -12,8 +11,8 @@ import FAQFeedbackThumbs from "./faq-feedback-thumbs"
 import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
 import { customerIOTrack } from "@/lib/customer-io"
-// import { useMixpanelContext } from "@/app/AnalyticsScrips"
-// import { createFAQFeedbackTicket } from "@/lib/notion"
+import { mixpanelTrack, useMixpanelContext } from "@/app/mixpanel"
+import { createFAQFeedbackTicket } from "@/lib/notion"
 
 interface FAQFeedbackType {
     helpful?: boolean
@@ -31,7 +30,7 @@ interface FAQFeedbackType {
 export default function FAQFeedback() {
     const pathWithoutAnchor = usePathname().split("#")[0]
     const [submitted, setSubmitted] = useState(false)
-    // const { mixpanelContext } = useMixpanelContext()
+    const { mixpanelContext } = useMixpanelContext()
 
     // thumbs up/down, radio buttons (for more details), feedback text form, for even more details
     const [feedback, setFeedback] = useState<FAQFeedbackType>({})
@@ -54,7 +53,7 @@ export default function FAQFeedback() {
     const handleSubmitFeedback = async (feedback: FAQFeedbackType) => {
         try {
             const article = getArticleData()
-            mixpanel.track("FAQ Feedback", {
+            mixpanelTrack("FAQ Feedback", {
                 helpful: feedback.helpful,
                 ...(feedback.issueType
                     ? { issueType: feedback.issueType }
@@ -69,33 +68,33 @@ export default function FAQFeedback() {
                 article_path: article.href
             })
 
-            // await customerIOTrack({
-            //     userId: mixpanelContext?.distinctId,
-            //     event: "faq_feedback_sent",
-            //     properties: {
-            //         helpful: feedback.helpful ? "true" : "false",
-            //         name: feedback.name,
-            //         email: feedback.email,
-            //         issue_type: feedback.issueType,
-            //         issue_description: feedback.issueDescription,
-            //         article_prompt: article.prompt,
-            //         article_description: article.description,
-            //         article_path: article.href
-            //     }
-            // })
+            await customerIOTrack({
+                userId: mixpanelContext?.distinctId,
+                event: "faq_feedback_sent",
+                properties: {
+                    helpful: feedback.helpful ? "true" : "false",
+                    name: feedback.name,
+                    email: feedback.email,
+                    issue_type: feedback.issueType,
+                    issue_description: feedback.issueDescription,
+                    article_prompt: article.prompt,
+                    article_description: article.description,
+                    article_path: article.href
+                }
+            })
 
-            // if (feedback.issueDescription) {
-            //     await createFAQFeedbackTicket({
-            //         name: feedback.name || "",
-            //         email: feedback.email || "",
-            //         helpful: feedback.helpful ? true : false,
-            //         issue_type: feedback.issueType || "",
-            //         issue_description: feedback.issueDescription || "",
-            //         article_prompt: article.prompt || "",
-            //         article_path: article.href || "",
-            //         article_description: article.description || ""
-            //     })
-            // }
+            if (feedback.issueDescription) {
+                await createFAQFeedbackTicket({
+                    name: feedback.name || "",
+                    email: feedback.email || "",
+                    helpful: feedback.helpful ? true : false,
+                    issue_type: feedback.issueType || "",
+                    issue_description: feedback.issueDescription || "",
+                    article_prompt: article.prompt || "",
+                    article_path: article.href || "",
+                    article_description: article.description || ""
+                })
+            }
 
             setSubmitted(true)
 
