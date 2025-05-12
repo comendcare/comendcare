@@ -8,7 +8,7 @@ import { Asset } from "@/lib/types"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import { useSession } from "next-auth/react"
-import { Dialog, DialogContent, DialogPortal } from "./ui/dialog"
+import { Dialog, DialogPortal } from "./ui/dialog"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 
 const assetSelector = (state: AssetState) => ({
