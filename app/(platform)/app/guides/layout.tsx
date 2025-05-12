@@ -4,17 +4,17 @@ import Link from "next/link"
 // import TextHover from "@/components/animations/text-hover"
 // import Footer from "@/components/footer"
 
-export const metadata = {
-    title: `FAQ - Librarey`,
-    description: `Frequently asked questions and further notes about this rare disease repository.`,
-    keywords: `Comend, Librarey, Rare Disease, Disability Resource Guide, Support, FAQ`,
-    openGraph: {
-        title: `FAQ - Librarey`,
-        images: ``,
-        description: `Frequently asked questions and further notes about this rare disease repository.`,
-        locale: `en_US`
-    }
-}
+// export const metadata = {
+//     title: `Guides `,
+//     description: `Frequently asked questions and further notes about this rare disease repository.`,
+//     keywords: `Comend, Librarey, Rare Disease, Disability Resource Guide, Support, FAQ`,
+//     openGraph: {
+//         title: `FAQ - Librarey`,
+//         images: ``,
+//         description: `Frequently asked questions and further notes about this rare disease repository.`,
+//         locale: `en_US`
+//     }
+// }
 
 export default function FAQLayout({
     children
