@@ -68,6 +68,7 @@ export default function OrganizationSearchBar() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
+                            <SelectItem value="recently-updated">Recently Updated</SelectItem>
                             <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
                             {/* <SelectItem value="patients-low-high">Patients (Low-High)</SelectItem>
                         <SelectItem value="patients-high-low">Patients (High-Low)</SelectItem>

@@ -156,7 +156,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
             }
             const {results: newSearchResults} = await getUpdatedSearchResults({
                 searchTerm: '',
-                sortBy: undefined,
+                sortBy: "alphabetical",
                 filters: newFilters,
                 lastFetchedPage: 1,
             }, true)
@@ -242,7 +242,7 @@ export interface CROSearchState {
     initState: (filters: FiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
-    sortBy: string | undefined,
+    sortBy: string,
     setSortBy: (sortBy: string | undefined) => void,
     lastFetchedPage: number,
     setLastFetchedPage: (page: number) => void,
@@ -296,7 +296,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                     totalResults: total,
                 })
             },
-            sortBy: undefined,
+            sortBy: "alphabetical",
             setSortBy: async (sortBy: string | undefined) => {
                 const { results, total } = await getUpdatedSearchResults({
                     ...get(),
