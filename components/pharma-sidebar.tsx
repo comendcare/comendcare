@@ -32,6 +32,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useEffect, useState} from "react";
+import {getCROData, getPharmaProjects} from "@/lib/fetchers";
 
 const data = {
     user: {
@@ -73,7 +76,7 @@ const data = {
             icon: HelpCircleIcon,
         },
     ],
-    documents: [
+    projects: [
         {
             name: "ASO for type 1 Arcadion",
             url: "#",
@@ -88,6 +91,27 @@ const data = {
 }
 
 export function PharmaSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const [projects, setProjects] = useState<any[] | null>(null)
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            const result = await getPharmaProjects()
+            if (result.success && result.data) {
+                // Map DB projects to match NavProjects expected format
+                const formatted = result.data.map((project: any) => ({
+                    name: project.name ?? "Untitled Project",
+                    url: `/pharma/project/${project.id}`,
+                    icon: FolderIcon,
+                }))
+                setProjects(formatted)
+            } else {
+                setProjects([]) // or handle error differently
+            }
+        }
+
+        fetchProjects()
+    }, [])
+
     return (
         <Sidebar collapsible="offcanvas" {...props}>
             <SidebarHeader>
@@ -107,11 +131,15 @@ export function PharmaSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavProjects items={data.documents} />
+                {projects !== null ? (
+                    <NavProjects items={projects} />
+                ) : (
+                    <div className="p-4 text-sm text-muted-foreground">Loading projects...</div>
+                )}
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                <NavUser/>
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     )

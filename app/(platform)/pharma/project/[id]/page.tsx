@@ -78,19 +78,19 @@ export default function Example() {
                 className="space-y-4 w-full"
             >
                 <TabsList variant="outline">
-                    <TabsTrigger value="services" variant="outline" className="px-8">
+                    <TabsTrigger value="analytics" variant="outline" className="px-8">
                         <Briefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         Analytics
                     </TabsTrigger>
-                    <TabsTrigger value="reviews" variant="outline" className="px-8">
+                    <TabsTrigger value="biosamples" variant="outline" className="px-8">
                         <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         Biosamples
                     </TabsTrigger>
                 </TabsList>
-                <TabsContent value="services" className="space-y-4 w-full">
+                <TabsContent value="analytics" className="space-y-4 w-full">
                     {/*<CROMarketplaceProfileServicesTab croServices={cro.services}/>*/}
                 </TabsContent>
-                <TabsContent value="reviews" className="space-y-4 w-full">
+                <TabsContent value="biosamples" className="space-y-4 w-full">
                     {/*<CROMarketplaceProfileReviewsTab cro={cro as CompanyWithReviewsAndServices}/>*/}
                 </TabsContent>
             </Tabs>

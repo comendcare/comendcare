@@ -1504,3 +1504,19 @@ export async function getUserWhitelist() {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function getPharmaProjects () {
+    try {
+        const projects = await prisma.project.findMany({
+            orderBy: { createdAt: "desc" },
+        })
+
+        return {
+            success: true,
+            data: projects
+        };
+    } catch (error: any) {
+        logError("Error fetching pharma projects", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
