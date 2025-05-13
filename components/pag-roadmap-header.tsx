@@ -6,13 +6,13 @@ import { formatMoney, standardizeYear } from "@/lib/utils";
 export function PAGRoadmapHeader({organization, editable}: {organization: Organization, editable: boolean}) {
     return (
         <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
-                <ProfilePhoto
-                    img={organization.image}
-                    name={organization.name}
-                    className="h-16 w-16 rounded-full"
-                    textSize="small"
-                    editable={editable}
-                />
+            <ProfilePhoto
+                img={organization.image}
+                name={organization.name}
+                className="h-16 w-16 rounded-full"
+                textSize="small"
+                editable={editable}
+            />
             <div className="flex flex-col">
                 <div className="flex gap-4 justify-between">
                     <h1 className="text-wrap text-2xl md:text-3xl font-semibold">
