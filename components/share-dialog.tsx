@@ -1,24 +1,16 @@
 "use client"
-import React, {ReactNode} from "react"
+import React from "react"
 import {
-    Dialog,
-    DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
 } from "@/components/ui/dialog"
-import mixpanel from "mixpanel-browser"
 import {toast} from "sonner";
 import { Organization } from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import { mixpanelTrack } from "@/app/mixpanel";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import CopyCodeBlock from "./code-block";
-import { Milestone, Roadmap } from "@/lib/types";
-import { useSearchParams } from "next/navigation";
 
 export default function ShareDialog({
     url,
