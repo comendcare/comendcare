@@ -229,7 +229,7 @@ export default async function OrganizationRoadmapPage({
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
                                             organization={organization}
-                                            embeddedResearchPlansLink={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
+                                            embeddedResearchPlansLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`}
                                         />
                                     ),
                                 },

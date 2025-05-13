@@ -159,7 +159,6 @@ export default async function OrganizationRoadmapPage({
     }
 
     const roadmap = roadmaps.find(roadmap => roadmap.id === params.id)
-    console.log(`roadmap`, roadmap)
 
     return (
         <>
@@ -234,7 +233,7 @@ export default async function OrganizationRoadmapPage({
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap}`}
                                             organization={organization}
-                                            embeddedResearchPlanLink={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`}
+                                            embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${roadmap.id}`}
                                             // embeddedProjectLink={milestone ? `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}?project=${milestone}` : undefined}
                                         />
                                     ),
