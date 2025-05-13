@@ -1,20 +1,15 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
-import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
-import {ProfilePhoto} from "@/components/profile-photo";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {FloatingDock} from "@/components/floating-dock";
-import {IconFlag, IconShare} from "@tabler/icons-react";
 import ShareDialog from "@/components/share-dialog";
-import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
-import FeedbackForm from "@/components/feedback-form";
 import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
+import { Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
+import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
 
 export async function generateMetadata({
                                            params
@@ -156,7 +151,6 @@ export default async function OrganizationRoadmapPage({
     }
 
     const roadmap = roadmaps.find(roadmap => roadmap.id === params.id)
-    console.log(`roadmap`, roadmap)
 
     return (
         <>
@@ -169,83 +163,13 @@ export default async function OrganizationRoadmapPage({
                                 organization={organization}
                                 roadmap={roadmap}
                             />
-                            <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
-                                    <ProfilePhoto
-                                        img={organization.image}
-                                        name={organization.name}
-                                        className="h-16 w-16 rounded-full"
-                                        textSize="small"
-                                        editable={false}
-                                    />
-                                <div className="flex flex-col">
-                                    <div className="flex gap-4 justify-between">
-                                        <h1 className="text-wrap text-2xl md:text-3xl font-semibold">
-                                            {organization?.name}
-                                        </h1>
-                                        {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
-                                    </div>
-                                    <div className="w-full flex flex-wrap gap-x-6">
-                                        {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <HandCoins
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
-                                                {formatMoney(organization?.moneyRaised)} raised
-                                            </div>
-                                        }
-                                        {organization?.yearFounded && (
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <Calendar
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"/>
-                                                Founded
-                                                in {standardizeYear(organization?.yearFounded ?? "")}
-                                            </div>
-                                        )}
-                                        {organization?.incorporationStatus === "YES" &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <Building2
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"/>
-                                                {`501(c)(3)`}
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-
+                            <PAGRoadmapHeader organization={organization} editable={false} />
                             <PublicRoadmapContent 
+                                organization={organization}
                                 roadmap={roadmap}
                                 subdomain={organization?.subdomain || undefined}
                             />
                         </div>
-
-                        <FloatingDock
-                            items={[
-                                {
-                                    title: "Share on social media",
-                                    icon: <Share />,
-                                    dialog: (
-                                        <ShareDialog
-                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
-                                            organization={organization}
-                                        />
-                                    ),
-                                },
-                                ...(organization.contactEmail
-                                    ? [
-                                        {
-                                            title: "Contact patient group",
-                                            icon: <Mail/>,
-                                            dialog: <ContactPAGDialog organization={organization} />,
-                                        },
-                                    ]
-                                    : []),
-                            ]}
-                            orientation="vertical"
-                            desktopClassName="right-4"
-                        />
                     </>
                 ) :
                 (
