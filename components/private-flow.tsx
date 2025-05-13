@@ -229,31 +229,6 @@ export const PrivateFlowView = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
-            handleEditClick: (nodeId: string) => {
-                setSelectedNodeId(node.id)
-            },
-            handleDelete: (nodeId: string) => {
-                const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
-                const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
-
-                handleDelete({
-                    nodes: nodesList || [],
-                    edges: edgesList || []
-                })
-            },
-            handleDuplicate: (nodeId: string) => {
-                const milestone = milestones.find(milestone => milestone.nodeId === nodeId)
-
-                if (milestone) {
-                    addMilestones([{
-                        nodeType: milestone.nodeType || milestone.nodeType,
-                        title: milestone.title,
-                        description: milestone.description,
-                        types: milestone.types || [],
-                        status: milestone.status
-                    }], "Duplicate")
-                }
-            },
             // last node is the onboarding node, localNodes are sorted by their creation date
             onboardingMilestone: index === 0
         }

@@ -1,5 +1,6 @@
 import {getSession} from "@/lib/auth";
 import {redirect} from "next/navigation";
+import prisma from "@/lib/prisma";
 
 interface PlatformLayoutProps {
     children: React.ReactNode
@@ -8,10 +9,21 @@ interface PlatformLayoutProps {
 export default async function PlatformLayout({children}: PlatformLayoutProps) {
     const session = await getSession()
 
+    const whitelist = await prisma.whitelist.findMany({
+        select: { email: true },
+    });
+
     const email = session?.user?.email?.toLowerCase();
-    const isWhitelisted =
-        email?.endsWith("@comendcare.com") ||
-        process.env.USER_WHITELIST?.split(",").some((whitelistedEmail) => whitelistedEmail.toLowerCase() === email);
+
+    // Env variable whitelisting
+    // const isWhitelisted =
+    //     email?.endsWith("@comendcare.com") ||
+    //     process.env.USER_WHITELIST?.split(",").some((whitelistedEmail) => whitelistedEmail.toLowerCase() === email);
+
+    // Database whitelisting
+    const isWhitelisted = whitelist.some(
+        (entry) => entry.email.toLowerCase() === email
+    ) || email?.endsWith("@comendcare.com");
 
     if (!session) {
         redirect("/");

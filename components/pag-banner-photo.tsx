@@ -24,8 +24,8 @@ import {Button} from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 
 const editOrgProfileImageSchema = z.object({
-    image: z.string().optional(),
-    headerImage: z.string().optional(),
+    image: z.string().nullable().optional(),
+    headerImage: z.string().nullable().optional(),
 });
 
 export function PAGBannerPhoto({
@@ -103,7 +103,7 @@ export function PAGBannerPhoto({
             {img ? (
                 <img className="w-full object-cover" src={img || ""} alt=""/>
             ) : (
-                <div className="w-full object-cover bg-secondary"></div>
+                <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
             )}
 
             {/* Edit Button (Only if Editable) */}
