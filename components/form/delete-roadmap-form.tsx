@@ -35,6 +35,7 @@ export default function DeleteRoadmapForm({
 
                 initializeRoadmapState({
                     roadmapId: null,
+                    details: undefined,
                     nodes: [],
                     edges: [],
                     milestones: [],

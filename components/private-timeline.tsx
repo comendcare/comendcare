@@ -3,13 +3,12 @@
 import React from "react"
 import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
-import { cn, formatMoney } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "./ui/button"
 import { ScrollArea } from "./ui/scroll-area"
 import { TypeBadge } from "./type-badge"
-import { AttachmentsTag } from "./private-milestone-node"
 import { Milestone, StatusType } from "@/lib/types"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
@@ -30,9 +29,10 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {CircleDollarSign, GripVertical, Megaphone, Star, User} from "lucide-react"
+import {GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { PropertyBadge } from "./property-badge"
+import { ProjectActionsMenu } from "./project-actions-menu";
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
@@ -46,14 +46,9 @@ const selector = (state: RoadmapState) => ({
 export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     const {
         selectedNodeId,
-        setSelectedNodeId,
         milestones,
         setMilestones
     } = useRoadmapStore(useShallow(selector))
-
-    const handleEditClick = (nodeId: string) => {
-        setSelectedNodeId(nodeId)
-    }
 
     const sensors = useSensors(
         useSensor(MouseSensor),
@@ -115,7 +110,7 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     }
 
     return (
-        <ScrollArea className="w-full h-full p-10 pt-0">
+        <ScrollArea className="w-full h-full px-10 pt-0">
             <DndContext
                 accessibility={{
                     announcements
@@ -179,7 +174,6 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                                 index={index} 
                                 key={milestone.id}
                                 selectedNodeId={selectedNodeId} 
-                                handleEditClick={handleEditClick} 
                                 disabled={sortBy !== "custom"}
                             />
                         ))}
@@ -190,7 +184,17 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     )
 }
 
-const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClick, disabled}: {milestone: any, index: number, selectedNodeId: string | null, handleEditClick: (nodeId: string) => void, disabled: boolean}) => {
+const DraggableTimelineItem = ({
+    milestone, 
+    index, 
+    selectedNodeId, 
+    disabled
+}: {
+    milestone: Milestone, 
+    index: number, 
+    selectedNodeId: string | null, 
+    disabled: boolean
+}) => {
     const {
         attributes,
         listeners,
@@ -199,6 +203,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
         transition,
         isDragging
     } = useSortable({id: milestone.id})
+    const {setSelectedNodeId} = useRoadmapStore(useShallow(selector))
 
     const style = {
         transition,
@@ -217,7 +222,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                 isDragging ? "z-20" : "",
                 index === 0 ? "click-project-step" : ""
             )}
-            onClick={() => {handleEditClick(milestone.nodeId)}}
+            onClick={() => setSelectedNodeId(milestone.nodeId || null)}
         >
             {disabled ? (
                 <Tooltip>
@@ -270,6 +275,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                         className="ml-auto block font-semibold leading-none dark:text-gray-500">
                         {getDates(milestone)}
                     </time>
+                    <ProjectActionsMenu milestone={milestone}/>
                 </div>
                 <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
                     {milestone.description}
@@ -281,109 +287,45 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 }
 
 export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData: Milestone, nodeType: string }) => {
-    // if (nodeType === "ASSET") {
-    //     return (
-    //         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-    //             {(milestoneData?.types || []).map((milestoneType, index) => (
-    //                 <li key={index}>
-    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-    //                 </li>
-    //             ))}
-    //             {milestoneData?.attachments && milestoneData?.attachments?.length > 0 && (
-    //                 <li>
-    //                     <AttachmentsTag attachments={milestoneData.attachments}/>
-    //                 </li>
-    //             )}
-    //             {milestoneData?.contacts && milestoneData.contacts.length > 0 && (milestoneData?.contacts || []).map((contact, index) => {
-    //                 if (contact.name && contact.email) {
-    //                     return (
-    //                         <li key={index} className="flex gap-2 items-center">
-    //                             <User />
-    //                             <p>{contact.name} &bull; {contact.email}</p>
-    //                         </li>)
-    //                 } else if (contact.name) {
-    //                     return (
-    //                         <li key={index} className="flex gap-2 items-center w-full">
-    //                             <User />
-    //                             <p>{contact.name}</p>
-    //                         </li>)
-    //                 } else if (contact.email) {
-    //                     return (
-    //                         <li key={index} className="flex gap-2 items-center">
-    //                             <User />
-    //                             <p>{contact.email}</p>
-    //                         </li>)
-    //                 }
-    //             })}
-    //         </ul>
-    //     )
-
-    //     return
-    // }
-
-    // if (nodeType === "PROJECT") {
-        return (
-            <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                <li>
-                    <StatusButton
-                        disabled={true}
-                        status={milestoneData?.status as StatusType || undefined}
-                        onStatusChange={() => {}}
-                    />
-                </li>
-                {(milestoneData?.types || []).map((milestoneType, index) => (
-                    <li key={index}>
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-                    </li>
-                ))}
-                {(milestoneData?.contacts || []).map((contact, index) => {
-                    if (contact.affiliation) {
-                        return (
-                            <li key={index}>
-                                <PropertyBadge icon={User}>
-                                    <p>{contact.affiliation}</p>
-                                </PropertyBadge>
-                            </li>
-                        )
-                    }
-                })}
-                {(milestoneData?.assets || []).map((asset, index) => (
-                    <li key={index}>
-                        <PropertyBadge icon={Star}>
-                            <p>{asset.asset?.title}</p>
-                        </PropertyBadge>
-                    </li>
-                ))}
-                {(milestoneData?.rfps || []).map((rfp, index) => (
-                    <li key={index}>
-                        <PropertyBadge icon={Megaphone}>
-                            <p>{rfp.rfp?.title}</p>
-                        </PropertyBadge>
-                    </li>
-                ))}
-            </ul>
-        )
-    // }
-
-    // if (nodeType === "RFP") {
-    //     return (
-    //         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-    //             {(milestoneData?.types || []).map((milestoneType, index) => (
-    //                 <li key={index}>
-    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-    //                 </li>
-    //             ))}
-    //             {milestoneData?.budget && (
-    //                 <li className="flex gap-2 items-center">
-    //                     <CircleDollarSign />
-    //                     {formatMoney(milestoneData?.budget)} budget
-    //                 </li>
-    //             )}
-    //         </ul>
-    //     )
-    // }
-
     return (
-        <div>error</div>
+        <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
+            <li>
+                <StatusButton
+                    disabled={true}
+                    status={milestoneData?.status as StatusType || undefined}
+                    onStatusChange={() => {}}
+                />
+            </li>
+            {(milestoneData?.types || []).map((milestoneType, index) => (
+                <li key={index}>
+                    <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                </li>
+            ))}
+            {(milestoneData?.contacts || []).map((contact, index) => {
+                if (contact.affiliation) {
+                    return (
+                        <li key={index}>
+                            <PropertyBadge icon={User}>
+                                <p>{contact.affiliation}</p>
+                            </PropertyBadge>
+                        </li>
+                    )
+                }
+            })}
+            {(milestoneData?.assets || []).map((asset, index) => (
+                <li key={index}>
+                    <PropertyBadge icon={Star}>
+                        <p>{asset.asset?.title}</p>
+                    </PropertyBadge>
+                </li>
+            ))}
+            {(milestoneData?.rfps || []).map((rfp, index) => (
+                <li key={index}>
+                    <PropertyBadge icon={Megaphone}>
+                        <p>{rfp.rfp?.title}</p>
+                    </PropertyBadge>
+                </li>
+            ))}
+        </ul>
     )
 }

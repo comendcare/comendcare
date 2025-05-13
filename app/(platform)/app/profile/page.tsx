@@ -4,12 +4,18 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Link from "next/link";
 import prisma from "@/lib/prisma"
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers";
+import {
+    getConditionsDataFromOrgId,
+    getOrganizationFromOrganizationId,
+    getPublicAssetsForOrganization,
+    getPublicRFPsForOrganization,
+    getPublicRoadmapsForOrganization
+} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PAGBannerPhoto} from "@/components/pag-banner-photo";
-import {NoResearchPlanCard, RoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapsCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
@@ -19,8 +25,11 @@ import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dia
 import {ProfileCompletionCard} from "@/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdomain-dialog";
 import EditPAGContactEmailDialog from "@/components/edit-pag-contact-email-dialog";
-import { Building2, Calendar, ExternalLink, HandCoins } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {Building2, Calendar, ExternalLink, HandCoins} from "lucide-react";
+import {ScrollArea} from "@/components/ui/scroll-area";
+import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
+import ShareDialog from "@/components/share-dialog";
+import {Button} from "@/components/ui/button";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -141,18 +150,7 @@ export default async function ProfilePage() {
                                             assets={assets}
                                             rfps={rfps}
                                         />
-                                        <RoadmapCard
-                                            roadmap={roadmaps[0]}
-                                            subdomain={organization?.subdomain || undefined}
-                                            isPublic={false}
-                                            externalLinks={true}
-                                        />
-                                        {roadmaps.length <= 0 && (
-                                            <div
-                                                className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
-                                                <NoResearchPlanCard isPublic={false}/>
-                                            </div>
-                                        )}
+                                        <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     </div>
                                 </div>
                             </div>
@@ -162,7 +160,7 @@ export default async function ProfilePage() {
                 <Card className="col-span-1 flex flex-col space-y-4 h-fit">
                     <CardHeader className="flex flex-col gap-4 pb-0">
                         {/*<PublishOrganizationSwitch organization={organization}/>*/}
-                        <BiopharmaConsentSwitch organization={organization} />
+                        <BiopharmaConsentSwitch organization={organization}/>
 
                         <div className="flex flex-col gap-2 pb-0">
                             <div
@@ -175,13 +173,27 @@ export default async function ProfilePage() {
                                 href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                                className="w-full inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                             >
                                 <span className="truncate block max-w-[150px] overflow-hidden whitespace-nowrap">
                                     {organization.subdomain}.comend.io
                                 </span>
                                 <ExternalLink className="flex-shrink-0 h-4 w-4"/>
                             </Link>
+
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="cta">
+                                        Share public profile
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <ShareDialog
+                                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                        organization={organization}
+                                    />
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </CardHeader>
                     <CardContent>

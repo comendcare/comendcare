@@ -737,7 +737,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
-                                badgeClassName={badgeVariants({variant: "blue"})}
+                                badgeClassName={badgeVariants({variant: "lightBlue"})}
                                 defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 options={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}

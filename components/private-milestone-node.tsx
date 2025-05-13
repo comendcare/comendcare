@@ -23,7 +23,7 @@ import {truncate, cn, formatMoney} from "@/lib/utils"
 import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
 import {badgeVariants} from "./ui/badge"
-import {StatusType} from "@/lib/types"
+import {Milestone, StatusType} from "@/lib/types"
 import {PopoverClose, PopoverContent, PopoverTrigger} from "@radix-ui/react-popover"
 import {Popover} from "./plate-ui/popover"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
@@ -35,42 +35,10 @@ import { MilestoneTypeBadge } from "./milestone-type-badge"
 import { Calendar, CircleDollarSign, Ellipsis, ExternalLink, Megaphone, Plus, Star, Trash, User } from "lucide-react"
 import { Asset as DBAsset, RFP as DBRFP } from "@prisma/client"
 import { PropertyBadge } from "./property-badge"
+import { ProjectActionsMenu } from "./project-actions-menu"
 
 export type PrivateMilestoneNode = Node<
-    {
-        nodeType: string
-        nodeId: string
-        node: any
-        title: string
-        description?: string
-        types?: {milestoneId: string, milestoneTypeId: string, milestoneType: MilestoneType}[],
-        startDate?: Date,
-        endDate?: Date,
-        budget?: number
-        attachments?: string[]
-        stakeholders?: string[]
-        labels?: string[]
-        // tasks: TaskType[],
-        dependencies?: string[]
-        notes?: string
-        status: StatusType
-        handleEditClick: (nodeId: string) => void,
-        handleDelete: (nodeId: string) => void,
-        handleDuplicate: (nodeId: string) => void,
-        onboardingMilestone: boolean,
-        private: boolean,
-        contacts: any[],
-        assets: Array<{
-                asset?: DBAsset,
-                milestoneId?: string,
-                assetId: string
-            }>,
-        rfps: Array<{
-                rfp?: DBRFP,
-                milestoneId?: string,
-                rfpId: string,
-            }>
-    },
+    Milestone,
     "PROJECT" | "ASSET" | "RFP"
 >
 
@@ -88,21 +56,7 @@ const selector = (state: RoadmapState) => ({
 })
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const {
-        selectedNodeId,
-    } = useRoadmapStore(useShallow(selector))
-
-    const handleEditClick = () => {
-        props.data?.handleEditClick(props?.id)
-    }
-
-    const handleDeleteClick = () => {
-        props.data?.handleDelete(props?.id)
-    }
-
-    const handleDuplicate = () => {
-        props.data?.handleDuplicate(props?.id)
-    }
+    const {selectedNodeId} = useRoadmapStore(useShallow(selector))
 
     return (
         <Card className={cn(
@@ -112,56 +66,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
         )}>
             <CardHeader>
                 <div className="flex flex-row align-center items-center justify-end gap-4">
-                    {/* <TypeBadge type={props.type}/> */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                onClick={(e) => e.stopPropagation()}
-                                variant="ghost"
-                                className="p-2 h-auto justify-end h-full z-20"
-                            >
-                                <Ellipsis />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-40 z-20">
-                            <Card className="p-0 m-0">
-                                <CardContent className="p-2 m-0 flex flex-col gap-0">
-                                    <PopoverClose>
-                                        <Button
-                                            onClick={(e) => {
-                                                // e.stopPropagation()
-                                                handleEditClick()
-                                            }}
-                                            variant="ghost"
-                                            className="w-full h-full justify-start text-xl"
-                                        >
-                                            Edit
-                                        </Button>
-                                    </PopoverClose>
-                                    <Button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            handleDuplicate()
-                                        }}
-                                        variant="ghost"
-                                        className="w-full h-full justify-start text-xl"
-                                    >
-                                        Duplicate
-                                    </Button>
-                                    <Button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            handleDeleteClick()
-                                        }}
-                                        variant="ghost"
-                                        className="w-full h-full justify-start text-xl"
-                                    >
-                                        Delete
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </PopoverContent>
-                    </Popover>
+                    <ProjectActionsMenu milestone={props.data as Milestone}/>
                 </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -325,7 +230,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     {(props?.data?.startDate || props?.data?.endDate) && (
                         <li>
                             <PropertyBadge icon={Calendar}>
-                                <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                                <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
                             </PropertyBadge>
                         </li>
                     )}
@@ -347,10 +252,10 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                 <span className="w-full flex gap-2 flex-wrap">
                     <StatusButton
                         disabled={true}
-                        status={props.data.status}
+                        status={props.data.status as StatusType || undefined}
                         onStatusChange={() => {}}
                     />
-                    {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+                    {(props?.data?.types || []).sort((a, b) => (a?.milestoneType?.label?.length || 0) - (b?.milestoneType?.label?.length || 0)).map((milestoneType, index) => (
                         <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
                     ))}
                 </span>
