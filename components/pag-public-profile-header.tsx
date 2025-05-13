@@ -15,7 +15,6 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
         <div className="w-full flex flex-col space-y-8">
             <div>
                 <div className="pb-4 flex flex-col gap-4">
-                    {showBackButton && <BackButton/>}
                     <PAGBannerPhoto
                         img={organization.headerImage}
                         name={organization.headerImage}
