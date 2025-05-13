@@ -1,6 +1,6 @@
 "use client"
 
-import { Ellipsis } from "lucide-react"
+import {Copy, Ellipsis, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -87,6 +87,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                             handleDuplicate()
                         }}
                     >
+                        <Copy/>
                         Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -96,6 +97,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                             handleDelete()
                         }}
                     >
+                        <Trash/>
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>

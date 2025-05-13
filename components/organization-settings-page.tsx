@@ -20,65 +20,10 @@ import {toast} from "sonner";
 import {deleteOrganization, deleteOrgRoadmap} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
+import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session, update} = useSession()
-    const [isDeleting, setIsDeleting] = useState(false); // Track API call state
-
-    const handleDeleteOrganization = async () => {
-        setIsDeleting(true); // Disable the button
-
-        try {
-            await deleteOrganization(organization)
-                .then(async res => {
-                    if (res.success) {
-                        await update({
-                            user: {
-                                ...session?.user,
-                                organizationId: undefined,
-                                membership: undefined,
-                            }
-                        })
-
-                        mixpanelTrack("Organization Deleted", {
-                            "ID": res?.data?.id,
-                            "Name": res?.data?.name,
-                        })
-                        toast.success(`Successfully deleted organization!`)
-                    } else {
-                        toast.error(res.error)
-                    }
-                })
-                .catch((err: Error) => toast.error(err.message))
-        } catch (error) {
-            toast.error("An error occurred. Please try again later.");
-        } finally {
-            setIsDeleting(false); // Re-enable the button
-        }
-    };
-
-    async function handleDeleteRoadmap() {
-        try {
-            if (!session?.user?.organizationId) throw new Error('Organization id is not defined')
-
-            const {success, data: roadmaps} = await getRoadmaps(session?.user?.organizationId)
-
-            if (!success || !roadmaps || roadmaps.length <= 0) throw new Error('Could not find research plan for organzation')
-
-            const response = await deleteOrgRoadmap(roadmaps[0].id, session?.user?.organizationId)
-
-            mixpanelTrack("Research Plan Deleted")
-
-            if (!response.success) {
-                toast.error("An error occurred. Please try again later.")
-                return
-            }
-
-            toast.success("Research plan deleted successfully.");
-        } catch (error) {
-            toast.error("An error occurred. Please try again later.");
-        }
-    }
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-4 space-y-8">
@@ -105,37 +50,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
                             </span>
                         </span>
 
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild disabled={session?.user?.membership?.role !== "owner"}>
-                                <Button variant="destructive">
-                                    Delete organization
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will remove all memberships
-                                        from this organization, delete all associated roadmaps,
-                                        then delete the organization.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction asChild>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={handleDeleteOrganization}
-                                            disabled={isDeleting}
-                                        >
-                                            {isDeleting ? "Deleting..." : "Continue"}
-                                        </Button>
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                        <DeleteOrganizationAlertDialog organization={organization} />
 
                     </div>
                 </div>

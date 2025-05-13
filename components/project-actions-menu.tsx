@@ -1,4 +1,4 @@
-import {Ellipsis} from "lucide-react"
+import {Copy, Ellipsis, Pencil, Share, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -131,6 +131,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             handleEdit()
                         }}
                     >
+                        <Pencil/>
                         Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -139,6 +140,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             handleShare()
                         }}
                     >
+                        <Share/>
                         Share
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -147,6 +149,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             handleDuplicate()
                         }}
                     >
+                        <Copy/>
                         Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -155,6 +158,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             handleDelete()
                         }}
                     >
+                        <Trash/>
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
