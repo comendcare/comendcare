@@ -6,7 +6,7 @@ import { PublicMilestoneDetails } from "./public-milestone-details"
 import { usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
-export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) {
+export function PublicRoadmapContent({roadmap, subdomain, milestoneChangedCallback}: {roadmap: any, subdomain: string | undefined, milestoneChangedCallback?: (milestoneId: string | undefined) => void}) {
     const searchParams = useSearchParams()
     const pathname = usePathname()
     const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("project") || undefined)
@@ -24,6 +24,8 @@ export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdom
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
+
+        if (milestoneChangedCallback) milestoneChangedCallback(milestone)
     }, [milestone, view, pathname, searchParams])
     
     return (

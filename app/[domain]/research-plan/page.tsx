@@ -141,10 +141,9 @@ export async function generateStaticParams() {
 export default async function OrganizationRoadmapPage({
                                                           params
                                                       }: {
-    params: { domain: string; slug: string }
+    params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const slug = decodeURIComponent(params.slug)
 
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
@@ -228,8 +227,9 @@ export default async function OrganizationRoadmapPage({
                                     icon: <Share />,
                                     dialog: (
                                         <ShareDialog
-                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
                                             organization={organization}
+                                            embeddedResearchPlansLink={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
                                         />
                                     ),
                                 },

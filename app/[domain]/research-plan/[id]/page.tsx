@@ -1,4 +1,4 @@
-import {notFound} from "next/navigation"
+import {notFound, useSearchParams} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import {formatMoney, standardizeYear} from "@/lib/utils"
@@ -11,7 +11,7 @@ import {IconFlag, IconShare} from "@tabler/icons-react";
 import ShareDialog from "@/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
-import React from "react";
+import React, { useState } from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
@@ -142,8 +142,11 @@ export default async function OrganizationRoadmapPage({
                                                       }: {
     params: { domain: string; slug: string; id: string }
 }) {
+    // const searchParams = useSearchParams()
     const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
+
+    // const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("project") || undefined)
 
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
@@ -218,6 +221,7 @@ export default async function OrganizationRoadmapPage({
                             <PublicRoadmapContent 
                                 roadmap={roadmap}
                                 subdomain={organization?.subdomain || undefined}
+                                // milestoneChangedCallback={setMilestone}
                             />
                         </div>
 
@@ -228,8 +232,10 @@ export default async function OrganizationRoadmapPage({
                                     icon: <Share />,
                                     dialog: (
                                         <ShareDialog
-                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap}`}
                                             organization={organization}
+                                            embeddedResearchPlanLink={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`}
+                                            // embeddedProjectLink={milestone ? `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}?project=${milestone}` : undefined}
                                         />
                                     ),
                                 },
