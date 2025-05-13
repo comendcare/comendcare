@@ -14,14 +14,36 @@ import {toast} from "sonner";
 import { Organization } from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import { mixpanelTrack } from "@/app/mixpanel";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import CopyCodeBlock from "./code-block";
+import { Milestone, Roadmap } from "@/lib/types";
+import { useSearchParams } from "next/navigation";
 
 export default function ShareDialog({
     url,
-    organization
+    organization,
+    embeddedResearchPlansLink,
+    embeddedResearchPlanLink,
+    embeddedProjectLink
 }: {
     url: string,
-    organization?: Organization
+    organization?: Organization,
+    embeddedResearchPlansLink?: string,
+    embeddedResearchPlanLink?: string,
+    embeddedProjectLink?: string
 }) {
+    function embedCode(link: string) {
+        return (
+`<iframe
+    src=${link}
+    width="100%"
+    height="600"
+    name="iframe"
+    title={name}
+/>`
+        )
+    }
 
     const handleCopyResourceLinkToClipboard = async () => {
         trackMixpanelEvent("Link")
@@ -193,6 +215,38 @@ export default function ShareDialog({
                         </div>
                     </div>
                 </DialogDescription>
+                <Accordion type="single" collapsible className="w-full">
+                    {embeddedResearchPlansLink && (
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="font-semibold text-primary">
+                                Embed Research Plans Table
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <CopyCodeBlock code={embedCode(embeddedResearchPlansLink)} language={"JavaScript"} />
+                            </AccordionContent>
+                        </AccordionItem>
+                    )}
+                    {embeddedResearchPlanLink && (
+                        <AccordionItem value="item-2">
+                            <AccordionTrigger className="font-semibold text-primary">
+                                Embed Research Plan
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <CopyCodeBlock code={embedCode(embeddedResearchPlanLink)} language={"JavaScript"} />
+                            </AccordionContent>
+                        </AccordionItem>
+                    )}
+                    {embeddedProjectLink && (
+                        <AccordionItem value="item-3">
+                            <AccordionTrigger className="font-semibold text-primary">
+                                Embed Project
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <CopyCodeBlock code={embedCode(embeddedProjectLink)} language={"JavaScript"} />
+                            </AccordionContent>
+                        </AccordionItem>
+                    )}
+                </Accordion>
             </DialogHeader>
         </>
     )
