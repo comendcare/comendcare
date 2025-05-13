@@ -1126,6 +1126,10 @@ export async function inviteUser(
         })
         invitationId = invitation.id
 
+        const inviter = await prisma.user.findUnique({
+            where: {id: session?.user.id}
+        })
+
         await sendInviteEmail(
             {
                 invitee: {
@@ -1134,9 +1138,9 @@ export async function inviteUser(
                     image: ""
                 },
                 inviter: {
-                    name: session?.user.name,
-                    email: session?.user.email,
-                    image: session?.user.image,
+                    name: inviter?.name || session?.user.name,
+                    email: inviter?.email || session?.user.email,
+                    image: inviter?.image || session?.user.image,
                     organizationName: organization.organizationName,
                     organizationImage: organization.organizationImage,
                     ip: ip,
