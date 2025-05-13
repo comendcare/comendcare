@@ -1,19 +1,13 @@
-import {notFound, useSearchParams} from "next/navigation"
+import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
-import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
-import {ProfilePhoto} from "@/components/profile-photo";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {FloatingDock} from "@/components/floating-dock";
-import {IconFlag, IconShare} from "@tabler/icons-react";
 import ShareDialog from "@/components/share-dialog";
-import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
-import FeedbackForm from "@/components/feedback-form";
-import React, { useState } from "react";
+import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
+import { Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
 
@@ -143,11 +137,8 @@ export default async function OrganizationRoadmapPage({
                                                       }: {
     params: { domain: string; slug: string; id: string }
 }) {
-    // const searchParams = useSearchParams()
     const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
-
-    // const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("project") || undefined)
 
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
@@ -174,39 +165,11 @@ export default async function OrganizationRoadmapPage({
                             />
                             <PAGRoadmapHeader organization={organization} editable={false} />
                             <PublicRoadmapContent 
+                                organization={organization}
                                 roadmap={roadmap}
                                 subdomain={organization?.subdomain || undefined}
-                                // milestoneChangedCallback={setMilestone}
                             />
                         </div>
-
-                        <FloatingDock
-                            items={[
-                                {
-                                    title: "Share on social media",
-                                    icon: <Share />,
-                                    dialog: (
-                                        <ShareDialog
-                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap}`}
-                                            organization={organization}
-                                            embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${roadmap.id}`}
-                                            // embeddedProjectLink={milestone ? `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}?project=${milestone}` : undefined}
-                                        />
-                                    ),
-                                },
-                                ...(organization.contactEmail
-                                    ? [
-                                        {
-                                            title: "Contact patient group",
-                                            icon: <Mail/>,
-                                            dialog: <ContactPAGDialog organization={organization} />,
-                                        },
-                                    ]
-                                    : []),
-                            ]}
-                            orientation="vertical"
-                            desktopClassName="right-4"
-                        />
                     </>
                 ) :
                 (

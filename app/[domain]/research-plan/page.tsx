@@ -12,8 +12,7 @@ import ShareDialog from "@/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
 import React from "react";
-import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react"
+import { Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import { RoadmapsCard } from "@/components/public-roadmap-card"
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"

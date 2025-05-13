@@ -2,27 +2,15 @@ import React from "react";
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
-import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
-import {Button} from "@/components/ui/button"
-import {ProfilePhoto} from "@/components/profile-photo";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {Post} from "@/app/condition/[slug]/page";
 import {FloatingDock} from "@/components/floating-dock";
-import {
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
-import {PublicRoadmapContent} from "@/components/public-roadmap-content";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
-import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react";
+import { Mail, Share } from "lucide-react";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
+import { RoadmapsCard } from "@/components/public-roadmap-card";
 
 export async function generateMetadata({
                                            params
@@ -177,11 +165,7 @@ export default async function OrganizationRoadmapPage({
                             />
 
                             <PAGRoadmapHeader organization={organization} editable={false} />
-
-                            <PublicRoadmapContent
-                                roadmap={roadmaps[0]}
-                                subdomain={organization?.subdomain || undefined}
-                            />
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
 
                         <FloatingDock
