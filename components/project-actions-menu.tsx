@@ -1,12 +1,23 @@
-import { Ellipsis } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { Button } from "./ui/button"
-import { useEffect, useRef, useState } from "react"
-import { Milestone } from "@/lib/types"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
-import { useShallow } from "zustand/react/shallow"
-import { Dialog } from "./ui/dialog"
-import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
+import {Ellipsis} from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
+import {Button} from "./ui/button"
+import {useEffect, useRef, useState} from "react"
+import {Milestone} from "@/lib/types"
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
+import {useShallow} from "zustand/react/shallow"
+import {Dialog, DialogContent, DialogPortal} from "./ui/dialog"
+import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
+import ShareDialog from "@/components/share-dialog";
+import {toast} from "sonner";
+import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {useSession} from "next-auth/react";
+import {Organization} from "@prisma/client";
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -16,15 +27,48 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
 })
 
-export const ProjectActionsMenu = ({milestone}: {milestone: Milestone}) => {
+export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
+    const {data: session, status} = useSession()
     const [isOpen, setIsOpen] = useState(false)
+    const [organization, setOrganization] = useState<Organization | {}>({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [shareIsOpen, setShareIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
 
     const {setSelectedNodeId, addMilestones} = useRoadmapStore(useShallow(selector))
 
+    useEffect(() => {
+
+        async function fetchOrgData() {
+            if (session?.user.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+
+                    // Map the response to the correct structure if needed
+                    if (response.success && response.data) {
+                        setOrganization(response.data);
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching organizations:", error);
+                    toast.error("Couldn't get organizations");
+                }
+            }
+        }
+
+        fetchOrgData()
+    }, [session])
+
     const handleEdit = () => {
         setSelectedNodeId(milestone.nodeId)
+    }
+
+    const handleShare = async () => {
+        // override default delete behaviour with our custom dialog
+        setShareIsOpen(true)
     }
 
     const handleDuplicate = async () => {
@@ -74,58 +118,68 @@ export const ProjectActionsMenu = ({milestone}: {milestone: Milestone}) => {
 
     return (
         <>
-        <Popover open={isOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        setIsOpen(true)
-                    }}
-                    variant="ghost"
-                    className="p-2 h-auto justify-end h-full"
-                >
-                    <Ellipsis />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="flex flex-col w-fit p-2 z-20" side={'left'} sideOffset={4} ref={popoverRef}>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleEdit()
-                        setIsOpen(false)
-                    }}
-                    variant="ghost"
-                    className="h-full justify-start"
-                >
-                    Edit
-                </Button>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleDuplicate()
-                        setIsOpen(false)
-                    }}
-                    variant="ghost"
-                    className="h-full justify-start"
-                >
-                    Duplicate
-                </Button>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleDelete()
-                        setIsOpen(false)
-                    }}
-                    variant="ghost"
-                    className="h-full justify-start"
-                >
-                    Delete
-                </Button>
-            </PopoverContent>
-        </Popover>
-        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-            <DeleteMilestoneDialogContent milestoneData={milestone}/>
-        </Dialog>
+            <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-2 justify-end h-full">
+                        <Ellipsis/>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleEdit()
+                        }}
+                    >
+                        Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleShare()
+                        }}
+                    >
+                        Share
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleDuplicate()
+                        }}
+                    >
+                        Duplicate
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleDelete()
+                        }}
+                    >
+                        Delete
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+                <DialogContent>
+                    { "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                        <ShareDialog
+                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
+                            organization={organization}
+                        />
+                    ) : (
+                        <div className="text-sm text-muted-foreground">Loading organization...</div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                <DialogPortal>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <DeleteMilestoneDialogContent milestoneData={milestone}/>
+                    </div>
+                </DialogPortal>
+            </Dialog>
         </>
     )
 }
