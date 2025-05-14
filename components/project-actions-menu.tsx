@@ -120,7 +120,15 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
         <>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="p-2 justify-end h-full">
+                    <Button
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setIsOpen(true)
+                        }}
+                        variant="ghost"
+                        className="p-2 justify-end h-full"
+                    >
                         <Ellipsis/>
                     </Button>
                 </DropdownMenuTrigger>
