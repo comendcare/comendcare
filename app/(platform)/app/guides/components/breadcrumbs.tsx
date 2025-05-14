@@ -3,9 +3,9 @@ import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronRight, House } from "lucide-react"
 
-export default function Breadcrumbs() {
+export default function Breadcrumbs({pathname}: {pathname: string}) {
     // const router = useRouter();
-    const pathWithoutAnchor = usePathname().split("#")[0]
+    const pathWithoutAnchor = pathname.split("#")[0]
     const pathSegments = pathWithoutAnchor.split("/").filter(segment => segment.length > 0)
 
     // Mapping URL segments to breadcrumb format
