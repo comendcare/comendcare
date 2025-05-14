@@ -7,6 +7,7 @@ import React from "react";
 import { Building2, Calendar, HandCoins } from "lucide-react"
 import { RoadmapCard } from "@/components/public-roadmap-card";
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default async function EmbeddedResearchPlanPage({params}: {params: {domain: string, researchPlanId: string}}) {
     const [organization, roadmaps] = await Promise.all([
@@ -27,7 +28,28 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
                         <div
                             className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left p-2"
                         >
-                            <PAGRoadmapHeader organization={organization} editable={false} />
+                            <Breadcrumb>
+                                <BreadcrumbList>
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
+                                            {organization.name}
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`} target="_blank">
+                                            Research Plans
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`} target="_blank">
+                                            {roadmap?.title || 'Untitled Research Plan'}
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
+                            <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
                             <div className={cn(!(roadmap.milestones && roadmap.milestones.length > 0) ? "col-span-full" : "")}>
                                 <RoadmapCard
                                     roadmap={roadmap}
