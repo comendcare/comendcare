@@ -6,6 +6,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import { PublicMilestoneDetails } from "@/components/public-milestone-details"
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
 export default async function EmbeddedProjectPage({params}: {params: {domain: string, researchPlanId: string, projectId: string}}) {
     const [organization, roadmaps] = await Promise.all([
@@ -27,6 +28,33 @@ export default async function EmbeddedProjectPage({params}: {params: {domain: st
                         <div
                             className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left p-2"
                         >
+                            <Breadcrumb>
+                                <BreadcrumbList>
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
+                                            {organization.name}
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`} target="_blank">
+                                            Research Plans
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${params.researchPlanId}`} target="_blank">
+                                            {roadmap?.title || 'Untitled Research Plan'}
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${params.researchPlanId}?project=${params.projectId}`} target="_blank">
+                                            {milestone?.title || 'Untitled Project'}
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>   
+                                </BreadcrumbList>
+                            </Breadcrumb>
                             <PAGRoadmapHeader organization={organization} editable={false} />
                             <PublicMilestoneDetails 
                                 roadmap={roadmap}
