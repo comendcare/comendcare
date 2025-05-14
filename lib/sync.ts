@@ -153,6 +153,30 @@ export const syncToTypesense = async (env: {
                     type: "string"
                 },
                 {
+                    name: "updatedAt",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
+                    name: "createdAt",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
                     name: "moneyDeployed",
                     facet: false,
                     index: true,
@@ -442,6 +466,8 @@ export const syncToTypesense = async (env: {
 
                 return {
                     ...organization,
+                    updatedAt: organization.updatedAt.valueOf(),
+                    createdAt: organization.createdAt.valueOf(),
                     firstConditionPatientsEngaged,
                 }
             }))

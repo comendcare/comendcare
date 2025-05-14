@@ -1,6 +1,12 @@
 "use client"
 
-import { Ellipsis } from "lucide-react"
+import {Copy, Ellipsis, Trash} from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Button } from "./ui/button"
 import { useEffect, useRef, useState } from "react"
@@ -60,52 +66,51 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
 
     return (
         <>
-        <Popover open={isOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        setIsOpen(true)
-                    }}
-                    variant="ghost"
-                    className="p-2 h-auto justify-end h-full"
-                >
-                    <Ellipsis />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="flex flex-col w-fit p-2 z-20" side={'left'} sideOffset={4} ref={popoverRef}>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleDuplicate()
-                        setIsOpen(false)
-                    }}
-                    variant="ghost"
-                    className="h-full justify-start"
-                >
-                    Duplicate
-                </Button>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleDelete()
-                        setIsOpen(false)
-                    }}
-                    variant="ghost"
-                    className="h-full justify-start"
-                >
-                    Delete
-                </Button>
-            </PopoverContent>
-        </Popover>
-        {/* Contain dialog content isn a Dialog Portal, so any click events don't propogate and cause unexpected open/close behaviour in the EditAssetForm */}
-        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-        <DialogPortal>
-            <div onClick={(e) => e.stopPropagation()}>
-            <DeleteAssetDialog assetId={asset.id} />
-            </div>
-        </DialogPortal>
-        </Dialog>
+            <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setIsOpen(true)
+                        }}
+                        variant="ghost"
+                        className="p-2 justify-end h-full"
+                    >
+                        <Ellipsis />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDuplicate()
+                        }}
+                    >
+                        <Copy/>
+                        Duplicate
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDelete()
+                        }}
+                    >
+                        <Trash/>
+                        Delete
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                <DialogPortal>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <DeleteAssetDialog assetId={asset.id} />
+                    </div>
+                </DialogPortal>
+            </Dialog>
         </>
     )
 }

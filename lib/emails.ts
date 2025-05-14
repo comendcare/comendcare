@@ -162,7 +162,7 @@ export async function sendInviteEmail(params: {
         InviteToOrganizationEmail(
             {
                 username: params.invitee.name,
-                userImage: params.invitee.image,
+                userImage: params.inviter.image,
                 invitedByUsername: params.inviter.name,
                 invitedByEmail: params.inviter.email,
                 organizationName: params.inviter.organizationName,

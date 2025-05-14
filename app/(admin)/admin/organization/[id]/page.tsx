@@ -5,18 +5,11 @@ import Roadmaps from "@/components/roadmaps"
 import CreateRoadmapButton from "@/components/create-roadmap-button"
 import {VerifyOrganizationSwitch} from "@/components/verify-organization-switch";
 import OrganizationRoadmaps from "@/components/organization-roadmaps";
-import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger
-} from "@/components/ui/alert-dialog";
-import {Button} from "@/components/ui/button";
 import {deleteOrganization} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import { mixpanelTrack } from "@/app/mixpanel"
+import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
 
 export default async function AdminOrganizationPage({
     params
@@ -82,36 +75,9 @@ export default async function AdminOrganizationPage({
                     <VerifyOrganizationSwitch organization={data}/>
                 </div>
                 <CreateRoadmapButton />
-                <AlertDialog>
-                    <AlertDialogTrigger asChild disabled={session?.user?.membership?.role !== "owner"}>
-                        <Button variant="destructive">
-                            Delete organization
-                        </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will remove all memberships
-                                from this organization, delete all associated roadmaps,
-                                then delete the organization.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction asChild>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleDeleteOrganization}
-                                >
-                                    Continue
-                                </Button>
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+
+                <DeleteOrganizationAlertDialog organization={data} />
+
             </div>
             <OrganizationRoadmaps organizationId={decodeURIComponent(params.id)} />
         </>
