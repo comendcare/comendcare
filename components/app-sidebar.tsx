@@ -47,21 +47,35 @@ const data = {
             variant: "ghost",
             url: `/app/research-plan`,
             subPages: [
-                {
-                    title: "Tools",
-                    icon: Star,
-                    variant: "ghost",
-                    url: `/app/tools`,
-                    subPages: []
-                },
-                {
-                    title: "RFPs",
-                    icon: Megaphone,
-                    variant: "ghost",
-                    url: `/app/rfps`,
-                    subPages: []
-                }
+                // {
+                //     title: "Assets",
+                //     icon: Star,
+                //     variant: "ghost",
+                //     url: `/app/assets`,
+                //     subPages: []
+                // },
+                // {
+                //     title: "RFPs",
+                //     icon: Megaphone,
+                //     variant: "ghost",
+                //     url: `/app/rfps`,
+                //     subPages: []
+                // }
             ]
+        },
+        {
+            title: "Tools",
+            icon: Star,
+            variant: "ghost",
+            url: `/app/tools`,
+            subPages: []
+        },
+        {
+            title: "RFPs",
+            icon: Megaphone,
+            variant: "ghost",
+            url: `/app/rfps`,
+            subPages: []
         },
         {
             title: "Organization Profile",

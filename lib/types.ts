@@ -16,6 +16,7 @@ import {
     Asset as DBAsset,
     RFP as DBRFP
 } from "@prisma/client";
+import { z } from "zod";
 
 export type MilestoneKey =
     | "Add website and description"
@@ -57,6 +58,28 @@ export type ImportField = {
     defaultValue: any,
     isValid: (value: any) => boolean
 }
+
+export type Roadmap = Prisma.RoadmapGetPayload<{
+    include: {
+        nodes: {
+            include: {data: true},
+            orderBy: [{ createdAt: "desc" }]
+        },
+        milestones: {
+            include: {
+                node: true,
+                contacts: true,
+                attachments: true,
+                types: {include: { milestoneType: true }},
+                assets: {include: {asset: true}},
+                rfps: {include: {rfp: true}}
+            },
+            orderBy: [{ createdAt: "desc" }]
+        },
+        edges: true,
+        organization: true
+    }
+}>
 
 export type Asset = Omit<Prisma.AssetGetPayload<{
     include: {
@@ -103,6 +126,7 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {
         node: true,
         contacts: true,
+        roadmap: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
         assets: { include: { asset: true, assetId: true, milestoneId: true } },
@@ -136,6 +160,12 @@ export interface Option {
     /** Group the options by providing key. */
     [key: string]: any;
 }
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+})
 
 export type AssetTableData = Asset & {
     asset: Asset
@@ -224,6 +254,56 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // },
 ]
 
+export const TREATMENT_TYPE = [
+    {
+        label: 'Gene Therapy',
+        description: 'Fixes or replaces faulty genes',
+        modalities: ['GENE_THERAPY_AAV', 'GENE_EDITING']
+    },
+    {
+        id: '2',
+        label: 'RNA Therapy',
+        description: 'Targets how genes are read (e.g., ASOs)',
+        modalities: ['ANTISENSE_OLIGONUCLEOTIDE', 'OTHER_RNA_THERAPY']
+    },
+    {
+        id: '3',
+        label: 'Cell Therapy',
+        description: 'Uses modified or donor cells to treat disease',
+    },
+    {
+        id: '4',
+        label: 'Drug Therapy',
+        description: 'Uses small molecules or repurposed drugs',
+        modalities: ['DRUG_REPURPOSING_SCREENING']
+    },
+    {
+        id: '5',
+        label: 'Enzyme Therapy',
+        description: 'Replaces missing or faulty enzymes',
+        modalities: ['ENZYME_REPLACEMENT']
+    },
+    {
+        id: '6',
+        label: 'Protein Therapy',
+        description: 'Delivers helpful proteins to cells',
+    },
+    {
+        id: '7',
+        label: 'Other',
+        modalities: ['PATHWAY_MODULATORS', 'EXPLORATORY_RESEARCH']
+    },
+]
+
+export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
+    {
+        id: '1',
+        label: 'Exploratory Research',
+        value: 'EXPLORATORY_RESEARCH',
+        // description: 'A therapeutic approach using adeno-associated viruses (AAV) to deliver genetic material into cells, often to correct or replace defective genes.',
+    },
+]
+
 export const MODALITIES: Option[] = [
     {
         id: '1',
@@ -310,6 +390,8 @@ export const MODALITIES: Option[] = [
         strengths: 'Flexibility to incorporate novel, interdisciplinary methods and adaptability to unique challenges.',
     },
 ]
+
+export const RESEARCH_PLAN_TYPES: Option[] = MODALITIES.concat(ADDITIONAL_RESEARCH_PLAN_TYPES)
 
 export const ASSOCIATED_SYSTEMS: Option[] = [
     {

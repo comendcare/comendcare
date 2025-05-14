@@ -13,7 +13,7 @@ import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {Milestone, SavedCompany} from "@prisma/client";
+import {SavedCompany} from "@prisma/client";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {
     Dialog,
@@ -32,16 +32,20 @@ import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDesc
 import va from "@vercel/analytics"
 import {editSavedCRO, unsaveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
-import {SavedCompanyData} from "@/lib/types";
+import {Milestone, SavedCompanyData} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 import { mixpanelTrack } from "@/app/mixpanel";
+import ProjectMultipleSelector from "../project-multiple-selector";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
     //     errorMap: () => ({message: "Select a valid engagement type"})
     // }),
-    milestoneId: z.string().min(1, "Please select a milestone"),
+    // milestoneId: z.string().min(1, "Please select a milestone"),
+    milestones: z.array(z.custom<Milestone>())
+        .min(1, "Please select a project")
+        .max(1, "Cannot select more than one project")
 });
 
 type SaveCROFormData = z.infer<typeof formSchema>;
@@ -72,7 +76,8 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             // engagement: row.original.engagement,
-            milestoneId: row.original.milestoneId,
+            // milestoneId: row.original.milestoneId,
+            milestones: ([row.original.milestone])
         }
     });
 
@@ -101,7 +106,10 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await editSavedCRO(row.original.id, data.milestoneId);
+            if (!data.milestones?.[0]?.id) {
+                console.error(`Error: Invalid milestone ID`)
+            }
+            const response = await editSavedCRO(row.original.id, data.milestones[0].id);
 
             if (response.success && response.data) {
                 va.track("Edited saved CRO");
@@ -205,7 +213,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
 
                     <FormField
                         control={form.control}
-                        name="milestoneId"
+                        name="milestones"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>Milestone</FormLabel>
@@ -213,7 +221,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                                     For which milestone would you like to connect with this company?
                                 </FormDescription>
                                 <FormControl>
-                                    <Select onValueChange={field.onChange} value={field.value}>
+                                    {/* <Select onValueChange={field.onChange} value={field.value}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select a milestone"/>
                                         </SelectTrigger>
@@ -224,7 +232,8 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
-                                    </Select>
+                                    </Select> */}
+                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>

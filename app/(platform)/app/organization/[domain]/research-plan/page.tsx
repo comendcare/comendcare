@@ -2,26 +2,15 @@ import React from "react";
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
-import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
-import {Button} from "@/components/ui/button"
-import {ProfilePhoto} from "@/components/profile-photo";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {Post} from "@/app/condition/[slug]/page";
 import {FloatingDock} from "@/components/floating-dock";
-import {
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
-import {PublicRoadmapContent} from "@/components/public-roadmap-content";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
-import { Building2, Calendar, HandCoins, Mail, Share } from "lucide-react";
+import { Mail, Share } from "lucide-react";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
+import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
+import { RoadmapsCard } from "@/components/public-roadmap-card";
 
 export async function generateMetadata({
                                            params
@@ -175,79 +164,8 @@ export default async function OrganizationRoadmapPage({
                                 marketplaceDomain={"/app/marketplace/milestones"}
                             />
 
-                            {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
-                            {/*    {roadmaps[0].title}*/}
-                            {/*</h1>*/}
-
-                            <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
-                                    <ProfilePhoto
-                                        img={organization.image}
-                                        name={organization.name}
-                                        className="h-16 w-16 rounded-full"
-                                        textSize="small"
-                                        editable={false}
-                                    />
-                                <div className="flex flex-col">
-                                    <div className="flex gap-4 justify-between">
-                                        <h1 className="text-wrap text-2xl md:text-3xl font-semibold">
-                                            {organization?.name}
-                                        </h1>
-                                        {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
-                                    </div>
-                                    <div className="w-full flex flex-wrap gap-x-6">
-                                        {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <HandCoins
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
-                                                {formatMoney(organization?.moneyRaised)} raised
-                                            </div>
-                                        }
-                                        {organization?.yearFounded && (
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <Calendar
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"/>
-                                                Founded
-                                                in {standardizeYear(organization?.yearFounded ?? "")}
-                                            </div>
-                                        )}
-                                        {organization?.incorporationStatus === "YES" &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <Building2
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"/>
-                                                {`501(c)(3)`}
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* <p>
-                                {roadmaps[0].description}
-                            </p> */}
-
-                            <PublicRoadmapContent
-                                roadmap={roadmaps[0]}
-                                subdomain={organization?.subdomain || undefined}
-                            />
-
-                            {/*<div className="mt-8 w-full space-y-8">*/}
-                            {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}
-                            {/*        Recent activity*/}
-                            {/*    </h2>*/}
-                            {/*    <Carousel>*/}
-                            {/*        <CarouselContent className="p-4 gap-4">*/}
-                            {/*            {posts.map((post, index) => (*/}
-                            {/*                <ConditionProfileRecentActivityCard post={post} key={index}/>*/}
-                            {/*            ))}*/}
-                            {/*        </CarouselContent>*/}
-                            {/*        <CarouselPrevious/>*/}
-                            {/*        <CarouselNext/>*/}
-                            {/*    </Carousel>*/}
-                            {/*</div>*/}
+                            <PAGRoadmapHeader organization={organization} editable={false} />
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
 
                         <FloatingDock

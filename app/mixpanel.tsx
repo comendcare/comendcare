@@ -126,23 +126,6 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         mixpanel.opt_out_tracking() // opt out for safety
                         return
                     }
-
-                    // if (localStorage.getItem(`mp_${mixpanelPublicToken}_mixpanel`) === null) {
-                    //     // if the opt-in/opt-out token is not available in localstorage, pull user connsent data from database
-                    //     if (userData.data.consentSettings === true) {
-                    //         console.log(`mixpanel opt-in`)
-                    //         mixpanel.opt_in_tracking()
-                    //     } else {
-                    //         console.log(`mixpanel opt-out`)
-                    //         mixpanel.opt_out_tracking()
-                    //     }
-                    // }
-
-                    // if (localStorage.getItem(`mp_${mixpanelPublicToken}_mixpanel`) === 'false') {
-                    //     // if the user has not consented, opt them out (just in case they have been previously identified while logged out)
-                    //     console.log(`mixpanel opt-out`)
-                    //     mixpanel.opt_out_tracking()
-                    // }
  
                     if (userData.data.consentSettings === true) {
                         // user has consented to data tracking, opt into mixpanel tracking
@@ -197,7 +180,15 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
         ) {
             console.log(`session has changed, update mixpanel identify`)
-            identifyUser()
+            if (process.env.NEXT_PUBLIC_NODE_ENV == 'production' || process.env.NEXT_PUBLIC_MIXPANEL_ENABLED == 'true') {
+                try {
+                    identifyUser()
+                } catch(e) {
+                    console.error(`Error tracking mixpanel event: ${e}`)
+                }
+            } else {
+                console.log(`Mixpanel event not tracked: Mixpanel is currently not enabled in your pre-production environment. Update the NEXT_PUBLIC_MIXPANEL_ENABLED flag to enable/disable mixpanel tracking.`)
+            }
         }
 
         prevSessionRef.current = session

@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
     organization?: Organization,
-    roadmap?: Roadmap,
+    roadmap?: Roadmap | undefined,
 }) {
 
     const searchParams = useSearchParams();

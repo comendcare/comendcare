@@ -201,6 +201,7 @@ model Roadmap {
   nodes          Node[]
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  modalities     String[]
 
   @@unique([slug, organizationId])
   @@index([organizationId])
