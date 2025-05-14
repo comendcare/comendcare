@@ -49,7 +49,7 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
                                     </BreadcrumbItem>
                                 </BreadcrumbList>
                             </Breadcrumb>
-                            <PAGRoadmapHeader organization={organization} editable={false} />
+                            <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
                             <div className={cn(!(roadmap.milestones && roadmap.milestones.length > 0) ? "col-span-full" : "")}>
                                 <RoadmapCard
                                     roadmap={roadmap}

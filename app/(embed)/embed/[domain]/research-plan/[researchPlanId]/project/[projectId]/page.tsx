@@ -55,7 +55,7 @@ export default async function EmbeddedProjectPage({params}: {params: {domain: st
                                     </BreadcrumbItem>   
                                 </BreadcrumbList>
                             </Breadcrumb>
-                            <PAGRoadmapHeader organization={organization} editable={false} />
+                            <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
                             <PublicMilestoneDetails 
                                 roadmap={roadmap}
                                 urlMilestone={milestone?.id || null}
