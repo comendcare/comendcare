@@ -178,6 +178,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             organization={organization}
+                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestone.roadmapId}/project/${milestone.id}`}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
