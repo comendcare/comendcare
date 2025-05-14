@@ -70,6 +70,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
                 <DropdownMenuTrigger asChild>
                     <Button
                         onClick={(e) => {
+                            e.preventDefault()
                             e.stopPropagation()
                             setIsOpen(true)
                         }}
