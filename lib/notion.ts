@@ -202,3 +202,43 @@ export async function createFeedbackTicket(data: FeedbackTicketData) {
 
     console.log(`New ticket created: `, newTicket)
 }
+
+export async function getNotionDatabase(id: string) {
+    const client = new Client({ auth: process.env.NOTION_API_KEY })
+    return await client.databases.retrieve({ database_id: id })
+}
+
+export async function getNotionDatabaseContent(id: string) {
+    const client = new Client({ auth: process.env.NOTION_API_KEY })
+    return await client.databases.query({database_id: id})
+}
+
+export async function getNotionPage(id: string) {
+    const client = new Client({ auth: process.env.NOTION_API_KEY })
+        const pageDetails = await client.pages.retrieve({ page_id: id })
+        const pageBlockChildren = await client.blocks.children.list({
+            block_id: id,
+            page_size: 50,
+        })
+        return {
+            ...pageDetails,
+            block_children: pageBlockChildren
+        }
+}
+
+export async function getNotionDatabaseAndContents(id: string) {
+    const client = new Client({ auth: process.env.NOTION_API_KEY })
+    const database = await client.databases.retrieve({ database_id: id })
+    const content = await client.databases.query({database_id: id})
+
+    // add page details to each page
+    const pages = await Promise.all(content.results.map(async (result) => {
+        return await getNotionPage(result.id)
+    }))
+
+    return {
+        database,
+        content,
+        pages
+    }
+}
