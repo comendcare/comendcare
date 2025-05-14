@@ -57,18 +57,39 @@ export async function getOrganizationData(domain: string) {
 
     return await unstable_cache(
         async () => {
-            return prisma.organization.findUnique({
+            let organization = await prisma.organization.findUnique({
                 where: subdomain ? {subdomain} : {customDomain: domain},
                 include: {
                     user: true,
                     roadmaps: true,
                     members: {
+                        orderBy: {
+                            createdAt: 'asc'
+                        },
                         include: {
                             user: true
                         }
                     }
                 }
             })
+
+            if (!organization) return organization
+
+            // sort members list - move org owners to the beginning of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.role === 'owner' && b.role !== 'owner') return -1
+                if (b.role === 'owner' && a.role !== 'owner') return 1
+                return 0
+            })
+
+            // sort members list - move comend users to the end of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+                return 0
+            })
+
+            return organization
         },
         [`${domain}-metadata`],
         {
@@ -671,13 +692,16 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
 
 export const getOrganizationFromOrganizationId = async (organizationId: string) => {
     try {
-        const organization = await prisma.organization.findUnique({
+        let organization = await prisma.organization.findUnique({
             where: {
                 id: organizationId,
             },
             include: {
                 roadmaps: true,
                 members: {
+                    orderBy: {
+                        createdAt: 'asc'
+                    },
                     include: {
                         user: true
                     }
@@ -693,6 +717,20 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
         if (!organization) {
             return {success: false, error: "organization not found"};
         }
+
+        // sort members list - move org owners to the beginning of the list
+        organization.members = organization.members.sort((a, b) => {
+            if (a.role === 'owner' && b.role !== 'owner') return -1
+            if (b.role === 'owner' && a.role !== 'owner') return 1
+            return 0
+        })
+
+        // sort members list - move comend users to the end of the list
+        organization.members = organization.members.sort((a, b) => {
+            if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+            if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+            return 0
+        })
 
         return {success: true, data: organization};
     } catch (error: any) {
