@@ -36,7 +36,7 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-            <PAGRoadmapHeader organization={organization} editable={false} />
+            <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
             <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
         </div>
     )
