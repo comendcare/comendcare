@@ -5,8 +5,9 @@ import { DateView } from "@/components/miletone-date-view";
 import { Calendar, CircleDollarSign, DollarSign, Pin, User } from "lucide-react";
 import { PropertyBadge } from "./property-badge";
 import { formatMoney } from "@/lib/utils";
+import { RFPActionsMenu } from "./rfp-actions-menu";
 
-export const RFPCard = ({rfp}: {rfp: any}) => {
+export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean}) => {
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
@@ -22,9 +23,17 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
                             }}
                         />
                     )}
-                    {rfp.pinned && <Pin fill="current-color" className="absolute top-0 right-0 h-4 w-4 m-2"/>}
+                    {isPrivate && (
+                        <div className="absolute top-1 right-1">
+                            <RFPActionsMenu rfp={rfp}/>
+                        </div>
+                    )}
                 </div>
-                <CardTitle>{rfp.title} {rfp.private && <PrivateBadge iconOnly className="ml-auto pl-auto"/>}</CardTitle>
+                <CardTitle className="flex gap-2 items-center">
+                    {rfp.title} 
+                    {rfp.private && <PrivateBadge iconOnly className="ml-auto pl-auto"/>}
+                    {rfp.pinned && <Pin fill="current-color" className="ml-auto pl-auto min-h-4 h-4 min-w-4 w-4"/>}
+                </CardTitle>
                 <CardDescription className="line-clamp-3">{rfp.description}</CardDescription>
             </CardHeader>
             <CardContent>

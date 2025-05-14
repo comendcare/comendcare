@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
-import {Asset, Milestone} from "@/lib/types"
+import {Asset} from "@/lib/types"
 import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -37,10 +37,14 @@ import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from 
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Option } from "@/lib/types"
-import { Pin } from "lucide-react"
+import { Delete, Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
+import mixpanel from "mixpanel-browser"
+import ProjectMultipleSelector from "./project-multiple-selector"
+import { DeleteAssetDialog } from "./delete-asset-dialog"
+// import { DeleteAssetDialog } from "./delete-asset-dialog"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -77,6 +81,8 @@ const assetSelector = (state: AssetState) => ({
     saveState: state.saveState
 })
 
+export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
+
 export function EditAssetForm({
     assetData,
     numAssetsPinned,
@@ -90,14 +96,8 @@ export function EditAssetForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
-    const { createAsset, updateAsset, deleteAsset, saveState } = useAssetStore(useShallow(assetSelector))
-    const { undo } = useAssetStore.temporal.getState()
-
-    const handleUndo = () => {
-        undo()
-        saveState()
-        toast.dismiss("undo-toast")
-    }
+    const { createAsset, updateAsset } = useAssetStore(useShallow(assetSelector))
+    const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editAssetForm>>({
         mode: "onChange",
@@ -184,49 +184,6 @@ export function EditAssetForm({
                 "Failed to create or update tool.",
                 {position: "bottom-left"}
             )
-        }
-    }
-
-    const handleDeleteAsset = async () => {
-        if (!session?.user?.organizationId) {
-            toast.error(
-                "You're not signed into an organization right now.",
-                {position: "bottom-left"}
-            )
-            return
-        }
-
-        if (!assetData.id) {
-            toast.error(
-                "This tool does not have an id.",
-                {position: "bottom-left"}
-            )
-            return
-        }
-
-        try {
-            await deleteAsset(assetData.id)
-            if (closeDialog) closeDialog()
-            toast(
-                <div className="flex flex-col gap-2 w-full">
-                    <span className="flex justify-between items-center">
-                        <p className="font-semibold text-gray-900">
-                            {`Tool Deleted`}
-                        </p>
-                        <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
-                    </span>
-                    <p className="text-sm text-gray-500">
-                        {`Your tool had been deleted successfully.`}
-                    </p>
-                </div>,
-                {position: "bottom-left", duration: 20000, id: "undo-toast"}
-            )
-        } catch (error) {
-            console.error("Error deleting tool:", error);
-            toast.error(
-                "Failed to delete tool.",
-                {position: "bottom-left"}
-            );
         }
     }
 
@@ -361,20 +318,7 @@ export function EditAssetForm({
                             <FormItem className="w-full mt-2">
                                 <FormLabel >{`Linked Projects`}</FormLabel>
                                 <FormControl>
-                                    <MultipleSelector
-                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
-                                        onChange={field.onChange}
-                                        defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
-                                        options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
-                                        hidePlaceholderWhenSelected={true}
-                                        showHoverCard={false}
-                                        placeholder="Link projects"
-                                        emptyIndicator={
-                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                no results found.
-                                            </p>
-                                        }
-                                    />
+                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
                                 <FormMessage className="text-primary"/>
                             </FormItem>
@@ -393,38 +337,12 @@ export function EditAssetForm({
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Dialog>
-                            <DialogTrigger asChild className={cn(assetData.id ? "" : "hidden")}>
-                                <Button type="button" variant="destructive">
-                                    Delete Tool
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Are you absolutely sure?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your Tool and it's data.`}
-                                    </DialogDescription>
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <Button type="button">
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
-                                        <DialogClose>
-                                            <Button
-                                                type="button"
-                                                variant={"destructive"}
-                                                onClick={handleDeleteAsset}
-                                            >
-                                                Delete Tool
-                                            </Button>
-                                        </DialogClose>
-                                    </DialogFooter>
-                                </DialogHeader>
-                            </DialogContent>
+
+                        <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                            Delete Tool
+                        </Button>
+                        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                            <DeleteAssetDialog assetId={assetData.id} closeDialog={closeDialog}/>
                         </Dialog>
                         <DialogClose disabled={!form.formState.isValid}>
                             <Button
