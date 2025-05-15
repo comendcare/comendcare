@@ -1,21 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { getNotionDatabaseAndContents, getNotionDatabaseContent, getNotionPage } from "@/lib/notion"
-import { cards } from "./components/faq-card-deck"
+import { getNotionDatabaseAndContents } from "@/lib/notion"
 import Link from "next/link"
-// import TextHover from "@/components/animations/text-hover"
-// import Footer from "@/components/footer"
-
-// export const metadata = {
-//     title: `Guides `,
-//     description: `Frequently asked questions and further notes about this rare disease repository.`,
-//     keywords: `Comend, Librarey, Rare Disease, Disability Resource Guide, Support, FAQ`,
-//     openGraph: {
-//         title: `FAQ - Librarey`,
-//         images: ``,
-//         description: `Frequently asked questions and further notes about this rare disease repository.`,
-//         locale: `en_US`
-//     }
-// }
 
 export default async function FAQLayout({
     children
@@ -24,11 +9,6 @@ export default async function FAQLayout({
 }>) {
     const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
     const {database, content, pages} = await getNotionDatabaseAndContents(faqDBKey)
-
-    // console.log(`sections`, database.properties.Section)
-    // if (database.properties.Section.type === 'select') console.log(database.properties.Section.select.options)
-    // console.log(`pages`, pages.map((page: any) => page.properties.Section.select))
-    console.log(`pages`, (pages as any[]).map(page => page))
 
     return (
         <main className="w-full h-full">
@@ -43,11 +23,6 @@ export default async function FAQLayout({
                                         {option.name}
                                     </AccordionTrigger>
                                     <AccordionContent className="flex flex-col space-y-1 px-2">
-                                        {/* {card.prompts.map((prompt, index) => (
-                                            <Link href={prompt.href} key={index}>
-                                                {prompt.prompt}
-                                            </Link>
-                                        ))} */}
                                         {pages.filter((page: any) => page.properties.Section.type === 'select' && page.properties.Section.select.name === option.name).map((page: any, index: number) => (
                                             <Link href={`/app/guides/${page.id}`} key={index}>
                                                 {page.properties.Name.title?.[0].text.content}
@@ -58,28 +33,9 @@ export default async function FAQLayout({
                             </Accordion>
                         </div>
                     ))}
-                    {/* {cards.map((card, index) => (
-                        <div key={index}>
-                            <Accordion type="single" collapsible className="w-full" defaultValue={card.heading}>
-                                <AccordionItem value={card.heading}>
-                                    <AccordionTrigger className="p-2 flex flex-row text-left">
-                                        {card.heading}
-                                    </AccordionTrigger>
-                                    <AccordionContent className="flex flex-col space-y-1 px-2">
-                                        {card.prompts.map((prompt, index) => (
-                                            <Link href={prompt.href} key={index}>
-                                                {prompt.prompt}
-                                            </Link>
-                                        ))}
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        </div>
-                    ))} */}
                 </div>
                 <div>{children}</div>
             </div>
-            {/* <Footer /> */}
         </main>
     )
 }

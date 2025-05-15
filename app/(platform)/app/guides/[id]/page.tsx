@@ -51,35 +51,30 @@ function formatPageId(id: string): string {
 }
 
 export default async function NotionDynamicPage({
-  params
+	params
 }: {
-  params: { id: string }
+	params: { id: string }
 }) {
-  const rootNotionPageId = '067dd719a912471ea9a3ac10710e7fdf'
-  const pageId = params.id || rootNotionPageId
-
     const res = await fetch('https://www.notion.so/api/v3/loadPageChunk', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      pageId: formatPageId(params.id),
-      limit: 50,
-      chunkNumber: 0,
-      verticalColumns: false
-    })
-  })
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			pageId: formatPageId(params.id),
+			limit: 50,
+			chunkNumber: 0,
+			verticalColumns: false
+		})
+	})
 
-  const json = await res.json()
-  console.log(`NOTION RAW FETCH`, json)
+	const json = await res.json()
 
-  try {
-    // const recordMap = await notion.getPage(pageId)
-    return <NotionPage recordMap={json.recordMap} rootPageId={rootNotionPageId} />
-  } catch (error) {
-    console.error('Failed to fetch page:', error)
-  }
+	try {
+		return <NotionPage recordMap={json.recordMap} rootPageId={params.id} />
+	} catch (error) {
+			console.error('Failed to fetch page:', error)
+	}
 
-  return <p>FAILED to fetch</p>
+	return <p>FAILED to fetch</p>
 }
