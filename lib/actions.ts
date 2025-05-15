@@ -1126,6 +1126,13 @@ export async function inviteUser(
         })
         invitationId = invitation.id
 
+        // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
+        await prisma.whitelist.upsert({
+            where: { email: lowerCaseEmail },
+            update: {}, // No fields to update
+            create: { email: lowerCaseEmail },
+        });
+
         const inviter = await prisma.user.findUnique({
             where: {id: session?.user.id}
         })
