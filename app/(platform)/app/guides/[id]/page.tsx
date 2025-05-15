@@ -1,33 +1,35 @@
 import React from "react"
-import Breadcrumbs from "../components/breadcrumbs"
-import FAQFeedback from "../components/faq-feedback"
-import { getNotionPage } from "@/lib/notion"
+import { BlockMapType } from "react-notion";
+import { NotionPage } from "@/components/notion-page";
 
 export default async function NotionFAQPage({params}: {params: {id: string}}) {
-    const page: any = await getNotionPage(params.id)
-    // const client = new Client({ auth: process.env.NOTION_API_KEY })
-    // const page = await client.pages.retrieve({ page_id: params.id })
-    // const notion = new NotionAPI()
-    // const recordMap = await notion.getPage(params.id)
+    const pageId = params.id;
+
+    if (!pageId) {
+        return;
+    }
+
+    const blockMap: BlockMapType = await fetch(
+        `https://notion-api.splitbee.io/v1/page/${pageId}`
+    ).then(res => res.json());
+
+
+    if (!blockMap || Object.keys(blockMap).length === 0) {
+        return (
+        <div>
+            <h3>No data found.</h3>
+            <div> Make sure the pageId is valid.</div>
+            <div>Only public pages are supported in this example.</div>
+        </div>
+        );
+    }
+
+    const title =
+        blockMap[Object.keys(blockMap)[0]]?.value.properties.title[0][0];
 
     return (
-        <>
-            <div className="bg-white px-6 lg:px-8">
-                <div className="mx-auto max-w-4xl text-base leading-7 text-gray-700">
-                    <article className="prose prose-lg flex flex-col mx-auto w-full max-w-4xl format format-sm sm:format-base lg:format-lg format-blue">
-                        <div className="not-prose">
-                            <Breadcrumbs pathname={`/app/guides/${page.properties.Name.title?.[0].text.content}`} />
-                        </div>
-
-                        <div>
-                            <h1>TEST CONTENT</h1>
-                            {/* <NotionRenderer recordMap={recordMap} fullPage={true} darkMode={false} /> */}
-                        </div>
-
-                        <FAQFeedback />
-                    </article>
-                </div>
-            </div>
-        </>
-    )
+        <div style={{ maxWidth: 768 }}>
+            <NotionPage blockMap={blockMap} />
+        </div>
+    );
 }
