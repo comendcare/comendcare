@@ -1,4 +1,7 @@
 module.exports = {
+    // experimental: {
+    //     runtime: 'nodejs' // NOT 'edge'
+    // },
     parser: '@typescript-eslint/parser',
     extends: [
         'eslint:recommended',
