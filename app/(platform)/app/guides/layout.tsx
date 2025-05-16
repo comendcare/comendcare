@@ -10,19 +10,15 @@ export default async function FAQLayout({
     const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
     const {database, content, pages} = await getNotionDatabaseAndContents(faqDBKey)
 
-    console.log(`pages`, pages.map((page: any) => page))
-
     const filteredPages = (
         process.env.NEXT_PUBLIC_NODE_ENV === 'production'
             ? pages
                 .filter((page: any) => page.properties.Status.type === 'status' && page.properties.Status.status === 'Published (in production)')
+                .filter((page: any) => page.properties.Section)
                 .filter((page: any) => page.public_url)
             : pages
                 .filter((page: any) => page.public_url)
     )
-    // const filteredSections = [...new Set(filteredPages.flatMap((page: any) => page.properties.Section.select.name))]
-
-    // console.log(`filtered sections`, filteredSections)
 
     return (
         <main className="w-full h-full">

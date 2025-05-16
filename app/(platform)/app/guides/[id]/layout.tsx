@@ -1,21 +1,6 @@
 import { ProfilePhoto } from "@/components/profile-photo"
 import { getNotionPage } from "@/lib/notion"
 
-export async function getNotionPageProperties(pageId: string) {
-    const page: any = await getNotionPage(pageId)
-    if (!page) throw new Error("No page found")
-
-    const propertyKeys = Object.keys(page.properties)
-
-    let properties: {[key: string]: any} = {}
-    propertyKeys.forEach(key => {
-        const type = page.properties[key].type
-        properties[key] = page.properties[key][type]
-    })
-
-    return properties
-}
-
 export default async function GuideArticleLayout({
     params,
     children
@@ -31,6 +16,21 @@ export default async function GuideArticleLayout({
     const publishDate = page.properties["Publication Date"].date.start
     const title = page.properties["Name"].title.map((text: any) => text.plain_text).join(" ")
     const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")
+
+    async function getNotionPageProperties(pageId: string) {
+        const page: any = await getNotionPage(pageId)
+        if (!page) throw new Error("No page found")
+
+        const propertyKeys = Object.keys(page.properties)
+
+        let properties: {[key: string]: any} = {}
+        propertyKeys.forEach(key => {
+            const type = page.properties[key].type
+            properties[key] = page.properties[key][type]
+        })
+
+        return properties
+    }
 
     const properties = await getNotionPageProperties(params.id)
     console.log(`page properties`, properties)
