@@ -1436,8 +1436,6 @@ export async function getBiosampleData() {
         const data = await fs.readFile(
             path.join(process.cwd(), "data/pharma-data/biosamples.json")
         )
-        console.log("FUCK")
-        console.log(data)
 
         const tasks = JSON.parse(data.toString())
 
