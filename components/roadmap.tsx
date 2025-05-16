@@ -91,6 +91,7 @@ export function Roadmap() {
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [organization, setOrganization] = useState<Organization | undefined>()
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
     const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
     const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
@@ -113,6 +114,7 @@ export function Roadmap() {
             if (session?.user.organizationId) {
                 let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
                 if (orgData.success && orgData.data) {
+                    setOrganization(orgData.data)
                     setOrgSubdomain(orgData.data.subdomain || undefined)
                     setOrgIsPublished(orgData.data.published || false)
                 }
@@ -345,6 +347,7 @@ export function Roadmap() {
                             className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
                         >
                             <MilestoneDetailsPanel
+                                organization={organization}
                                 remountKey={milestoneRemountKey}
                                 milestone={milestones.find(
                                     milestone =>
@@ -432,11 +435,13 @@ export function Roadmap() {
 }
 
 const MilestoneDetailsPanel = ({
+    organization,
     remountKey,
     milestone,
     orgIsPublished,
     handlePanelChange
 }: {
+    organization: Organization | undefined,
     remountKey: number,
     milestone: Milestone | undefined
     orgIsPublished: boolean,
@@ -462,6 +467,7 @@ const MilestoneDetailsPanel = ({
     if (milestone) {
         return (
             <EditMilestoneForm
+                organization={organization}
                 key={milestoneRemountKey}
                 milestoneData={milestone}
                 orgIsPublished={orgIsPublished}
