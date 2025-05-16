@@ -177,10 +177,11 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
             </TableHeader>
             <TableBody>
                 {RESEARCH_PLAN_TYPES.map(type => {
-                    const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(type.value))
+                    const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(type.value) && type.value !== "OTHER")
                     if (roadmapsForModality.length <= 0) return <></>
 
                     return (
+                        // add a section for each roadmap type EXCEPT the OTHER type (handled below)
                         <CollapsibleTableGroup 
                             label={type.label}
                             colSpan={2}
@@ -202,11 +203,12 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                     )
                 })}
                 {roadmaps.filter(roadmap => roadmap.modalities.length === 0).length > 0 && (
+                    // group research plans with no type or 'other' type together in the table
                     <CollapsibleTableGroup 
-                        label={'No type'}
+                        label={'Other'}
                         colSpan={2}
                     >
-                        {roadmaps.filter(roadmap => roadmap.modalities.length === 0).map(roadmap => (
+                        {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
                             <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
                                 <TableCell>
                                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
