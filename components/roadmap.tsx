@@ -28,7 +28,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "./ui/dialog"
-import { ArrowLeft, ExternalLink, Import, Info, Pencil, Plus, Redo2, Undo2, Wand2, Workflow } from "lucide-react"
+import { ArrowLeft, Ellipsis, ExternalLink, Import, Info, Pencil, Plus, Redo2, Share, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -36,13 +36,15 @@ import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Milestone } from "@/lib/types"
 import Loading from "@/app/loading"
-import { MilestoneType, Roadmap as RoadmapType } from "@prisma/client"
+import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "./ui/separator"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import ShareDialog from "./share-dialog"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -89,6 +91,7 @@ export function Roadmap() {
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [organization, setOrganization] = useState<Organization | undefined>()
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
     const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
     const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
@@ -111,6 +114,7 @@ export function Roadmap() {
             if (session?.user.organizationId) {
                 let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
                 if (orgData.success && orgData.data) {
+                    setOrganization(orgData.data)
                     setOrgSubdomain(orgData.data.subdomain || undefined)
                     setOrgIsPublished(orgData.data.published || false)
                 }
@@ -203,6 +207,7 @@ export function Roadmap() {
             >
                 <ResizablePanel className="p-2 flex flex-col gap-2">
                     <RoadmapHeader 
+                        researchPlanId={roadmapId}
                         researchPlanDetails={{
                             id: roadmapId,
                             ...details
@@ -342,6 +347,7 @@ export function Roadmap() {
                             className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
                         >
                             <MilestoneDetailsPanel
+                                organization={organization}
                                 remountKey={milestoneRemountKey}
                                 milestone={milestones.find(
                                     milestone =>
@@ -429,11 +435,13 @@ export function Roadmap() {
 }
 
 const MilestoneDetailsPanel = ({
+    organization,
     remountKey,
     milestone,
     orgIsPublished,
     handlePanelChange
 }: {
+    organization: Organization | undefined,
     remountKey: number,
     milestone: Milestone | undefined
     orgIsPublished: boolean,
@@ -459,6 +467,7 @@ const MilestoneDetailsPanel = ({
     if (milestone) {
         return (
             <EditMilestoneForm
+                organization={organization}
                 key={milestoneRemountKey}
                 milestoneData={milestone}
                 orgIsPublished={orgIsPublished}
@@ -531,6 +540,7 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
 }
 
 const RoadmapHeader = ({
+    researchPlanId,
     researchPlanDetails, 
     setTab, 
     setNewMilestoneIsOpen, 
@@ -540,6 +550,7 @@ const RoadmapHeader = ({
     setBulkImportIsOpen,
     orgSubdomain
 }: {
+    researchPlanId: string,
     researchPlanDetails: Partial<RoadmapType>, 
     setTab: any, 
     setNewMilestoneIsOpen: any, 
@@ -549,30 +560,62 @@ const RoadmapHeader = ({
     setBulkImportIsOpen: any,
     orgSubdomain: string | undefined
 }) => {
+    const {data: session, status} = useSession()
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
+    const [shareIsOpen, setShareIsOpen] = useState(false)
+    const [organization, setOrganization] = useState<Organization | {}>({})
 
     useEffect(() => {
-    const el = parentRef.current;
-    if (!el) return;
+        const el = parentRef.current;
+        if (!el) return;
 
-    const observer = new ResizeObserver((entries) => {
-        const entry = entries[0];
-        if (entry?.contentRect) {
-        setParentWidth(entry.contentRect.width);
-        }
-    });
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry?.contentRect) {
+            setParentWidth(entry.contentRect.width);
+            }
+        });
 
-    observer.observe(el);
+        observer.observe(el);
 
-    return () => observer.disconnect();
+        return () => observer.disconnect();
     }, []);
+
+    useEffect(() => {
+        async function fetchOrgData() {
+            if (session?.user.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+
+                    // Map the response to the correct structure if needed
+                    if (response.success && response.data) {
+                        setOrganization(response.data);
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching organizations:", error);
+                    toast.error("Couldn't get organizations");
+                }
+            }
+        }
+
+        fetchOrgData()
+    }, [session])
 
     useEffect(() => {
         setIsCollapsed(parentWidth <= 1024)
     }, [parentWidth])
+
+    const handleShare = async () => {
+        // override default delete behaviour with our custom dialog
+        setShareIsOpen(true)
+    }
 
     return (
         <>
@@ -597,7 +640,7 @@ const RoadmapHeader = ({
                 <StageOfActivityBadge milestones={milestones} />
             </span>
 
-            <span className="onborda-create-a-project flex flex-row items-start gap-x-1 justify-end">
+            <span className="onborda-create-a-project flex flex-row items-center gap-x-1 justify-end">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
@@ -653,23 +696,43 @@ const RoadmapHeader = ({
                     Templates
                 </Button>
 
-                <Tooltip>
-                    <TooltipTrigger asChild disabled={!orgSubdomain}>
-                        <Link
-                            href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
-                            className={cn(
-                                buttonVariants({ variant: "ghost" }),
-                                "flex items-center w-[40px]"
-                            )}
-                            target={"_blank"}
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                            }}
+                            variant="ghost"
+                            className="p-2 justify-end h-full"
                         >
-                            <ExternalLink className="h-4 w-4"/>
-                        </Link>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`View public research plan`}</p>
-                    </TooltipContent>
-                </Tooltip>
+                            <Ellipsis/>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="left" sideOffset={4} className="p-1">
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                    className={cn(
+                                        "flex items-center"
+                                    )}
+                                    target={"_blank"}
+                                >
+                                    <ExternalLink/>
+                                    View public research plan
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleShare()
+                                }}
+                            >
+                                <Share />
+                                Share
+                            </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </span>
 
             <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>
@@ -683,6 +746,22 @@ const RoadmapHeader = ({
                         </DialogDescription>
                     </DialogHeader>
                     <EditResearchPlanForm researchPlanData={researchPlanDetails} closeDialog={() => setEditResearchPlanIsOpen(false)}/>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+                <DialogContent>
+                    { "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                        <ShareDialog
+                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlanId}`}
+                            organization={organization}
+                            // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
+                            // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
+                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`}
+                        />
+                    ) : (
+                        <div className="text-sm text-muted-foreground">Loading organization...</div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

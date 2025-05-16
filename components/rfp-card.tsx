@@ -7,7 +7,7 @@ import { PropertyBadge } from "./property-badge";
 import { formatMoney } from "@/lib/utils";
 import { RFPActionsMenu } from "./rfp-actions-menu";
 
-export const RFPCard = ({rfp}: {rfp: any}) => {
+export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean}) => {
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
@@ -23,9 +23,11 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
                             }}
                         />
                     )}
-                    <div className="absolute top-1 right-1">
-                        <RFPActionsMenu rfp={rfp}/>
-                    </div>
+                    {isPrivate && (
+                        <div className="absolute top-1 right-1">
+                            <RFPActionsMenu rfp={rfp}/>
+                        </div>
+                    )}
                 </div>
                 <CardTitle className="flex gap-2 items-center">
                     {rfp.title} 
