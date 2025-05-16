@@ -29,6 +29,7 @@ import {
 } from "./ui/select"
 import {
     Dialog,
+    DialogContent,
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
@@ -36,7 +37,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
-import {AssetToMilestone, MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {AssetToMilestone, MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
 import {getAssets, getOrganizationFromOrganizationId, getRFPs} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -69,12 +70,13 @@ import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
-import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
+import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share } from "lucide-react"
 import { toast } from "sonner"
 import { badgeVariants } from "./ui/badge"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { mixpanelTrack } from "@/app/mixpanel"
+import ShareDialog from "./share-dialog"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -140,10 +142,12 @@ const editMilestoneForm = z.object({
 )
 
 export function EditMilestoneForm({
+    organization,
     milestoneData,
     orgIsPublished,
     onClose
 }: {
+    organization: Organization | undefined
     milestoneData: Milestone
     orgIsPublished: boolean
     onClose: () => void
@@ -161,6 +165,7 @@ export function EditMilestoneForm({
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
     const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
+    const [shareIsOpen, setShareIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -307,6 +312,11 @@ export function EditMilestoneForm({
         [milestoneData, session?.user.organizationId, setMilestone, setRecommendations, milestoneTypes]
     )
 
+    const handleShare = async () => {
+        // override default delete behaviour with our custom dialog
+        setShareIsOpen(true)
+    }
+
     // memo ensures we're not creating a new debounce every time this is called
     const debounceUpdates = useMemo(() => 
         debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500), 
@@ -444,6 +454,7 @@ export function EditMilestoneForm({
     }, [step])
 
     return (
+        <>
         <Form {...form}>
             <ScrollArea className="px-8 pb-4 h-full">
                 <form
@@ -489,6 +500,7 @@ export function EditMilestoneForm({
                             <TabsContent value="edit" className="space-y-6 w-full h-full">
                                 <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                     <FormLabel>Visibility</FormLabel>
+                                    <div className="flex gap-2 justify-end items-center">
                                     <PrivatePublicFormField 
                                         form={form} 
                                         formData={formData} 
@@ -501,6 +513,46 @@ export function EditMilestoneForm({
                                             })
                                         }}
                                     />
+                                    <DropdownMenu modal={false}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    // setIsOpen(true)
+                                                }}
+                                                variant="ghost"
+                                                className="p-2 justify-end h-full"
+                                            >
+                                                <Ellipsis/>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
+                                            <Tooltip delayDuration={0}>
+                                                <TooltipTrigger asChild>
+                                                    <div>
+                                                        <DropdownMenuItem
+                                                            disabled={formData.isPrivate}
+                                                            onClick={(e) => {
+                                                                if (formData.isPrivate) return
+                                                                e.preventDefault()
+                                                                handleShare()
+                                                            }}
+                                                        >
+                                                            <Share />
+                                                            Share
+                                                        </DropdownMenuItem>
+                                                    </div>
+                                                </TooltipTrigger>
+                                                {formData.isPrivate && (
+                                                    <TooltipContent>
+                                                        <p>This project is private. Make it public to share.</p>
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    </div>
 
                                     <FormField
                                         control={form.control}
@@ -720,6 +772,22 @@ export function EditMilestoneForm({
                 </form>
             </ScrollArea>
         </Form>
+        <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+            <DialogContent>
+                { organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                    <ShareDialog
+                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
+                        organization={organization}
+                        postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
+                        postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
+                        embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`}
+                    />
+                ) : (
+                    <div className="text-sm text-muted-foreground">Loading organization...</div>
+                )}
+            </DialogContent>
+        </Dialog>
+        </>
     )
 }
 
