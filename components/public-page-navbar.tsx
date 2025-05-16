@@ -27,11 +27,12 @@ interface NavbarItem {
 interface NavbarProps {
     navItems: NavbarItem[]
     visible: boolean
+    externalOpen: boolean
 }
 
 const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
-export const PublicPageNavbar: React.FC = () => {
+export const PublicPageNavbar: React.FC = ({externalOpen = false}: {externalOpen?: boolean}) => {
     const navItems: NavbarItem[] = [
         // {
         //     name: "Products",
@@ -101,13 +102,13 @@ export const PublicPageNavbar: React.FC = () => {
 
     return (
         <motion.div ref={ref} className="w-full fixed top-0 inset-x-0 z-50">
-            <DesktopNav visible={visible} navItems={navItems}/>
-            <MobileNav visible={visible} navItems={navItems}/>
+            <DesktopNav visible={visible} navItems={navItems} externalOpen={externalOpen}/>
+            <MobileNav visible={visible} navItems={navItems} externalOpen={externalOpen}/>
         </motion.div>
     )
 }
 
-const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
+const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, externalOpen}) => {
     const session = useSession()
     const router = useRouter()
     const [hovered, setHovered] = useState<number | null>(null)
@@ -138,7 +139,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
             )}
         >
             <Link href={process.env.NEXT_PUBLIC_VERCEL_ENV
-                ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                ? `https://${rootDomain}/` : `http://${rootDomain}/`} target={externalOpen ? "_blank": "_self"}
             >
                 <Image className="w-36 inline" src={logo} alt="Comend Logo"/>
             </Link>
@@ -209,7 +210,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
     )
 }
 
-const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
+const MobileNav: React.FC<NavbarProps> = ({navItems, visible, externalOpen}) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -237,7 +238,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                 )}
             >
                 <div className="flex flex-row justify-between items-center w-full">
-                    <Link href="/">
+                    <Link href="/" target={externalOpen ? "_blank": "_self"}>
                         <Image
                             className="w-24 inline"
                             src={logo}

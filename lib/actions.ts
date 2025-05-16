@@ -42,7 +42,8 @@ import {
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
-import { templateResearchPlans } from "./templates"
+import {templateResearchPlans} from "./templates"
+import { getCategoriesAndMilestones } from "@/lib/utils"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -878,26 +879,26 @@ export const updateRoadmap = async (data: Partial<Roadmap>) => {
         include: {
             nodes: {
                 include: {data: true},
-                orderBy: [{ createdAt: "desc" }]
+                orderBy: [{createdAt: "desc"}]
             },
             milestones: {
                 include: {
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: {include: { milestoneType: true }},
+                    types: {include: {milestoneType: true}},
                     assets: {include: {asset: true}},
                     rfps: {include: {rfp: true}}
                 },
-                orderBy: [{ createdAt: "desc" }]
+                orderBy: [{createdAt: "desc"}]
             },
             edges: true,
             organization: true
         }
     })
 
-    if (!roadmap) return { error: "Roadmap not found"}
-    
+    if (!roadmap) return {error: "Roadmap not found"}
+
     try {
         const response = await prisma.roadmap.update({
             where: {
@@ -1125,6 +1126,13 @@ export async function inviteUser(
             return res
         })
         invitationId = invitation.id
+
+        // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
+        await prisma.whitelist.upsert({
+            where: {email: lowerCaseEmail},
+            update: {}, // No fields to update
+            create: {email: lowerCaseEmail},
+        });
 
         const inviter = await prisma.user.findUnique({
             where: {id: session?.user.id}
@@ -3620,7 +3628,17 @@ export const createCompany = async (formData: FormData) => {
     const yearEstablished = parseInt(formData.get("founded") as string)
     const companyType = formData.get("type") as string
     const url = formData.get("website") as string
-    const servicesRaw = formData.get("services") as string // comma-separated labels
+    const servicesRaw = formData.get("services") as string
+    const certificationsRaw = formData.get("certifications") as string
+
+    const parsedServices = servicesRaw
+        ? servicesRaw.split(",").map((name) => name.trim())
+        : []
+    const parsedCertifications = certificationsRaw
+        ? certificationsRaw.split(",").map((name) => name.trim())
+        : []
+
+    const { categories, milestoneTypes } = getCategoriesAndMilestones(parsedServices)
 
     try {
         const company = await prisma.company.create({
@@ -3630,13 +3648,19 @@ export const createCompany = async (formData: FormData) => {
                 yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
                 companyType,
                 url,
-                services: servicesRaw
+                services: parsedServices.length
                     ? {
-                        create: servicesRaw
-                            .split(",")
-                            .map((name) => ({ name: name.trim() }))
+                        create: parsedServices.map((name) => ({ name }))
                     }
                     : undefined,
+                certifications: parsedCertifications.length
+                    ? {
+                        create: parsedCertifications.map((name) => ({ name }))
+                    }
+                    : undefined,
+                simplifiedCertifications: parsedCertifications,
+                categories,
+                milestoneTypes,
             },
             include: { services: true },
         })
@@ -3650,7 +3674,6 @@ export const createCompany = async (formData: FormData) => {
             "companies"
         )
 
-        // Optional: trigger revalidation
         await revalidateTag(`${company.id}-company-metadata`)
 
         return { success: true, data: company }
