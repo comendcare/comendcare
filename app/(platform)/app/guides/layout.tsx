@@ -21,6 +21,8 @@ export default async function FAQLayout({
                 .filter((page: any) => page.public_url)
     )
 
+    console.log(`page sections`, pages.map((page: any) => page.properties.Section))
+
     return (
         <main className="w-full h-full">
             <div className="w-full container relative flex gap-8 bg-white mx-auto max-w-8xl px-6 py-4 sm:py-8 lg:px-8">

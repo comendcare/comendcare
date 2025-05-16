@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -11,6 +11,8 @@ import { articles, imgHeight, imgWidth } from "@/lib/articles"
 import type { TagType } from "@/lib/articles"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Lightbulb, Save, ThumbsUp } from "lucide-react"
+import { getNotionDatabaseAndContents } from "@/lib/notion"
+import Loading from "@/app/loading"
 
 // const faqs = [
 //     {
@@ -31,11 +33,12 @@ import { Lightbulb, Save, ThumbsUp } from "lucide-react"
 //     }
 // ]
 
-export default function FAQ() {
+export default async function FAQ() {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const [filterState, setFilterState] = useState(searchParams.get("view") || "start")
+    const [filterState, setFilterState] = useState(searchParams.get("view") || "Sample")
+    const [filteredPages, setFilteredPages] = useState<any[]>([])
 
     const handleSetFilterState = (state: TagType) => {
         const params = new URLSearchParams(searchParams.toString())
@@ -48,6 +51,43 @@ export default function FAQ() {
 
         setFilterState(state)
     }
+
+    useEffect(() => {
+        const init = async () => {
+            const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
+            const {database, pages} = await getNotionDatabaseAndContents(faqDBKey)
+
+            const filteredPages = (
+                process.env.NEXT_PUBLIC_NODE_ENV === 'production'
+                    ? pages
+                        .filter((page: any) => page.properties.Status.type === 'status' && page.properties.Status.status === 'Published (in production)')
+                        .filter((page: any) => page.properties.Section)
+                        .filter((page: any) => page.public_url)
+                    : pages
+                        .filter((page: any) => page.properties.Section)
+                        .filter((page: any) => page.public_url)
+            )
+
+            setFilteredPages(filteredPages)
+        }
+        init()
+    }, [])
+
+    // const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
+    // const {database, pages} = await getNotionDatabaseAndContents(faqDBKey)
+
+    // const filteredPages = (
+    //     process.env.NEXT_PUBLIC_NODE_ENV === 'production'
+    //         ? pages
+    //             .filter((page: any) => page.properties.Status.type === 'status' && page.properties.Status.status === 'Published (in production)')
+    //             .filter((page: any) => page.properties.Section)
+    //             .filter((page: any) => page.public_url)
+    //         : pages
+    //             .filter((page: any) => page.properties.Section)
+    //             .filter((page: any) => page.public_url)
+    // )
+
+    if (!filteredPages) return <Loading />
 
     return (
         <div className="mx-auto space-y-16">
@@ -82,12 +122,12 @@ export default function FAQ() {
                         <div className="w-full flex flex-row items-center justify-start gap-4">
                             <Lightbulb className="min-w-8 w-8 min-h-8 h-8" />
                             <div className="flex flex-col items-start text-start">
-                                <h3 className="text-lg">Getting Started</h3>
-                                <p className="mt-1 text-sm text-gray-500">Start from the beginning</p>
+                                <h3 className="text-lg">Sample</h3>
+                                <p className="mt-1 text-sm text-gray-500">Sample Pages</p>
                             </div>
                         </div>
                     </ToggleGroupItem>
-                    <ToggleGroupItem
+                    {/* <ToggleGroupItem
                         variant="outline"
                         className="p-4 h-full"
                         value="contribute"
@@ -112,25 +152,26 @@ export default function FAQ() {
                                 <p className="mt-1 text-sm text-gray-500">Create and add collection to your site</p>
                             </div>
                         </div>
-                    </ToggleGroupItem>
+                    </ToggleGroupItem> */}
                 </ToggleGroup>
 
                 <h2 className="text-2xl">
-                    {filterState === "start" && `Getting Started`}
-                    {filterState === "contribute" && `Uploading Resources`}
-                    {filterState === "collections" && `Create Collection and Embed`}
+                    {filterState === "Sample" && `Sample Pages`}
+                    {/* {filterState === "contribute" && `Uploading Resources`}
+                    {filterState === "collections" && `Create Collection and Embed`} */}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {articles
-                        .filter(article => article.tags.includes(filterState as TagType))
-                        .map((article, index) => (
-                            <PreviewCard
-                                key={index}
-                                index={index}
-                                article={article}
-                                imgWidth={imgWidth}
-                                imgHeight={imgHeight}
-                            />
+                    {filteredPages
+                        .filter((page: any) => page.properties.Section.select.name === filterState)
+                        .map((page, index) => (
+                            // <PreviewCard
+                            //     key={index}
+                            //     index={index}
+                            //     article={article}
+                            //     imgWidth={imgWidth}
+                            //     imgHeight={imgHeight}
+                            // />
+                            <p>{JSON.stringify(page)}</p>
                         ))}
                 </div>
             </div>
