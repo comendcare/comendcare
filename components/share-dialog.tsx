@@ -6,28 +6,32 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import {toast} from "sonner";
-import { Organization } from "@prisma/client";
+import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
-import { mixpanelTrack } from "@/app/mixpanel";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import {mixpanelTrack} from "@/app/mixpanel";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "./ui/accordion";
 import CopyCodeBlock from "./code-block";
 
 export default function ShareDialog({
-    url,
-    organization,
-    embeddedResearchPlansLink,
-    embeddedResearchPlanLink,
-    embeddedProjectLink
-}: {
+                                        url,
+                                        organization,
+                                        postSubject,
+                                        postMessage,
+                                        embeddedResearchPlansLink,
+                                        embeddedResearchPlanLink,
+                                        embeddedProjectLink
+                                    }: {
     url: string,
     organization?: Organization,
+    postSubject?: string,
+    postMessage?: string,
     embeddedResearchPlansLink?: string,
     embeddedResearchPlanLink?: string,
     embeddedProjectLink?: string
 }) {
     function embedCode(link: string) {
         return (
-`<iframe
+            `<iframe
     src=${link}
     width="100%"
     height="600"
@@ -66,7 +70,7 @@ export default function ShareDialog({
                         <div className="grid grid-cols-2 gap-4 sm:flex sm:justify-around">
                             <a
                                 className="border hover:bg-[#1877f2] w-12 h-12 fill-[#1877f2] hover:fill-white border-blue-200 rounded-full flex items-center justify-center shadow-md hover:shadow-blue-500/50 cursor-pointer"
-                                href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
+                                href={`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(postMessage || "")}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => trackMixpanelEvent("Facebook")}
@@ -78,7 +82,7 @@ export default function ShareDialog({
                             </a>
                             <a
                                 className="border hover:bg-[#B2D1FB] w-12 h-12 fill-[#1877f2] hover:fill-white border-blue-200 rounded-full flex items-center justify-center shadow-md hover:shadow-blue-500/50 cursor-pointer"
-                                href={`http://www.facebook.com/dialog/send?app_id=738683701326096&name=Facebook%20Dialogs&link=${url}&redirect_uri=https://www.librarey.com/`}
+                                href={`http://www.facebook.com/dialog/send?app_id=738683701326096&name=Facebook%20Dialogs&link=${url}&redirect_uri=https://www.comend.io/`}
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => trackMixpanelEvent("Messenger")}
@@ -117,7 +121,7 @@ export default function ShareDialog({
                             </a>
                             <a
                                 className="border hover:bg-[#1d9bf0] w-12 h-12 fill-[#1d9bf0] hover:fill-white border-blue-200 rounded-full flex items-center justify-center shadow-md hover:shadow-sky-500/50 cursor-pointer"
-                                href={`https://twitter.com/intent/tweet?text=${url}`}
+                                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Discover powerful research tools on Comend! 🚀")}&url=${encodeURIComponent(url)}&hashtags=research,healthtech,Comend`}
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => trackMixpanelEvent("Twitter")}
@@ -145,7 +149,7 @@ export default function ShareDialog({
                             </a>
                             <a
                                 className="border hover:bg-[#EA4335] w-12 h-12 fill-[#EA4335] hover:fill-white border-red-200 rounded-full flex items-center justify-center shadow-md hover:shadow-pink-500/50 cursor-pointer"
-                                href={`mailto:email@example.com?subject=Librarey Resource&body=${url}`}
+                                href={`mailto:email@example.com?subject=Comend&body=${url}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => trackMixpanelEvent("Email")}
@@ -214,7 +218,7 @@ export default function ShareDialog({
                                 Embed Research Plans Table
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedResearchPlansLink)} language={"JavaScript"} />
+                                <CopyCodeBlock code={embedCode(embeddedResearchPlansLink)} language={"JavaScript"}/>
                             </AccordionContent>
                         </AccordionItem>
                     )}
@@ -224,7 +228,7 @@ export default function ShareDialog({
                                 Embed Research Plan
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedResearchPlanLink)} language={"JavaScript"} />
+                                <CopyCodeBlock code={embedCode(embeddedResearchPlanLink)} language={"JavaScript"}/>
                             </AccordionContent>
                         </AccordionItem>
                     )}
@@ -234,7 +238,7 @@ export default function ShareDialog({
                                 Embed Project
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedProjectLink)} language={"JavaScript"} />
+                                <CopyCodeBlock code={embedCode(embeddedProjectLink)} language={"JavaScript"}/>
                             </AccordionContent>
                         </AccordionItem>
                     )}

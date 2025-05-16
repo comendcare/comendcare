@@ -9,6 +9,7 @@ import {formatDistanceToNowStrict} from "date-fns";
 import {Condition, CustomOrganization, ImportField, MilestoneKey} from "@/lib/types";
 import Papa from "papaparse";
 import type { Option } from "@/lib/types";
+import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
 
 // get the items that are in group A but NOT in group B
 export const getExclusiveToFirstGroup = (a: {[key: string]: Option[]}, b: {[key: string]: Option[]}, key: string) => {
@@ -471,4 +472,42 @@ export function nameToInitials(name: string | null | undefined): string | undefi
         .split(' ') // Split the name into parts by spaces
         .map(part => part.charAt(0).toUpperCase()) // Take the first letter of each part and capitalize it
         .join(''); // Join the initials together
+}
+
+const serviceToCategoriesMap = new Map<string, Set<string>>();
+const serviceToMilestoneIdsMap = new Map<string, Set<string>>();
+
+for (const milestone of MILESTONE_TYPE_OPTIONS) {
+    for (const service of milestone.services) {
+        if (!serviceToCategoriesMap.has(service)) {
+            serviceToCategoriesMap.set(service, new Set());
+        }
+        milestone.categories.forEach((cat: any) => {
+            serviceToCategoriesMap.get(service)!.add(cat);
+        });
+
+        if (!serviceToMilestoneIdsMap.has(service)) {
+            serviceToMilestoneIdsMap.set(service, new Set());
+        }
+        serviceToMilestoneIdsMap.get(service)!.add(milestone.id);
+    }
+}
+
+export function getCategoriesAndMilestones(services: string[]) {
+    const categorySet = new Set<string>();
+    const milestoneSet = new Set<string>();
+
+    for (const serviceName of services) {
+        if (serviceToCategoriesMap.has(serviceName)) {
+            serviceToCategoriesMap.get(serviceName)!.forEach(cat => categorySet.add(cat));
+        }
+        if (serviceToMilestoneIdsMap.has(serviceName)) {
+            serviceToMilestoneIdsMap.get(serviceName)!.forEach(id => milestoneSet.add(id));
+        }
+    }
+
+    return {
+        categories: Array.from(categorySet),
+        milestoneTypes: Array.from(milestoneSet),
+    };
 }

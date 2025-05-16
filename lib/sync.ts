@@ -454,7 +454,13 @@ export const syncToTypesense = async (env: {
                 console.log(`Org ${index + 1}:`, org)
                 const organization = await prisma.organization.findUnique({
                     where: { id: org.id },
-                    include: { condition: {include: {condition: true}}}
+                    include: { 
+                        condition: {include: {condition: true}},
+                        roadmaps: true,
+                        Milestone: true,
+                        Asset: true,
+                        RFP: true
+                    }
                 })
 
                 if (!organization) return null;
@@ -463,10 +469,18 @@ export const syncToTypesense = async (env: {
                 // This is temporary until we find a better way to handle the organization condition relationship
                 const firstConditionPatientsEngaged = organization.condition?.[0]?.condition?.numberOfPatientsEngaged ?? 0;
 
+                // combine, org updates, research plan updates, project updates, tool updates, and RFP updates. Then find
+                // the most recently updated time (this will be used in the Recently Updates sortBy in the marketplace)
+                const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
+                    organization.roadmaps.map(roadmap => roadmap.updatedAt.valueOf()),
+                    organization.Milestone.map(milestone => milestone.updatedAt.valueOf()),
+                    organization.Asset.map(asset => asset.updatedAt.valueOf()),
+                    organization.RFP.map(rfp => rfp.updatedAt.valueOf())
+                ))
 
                 return {
                     ...organization,
-                    updatedAt: organization.updatedAt.valueOf(),
+                    updatedAt: orgUpdatedAt,
                     createdAt: organization.createdAt.valueOf(),
                     firstConditionPatientsEngaged,
                 }

@@ -590,7 +590,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                     </CommandItem>
                                                                 </HoverCardTrigger>
                                                                 {showHoverCard && (
-                                                                    <HoverCardContent side="left" align="start" className="min-h-[280px]">
+                                                                    <HoverCardContent side="left" align="start" className="h-min">
                                                                         <div className="grid gap-2">
                                                                             <h4 className="font-medium leading-none">{framework.label}</h4>
                                                                             <div className="text-sm text-muted-foreground">{framework.description}</div>
