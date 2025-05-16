@@ -236,7 +236,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
     )
 }
 
-export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
+export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
     const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
 
     if (isHidden) {
@@ -276,24 +276,27 @@ export const ResearchPlanTemplatesCard = ({orgId}: {orgId: string}) => {
                 </Tooltip>
             </CardHeader>
             <CardContent className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                <CreateEmptyResearchPlanCard orgId={orgId} />
+                <CreateEmptyResearchPlanCard setIsLoading={setIsLoading}/>
                 {templateResearchPlans.map(plan => (
-                    <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId}/>
+                    <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId} setIsLoading={setIsLoading}/>
                 ))}
             </CardContent>
         </Card>
     )
 }
 
-export const CreateEmptyResearchPlanCard = ({orgId}: {orgId: string}) => {
+export const CreateEmptyResearchPlanCard = ({setIsLoading}: {setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
     const router = useRouter()
 
     return (
         <button
-            onClick={() => router.push(`/app/research-plan/create`)}
+            onClick={() => {
+                if (setIsLoading) setIsLoading(true)
+                router.push(`/app/research-plan/create`)
+            }}
             className="hover:cursor-pointer"
         >
-            <Card className="h-full">
+            <Card className="h-full hover:border-black">
                 <CardContent className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
                     <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
                     <Plus />
@@ -303,12 +306,13 @@ export const CreateEmptyResearchPlanCard = ({orgId}: {orgId: string}) => {
     )
 }
 
-export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof templateResearchPlans[0], orgId: string}) => {
+export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: {plan: typeof templateResearchPlans[0], orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
     const router = useRouter()
 
     return (
         <button
             onClick={async () => {
+                if (setIsLoading) setIsLoading(true)
                 const roadmap =  await createRoadmap(orgId, plan)
                 if (roadmap && roadmap.id) {
                     router.push(`/app/research-plan/${roadmap.id}`)
@@ -316,17 +320,12 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId}: {plan: typeof 
             }}
             className="hover:cursor-pointer"
         >
-            <Card className="text-left h-full">
+            <Card className="text-left h-full hover:border-black">
                 <CardHeader>
                     <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
                     <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
-                    {/* <ol>
-                        {plan.milestones.map(milestone => (
-                            <li>{milestone.title}</li>
-                        ))}
-                    </ol> */}
                     {plan.milestones.map(milestone => (
                         <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
                     ))}
