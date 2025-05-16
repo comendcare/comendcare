@@ -18,6 +18,12 @@ import {toast} from "sonner";
 import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -142,15 +148,30 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         <Pencil/>
                         Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleShare()
-                        }}
-                    >
-                        <Share/>
-                        Share
-                    </DropdownMenuItem>
+                    <TooltipProvider>
+                        <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                                <div>
+                                    <DropdownMenuItem
+                                        disabled={milestone.private}
+                                        onClick={(e) => {
+                                            if (milestone.private) return
+                                            e.preventDefault()
+                                            handleShare()
+                                        }}
+                                    >
+                                        <Share />
+                                        Share
+                                    </DropdownMenuItem>
+                                </div>
+                            </TooltipTrigger>
+                            {milestone.private && (
+                                <TooltipContent>
+                                    <p>This project is private. Make it public to share.</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                    </TooltipProvider>
                     <DropdownMenuItem
                         onClick={(e) => {
                             e.preventDefault()
@@ -178,6 +199,9 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             organization={organization}
+                            postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
+                            postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
+                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestone.roadmapId}/project/${milestone.id}`}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>

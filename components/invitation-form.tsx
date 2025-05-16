@@ -85,9 +85,6 @@ export default function InvitationForm() {
                             </FormControl>
                             <FormDescription>
                                 The invitation to your organization will be sent here.
-                                <div className="mt-1 font-semibold text-sm">
-                                    Only whitelisted users can sign in. Please contact us to whitelist a user.
-                                </div>
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
