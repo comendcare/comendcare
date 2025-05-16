@@ -8,7 +8,7 @@ export default async function FAQLayout({
     children: React.ReactNode
 }>) {
     const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
-    const {database, content, pages} = await getNotionDatabaseAndContents(faqDBKey)
+    const {database, pages} = await getNotionDatabaseAndContents(faqDBKey)
 
     const filteredPages = (
         process.env.NEXT_PUBLIC_NODE_ENV === 'production'
@@ -17,6 +17,7 @@ export default async function FAQLayout({
                 .filter((page: any) => page.properties.Section)
                 .filter((page: any) => page.public_url)
             : pages
+                .filter((page: any) => page.properties.Section)
                 .filter((page: any) => page.public_url)
     )
 
@@ -33,7 +34,7 @@ export default async function FAQLayout({
                                         {option.name}
                                     </AccordionTrigger>
                                     <AccordionContent className="flex flex-col space-y-1 px-2">
-                                        {filteredPages.filter((page: any) => page.properties.Section.type === 'select' && page.properties.Section.select.name === option.name).map((page: any, index: number) => (
+                                        {filteredPages.filter((page: any) => page.properties.Section.type === 'select' && page.properties.Section.select?.name === option.name).map((page: any, index: number) => (
                                             <Link href={`/app/guides/${page.id}`} key={index}>
                                                 {page.properties.Name.title?.[0].text.content}
                                             </Link>

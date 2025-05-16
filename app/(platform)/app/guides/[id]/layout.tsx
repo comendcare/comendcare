@@ -13,54 +13,56 @@ export default async function GuideArticleLayout({
     if (!page) throw new Error("No page found")
     
     const author = page.properties["Author"].people[0]
-    const publishDate = page.properties["Publication Date"].date.start
+    const publishDate = page.properties["Publication Date"].date?.start
     const title = page.properties["Name"].title.map((text: any) => text.plain_text).join(" ")
     const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")
 
-    async function getNotionPageProperties(pageId: string) {
-        const page: any = await getNotionPage(pageId)
-        if (!page) throw new Error("No page found")
+    // async function getNotionPageProperties(pageId: string) {
+    //     const page: any = await getNotionPage(pageId)
+    //     if (!page) throw new Error("No page found")
 
-        const propertyKeys = Object.keys(page.properties)
+    //     const propertyKeys = Object.keys(page.properties)
 
-        let properties: {[key: string]: any} = {}
-        propertyKeys.forEach(key => {
-            const type = page.properties[key].type
-            properties[key] = page.properties[key][type]
-        })
+    //     let properties: {[key: string]: any} = {}
+    //     propertyKeys.forEach(key => {
+    //         const type = page.properties[key].type
+    //         properties[key] = page.properties[key][type]
+    //     })
 
-        return properties
-    }
+    //     return properties
+    // }
 
-    const properties = await getNotionPageProperties(params.id)
-    console.log(`page properties`, properties)
+    // const properties = await getNotionPageProperties(params.id)
+    // console.log(`page properties`, properties)
 
     return (
         <div>
             <header className="mt-6 flex flex-col gap-8 p-4">
-                <div className="inline-flex items-center mr-3 text-sm text-gray-900 gap-4">
-                    <ProfilePhoto 
-                        img={properties["Author"][0].avatar_url}
-                        name={properties["Author"][0].name}
-                        textSize={"medium"}
-                        editable={false}
-                        className="h-16 w-16"
-                    />
-                    <div className="flex flex-col gap-1">
-                        <p className="text-base font-semibold">{properties["Author"][0].name}</p>
-                        <p className="text-base text-muted-foreground">{
-                            (publishDate 
-                                ? new Date(publishDate)
-                                : new Date())
-                                .toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })
-                            }
-                        </p>
+                {author && (
+                    <div className="inline-flex items-center mr-3 text-sm text-gray-900 gap-4">
+                        <ProfilePhoto 
+                            img={author?.avatar_url}
+                            name={author?.name}
+                            textSize={"medium"}
+                            editable={false}
+                            className="h-16 w-16"
+                        />
+                        <div className="flex flex-col gap-1">
+                            <p className="text-base font-semibold">{author?.name}</p>
+                            <p className="text-base text-muted-foreground">{
+                                (publishDate 
+                                    ? new Date(publishDate)
+                                    : new Date())
+                                    .toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })
+                                }
+                            </p>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div>
                     <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                         {title}
