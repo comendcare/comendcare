@@ -35,7 +35,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { BUSINESS_TYPES } from "@/lib/types"
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
+import {badgeVariants} from "@/components/ui/badge";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -50,6 +51,7 @@ const formSchema = z.object({
     yearFounded: z.string().regex(/^\d{4}$/, "Enter a valid year"),
     type: z.string(),
     services: z.array(optionSchema),
+    certifications: z.array(optionSchema),
 })
 
 type CreateCompanyFormValues = z.infer<typeof formSchema>
@@ -89,6 +91,7 @@ export function CreateCompanyDialog() {
             // Map form values into FormData
             const data = {
                 services: values.services?.map((service) => service.label).join(",") || "",
+                certifications: values.certifications?.map((cert) => cert.label).join(",") || "",
             };
 
             // Append data to FormData
@@ -235,6 +238,33 @@ export function CreateCompanyDialog() {
                                                 emptyIndicator={<p>No services found.</p>}
                                                 showHoverCard={false}
                                             />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="certifications"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Certifications
+                                    </FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            badgeClassName={badgeVariants({variant: "lightBlue"})}
+                                            defaultOptions={CRO_CERTIFICATIONS}
+                                            hidePlaceholderWhenSelected={true}
+                                            placeholder="Select relevant certifications..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                        />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
