@@ -6,33 +6,62 @@ import {
     Briefcase,
     MapPin,
     DollarSign,
-    CalendarIcon, Users
+    CalendarIcon,
+    BarChart3,
+    Database,
+    Stethoscope,
+    FlaskConical,
+    FileSignature,
+    ActivitySquare,
+    Workflow,
+    Share2
 } from "lucide-react";
 import {GroupAvatar} from "@/components/ui/group-avatar";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {getCROData} from "@/lib/fetchers";
-import PharmaProjectBiosamplesTab from "@/components/pharma-project-biosamples-tab";
+import {getPharmaProjectData} from "@/lib/fetchers";
+import PharmaProjectBiorepositoryTab from "@/components/pharma-project-biorepository-tab";
+import Loading from "@/app/loading";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
-export default function Example() {
+
+export default function PharmaProjectPage() {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [selectedTab, setSelectedTab] = useState("analytics")
-    const [cro, setCRO] = useState<any | null>(null)
+    const [pharmaProject, setPharmaProject] = useState<any | null>(null)
 
     useEffect(() => {
         const tabFromUrl = searchParams.get("tab") || "analytics"
         setSelectedTab(tabFromUrl)
     }, [searchParams])
 
+    useEffect(() => {
+        const fetchCRO = async () => {
+            const pathParts = pathname.split("/")
+            const id = decodeURIComponent(pathParts[pathParts.length - 1])
+            const data = await getPharmaProjectData(id)
+            setPharmaProject(data)
+        }
+
+        fetchCRO()
+    }, [pathname])
+
+    if (!pharmaProject) return <Loading />
+
     return (
         <div className="h-full flex-1 space-y-8 px-8">
             <div className="flex items-start">
                 <div className="min-w-0 flex-1">
                     <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                        ASO Therapy Development – Arcadion Syndrome
+                        {pharmaProject.name}
                     </h2>
                     <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                         <div className="mt-2 flex items-center text-sm text-gray-500">
@@ -80,19 +109,78 @@ export default function Example() {
             >
                 <TabsList variant="outline">
                     <TabsTrigger value="analytics" variant="outline" className="px-8">
-                        <Briefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                        <BarChart3 className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         Analytics
                     </TabsTrigger>
-                    <TabsTrigger value="biosamples" variant="outline" className="px-8">
-                        <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                        Biosamples
+                    <TabsTrigger value="biorepository" variant="outline" className="px-8">
+                        <Database className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                        Biorepository
                     </TabsTrigger>
+                    <TabsTrigger value="clinical" variant="outline" className="px-8">
+                        <Stethoscope className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                        Clinical
+                    </TabsTrigger>
+                    <TabsTrigger value="pre-clinical" variant="outline" className="px-8">
+                        <FlaskConical className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                        Pre-clinical
+                    </TabsTrigger>
+                    <TabsTrigger value="ip" variant="outline" className="px-8">
+                        <FileSignature className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                        IP repository
+                    </TabsTrigger>
+                    <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div>
+                                    <TabsTrigger value="epidemiology" variant="outline" className="px-8" disabled>
+                                        <ActivitySquare className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                                        Epidemiology
+                                    </TabsTrigger>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Coming soon</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div>
+                                    <TabsTrigger value="pipelines" variant="outline" className="px-8" disabled>
+                                        <Workflow className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                                        Pipelines
+                                    </TabsTrigger>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Coming soon</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div>
+                                    <TabsTrigger value="networks" variant="outline" className="px-8" disabled>
+                                        <Share2 className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                                        Networks
+                                    </TabsTrigger>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Coming soon</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </TabsList>
                 <TabsContent value="analytics" className="space-y-4 w-full">
                     {/*<CROMarketplaceProfileServicesTab croServices={cro.services}/>*/}
                 </TabsContent>
-                <TabsContent value="biosamples" className="space-y-4 w-full">
-                    <PharmaProjectBiosamplesTab/>
+                <TabsContent value="biorepository" className="space-y-4 w-full">
+                    <PharmaProjectBiorepositoryTab/>
                 </TabsContent>
             </Tabs>
         </div>
