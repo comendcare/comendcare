@@ -28,8 +28,7 @@ import { sleep } from "@/lib/utils"
 import MultipleSelector from "./ui/multiple-selector"
 import { optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
 
-const editMilestoneForm = z.object({
-    nodeType: z.string(),
+const editResearchPlanForm = z.object({
     title: z
         .string({
             required_error: "Please provide a title"
@@ -61,9 +60,9 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             setDetails
         } = useRoadmapStore(useShallow(selector))
 
-    const form = useForm<z.infer<typeof editMilestoneForm>>({
+    const form = useForm<z.infer<typeof editResearchPlanForm>>({
         mode: "onChange",
-        resolver: zodResolver(editMilestoneForm),
+        resolver: zodResolver(editResearchPlanForm),
         defaultValues: {
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
@@ -71,7 +70,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
         }
     })
 
-    const handleFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editResearchPlanForm>) => {
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
             return
@@ -212,10 +211,10 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                         </Dialog>
                     ) : (
                         <Button
-                            type="submit"
                             variant={"secondary"}
                             className="w-fit"
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.preventDefault()
                                 // reroute the user back to the research plans page
                                 router.push('/app/research-plan')
                             }}
@@ -225,14 +224,10 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                     )}
                     
                     <Button
-                        // disabled={!form.formState.isValid}
+                        disabled={!form.formState.isValid}
                         type="submit"
                         variant={"cta"}
                         className="w-fit"
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleFormSubmit(form.getValues())
-                        }}
                     >
                         {researchPlanData?.id ? `Save` : `Create Research Plan`}
                     </Button>
