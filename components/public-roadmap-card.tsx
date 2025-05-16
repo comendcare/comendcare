@@ -289,7 +289,7 @@ export const getStage = (milestones: Milestone[]): {value: string, label: string
     const relevantMilestoneTypes = milestones
         .filter(milestone => milestone.status === "INPROGRESS" && !milestone.private)
         .flatMap(milestone => milestone.types)
-        .map(type => type.milestoneTypeId)
+        .map(type => type?.milestoneTypeId)
 
     // if the research plan has no public milestones in progress we consider it in the 'planning' stage
     // if the research plan has ONLY data collection milestones we consider it in the 'data collection' stage
