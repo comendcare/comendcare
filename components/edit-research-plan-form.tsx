@@ -26,7 +26,7 @@ import { useShallow } from "zustand/react/shallow"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { sleep } from "@/lib/utils"
 import MultipleSelector from "./ui/multiple-selector"
-import { optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
+import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
 
 const editResearchPlanForm = z.object({
     title: z
@@ -150,7 +150,9 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={RESEARCH_PLAN_TYPES}
+                                    defaultOptions={
+                                        MODALITIES.map(option => ({...option, type: 'Modality'})).concat(ADDITIONAL_RESEARCH_PLAN_TYPES.map(option => ({...option, type: "Non-Modality"})))
+                                    }
                                     placeholder="Select a type..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
@@ -160,6 +162,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                     }
                                     maxSelected={1}
                                     showHoverCard={false}
+                                    groupBy="type"
                                 />
                             </FormControl>
                             <FormMessage />
