@@ -1450,3 +1450,11 @@ export async function getBiosampleData() {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function getPharmaProjectData(id: string) {
+    return prisma.project.findUnique({
+        where: {
+            id: id
+        },
+    })
+}

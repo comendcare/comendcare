@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {getBiosampleData} from "@/lib/fetchers";
 
 
-export default function PharmaProjectBiosamplesTab() {
+export default function PharmaProjectBiorepositoryTab() {
     const [biosamples, setBiosamples] = useState<any[]>([])
 
     useEffect(() => {
