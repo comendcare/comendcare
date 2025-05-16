@@ -1,8 +1,8 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React from "react"
-import {useForm} from "react-hook-form"
+import React, { useState } from "react"
+import {FormProvider, useForm} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -26,7 +26,8 @@ import { useShallow } from "zustand/react/shallow"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { sleep } from "@/lib/utils"
 import MultipleSelector from "./ui/multiple-selector"
-import { optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
+import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 const editResearchPlanForm = z.object({
     title: z
@@ -54,11 +55,12 @@ const selector = (state: RoadmapState) => ({
 export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchPlanData?: Partial<Roadmap>, closeDialog?: () => void}) {
     const router = useRouter()
     const {data: session} = useSession()
-        const { 
-            roadmapId,
-            details,
-            setDetails
-        } = useRoadmapStore(useShallow(selector))
+    const { 
+        roadmapId,
+        details,
+        setDetails
+    } = useRoadmapStore(useShallow(selector))
+    const [otherModality, setOtherModality] = useState<string>("");
 
     const form = useForm<z.infer<typeof editResearchPlanForm>>({
         mode: "onChange",
@@ -76,6 +78,13 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             return
         }
 
+        // Mixpanel tracking for "Other" fields
+        if (otherModality) {
+            mixpanelTrack("Research Plan has OTHER type", {
+                details: otherModality,
+            })
+        }
+
         if (researchPlanData?.id) {
             // if the research plan already exists, just update it
             await setDetails({
@@ -83,6 +92,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                 description: values.description || null,
                 modalities: (values.modalities || []).map(modality => modality.value)
             })
+
             if (closeDialog) closeDialog()
         } else {
             // if the research plan doesn't exist yet, create it
@@ -150,7 +160,9 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={RESEARCH_PLAN_TYPES}
+                                    defaultOptions={
+                                        MODALITIES.map(option => ({...option, type: 'Modality'})).concat(ADDITIONAL_RESEARCH_PLAN_TYPES.map(option => ({...option, type: "Non-Modality"})))
+                                    }
                                     placeholder="Select a type..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
@@ -160,9 +172,21 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                     }
                                     maxSelected={1}
                                     showHoverCard={false}
+                                    groupBy="type"
                                 />
                             </FormControl>
                             <FormMessage />
+                            {form.watch("modalities")?.some((item) => item.value === "OTHER") && (
+                                <FormItem>
+                                    <FormDescription>{`(Optional) Other details. This won't be displayed on your research plan, but will be used to improve the platform.`}</FormDescription>
+                                    <Input
+                                        type="text"
+                                        id="modalities-other"
+                                        value={otherModality}
+                                        onChange={(e) => setOtherModality(e.target.value)}
+                                    />
+                                </FormItem>
+                            )}
                         </FormItem>
                     )}
                 />
