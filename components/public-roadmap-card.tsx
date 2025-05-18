@@ -10,9 +10,9 @@ import Image from "next/image"
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
-import { ChevronsUpDown, Pencil, Plus } from "lucide-react";
+import { ChevronsUpDown, Pencil, Plus, Variable } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
+import { Milestone, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Organization } from "@prisma/client";
 import { PrivateNoResearchPlansColumn, PublicNoResearchPlans } from "./no-research-plans";
@@ -250,18 +250,72 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string
     )
 }
 
-export const getStage = (milestones: any[]): {value: string, label: string, variant: string} => {
-    if (milestones.length <= 2) return {value: 'IDEA', label: 'Idea Stage', variant: 'amber'}
-    if (milestones.length <= 4) return {value: 'EARLY_RESEARCH', label: 'Early Research', variant: 'lime'}
-    if (milestones.length <= 6) return {value: 'LAB_TESTING', label: 'Lab Testing', variant: 'emerald'}
-    if (milestones.length <= 8) return {value: 'TRIAL_READY', label: 'Trial Ready', variant: 'cyan'}
-    if (milestones.length <= 10) return {value: 'IN_TRIALS', label: 'In Trials', variant: 'indigo'}
-    if (milestones.length <= 12) return {value: 'POST_TRIAL', label: 'Post Trial', variant: 'purple'}
-    
-    return {value: 'UNKNOWN', label: 'Unknown Stage', variant: 'secondary'}
+const milestoneCategories = {
+    'PLANNING': {
+        option: {value: 'PLANNING', label: 'Planning', variant: 'amber'},
+        types: []
+    },
+    'DATA_COLLECTION': {
+        option: {value: 'DATA_COLLECTION', label: 'Patient Data Collection', variant: 'yellow'},
+        types: ['NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'OUTCOMEMEASURE']
+    },
+    'DISCOVERY': {
+        option: {value: 'DISCOVERY', label: 'Discovery', variant: 'lime'},
+        types: ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'BIOMARKER', 'TARGETVALIDATION', 'DRUGSCREEN']
+    },
+    'DISEASE_MODELS': {
+        option: {value: 'DISEASE_MODELS', label: 'Disease Models', variant: 'emerald'},
+        types: ['BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL']
+    },
+    'DESIGN_MANUFACTURING': {
+        option: {value: 'DESIGN_MANUFACTURING', label: 'Design & Manufacturing', variant: 'cyan'},
+        types: ['GENETHERAPYPRODUCTION', 'GPMANUFACTURING']
+    },
+    'PRECLINICAL': {
+        option: {value: 'PRECLINICA', label: 'Preclinical', variant: 'indigo'},
+        types: ['ASSAYDEVELOPMENT', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY']
+    },
+    'CLINICAL_TRIAL': {
+        option: {value: 'CLINICAL_TRIAL', label: 'Clinical Trial', variant: 'purple'},
+        types: ['SITESELECTION', 'PATIENTRECRUITMENT', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'PHASE4']
+    },
+    'REGULATORY': {
+        option: {value: 'REGULATORY', label: 'Regulatory', variant: 'pink'},
+        types: ['INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'FDAAPPROVAL']
+    },
 }
 
-export const StageOfActivityBadge = ({milestones}: {milestones: any[]}) => {
+export const getStage = (milestones: Milestone[]): {value: string, label: string, variant: string} => {
+    const relevantMilestoneTypes = milestones
+        .filter(milestone => milestone.status === "INPROGRESS" && !milestone.private)
+        .flatMap(milestone => milestone.types)
+        .map(type => type?.milestoneTypeId)
+
+    // if the research plan has no public milestones in progress we consider it in the 'planning' stage
+    // if the research plan has ONLY data collection milestones we consider it in the 'data collection' stage
+    const option = relevantMilestoneTypes
+        .filter(value => milestoneCategories['DATA_COLLECTION'].types.includes(value)).length > 0 
+            ? 'DATA_COLLECTION' 
+            : 'PLANNING'
+
+    // we've already handled Data Collection and Planning options, so filter them out of the types check
+    const categoryKeys = (Object.keys(milestoneCategories))
+        .filter(key => key !== 'DATA_COLLECTION' && key !== 'PLANNING')
+
+    // iterate from end of list to beginning - furthest along option with a relevant milestone type is returned
+    for (let i = categoryKeys.length - 1; i >= 0; i--) {
+        const key = (categoryKeys as (keyof (typeof milestoneCategories))[])[i]
+        const currentCategory = milestoneCategories[key]
+        
+        if (currentCategory.types.filter(type => relevantMilestoneTypes.includes(type)).length > 0) {
+            return currentCategory.option
+        }
+    }
+
+    return milestoneCategories[option].option
+}
+
+export const StageOfActivityBadge = ({milestones}: {milestones: Milestone[]}) => {
     const stage = getStage(milestones)
     return (
         <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
