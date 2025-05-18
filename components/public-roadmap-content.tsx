@@ -66,8 +66,6 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap}`}
                             organization={organization}
-                            embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${roadmap.id}`}
-                            embeddedProjectLink={milestone ? `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${roadmap.id}/project/${milestone}` : undefined}
                         />
                     ),
                 },
