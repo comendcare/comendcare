@@ -52,16 +52,22 @@ const data = {
             title: "BioRepo",
             url: "#",
             icon: DatabaseIcon,
+            comingSoon: true,
+            badge: "80K",
         },
         {
             title: "Tools",
             url: "#",
             icon: ListIcon,
+            comingSoon: true,
+            badge: "21K",
         },
         {
             title: "Patient Groups",
             url: "#",
             icon: UsersIcon,
+            comingSoon: true,
+            badge: "2.3K",
         },
     ],
     navSecondary: [
