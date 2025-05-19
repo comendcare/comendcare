@@ -25,12 +25,51 @@ import {
 } from "@/components/ui/dialog";
 import {formatNumberWithCommas} from "@/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {researchFormSchema} from "@/components/research-onboarding-form";
+import {optionSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {SidebarMenuButton} from "@/components/ui/sidebar"
 import {mixpanelTrack} from "@/app/mixpanel";
-import {Plus} from "lucide-react";
+import {Info, Plus} from "lucide-react";
+
+const newPharmaProjectSchema = z.object({
+    disorder: z.string()
+        .min(2, {
+            message: "The name of your condition needs to be longer than 2 characters",
+        })
+        .max(60, {
+            message: "The name of your condition needs to be shorter than 60 characters",
+        }),
+    summary: z.string()
+        // .min(30, {
+        //     message: "The summary of your condition needs to be longer than 30 characters",
+        // })
+        .max(500, {
+            message: "The name of your condition needs to be shorter than 500 characters",
+        })
+        .optional(),
+    categories: z.array(optionSchema).optional(),
+    prevalenceNumerator: z.string().min(1, {
+        message: "Your prevalence numerator must be at least 1",
+    }).optional(),
+    prevalenceDenominator: z.string().min(1, {
+        message: "Your prevalence denominator must be at least 1",
+    }).optional(),
+    engaged: z.string().min(1, {  // These need to be strings because
+        message: "The number of patients your organization has engaged with must be at least 1.",
+    }).optional(),
+    national: z.string().optional(),
+    global: z.string().optional(),
+    // mechanisms: z.array(optionSchema).min(0),
+    mechanisms: z.array(z.string()).optional(),
+    modalities: z.array(optionSchema).optional(),
+    biomarkers: z.array(optionSchema).optional(),
+    systems: z.array(optionSchema).optional(),
+    symptoms: z.array(optionSchema).optional(),
+    studies: z.array(optionSchema).optional(),
+    assets: z.array(optionSchema).optional(),
+})
+
 
 export default function CreatePharmaProjectDialog() {
     const {data: session} = useSession()
@@ -40,66 +79,14 @@ export default function CreatePharmaProjectDialog() {
     const [otherModality, setOtherModality] = useState<string>("");
     const [otherCategories, setOtherCategories] = useState<string>("");
     const [otherSystem, setOtherSystem] = useState<string>("");
-    const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
+    const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof newPharmaProjectSchema> | undefined>(undefined);
 
-    const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
+    const editResearchForm = useForm<z.infer<typeof newPharmaProjectSchema>>({
         mode: "onChange",
-        resolver: zodResolver(researchFormSchema),
+        resolver: zodResolver(newPharmaProjectSchema),
     })
 
-    useEffect(() => {
-        async function fetchResearchData() {
-            if (!session?.user?.organizationId) {
-                toast.error("You must be signed into an organization.");
-                return;
-            }
-
-            try {
-                // Fetch conditions for the given organization ID
-                const response = await getConditionsFromOrganizationId(session.user.organizationId);
-
-                if (response.success) {
-                    const conditions = response.data;
-
-                    if (conditions && conditions.length > 0) {
-                        const fetchedValues = conditions.map((condition) => ({
-                            disorder: condition.name || "",
-                            categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
-                            causal: condition.causalGenes.map((gene) => ({label: gene, value: gene})) || [],
-                            genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
-                            systems: condition.associatedSystems.map((system) => ({
-                                label: system,
-                                value: system
-                            })) || [],
-                            prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
-                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
-                            engaged: condition.numberOfPatientsEngaged?.toString() || "",
-                            national: condition.nationalEstimatedPopulation?.toString() || "",
-                            global: condition.globalEstimatedPopulation?.toString() || "",
-                        }));
-
-                        // Assuming you're working with one condition at a time (e.g., the first condition)
-                        const defaultValues = fetchedValues[0] || {};
-
-                        setDefaultResearchValues(defaultValues);
-                        editResearchForm.reset(defaultValues);
-                    } else {
-                        toast.error("No conditions found for this organization.");
-                    }
-                } else {
-                    console.error(response.error);
-                    toast.error(response.error);
-                }
-            } catch (error) {
-                console.error("Failed to fetch research data:", error);
-                toast.error("An error occurred while fetching research data.");
-            }
-        }
-
-        fetchResearchData();
-    }, [session?.user?.organizationId, editResearchForm]);
-
-    async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
+    async function onResearchFormSubmit(values: z.infer<typeof newPharmaProjectSchema>) {
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
@@ -121,8 +108,6 @@ export default function CreatePharmaProjectDialog() {
                 nationalEstimatedPopulation: values.national ? parseInt(values.national, 10) || null : null,
                 globalEstimatedPopulation: values.global ? parseInt(values.global, 10) || null : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
-                causalGenes: values.causal?.map((item) => item.label) || [],
-                associatedGenes: values.genes?.map((item) => item.label) || [],
                 associatedSystems: values.systems?.map((item) => item.label) || [],
                 associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
                 existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
@@ -239,48 +224,23 @@ export default function CreatePharmaProjectDialog() {
 
                             <FormField
                                 control={editResearchForm.control}
-                                name="causal"
+                                name="modalities"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Causal genes</FormLabel>
-                                        <FormDescription>
-                                            Select all that apply.
-                                        </FormDescription>
+                                        <FormLabel>
+                                            Modalities of interest
+                                        </FormLabel>
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
-                                                onSearch={handleAsyncSearch}
-                                                placeholder="Search for genes..."
+                                                defaultOptions={MODALITIES}
                                                 hidePlaceholderWhenSelected={true}
-                                                loadingIndicator={<p>Loading genes...</p>}
-                                                emptyIndicator={<p>No genes found.</p>}
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="genes"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated genes</FormLabel>
-                                        <FormDescription>
-                                            Select all that apply.
-                                        </FormDescription>
-                                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                onSearch={handleAsyncSearch}
-                                                placeholder="Search for genes..."
-                                                hidePlaceholderWhenSelected={true}
-                                                loadingIndicator={<p>Loading genes...</p>}
-                                                emptyIndicator={<p>No genes found.</p>}
-                                                showHoverCard={false}
+                                                placeholder="Select modalities..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
                                             />
                                         </FormControl>
                                         <FormMessage/>
@@ -362,109 +322,6 @@ export default function CreatePharmaProjectDialog() {
                                                 />
                                             </div>
                                         )}
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="prevalenceNumerator"
-                                render={({field: numeratorField}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
-                                        </FormLabel>
-                                        <FormDescription>
-                                            {`The estimated global prevalence ratio of your condition.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <div className="flex flex-row items-end justify-start space-x-2">
-                                                <Input
-                                                    type="number"
-                                                    id="prevalenceNumerator"
-                                                    {...numeratorField}
-                                                    className="w-16"
-                                                    min={0}
-                                                />
-                                                <span>in</span>
-                                                <FormField
-                                                    control={editResearchForm.control}
-                                                    name="prevalenceDenominator"
-                                                    render={({field: denominatorField}) => (
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                id="prevalenceDenominator"
-                                                                {...denominatorField}
-                                                                className="w-32"
-                                                                min={0}
-                                                            />
-                                                        </FormControl>
-                                                    )}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="engaged"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Number of patients engaged`}</FormLabel>
-                                        <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                id="engaged"
-                                                {...field}
-                                                min={0}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="national"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
-                                        {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                id="national"
-                                                {...field}
-                                                min={0}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={editResearchForm.control}
-                                name="global"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
-                                        {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                id="global"
-                                                {...field}
-                                                min={0}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
