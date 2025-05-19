@@ -11,7 +11,7 @@ export default function PharmaDashboardPage() {
             <div className="px-4 lg:px-6">
                 <PharmaChartAreaInteractive/>
             </div>
-            <PharmaDataTable data={data}/>
+            {/*<PharmaDataTable data={data}/>*/}
         </>
     )
 }
