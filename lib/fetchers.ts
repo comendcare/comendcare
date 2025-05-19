@@ -1456,3 +1456,24 @@ export async function getPharmaProjectData(id: string) {
         },
     })
 }
+
+export async function getAllOrganizationsWithConditions() {
+    try {
+        const organizations = await prisma.organization.findMany({
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                condition: true,
+            },
+        })
+
+        return {
+            success: true,
+            data: organizations
+        };
+    } catch (error: any) {
+        logError("Error fetching organizations", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
