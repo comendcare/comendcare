@@ -12,7 +12,7 @@ import {Condition} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
+import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -1481,6 +1481,24 @@ export async function getPreclinicalData() {
         };
     } catch (error: any) {
         logError("Error fetching pre-clinical data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getIPData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/ip.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(IPSchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching ip data", error);
         return {success: false, error: "Internal server error"};
     }
 }
