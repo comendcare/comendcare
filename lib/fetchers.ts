@@ -9,6 +9,10 @@ import {getProfileCompletionChecks, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition} from "@prisma/client";
+import {promises as fs} from "fs";
+import path from "path";
+import {z} from "zod";
+import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -1409,4 +1413,121 @@ export async function getOverviewAnalytics() {
         totalCompanies,
         totalProjects,
     };
+}
+
+export async function getPharmaProjects() {
+    try {
+        const projects = await prisma.pharmaProject.findMany({
+            orderBy: { createdAt: "desc" },
+        })
+
+        return {
+            success: true,
+            data: projects
+        };
+    } catch (error: any) {
+        logError("Error fetching pharma projects", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getBiosampleData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/biosamples.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(biosampleSchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching biosamples", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getClinicalData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/clinical.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(clinicalStudySchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching clinical data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getPreclinicalData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/pre-clinical.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(preclinicalStudySchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching pre-clinical data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getIPData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/ip.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(IPSchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching ip data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getPharmaProjectData(id: string) {
+    return prisma.pharmaProject.findUnique({
+        where: {
+            id: id
+        },
+    })
+}
+
+export async function getAllOrganizationsWithConditions() {
+    try {
+        const organizations = await prisma.organization.findMany({
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                condition: true,
+            },
+        })
+
+        return {
+            success: true,
+            data: organizations
+        };
+    } catch (error: any) {
+        logError("Error fetching organizations", error);
+        return {success: false, error: "Internal server error"};
+    }
 }
