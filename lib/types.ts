@@ -14,7 +14,7 @@ import {
     ReviewFeedback, Service,
     Milestone as DBMilestone,
     Asset as DBAsset,
-    RFP as DBRFP
+    RFP as DBRFP, ConditionToOrganization
 } from "@prisma/client";
 import { z } from "zod";
 
@@ -183,6 +183,12 @@ export interface CompanyWithReviewsAndServices extends Company {
 
 export type MembershipWithOrganization = Member & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
+};
+
+export type OrganizationsWithConditions = Organization & {
+    condition?: (ConditionToOrganization & {
+        condition?: Condition | null;
+    })[] | null;
 };
 
 export interface ReviewWithAuthor extends Review {
