@@ -32,6 +32,7 @@ import {
 import PharmaProjectAnalyticsTab from "@/components/pharma-project-analytics-tab";
 import PharmaProjectClinicalTab from "@/components/pharma-project-clinical-tab";
 import PharmaProjectPreclinicalTab from "@/components/pharma-project-preclinical-tab";
+import PharmaProjectIPTab from "@/components/pharma-project-ip-tab";
 
 
 export default function PharmaProjectPage() {
@@ -136,7 +137,7 @@ export default function PharmaProjectPage() {
                             <TooltipTrigger asChild>
                                 <div>
                                     <TabsTrigger value="epidemiology" variant="outline" className="px-4" disabled>
-                                        <ActivitySquare className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                                        <ActivitySquare className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                         Epidemiology
                                     </TabsTrigger>
                                 </div>
@@ -152,7 +153,7 @@ export default function PharmaProjectPage() {
                             <TooltipTrigger asChild>
                                 <div>
                                     <TabsTrigger value="pipelines" variant="outline" className="px-4" disabled>
-                                        <Workflow className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                                        <Workflow className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                         Pipelines
                                     </TabsTrigger>
                                 </div>
@@ -168,7 +169,7 @@ export default function PharmaProjectPage() {
                             <TooltipTrigger asChild>
                                 <div>
                                     <TabsTrigger value="networks" variant="outline" className="px-4" disabled>
-                                        <Share2 className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                                        <Share2 className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                         Networks
                                     </TabsTrigger>
                                 </div>
@@ -192,9 +193,9 @@ export default function PharmaProjectPage() {
                     <PharmaProjectPreclinicalTab/>
                 </TabsContent>
                 <TabsContent value="ip" className="space-y-4 w-full">
-                    <PharmaProjectBiorepositoryTab/>
+                    <PharmaProjectIPTab/>
                 </TabsContent>
             </Tabs>
         </div>
-    )
+    );
 }

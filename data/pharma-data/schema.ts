@@ -46,6 +46,25 @@ export const clinicalStudySchema = z.object({
   doi: z.union([z.string().url(), z.null()]),
 })
 
+export const IPSchema = z.object({
+  id: z.string(), // e.g., "APP-1000"
+  title: z.string(), // e.g., "Biomarker Assay for Rett Syndrome"
+  type: z.enum([
+    "delivery system",
+    "therapeutic target",
+    "payload",
+    "diagnostic assay",
+    "biomarker assay",
+    "algorithms",
+    "manufacturing methods",
+    "gene editing technology",
+  ]),
+  disease: z.string(), // disease name from the provided list
+  publications: z.string().url(), // DOI-like or publication URL
+  status: z.enum(["filed", "granted"]),
+  applicationDate: z.string(), // e.g., "2023-07-12"
+})
+
 export const preclinicalStudySchema = z.object({
   id: z.string(),
   type: z.string(),
