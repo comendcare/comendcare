@@ -840,7 +840,7 @@ model Whitelist {
   createdAt DateTime @default(now())
 }
 
-model Project {
+model PharmaProject {
   id        String   @id @default(uuid())
   name      String?
   createdAt DateTime @default(now())
