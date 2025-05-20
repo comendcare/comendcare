@@ -30,6 +30,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import PharmaProjectAnalyticsTab from "@/components/pharma-project-analytics-tab";
+import PharmaProjectClinicalTab from "@/components/pharma-project-clinical-tab";
+import PharmaProjectPreclinicalTab from "@/components/pharma-project-preclinical-tab";
 
 
 export default function PharmaProjectPage() {
@@ -181,6 +183,15 @@ export default function PharmaProjectPage() {
                     <PharmaProjectAnalyticsTab/>
                 </TabsContent>
                 <TabsContent value="biorepository" className="space-y-4 w-full">
+                    <PharmaProjectBiorepositoryTab/>
+                </TabsContent>
+                <TabsContent value="clinical" className="space-y-4 w-full">
+                    <PharmaProjectClinicalTab/>
+                </TabsContent>
+                <TabsContent value="pre-clinical" className="space-y-4 w-full">
+                    <PharmaProjectPreclinicalTab/>
+                </TabsContent>
+                <TabsContent value="ip" className="space-y-4 w-full">
                     <PharmaProjectBiorepositoryTab/>
                 </TabsContent>
             </Tabs>
