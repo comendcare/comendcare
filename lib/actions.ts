@@ -908,7 +908,8 @@ export const updateRoadmap = async (data: Partial<Roadmap>) => {
                 title: data.title,
                 description: data.description,
                 content: data.content,
-                modalities: data.modalities
+                modalities: data.modalities,
+                otherModalities: data.otherModalities
             }
         })
 

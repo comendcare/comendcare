@@ -82,7 +82,8 @@ export const useRoadmapStore = create<RoadmapState>()(
                 id,
                 title: details.title,
                 description: details.description || null,
-                modalities: details.modalities || []
+                modalities: details.modalities || [],
+                otherModalities: details.otherModalities || null
             })
 
             if (roadmap) set({ details: roadmap as Roadmap })
