@@ -22,6 +22,7 @@ import ContactSection from "@/components/layout/sections/contact";
 import FeatureResearchMarketplace from "@/components/layout/sections/feature-research-marketplace";
 import FeaturePublicPages from "@/components/layout/sections/feature-public-pages";
 import FeatureResearchPlan from "@/components/layout/sections/feature-research-plan";
+import {News} from "@/components/layout/sections/news";
 
 export default function App() {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
@@ -51,6 +52,7 @@ export default function App() {
             <FeatureResearchPlan />
             <FeatureResearchMarketplace  />
             <FeaturePublicPages />
+            <News />
             {/*<TabsFeaturesSection />*/}
             {/*<MoreFeaturesSection />*/}
             {/*<WhoSection/>*/}

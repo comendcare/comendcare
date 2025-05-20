@@ -166,7 +166,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                                 </div>
                             </TooltipTrigger>
                             {milestone.private && (
-                                <TooltipContent>
+                                <TooltipContent side={"left"}>
                                     <p>This project is private. Make it public to share.</p>
                                 </TooltipContent>
                             )}
