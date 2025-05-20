@@ -61,7 +61,7 @@ export const MemberDeletedEmail = ({
                             {`You've been removed from `} <strong>{organizationName}</strong> on{" "}
                             <strong>Comend</strong>. If you believe this was a mistake, please contact the owners of your organization.
                         </Text>
-                        <Section>
+                        {/* <Section>
                             <Row>
                                 <Column align="right">
                                     {organizationImage &&
@@ -90,7 +90,7 @@ export const MemberDeletedEmail = ({
                                     />
                                 </Column>
                             </Row>
-                        </Section>
+                        </Section> */}
                         <Section className="text-center mt-[32px] mb-[32px]">
                             <Button
                                 className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
