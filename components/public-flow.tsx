@@ -72,10 +72,10 @@ export const PublicFlowView = ({
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.1}
     >
-        {/* <MiniMap
-            nodeColor='#757575'
-            maskColor='rgb(200, 200, 200, 0.8)' 
-        /> */}
+    <MiniMap
+        nodeColor='#757575'
+        maskColor='rgb(200, 200, 200, 0.8)' 
+    />
     </ReactFlow>
     )
 }
