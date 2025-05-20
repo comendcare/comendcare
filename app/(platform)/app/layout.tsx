@@ -290,12 +290,12 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     <Wand2 aria-hidden={true} />
                                     Take a tour
                                 </Button>
-                                <Link type={'button'} href={'/app/guides'}>
+                                {/* <Link type={'button'} href={'/app/guides'}>
                                     <Button variant={'ghost'}>
                                         <BookOpen />
                                         Guides
                                     </Button>
-                                </Link>
+                                </Link> */}
                                 <FeedbackSheet />
                                 <Button
                                     variant="ghost"
