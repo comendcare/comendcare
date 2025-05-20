@@ -31,4 +31,35 @@ export const biosampleSchema = z.object({
   area: z.union([z.string(), z.number(), z.null()]),
 })
 
+export const clinicalStudySchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  title: z.string(),
+  institution: z.string(),
+  principalInvestigator: z.string(),
+  country: z.string(),
+  numberOfPatients: z.number(),
+  startDate: z.string(), // or z.coerce.date() if parsing to Date
+  endDate: z.string(),   // same as above
+  summary: z.string(),
+  published: z.boolean(),
+  doi: z.union([z.string().url(), z.null()]),
+})
+
+export const preclinicalStudySchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  title: z.string(),
+  institution: z.string(),
+  principalInvestigator: z.string(),
+  country: z.string(),
+  numberOfPatients: z.number(),
+  startDate: z.string(), // or z.coerce.date() if parsing to Date
+  endDate: z.union([z.string(), z.null()]), // since some may not have end dates
+  summary: z.string(),
+  published: z.boolean(),
+  doi: z.union([z.string().url(), z.null()]),
+  status: z.enum(["planning", "fundraising", "in-progress", "completed"]),
+})
+
 export type Biosample = z.infer<typeof biosampleSchema>

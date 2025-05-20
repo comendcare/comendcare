@@ -12,7 +12,7 @@ import {Condition} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {biosampleSchema, taskSchema} from "@/data/pharma-data/schema";
+import {biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -1445,6 +1445,42 @@ export async function getBiosampleData() {
         };
     } catch (error: any) {
         logError("Error fetching biosamples", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getClinicalData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/clinical.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(clinicalStudySchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching clinical data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getPreclinicalData() {
+    try {
+        const data = await fs.readFile(
+            path.join(process.cwd(), "data/pharma-data/pre-clinical.json")
+        )
+
+        const tasks = JSON.parse(data.toString())
+
+        return {
+            success: true,
+            data: z.array(preclinicalStudySchema).parse(tasks)
+        };
+    } catch (error: any) {
+        logError("Error fetching pre-clinical data", error);
         return {success: false, error: "Internal server error"};
     }
 }
