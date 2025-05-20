@@ -209,3 +209,39 @@ It comes with a lot of features out of the box, but the only special things to n
    - You can test if the syncing is working by opening prisma studio and triggering a change (create, update, or delete)
 
 > Just for emphasis; Prisma Pulse DOES NOT WORK WITH LOCALLY HOSTED DATABASES. This means you cannot connect to a database hosted locally, and you cannot stream events triggered to your local database.
+
+# Notion Integration (Guides & News)
+
+Our integration with Notion (used in the Guides & News pages) is a combination of two APIs:
+1. [The Official Notion API](https://developers.notion.com/reference/intro) - this is used for listing articles in a database and grabbing the properties of an article
+2. [React Notion X](https://github.com/NotionX/react-notion-x) - (this is an unofficial API that has been reverse engineered) this is used for rendering page content
+
+## Page Setup in Notion
+
+All the relevant databases are on the [Comend Content Pages](https://www.notion.so/comend/Comend-Content-Pages-1f3801a6fddc80b99eb8d21a6cab1ed5) page in our Comend project on Notion.
+
+The article pages are grouped into a dedicated database. For example:
+- [Guides Articles](https://www.notion.so/comend/1f3801a6fddc8010b610f8175f5cccf9?v=1f3801a6fddc8088948c000ce3c9df04)
+- [New Articles](https://www.notion.so/comend/1f7801a6fddc805297d9d10211608c11?v=1f7801a6fddc8163a80b000c8e457978)
+
+In each of these Notion databases is a list of articles that can be rendered in the app. To create a new article:
+1. Add a page to the database
+2. Add any properties it may require (e.g. title, author, description, etc.)
+3. Add the content of your article to the new notion page (this content will be rendered in the page almost exactly as it appears in Notion. You can include any header styling or images you like.)
+4. Once you've finished drafting your article make sure you publish the page and set the status to `Ready to Deploy (in preview)` or `Published (in production)` if you want it to appear in preview or production, respectively.
+   - Status: Status tells us if we should be showing this pages in preview or production (primarily used by our integration with the Official Notion API)
+   - Published vs. Unpublished page: published Notion pages allow our React Notion X integration to access the page content
+
+> **Important Note!** Both the parent database AND the page must be PUBLISHED in Notion for React Notion X to have access to the page information. If they are not published, React Notion X will not load the page content.
+
+## Rendering Pages In-App
+
+See the [/app/(platform)/app/guides](https://github.com/comendcare/comendcare/tree/development/app/(platform)/app/guides) directory for an example of how to setup and render notion pages in app.
+
+Some Notes:
+- In `.../guides/layout.tsx` we us the Official Notion API to fetch the pages in the database & render them
+- In `.../guides/[id]/layout.tsx` we use the Official Notion API to fetch the properties of a specific page (title, author, publish date, description), and render a header component.
+- In `.../guides/[id]/page.tsx` we use the React Notion X integration to fetch the page contents of a specific page, and render it via the `NotionPage` component.
+
+   > **Note** The default React Notion X `getPage()` function hangs when pulling content, so we're fetching the data directly
+
