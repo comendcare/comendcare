@@ -73,22 +73,31 @@ export const MemberRequestApprovedEmail = ({
                                             height="64"
                                         />
                                     ) : (
-                                        <div
+                                        // flexbox and grid styling doesn't work reliably in emails
+                                        // instead use a table
+                                        <table
                                             style={{
-                                                width: "64px",
                                                 height: "64px",
+                                                width: "64px",
                                                 borderRadius: "9999px",
-                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                fontSize: "24px",
-                                                fontWeight: "bold",
-                                                color: "#374151", // Tailwind gray-700
+                                                backgroundColor: "#e5e7eb",
                                             }}
                                         >
-                                            {userName?.[0] ?? "?"}
-                                        </div>
+                                            <tr>
+                                                <td
+                                                align="center"
+                                                valign="middle"
+                                                style={{
+                                                    fontSize: "24px",
+                                                    fontWeight: "bold",
+                                                    color: "#374151",
+                                                    borderRadius: "9999px",
+                                                }}
+                                                >
+                                                {userName?.[0] ?? "?"}
+                                                </td>
+                                            </tr>
+                                        </table>
                                     )}
                                 </Column>
                                 <Column align="center">
@@ -108,22 +117,31 @@ export const MemberRequestApprovedEmail = ({
                                             height="64"
                                         />
                                     ) : (
-                                        <div
+                                        // flexbox and grid styling doesn't work reliably in emails
+                                        // instead use a table
+                                        <table
                                             style={{
-                                                width: "64px",
                                                 height: "64px",
+                                                width: "64px",
                                                 borderRadius: "9999px",
-                                                backgroundColor: "#e5e7eb", // Tailwind gray-200
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                fontSize: "24px",
-                                                fontWeight: "bold",
-                                                color: "#374151", // Tailwind gray-700
+                                                backgroundColor: "#e5e7eb",
                                             }}
                                         >
-                                            {organizationName?.[0] ?? "?"}
-                                        </div>
+                                            <tr>
+                                                <td
+                                                align="center"
+                                                valign="middle"
+                                                style={{
+                                                    fontSize: "24px",
+                                                    fontWeight: "bold",
+                                                    color: "#374151",
+                                                    borderRadius: "9999px",
+                                                }}
+                                                >
+                                                {organizationName?.[0] ?? "?"}
+                                                </td>
+                                            </tr>
+                                        </table>
                                     )}
                                 </Column>
                             </Row>
