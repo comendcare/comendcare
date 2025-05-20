@@ -23,14 +23,15 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sid
 import {AppSidebar} from "@/components/app-sidebar";
 import { FeedbackSheet } from "@/components/feedback";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { cn, sleep } from "@/lib/utils";
-import { Wand2 } from "lucide-react";
+import { BookOpen, Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
+import Link from "next/link";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -289,6 +290,12 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     <Wand2 aria-hidden={true} />
                                     Take a tour
                                 </Button>
+                                {/* <Link type={'button'} href={'/app/guides'}>
+                                    <Button variant={'ghost'}>
+                                        <BookOpen />
+                                        Guides
+                                    </Button>
+                                </Link> */}
                                 <FeedbackSheet />
                                 <Button
                                     variant="ghost"
