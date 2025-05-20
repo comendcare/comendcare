@@ -1417,7 +1417,7 @@ export async function getOverviewAnalytics() {
 
 export async function getPharmaProjects() {
     try {
-        const projects = await prisma.project.findMany({
+        const projects = await prisma.pharmaProject.findMany({
             orderBy: { createdAt: "desc" },
         })
 
@@ -1504,7 +1504,7 @@ export async function getIPData() {
 }
 
 export async function getPharmaProjectData(id: string) {
-    return prisma.project.findUnique({
+    return prisma.pharmaProject.findUnique({
         where: {
             id: id
         },
