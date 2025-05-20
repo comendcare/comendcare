@@ -68,7 +68,7 @@ export const MemberRequestDeniedEmail = ({
                                     {userImage ? (
                                         <Img
                                             className="rounded-full"
-                                            src={userImage}
+                                            src={encodeURI(userImage)}
                                             width="64"
                                             height="64"
                                         />
@@ -112,7 +112,7 @@ export const MemberRequestDeniedEmail = ({
                                     {organizationImage ? (
                                         <Img
                                             className="rounded-full"
-                                            src={organizationImage}
+                                            src={encodeURI(organizationImage)}
                                             width="64"
                                             height="64"
                                         />
