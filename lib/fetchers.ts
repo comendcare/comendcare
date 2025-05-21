@@ -1518,7 +1518,11 @@ export async function getAllOrganizationsWithConditions() {
                 createdAt: "desc",
             },
             include: {
-                condition: true,
+                condition: {
+                    include: {
+                        condition: true
+                    }
+                },
             },
         })
 
