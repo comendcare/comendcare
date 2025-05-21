@@ -3630,6 +3630,7 @@ export const createCompany = async (formData: FormData) => {
     const title = formData.get("orgName") as string
     const description = formData.get("description") as string
     const yearEstablished = parseInt(formData.get("founded") as string)
+    const headquarters = formData.get("headquarters") as string
     const companyType = formData.get("type") as string
     const url = formData.get("website") as string
     const servicesRaw = formData.get("services") as string
@@ -3651,6 +3652,7 @@ export const createCompany = async (formData: FormData) => {
                 description,
                 yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
                 companyType,
+                headquarters,
                 url,
                 services: parsedServices.length
                     ? {
