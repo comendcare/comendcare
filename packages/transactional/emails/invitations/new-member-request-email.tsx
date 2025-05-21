@@ -21,8 +21,6 @@ interface NewMemberRequestEmailProps {
     requestedByUserName?: string | null
     requestedByUserImage?: string | null
     requestedByUserEmail?: string | null
-    adminName?: string | null
-    adminEmail?: string | null
     organizationName?: string;
     organizationImage?: string;
 }
@@ -33,13 +31,11 @@ const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 
 export const NewMemberRequestEmail = ({
-                                          requestedByUserName,
-                                          requestedByUserImage,
-                                          requestedByUserEmail,
-                                          adminName,
-                                          adminEmail,
-                                          organizationName,
-                                          organizationImage,
+                                        requestedByUserName,
+                                        requestedByUserImage,
+                                        requestedByUserEmail,
+                                        organizationName,
+                                        organizationImage,
                                       }: NewMemberRequestEmailProps) => {
     const previewText = `${requestedByUserName} is requesting to join ${organizationName}`;
 
@@ -61,7 +57,7 @@ export const NewMemberRequestEmail = ({
                             <strong>{requestedByUserName}</strong> is requesting to join <strong>{organizationName}</strong>
                         </Heading>
                         <Text className="text-black text-[14px] leading-[24px]">
-                            Hello {adminName},
+                            Hello,
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px]">
                             <strong>{requestedByUserName}</strong> (
@@ -173,14 +169,14 @@ export const NewMemberRequestEmail = ({
     );
 };
 
-NewMemberRequestEmail.PreviewProps = {
-    requestedByUserName: "Not Flawnson",
-    userImage: ``,
-    requestedByUserEmail: "flawnsontong1@gmail.com",
-    adminName: "Flawnson",
-    adminEmail: "flawnson@comendcare.com",
-    organizationName: "Test org",
-    organizationImage: ``,
-} as NewMemberRequestEmailProps;
+// NewMemberRequestEmail.PreviewProps = {
+//     requestedByUserName: "Not Flawnson",
+//     userImage: ``,
+//     requestedByUserEmail: "flawnsontong1@gmail.com",
+//     adminName: "Flawnson",
+//     adminEmail: "flawnson@comendcare.com",
+//     organizationName: "Test org",
+//     organizationImage: ``,
+// } as NewMemberRequestEmailProps;
 
-export default NewMemberRequestEmail;
+// export default NewMemberRequestEmail;
