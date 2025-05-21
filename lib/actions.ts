@@ -110,7 +110,11 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
                 id: organizationId
             },
             include: {
-                user: true
+                user: true,
+                members: {
+                    where: {role: 'owner'},
+                    include: {user: true}
+                }
             }
         })
 
@@ -122,12 +126,12 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
                         email: session.user.email,
                         image: ""
                     },
-                    admin: {
-                        name: organization.user?.name,
-                        email: organization.user?.email,
-                        organizationName: organization.name || "",
-                        organizationImage: organization.image || "",
-                    },
+                    owners: organization.members.map(member => ({
+                        name: member.user?.name,
+                        email: member.user?.email,
+                    })),
+                    organizationName: organization.name || "",
+                    organizationImage: organization.image || "",
                 }
             ).then(() => {
                 console.log("email sent")
