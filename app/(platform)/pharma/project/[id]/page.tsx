@@ -122,7 +122,7 @@ export default function PharmaProjectPage() {
                     </TabsTrigger>
                     <TabsTrigger value="clinical" variant="outline" className="px-4">
                         <Stethoscope className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                        Clinical
+                        Patient data
                     </TabsTrigger>
                     <TabsTrigger value="pre-clinical" variant="outline" className="px-4">
                         <FlaskConical className="mr-1.5 h-4 w-4 flex-shrink-0"/>
