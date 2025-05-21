@@ -1,4 +1,4 @@
-import {TrendingDownIcon, TrendingUpIcon} from "lucide-react"
+import {TrendingUpIcon} from "lucide-react"
 
 import {Badge} from "@/components/ui/badge"
 import {
@@ -30,7 +30,7 @@ export function PharmaDashboardSectionCards() {
                         6 more added this month <TrendingUpIcon className="size-4"/>
                     </div>
                     <div className="text-muted-foreground">
-                        12 active this past week
+                        1,127 active this past week
                     </div>
                 </CardFooter>
             </Card>
@@ -42,7 +42,7 @@ export function PharmaDashboardSectionCards() {
                     </CardTitle>
                     <div className="absolute right-4 top-4">
                         <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-                            <TrendingDownIcon className="size-3"/>
+                            <TrendingUpIcon className="size-3"/>
                             +0.04%
                         </Badge>
                     </div>
@@ -52,7 +52,7 @@ export function PharmaDashboardSectionCards() {
                         3 added this month <TrendingUpIcon className="size-4"/>
                     </div>
                     <div className="text-muted-foreground">
-                        1 more patient group associated with conditions this week
+                        167 more patient group associated with conditions this week
                     </div>
                 </CardFooter>
             </Card>
@@ -80,7 +80,7 @@ export function PharmaDashboardSectionCards() {
                 <CardHeader className="relative">
                     <CardDescription>Total patient group projects</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        546
+                        11,952
                     </CardTitle>
                     <div className="absolute right-4 top-4">
                         <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
@@ -113,7 +113,7 @@ export function PharmaDashboardSectionCards() {
                     <div className="line-clamp-1 flex gap-2 font-medium">
                         24 added this month <TrendingUpIcon className="size-4"/>
                     </div>
-                    <div className="text-muted-foreground">67 updated this week</div>
+                    <div className="text-muted-foreground">67 new service provider projects started</div>
                 </CardFooter>
             </Card>
             <Card className="@container/card">
@@ -133,7 +133,7 @@ export function PharmaDashboardSectionCards() {
                     <div className="line-clamp-1 flex gap-2 font-medium">
                         83 added this month <TrendingUpIcon className="size-4"/>
                     </div>
-                    <div className="text-muted-foreground">137 updated this week</div>
+                    <div className="text-muted-foreground">137 new researcher projects started</div>
                 </CardFooter>
             </Card>
         </div>
