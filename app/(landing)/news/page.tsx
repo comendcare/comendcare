@@ -12,11 +12,17 @@ export default async function NewsPage() {
     const newsDBKey = '1f7801a6fddc805297d9d10211608c11'
     const {pages} = await getNotionDatabaseAndContents(newsDBKey)
 
-    console.log(`pages`, pages)
-    console.log(`page cover`, pages.map((page: any) => page.cover))
-
     const filteredPages: Blog[] = pages
         .map((page: any) => {
+            // depending on the page Status, show or hide it
+            if (process.env.NEXT_PUBLIC_NODE_ENV === 'production' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)')) {
+                return null
+            }
+
+            if (process.env.NEXT_PUBLIC_NODE_ENV === 'preview' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
+                return null
+            }
+
             const title = page?.properties?.["Name"]?.title?.map((text: any) => text?.plain_text)?.join(" ")
             const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")
             const slug = `/news/${page.id}`
@@ -30,8 +36,6 @@ export default async function NewsPage() {
         })
         .filter((page) => page !== null)
         .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-
-    console.log(`filtered pages`, filteredPages)
 
     return (
         <div
