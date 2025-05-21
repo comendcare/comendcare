@@ -39,7 +39,7 @@ export default async function FAQLayout({
                     <h1 className="col-span-full text-2xl md:text-3xl font-semibold min-w-fit text-nowrap">Comend Guides</h1>
                     {filteredSections.map((option, index) => (
                         <div key={index}>
-                            <Accordion type="single" collapsible className="w-full" defaultValue={option.name}>
+                            <Accordion type="single" collapsible className="w-[300px] max-w-[300px]" defaultValue={option.name}>
                                 <AccordionItem value={option.name}>
                                     <AccordionTrigger className="p-2 flex flex-row text-left">
                                         {option.name}
