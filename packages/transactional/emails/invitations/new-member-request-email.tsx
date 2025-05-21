@@ -80,7 +80,7 @@ export const NewMemberRequestEmail = ({
                                     {requestedByUserImage ? (
                                         <Img
                                             className="rounded-full"
-                                            src={requestedByUserImage}
+                                            src={encodeURI(requestedByUserImage)}
                                             width="64"
                                             height="64"
                                         />
@@ -124,7 +124,7 @@ export const NewMemberRequestEmail = ({
                                     {organizationImage ? (
                                         <Img
                                             className="rounded-full"
-                                            src={organizationImage}
+                                            src={encodeURI(organizationImage)}
                                             width="64"
                                             height="64"
                                         />
