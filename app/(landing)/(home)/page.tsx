@@ -52,7 +52,7 @@ export default function App() {
             <FeatureResearchPlan />
             <FeatureResearchMarketplace  />
             <FeaturePublicPages />
-            {process.env.NEXT_PUBLIC_NODE_ENV !== 'production' && <News />}
+            <News />
             {/*<TabsFeaturesSection />*/}
             {/*<MoreFeaturesSection />*/}
             {/*<WhoSection/>*/}

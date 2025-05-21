@@ -36,7 +36,7 @@ export async function News() {
     if (filteredPages.length === 0) return null
 
     return (
-        <div className="relative overflow-hidden py-20 md:py-0">
+        <div id="news" className="relative overflow-hidden py-20 md:py-0">
             <div className="py-4 md:py-10 overflow-hidden relative px-4 md:px-8">
                 <div className="relative z-20 py-10 mx-auto w-full text-center">
                     <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
