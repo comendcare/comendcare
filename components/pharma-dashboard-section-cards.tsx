@@ -58,7 +58,7 @@ export function PharmaDashboardSectionCards() {
             </Card>
             <Card className="@container/card">
                 <CardHeader className="relative">
-                    <CardDescription>Total biospecimans</CardDescription>
+                    <CardDescription>Total biospecimens</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
                         79,614
                     </CardTitle>

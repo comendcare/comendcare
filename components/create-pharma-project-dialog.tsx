@@ -5,7 +5,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
-import {updateCondition} from "@/lib/actions";
+import {createPharmaProject, updateCondition} from "@/lib/actions";
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
@@ -86,7 +86,7 @@ export default function CreatePharmaProjectDialog() {
         resolver: zodResolver(newPharmaProjectSchema),
     })
 
-    async function onResearchFormSubmit(values: z.infer<typeof newPharmaProjectSchema>) {
+    async function onCreatePharmProjectSubmit(values: z.infer<typeof newPharmaProjectSchema>) {
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
@@ -101,17 +101,6 @@ export default function CreatePharmaProjectDialog() {
             // Map the form values to match the Condition schema
             const mappedData: Record<string, any> = {
                 name: values.disorder || "",
-                diseaseCategories: values.categories?.map((item) => item.label) || [],
-                prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
-                prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
-                numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
-                nationalEstimatedPopulation: values.national ? parseInt(values.national, 10) || null : null,
-                globalEstimatedPopulation: values.global ? parseInt(values.global, 10) || null : null,
-                relevantDiseaseMechanisms: values.mechanisms || [],
-                associatedSystems: values.systems?.map((item) => item.label) || [],
-                associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
-                existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
-                assetsUnderDevelopment: values.assets?.map((item) => item.label) || [],
             };
 
             // Add mapped data to FormData
@@ -126,19 +115,19 @@ export default function CreatePharmaProjectDialog() {
             });
 
             // Call the `updateCondition` function
-            const response = await updateCondition(formData, session.user.organizationId);
+            const response = await createPharmaProject(formData);
 
             if (response.success) {
-                toast.success("Condition updated successfully!");
+                toast.success("Pharma project created successfully!");
 
                 setOpen(false)
                 router.refresh(); // Refresh the page to reflect changes
             } else {
                 console.error(response.error);
-                toast.error(response.error || "Failed to update condition.");
+                toast.error(response.error || "Failed to create pharma project.");
             }
         } catch (error) {
-            console.error("Unexpected error updating condition:", error);
+            console.error("Unexpected error creating pharma project:", error);
             toast.error("An unexpected error occurred.");
         } finally {
             setLoading(false); // Hide loading state
@@ -193,7 +182,7 @@ export default function CreatePharmaProjectDialog() {
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...editResearchForm}>
-                        <form onSubmit={editResearchForm.handleSubmit(onResearchFormSubmit)}
+                        <form onSubmit={editResearchForm.handleSubmit(onCreatePharmProjectSubmit)}
                               className="space-y-8">
 
                             <FormField
