@@ -3752,7 +3752,7 @@ export async function deletePharmaProject(pharmaProjectId: string | undefined) {
             return {success: false, error: "Database error. please try again later."}
         }
 
-        revalidatePath("/(platform)/pharma/project/[id]")
+        revalidatePath("/(platform)/pharma")
 
         return {success: true, data: response}
     } catch (error: any) {

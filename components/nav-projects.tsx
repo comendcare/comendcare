@@ -24,7 +24,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import CreatePharmaProjectDialog from "@/components/create-pharma-project-dialog";
-import { usePathname } from "next/navigation"
+import {usePathname, useRouter} from "next/navigation"
 import {deletePharmaProject, removeEmailFromWhitelist} from "@/lib/actions";
 import {toast} from "sonner";
 
@@ -37,6 +37,7 @@ export function NavProjects({
         icon: LucideIcon
     }[]
 }) {
+    const router = useRouter()
     const { isMobile } = useSidebar()
     const pathname = usePathname()
 
@@ -48,6 +49,8 @@ export function NavProjects({
 
             if (response.success) {
                 toast.success("Successfully deleted pharma project.");
+
+                router.push(`/pharma/dashboard`); // Redirect to new project page
             } else {
                 toast.error(response.error || "An error occurred while deleting pharma project.");
             }
