@@ -1,3 +1,5 @@
+"use client"
+
 import {Lock, Megaphone} from "lucide-react";
 import Image from "next/image"
 import publicProfile from "@/public/screenshots/public-profile.png"
