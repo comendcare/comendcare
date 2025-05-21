@@ -14,9 +14,9 @@ export async function News() {
                 return null
             }
 
-            if (process.env.NEXT_PUBLIC_NODE_ENV === 'development' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
-                return null
-            }
+            // if (process.env.NEXT_PUBLIC_NODE_ENV === 'development' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
+            //     return null
+            // }
 
             const title = page?.properties?.["Name"]?.title?.map((text: any) => text?.plain_text)?.join(" ")
             const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")

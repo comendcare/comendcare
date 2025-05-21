@@ -225,12 +225,12 @@ export async function sendMemberRequestCreatedEmail(params: {
         email: string | null | undefined
         image: string | null | undefined
     }
-    admin: {
+    owners: {
         name: string | null | undefined
         email: string | null | undefined
-        organizationName: string | undefined
-        organizationImage: string | undefined
-    }
+    }[],
+    organizationName: string | undefined
+    organizationImage: string | undefined
 }) {
     const emailTemplate = await render(
         NewMemberRequestEmail(
@@ -238,19 +238,17 @@ export async function sendMemberRequestCreatedEmail(params: {
                 requestedByUserName: params.user.name,
                 requestedByUserImage: params.user.image,
                 requestedByUserEmail: params.user.email,
-                adminName: params.admin.name,
-                adminEmail: params.admin.email,
-                organizationName: params.admin.organizationName,
-                organizationImage: params.admin.organizationImage,
+                organizationName: params.organizationName,
+                organizationImage: params.organizationImage,
             }
         )
     )
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
-    if (params.admin.email) {
+    if (params.owners.length > 0) {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
-            to: params.admin.email,
+            to: params.owners.map(owner => owner.email).filter(email => typeof email === 'string'),
             from: "corporate@comendcare.com",
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
