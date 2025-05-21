@@ -33,12 +33,12 @@ import {mixpanelTrack} from "@/app/mixpanel";
 import {Info, Plus} from "lucide-react";
 
 const newPharmaProjectSchema = z.object({
-    disorder: z.string()
+    name: z.string()
         .min(2, {
-            message: "The name of your condition needs to be longer than 2 characters",
+            message: "The name of your project needs to be longer than 2 characters",
         })
         .max(60, {
-            message: "The name of your condition needs to be shorter than 60 characters",
+            message: "The name of your project needs to be shorter than 60 characters",
         }),
     summary: z.string()
         // .min(30, {
@@ -100,7 +100,7 @@ export default function CreatePharmaProjectDialog() {
 
             // Map the form values to match the Condition schema
             const mappedData: Record<string, any> = {
-                name: values.disorder || "",
+                name: values.name || "",
             };
 
             // Add mapped data to FormData
@@ -187,7 +187,7 @@ export default function CreatePharmaProjectDialog() {
 
                             <FormField
                                 control={editResearchForm.control}
-                                name="disorder"
+                                name="name"
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Name of project (required)`}</FormLabel>
@@ -202,7 +202,7 @@ export default function CreatePharmaProjectDialog() {
                                         <FormControl>
                                             <Input
                                                 type="text"
-                                                id="disorder"
+                                                id="name"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -237,46 +237,46 @@ export default function CreatePharmaProjectDialog() {
                                 )}
                             />
 
-                            <FormField
-                                control={editResearchForm.control}
-                                name="categories"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Mechanisms of action
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`What types of genetic effects are you investigating? Select all that apply.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MOLECULAR_MECHANISMS}
-                                                placeholder="Select categories that apply to you..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="categories-other"
-                                                    value={otherCategories}
-                                                    onChange={(e) => setOtherCategories(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={editResearchForm.control}*/}
+                            {/*    name="categories"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>*/}
+                            {/*                Mechanisms of action*/}
+                            {/*            </FormLabel>*/}
+                            {/*            <FormDescription className="flex items-center">*/}
+                            {/*                {`What types of genetic effects are you investigating? Select all that apply.`}*/}
+                            {/*            </FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <MultipleSelector*/}
+                            {/*                    {...field}*/}
+                            {/*                    defaultOptions={MOLECULAR_MECHANISMS}*/}
+                            {/*                    placeholder="Select categories that apply to you..."*/}
+                            {/*                    hidePlaceholderWhenSelected={true}*/}
+                            {/*                    emptyIndicator={*/}
+                            {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                            {/*                            no results found.*/}
+                            {/*                        </p>*/}
+                            {/*                    }*/}
+                            {/*                    showHoverCard={false}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*            {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER") && (*/}
+                            {/*                <div className="mt-2">*/}
+                            {/*                    <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>*/}
+                            {/*                    <Input*/}
+                            {/*                        type="text"*/}
+                            {/*                        id="categories-other"*/}
+                            {/*                        value={otherCategories}*/}
+                            {/*                        onChange={(e) => setOtherCategories(e.target.value)}*/}
+                            {/*                    />*/}
+                            {/*                </div>*/}
+                            {/*            )}*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={editResearchForm.control}

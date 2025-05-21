@@ -3723,7 +3723,7 @@ export const createPharmaProject = async (formData: FormData) => {
         }
     }
 
-    const name = formData.get("orgName") as string;
+    const name = formData.get("name") as string;
 
     try {
         const pharmaProject = await prisma.pharmaProject.create({
@@ -3737,6 +3737,24 @@ export const createPharmaProject = async (formData: FormData) => {
         return {success: true, data: pharmaProject}
     } catch (error: any) {
         console.error("Error creating pharma project:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function deletePharmaProject(pharmaProjectId: string | undefined) {
+    try {
+        const response = prisma.pharmaProject.delete({
+            where: {id: pharmaProjectId},
+        });
+
+        if (!response) {
+            console.error("Error deleting pharma project.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error deleting pharma project:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }
