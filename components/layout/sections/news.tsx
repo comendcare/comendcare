@@ -116,6 +116,7 @@ export type Blog = {
     author: string;
     authorAvatar: string;
     date: Date;
+    section?: string | undefined;
 };
 
 export interface IBlurImage {
