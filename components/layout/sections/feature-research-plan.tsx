@@ -1,3 +1,5 @@
+"use client"
+
 import {CloudUpload, Users} from "lucide-react";
 import Image from "next/image"
 import researchPlanner from "@/public/screenshots/research-planner.png";
