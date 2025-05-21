@@ -376,7 +376,7 @@ export const MODALITIES: Option[] = [
     },
     {
         id: '6',
-        label: 'Enzyme Replacement',
+        label: 'Enzyme or Protein Replacement',
         value: 'ENZYME_REPLACEMENT',
         description: 'A treatment approach involving the administration of exogenous enzymes to replace deficient or malfunctioning enzymes in patients.',
         strengths: 'Addresses underlying enzyme deficiencies, well-established for several metabolic disorders, and provides symptomatic relief.',

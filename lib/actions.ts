@@ -43,7 +43,7 @@ import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
-import { getCategoriesAndMilestones } from "@/lib/utils"
+import {getCategoriesAndMilestones} from "@/lib/utils"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -3620,7 +3620,7 @@ export async function removeEmailFromWhitelist(email: string) {
 export const createCompany = async (formData: FormData) => {
     const session = await getSession()
     if (!session?.user.id) {
-        return { error: "Not authenticated" }
+        return {error: "Not authenticated"}
     }
 
     const title = formData.get("orgName") as string
@@ -3638,7 +3638,7 @@ export const createCompany = async (formData: FormData) => {
         ? certificationsRaw.split(",").map((name) => name.trim())
         : []
 
-    const { categories, milestoneTypes } = getCategoriesAndMilestones(parsedServices)
+    const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices)
 
     try {
         const company = await prisma.company.create({
@@ -3650,19 +3650,19 @@ export const createCompany = async (formData: FormData) => {
                 url,
                 services: parsedServices.length
                     ? {
-                        create: parsedServices.map((name) => ({ name }))
+                        create: parsedServices.map((name) => ({name}))
                     }
                     : undefined,
                 certifications: parsedCertifications.length
                     ? {
-                        create: parsedCertifications.map((name) => ({ name }))
+                        create: parsedCertifications.map((name) => ({name}))
                     }
                     : undefined,
                 simplifiedCertifications: parsedCertifications,
                 categories,
                 milestoneTypes,
             },
-            include: { services: true },
+            include: {services: true},
         })
 
         await addTypeSenseDocument(
@@ -3676,10 +3676,10 @@ export const createCompany = async (formData: FormData) => {
 
         await revalidateTag(`${company.id}-company-metadata`)
 
-        return { success: true, data: company }
+        return {success: true, data: company}
     } catch (error: any) {
         console.error("Error creating company:", error)
-        return { success: false, error: "Database error. Please try again later." }
+        return {success: false, error: "Database error. Please try again later."}
     }
 }
 
@@ -3711,6 +3711,32 @@ export async function deleteCompany(company: Company) {
         return {success: true, data: response}
     } catch (error: any) {
         console.error("Error deleting company:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export const createPharmaProject = async (formData: FormData) => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        return {
+            error: "Not authenticated"
+        }
+    }
+
+    const name = formData.get("orgName") as string;
+
+    try {
+        const pharmaProject = await prisma.pharmaProject.create({
+            data: {
+                name,
+            },
+        });
+
+        revalidatePath("/(platform)/pharma/project/[id]")
+
+        return {success: true, data: pharmaProject}
+    } catch (error: any) {
+        console.error("Error creating pharma project:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }

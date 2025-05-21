@@ -28,7 +28,7 @@ export default function PharmaProjectAnalyticsTab() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                Relevant Biosamples
+                                Biosamples
                             </CardTitle>
                             <Database className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
@@ -44,7 +44,7 @@ export default function PharmaProjectAnalyticsTab() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                Clinical Assets
+                                Patient datasets
                             </CardTitle>
                             <Stethoscope className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         </CardHeader>
@@ -60,7 +60,7 @@ export default function PharmaProjectAnalyticsTab() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                Pre-clinical assets
+                                Pre-clinical studies
                             </CardTitle>
                             <FlaskConical className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         </CardHeader>
@@ -76,7 +76,7 @@ export default function PharmaProjectAnalyticsTab() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                Relevant IP
+                                IP
                             </CardTitle>
                             <FileSignature className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         </CardHeader>
