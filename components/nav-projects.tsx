@@ -3,7 +3,7 @@
 import {
     FolderIcon,
     MoreHorizontalIcon,
-    Plus,
+    Trash,
     ShareIcon,
     type LucideIcon,
 } from "lucide-react"
@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/sidebar"
 import CreatePharmaProjectDialog from "@/components/create-pharma-project-dialog";
 import { usePathname } from "next/navigation"
+import {deletePharmaProject, removeEmailFromWhitelist} from "@/lib/actions";
+import {toast} from "sonner";
 
 export function NavProjects({
                                 items,
@@ -37,6 +39,23 @@ export function NavProjects({
 }) {
     const { isMobile } = useSidebar()
     const pathname = usePathname()
+
+    const onDeleteClick = async () => {
+        try {
+            const id = pathname.split("/").pop();
+
+            const response = await deletePharmaProject(id);
+
+            if (response.success) {
+                toast.success("Successfully deleted pharma project.");
+            } else {
+                toast.error(response.error || "An error occurred while deleting pharma project.");
+            }
+        } catch (error) {
+            console.error("Pharma project deletion error:", error);
+            toast.error("An error occurred while deleting email.");
+        }
+    };
 
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -78,6 +97,10 @@ export function NavProjects({
                                     <DropdownMenuItem>
                                         <ShareIcon />
                                         <span>Share</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={onDeleteClick}>
+                                        <Trash />
+                                        <span>Delete</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
