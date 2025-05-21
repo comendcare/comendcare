@@ -101,6 +101,12 @@ const nextConfig = {
                 port: '',
                 pathname: '**',
             },
+            {
+                protocol: 'https',
+                hostname: 'www.notion.so',
+                port: '',
+                pathname: '**'
+            }
         ]
     },
     experimental: {
