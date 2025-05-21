@@ -14,7 +14,7 @@ export async function News() {
                 return null
             }
 
-            if (process.env.NEXT_PUBLIC_NODE_ENV === 'preview' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
+            if (process.env.NEXT_PUBLIC_NODE_ENV === 'development' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
                 return null
             }
 
@@ -32,6 +32,8 @@ export async function News() {
         .filter((page) => page !== null)
         .sort((a, b) => b.date.valueOf() - a.date.valueOf())
         .slice(0, 3) // only show 3 most recent pages in news section on landing page
+
+    if (filteredPages.length === 0) return null
 
     return (
         <div className="relative overflow-hidden py-20 md:py-0">
