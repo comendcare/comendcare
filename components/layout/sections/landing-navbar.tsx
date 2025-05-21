@@ -40,7 +40,18 @@ interface NavbarProps {
 const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const LandingNavbar: React.FC = () => {
-    const navItems: NavbarItem[] = [
+    const navItems: NavbarItem[] = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? [
+        {
+            name: "About",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/about` : `http://${rootDomain}/about`
+        },
+        {
+            name: "FAQ",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/faq` : `http://${rootDomain}/faq`
+        },
+    ] : [
         // {
         //     name: "Products",
         //     items: [
@@ -89,11 +100,11 @@ export const LandingNavbar: React.FC = () => {
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/faq` : `http://${rootDomain}/faq`
         },
-        // {
-        //     name: "News",
-        //     link: process.env.NEXT_PUBLIC_VERCEL_ENV
-        //         ? `https://${rootDomain}/news` : `http://${rootDomain}/news`
-        // },
+        {
+            name: "News",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/news` : `http://${rootDomain}/news`
+        },
         // {
         //     name: "Contact",
         //     link: process.env.NEXT_PUBLIC_VERCEL_ENV
