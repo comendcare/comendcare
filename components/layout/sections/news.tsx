@@ -9,6 +9,15 @@ export async function News() {
 
     const filteredPages: Blog[] = pages
         .map((page: any) => {
+            // depending on the page Status, show or hide it
+            if (process.env.NEXT_PUBLIC_NODE_ENV === 'production' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)')) {
+                return null
+            }
+
+            if (process.env.NEXT_PUBLIC_NODE_ENV === 'preview' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
+                return null
+            }
+
             const title = page?.properties?.["Name"]?.title?.map((text: any) => text?.plain_text)?.join(" ")
             const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")
             const slug = `/news/${page.id}`
@@ -22,10 +31,8 @@ export async function News() {
         })
         .filter((page) => page !== null)
         .sort((a, b) => b.date.valueOf() - a.date.valueOf())
+        .slice(0, 3) // only show 3 most recent pages in news section on landing page
 
-    console.log(`pages`, pages)
-    console.log(`page cover`, pages.map((page: any) => page.cover))
-    
     return (
         <div className="relative overflow-hidden py-20 md:py-0">
             <div className="py-4 md:py-10 overflow-hidden relative px-4 md:px-8">
