@@ -40,9 +40,9 @@ export async function PharmaProjectRecentRecommendations() {
 
     return (
         <div className="space-y-8">
-            {organizations.slice(0, 5).map((organization) => {
+            {organizations.slice(2, 7).map((organization) => {
                 const patients =
-                    organization.condition?.[0]?.condition?.nationalEstimatedPopulation ?? "N/A"
+                    organization.condition?.[0]?.condition?.numberOfPatientsEngaged ?? "N/A"
 
                 return (
                     <div key={organization.id} className="flex items-center">

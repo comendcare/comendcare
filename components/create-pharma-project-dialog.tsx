@@ -117,11 +117,11 @@ export default function CreatePharmaProjectDialog() {
             // Call the `updateCondition` function
             const response = await createPharmaProject(formData);
 
-            if (response.success) {
+            if (response.success && response.data) {
                 toast.success("Pharma project created successfully!");
 
                 setOpen(false)
-                router.refresh(); // Refresh the page to reflect changes
+                router.push(`/pharma/project/${response.data.id}`); // Redirect to new project page
             } else {
                 console.error(response.error);
                 toast.error(response.error || "Failed to create pharma project.");
