@@ -37,7 +37,7 @@ const newPharmaProjectSchema = z.object({
         .min(2, {
             message: "The name of your project needs to be longer than 2 characters",
         })
-        .max(60, {
+        .max(200, {
             message: "The name of your project needs to be shorter than 200 characters",
         }),
     summary: z.string()
