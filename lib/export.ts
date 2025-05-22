@@ -15,7 +15,7 @@ async function exportResearchPlan(researchPlanId: string) {
     const researchPlan = await prisma?.roadmap.findUnique({
         where: {id: researchPlanId},
         include: {
-            milestones: true,
+            milestones: {include: {types: true}},
             nodes: true,
             edges: true,
         }
