@@ -1,0 +1,949 @@
+{
+    "id": "cm9ud3w9v0000zzb8a7osd7r5",
+    "title": "Gene Therapy Research Plan",
+    "description": "This research plan is designed to develop and evaluate innovative genetic strategies for treating and potentially curing inherited or acquired diseases at the molecular level.",
+    "content": null,
+    "slug": "cm9ud3w9v0001zzb85j40fuo4",
+    "image": null,
+    "createdAt": "2025-04-23T20:04:13.220Z",
+    "updatedAt": "2025-04-23T20:04:13.220Z",
+    "published": true,
+    "organizationId": "cm869ngpm0000of3vh8f98q2l",
+    "userId": null,
+    "modalities": [],
+    "milestones": [
+        {
+            "id": "keBvWptYotYkbU2hHdCT3",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-14T19:20:49.456Z",
+            "title": "GMP manufacturing",
+            "description": "(Good Manufacturing Practices)\n\nProduce clinical-grade materials under strict quality controls for human use.",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 7,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "Y2QiJSFxSslKqsb2wWnrp",
+            "types": [
+                {
+                    "id": "fc933c82-49dc-4b94-8bed-389c34ad94c5",
+                    "milestoneTypeId": "GPMANUFACTURING",
+                    "milestoneId": "keBvWptYotYkbU2hHdCT3",
+                    "createdAt": "2025-05-14T19:20:49.456Z"
+                }
+            ]
+        },
+        {
+            "id": "4YmjJ3S8W6BjaoCGBTi9P",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-14T19:20:49.442Z",
+            "title": "Site selection",
+            "description": "",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 2,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "inpt2ZZtkRU03qSGMqjxg",
+            "types": [
+                {
+                    "id": "c46fadfe-b380-41fe-9dcf-e265907bc5b0",
+                    "milestoneTypeId": "SITESELECTION",
+                    "milestoneId": "4YmjJ3S8W6BjaoCGBTi9P",
+                    "createdAt": "2025-05-14T19:20:49.442Z"
+                }
+            ]
+        },
+        {
+            "id": "YEZP0e0e0RyI9NCMnjbjz",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-14T19:20:49.455Z",
+            "title": "Trial design",
+            "description": "",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 4,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "QwoNl3LK3aZC8YQzqBVCb",
+            "types": [
+                {
+                    "id": "2e9a6ba1-c7cd-48db-b0e1-ba4f70b431c2",
+                    "milestoneTypeId": "TRIALDESIGN",
+                    "milestoneId": "YEZP0e0e0RyI9NCMnjbjz",
+                    "createdAt": "2025-05-14T19:20:49.455Z"
+                }
+            ]
+        },
+        {
+            "id": "76PDTYpzqKXVA-PDP6wkT",
+            "createdAt": "2025-04-23T20:10:13.996Z",
+            "updatedAt": "2025-05-14T19:20:49.457Z",
+            "title": "Gene therapy production",
+            "description": "",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 9,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "l1oLacGHO24tfDDsLcqHf",
+            "types": [
+                {
+                    "id": "8c72b04d-2762-446c-b23d-b57e0dff11bc",
+                    "milestoneTypeId": "GENETHERAPYPRODUCTION",
+                    "milestoneId": "76PDTYpzqKXVA-PDP6wkT",
+                    "createdAt": "2025-05-14T19:20:49.457Z"
+                }
+            ]
+        },
+        {
+            "id": "1PrLYqL0LqeznEjBlBztc",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-14T19:20:49.455Z",
+            "title": "Phase 1/2",
+            "description": "A combination of the first two phases of clinical testing, designed to evaluate both the safety and efficacy of a drug in a single trial.",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 5,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "2CLpjWndMwHdj9PkUnHAY",
+            "types": [
+                {
+                    "id": "3990bbdd-040e-49ec-ac09-98393abb569c",
+                    "milestoneTypeId": "PHASE1/2",
+                    "milestoneId": "1PrLYqL0LqeznEjBlBztc",
+                    "createdAt": "2025-05-14T19:20:49.455Z"
+                }
+            ]
+        },
+        {
+            "id": "z3PPSgFUh0PEddtUSHgTo",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-14T19:20:49.456Z",
+            "title": "Phase 3",
+            "description": "Confirm the drug's efficacy, monitor side effects in a larger population, and compare it to current standard treatments.",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 6,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "QKsTC9G5zS2v7igkyxIkO",
+            "types": [
+                {
+                    "id": "bf0cba1e-ad0d-4b14-8615-af7fba1c5416",
+                    "milestoneTypeId": "PHASE3",
+                    "milestoneId": "z3PPSgFUh0PEddtUSHgTo",
+                    "createdAt": "2025-05-14T19:20:49.456Z"
+                }
+            ]
+        },
+        {
+            "id": "C-P-fxYlkoUYQCQ04PUnY",
+            "createdAt": "2025-04-24T13:50:26.965Z",
+            "updatedAt": "2025-05-14T19:20:49.454Z",
+            "title": "FDA approval",
+            "description": "",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 16,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "ujtrqwCg_9Gh-ZIkGd78O",
+            "types": [
+                {
+                    "id": "40992668-caae-4a44-a247-1c124ebcda36",
+                    "milestoneTypeId": "FDAAPPROVAL",
+                    "milestoneId": "C-P-fxYlkoUYQCQ04PUnY",
+                    "createdAt": "2025-05-14T19:20:49.454Z"
+                }
+            ]
+        },
+        {
+            "id": "RNlbatVOqkhB1cMIAZTV0",
+            "createdAt": "2025-04-23T20:09:41.925Z",
+            "updatedAt": "2025-05-14T19:20:49.456Z",
+            "title": "Efficacy study",
+            "description": "",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 8,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "aG7Bk6a7EW3Mu9_EBwvOA",
+            "types": [
+                {
+                    "id": "066c4efd-6316-48c0-9a24-72414bc6bade",
+                    "milestoneTypeId": "EFFICASYSTUDY",
+                    "milestoneId": "RNlbatVOqkhB1cMIAZTV0",
+                    "createdAt": "2025-05-14T19:20:49.456Z"
+                }
+            ]
+        },
+        {
+            "id": "8GWq413B1TsSIKjEvBmUH",
+            "createdAt": "2025-04-23T20:09:29.133Z",
+            "updatedAt": "2025-05-14T19:20:49.454Z",
+            "title": "Patient recruitment",
+            "description": "",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 3,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "4MzkYCUdHnd9TDvr5Bq1R",
+            "types": [
+                {
+                    "id": "82a1268c-7dc2-4296-a1cf-3bd566d95920",
+                    "milestoneTypeId": "PATIENTRECRUITMENT",
+                    "milestoneId": "8GWq413B1TsSIKjEvBmUH",
+                    "createdAt": "2025-05-14T19:20:49.454Z"
+                }
+            ]
+        },
+        {
+            "id": "k-HVejsKS5-HIijsa82pe",
+            "createdAt": "2025-04-24T13:50:43.783Z",
+            "updatedAt": "2025-05-14T19:20:49.454Z",
+            "title": "Orphan Drug Designation & Rare Pediatric Disease Designation",
+            "description": "Submit application for ODD and RPDD",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 17,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "dz-8w8j1fFMZdCgbFMi5F",
+            "types": []
+        },
+        {
+            "id": "SaaHLmp-hvviJCof1Ynf9",
+            "createdAt": "2025-04-23T20:11:16.484Z",
+            "updatedAt": "2025-05-14T19:20:49.457Z",
+            "title": "Patient recruitment",
+            "description": "",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 10,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "25FR_PObpsO8-gjwFBEf7",
+            "types": [
+                {
+                    "id": "cde02a03-5f97-4443-82d5-49a8cd7aacd2",
+                    "milestoneTypeId": "PATIENTRECRUITMENT",
+                    "milestoneId": "SaaHLmp-hvviJCof1Ynf9",
+                    "createdAt": "2025-05-14T19:20:49.457Z"
+                }
+            ]
+        },
+        {
+            "id": "linqZ9B2_p_kvd0nVWp64",
+            "createdAt": "2025-04-23T20:11:50.175Z",
+            "updatedAt": "2025-05-14T19:20:49.457Z",
+            "title": "Site selection",
+            "description": "",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 11,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "89BfinVstKaOD2QwreUoF",
+            "types": [
+                {
+                    "id": "b90aa145-3a04-4d46-bd77-8deffa71b0f3",
+                    "milestoneTypeId": "SITESELECTION",
+                    "milestoneId": "linqZ9B2_p_kvd0nVWp64",
+                    "createdAt": "2025-05-14T19:20:49.457Z"
+                }
+            ]
+        },
+        {
+            "id": "MsnsFLCOy5Ya-HAr2LRyI",
+            "createdAt": "2025-04-23T20:12:33.570Z",
+            "updatedAt": "2025-05-14T19:20:49.458Z",
+            "title": "IND submission",
+            "description": "Submit an Investigational New Drug (IND) application to begin human clinical trials.",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 12,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "il4Esfkz0UNxdU_daz4af",
+            "types": [
+                {
+                    "id": "864afc0b-f2e0-43c5-a38e-e4512ae57715",
+                    "milestoneTypeId": "INDSUBMISSION",
+                    "milestoneId": "MsnsFLCOy5Ya-HAr2LRyI",
+                    "createdAt": "2025-05-14T19:20:49.458Z"
+                }
+            ]
+        },
+        {
+            "id": "MLT63EudLpArJrwY088NB",
+            "createdAt": "2025-04-23T20:05:19.155Z",
+            "updatedAt": "2025-05-14T19:20:49.455Z",
+            "title": "Toxicology & Biodistribution ",
+            "description": "Assess potential harmful effects of a treatment in model systems before human trials.",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 4,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "IOHwYPu8acer558AsyzB2",
+            "types": [
+                {
+                    "id": "b45a4508-2957-484d-91e6-16707a91371e",
+                    "milestoneTypeId": "TOXICOLOGYSTUDY",
+                    "milestoneId": "MLT63EudLpArJrwY088NB",
+                    "createdAt": "2025-05-14T19:20:49.455Z"
+                }
+            ]
+        },
+        {
+            "id": "SSJ59KDUrWlQQzVoNxb-h",
+            "createdAt": "2025-04-24T13:42:17.060Z",
+            "updatedAt": "2025-05-14T19:20:49.458Z",
+            "title": "Pre-IND meeting",
+            "description": "Discuss the preclinical data, manufacturing, plans for clinical testing and get feedback on the proposed clinical trial design, preclinical data, and regulatory requirements.",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 13,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "iQSEQtbupZfXIj93LxdQx",
+            "types": [
+                {
+                    "id": "9a2f4508-1a19-4fbc-abad-b178b0bbe1c8",
+                    "milestoneTypeId": "PREINDMEETING",
+                    "milestoneId": "SSJ59KDUrWlQQzVoNxb-h",
+                    "createdAt": "2025-05-14T19:20:49.458Z"
+                }
+            ]
+        },
+        {
+            "id": "9fIwaDYyD_AEzfTTmvnnb",
+            "createdAt": "2025-04-24T13:48:49.803Z",
+            "updatedAt": "2025-05-14T19:20:49.458Z",
+            "title": "Assay development",
+            "description": "",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 15,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "osQG05juc0Iv6JpMvKAya",
+            "types": [
+                {
+                    "id": "ce34a0b8-6b30-4948-8de4-f11fb359886a",
+                    "milestoneTypeId": "ASSAYDEVELOPMENT",
+                    "milestoneId": "9fIwaDYyD_AEzfTTmvnnb",
+                    "createdAt": "2025-05-14T19:20:49.458Z"
+                }
+            ]
+        },
+        {
+            "id": "gkg0_lkxStZPbnTFM09dc",
+            "createdAt": "2025-04-24T13:44:44.535Z",
+            "updatedAt": "2025-05-14T19:20:49.458Z",
+            "title": "Assay development",
+            "description": "",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 14,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "GrJnm8VnAynOw1wxjTUtK",
+            "types": [
+                {
+                    "id": "3c4fadef-d7d1-4744-93ae-f33c7ee4fc88",
+                    "milestoneTypeId": "ASSAYDEVELOPMENT",
+                    "milestoneId": "gkg0_lkxStZPbnTFM09dc",
+                    "createdAt": "2025-05-14T19:20:49.458Z"
+                }
+            ]
+        },
+        {
+            "id": "e9ltwQ3aQmjPZp3FOhbAo",
+            "createdAt": "2025-04-23T20:05:19.155Z",
+            "updatedAt": "2025-05-14T19:20:49.454Z",
+            "title": "Mouse model",
+            "description": "Model genetic impacts on disease in order to understand the disease biology and the impacts of treatment on disease. ",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 3,
+            "nodeType": "PROJECT",
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
+            "organizationId": "cm869ngpm0000of3vh8f98q2l",
+            "nodeId": "qUdwkLvKBcjmjlJtC6Aos",
+            "types": [
+                {
+                    "id": "b4f06b83-035b-488c-805d-525c65d5284d",
+                    "milestoneTypeId": "MOUSEMODEL",
+                    "milestoneId": "e9ltwQ3aQmjPZp3FOhbAo",
+                    "createdAt": "2025-05-14T19:20:49.454Z"
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "id": "2CLpjWndMwHdj9PkUnHAY",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 3797,
+            "positionY": 2,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "qUdwkLvKBcjmjlJtC6Aos",
+            "createdAt": "2025-04-23T20:05:19.155Z",
+            "updatedAt": "2025-05-16T16:26:17.976Z",
+            "positionX": 525,
+            "positionY": -437,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "iQSEQtbupZfXIj93LxdQx",
+            "createdAt": "2025-04-24T13:42:17.060Z",
+            "updatedAt": "2025-05-16T16:26:17.976Z",
+            "positionX": 1462,
+            "positionY": 51,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "l1oLacGHO24tfDDsLcqHf",
+            "createdAt": "2025-04-23T20:10:13.996Z",
+            "updatedAt": "2025-05-16T16:26:17.973Z",
+            "positionX": 334,
+            "positionY": -68,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "dz-8w8j1fFMZdCgbFMi5F",
+            "createdAt": "2025-04-24T13:50:43.783Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 1396,
+            "positionY": -392,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "aG7Bk6a7EW3Mu9_EBwvOA",
+            "createdAt": "2025-04-23T20:09:41.925Z",
+            "updatedAt": "2025-05-16T16:26:17.976Z",
+            "positionX": 941,
+            "positionY": -183,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "25FR_PObpsO8-gjwFBEf7",
+            "createdAt": "2025-04-23T20:11:16.484Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 4246,
+            "positionY": -203,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "ujtrqwCg_9Gh-ZIkGd78O",
+            "createdAt": "2025-04-24T13:50:26.965Z",
+            "updatedAt": "2025-05-16T16:26:17.974Z",
+            "positionX": 5179,
+            "positionY": 19,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "inpt2ZZtkRU03qSGMqjxg",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 2831,
+            "positionY": -291,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "IOHwYPu8acer558AsyzB2",
+            "createdAt": "2025-04-23T20:05:19.155Z",
+            "updatedAt": "2025-05-16T16:26:17.976Z",
+            "positionX": 1949,
+            "positionY": -18,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "89BfinVstKaOD2QwreUoF",
+            "createdAt": "2025-04-23T20:11:50.175Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 3860,
+            "positionY": -437,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "QKsTC9G5zS2v7igkyxIkO",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 4652,
+            "positionY": -2,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "QwoNl3LK3aZC8YQzqBVCb",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-16T16:26:17.976Z",
+            "positionX": 961,
+            "positionY": 223,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "4MzkYCUdHnd9TDvr5Bq1R",
+            "createdAt": "2025-04-23T20:09:29.133Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 3302,
+            "positionY": 24,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "Y2QiJSFxSslKqsb2wWnrp",
+            "createdAt": "2025-04-23T20:09:29.134Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 2400,
+            "positionY": 30,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "osQG05juc0Iv6JpMvKAya",
+            "createdAt": "2025-04-24T13:48:49.803Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 2841,
+            "positionY": 320,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "il4Esfkz0UNxdU_daz4af",
+            "createdAt": "2025-04-23T20:12:33.570Z",
+            "updatedAt": "2025-05-16T16:26:17.975Z",
+            "positionX": 2842,
+            "positionY": 28,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "GrJnm8VnAynOw1wxjTUtK",
+            "createdAt": "2025-04-24T13:44:44.535Z",
+            "updatedAt": "2025-05-16T16:26:17.976Z",
+            "positionX": 943,
+            "positionY": 477,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        }
+    ],
+    "edges": [
+        {
+            "id": "xy-edge__QwoNl3LK3aZC8YQzqBVCb-iQSEQtbupZfXIj93LxdQx",
+            "source": "QwoNl3LK3aZC8YQzqBVCb",
+            "target": "iQSEQtbupZfXIj93LxdQx",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__25FR_PObpsO8-gjwFBEf7-QKsTC9G5zS2v7igkyxIkO",
+            "source": "25FR_PObpsO8-gjwFBEf7",
+            "target": "QKsTC9G5zS2v7igkyxIkO",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__2CLpjWndMwHdj9PkUnHAY-QKsTC9G5zS2v7igkyxIkO",
+            "source": "2CLpjWndMwHdj9PkUnHAY",
+            "target": "QKsTC9G5zS2v7igkyxIkO",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__qUdwkLvKBcjmjlJtC6Aos-aG7Bk6a7EW3Mu9_EBwvOA",
+            "source": "qUdwkLvKBcjmjlJtC6Aos",
+            "target": "aG7Bk6a7EW3Mu9_EBwvOA",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__Y2QiJSFxSslKqsb2wWnrp-il4Esfkz0UNxdU_daz4af",
+            "source": "Y2QiJSFxSslKqsb2wWnrp",
+            "target": "il4Esfkz0UNxdU_daz4af",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__ewbit8X_UnRo3KngXD9me-DyrRhtBCGtKLDI5urfkMi",
+            "source": "ewbit8X_UnRo3KngXD9me",
+            "target": "DyrRhtBCGtKLDI5urfkMi",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__l1oLacGHO24tfDDsLcqHf-aG7Bk6a7EW3Mu9_EBwvOA",
+            "source": "l1oLacGHO24tfDDsLcqHf",
+            "target": "aG7Bk6a7EW3Mu9_EBwvOA",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__ag6NIjDinJmjPSCRJUHfP-vy-KwOh2yZ73yjiwwJ2xX",
+            "source": "ag6NIjDinJmjPSCRJUHfP",
+            "target": "vy-KwOh2yZ73yjiwwJ2xX",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__aG7Bk6a7EW3Mu9_EBwvOA-dz-8w8j1fFMZdCgbFMi5F",
+            "source": "aG7Bk6a7EW3Mu9_EBwvOA",
+            "target": "dz-8w8j1fFMZdCgbFMi5F",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__NNyJeT7oUGLZU9OjN9tqJ-vy-KwOh2yZ73yjiwwJ2xX",
+            "source": "NNyJeT7oUGLZU9OjN9tqJ",
+            "target": "vy-KwOh2yZ73yjiwwJ2xX",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__vy-KwOh2yZ73yjiwwJ2xX-Ti8irqgiwC_a7-mDKG0Ao",
+            "source": "vy-KwOh2yZ73yjiwwJ2xX",
+            "target": "Ti8irqgiwC_a7-mDKG0Ao",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__osQG05juc0Iv6JpMvKAya-nq4bA1Tz1OqHGB-hwIdGv",
+            "source": "osQG05juc0Iv6JpMvKAya",
+            "target": "nq4bA1Tz1OqHGB-hwIdGv",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__sZNolJx3ODGc7jWY7hSLe-tDgHZlueyS40sTVBstPY7",
+            "source": "sZNolJx3ODGc7jWY7hSLe",
+            "target": "tDgHZlueyS40sTVBstPY7",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__iQSEQtbupZfXIj93LxdQx-IOHwYPu8acer558AsyzB2",
+            "source": "iQSEQtbupZfXIj93LxdQx",
+            "target": "IOHwYPu8acer558AsyzB2",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__c6Ye-_tqmWYWtMPcuGV3n-DyrRhtBCGtKLDI5urfkMi",
+            "source": "c6Ye-_tqmWYWtMPcuGV3n",
+            "target": "DyrRhtBCGtKLDI5urfkMi",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__DyrRhtBCGtKLDI5urfkMi-NNyJeT7oUGLZU9OjN9tqJ",
+            "source": "DyrRhtBCGtKLDI5urfkMi",
+            "target": "NNyJeT7oUGLZU9OjN9tqJ",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__aG7Bk6a7EW3Mu9_EBwvOA-iQSEQtbupZfXIj93LxdQx",
+            "source": "aG7Bk6a7EW3Mu9_EBwvOA",
+            "target": "iQSEQtbupZfXIj93LxdQx",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__89BfinVstKaOD2QwreUoF-25FR_PObpsO8-gjwFBEf7",
+            "source": "89BfinVstKaOD2QwreUoF",
+            "target": "25FR_PObpsO8-gjwFBEf7",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__il4Esfkz0UNxdU_daz4af-4MzkYCUdHnd9TDvr5Bq1R",
+            "source": "il4Esfkz0UNxdU_daz4af",
+            "target": "4MzkYCUdHnd9TDvr5Bq1R",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__w78C6QRgw7AXjv7u35aTe-DyrRhtBCGtKLDI5urfkMi",
+            "source": "w78C6QRgw7AXjv7u35aTe",
+            "target": "DyrRhtBCGtKLDI5urfkMi",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__v6dz53_vCSAPFf6DZmWkD-vy-KwOh2yZ73yjiwwJ2xX",
+            "source": "v6dz53_vCSAPFf6DZmWkD",
+            "target": "vy-KwOh2yZ73yjiwwJ2xX",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__IOHwYPu8acer558AsyzB2-Y2QiJSFxSslKqsb2wWnrp",
+            "source": "IOHwYPu8acer558AsyzB2",
+            "target": "Y2QiJSFxSslKqsb2wWnrp",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__QKsTC9G5zS2v7igkyxIkO-ujtrqwCg_9Gh-ZIkGd78O",
+            "source": "QKsTC9G5zS2v7igkyxIkO",
+            "target": "ujtrqwCg_9Gh-ZIkGd78O",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__Ti8irqgiwC_a7-mDKG0Ao-sZNolJx3ODGc7jWY7hSLe",
+            "source": "Ti8irqgiwC_a7-mDKG0Ao",
+            "target": "sZNolJx3ODGc7jWY7hSLe",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__rAdUrg7b_2rXOyOHb4f9n-c6Ye-_tqmWYWtMPcuGV3n",
+            "source": "rAdUrg7b_2rXOyOHb4f9n",
+            "target": "c6Ye-_tqmWYWtMPcuGV3n",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__inpt2ZZtkRU03qSGMqjxg-4MzkYCUdHnd9TDvr5Bq1R",
+            "source": "inpt2ZZtkRU03qSGMqjxg",
+            "target": "4MzkYCUdHnd9TDvr5Bq1R",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        },
+        {
+            "id": "xy-edge__4MzkYCUdHnd9TDvr5Bq1R-2CLpjWndMwHdj9PkUnHAY",
+            "source": "4MzkYCUdHnd9TDvr5Bq1R",
+            "target": "2CLpjWndMwHdj9PkUnHAY",
+            "type": null,
+            "data": null,
+            "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5"
+        }
+    ]
+}

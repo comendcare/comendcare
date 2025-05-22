@@ -1,7 +1,7 @@
 import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options"
 import { MODALITIES } from "./types"
 import ASOResearchPlan from '@/data/research-plan-templates/ASO Research Plan-cmaqujvbw00007u8av9kl1u60.json'
-import MegansTestResearchPlan from "@/data/research-plan-templates/Megan's test research plan with other details-cmah493yq0004gkyodk5j6m0p.json"
+import GeneTherapyResearchPlan from '@/data/research-plan-templates/Gene-Therapy-Template.json'
 
 export const templateMilestones = MILESTONE_TYPE_OPTIONS.map(typeData => ({
     title: typeData.label,
@@ -32,7 +32,7 @@ export const templateMilestones = MILESTONE_TYPE_OPTIONS.map(typeData => ({
 
 export const templateResearchPlans = [
     ASOResearchPlan,
-    MegansTestResearchPlan
+    GeneTherapyResearchPlan
 ]
 
 export const emptyMilestoneTemplate = {
