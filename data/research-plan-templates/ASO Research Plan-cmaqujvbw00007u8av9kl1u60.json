@@ -32,7 +32,15 @@
             "nodeType": "PROJECT",
             "roadmapId": "cmaqujvbw00007u8av9kl1u60",
             "organizationId": "cmah3gmve000e10fa66iiodi5",
-            "nodeId": "824d01a7-04cf-43d3-9c06-1702a294f9be"
+            "nodeId": "824d01a7-04cf-43d3-9c06-1702a294f9be",
+            "types": [
+                {
+                    "id": "cb2a3262-472c-4118-8715-54a172576ce3",
+                    "milestoneTypeId": "NATURALHISTORYSTUDY",
+                    "milestoneId": "f4ef0a99-7ee2-4424-94da-c74b44741cf9",
+                    "createdAt": "2025-05-16T15:33:45.543Z"
+                }
+            ]
         },
         {
             "id": "a141e555-e4e8-41ae-91e0-69d4a953481c",
@@ -52,7 +60,15 @@
             "nodeType": "PROJECT",
             "roadmapId": "cmaqujvbw00007u8av9kl1u60",
             "organizationId": "cmah3gmve000e10fa66iiodi5",
-            "nodeId": "f6f709bb-f04e-401c-a943-6c14a777c562"
+            "nodeId": "f6f709bb-f04e-401c-a943-6c14a777c562",
+            "types": [
+                {
+                    "id": "84af4a7e-c4dd-496c-a270-27360ac1910b",
+                    "milestoneTypeId": "BASICSCIENCE",
+                    "milestoneId": "a141e555-e4e8-41ae-91e0-69d4a953481c",
+                    "createdAt": "2025-05-16T15:33:45.544Z"
+                }
+            ]
         },
         {
             "id": "8c04db10-ceed-4c8d-9792-e0cc1bab5db8",
@@ -72,7 +88,15 @@
             "nodeType": "PROJECT",
             "roadmapId": "cmaqujvbw00007u8av9kl1u60",
             "organizationId": "cmah3gmve000e10fa66iiodi5",
-            "nodeId": "46816ebf-752c-409a-abb8-7c58a59daf44"
+            "nodeId": "46816ebf-752c-409a-abb8-7c58a59daf44",
+            "types": [
+                {
+                    "id": "a1e6915b-0bcd-45f2-b008-4738604f2c38",
+                    "milestoneTypeId": "PATIENTDERIVEDCELLLINE",
+                    "milestoneId": "8c04db10-ceed-4c8d-9792-e0cc1bab5db8",
+                    "createdAt": "2025-05-16T15:33:45.543Z"
+                }
+            ]
         },
         {
             "id": "7a5b95be-11ed-48ad-8509-4f62821e3157",
@@ -92,7 +116,15 @@
             "nodeType": "PROJECT",
             "roadmapId": "cmaqujvbw00007u8av9kl1u60",
             "organizationId": "cmah3gmve000e10fa66iiodi5",
-            "nodeId": "761b9706-1429-4f96-b6f8-4adc22fc14b7"
+            "nodeId": "761b9706-1429-4f96-b6f8-4adc22fc14b7",
+            "types": [
+                {
+                    "id": "e5b9a0bc-4416-46be-85ba-3102d5007cca",
+                    "milestoneTypeId": "TOXICOLOGYSTUDY",
+                    "milestoneId": "7a5b95be-11ed-48ad-8509-4f62821e3157",
+                    "createdAt": "2025-05-16T15:33:45.544Z"
+                }
+            ]
         },
         {
             "id": "c9bb11dc-56c4-4ed5-9e33-a51fce7319ad",
@@ -112,7 +144,15 @@
             "nodeType": "PROJECT",
             "roadmapId": "cmaqujvbw00007u8av9kl1u60",
             "organizationId": "cmah3gmve000e10fa66iiodi5",
-            "nodeId": "33c78fb9-26f6-4407-8ed4-0d6f480a80d7"
+            "nodeId": "33c78fb9-26f6-4407-8ed4-0d6f480a80d7",
+            "types": [
+                {
+                    "id": "46bfdd10-d884-49bb-8144-db4e10c8f959",
+                    "milestoneTypeId": "MOUSEMODEL",
+                    "milestoneId": "c9bb11dc-56c4-4ed5-9e33-a51fce7319ad",
+                    "createdAt": "2025-05-16T15:33:45.544Z"
+                }
+            ]
         }
     ],
     "nodes": [
