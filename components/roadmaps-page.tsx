@@ -85,7 +85,7 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             Share
                         </Button>
                 </div>
-                {roadmaps.length > 0 && (
+                {/* {roadmaps.length > 0 && ( */}
                     <RoadmapsTable 
                         roadmaps={roadmaps} 
                         rowClickCallback={(roadmap) => {
@@ -93,10 +93,10 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             router.push(`/app/research-plan/${roadmap.id}`)
                         }}
                     />
-                )}
-                {roadmaps.length === 0 && (
+                {/* )} */}
+                {/* {roadmaps.length === 0 && (
                     <PrivateNoResearchPlansRow />
-                )}
+                )} */}
             </div>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>

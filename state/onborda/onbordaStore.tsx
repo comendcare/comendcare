@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import gif1 from "@/public/onboarding-gif-1.gif"
+import gif2 from "@/public/Screen Recording 2025-05-22 at 3.33.16 PM.gif"
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { Tour } from '@/components/onborda/types';
@@ -142,7 +143,10 @@ export const onbordaTours: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "View All Your Plans",
-                content: <>{`See all your research plans organized in one table. To categorize, open any plan and select its type.`}</>,
+                content: <div>
+                    {`See all your research plans organized in one table. To categorize, open any plan and select its type.`}
+                    <Image className="max-w-64" src={gif2} alt={'Research plan type selection gif.'}/>
+                </div>,
                 selector: ".onborda-existing-research-plans-section",
                 side:  "top-left" as any,
                 showControls: true,

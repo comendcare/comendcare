@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Milestone, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { Organization } from "@prisma/client";
-import { PrivateNoResearchPlansColumn, PublicNoResearchPlans } from "./no-research-plans";
+import { PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans } from "./no-research-plans";
 import { NoProjects } from "./no-projects";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { FunctionComponent, ReactElement, useState } from "react";
@@ -222,6 +222,11 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                             </TableRow>
                         ))}
                     </CollapsibleTableGroup>
+                )}
+                {roadmaps.length <= 0 && (
+                    <div className="p-4">
+                        <PrivateNoResearchPlansRow />
+                    </div>
                 )}
             </TableBody>
         </Table>
