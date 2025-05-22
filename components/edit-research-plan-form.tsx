@@ -99,8 +99,19 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             const roadmap =  await createRoadmap(session.user.organizationId, {
                 title: values.title,
                 description: values.description || '',
-                modalities: values.modalities || [],
+                modalities: values?.modalities?.map(modality => modality.value) || [],
                 milestones: [],
+                id: "",
+                content: null,
+                slug: "",
+                image: null,
+                createdAt: "",
+                updatedAt: "",
+                published: false,
+                organizationId: "",
+                userId: null,
+                nodes: [],
+                edges: []
             })
 
             if (roadmap && roadmap.id) {
