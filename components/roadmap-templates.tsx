@@ -251,7 +251,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
     }
 
     return (
-        <Card className="w-full bg-gray-50">
+        <Card className="w-full bg-gray-50 onborda-research-plan-templates-section">
             <CardHeader className="relative">
                 <CardTitle>
                     Research Plan Templates
