@@ -125,7 +125,42 @@ export const onbordaTours: Tour[] = [
             //     pointerRadius: 10
             // },
         ]
-    }
+    },
+        {
+        tour: "research-plans-page-tour",
+        steps: [
+            {
+                icon: <>👋</>,
+                title: "Start a New Research Plan",
+                content: <>{`Begin by creating from a blank template or use a curated template—either way, you’ll be able to fully customize each plan to fit your needs.`}</>,
+                selector: ".onborda-research-plan-templates-section",
+                side: "bottom-left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "View All Your Plans",
+                content: <>{`See all your research plans organized in one table. To categorize, open any plan and select its type.`}</>,
+                selector: ".onborda-existing-research-plans-section",
+                side:  "top-left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Share Your Progress",
+                content: <>{`Showcase your work by sharing on social media or embedding your research plan directly on your website!`}</>,
+                selector: ".onborda-share-research-plan",
+                side:  "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            }
+        ]
+    },
 ]
 
 export type Selector = 

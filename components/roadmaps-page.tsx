@@ -70,7 +70,7 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
-            <div className="p-6 w-full">
+            <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">Research Plans</h2>
                     <DropdownMenu modal={false}>
@@ -81,7 +81,7 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                                     e.stopPropagation()
                                 }}
                                 variant="ghost"
-                                className="p-2 justify-end h-full"
+                                className="p-2 justify-end h-full onborda-share-research-plan"
                             >
                                 <Ellipsis/>
                             </Button>

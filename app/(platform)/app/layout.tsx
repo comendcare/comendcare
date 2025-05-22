@@ -42,6 +42,7 @@ interface AppLayoutProps {
 }
 
 const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
     setSelectedNodeId: state.setSelectedNodeId
 })
 
@@ -55,7 +56,14 @@ export default function AppLayout({children}: AppLayoutProps) {
     const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
-    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { roadmapId, setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const [tourName, setTourName] = useState(getTourName())
+
+    function getTourName() {
+        if (pathname === '/app/research-plan') return 'research-plans-page-tour'
+        if (pathname === `/app/research-plan/${roadmapId}`) return 'research-plan-tour'
+        return null
+    }
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
         shallow: true,
@@ -260,6 +268,10 @@ export default function AppLayout({children}: AppLayoutProps) {
         prevSessionRef.current = session
     }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
 
+    useEffect(() => {
+        setTourName(getTourName())
+    }, [pathname, roadmapId, getTourName])
+
     if (status === "authenticated" && session) {
         return (
             <SidebarProvider>
@@ -270,21 +282,13 @@ export default function AppLayout({children}: AppLayoutProps) {
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
                                 <Button 
-                                    // className={cn(!pathname.includes('app/profile') && !pathname.includes('app/research-plan') ? "hidden" : "")}
-                                    className={cn(!pathname.includes('app/research-plan') ? "hidden" : "")}
-                                    // disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
-                                    disabled={!pathname.includes('app/research-plan')}
+                                    className={cn(tourName ? "" : "hidden")}
+                                    disabled={!tourName}
                                     variant="ghost"
                                     onClick={() => {
-                                        // if (pathname.includes('app/profile')) {
-                                        //     startOnborda('organization-profile-tour')
-                                        // } else if (pathname.includes('app/research-plan')) {
-                                        //     setSelectedNodeId(null)
-                                        //     startOnborda('research-plan-tour')
-                                        // }
-                                        if (pathname.includes('app/research-plan')) {
+                                        if (tourName) {
                                             setSelectedNodeId(null)
-                                            startOnborda('research-plan-tour')
+                                            startOnborda(tourName)
                                         }
                                     }}>
                                     <Wand2 aria-hidden={true} />
@@ -299,10 +303,9 @@ export default function AppLayout({children}: AppLayoutProps) {
                                 <FeedbackSheet />
                                 <Button
                                     variant="ghost"
-                                    // disabled={true}
                                     className="pointer-events-none"
                                 >
-                                <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
+                                    <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
                                 </Button>
                             </div>
                         </div>
