@@ -338,6 +338,41 @@ export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
     },
 ]
 
+export const milestoneCategories = {
+    'PLANNING': {
+        option: {value: 'PLANNING', label: 'Planning', variant: 'amber'},
+        types: []
+    },
+    'DATA_COLLECTION': {
+        option: {value: 'DATA_COLLECTION', label: 'Patient Data Collection', variant: 'yellow'},
+        types: ['NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'OUTCOMEMEASURE']
+    },
+    'DISCOVERY': {
+        option: {value: 'DISCOVERY', label: 'Discovery', variant: 'lime'},
+        types: ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'BIOMARKER', 'TARGETVALIDATION', 'DRUGSCREEN']
+    },
+    'DISEASE_MODELS': {
+        option: {value: 'DISEASE_MODELS', label: 'Disease Models', variant: 'emerald'},
+        types: ['BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL']
+    },
+    'DESIGN_MANUFACTURING': {
+        option: {value: 'DESIGN_MANUFACTURING', label: 'Design & Manufacturing', variant: 'cyan'},
+        types: ['GENETHERAPYPRODUCTION', 'GPMANUFACTURING']
+    },
+    'PRECLINICAL': {
+        option: {value: 'PRECLINICA', label: 'Preclinical', variant: 'indigo'},
+        types: ['ASSAYDEVELOPMENT', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY']
+    },
+    'CLINICAL_TRIAL': {
+        option: {value: 'CLINICAL_TRIAL', label: 'Clinical Trial', variant: 'purple'},
+        types: ['SITESELECTION', 'PATIENTRECRUITMENT', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'PHASE4']
+    },
+    'REGULATORY': {
+        option: {value: 'REGULATORY', label: 'Regulatory', variant: 'pink'},
+        types: ['INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'FDAAPPROVAL']
+    },
+}
+
 export const MODALITIES: Option[] = [
     {
         id: '1',
