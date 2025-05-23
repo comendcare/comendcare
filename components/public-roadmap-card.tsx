@@ -255,7 +255,7 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string
     )
 }
 
-const milestoneCategories = {
+export const milestoneCategories = {
     'PLANNING': {
         option: {value: 'PLANNING', label: 'Planning', variant: 'amber'},
         types: []

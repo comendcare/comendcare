@@ -97,34 +97,34 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
         setDeleteIsOpen(true)
     }
 
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-        if (
-            popoverRef.current &&
-            !popoverRef.current.contains(event.target as Node)
-        ) {
-            setIsOpen(false);
-            popoverRef.current.blur();
-        }
-    };
+    // const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+    //     if (
+    //         popoverRef.current &&
+    //         !popoverRef.current.contains(event.target as Node)
+    //     ) {
+    //         setIsOpen(false);
+    //         popoverRef.current.blur();
+    //     }
+    // };
 
-    useEffect(() => {
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('touchend', handleClickOutside);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('touchend', handleClickOutside);
-        }
+    // useEffect(() => {
+    //     if (isOpen) {
+    //         document.addEventListener('mousedown', handleClickOutside);
+    //         document.addEventListener('touchend', handleClickOutside);
+    //     } else {
+    //         document.removeEventListener('mousedown', handleClickOutside);
+    //         document.removeEventListener('touchend', handleClickOutside);
+    //     }
 
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('touchend', handleClickOutside);
-        };
-    }, [isOpen]);
+    //     return () => {
+    //         document.removeEventListener('mousedown', handleClickOutside);
+    //         document.removeEventListener('touchend', handleClickOutside);
+    //     };
+    // }, [isOpen]);
 
     return (
         <>
-            <DropdownMenu modal={false}>
+            <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                     <Button
                         onClick={(e) => {
@@ -143,6 +143,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         onClick={(e) => {
                             e.preventDefault()
                             handleEdit()
+                            setIsOpen(false)
                         }}
                     >
                         <Pencil/>
@@ -158,6 +159,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                                             if (milestone.private) return
                                             e.preventDefault()
                                             handleShare()
+                                            setIsOpen(false)
                                         }}
                                     >
                                         <Share />
@@ -176,6 +178,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         onClick={(e) => {
                             e.preventDefault()
                             handleDuplicate()
+                            setIsOpen(false)
                         }}
                     >
                         <Copy/>
@@ -185,6 +188,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         onClick={(e) => {
                             e.preventDefault()
                             handleDelete()
+                            setIsOpen(false)
                         }}
                     >
                         <Trash/>
