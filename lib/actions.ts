@@ -118,13 +118,17 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
             }
         })
 
+        const requester = await prisma.organization.findUnique({
+            where: {id: session.user.id}
+        })
+
         if (organization) {
             await sendMemberRequestCreatedEmail(
                 {
                     user: {
-                        name: session.user.name,
-                        email: session.user.email,
-                        image: ""
+                        name: requester?.name || session.user.name,
+                        email: requester?.contactEmail || session.user.email,
+                        image: requester?.image || ""
                     },
                     owners: organization.members.map(member => ({
                         name: member.user?.name,
