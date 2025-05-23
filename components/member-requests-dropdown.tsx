@@ -30,6 +30,8 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
                 console.error(response.error)
                 toast.error(response.error)
             }
+
+            location.reload() // force full page refresh
         }
     }
 
@@ -50,6 +52,8 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
                 console.error(response.error)
                 toast.error(response.error)
             }
+
+            location.reload() // force full page refresh
         }
     }
 
