@@ -10,7 +10,7 @@
     "published": true,
     "organizationId": "cm869ngpm0000of3vh8f98q2l",
     "userId": null,
-    "modalities": ["GENE_THERAPY"],
+    "modalities": ["GENE_THERAPY_AAV"],
     "milestones": [
         {
             "id": "keBvWptYotYkbU2hHdCT3",
