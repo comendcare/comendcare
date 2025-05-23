@@ -22,7 +22,7 @@ export async function handleImageUpload(file: File, data: string | undefined): P
 
     const base64data = data.replace(/^data:image\/\w+;base64,/, "")
     const imageUrl = await uploadImg({
-        name: file.name,
+        name: file.name.replace(/\s/g, "-"), // replace spaces with - to avoid issues with encoding image links
         type: file.type,
         data: base64data || "",
     })
