@@ -122,6 +122,8 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
             where: {id: session.user.id}
         })
 
+        console.log(`requester`, requester)
+
         if (organization) {
             await sendMemberRequestCreatedEmail(
                 {
