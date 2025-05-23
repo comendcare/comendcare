@@ -49,6 +49,7 @@ const formSchema = z.object({
     description: z.string().min(1, "Description is required"),
     website: z.string().url("Enter a valid URL"),
     yearFounded: z.string().regex(/^\d{4}$/, "Enter a valid year"),
+    headquarters: z.string(),
     type: z.string(),
     services: z.array(optionSchema),
     certifications: z.array(optionSchema),
@@ -86,6 +87,7 @@ export function CreateCompanyDialog() {
             formData.set("description", values.description)
             formData.set("website", values.website)
             formData.set("founded", values.yearFounded)
+            formData.set("headquarters", values.headquarters)
             formData.set("type", values.yearFounded)
 
             // Map form values into FormData
@@ -183,6 +185,20 @@ export function CreateCompanyDialog() {
                                     <FormLabel>Year Founded</FormLabel>
                                     <FormControl>
                                         <Input placeholder="e.g. 2012" type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="headquarters"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Headquarters</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g. Toronto, Canada" type="text" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

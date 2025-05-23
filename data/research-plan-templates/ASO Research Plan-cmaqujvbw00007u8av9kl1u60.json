@@ -1,0 +1,254 @@
+{
+    "id": "cmaqujvbw00007u8av9kl1u60",
+    "title": "ASO Research Plan",
+    "description": "Outlines each stage of developing an ASO therapy, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.",
+    "content": null,
+    "slug": "cmaqujvbx00017u8atas30eao",
+    "image": null,
+    "createdAt": "2025-05-16T13:41:09.596Z",
+    "updatedAt": "2025-05-16T13:41:09.596Z",
+    "published": true,
+    "organizationId": "cmah3gmve000e10fa66iiodi5",
+    "userId": null,
+    "modalities": [
+        "ANTISENSE_OLIGONUCLEOTIDE"
+    ],
+    "milestones": [
+        {
+            "id": "f4ef0a99-7ee2-4424-94da-c74b44741cf9",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T15:33:45.543Z",
+            "title": "Natural history study",
+            "description": "Observe how a disease naturally progresses over time under standard of care conditions. Outcomes are usually measured by clinical researchers through formal clinical visits.",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": false,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 0,
+            "nodeType": "PROJECT",
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60",
+            "organizationId": "cmah3gmve000e10fa66iiodi5",
+            "nodeId": "824d01a7-04cf-43d3-9c06-1702a294f9be",
+            "types": [
+                {
+                    "id": "cb2a3262-472c-4118-8715-54a172576ce3",
+                    "milestoneTypeId": "NATURALHISTORYSTUDY",
+                    "milestoneId": "f4ef0a99-7ee2-4424-94da-c74b44741cf9",
+                    "createdAt": "2025-05-16T15:33:45.543Z"
+                }
+            ]
+        },
+        {
+            "id": "a141e555-e4e8-41ae-91e0-69d4a953481c",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T15:33:45.544Z",
+            "title": "Basic science",
+            "description": "Understand the fundamental biological processes that contribute to a disease",
+            "notes": "[]",
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": false,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 0,
+            "nodeType": "PROJECT",
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60",
+            "organizationId": "cmah3gmve000e10fa66iiodi5",
+            "nodeId": "f6f709bb-f04e-401c-a943-6c14a777c562",
+            "types": [
+                {
+                    "id": "84af4a7e-c4dd-496c-a270-27360ac1910b",
+                    "milestoneTypeId": "BASICSCIENCE",
+                    "milestoneId": "a141e555-e4e8-41ae-91e0-69d4a953481c",
+                    "createdAt": "2025-05-16T15:33:45.544Z"
+                }
+            ]
+        },
+        {
+            "id": "8c04db10-ceed-4c8d-9792-e0cc1bab5db8",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T15:33:45.543Z",
+            "title": "Patient-derived cell line",
+            "description": "Grow cells taken directly from patients to study disease characteristics.",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 0,
+            "nodeType": "PROJECT",
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60",
+            "organizationId": "cmah3gmve000e10fa66iiodi5",
+            "nodeId": "46816ebf-752c-409a-abb8-7c58a59daf44",
+            "types": [
+                {
+                    "id": "a1e6915b-0bcd-45f2-b008-4738604f2c38",
+                    "milestoneTypeId": "PATIENTDERIVEDCELLLINE",
+                    "milestoneId": "8c04db10-ceed-4c8d-9792-e0cc1bab5db8",
+                    "createdAt": "2025-05-16T15:33:45.543Z"
+                }
+            ]
+        },
+        {
+            "id": "7a5b95be-11ed-48ad-8509-4f62821e3157",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T15:33:45.544Z",
+            "title": "Toxicology study",
+            "description": "Assess potential harmful effects of a treatment in model systems before human trials.",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 0,
+            "nodeType": "PROJECT",
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60",
+            "organizationId": "cmah3gmve000e10fa66iiodi5",
+            "nodeId": "761b9706-1429-4f96-b6f8-4adc22fc14b7",
+            "types": [
+                {
+                    "id": "e5b9a0bc-4416-46be-85ba-3102d5007cca",
+                    "milestoneTypeId": "TOXICOLOGYSTUDY",
+                    "milestoneId": "7a5b95be-11ed-48ad-8509-4f62821e3157",
+                    "createdAt": "2025-05-16T15:33:45.544Z"
+                }
+            ]
+        },
+        {
+            "id": "c9bb11dc-56c4-4ed5-9e33-a51fce7319ad",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T15:33:45.544Z",
+            "title": "Mouse model",
+            "description": "Model genetic impacts on disease in order to understand the disease biology and the impacts of treatment on disease. ",
+            "notes": null,
+            "status": "PLANNED",
+            "budget": null,
+            "endDate": null,
+            "startDate": null,
+            "private": true,
+            "otherTypeDetails": null,
+            "openTo": [],
+            "timelineOrder": 0,
+            "nodeType": "PROJECT",
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60",
+            "organizationId": "cmah3gmve000e10fa66iiodi5",
+            "nodeId": "33c78fb9-26f6-4407-8ed4-0d6f480a80d7",
+            "types": [
+                {
+                    "id": "46bfdd10-d884-49bb-8144-db4e10c8f959",
+                    "milestoneTypeId": "MOUSEMODEL",
+                    "milestoneId": "c9bb11dc-56c4-4ed5-9e33-a51fce7319ad",
+                    "createdAt": "2025-05-16T15:33:45.544Z"
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "id": "824d01a7-04cf-43d3-9c06-1702a294f9be",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T13:41:09.617Z",
+            "positionX": 500,
+            "positionY": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "f6f709bb-f04e-401c-a943-6c14a777c562",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T13:41:09.617Z",
+            "positionX": 0,
+            "positionY": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "46816ebf-752c-409a-abb8-7c58a59daf44",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T13:41:09.617Z",
+            "positionX": 1000,
+            "positionY": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "761b9706-1429-4f96-b6f8-4adc22fc14b7",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T13:41:09.617Z",
+            "positionX": 2000,
+            "positionY": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "33c78fb9-26f6-4407-8ed4-0d6f480a80d7",
+            "createdAt": "2025-05-16T13:41:09.617Z",
+            "updatedAt": "2025-05-16T13:41:09.617Z",
+            "positionX": 1500,
+            "positionY": 0,
+            "origin": [
+                0,
+                0
+            ],
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        }
+    ],
+    "edges": [
+        {
+            "id": "dc1fde69-c999-4188-9bff-ff1a39119676",
+            "source": "f6f709bb-f04e-401c-a943-6c14a777c562",
+            "target": "824d01a7-04cf-43d3-9c06-1702a294f9be",
+            "type": null,
+            "data": null,
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "ba76d98f-4b99-466b-989d-546bc03b93e3",
+            "source": "824d01a7-04cf-43d3-9c06-1702a294f9be",
+            "target": "46816ebf-752c-409a-abb8-7c58a59daf44",
+            "type": null,
+            "data": null,
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "ca807a75-b04e-45d5-aa23-5c0cbf5d08b5",
+            "source": "46816ebf-752c-409a-abb8-7c58a59daf44",
+            "target": "33c78fb9-26f6-4407-8ed4-0d6f480a80d7",
+            "type": null,
+            "data": null,
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        },
+        {
+            "id": "e5162db9-003d-4e6c-922c-04b19e624818",
+            "source": "33c78fb9-26f6-4407-8ed4-0d6f480a80d7",
+            "target": "761b9706-1429-4f96-b6f8-4adc22fc14b7",
+            "type": null,
+            "data": null,
+            "roadmapId": "cmaqujvbw00007u8av9kl1u60"
+        }
+    ]
+}

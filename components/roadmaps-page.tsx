@@ -70,36 +70,22 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
-            <div className="p-6 w-full">
+            <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">Research Plans</h2>
-                    <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                }}
-                                variant="ghost"
-                                className="p-2 justify-end h-full"
-                            >
-                                <Ellipsis/>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
-                                <DropdownMenuItem
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleShare()
-                                    }}
-                                >
-                                    <Share />
-                                    Share
-                                </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        <Button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleShare()
+                            }}
+                            variant={'secondary'}
+                            className="onborda-share-research-plan"
+                        >
+                            <Share />
+                            Share
+                        </Button>
                 </div>
-                {roadmaps.length > 0 && (
+                {/* {roadmaps.length > 0 && ( */}
                     <RoadmapsTable 
                         roadmaps={roadmaps} 
                         rowClickCallback={(roadmap) => {
@@ -107,10 +93,10 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             router.push(`/app/research-plan/${roadmap.id}`)
                         }}
                     />
-                )}
-                {roadmaps.length === 0 && (
+                {/* )} */}
+                {/* {roadmaps.length === 0 && (
                     <PrivateNoResearchPlansRow />
-                )}
+                )} */}
             </div>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
