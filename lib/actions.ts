@@ -130,7 +130,7 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
                     user: {
                         name: requester?.name || session.user.name,
                         email: requester?.contactEmail || session.user.email,
-                        image: requester?.image || ""
+                        image: requester?.image || session.user.image,
                     },
                     owners: organization.members.map(member => ({
                         name: member.user?.name,
