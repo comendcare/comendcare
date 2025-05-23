@@ -10,7 +10,7 @@
     "published": true,
     "organizationId": "cm869ngpm0000of3vh8f98q2l",
     "userId": null,
-    "modalities": [],
+    "modalities": ["DRUG_REPURPOSING_SCREENING"],
     "milestones": [
         {
             "id": "1VcjfcnkOnfShyVI8xtTu",
