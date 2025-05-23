@@ -20,6 +20,8 @@ export default async function InvitationsDropdown({invitation}: { invitation: In
                 console.error(response.error)
                 toast.error(response.error)
             }
+
+            location.reload() // force full page refresh
         }
     }
 
