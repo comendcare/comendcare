@@ -2030,9 +2030,12 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: ty
             organization: {
                 connect: {id: organizationId}
             },
-            modalities: roadmapTemplate?.modalities.map(modality => modality.value)
+            modalities: roadmapTemplate?.modalities
         }
     })
+
+    // maps the original node id (from the template) to the new node ID that's stored in the DB
+    const nodeIDMap: {[originalNodeId: string]: string} = {}
 
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
@@ -2040,12 +2043,15 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: ty
 
         const nodes = await Promise.all(
             milestones.map(async (milestone: any, index: number) => {
+                // find the node associated with the milestone, used to fetch position information
+                const templateNode = roadmapTemplate.nodes.find(n => n.id === milestone.nodeId)
+
                 // create Node & associated Milestone
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        positionX: index * 500,
-                        positionY: 0,
+                        positionX: templateNode ? templateNode.positionX : index * 500,
+                        positionY: templateNode ? templateNode.positionY : 0,
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
@@ -2060,7 +2066,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: ty
                                 types: {
                                     create: (milestone.types || []).map((type: any) => ({
                                         milestoneType: {
-                                            connect: {id: type}
+                                            connect: {id: type.milestoneTypeId}
                                         }
                                     }))
                                 },
@@ -2068,6 +2074,10 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: ty
                         }
                     }
                 })
+
+                // append to node ID map, this is used to create edges so we can map the template node ID to the
+                // new node ID that will be used in the database
+                if (templateNode) nodeIDMap[templateNode.id] = node.id
 
                 // grab milestone so we can add tasks
                 // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
@@ -2108,14 +2118,30 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: ty
             })
         )
 
-        for (let i = 0; i < nodes.length - 1; i++) {
-            await prisma.edge.create({
-                data: {
-                    roadmap: {connect: {id: roadmap.id}},
-                    source: nodes[i]?.id,
-                    target: nodes[i + 1]?.id
-                }
-            })
+        // create any edges that are connecting nodes
+        if (roadmapTemplate.edges) {
+            const edges = await Promise.all(
+                roadmapTemplate.edges.map(async (edge: Edge, index: number)=> {
+                    const newEdge = await prisma.edge.create({
+                        data: {
+                            roadmap: {connect: {id: roadmap.id}},
+                            source: nodeIDMap[edge.source] || edge.source,
+                            target: nodeIDMap[edge.target] || edge.target,
+                        }
+                    })
+                })
+            )
+        } else {
+            // template doesn't have any defined edges, use default edge generation
+            for (let i = 0; i < nodes.length - 1; i++) {
+                await prisma.edge.create({
+                    data: {
+                        roadmap: {connect: {id: roadmap.id}},
+                        source: nodes[i]?.id,
+                        target: nodes[i + 1]?.id
+                    }
+                })
+            }
         }
     }
 
@@ -3630,6 +3656,7 @@ export const createCompany = async (formData: FormData) => {
     const title = formData.get("orgName") as string
     const description = formData.get("description") as string
     const yearEstablished = parseInt(formData.get("founded") as string)
+    const headquarters = formData.get("headquarters") as string
     const companyType = formData.get("type") as string
     const url = formData.get("website") as string
     const servicesRaw = formData.get("services") as string
@@ -3651,6 +3678,7 @@ export const createCompany = async (formData: FormData) => {
                 description,
                 yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
                 companyType,
+                headquarters,
                 url,
                 services: parsedServices.length
                     ? {

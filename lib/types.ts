@@ -673,6 +673,21 @@ export const CRO_CERTIFICATIONS: { id: string; label: string; value: string; des
     },
 ];
 
+export const CRO_TAGS: { id: string; label: string; value: string; description: string }[] = [
+    {
+        id: '1',
+        label: 'Experience in rare disease',
+        value: 'Experience in rare disease',
+        description: 'These companies and service providers have experience working within rare disease.',
+    },
+    {
+        id: '1',
+        label: 'PAG friendly',
+        value: 'PAG friendly',
+        description: 'These companies and service providers have experience working with PAGs.',
+    },
+];
+
 export const MOLECULAR_MECHANISMS: Option[] = [
     {
         id: '1',

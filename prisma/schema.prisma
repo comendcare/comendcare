@@ -702,6 +702,7 @@ model Company {
   simplifiedCertifications String[]
   rfis                     RFI[]
   reviews                  Review[]
+  tags                     String[]
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
   categories               String[]
   milestoneTypes           String[]
