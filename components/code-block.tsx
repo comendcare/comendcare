@@ -14,7 +14,16 @@ export default function CopyCodeBlock({ code, language }: { code: string; langua
     return (
         <CodeBlock code={code} language={language}>
             <div className="relative">
-                <CodeBlock.Code className="bg-gray-900 !p-6 rounded-xl shadow-lg max-w-md overflow-y-auto">
+                <CodeBlock.Code 
+                    className="bg-gray-900 !p-6 rounded-xl shadow-lg max-w-md overflow-y-auto"
+                    onCopy={(e) => {
+                        // console.log("Code copied!");
+                        // Optionally, you can access the copied text:
+                        // const copiedText = window.getSelection()?.toString();
+                        // console.log("Copied text:", copiedText);
+                        // You can also trigger a toast, analytics event, etc.
+                    }}
+                >
                     <div className="table-row">
                         <CodeBlock.LineNumber className="table-cell pr-4 text-sm text-gray-500 text-right select-none" />
                         <CodeBlock.LineContent className="table-cell">

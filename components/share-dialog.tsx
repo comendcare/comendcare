@@ -20,7 +20,8 @@ export default function ShareDialog({
                                         embeddedResearchPlansLink,
                                         embeddedResearchPlanLink,
                                         embeddedProjectLink,
-                                        trackShareEvent
+                                        trackShareEvent,
+                                        trackEmbedCopyEvent,
                                     }: {
     url: string,
     organization?: Organization,
@@ -29,7 +30,8 @@ export default function ShareDialog({
     embeddedResearchPlansLink?: string,
     embeddedResearchPlanLink?: string,
     embeddedProjectLink?: string,
-    trackShareEvent?: (socialOption: string) => void
+    trackShareEvent?: (socialOption: string) => void,
+    trackEmbedCopyEvent?: () => void
 }) {
     function embedCode(link: string) {
         return (

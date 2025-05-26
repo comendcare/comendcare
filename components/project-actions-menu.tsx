@@ -1,3 +1,4 @@
+"use server"
 import {Copy, Ellipsis, Pencil, Share, Trash} from "lucide-react"
 import {
     DropdownMenu,
