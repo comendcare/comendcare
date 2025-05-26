@@ -186,7 +186,7 @@ export type MembershipWithOrganization = Member & {
 };
 
 export type OrganizationsWithConditions = Organization & {
-    condition?: (ConditionToOrganization & {
+    conditions?: (ConditionToOrganization & {
         condition?: Condition | null;
     })[] | null;
 };
