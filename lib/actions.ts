@@ -3220,7 +3220,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                 })
 
                 const organizations = await prisma.organization.findMany({
-                    where: {Kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
+                    where: {kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
                     select: {id: true},
                 });
 
