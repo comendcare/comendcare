@@ -24,6 +24,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -206,6 +207,17 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestone.roadmapId}/project/${milestone.id}`}
+                            trackShareEvent={(socialOption: string) => {
+                                mixpanelTrack(`Project Shared`, {
+                                    "Platform": socialOption,
+                                    ...(organization ? {
+                                        "Organization ID": organization.id,
+                                        "Organization Name": organization.name,
+                                        "Project ID": milestone.id,
+                                        "Project Title": milestone.title
+                                    } : undefined)
+                                })
+                            }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>

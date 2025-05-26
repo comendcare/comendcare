@@ -11,6 +11,7 @@ import { Mail, Share } from "lucide-react";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
 import { RoadmapsCard } from "@/components/public-roadmap-card";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export async function generateMetadata({
                                            params
@@ -177,6 +178,15 @@ export default async function OrganizationRoadmapPage({
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
                                             organization={organization}
+                                            trackShareEvent={(socialOption: string) => {
+                                                mixpanelTrack(`Research Plans Table Shared`, {
+                                                    "Platform": socialOption,
+                                                    ...(organization ? {
+                                                        "Organization ID": organization.id,
+                                                        "Organization Name": organization.name
+                                                    } : undefined)
+                                                })
+                                            }}
                                         />
                                     ),
                                 },
