@@ -1225,6 +1225,36 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
     };
 }
 
+export async function getToolsAnalytics(orgId?: string | undefined) {
+    const totalTools: number = (await prisma.asset.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined)
+    })).length
+    const totalPinnedTools: number = (await prisma.asset.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined),
+        where: {pinned: true}
+    })).length
+
+    return {
+        totalTools,
+        totalPinnedTools,
+    };
+}
+
+export async function getRFPsAnalytics(orgId?: string | undefined) {
+    const totalRFPs: number = (await prisma.rFP.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined)
+    })).length
+    const totalPinnedRFPs: number = (await prisma.rFP.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined),
+        where: {pinned: true}
+    })).length
+
+    return {
+        totalRFPs,
+        totalPinnedRFPs,
+    };
+}
+
 export async function getOrganizationAnalytics() {
     const now = new Date();
     const startOfCurrentMonth = startOfMonth(now);
