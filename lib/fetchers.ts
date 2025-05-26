@@ -4,8 +4,8 @@ import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse, CustomOrganization} from "@/lib/types";
-import {getProfileCompletionChecks, logError} from "@/lib/utils";
+import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
+import {getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition} from "@prisma/client";
@@ -1177,6 +1177,49 @@ export async function getUserAnalytics() {
         newUsersLastMonth,
         activeUsers,
         growthRate,
+    };
+}
+
+export async function getResearchPlansAnalytics() {
+    const allResearchPlans = await prisma.roadmap.findMany({
+        include: {milestones: {include: {types: true}}}
+    })
+
+    // Total research plans
+    const totalResearchPlans = allResearchPlans.length
+
+    // Total research plans, by type
+    let totalResearchPlansOfType: {type: string, num: number}[] = await Promise.all(RESEARCH_PLAN_TYPES.map(async (type) => ({
+        type: type.label,
+        num: await prisma.roadmap.count({
+            where: {modalities: {has: type.value}}
+        })
+    })))
+
+    // Total projects, by type
+    const milestoneTypes = await prisma.milestoneType.findMany()
+    const allProjects = await prisma.milestone.findMany({
+        include: {types: true}
+    })
+    let totalProjects = allProjects.length
+    let totalProjectsOfType: {type: string, num: number}[] = milestoneTypes.map((type) => (
+        {
+            type: type.label,
+            num: allProjects.filter(project => project.types.map(type => type.milestoneTypeId).includes(type.id)).length
+        }
+    ))
+
+    let totalResearchPlansByStatus = Object.values(milestoneCategories).map(({option}) => ({
+        type: option.label,
+        num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
+    }))
+
+    return {
+        totalResearchPlans,
+        totalResearchPlansOfType,
+        totalResearchPlansByStatus,
+        totalProjects,
+        totalProjectsOfType
     };
 }
 
