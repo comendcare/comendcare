@@ -1,14 +1,9 @@
 import {notFound} from "next/navigation"
-import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
-import {FloatingDock} from "@/components/floating-dock";
-import ShareDialog from "@/components/share-dialog";
 import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { Mail, Share } from "lucide-react"
-import ContactPAGDialog from "@/components/contact-pag-dialog";
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
 
 // export async function generateMetadata({

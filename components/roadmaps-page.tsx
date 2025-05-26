@@ -15,6 +15,7 @@ import ShareDialog from "./share-dialog";
 import { getOrganizationFromOrganizationId } from "@/lib/fetchers";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], orgId: string}) {
     const router = useRouter()
@@ -107,7 +108,16 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             organization={organization}
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
-                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`}
+                            embeddedResearchPlansLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plans Table Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name
+                            //         } : undefined)
+                            //     })
+                            // }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>

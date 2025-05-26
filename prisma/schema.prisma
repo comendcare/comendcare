@@ -737,18 +737,18 @@ model Site {
 }
 
 model Service {
-  id          String  @id @default(uuid())
-  name        String
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String?
-  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId   String
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId   String?
 }
 
 model Certification {
-  id        String  @id @default(uuid())
-  name      String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId String
+  id        String   @id @default(uuid())
+  name      String   @unique
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String?
   files     File[]
 }
 
