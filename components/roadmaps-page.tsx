@@ -109,15 +109,15 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             embeddedResearchPlansLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`}
-                            trackShareEvent={(socialOption: string) => {
-                                mixpanelTrack(`Research Plans Table Shared`, {
-                                    "Platform": socialOption,
-                                    ...(organization ? {
-                                        "Organization ID": organization.id,
-                                        "Organization Name": organization.name
-                                    } : undefined)
-                                })
-                            }}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plans Table Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name
+                            //         } : undefined)
+                            //     })
+                            // }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>

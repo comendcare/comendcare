@@ -181,15 +181,15 @@ export default async function OrganizationRoadmapPage({
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
                                             organization={organization}
-                                            trackShareEvent={(socialOption: string) => {
-                                                mixpanelTrack(`Research Plans Table Shared`, {
-                                                    "Platform": socialOption,
-                                                    ...(organization ? {
-                                                        "Organization ID": organization.id,
-                                                        "Organization Name": organization.name
-                                                    } : undefined)
-                                                })
-                                            }}
+                                            // trackShareEvent={(socialOption: string) => {
+                                            //     mixpanelTrack(`Research Plans Table Shared`, {
+                                            //         "Platform": socialOption,
+                                            //         ...(organization ? {
+                                            //             "Organization ID": organization.id,
+                                            //             "Organization Name": organization.name
+                                            //         } : undefined)
+                                            //     })
+                                            // }}
                                         />
                                     ),
                                 },
