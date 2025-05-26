@@ -17,27 +17,32 @@ export default function ShareDialog({
                                         organization,
                                         postSubject,
                                         postMessage,
-                                        embeddedResearchPlansLink,
-                                        embeddedResearchPlanLink,
-                                        embeddedProjectLink,
+                                        embeddedResearchPlansData,
+                                        embeddedResearchPlanData,
+                                        embeddedProjectData,
                                         trackShareEvent,
-                                        trackEmbedEvent,
                                     }: {
     url: string,
     organization?: Organization,
     postSubject?: string,
     postMessage?: string,
-    embeddedResearchPlansLink?: string,
-    embeddedResearchPlanLink?: string,
-    embeddedProjectLink?: string,
+    embeddedResearchPlansData?: {
+        embeddedResearchPlansLink: string,
+    }
+    embeddedResearchPlanData?: {
+        embeddedResearchPlanLink: string,
+        resarchPlanId: string,
+        researchPlanTitle: string,
+    },
+    embeddedProjectData?: {
+        embeddedProjectLink?: string,
+        projectId: string,
+        projectTitle: string
+    }
     trackShareEvent?: {
         title: string,
         additonalProperties?: {[key: string]: string} | undefined
     },
-    trackEmbedEvent?: {
-        title: string,
-        additionalProperties?: {[key: string]: string} | undefined
-    }
 }) {
     function embedCode(link: string) {
         return (
@@ -73,18 +78,6 @@ export default function ShareDialog({
             })
         }
     }
-
-    // const trackMixpanelEmbedEvent = (title: string) => {
-    //     if (trackEmbedEvent?.title) {
-    //         mixpanelTrack(trackEmbedEvent.title, {
-    //             ...(trackEmbedEvent?.additionalProperties ? trackEmbedEvent?.additionalProperties : undefined),
-    //             ...(organization ? {
-    //                 "Organization ID": organization.id,
-    //                 "Organization Name": organization.name
-    //             } : undefined),
-    //         })
-    //     }
-    // }
 
     return (
         <>
@@ -251,14 +244,14 @@ export default function ShareDialog({
                     </div>
                 </DialogDescription>
                 <Accordion type="single" collapsible className="w-full">
-                    {embeddedResearchPlansLink && (
+                    {embeddedResearchPlansData?.embeddedResearchPlansLink && (
                         <AccordionItem value="item-1">
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Research Plans Table
                             </AccordionTrigger>
                             <AccordionContent>
                                 <CopyCodeBlock 
-                                    code={embedCode(embeddedResearchPlansLink)} 
+                                    code={embedCode(embeddedResearchPlansData.embeddedResearchPlansLink)} 
                                     language={"JavaScript"}
                                     onCopyCallback={() => {
                                         mixpanelTrack(`Research Plans Table Embed Copied`, {
@@ -272,20 +265,22 @@ export default function ShareDialog({
                             </AccordionContent>
                         </AccordionItem>
                     )}
-                    {embeddedResearchPlanLink && (
+                    {embeddedResearchPlanData?.embeddedResearchPlanLink && (
                         <AccordionItem value="item-2">
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Research Plan
                             </AccordionTrigger>
                             <AccordionContent>
                                 <CopyCodeBlock 
-                                    code={embedCode(embeddedResearchPlanLink)} 
+                                    code={embedCode(embeddedResearchPlanData.embeddedResearchPlanLink)} 
                                     language={"JavaScript"}
                                     onCopyCallback={() => {
                                         mixpanelTrack(`Research Plan Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
-                                                "Organization Name": organization.name
+                                                "Organization Name": organization.name,
+                                                "Research Plan ID": embeddedResearchPlanData.resarchPlanId,
+                                                "Research Plan Title": embeddedResearchPlanData.researchPlanTitle
                                             } : undefined),
                                         })
                                     }}
@@ -293,20 +288,22 @@ export default function ShareDialog({
                             </AccordionContent>
                         </AccordionItem>
                     )}
-                    {embeddedProjectLink && (
+                    {embeddedProjectData?.embeddedProjectLink && (
                         <AccordionItem value="item-3">
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Project
                             </AccordionTrigger>
                             <AccordionContent>
                                 <CopyCodeBlock 
-                                    code={embedCode(embeddedProjectLink)} 
+                                    code={embedCode(embeddedProjectData.embeddedProjectLink)} 
                                     language={"JavaScript"}
                                     onCopyCallback={() => {
                                         mixpanelTrack(`Project Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
-                                                "Organization Name": organization.name
+                                                "Organization Name": organization.name,
+                                                "Project ID": embeddedProjectData.projectId,
+                                                "Project Title": embeddedProjectData.projectTitle
                                             } : undefined),
                                         })
                                     }}

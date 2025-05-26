@@ -764,7 +764,11 @@ export function EditMilestoneForm({
                         organization={organization}
                         postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
                         postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
-                        embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`}
+                        embeddedProjectData={{
+                            embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
+                            projectId: milestoneData.id,
+                            projectTitle: milestoneData.title
+                        }}
                         // trackShareEvent={(socialOption: string) => {
                         //     mixpanelTrack(`Project Shared`, {
                         //         "Platform": socialOption,
