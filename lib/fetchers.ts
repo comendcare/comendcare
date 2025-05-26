@@ -1180,8 +1180,9 @@ export async function getUserAnalytics() {
     };
 }
 
-export async function getResearchPlansAnalytics() {
+export async function getResearchPlansAnalytics(orgId?: string | undefined) {
     const allResearchPlans = await prisma.roadmap.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined),
         include: {milestones: {include: {types: true}}}
     })
 
@@ -1199,6 +1200,7 @@ export async function getResearchPlansAnalytics() {
     // Total projects, by type
     const milestoneTypes = await prisma.milestoneType.findMany()
     const allProjects = await prisma.milestone.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined),
         include: {types: true}
     })
     let totalProjects = allProjects.length

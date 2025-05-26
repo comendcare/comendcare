@@ -35,11 +35,11 @@ const projectsChartConfig = {
   },
 } satisfies ChartConfig
 
-export function AdminResearchPlansAnalyticsCards() {
+export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | undefined}) {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getResearchPlansAnalytics()
+        getResearchPlansAnalytics(orgId)
             .then((res) => {
                 console.log(`results`, res)
                 return res
