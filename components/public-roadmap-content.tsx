@@ -67,17 +67,17 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`}
                             organization={organization}
-                            trackShareEvent={(socialOption: string) => {
-                                mixpanelTrack(`Research Plan Shared`, {
-                                    "Platform": socialOption,
-                                    ...(organization ? {
-                                        "Organization ID": organization.id,
-                                        "Organization Name": organization.name,
-                                        "Research Plan ID": roadmap.id,
-                                        "Research Plan Title": roadmap.title
-                                    } : undefined)
-                                })
-                            }}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plan Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name,
+                            //             "Research Plan ID": roadmap.id,
+                            //             "Research Plan Title": roadmap.title
+                            //         } : undefined)
+                            //     })
+                            // }}
                         />
                     ),
                 },
