@@ -190,6 +190,9 @@ export default async function OrganizationRoadmapPage({
                                             //         } : undefined)
                                             //     })
                                             // }}
+                                            trackShareEvent={{
+                                                title: `Research Plans Table Shared`
+                                            }}
                                         />
                                     ),
                                 },

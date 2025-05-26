@@ -17,21 +17,32 @@ export default function ShareDialog({
                                         organization,
                                         postSubject,
                                         postMessage,
-                                        embeddedResearchPlansLink,
-                                        embeddedResearchPlanLink,
-                                        embeddedProjectLink,
+                                        embeddedResearchPlansData,
+                                        embeddedResearchPlanData,
+                                        embeddedProjectData,
                                         trackShareEvent,
-                                        // trackEmbedCopyEvent,
                                     }: {
     url: string,
     organization?: Organization,
     postSubject?: string,
     postMessage?: string,
-    embeddedResearchPlansLink?: string,
-    embeddedResearchPlanLink?: string,
-    embeddedProjectLink?: string,
-    trackShareEvent?: (socialOption: string) => void,
-    // trackEmbedCopyEvent?: () => void
+    embeddedResearchPlansData?: {
+        embeddedResearchPlansLink: string,
+    }
+    embeddedResearchPlanData?: {
+        embeddedResearchPlanLink: string,
+        resarchPlanId: string,
+        researchPlanTitle: string,
+    },
+    embeddedProjectData?: {
+        embeddedProjectLink?: string,
+        projectId: string,
+        projectTitle: string
+    }
+    trackShareEvent?: {
+        title: string,
+        additonalProperties?: {[key: string]: string} | undefined
+    },
 }) {
     function embedCode(link: string) {
         return (
@@ -46,7 +57,7 @@ export default function ShareDialog({
     }
 
     const handleCopyResourceLinkToClipboard = async () => {
-        if (trackShareEvent) trackShareEvent("Link")
+        if (trackShareEvent) trackMixpanelShareEvent("Link")
         try {
             await navigator.clipboard.writeText(url)
             toast.success(`URL successfully copied to clipboard.`)
@@ -55,15 +66,18 @@ export default function ShareDialog({
         }
     }
 
-    // const trackMixpanelEvent = (socialOption: string) => {
-    //     mixpanelTrack(`Organization Profile Shared`, {
-    //         "Platform": socialOption,
-    //         ...(organization ? {
-    //             "Organization ID": organization.id,
-    //             "Organization Name": organization.name
-    //         } : undefined)
-    //     })
-    // }
+    const trackMixpanelShareEvent = (socialOption: string) => {
+        if (trackShareEvent?.title) {
+            mixpanelTrack(trackShareEvent.title, {
+                ...(trackShareEvent?.additonalProperties ? trackShareEvent?.additonalProperties : undefined),
+                ...(organization ? {
+                    "Organization ID": organization.id,
+                    "Organization Name": organization.name
+                } : undefined),
+                "Platform": socialOption,
+            })
+        }
+    }
 
     return (
         <>
@@ -78,7 +92,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Facebook")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Facebook")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -92,7 +106,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Messenger")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Messenger")
                                 }}
                             >
                                 <svg
@@ -133,7 +147,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Twitter")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Twitter")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -147,7 +161,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Reddit")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Reddit")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
@@ -165,7 +179,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Email")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Email")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -181,7 +195,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Whatsapp")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Whatsapp")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -198,7 +212,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackShareEvent("Linkedin")
+                                    if (trackShareEvent) trackMixpanelShareEvent("Linkedin")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -230,33 +244,70 @@ export default function ShareDialog({
                     </div>
                 </DialogDescription>
                 <Accordion type="single" collapsible className="w-full">
-                    {embeddedResearchPlansLink && (
+                    {embeddedResearchPlansData?.embeddedResearchPlansLink && (
                         <AccordionItem value="item-1">
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Research Plans Table
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedResearchPlansLink)} language={"JavaScript"}/>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedResearchPlansData.embeddedResearchPlansLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={() => {
+                                        mixpanelTrack(`Research Plans Table Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}
-                    {embeddedResearchPlanLink && (
+                    {embeddedResearchPlanData?.embeddedResearchPlanLink && (
                         <AccordionItem value="item-2">
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Research Plan
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedResearchPlanLink)} language={"JavaScript"}/>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedResearchPlanData.embeddedResearchPlanLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={() => {
+                                        mixpanelTrack(`Research Plan Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name,
+                                                "Research Plan ID": embeddedResearchPlanData.resarchPlanId,
+                                                "Research Plan Title": embeddedResearchPlanData.researchPlanTitle
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}
-                    {embeddedProjectLink && (
+                    {embeddedProjectData?.embeddedProjectLink && (
                         <AccordionItem value="item-3">
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Project
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedProjectLink)} language={"JavaScript"}/>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedProjectData.embeddedProjectLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={() => {
+                                        mixpanelTrack(`Project Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name,
+                                                "Project ID": embeddedProjectData.projectId,
+                                                "Project Title": embeddedProjectData.projectTitle
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}

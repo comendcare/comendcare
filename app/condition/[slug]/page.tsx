@@ -529,15 +529,6 @@ export default async function ConditionPage({
                         icon: <IconShare/>,
                         dialog: <ShareDialog 
                             url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`}
-                            // trackShareEvent={(socialOption: string) => {
-                            //     mixpanelTrack(`Organization Profile Shared`, {
-                            //         "Platform": socialOption,
-                            //         ...(organization ? {
-                            //             "Organization ID": organization.id,
-                            //             "Organization Name": organization.name
-                            //         } : undefined)
-                            //     })
-                            // }}
                         />
                     },
                     {
