@@ -207,7 +207,11 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             organization={organization}
                             postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
-                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestone.roadmapId}/project/${milestone.id}`}
+                            embeddedProjectData={{
+                                embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestone.roadmapId}/project/${milestone.id}`,
+                                projectId: milestone.id,
+                                projectTitle: milestone.title
+                            }}
                             // trackShareEvent={(socialOption: string) => {
                             //     mixpanelTrack(`Project Shared`, {
                             //         "Platform": socialOption,
