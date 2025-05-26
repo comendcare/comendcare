@@ -1209,7 +1209,6 @@ export async function getResearchPlansAnalytics() {
         }
     ))
 
-    console.log(`milestone categories`, milestoneCategories)
     let totalResearchPlansByStatus = Object.values(milestoneCategories).map(({option}) => ({
         type: option.label,
         num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
