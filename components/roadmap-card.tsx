@@ -9,16 +9,22 @@ export default function RoadmapCard({
 }: {
     data: Roadmap & { organization: Organization | null }
 }) {
-    const url = `${data.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${data.slug}`
+    const url = `${data.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${data.id}`
 
     return (
         <div className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
             <Link
-                href={`/admin/research-plan/${data.id}`}
+                href={
+                    process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${url}`
+                        : `http://${data.organization?.subdomain}.localhost:3000/research-plan/${data.id}`
+                }
+                target="_blank"
+                rel="noreferrer"
                 className="flex flex-col overflow-hidden rounded-lg"
             >
-                <div className="relative h-44 overflow-hidden">
-                    <BlurImage
+                <div className="relative h-44 overflow-hidden bg-blue-light">
+                    {/* <BlurImage
                         alt={data.title ?? "Card thumbnail"}
                         width={500}
                         height={400}
@@ -26,7 +32,7 @@ export default function RoadmapCard({
                         src={data.image ?? "/placeholder.png"}
                         placeholder="blur"
                         blurDataURL={placeholderBlurhash}
-                    />
+                    /> */}
                     {!data.published && (
                         <span className="absolute bottom-2 right-2 rounded-md border border-stone-200 bg-white px-3 py-0.5 text-sm font-medium text-stone-600 shadow-md">
                             Draft
@@ -47,7 +53,7 @@ export default function RoadmapCard({
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
                             ? `https://${url}`
-                            : `http://${data.organization?.subdomain}.localhost:3000/${data.slug}`
+                            : `http://${data.organization?.subdomain}.localhost:3000/research-plan/${data.id}`
                     }
                     target="_blank"
                     rel="noreferrer"
