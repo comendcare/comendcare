@@ -711,8 +711,8 @@ export const CRO_CERTIFICATIONS: { id: string; label: string; value: string; des
 export const CRO_TAGS: { id: string; label: string; value: string; description: string }[] = [
     {
         id: '1',
-        label: 'Experience in rare disease',
-        value: 'Experience in rare disease',
+        label: 'Experienced in rare disease',
+        value: 'Experienced in rare disease',
         description: 'These companies and service providers have experience working within rare disease.',
     },
     {

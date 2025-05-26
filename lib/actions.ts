@@ -3688,12 +3688,18 @@ export const createCompany = async (formData: FormData) => {
                 url,
                 services: parsedServices.length
                     ? {
-                        create: parsedServices.map((name) => ({name}))
+                        connectOrCreate: parsedServices.map((name) => ({
+                            where: { name },
+                            create: { name },
+                        })),
                     }
                     : undefined,
                 certifications: parsedCertifications.length
                     ? {
-                        create: parsedCertifications.map((name) => ({name}))
+                        connectOrCreate: parsedCertifications.map((name) => ({
+                            where: { name },
+                            create: { name },
+                        })),
                     }
                     : undefined,
                 simplifiedCertifications: parsedCertifications,
