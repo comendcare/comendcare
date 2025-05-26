@@ -219,6 +219,13 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             //         } : undefined)
                             //     })
                             // }}
+                            trackShareEvent={{
+                                title: `Project Shared`,
+                                additonalProperties: {
+                                    "Project ID": milestone.id,
+                                    "Project Title": milestone.title
+                                }
+                            }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>

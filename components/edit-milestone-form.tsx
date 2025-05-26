@@ -776,6 +776,13 @@ export function EditMilestoneForm({
                         //         } : undefined)
                         //     })
                         // }}
+                        trackShareEvent={{
+                            title: `Project Shared`,
+                            additonalProperties: {
+                                "Project ID": milestoneData.id,
+                                "Project Title": milestoneData.title
+                            }
+                        }}
                     />
                 ) : (
                     <div className="text-sm text-muted-foreground">Loading organization...</div>

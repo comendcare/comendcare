@@ -770,6 +770,13 @@ const RoadmapHeader = ({
                             //         } : undefined)
                             //     })
                             // }}
+                            trackShareEvent={{
+                                title: `Research Plan Shared`,
+                                additonalProperties: {
+                                    "Research Plan ID": researchPlanId,
+                                    "Research Plan Title": researchPlanDetails.title || ''
+                                }
+                            }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
