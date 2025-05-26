@@ -78,6 +78,13 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                             //         } : undefined)
                             //     })
                             // }}
+                            trackShareEvent={{
+                                title: `Research Plan Shared`,
+                                additonalProperties: {
+                                    "Research Plan ID": roadmap.id,
+                                    "Research Plan Title": roadmap.title
+                                }
+                            }}
                         />
                     ),
                 },

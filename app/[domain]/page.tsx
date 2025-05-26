@@ -154,6 +154,9 @@ export default async function OrganizationHomePage({
                                 //         } : undefined)
                                 //     })
                                 // }}
+                                trackShareEvent={{
+                                    title: `Organization Profile Shared`
+                                }}
                             />
                         ),
                     },

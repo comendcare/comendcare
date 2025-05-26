@@ -118,6 +118,9 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             //         } : undefined)
                             //     })
                             // }}
+                            trackShareEvent={{
+                                title: `Research Plans Table Shared`
+                            }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
