@@ -16,7 +16,7 @@ export default function CopyCodeBlock({ code, language }: { code: string; langua
             <div className="relative">
                 <CodeBlock.Code 
                     className="bg-gray-900 !p-6 rounded-xl shadow-lg max-w-md overflow-y-auto"
-                    onCopy={(e) => {
+                    onCopy={(e: any) => {
                         // console.log("Code copied!");
                         // Optionally, you can access the copied text:
                         // const copiedText = window.getSelection()?.toString();
