@@ -21,7 +21,7 @@ export default function ShareDialog({
                                         embeddedResearchPlanLink,
                                         embeddedProjectLink,
                                         trackShareEvent,
-                                        // trackEmbedCopyEvent,
+                                        trackEmbedEvent,
                                     }: {
     url: string,
     organization?: Organization,
@@ -34,7 +34,10 @@ export default function ShareDialog({
         title: string,
         additonalProperties?: {[key: string]: string} | undefined
     },
-    // trackEmbedCopyEvent?: () => void
+    trackEmbedEvent?: {
+        title: string,
+        additionalProperties?: {[key: string]: string} | undefined
+    }
 }) {
     function embedCode(link: string) {
         return (
@@ -59,13 +62,6 @@ export default function ShareDialog({
     }
 
     const trackMixpanelShareEvent = (socialOption: string) => {
-        // mixpanelTrack(`Organization Profile Shared`, {
-        //     "Platform": socialOption,
-        //     ...(organization ? {
-        //         "Organization ID": organization.id,
-        //         "Organization Name": organization.name
-        //     } : undefined)
-        // })
         if (trackShareEvent?.title) {
             mixpanelTrack(trackShareEvent.title, {
                 ...(trackShareEvent?.additonalProperties ? trackShareEvent?.additonalProperties : undefined),
@@ -77,6 +73,18 @@ export default function ShareDialog({
             })
         }
     }
+
+    // const trackMixpanelEmbedEvent = (title: string) => {
+    //     if (trackEmbedEvent?.title) {
+    //         mixpanelTrack(trackEmbedEvent.title, {
+    //             ...(trackEmbedEvent?.additionalProperties ? trackEmbedEvent?.additionalProperties : undefined),
+    //             ...(organization ? {
+    //                 "Organization ID": organization.id,
+    //                 "Organization Name": organization.name
+    //             } : undefined),
+    //         })
+    //     }
+    // }
 
     return (
         <>
@@ -249,7 +257,18 @@ export default function ShareDialog({
                                 Embed Research Plans Table
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedResearchPlansLink)} language={"JavaScript"}/>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedResearchPlansLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={() => {
+                                        mixpanelTrack(`Research Plans Table Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}
@@ -259,7 +278,18 @@ export default function ShareDialog({
                                 Embed Research Plan
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedResearchPlanLink)} language={"JavaScript"}/>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedResearchPlanLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={() => {
+                                        mixpanelTrack(`Research Plan Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}
@@ -269,7 +299,18 @@ export default function ShareDialog({
                                 Embed Project
                             </AccordionTrigger>
                             <AccordionContent>
-                                <CopyCodeBlock code={embedCode(embeddedProjectLink)} language={"JavaScript"}/>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedProjectLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={() => {
+                                        mixpanelTrack(`Project Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
                             </AccordionContent>
                         </AccordionItem>
                     )}
