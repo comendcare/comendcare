@@ -1182,7 +1182,6 @@ export async function getUserAnalytics() {
 
 export async function getResearchPlansAnalytics(orgId?: string | undefined) {
     const allResearchPlans = await prisma.roadmap.findMany({
-        ...(orgId ? {where: {organizationId: orgId}} : undefined),
         where: {
             organizationId: orgId
         },

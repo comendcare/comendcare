@@ -19,7 +19,9 @@ export default function ShareDialog({
                                         postMessage,
                                         embeddedResearchPlansLink,
                                         embeddedResearchPlanLink,
-                                        embeddedProjectLink
+                                        embeddedProjectLink,
+                                        trackShareEvent,
+                                        // trackEmbedCopyEvent,
                                     }: {
     url: string,
     organization?: Organization,
@@ -27,7 +29,9 @@ export default function ShareDialog({
     postMessage?: string,
     embeddedResearchPlansLink?: string,
     embeddedResearchPlanLink?: string,
-    embeddedProjectLink?: string
+    embeddedProjectLink?: string,
+    trackShareEvent?: (socialOption: string) => void,
+    // trackEmbedCopyEvent?: () => void
 }) {
     function embedCode(link: string) {
         return (
@@ -42,7 +46,7 @@ export default function ShareDialog({
     }
 
     const handleCopyResourceLinkToClipboard = async () => {
-        trackMixpanelEvent("Link")
+        if (trackShareEvent) trackShareEvent("Link")
         try {
             await navigator.clipboard.writeText(url)
             toast.success(`URL successfully copied to clipboard.`)
@@ -51,15 +55,15 @@ export default function ShareDialog({
         }
     }
 
-    const trackMixpanelEvent = (socialOption: string) => {
-        mixpanelTrack(`Organization Profile Shared`, {
-            "Platform": socialOption,
-            ...(organization ? {
-                "Organization ID": organization.id,
-                "Organization Name": organization.name
-            } : undefined)
-        })
-    }
+    // const trackMixpanelEvent = (socialOption: string) => {
+    //     mixpanelTrack(`Organization Profile Shared`, {
+    //         "Platform": socialOption,
+    //         ...(organization ? {
+    //             "Organization ID": organization.id,
+    //             "Organization Name": organization.name
+    //         } : undefined)
+    //     })
+    // }
 
     return (
         <>
@@ -73,7 +77,9 @@ export default function ShareDialog({
                                 href={`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(postMessage || "")}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Facebook")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Facebook")
+                                }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path
@@ -85,7 +91,9 @@ export default function ShareDialog({
                                 href={`http://www.facebook.com/dialog/send?app_id=738683701326096&name=Facebook%20Dialogs&link=${url}&redirect_uri=https://www.comend.io/`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Messenger")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Messenger")
+                                }}
                             >
                                 <svg
                                     width="24"
@@ -124,7 +132,9 @@ export default function ShareDialog({
                                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Discover powerful research tools on Comend! 🚀")}&url=${encodeURIComponent(url)}&hashtags=research,healthtech,Comend`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Twitter")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Twitter")
+                                }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path
@@ -136,7 +146,9 @@ export default function ShareDialog({
                                 href={`https://reddit.com/submit?url=${url}&title=${url}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Reddit")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Reddit")
+                                }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
                                     <path
@@ -152,7 +164,9 @@ export default function ShareDialog({
                                 href={`mailto:email@example.com?subject=Comend&body=${url}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Email")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Email")
+                                }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path
@@ -166,7 +180,9 @@ export default function ShareDialog({
                                 href={`whatsapp://send?text=${url}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Whatsapp")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Whatsapp")
+                                }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path
@@ -181,7 +197,9 @@ export default function ShareDialog({
                                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${url}`}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                onClick={() => trackMixpanelEvent("Linkedin")}
+                                onClick={() => {
+                                    if (trackShareEvent) trackShareEvent("Linkedin")
+                                }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path
