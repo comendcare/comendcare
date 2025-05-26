@@ -60,9 +60,9 @@ model User {
   stakeholders          TaskStakeholder[]
   platformNotifications PlatformNotification[]
   reviews               Review[]
-  repliess              Reply[]
+  replies               Reply[]
   reportOnReviews       ReportOnReview[]
-  reportOnReplys        ReportOnReply[]
+  reportOnReplies       ReportOnReply[]
   reviewFeedbacks       ReviewFeedback[]
 }
 
