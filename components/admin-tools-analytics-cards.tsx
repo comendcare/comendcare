@@ -6,7 +6,7 @@ import {getToolsAnalytics} from "@/lib/fetchers";
 
 interface AnalyticsData {
     totalTools: number,
-    totalPinnedTools: number
+    totalPinnedTools: number,
 }
 
 export function AdminToolsAnalyticsCards({orgId}: {orgId?: string | undefined}) {
