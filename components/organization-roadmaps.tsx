@@ -17,7 +17,6 @@ export default async function OrganizationRoadmaps({
     }
     const roadmaps = await prisma.roadmap.findMany({
         where: {
-            userId: session.user.id as string,
             ...(organizationId ? { organizationId } : {})
         },
         orderBy: {
