@@ -20,7 +20,7 @@ export default function ShareDialog({
                                         embeddedResearchPlansLink,
                                         embeddedResearchPlanLink,
                                         embeddedProjectLink,
-                                        // trackShareEvent,
+                                        trackShareEvent,
                                         // trackEmbedCopyEvent,
                                     }: {
     url: string,
@@ -30,7 +30,7 @@ export default function ShareDialog({
     embeddedResearchPlansLink?: string,
     embeddedResearchPlanLink?: string,
     embeddedProjectLink?: string,
-    // trackShareEvent?: (socialOption: string) => void,
+    trackShareEvent?: (socialOption: string) => void,
     // trackEmbedCopyEvent?: () => void
 }) {
     function embedCode(link: string) {
@@ -46,8 +46,7 @@ export default function ShareDialog({
     }
 
     const handleCopyResourceLinkToClipboard = async () => {
-        // trackMixpanelEvent("Link")
-        // if (trackShareEvent) trackShareEvent("Link")
+        if (trackShareEvent) trackShareEvent("Link")
         try {
             await navigator.clipboard.writeText(url)
             toast.success(`URL successfully copied to clipboard.`)
@@ -79,7 +78,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Facebook")
+                                    if (trackShareEvent) trackShareEvent("Facebook")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -93,7 +92,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Messenger")
+                                    if (trackShareEvent) trackShareEvent("Messenger")
                                 }}
                             >
                                 <svg
@@ -134,7 +133,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Twitter")
+                                    if (trackShareEvent) trackShareEvent("Twitter")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -148,7 +147,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Reddit")
+                                    if (trackShareEvent) trackShareEvent("Reddit")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
@@ -166,7 +165,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Email")
+                                    if (trackShareEvent) trackShareEvent("Email")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -182,7 +181,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Whatsapp")
+                                    if (trackShareEvent) trackShareEvent("Whatsapp")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -199,7 +198,7 @@ export default function ShareDialog({
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    // if (trackShareEvent) trackShareEvent("Linkedin")
+                                    if (trackShareEvent) trackShareEvent("Linkedin")
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
