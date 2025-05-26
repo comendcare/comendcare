@@ -1183,6 +1183,9 @@ export async function getUserAnalytics() {
 export async function getResearchPlansAnalytics(orgId?: string | undefined) {
     const allResearchPlans = await prisma.roadmap.findMany({
         ...(orgId ? {where: {organizationId: orgId}} : undefined),
+        where: {
+            organizationId: orgId
+        },
         include: {milestones: {include: {types: true}}}
     })
 
@@ -1193,15 +1196,22 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
     let totalResearchPlansOfType: {type: string, num: number}[] = await Promise.all(RESEARCH_PLAN_TYPES.map(async (type) => ({
         type: type.label,
         num: await prisma.roadmap.count({
-            where: {modalities: {has: type.value}}
+            where: {
+                organizationId: orgId,
+                modalities: {has: type.value}
+            }
         })
     })))
 
     // Total projects, by type
     const milestoneTypes = await prisma.milestoneType.findMany()
     const allProjects = await prisma.milestone.findMany({
-        ...(orgId ? {where: {organizationId: orgId}} : undefined),
-        include: {types: true}
+        where: {
+            organizationId: orgId
+        },
+        include: {
+            types: true
+        }
     })
     let totalProjects = allProjects.length
     let totalProjectsOfType: {type: string, num: number}[] = milestoneTypes.map((type) => (
@@ -1227,11 +1237,15 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
 
 export async function getToolsAnalytics(orgId?: string | undefined) {
     const totalTools: number = (await prisma.asset.findMany({
-        ...(orgId ? {where: {organizationId: orgId}} : undefined)
+        where: {
+            organizationId: orgId
+        }
     })).length
     const totalPinnedTools: number = (await prisma.asset.findMany({
-        ...(orgId ? {where: {organizationId: orgId}} : undefined),
-        where: {pinned: true}
+        where: {
+            organizationId: orgId,
+            pinned: true
+        }
     })).length
 
     return {
@@ -1242,18 +1256,25 @@ export async function getToolsAnalytics(orgId?: string | undefined) {
 
 export async function getRFPsAnalytics(orgId?: string | undefined) {
     const allRFPs = await prisma.rFP.findMany({
-        ...(orgId ? {where: {organizationId: orgId}} : undefined)
+        where: {
+            organizationId: orgId
+        }
     })
     const totalRFPs: number = allRFPs.length
     const totalPinnedRFPs: number = (await prisma.rFP.findMany({
-        ...(orgId ? {where: {organizationId: orgId}} : undefined),
-        where: {pinned: true}
+        where: {
+            organizationId: orgId,
+            pinned: true
+        }
     })).length
 
     const RFPsByOpenTo = await Promise.all(["CRO", "ACADEMIC"].map(async (openToKey) => ({
         type: openToKey,
         num: (await prisma.rFP.findMany({
-            where: {openTo: {has: openToKey}}
+            where: {
+                organizationId: orgId,
+                openTo: {has: openToKey}
+            }
         })).length
     })))
 
