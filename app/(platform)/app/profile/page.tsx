@@ -1,3 +1,4 @@
+"use server"
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {formatMoney, standardizeYear} from "@/lib/utils";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
