@@ -2,6 +2,9 @@ import { getSession } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import AnalyticsMockup from "@/components/analytics"
+import { AdminResearchPlansAnalyticsCards } from "@/components/admin-research-plans-analytics-cards"
+import { AdminToolsAnalyticsCards } from "@/components/admin-tools-analytics-cards"
+import { AdminRFPsAnalyticsCards } from "@/components/admin-rfps-analytics-cards"
 
 export default async function OrganizationAnalytics({
     params
@@ -21,6 +24,7 @@ export default async function OrganizationAnalytics({
     if (!data) {
         notFound()
     }
+    
 
     const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
 
@@ -41,7 +45,9 @@ export default async function OrganizationAnalytics({
                     </a>
                 </div>
             </div>
-            <AnalyticsMockup />
+            <AdminResearchPlansAnalyticsCards orgId={data.id} />
+            <AdminToolsAnalyticsCards orgId={data.id} />
+            <AdminRFPsAnalyticsCards orgId={data.id} />
         </>
     )
 }

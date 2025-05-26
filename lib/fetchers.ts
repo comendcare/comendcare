@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
-import {getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
+import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition} from "@prisma/client";
@@ -1180,8 +1180,12 @@ export async function getUserAnalytics() {
     };
 }
 
-export async function getResearchPlansAnalytics() {
+export async function getResearchPlansAnalytics(orgId?: string | undefined) {
     const allResearchPlans = await prisma.roadmap.findMany({
+        ...(orgId ? {where: {organizationId: orgId}} : undefined),
+        where: {
+            organizationId: orgId
+        },
         include: {milestones: {include: {types: true}}}
     })
 
@@ -1192,14 +1196,22 @@ export async function getResearchPlansAnalytics() {
     let totalResearchPlansOfType: {type: string, num: number}[] = await Promise.all(RESEARCH_PLAN_TYPES.map(async (type) => ({
         type: type.label,
         num: await prisma.roadmap.count({
-            where: {modalities: {has: type.value}}
+            where: {
+                organizationId: orgId,
+                modalities: {has: type.value}
+            }
         })
     })))
 
     // Total projects, by type
     const milestoneTypes = await prisma.milestoneType.findMany()
     const allProjects = await prisma.milestone.findMany({
-        include: {types: true}
+        where: {
+            organizationId: orgId
+        },
+        include: {
+            types: true
+        }
     })
     let totalProjects = allProjects.length
     let totalProjectsOfType: {type: string, num: number}[] = milestoneTypes.map((type) => (
@@ -1220,6 +1232,88 @@ export async function getResearchPlansAnalytics() {
         totalResearchPlansByStatus,
         totalProjects,
         totalProjectsOfType
+    };
+}
+
+export async function getToolsAnalytics(orgId?: string | undefined) {
+    const totalTools: number = (await prisma.asset.findMany({
+        where: {
+            organizationId: orgId
+        }
+    })).length
+    const totalPinnedTools: number = (await prisma.asset.findMany({
+        where: {
+            organizationId: orgId,
+            pinned: true
+        }
+    })).length
+
+    return {
+        totalTools,
+        totalPinnedTools,
+    };
+}
+
+export async function getRFPsAnalytics(orgId?: string | undefined) {
+    const allRFPs = await prisma.rFP.findMany({
+        where: {
+            organizationId: orgId
+        }
+    })
+    const totalRFPs: number = allRFPs.length
+    const totalPinnedRFPs: number = (await prisma.rFP.findMany({
+        where: {
+            organizationId: orgId,
+            pinned: true
+        }
+    })).length
+
+    const RFPsByOpenTo = await Promise.all(["CRO", "ACADEMIC"].map(async (openToKey) => ({
+        type: openToKey,
+        num: (await prisma.rFP.findMany({
+            where: {
+                organizationId: orgId,
+                openTo: {has: openToKey}
+            }
+        })).length
+    })))
+
+    const createMoneyFormatter = (cents?: boolean) => Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: cents ? 2 : 0,
+        maximumFractionDigits: cents ? 2 : 0,
+    });
+    const moneyFormatter = createMoneyFormatter(undefined)
+
+    const budgetBuckets = [50000, 100000, 500000, 1000000, 5000000]
+    let RFPsByBudget: {type: string, num: number}[] = []
+
+    for (let i = 0; i < budgetBuckets.length; i++) {
+        const min = i <= 0 ? 0 : budgetBuckets[i-1]
+        const max = budgetBuckets[i]
+
+        RFPsByBudget.push({
+            type: `${moneyFormatter.format(min)} - ${moneyFormatter.format(max - 1)}`,
+            num: allRFPs.filter(rfp => typeof rfp.budget === 'number' && rfp.budget >= min && rfp.budget < max).length
+        })
+    }
+
+    RFPsByBudget.push({
+        type: `${formatMoney(budgetBuckets[budgetBuckets.length - 1])} +`,
+        num: allRFPs.filter(rfp => typeof rfp.budget === 'number' && rfp.budget >= budgetBuckets[budgetBuckets.length - 1]).length
+    })
+
+    RFPsByBudget.push({
+        type: 'No Budget',
+        num: allRFPs.filter(rfp => rfp.budget === undefined || rfp.budget === null).length
+    })
+
+    return {
+        totalRFPs,
+        totalPinnedRFPs,
+        RFPsByOpenTo,
+        RFPsByBudget
     };
 }
 
