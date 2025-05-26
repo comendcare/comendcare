@@ -74,7 +74,7 @@ export default async function AdminOrganizationPage({
                     </a>
                     <VerifyOrganizationSwitch organization={data}/>
                 </div>
-                <CreateRoadmapButton />
+                {/* <CreateRoadmapButton /> */}
 
                 <DeleteOrganizationAlertDialog organization={data} />
 
