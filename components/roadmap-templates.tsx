@@ -325,7 +325,7 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: 
                     <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
                     <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2 items-center">
+                {/* <CardContent className="flex flex-wrap gap-2 items-center">
                     {plan.milestones.slice(0, 3).map(milestone => (
                         <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
                     ))}
@@ -341,7 +341,7 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: 
                             ))}
                         </TooltipContent>
                     </Tooltip>
-                </CardContent>
+                </CardContent> */}
             </Card>
         </button>
     )
