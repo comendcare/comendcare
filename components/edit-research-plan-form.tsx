@@ -28,6 +28,7 @@ import { sleep } from "@/lib/utils"
 import MultipleSelector from "./ui/multiple-selector"
 import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
 import { mixpanelTrack } from "@/app/mixpanel"
+import { JsonObject } from "@prisma/client/runtime/library"
 
 const editResearchPlanForm = z.object({
     title: z
@@ -44,6 +45,7 @@ const editResearchPlanForm = z.object({
         .min(1, "Please select a type")
         .max(1, "You can only select one type")
         .optional(),
+    otherModalities: z.string().optional()
 })
 
 const selector = (state: RoadmapState) => ({
@@ -60,7 +62,6 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
         details,
         setDetails
     } = useRoadmapStore(useShallow(selector))
-    const [otherModality, setOtherModality] = useState<string>("");
 
     const form = useForm<z.infer<typeof editResearchPlanForm>>({
         mode: "onChange",
@@ -68,7 +69,8 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
         defaultValues: {
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
-            modalities: RESEARCH_PLAN_TYPES.filter(modality => (researchPlanData?.modalities || []).includes(modality.value))
+            modalities: RESEARCH_PLAN_TYPES.filter(modality => (researchPlanData?.modalities || []).includes(modality.value)),
+            otherModalities: typeof researchPlanData?.metadata == 'object'? (researchPlanData?.metadata as { [key: string]: any })?.otherModalities : undefined,
         }
     })
 
@@ -78,19 +80,16 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             return
         }
 
-        // Mixpanel tracking for "Other" fields
-        if (otherModality) {
-            mixpanelTrack("Research Plan has OTHER type", {
-                details: otherModality,
-            })
-        }
-
         if (researchPlanData?.id) {
             // if the research plan already exists, just update it
             await setDetails({
                 title: values.title,
                 description: values.description || null,
-                modalities: (values.modalities || []).map(modality => modality.value)
+                modalities: (values.modalities || []).map(modality => modality.value),
+                metadata: {
+                    ...(researchPlanData?.metadata ? JSON.parse(JSON.stringify(researchPlanData.metadata)) : undefined),
+                    otherModalities: values.otherModalities
+                } as JsonObject
             })
 
             if (closeDialog) closeDialog()
@@ -111,7 +110,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                 organizationId: "",
                 userId: null,
                 nodes: [],
-                edges: []
+                edges: [],
             })
 
             if (roadmap && roadmap.id) {
@@ -187,20 +186,30 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                 />
                             </FormControl>
                             <FormMessage />
-                            {form.watch("modalities")?.some((item) => item.value === "OTHER") && (
-                                <FormItem>
-                                    <FormDescription>{`(Optional) Other details. This won't be displayed on your research plan, but will be used to improve the platform.`}</FormDescription>
-                                    <Input
-                                        type="text"
-                                        id="modalities-other"
-                                        value={otherModality}
-                                        onChange={(e) => setOtherModality(e.target.value)}
-                                    />
-                                </FormItem>
-                            )}
                         </FormItem>
                     )}
                 />
+
+                {form.watch("modalities")?.some((item) => item.value === "OTHER" || item.value === "OTHER_NON_MODALITY") && (
+                    <FormField 
+                        control={form.control}
+                        name="otherModalities"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel >{`Additional Type Details`}</FormLabel>
+                                <FormDescription>{`(Optional) Other details. This won't be displayed on your research plan, but will be used to improve the platform.`}</FormDescription>
+                                <FormControl>
+                                        <Input
+                                            type="text"
+                                            id="modalities-other"
+                                            {...field}
+                                        />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
 
                 <div className="flex gap-2 justify-end">
                     {researchPlanData?.id ? (
