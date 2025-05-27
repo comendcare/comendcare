@@ -425,7 +425,7 @@ export default function EditConditionProfileDialog() {
             });
 
             try {
-                await updateOrganization(formData, session.user.organizationId);
+                await updateOrganization(session.user.organizationId, formData);
                 toast.success("Organization profile updated successfully!");
             } catch (error) {
                 console.error("Error updating organization:", error);

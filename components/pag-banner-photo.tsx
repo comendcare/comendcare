@@ -86,7 +86,7 @@ export function PAGBannerPhoto({
         }
 
         try {
-            await updateOrganization(formData, session.user.organizationId);
+            await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
             setIsCropping(false)
             setOpen(false);

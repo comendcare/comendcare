@@ -255,11 +255,12 @@ export function getSession() {
     3. The user's membership role matches one of the provided roles. If no roles are provided, it is assumed that the action
         is accessible to EVERY org member
 */
-export function withOrganizationAuth(action: any) {
+export function withOrganizationAuth(action: any, roles?: string[]) {
     return async (
-        formData: FormData | null,
+        // formData: FormData | null,
         organizationId: string,
-        roles?: string[]
+        ...args: any
+        // roles?: string[]
     ) => {
         const session = await getSession()
         if (!session) {
@@ -283,7 +284,7 @@ export function withOrganizationAuth(action: any) {
             }
         }
 
-        return action(formData, organization)
+        return action(organization, ...args)
     }
 }
 
