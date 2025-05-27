@@ -83,7 +83,9 @@ export const newOrgFormSchema = z.object({
         required_error: "You need to select a 501(c)(3) status.",
     }).optional(),
     therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
+    otherTherapeuticsInDevelopment: z.string().optional(),
     therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
+    otherTherapeuticsOfInterest: z.string().optional(),
     address1: z.string().optional(),
     address2: z.string().optional(),
     formattedAddress: z.string().optional(),
@@ -95,30 +97,6 @@ export const newOrgFormSchema = z.object({
     lng: z.number().optional(),
     image: z.string().optional(),
 })
-
-const OPTIONS: Option[] = [
-    {
-        id: '1',
-        label: 'nextjs',
-        value: 'Nextjs',
-        description: 'A React framework for building server-side rendered (SSR) and static web applications. It simplifies routing, API handling, and rendering optimizations.',
-        strengths: 'Out-of-the-box SSR and static site generation (SSG), built-in API routes, and strong developer tooling with performance optimizations.',
-    },
-    {
-        id: '2',
-        label: 'React',
-        value: 'react',
-        description: 'A popular JavaScript library for building user interfaces, especially for single-page applications (SPAs). React focuses on the component-based architecture.',
-        strengths: 'Highly reusable components, vast community support, and strong performance with Virtual DOM rendering.',
-    },
-    {
-        id: '3',
-        label: 'Remix',
-        value: 'remix',
-        description: 'A modern framework focused on seamless data fetching and SSR for web applications. Remix emphasizes web standards and progressive enhancement.',
-        strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
-    },
-];
 
 export default function OrganizationOnboardingForm(
     {
@@ -153,7 +131,6 @@ export default function OrganizationOnboardingForm(
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null)
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [otherModality, setOtherModality] = useState<string>("");
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
 
     const onDrop = useCallback(
@@ -344,14 +321,6 @@ export default function OrganizationOnboardingForm(
             createOrganization(formData).then((res: any) => {
                 if (res.error) {
                     toast.error(res.error)
-
-                    // Mixpanel tracking for "Other" fields
-                    if (otherModality) {
-                        mixpanelTrack("Org has other modality", {
-                            orgName: newOrgForm.watch("orgName") || "Unknown Org",
-                            looking: otherModality,
-                        });
-                    }
                 } else {
                     va.track("Created Organization")
 
@@ -408,10 +377,12 @@ export default function OrganizationOnboardingForm(
                             label: therapeutic,
                             value: therapeutic
                         })),
+                        otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
                         therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality) => ({
                             label: modality,
                             value: modality
                         })),
+                        otherTherapeuticsOfInterest: typeof organizationData?.metadata == 'object'? (organizationData?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
                         address1: organizationData.address1 || "",
                         address2: organizationData.address2 || "",
                         formattedAddress: organizationData.formattedAddress || "",
@@ -711,20 +682,31 @@ export default function OrganizationOnboardingForm(
                                                 />
                                             </FormControl>
                                             <FormMessage/>
-                                            {newOrgForm.watch("therapeuticsInDevelopment")?.some((item) => item.value === "OTHER") && (
-                                                <div className="mt-2">
-                                                    <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                    <Input
-                                                        type="text"
-                                                        id="modalities-other"
-                                                        value={otherModality}
-                                                        onChange={(e) => setOtherModality(e.target.value)}
-                                                    />
-                                                </div>
-                                            )}
                                         </FormItem>
                                     )}
                                 />
+
+                                {newOrgForm.watch("therapeuticsInDevelopment")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                    <FormField
+                                        control={newOrgForm.control}
+                                        name="otherTherapeuticsInDevelopment"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                        <Input
+                                                            type="text"
+                                                            id="modalities-other"
+                                                            {...field}
+                                                        />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
 
                                 <FormField
                                     control={newOrgForm.control}
@@ -763,20 +745,31 @@ export default function OrganizationOnboardingForm(
                                                 />
                                             </FormControl>
                                             <FormMessage/>
-                                            {newOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "OTHER") && (
-                                                <div className="mt-2">
-                                                    <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                    <Input
-                                                        type="text"
-                                                        id="modalities-other"
-                                                        value={otherModality}
-                                                        onChange={(e) => setOtherModality(e.target.value)}
-                                                    />
-                                                </div>
-                                            )}
                                         </FormItem>
                                     )}
                                 />
+
+                                {newOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                    <FormField
+                                        control={newOrgForm.control}
+                                        name="otherTherapeuticsOfInterest"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="modalities-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
 
                                 {/*<FormField*/}
                                 {/*    control={newOrgForm.control}*/}
