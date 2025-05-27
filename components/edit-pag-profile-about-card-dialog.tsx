@@ -25,8 +25,6 @@ import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@/components/ui/multiple-selector";
 import {MODALITIES} from "@/lib/types";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -42,13 +40,14 @@ const editOrgFormSchema = z.object({
         message: "Enter a valid URL for your organization's website."
     }).optional(),
     therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
+    otherTherapeuticsInDevelopment: z.string().optional(),
     therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
+    otherTherapeuticsOfInterest: z.string().optional(),
 });
 
 export default function EditPagProfileAboutCardDialog({organization}: { organization: Organization & { members: (Member & { user: User })[] }}) {
     const {data: session} = useSession();
     const router = useRouter();
-    const [otherModality, setOtherModality] = useState<string>("");
     const [open, setOpen] = useState(false);
     console.log(organization.therapeuticsInDevelopment)
     console.log(organization.therapeuticsOfInterest)
@@ -60,7 +59,9 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
             description: organization.description || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
+            otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
             therapeuticsOfInterest: organization.therapeuticsOfInterest.map((ther) => ({label: ther, value: ther})) || [],
+            otherTherapeuticsOfInterest: typeof organization.metadata == 'object'? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
         }
     });
 
@@ -69,9 +70,17 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
             description: organization.description || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
+            otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
             therapeuticsOfInterest: organization.therapeuticsOfInterest.map((ther) => ({label: ther, value: ther})) || [],
+            otherTherapeuticsOfInterest: typeof organization.metadata == 'object'? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
         });
     }, [organization, editOrgForm]);
+
+    const formData = editOrgForm.watch()
+
+    useEffect(() => {
+        console.log(`form data`, formData)
+    }, [formData])
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
         if (!session?.user?.organizationId) {
@@ -82,7 +91,9 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
             if (key === "therapeuticsInDevelopment") return
+            if (key === "otherTherapeuticsInDevelopment") return
             if (key === "therapeuticsOfInterest") return
+            if (key === "otherTherapeuticsOfInterest") return
 
             if (value !== undefined) {
                 formData.append(key, value.toString());
@@ -92,6 +103,11 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         const data = {
             therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
             therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
+            metadata: JSON.stringify({
+                ...(organization?.metadata ? JSON.parse(JSON.stringify(organization.metadata)) : undefined),
+                otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
+                otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
+            })
         }
         Object.entries(data).forEach(([key, value]) => {
             if (value) {
@@ -101,14 +117,6 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
 
         try {
             await updateOrganization(formData, session.user.organizationId);
-
-            // Mixpanel tracking for "Other" fields
-            if (otherModality) {
-                mixpanelTrack("Org has other modality", {
-                    orgName: organization.name || "Unknown Org",
-                    looking: otherModality,
-                });
-            }
             toast.success("Organization profile updated successfully!");
             setOpen(false);
             router.refresh();
@@ -195,20 +203,31 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                         />
                                     </FormControl>
                                     <FormMessage/>
-                                    {editOrgForm.watch("therapeuticsInDevelopment")?.some((item) => item.value === "OTHER") && (
-                                        <div className="mt-2">
-                                            <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                            <Input
-                                                type="text"
-                                                id="modalities-other"
-                                                value={otherModality}
-                                                onChange={(e) => setOtherModality(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
                                 </FormItem>
                             )}
                         />
+
+                        {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                            <FormField
+                                control={editOrgForm.control}
+                                name="otherTherapeuticsInDevelopment"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormDescription className="flex items-center">
+                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                        </FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                id="modalities-other"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <FormField
                             control={editOrgForm.control}
@@ -248,20 +267,31 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                         />
                                     </FormControl>
                                     <FormMessage/>
-                                    {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "OTHER") && (
-                                        <div className="mt-2">
-                                            <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                            <Input
-                                                type="text"
-                                                id="modalities-other"
-                                                value={otherModality}
-                                                onChange={(e) => setOtherModality(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
                                 </FormItem>
                             )}
                         />
+
+                        {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                            <FormField
+                                control={editOrgForm.control}
+                                name="otherTherapeuticsOfInterest"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormDescription className="flex items-center">
+                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                        </FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                id="modalities-other"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <Button type="submit">Save</Button>
                     </form>
