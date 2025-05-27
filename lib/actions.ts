@@ -44,6 +44,7 @@ import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Miles
 import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
+import { JsonValue } from "@prisma/client/runtime/library"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -630,6 +631,10 @@ export const updateOrganization = withOrganizationAuth(
 
             if (key === "therapeuticsOfInterest") {
                 data[key] = value.toString().split(",");
+            }
+
+            if (key === "metadata") {
+                data[key] = JSON.parse(value.toString()) as JsonValue
             }
 
         });
