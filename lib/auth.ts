@@ -247,25 +247,40 @@ export function getSession() {
     } | null>
 }
 
+/*
+    Auth wrappers - only allows the given action function to execute if the active user satisfies the following criteria:
+
+    1. User is logged in - i.e. the active user's data is included in the session
+    2. The user is a member of the given organization
+    3. The user's membership role matches one of the provided roles. If no roles are provided, it is assumed that the action
+        is accessible to EVERY org member
+*/
 export function withOrganizationAuth(action: any) {
     return async (
         formData: FormData | null,
         organizationId: string,
+        roles?: string[]
     ) => {
         const session = await getSession()
         if (!session) {
             return {
-                error: "Not authenticated"
+                error: "Not authenticated: could not find session data"
             }
         }
+
         const organization = await prisma.organization.findUnique({
-            where: {
-                id: organizationId
-            },
-            include: { members: true }
+            where: {id: organizationId},
+            include: {members: true}
         })
-        if (!organization || !(organization.members.map(member => member.userId).includes(session.user.id))) {
-            return { error: "Not authorized" }
+        const membership = organization?.members.find(member => member.userId === session.user.id)
+
+        if (!organization) return {error: "Not authorized: organization doesn't exist"}
+        if (!membership) return {error: "Not authorized: user is not a member of this organziation"}
+
+        if (roles) {
+            if (!roles.includes(membership.role)) {
+                return { error: `Not authorized: role ${membership.role} doesn't have access to this action`}
+            }
         }
 
         return action(formData, organization)
