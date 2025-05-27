@@ -334,7 +334,7 @@ export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
     {
         id: '6',
         label: 'Other',
-        value: 'OTHER',
+        value: 'OTHER_NON_MODALITY',
     },
 ]
 
