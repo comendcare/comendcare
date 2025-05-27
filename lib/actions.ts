@@ -430,180 +430,186 @@ export const createOrganization = async (formData: FormData) => {
     }
 }
 
-export const toggleBiopharmaConsentSettings = async (organizationId: string) => {
-    try {
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: organizationId,
-            }
-        })
-        const newConsent = !organization?.biopharmaConsentSettings
+export const toggleBiopharmaConsentSettings = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            // const organization = await prisma.organization.findUnique({
+            //     where: {
+            //         id: organizationId,
+            //     }
+            // })
+            const newConsent = !organization?.biopharmaConsentSettings
 
-        if (organization) {
-            const updatedOrganization = await prisma.organization.update({
-                where: {
-                    id: organization.id
-                },
-                data: {
-                    biopharmaConsentSettings: newConsent
-                }
-            })
-
-            if (newConsent) {
-                await addTypeSenseDocument(
-                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                    (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                            : process.env.TYPESENSE_ADMIN_API_KEY
-                    )!,
-                    {
-                        id: organization.id,
-                        name: organization.name,
-                        description: organization.description,
-                        biopharmaConsentSettings: newConsent,
-                        subdomain: organization.subdomain,
+            if (organization) {
+                const updatedOrganization = await prisma.organization.update({
+                    where: {
+                        id: organization.id
                     },
-                    'organizations'
-                );
-            } else {
-                await deleteTypeSenseDocument(
-                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                    (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                            : process.env.TYPESENSE_ADMIN_API_KEY
-                    )!,
-                    organization.id,
-                    'organizations'
-                );
-            }
-
-            console.log("Toggled biopharma consent settings for organization", organization.id)
-            await revalidateTag(
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-            )
-
-            return updatedOrganization
-        }
-    } catch (error: any) {
-        return {
-            error: error.message
-        }
-    }
-}
-
-export const toggleOrganizationPublished = async (organizationId: string) => {
-    try {
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: organizationId,
-            }
-        })
-        const newPublished = !organization?.published
-
-        if (organization) {
-            // Toggle the 'published' attribute
-            const updatedOrganization = await prisma.organization.update({
-                where: {
-                    id: organization.id
-                },
-                data: {
-                    published: newPublished
-                }
-            })
-
-            // if the org is being published, don't change milestone types
-            // if the org is being unpublished, change all the org's milestones to private
-            if (!newPublished) {
-                const updatedMilestones = await prisma.milestone.updateMany({
-                    where: {organizationId: organization.id},
                     data: {
-                        private: true
+                        biopharmaConsentSettings: newConsent
                     }
                 })
-            }
 
-            if (newPublished) {
-                await addTypeSenseDocument(
-                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                    (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                            : process.env.TYPESENSE_ADMIN_API_KEY
-                    )!,
-                    {
-                        id: organization.id,
-                        name: organization.name,
-                        description: organization.description,
-                        published: newPublished,
-                        subdomain: organization.subdomain,
-                    },
-                    'organizations'
-                );
-            } else {
-                // Delete from TypeSense
-                await deleteTypeSenseDocument(
-                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                    (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                            : process.env.TYPESENSE_ADMIN_API_KEY
-                    )!,
-                    organization.id,
-                    'organizations'
-                );
-            }
-
-            // Log or revalidate if necessary
-            await revalidateTag(
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-            )
-
-            return updatedOrganization
-        }
-    } catch (error: any) {
-        return {
-            error: error.message
-        }
-    }
-}
-
-export const toggleOrganizationVerified = async (organizationId: string) => {
-    try {
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: organizationId,
-            }
-        })
-
-        if (organization) {
-            // Toggle the 'verified' attribute
-            const updatedOrganization = await prisma.organization.update({
-                where: {
-                    id: organization.id
-                },
-                data: {
-                    verified: !organization.verified
+                if (newConsent) {
+                    await addTypeSenseDocument(
+                        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                        (
+                            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                                : process.env.TYPESENSE_ADMIN_API_KEY
+                        )!,
+                        {
+                            id: organization.id,
+                            name: organization.name,
+                            description: organization.description,
+                            biopharmaConsentSettings: newConsent,
+                            subdomain: organization.subdomain,
+                        },
+                        'organizations'
+                    );
+                } else {
+                    await deleteTypeSenseDocument(
+                        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                        (
+                            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                                : process.env.TYPESENSE_ADMIN_API_KEY
+                        )!,
+                        organization.id,
+                        'organizations'
+                    );
                 }
-            })
 
-            // Log or revalidate if necessary
-            await revalidateTag(
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-            )
+                console.log("Toggled biopharma consent settings for organization", organization.id)
+                await revalidateTag(
+                    `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+                )
 
-            return updatedOrganization
-        }
-    } catch (error: any) {
-        return {
-            error: error.message
+                return updatedOrganization
+            }
+        } catch (error: any) {
+            return {
+                error: error.message
+            }
         }
     }
-}
+)
+
+export const toggleOrganizationPublished = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            // const organization = await prisma.organization.findUnique({
+            //     where: {
+            //         id: organizationId,
+            //     }
+            // })
+            const newPublished = !organization?.published
+
+            if (organization) {
+                // Toggle the 'published' attribute
+                const updatedOrganization = await prisma.organization.update({
+                    where: {
+                        id: organization.id
+                    },
+                    data: {
+                        published: newPublished
+                    }
+                })
+
+                // if the org is being published, don't change milestone types
+                // if the org is being unpublished, change all the org's milestones to private
+                if (!newPublished) {
+                    const updatedMilestones = await prisma.milestone.updateMany({
+                        where: {organizationId: organization.id},
+                        data: {
+                            private: true
+                        }
+                    })
+                }
+
+                if (newPublished) {
+                    await addTypeSenseDocument(
+                        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                        (
+                            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                                : process.env.TYPESENSE_ADMIN_API_KEY
+                        )!,
+                        {
+                            id: organization.id,
+                            name: organization.name,
+                            description: organization.description,
+                            published: newPublished,
+                            subdomain: organization.subdomain,
+                        },
+                        'organizations'
+                    );
+                } else {
+                    // Delete from TypeSense
+                    await deleteTypeSenseDocument(
+                        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                        (
+                            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                                : process.env.TYPESENSE_ADMIN_API_KEY
+                        )!,
+                        organization.id,
+                        'organizations'
+                    );
+                }
+
+                // Log or revalidate if necessary
+                await revalidateTag(
+                    `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+                )
+
+                return updatedOrganization
+            }
+        } catch (error: any) {
+            return {
+                error: error.message
+            }
+        }
+    }
+)
+
+export const toggleOrganizationVerified = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            // const organization = await prisma.organization.findUnique({
+            //     where: {
+            //         id: organizationId,
+            //     }
+            // })
+
+            if (organization) {
+                // Toggle the 'verified' attribute
+                const updatedOrganization = await prisma.organization.update({
+                    where: {
+                        id: organization.id
+                    },
+                    data: {
+                        verified: !organization.verified
+                    }
+                })
+
+                // Log or revalidate if necessary
+                await revalidateTag(
+                    `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+                )
+
+                return updatedOrganization
+            }
+        } catch (error: any) {
+            return {
+                error: error.message
+            }
+        }
+    }
+)
 
 export const updateOrganization = withOrganizationAuth(
-    async (formData: FormData, organization: Organization) => {
+    async (organization: Organization, formData: FormData) => {
         // Convert FormData to a plain object
         const data: Record<string, any> = {};
 

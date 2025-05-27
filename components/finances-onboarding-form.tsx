@@ -65,7 +65,7 @@ export default function FinancesOnboardingForm(
         });
 
         try {
-            const response = await updateOrganization(formData, session.data.user.organizationId);
+            const response = await updateOrganization(session.data.user.organizationId, formData);
             // mixpanelTrack("Onboarding Completed")
             toast.success("Organization updated successfully!");
             router.push("/app/marketplace/service-providers");

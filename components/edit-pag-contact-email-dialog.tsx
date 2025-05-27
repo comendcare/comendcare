@@ -57,7 +57,7 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
         formData.append("contactEmail", values.contactEmail);
 
         try {
-            await updateOrganization(formData, session.user.organizationId);
+            await updateOrganization(session.user.organizationId, formData);
             toast.success("Contact email updated successfully!");
             setOpen(false);
             router.refresh();

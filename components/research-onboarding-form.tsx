@@ -7,7 +7,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {connectOrganizationToCondition, createCondition, updateOrganization} from "@/lib/actions";
+import {connectOrganizationToCondition, createCondition} from "@/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import MultipleSelector from "@/components/ui/multiple-selector";
