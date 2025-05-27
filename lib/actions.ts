@@ -2833,7 +2833,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
                         notes: milestone.notes,
-                        nodeType: milestone.nodeType || "PROJECT"
+                        nodeType: milestone.nodeType || "PROJECT",
+                        ...(milestone.metadata ? {metadata: milestone.metadata} : undefined)
                     }
                 })
 

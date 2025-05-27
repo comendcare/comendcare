@@ -77,6 +77,7 @@ import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbor
 import { useOnborda } from "./onborda/OnbordaContext"
 import { mixpanelTrack } from "@/app/mixpanel"
 import ShareDialog from "./share-dialog"
+import { JsonObject } from "@prisma/client/runtime/library"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -175,7 +176,7 @@ export function EditMilestoneForm({
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
-            otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
+            otherTypeDetails: typeof milestoneData?.metadata === 'object' ? (milestoneData.metadata as {[key: string]: any})?.otherTypeDetails : undefined,
             startDate: milestoneData?.startDate || undefined,
             endDate: milestoneData?.endDate || undefined,
             budget: milestoneData?.budget || undefined,
@@ -249,7 +250,11 @@ export function EditMilestoneForm({
                     milestoneType: type
                 })  
             }).filter((type) => type !== undefined),
-            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
+            // ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
+            metadata: {
+                ...(milestoneData?.metadata ? JSON.parse(JSON.stringify(milestoneData.metadata)) : undefined),
+                otherTypeDetails: values.otherTypeDetails
+            } as JsonObject,
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
@@ -283,15 +288,15 @@ export function EditMilestoneForm({
 
         // Mixpanel tracking for "Other" field
         // only send to mixpanel if the details explaining the 'other' type have been updated
-        if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
-            const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        // if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
+        //     const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
 
-            mixpanelTrack("Project has other type", {
-                orgName: response?.data?.name || "Unknown Org",
-                milestoneTitle: title,
-                milestoneType: otherTypeDetails,
-            });
-        }
+        //     mixpanelTrack("Project has other type", {
+        //         orgName: response?.data?.name || "Unknown Org",
+        //         milestoneTitle: title,
+        //         milestoneType: otherTypeDetails,
+        //     });
+        // }
 
         // toast('Success!', {
         //     position: "bottom-left",
