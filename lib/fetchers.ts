@@ -710,7 +710,7 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
                         user: true
                     }
                 },
-                condition: {
+                conditions: {
                     include: {
                         condition: true
                     }
@@ -1359,7 +1359,7 @@ export async function getOrganizationAnalytics() {
 
     const allOrganizations = await prisma.organization.findMany({
         include: {
-            condition: true,
+            conditions: true,
             roadmaps: true,
         },
     });
@@ -1654,7 +1654,7 @@ export async function getAllOrganizationsWithConditions() {
                 createdAt: "desc",
             },
             include: {
-                condition: {
+                conditions: {
                     include: {
                         condition: true
                     }

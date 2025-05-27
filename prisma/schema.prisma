@@ -60,9 +60,9 @@ model User {
   stakeholders          TaskStakeholder[]
   platformNotifications PlatformNotification[]
   reviews               Review[]
-  repliess              Reply[]
+  replies               Reply[]
   reportOnReviews       ReportOnReview[]
-  reportOnReplys        ReportOnReply[]
+  reportOnReplies       ReportOnReply[]
   reviewFeedbacks       ReviewFeedback[]
 }
 
@@ -420,11 +420,11 @@ model ExternalAttachment {
   link String
 
   assetId     String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
-  RFPId       String?
-  RFP         RFP?       @relation(fields: [RFPId], references: [id])
+  asset       Asset?     @relation(fields: [assetId], references: [id])
+  rfpId       String?
+  rfp         RFP?       @relation(fields: [rfpId], references: [id])
   milestoneId String?
-  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
 }
 
 model ExternalContact {
@@ -435,11 +435,11 @@ model ExternalContact {
   affiliation String?
 
   assetId     String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
-  RFPId       String?
-  RFP         RFP?       @relation(fields: [RFPId], references: [id])
+  asset       Asset?     @relation(fields: [assetId], references: [id])
+  rfpId       String?
+  rfp         RFP?       @relation(fields: [rfpId], references: [id])
   milestoneId String?
-  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
 }
 
 model Edge {
@@ -493,17 +493,17 @@ model Organization {
   userId                    String?
   roadmaps                  Roadmap[]
   members                   Member[]
-  client                    Client[]
-  invitation                Invitation[]
-  membershipRequest         MemberRequest[]
-  condition                 ConditionToOrganization[]
-  Kanban                    Kanban?
-  Milestone                 Milestone[]
-  PlatformNotification      PlatformNotification[]
+  clients                   Client[]
+  invitations               Invitation[]
+  membershipRequests        MemberRequest[]
+  conditions                ConditionToOrganization[]
+  kanban                    Kanban?
+  milestones                Milestone[]
+  platformNotifications     PlatformNotification[]
   reviews                   Review[]
   savedCompanies            SavedCompany[]
-  Asset                     Asset[]
-  RFP                       RFP[]
+  assets                    Asset[]
+  rfps                      RFP[]
 
   @@index([userId])
 }

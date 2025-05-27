@@ -11,12 +11,12 @@ export async function POST(req: Request) {
                 id: { in: ids }, // Ensure we fetch all organizations
             },
             include: {
-                condition: {
+                conditions: {
                     include: {
                         condition: true
                     }
                 },
-                Milestone: {
+                milestones: {
                     include: {
                         node: true
                     }
