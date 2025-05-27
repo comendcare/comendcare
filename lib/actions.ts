@@ -2911,9 +2911,11 @@ export async function kanbanSync({kanbanId, columns, tasks}: {
                     data: {
                         ...column,
                         kanbanId,
+                        metadata: undefined,
                         tasks: {
                             create: tasks.filter(t => t.columnId === column.id).map(task => ({
                                 ...task,
+                                metadata: undefined,
                                 columnId: undefined,
                                 column: undefined,
                                 checklist: {
@@ -2928,7 +2930,7 @@ export async function kanbanSync({kanbanId, columns, tasks}: {
                                     create: (task.stakeholders || []).map((stakeholder: any) => ({
                                         userId: stakeholder?.user?.id || stakeholder?.userId,
                                     }))
-                                }
+                                },
                             }))
                         }
                     }
