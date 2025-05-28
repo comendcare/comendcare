@@ -117,7 +117,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                     "Service Provider ID": response.data.company.id,
                     "Milestone Title": response.data.milestone.title,
                     "Milestone ID": response.data.milestone.id,
-                    "Milestone Types": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
+                    "Milestone Types": response.data.milestone.types.map((type: any) => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
                     "Milestone Budget": response.data.milestone.budget
                 })
                 router.refresh();
@@ -145,7 +145,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                     "Service Provider ID": response.data.company.id,
                     "Milestone Title": response.data.milestone.title,
                     "Milestone ID": response.data.milestone.id,
-                    "Milestone Types": response.data.milestone.types.map(type => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
+                    "Milestone Types": response.data.milestone.types.map((type: any) => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
                     "Milestone Budget": response.data.milestone.budget
                 })
                 router.refresh()
