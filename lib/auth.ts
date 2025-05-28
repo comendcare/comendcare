@@ -248,8 +248,63 @@ export function getSession() {
 }
 
 /*
-    Auth wrappers - only allows the given action function to execute if the active user satisfies the following criteria:
+    This auth wrapper is meant to wrap admin actions ONLY
 
+    Auth wrapper - only allows the given action function to execute if the active user satisfies the following criteria:
+    1. User is logged in - i.e. the active user's data is included in the session
+    2. The user exists in the database
+    3. The user's email is included in our admin whitelist
+*/
+export function withAdminAuth(action: any) {
+    return async(
+        ...args: any
+    ) => {
+        const session = await getSession()
+        if (!session) {
+            return {error: "Not authenticated: could not find session data"}
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {id: session.user.id}
+        })
+        if (!user) return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
+        if (!user.email) return {error: `Not authenticated: could not find email address in the database for user ${session.user.id}`}
+
+        const adminUserEmailsList = process.env.ADMIN_WHITELIST?.split(",")
+        if (!adminUserEmailsList?.includes(user.email)) return {error: `Not authenticated: email ${user.email} is not included in the admin whitelist.`}
+
+        return action(...args)
+    }
+}
+
+/*
+    This is the most basic auth wrapper - for actions that are available to ALL users on the platform, no matter which organization
+    they're a part of. It just ensures the user is logged in & has an account on the platform
+
+    Auth wrapper - only allows the given action function to execute if the active user satisfies the following criteria:
+    1. The user is signed in
+    2. The user exists in the database
+ */
+export function withAuth(action: any) {
+    return async (
+        ...args: any
+    ) => {
+        const session = await getSession()
+        if (!session) {
+            return {error: "Not authenticated: could not find session data"}
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {id: session.user.id}
+        })
+        if (!user) return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
+
+        return action(...args)
+    }
+}
+
+/*
+    Auth wrapper - only allows the given action function to execute if the active user satisfies the following criteria:
     1. User is logged in - i.e. the active user's data is included in the session
     2. The user is a member of the given organization
     3. The user's membership role matches one of the provided roles. If no roles are provided, it is assumed that the action
@@ -264,9 +319,7 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
     ) => {
         const session = await getSession()
         if (!session) {
-            return {
-                error: "Not authenticated: could not find session data"
-            }
+            return {error: "Not authenticated: could not find session data"}
         }
 
         const organization = await prisma.organization.findUnique({

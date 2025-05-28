@@ -67,7 +67,6 @@ export const useRoadmapStore = create<RoadmapState>()(
         details: undefined,
         setDetails: async (details: Partial<Roadmap> | undefined) => {
             const id = get().roadmapId
-
             if (!id) {
                 console.error(`Error: no active research plan!`)
                 return
@@ -78,13 +77,23 @@ export const useRoadmapStore = create<RoadmapState>()(
                 return
             }
 
-            const roadmap = await updateRoadmap({
+            // fetch the updated org id OR (if it hasn't been updated) fetch the org id from the current roadmap
+            // used for authorization - check if the user has access to edit this roadmap
+            const orgId = details?.organizationId || get().details?.organizationId
+            if (!orgId) {
+                console.error(`Error: this research plan is not associated with an organization!`)
+                return
+            }
+
+            const roadmap = await updateRoadmap(orgId, {
                 id,
                 title: details.title,
                 description: details.description || null,
                 modalities: details.modalities || [],
                 metadata: details.metadata || null
             })
+
+            console.log(`roadmap data`, roadmap)
 
             if (roadmap) set({ details: roadmap as Roadmap })
         },
@@ -338,8 +347,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             return
         },
         partialize: (state) => {
-            const { selectedNodeId, nodes, edges, milestones, ...rest } = state;
-            return { selectedNodeId, nodes, edges, milestones };
+            const { selectedNodeId, nodes, edges, milestones, details, ...rest } = state;
+            return { selectedNodeId, nodes, edges, milestones, details };
         },
     })
 )
