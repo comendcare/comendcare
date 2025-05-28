@@ -185,6 +185,7 @@ export function EditTaskForm({
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
 
         updateTask(
+            session?.user?.organizationId,
             taskData?.id,
             {
                 name,

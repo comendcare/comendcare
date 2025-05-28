@@ -15,7 +15,7 @@ import {
     SavedCompany, Company
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
+import {withAdminAuth, withAuth, withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -3018,805 +3018,845 @@ export const updateColumns = withOrganizationAuth(
     }
 )
 
-export async function deleteColumn(columnId: string) {
-    try {
-        const deletedColumn = await prisma.column.delete({
-            where: {
-                id: columnId
+export const deleteColumn = withOrganizationAuth(
+    async (_: Organization, columnId: string) => {
+        try {
+            const deletedColumn = await prisma.column.delete({
+                where: {
+                    id: columnId
+                }
+            })
+
+            if (!deletedColumn) {
+                return {success: false, error: "failed to delete column"};
             }
-        })
 
-        if (!deletedColumn) {
-            return {success: false, error: "failed to delete column"};
+            // Typesense - if updating typesense, update here...
+
+            return {success: true, data: deletedColumn};
+        } catch (error: any) {
+            logError("Error deleting column", error);
+            return {success: false, error: "Internal server error"};
         }
-
-        // Typesense - if updating typesense, update here...
-
-        return {success: true, data: deletedColumn};
-    } catch (error: any) {
-        logError("Error deleting column", error);
-        return {success: false, error: "Internal server error"};
     }
-}
+)
 
 /* HANDLE KANBAN TASKS - create, update, delete -------------------------------------------------------------------------- */
-export async function createTask(columnId: string, properties?: any) {
-    try {
-        const newTask: Task = await prisma.task.create({
-            include: {checklist: true, stakeholders: {include: {user: true}}},
-            data: {
-                name: 'New Task',
-                id: nanoid(),
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                kanbanPosition: 0,
-                // status: null,
-                // description: null,
-                // milestoneId: null,
-                orderPosition: 0,
-                columnId,
-                // date: null,
-                // endDate: null,
-                // priority: null,
-                private: true,
-                // startDate: null,
-                // checklist: []
-                ...(properties?.stakeholders ? {
-                    stakeholders: {
-                        createMany: {
-                            data: (properties.stakeholders || []).map((stakeholder: any) => ({
-                                userId: stakeholder?.user?.id || stakeholder?.userId,
-                                // user: { connect: { id: stakeholder.id }},
-                            }))
-                        }
-                    }
-                } : undefined)
-            }
-        })
-
-        // const organizations = await prisma.organization.findMany({
-        //     where: {Kanban: {columns: {some: {id: columnId}}}},
-        //     select: { id: true },
-        // });
-
-        // // create notifications for assigned stakeholders
-        // if (properties.stakeholders && organizations.length == 1) {
-        //     await Promise.all(
-        //         properties.stakeholders.map(async (stakeholder: any) => {
-        //             if (!stakeholder) return
-
-        //             let n = await prisma.platformNotification.create({
-        //                 data: {
-        //                     type: "TASK_ASSIGN",
-        //                     title: "You've been assigned a task.",
-        //                     user: { connect: {id: stakeholder.userId} },
-        //                     organization: { connect: {id: organizations[0].id}}
-        //                 }
-        //             })
-        //         })
-        //     )
-        // }
-
-        if (!newTask) {
-            return {success: false, error: "Could not create task"}
-        }
-
-        // Typesense - if updating typesense, update here...
-
-        return {success: true, data: newTask}
-    } catch (error: any) {
-        logError("Could not create task", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
-
-export async function notificationsViewed({notifications}: { notifications: PlatformNotification[] }) {
-    try {
-        const updatedNotifications: PlatformNotification[] = []
-
-        await Promise.all(
-            notifications.map(async (notification: PlatformNotification) => {
-                if (!notification) return
-                let updatedNotification = await prisma.platformNotification.update({
-                    where: {id: notification.id},
-                    data: {
-                        lastViewedAt: new Date()
-                    }
-                })
-
-                updatedNotifications.push(updatedNotification)
-            })
-        )
-        console.log(`Successfully updated notifications`)
-        return {success: true, data: updatedNotifications}
-    } catch (error) {
-        logError("Could not update notifications", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
-
-export async function createNotification({notificationData}: { notificationData: any }) {
-    try {
-        const session = await getSession()
-        if (!session) throw new Error("No session data")
-
-        const notification = await prisma.platformNotification.create({
-            data: {
-                ...notificationData,
-                user: {connect: {id: session?.user.id}},
-                organization: {connect: {id: session.user.organizationId}},
-            }
-        })
-
-        return {success: true, data: notification}
-    } catch (error) {
-        logError("Could not create notification", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
-
-export async function createNotifications({notificationsList}: { notificationsList: any[] }) {
-    try {
-        const session = await getSession()
-        if (!session) throw new Error("No session data")
-
-        await prisma.platformNotification.createMany({
-            data: notificationsList.map(notification => ({
-                ...notification,
-                userId: session?.user.id,
-                organizationId: session.user.organizationId
-            }))
-        })
-
-        // Fetch the inserted notifications
-        const notifications = await prisma.platformNotification.findMany({
-            where: {
-                userId: session?.user.id,
-                organizationId: session.user.organizationId
-            },
-        })
-
-        return {success: true, data: notifications}
-    } catch (error) {
-        logError("Could not create notifications", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
-
-export async function updateTasks({tasks}: { tasks: Task[] }) {
-    try {
-        let updatedTasks: Task[] = []
-
-        await Promise.all(
-            tasks.map(async (task: any) => {
-                if (!task) return
-                let prevTask = await prisma.task.findUnique({
-                    where: {id: task.id},
-                    include: {stakeholders: {include: {user: true}}}
-                })
-
-                let newTask = await prisma.task.update({
-                    where: {id: task?.id},
-                    include: {milestone: true, checklist: true, stakeholders: {include: {user: true}}},
-                    data: {
-                        name: task.name,
-                        // status: task.status,
-                        description: task.description,
-                        orderPosition: task.orderPosition,
-                        kanbanPosition: task.kanbanPosition,
-                        checklist: {
-                            deleteMany: {},
-                            createMany: {
-                                data: (task.checklist || []).map((item: any) => ({
-                                    name: item?.name || "New Item",
-                                    complete: item?.complete || false,
-                                    orderPosition: item?.orderPosition
-                                }))
-                            }
-                        },
+export const createTask = withOrganizationAuth(
+    async (_: Organization, columnId: string, properties?: any) => {
+        try {
+            const newTask: Task = await prisma.task.create({
+                include: {checklist: true, stakeholders: {include: {user: true}}},
+                data: {
+                    name: 'New Task',
+                    id: nanoid(),
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    kanbanPosition: 0,
+                    // status: null,
+                    // description: null,
+                    // milestoneId: null,
+                    orderPosition: 0,
+                    columnId,
+                    // date: null,
+                    // endDate: null,
+                    // priority: null,
+                    private: true,
+                    // startDate: null,
+                    // checklist: []
+                    ...(properties?.stakeholders ? {
                         stakeholders: {
-                            deleteMany: {},
                             createMany: {
-                                data: (task.stakeholders || []).map((stakeholder: any) => ({
+                                data: (properties.stakeholders || []).map((stakeholder: any) => ({
                                     userId: stakeholder?.user?.id || stakeholder?.userId,
                                     // user: { connect: { id: stakeholder.id }},
                                 }))
                             }
-                        },
-                        milestone: task.milestoneId
-                            ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
-                            : {disconnect: true}, // Disconnect if milestoneId is undefined
-                        endDate: task.endDate,
-                        priority: task.priority,
-                        private: task.private,
-                        column: {
-                            connect: {id: task.columnId}
                         }
-                    }
-                })
-
-                const organizations = await prisma.organization.findMany({
-                    where: {kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
-                    select: {id: true},
-                });
-
-                const session = await getSession()
-                const prevStakeholderUserIds = prevTask?.stakeholders.map(stakeholder => stakeholder.user.id)
-                const notifications = newTask.stakeholders
-                    .filter(newStakeholder => !prevStakeholderUserIds?.includes(newStakeholder.user.id))
-
-                // if a new stakeholder has been added to this task, we create a notification for them
-                if (organizations.length === 1 && notifications.length > 0) {
-                    await Promise.all(
-                        notifications.map(async (stakeholder: any) => {
-                            if (!stakeholder) return
-                            // don't create a notification for the user creating the task
-                            if (stakeholder.userId === session?.user.id) return
-
-                            let n = await createNotification({
-                                notificationData: {
-                                    type: "NEW_TASK",
-                                    title: "New task assigned",
-                                    message: `${newTask.name} was assigned to you.`,
-                                    metadata: {taskId: stakeholder.taskId, stakeholderId: stakeholder.id}
-                                }
-                            })
-                        })
-                    )
-                }
-
-                if (!newTask) {
-                    logError("Could not update task", task)
-                } else {
-                    updatedTasks.push(newTask)
+                    } : undefined)
                 }
             })
-        )
 
-        // Typesense - if updating typesense, update here...
+            // const organizations = await prisma.organization.findMany({
+            //     where: {Kanban: {columns: {some: {id: columnId}}}},
+            //     select: { id: true },
+            // });
 
-        console.log(`Successfully updated tasks`)
-        return {success: true, data: updatedTasks}
-    } catch (error) {
-        logError("Could not update task", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
+            // // create notifications for assigned stakeholders
+            // if (properties.stakeholders && organizations.length == 1) {
+            //     await Promise.all(
+            //         properties.stakeholders.map(async (stakeholder: any) => {
+            //             if (!stakeholder) return
 
-export async function deleteTask(taskId: string) {
-    try {
-        const deletedTask = await prisma.task.delete({
-            include: {checklist: true, stakeholders: {include: {user: true}}},
-            where: {
-                id: taskId
+            //             let n = await prisma.platformNotification.create({
+            //                 data: {
+            //                     type: "TASK_ASSIGN",
+            //                     title: "You've been assigned a task.",
+            //                     user: { connect: {id: stakeholder.userId} },
+            //                     organization: { connect: {id: organizations[0].id}}
+            //                 }
+            //             })
+            //         })
+            //     )
+            // }
+
+            if (!newTask) {
+                return {success: false, error: "Could not create task"}
             }
-        })
 
-        if (!deletedTask) {
-            return {success: false, error: "failed to delete task"};
+            // Typesense - if updating typesense, update here...
+
+            return {success: true, data: newTask}
+        } catch (error: any) {
+            logError("Could not create task", error)
+            return {success: false, error: "Internal server error"}
         }
-
-        // Typesense - if updating typesense, update here...
-
-        return {success: true, data: deletedTask};
-    } catch (error: any) {
-        logError("Error deleting task", error);
-        return {success: false, error: "Internal server error"};
     }
-}
+)
 
-export const createReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
-    const session = await getSession();
-    if (!session?.user.id) {
-        throw new Error("You must be signed in to perform this action");
+export const notificationsViewed = withAuth(
+    async ({notifications}: { notifications: PlatformNotification[] }) => {
+        try {
+            const updatedNotifications: PlatformNotification[] = []
+
+            await Promise.all(
+                notifications.map(async (notification: PlatformNotification) => {
+                    if (!notification) return
+                    let updatedNotification = await prisma.platformNotification.update({
+                        where: {id: notification.id},
+                        data: {
+                            lastViewedAt: new Date()
+                        }
+                    })
+
+                    updatedNotifications.push(updatedNotification)
+                })
+            )
+            console.log(`Successfully updated notifications`)
+            return {success: true, data: updatedNotifications}
+        } catch (error) {
+            logError("Could not update notifications", error)
+            return {success: false, error: "Internal server error"}
+        }
     }
+)
 
-    try {
-        // Check if a review already exists
-        const existingReview = await prisma.review.findUnique({
-            where: {
-                authorId_companyId_organizationId: {
-                    authorId: session.user.id,
-                    companyId: companyId,
-                    organizationId: session.user.organizationId,
+export const createNotification = withAuth(
+    async ({notificationData}: { notificationData: any }) => {
+        try {
+            const session = await getSession()
+            if (!session) throw new Error("No session data")
+
+            const notification = await prisma.platformNotification.create({
+                data: {
+                    ...notificationData,
+                    user: {connect: {id: session?.user.id}},
+                    organization: {connect: {id: session.user.organizationId}},
+                }
+            })
+
+            return {success: true, data: notification}
+        } catch (error) {
+            logError("Could not create notification", error)
+            return {success: false, error: "Internal server error"}
+        }
+    }
+)
+
+export const createNotifications = withAuth(
+    async ({notificationsList}: { notificationsList: any[] }) => {
+        try {
+            const session = await getSession()
+            if (!session) throw new Error("No session data")
+
+            await prisma.platformNotification.createMany({
+                data: notificationsList.map(notification => ({
+                    ...notification,
+                    userId: session?.user.id,
+                    organizationId: session.user.organizationId
+                }))
+            })
+
+            // Fetch the inserted notifications
+            const notifications = await prisma.platformNotification.findMany({
+                where: {
+                    userId: session?.user.id,
+                    organizationId: session.user.organizationId
                 },
-            },
-        });
+            })
 
-        if (existingReview) {
-            return {success: false, error: "You have already created a review for this company."};
+            return {success: true, data: notifications}
+        } catch (error) {
+            logError("Could not create notifications", error)
+            return {success: false, error: "Internal server error"}
         }
+    }
+)
 
-        const title = formData.get("title") as string;
-        const body = formData.get("body") as string;
-        const rating = parseInt(formData.get("rating") as string);
+export const updateTasks = withOrganizationAuth(
+    async (_: Organization, {tasks}: { tasks: Task[] }) => {
+        try {
+            let updatedTasks: Task[] = []
 
-        // Use a transaction to create the review and update avgRating atomically
-        const result = await prisma.$transaction(async (tx) => {
-            // Create the review
-            const review = await tx.review.create({
-                include: {
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: true}
+            await Promise.all(
+                tasks.map(async (task: any) => {
+                    if (!task) return
+                    let prevTask = await prisma.task.findUnique({
+                        where: {id: task.id},
+                        include: {stakeholders: {include: {user: true}}}
+                    })
+
+                    let newTask = await prisma.task.update({
+                        where: {id: task?.id},
+                        include: {milestone: true, checklist: true, stakeholders: {include: {user: true}}},
+                        data: {
+                            name: task.name,
+                            // status: task.status,
+                            description: task.description,
+                            orderPosition: task.orderPosition,
+                            kanbanPosition: task.kanbanPosition,
+                            checklist: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (task.checklist || []).map((item: any) => ({
+                                        name: item?.name || "New Item",
+                                        complete: item?.complete || false,
+                                        orderPosition: item?.orderPosition
+                                    }))
+                                }
+                            },
+                            stakeholders: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (task.stakeholders || []).map((stakeholder: any) => ({
+                                        userId: stakeholder?.user?.id || stakeholder?.userId,
+                                        // user: { connect: { id: stakeholder.id }},
+                                    }))
+                                }
+                            },
+                            milestone: task.milestoneId
+                                ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
+                                : {disconnect: true}, // Disconnect if milestoneId is undefined
+                            endDate: task.endDate,
+                            priority: task.priority,
+                            private: task.private,
+                            column: {
+                                connect: {id: task.columnId}
                             }
                         }
+                    })
+
+                    const organizations = await prisma.organization.findMany({
+                        where: {kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
+                        select: {id: true},
+                    });
+
+                    const session = await getSession()
+                    const prevStakeholderUserIds = prevTask?.stakeholders.map(stakeholder => stakeholder.user.id)
+                    const notifications = newTask.stakeholders
+                        .filter(newStakeholder => !prevStakeholderUserIds?.includes(newStakeholder.user.id))
+
+                    // if a new stakeholder has been added to this task, we create a notification for them
+                    if (organizations.length === 1 && notifications.length > 0) {
+                        await Promise.all(
+                            notifications.map(async (stakeholder: any) => {
+                                if (!stakeholder) return
+                                // don't create a notification for the user creating the task
+                                if (stakeholder.userId === session?.user.id) return
+
+                                let n = await createNotification({
+                                    notificationData: {
+                                        type: "NEW_TASK",
+                                        title: "New task assigned",
+                                        message: `${newTask.name} was assigned to you.`,
+                                        metadata: {taskId: stakeholder.taskId, stakeholderId: stakeholder.id}
+                                    }
+                                })
+                            })
+                        )
                     }
-                },
-                data: {
-                    title,
-                    body,
-                    rating,
-                    author: {connect: {id: session.user.id}},
-                    company: {connect: {id: companyId}},
-                    organization: {connect: {id: session.user.organizationId}},
-                },
-            });
 
-            // Calculate new avgRating
-            const aggregated = await tx.review.aggregate({
-                where: {companyId},
-                _avg: {rating: true},
-            });
+                    if (!newTask) {
+                        logError("Could not update task", task)
+                    } else {
+                        updatedTasks.push(newTask)
+                    }
+                })
+            )
 
-            const newAvgRating = aggregated._avg.rating ?? 0;
+            // Typesense - if updating typesense, update here...
 
-            // Update the company's avgRating
-            const updatedCompany = await tx.company.update({
-                where: {id: companyId},
-                data: {avgRating: newAvgRating},
-            });
+            console.log(`Successfully updated tasks`)
+            return {success: true, data: updatedTasks}
+        } catch (error) {
+            logError("Could not update task", error)
+            return {success: false, error: "Internal server error"}
+        }
+    }
+)
 
-            if (review && updatedCompany) {
-                await updateTypeSenseDocument(
-                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                    (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                            : process.env.TYPESENSE_ADMIN_API_KEY
-                    )!,
-                    updatedCompany,
-                    'companies'
-                );
+export const deleteTask = withOrganizationAuth(
+    async (_: Organization, taskId: string) => {
+        try {
+            const deletedTask = await prisma.task.delete({
+                include: {checklist: true, stakeholders: {include: {user: true}}},
+                where: {
+                    id: taskId
+                }
+            })
+
+            if (!deletedTask) {
+                return {success: false, error: "failed to delete task"};
             }
 
-            return review;
-        });
+            // Typesense - if updating typesense, update here...
 
-        revalidatePath("app/service-providers/");
-
-        return {success: true, data: result};
-    } catch (error: any) {
-        console.error("Error creating review:", error);
-        return {success: false, error: "Database error. Please try again later."};
+            return {success: true, data: deletedTask};
+        } catch (error: any) {
+            logError("Error deleting task", error);
+            return {success: false, error: "Internal server error"};
+        }
     }
-};
+)
 
-export const editReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
-    const session = await getSession();
-    if (!session?.user.id) {
-        throw new Error("You must be signed in to perform this action");
-    }
-
-    try {
-        // Check if a review already exists
-        const existingReview = await prisma.review.findUnique({
-            where: {
-                authorId_companyId_organizationId: {
-                    authorId: session.user.id,
-                    companyId: companyId,
-                    organizationId: session.user.organizationId,
-                },
-            },
-        });
-
-        if (!existingReview) {
-            return {success: false, error: "No existing review found to update."};
+export const createReview = withAuth(
+    async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+        if (!session?.user.id) {
+            throw new Error("You must be signed in to perform this action");
         }
 
-        const title = formData.get("title") as string;
-        const body = formData.get("body") as string;
-        const rating = parseInt(formData.get("rating") as string);
-        const milestoneId = formData.get("milestone") as string || null;
-
-        // Use a transaction to update the review and recalculate avgRating atomically
-        const result = await prisma.$transaction(async (tx) => {
-            // Update the review
-            const updatedReview = await tx.review.update({
-                where: {id: existingReview.id},
-                data: {
-                    title,
-                    body,
-                    rating,
-                    milestones: milestoneId ? {connect: {id: milestoneId}} : undefined,
+        try {
+            // Check if a review already exists
+            const existingReview = await prisma.review.findUnique({
+                where: {
+                    authorId_companyId_organizationId: {
+                        authorId: session.user.id,
+                        companyId: companyId,
+                        organizationId: session.user.organizationId,
+                    },
                 },
             });
 
-            // Calculate new avgRating
-            const aggregated = await tx.review.aggregate({
-                where: {companyId},
-                _avg: {rating: true},
-            });
-
-            const newAvgRating = aggregated._avg.rating ?? 0;
-
-            // Update the company's avgRating
-            const updatedCompany = await tx.company.update({
-                where: {id: companyId},
-                data: {avgRating: newAvgRating},
-            });
-
-            if (updatedReview && updatedCompany) {
-                await updateTypeSenseDocument(
-                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                    (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                            : process.env.TYPESENSE_ADMIN_API_KEY
-                    )!,
-                    updatedCompany,
-                    'companies'
-                );
+            if (existingReview) {
+                return {success: false, error: "You have already created a review for this company."};
             }
 
-            return updatedReview;
-        });
+            const title = formData.get("title") as string;
+            const body = formData.get("body") as string;
+            const rating = parseInt(formData.get("rating") as string);
 
-        revalidatePath("app/service-providers/");
+            // Use a transaction to create the review and update avgRating atomically
+            const result = await prisma.$transaction(async (tx) => {
+                // Create the review
+                const review = await tx.review.create({
+                    include: {
+                        milestones: {
+                            include: {
+                                milestone: {
+                                    include: {types: true}
+                                }
+                            }
+                        }
+                    },
+                    data: {
+                        title,
+                        body,
+                        rating,
+                        author: {connect: {id: session.user.id}},
+                        company: {connect: {id: companyId}},
+                        organization: {connect: {id: session.user.organizationId}},
+                    },
+                });
 
-        return {success: true, data: result};
-    } catch (error: any) {
-        console.error("Error updating review:", error);
-        return {success: false, error: "Database error. Please try again later."};
+                // Calculate new avgRating
+                const aggregated = await tx.review.aggregate({
+                    where: {companyId},
+                    _avg: {rating: true},
+                });
+
+                const newAvgRating = aggregated._avg.rating ?? 0;
+
+                // Update the company's avgRating
+                const updatedCompany = await tx.company.update({
+                    where: {id: companyId},
+                    data: {avgRating: newAvgRating},
+                });
+
+                if (review && updatedCompany) {
+                    await updateTypeSenseDocument(
+                        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                        (
+                            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                                : process.env.TYPESENSE_ADMIN_API_KEY
+                        )!,
+                        updatedCompany,
+                        'companies'
+                    );
+                }
+
+                return review;
+            });
+
+            revalidatePath("app/service-providers/");
+
+            return {success: true, data: result};
+        } catch (error: any) {
+            console.error("Error creating review:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
     }
-};
+)
 
-export async function deleteReview(review: Review) {
-    try {
-        const response = prisma.review.delete({
-            where: {id: review.id},
-        });
+export const editReview = withAuth(
+    async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+        if (!session?.user.id) {
+            throw new Error("You must be signed in to perform this action");
+        }
 
-        if (!response) {
-            console.error("Error deleting review.")
+        try {
+            // Check if a review already exists
+            const existingReview = await prisma.review.findUnique({
+                where: {
+                    authorId_companyId_organizationId: {
+                        authorId: session.user.id,
+                        companyId: companyId,
+                        organizationId: session.user.organizationId,
+                    },
+                },
+            });
+
+            if (!existingReview) {
+                return {success: false, error: "No existing review found to update."};
+            }
+
+            const title = formData.get("title") as string;
+            const body = formData.get("body") as string;
+            const rating = parseInt(formData.get("rating") as string);
+            const milestoneId = formData.get("milestone") as string || null;
+
+            // Use a transaction to update the review and recalculate avgRating atomically
+            const result = await prisma.$transaction(async (tx) => {
+                // Update the review
+                const updatedReview = await tx.review.update({
+                    where: {id: existingReview.id},
+                    data: {
+                        title,
+                        body,
+                        rating,
+                        milestones: milestoneId ? {connect: {id: milestoneId}} : undefined,
+                    },
+                });
+
+                // Calculate new avgRating
+                const aggregated = await tx.review.aggregate({
+                    where: {companyId},
+                    _avg: {rating: true},
+                });
+
+                const newAvgRating = aggregated._avg.rating ?? 0;
+
+                // Update the company's avgRating
+                const updatedCompany = await tx.company.update({
+                    where: {id: companyId},
+                    data: {avgRating: newAvgRating},
+                });
+
+                if (updatedReview && updatedCompany) {
+                    await updateTypeSenseDocument(
+                        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                        (
+                            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                                : process.env.TYPESENSE_ADMIN_API_KEY
+                        )!,
+                        updatedCompany,
+                        'companies'
+                    );
+                }
+
+                return updatedReview;
+            });
+
+            revalidatePath("app/service-providers/");
+
+            return {success: true, data: result};
+        } catch (error: any) {
+            console.error("Error updating review:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
+export const deleteReview = withOrganizationAuth(
+    async (_: Organization, review: Review) => {
+        try {
+            const response = prisma.review.delete({
+                where: {id: review.id},
+            });
+
+            if (!response) {
+                console.error("Error deleting review.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error deleting review:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        console.error("Error deleting review:", error)
-        return {success: false, error: "Database error. please try again later."}
     }
-}
+)
 
-export async function saveCRO(croId: string, milestoneId: string) {
-    const session = await getSession()
+export const saveCRO = withOrganizationAuth(
+    async (_: Organization, croId: string, milestoneId: string) => {
+        const session = await getSession()
 
-    try {
-        const response = await prisma.savedCompany.create({
-            include: {
-                company: true,
-                milestone: {include: {types: true}}
-            },
-            data: {
-                company: {
-                    connect: {
-                        id: croId
-                    }
+        try {
+            const response = await prisma.savedCompany.create({
+                include: {
+                    company: true,
+                    milestone: {include: {types: true}}
                 },
-                organization: {
-                    connect: {
-                        id: session?.user.organizationId
-                    }
-                },
-                milestone: {
-                    connect: {
-                        id: milestoneId
-                    }
-                },
-                // engagement: engagement as OrganizationToCompanyEngagement
+                data: {
+                    company: {
+                        connect: {
+                            id: croId
+                        }
+                    },
+                    organization: {
+                        connect: {
+                            id: session?.user.organizationId
+                        }
+                    },
+                    milestone: {
+                        connect: {
+                            id: milestoneId
+                        }
+                    },
+                    // engagement: engagement as OrganizationToCompanyEngagement
+                }
+            });
+
+            if (!response) {
+                console.error("Error saving company.")
+                return {success: false, error: "Database error. please try again later."}
             }
-        });
 
-        if (!response) {
-            console.error("Error saving company.")
+            console.log(`response`, response)
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error saving company:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-
-        console.log(`response`, response)
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        console.error("Error saving company:", error)
-        return {success: false, error: "Database error. please try again later."}
     }
-}
+)
 
-export async function editSavedCRO(savedCROId: string, milestoneId: string) {
-    const session = await getSession()
+export const editSavedCRO = withOrganizationAuth(
+    async (_: Organization, savedCROId: string, milestoneId: string) => {
+        const session = await getSession()
 
-    try {
-        const response = await prisma.savedCompany.update({
-            where: {
-                id: savedCROId // Make sure to specify the ID of the saved company you want to update
-            },
-            include: {
-                company: true,
-                milestone: {include: {types: true}}
-            },
-            data: {
-                milestone: {
-                    connect: {
-                        id: milestoneId
-                    }
+        try {
+            const response = await prisma.savedCompany.update({
+                where: {
+                    id: savedCROId // Make sure to specify the ID of the saved company you want to update
                 },
-                // engagement: engagement as OrganizationToCompanyEngagement
-            }
-        });
+                include: {
+                    company: true,
+                    milestone: {include: {types: true}}
+                },
+                data: {
+                    milestone: {
+                        connect: {
+                            id: milestoneId
+                        }
+                    },
+                    // engagement: engagement as OrganizationToCompanyEngagement
+                }
+            });
 
-        if (!response) {
-            console.error("Error saving edits to saved company.")
+            if (!response) {
+                console.error("Error saving edits to saved company.")
+                return {success: false, error: "Database error. Please try again later."}
+            }
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error editing saved company:", error)
             return {success: false, error: "Database error. Please try again later."}
         }
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        console.error("Error editing saved company:", error)
-        return {success: false, error: "Database error. Please try again later."}
     }
-}
+)
 
-export async function unsaveCRO(savedCompanyId: string) {
-    try {
-        const response = await prisma.savedCompany.delete({
-            where: {id: savedCompanyId},
-            include: {
-                company: true,
-                milestone: {include: {types: true}}
-            },
-        });
-
-        if (!response) {
-            console.error("Error unsaving company.")
-            return {success: false, error: "Database error. please try again later."}
-        }
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        console.error("Error unsaving company:", error)
-        return {success: false, error: "Database error. please try again later."}
-    }
-}
-
-export async function submitFeedback(reviewId: string, userId: string, isHelpful: boolean) {
-    try {
-        // Check if the user has already provided feedback for this review
-        const existingFeedback = await prisma.reviewFeedback.findUnique({
-            where: {
-                reviewId_userId: {
-                    reviewId,
-                    userId,
-                },
-            },
-        });
-
-        if (existingFeedback) {
-            // If feedback exists, update it
-            const response = await prisma.reviewFeedback.update({
-                where: {
-                    id: existingFeedback.id,
-                },
-                data: {
-                    helpful: isHelpful,
+export const unsaveCRO = withOrganizationAuth(
+    async (_: Organization, savedCompanyId: string) => {
+        try {
+            const response = await prisma.savedCompany.delete({
+                where: {id: savedCompanyId},
+                include: {
+                    company: true,
+                    milestone: {include: {types: true}}
                 },
             });
 
-            return {success: true, data: response};
-        } else {
-            // Otherwise, create new feedback
-            const response = await prisma.reviewFeedback.create({
-                data: {
-                    reviewId,
-                    userId,
-                    helpful: isHelpful,
-                },
-            });
-
-            return {success: true, data: response};
-        }
-    } catch (error: any) {
-        console.error("Error submitting feedback:", error);
-        return {success: false, error: "Database error. Please try again later."};
-    }
-}
-
-export async function addEmailToWhitelist(email: string) {
-    try {
-        // Check if the user has already provided feedback for this review
-        // Otherwise, create new feedback
-        const response = await prisma.whitelist.create({
-            data: {
-                email: email
-            },
-        });
-
-        revalidatePath("/admin/users/whitelist")
-
-        return {success: true, data: response};
-    } catch (error: any) {
-        console.error("Error adding email to whitelist:", error);
-        return {success: false, error: "Database error. Please try again later."};
-    }
-}
-
-export async function removeEmailFromWhitelist(email: string) {
-    try {
-        // Check if the user has already provided feedback for this review
-        // Otherwise, create new feedback
-        const response = await prisma.whitelist.delete({
-            where: {
-                email: email
+            if (!response) {
+                console.error("Error unsaving company.")
+                return {success: false, error: "Database error. please try again later."}
             }
-        });
 
-        revalidatePath("/admin/users/whitelist")
-
-        return {success: true, data: response};
-    } catch (error: any) {
-        console.error("Error removing email to whitelist:", error);
-        return {success: false, error: "Database error. Please try again later."};
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error unsaving company:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
     }
-}
+)
 
-export const createCompany = async (formData: FormData) => {
-    const session = await getSession()
-    if (!session?.user.id) {
-        return {error: "Not authenticated"}
+export const submitFeedback = withAuth(
+    async (reviewId: string, userId: string, isHelpful: boolean) => {
+        try {
+            // Check if the user has already provided feedback for this review
+            const existingFeedback = await prisma.reviewFeedback.findUnique({
+                where: {
+                    reviewId_userId: {
+                        reviewId,
+                        userId,
+                    },
+                },
+            });
+
+            if (existingFeedback) {
+                // If feedback exists, update it
+                const response = await prisma.reviewFeedback.update({
+                    where: {
+                        id: existingFeedback.id,
+                    },
+                    data: {
+                        helpful: isHelpful,
+                    },
+                });
+
+                return {success: true, data: response};
+            } else {
+                // Otherwise, create new feedback
+                const response = await prisma.reviewFeedback.create({
+                    data: {
+                        reviewId,
+                        userId,
+                        helpful: isHelpful,
+                    },
+                });
+
+                return {success: true, data: response};
+            }
+        } catch (error: any) {
+            console.error("Error submitting feedback:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
     }
+)
 
-    const title = formData.get("orgName") as string
-    const description = formData.get("description") as string
-    const yearEstablished = parseInt(formData.get("founded") as string)
-    const headquarters = formData.get("headquarters") as string
-    const companyType = formData.get("type") as string
-    const url = formData.get("website") as string
-    const servicesRaw = formData.get("services") as string
-    const certificationsRaw = formData.get("certifications") as string
+export const addEmailToWhitelist = withAdminAuth(
+    async (email: string) => {
+        try {
+            // Check if the user has already provided feedback for this review
+            // Otherwise, create new feedback
+            const response = await prisma.whitelist.create({
+                data: {
+                    email: email
+                },
+            });
 
-    const parsedServices = servicesRaw
-        ? servicesRaw.split(",").map((name) => name.trim())
-        : []
-    const parsedCertifications = certificationsRaw
-        ? certificationsRaw.split(",").map((name) => name.trim())
-        : []
+            revalidatePath("/admin/users/whitelist")
 
-    const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices)
-
-    try {
-        const company = await prisma.company.create({
-            data: {
-                title,
-                description,
-                yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
-                companyType,
-                headquarters,
-                url,
-                services: parsedServices.length
-                    ? {
-                        connectOrCreate: parsedServices.map((name) => ({
-                            where: { name },
-                            create: { name },
-                        })),
-                    }
-                    : undefined,
-                certifications: parsedCertifications.length
-                    ? {
-                        connectOrCreate: parsedCertifications.map((name) => ({
-                            where: { name },
-                            create: { name },
-                        })),
-                    }
-                    : undefined,
-                simplifiedCertifications: parsedCertifications,
-                categories,
-                milestoneTypes,
-            },
-            include: {services: true},
-        })
-
-        await addTypeSenseDocument(
-            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
-                : process.env.TYPESENSE_ADMIN_API_KEY!,
-            company,
-            "companies"
-        )
-
-        await revalidateTag(`${company.id}-company-metadata`)
-
-        return {success: true, data: company}
-    } catch (error: any) {
-        console.error("Error creating company:", error)
-        return {success: false, error: "Database error. Please try again later."}
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error adding email to whitelist:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
     }
-}
+)
 
-export async function deleteCompany(company: Company) {
-    try {
-        const deleteCompany = prisma.company.delete({
-            where: {id: company.id},
-        });
+export const removeEmailFromWhitelist = withAdminAuth(
+    async (email: string) => {
+        try {
+            // Check if the user has already provided feedback for this review
+            // Otherwise, create new feedback
+            const response = await prisma.whitelist.delete({
+                where: {
+                    email: email
+                }
+            });
 
-        const deleteTypeSense = deleteTypeSenseDocument(
-            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            (
+            revalidatePath("/admin/users/whitelist")
+
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error removing email to whitelist:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
+export const createCompany = withAdminAuth(
+    async (formData: FormData) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {error: "Not authenticated"}
+        }
+
+        const title = formData.get("orgName") as string
+        const description = formData.get("description") as string
+        const yearEstablished = parseInt(formData.get("founded") as string)
+        const headquarters = formData.get("headquarters") as string
+        const companyType = formData.get("type") as string
+        const url = formData.get("website") as string
+        const servicesRaw = formData.get("services") as string
+        const certificationsRaw = formData.get("certifications") as string
+
+        const parsedServices = servicesRaw
+            ? servicesRaw.split(",").map((name) => name.trim())
+            : []
+        const parsedCertifications = certificationsRaw
+            ? certificationsRaw.split(",").map((name) => name.trim())
+            : []
+
+        const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices)
+
+        try {
+            const company = await prisma.company.create({
+                data: {
+                    title,
+                    description,
+                    yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
+                    companyType,
+                    headquarters,
+                    url,
+                    services: parsedServices.length
+                        ? {
+                            connectOrCreate: parsedServices.map((name) => ({
+                                where: { name },
+                                create: { name },
+                            })),
+                        }
+                        : undefined,
+                    certifications: parsedCertifications.length
+                        ? {
+                            connectOrCreate: parsedCertifications.map((name) => ({
+                                where: { name },
+                                create: { name },
+                            })),
+                        }
+                        : undefined,
+                    simplifiedCertifications: parsedCertifications,
+                    categories,
+                    milestoneTypes,
+                },
+                include: {services: true},
+            })
+
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                    : process.env.TYPESENSE_ADMIN_API_KEY
-            )!,
-            company.id,
-            'companies'
-        );
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
+                    : process.env.TYPESENSE_ADMIN_API_KEY!,
+                company,
+                "companies"
+            )
 
-        // Run both deletions concurrently
-        const [response] = await Promise.all([deleteCompany, deleteTypeSense])
+            await revalidateTag(`${company.id}-company-metadata`)
 
-        if (!response) {
-            console.error("Error deleting company.")
+            return {success: true, data: company}
+        } catch (error: any) {
+            console.error("Error creating company:", error)
+            return {success: false, error: "Database error. Please try again later."}
+        }
+    }
+)
+
+export const deleteCompany = withAdminAuth(
+    async (company: Company) => {
+        try {
+            const deleteCompany = prisma.company.delete({
+                where: {id: company.id},
+            });
+
+            const deleteTypeSense = deleteTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                company.id,
+                'companies'
+            );
+
+            // Run both deletions concurrently
+            const [response] = await Promise.all([deleteCompany, deleteTypeSense])
+
+            if (!response) {
+                console.error("Error deleting company.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error deleting company:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        console.error("Error deleting company:", error)
-        return {success: false, error: "Database error. please try again later."}
     }
-}
+)
 
-export const createPharmaProject = async (formData: FormData) => {
-    const session = await getSession()
-    if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
+export const createPharmaProject = withAuth(
+    async (formData: FormData) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
         }
-    }
 
-    const name = formData.get("name") as string;
+        const name = formData.get("name") as string;
 
-    try {
-        const pharmaProject = await prisma.pharmaProject.create({
-            data: {
-                name,
-            },
-        });
+        try {
+            const pharmaProject = await prisma.pharmaProject.create({
+                data: {
+                    name,
+                },
+            });
 
-        revalidatePath("/(platform)/pharma/project/[id]")
+            revalidatePath("/(platform)/pharma/project/[id]")
 
-        return {success: true, data: pharmaProject}
-    } catch (error: any) {
-        console.error("Error creating pharma project:", error)
-        return {success: false, error: "Database error. please try again later."}
-    }
-}
-
-export async function deletePharmaProject(pharmaProjectId: string | undefined) {
-    try {
-        const response = prisma.pharmaProject.delete({
-            where: {id: pharmaProjectId},
-        });
-
-        if (!response) {
-            console.error("Error deleting pharma project.")
+            return {success: true, data: pharmaProject}
+        } catch (error: any) {
+            console.error("Error creating pharma project:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-
-        revalidatePath("/(platform)/pharma")
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        console.error("Error deleting pharma project:", error)
-        return {success: false, error: "Database error. please try again later."}
     }
-}
+)
+
+export const deletePharmaProject = withAuth(
+    async (pharmaProjectId: string | undefined) => {
+        try {
+            const response = prisma.pharmaProject.delete({
+                where: {id: pharmaProjectId},
+            });
+
+            if (!response) {
+                console.error("Error deleting pharma project.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            revalidatePath("/(platform)/pharma")
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error deleting pharma project:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)

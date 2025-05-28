@@ -108,7 +108,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
             if (!data.milestones?.[0]?.id) {
                 console.error(`Error: Invalid milestone ID`)
             }
-            const response = await editSavedCRO(row.original.id, data.milestones[0].id);
+            const response = await editSavedCRO(row.original.organizationId, row.original.id, data.milestones[0].id);
 
             if (response.success && response.data) {
                 va.track("Edited saved CRO");
@@ -137,7 +137,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
 
     const handleUnsaveCRO = async () => {
         try {
-            const response = await unsaveCRO(row.original.id)
+            const response = await unsaveCRO(row.original.organizationId, row.original.id)
 
             if (response.success && response.data) {
                 mixpanelTrack("Service Provider Unsaved", {

@@ -14,13 +14,13 @@ export type KanbanState = {
     tasks: any[],
     initState: (columns: Column[], tasks: any[], kanbanId: string | undefined) => void,
     addColumn: (column: any, orgId: string | undefined | null) => Promise<Column | void>,
-    deleteColumn: (columnId: string) => Promise<Column | void>
+    deleteColumn: (columnId: string, orgId: string | undefined | null) => Promise<Column | void>
     updateColumn: (columnId: string, newProperties: any, orgId: string | undefined | null) => Promise<Column[] | void>,
     setColumns: (columns: Column[]) => Promise<Column[] | void>,
-    addTask: (columnId: string, properties?: any) => Promise<Task | void>,
-    updateTask: (taskId: string, newProperties: any) => Promise<Task[] | void>,
-    setTasks: (tasks: any[]) => Promise<Task[] | void>,
-    deleteTask: (taskId: string) => Promise<Task | void>,
+    addTask: (orgId: string | undefined | null, columnId: string, properties?: any) => Promise<Task | void>,
+    updateTask: (orgId: string | undefined | null, taskId: string, newProperties: any) => Promise<Task[] | void>,
+    setTasks: (orgId: string | undefined | null, tasks: any[]) => Promise<Task[] | void>,
+    deleteTask: (orgId: string | undefined | null, taskId: string) => Promise<Task | void>,
     saveState: (orgId: string | undefined | null) => void
 }
 
@@ -48,9 +48,9 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error adding your column')
                 }
             },
-            deleteColumn: async (columnId: string) => {
+            deleteColumn: async (columnId: string, orgId: string | undefined | null) => {
                 console.log(`delete column`)
-                const response = await deleteColumn(columnId)
+                const response = await deleteColumn(orgId, columnId)
                 if (response?.success && response?.data) {
                     // if task was successfully deleted, update zustand state
                     set({ columns: get().columns.filter(col => col.id !== response.data.id)})
@@ -100,10 +100,10 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error updating your column')
                 }
             },
-            addTask: async (columnId: string, properties?: any) => {
+            addTask: async (orgId: string | undefined | null, columnId: string, properties?: any) => {
                 console.log(`add task`)
                 // create task in the database
-                const response = await createTask(columnId, properties)
+                const response = await createTask(orgId, columnId, properties)
 
                 if (response?.success && response?.data) {
                     // if task was created successfully, update zustand state
@@ -116,7 +116,7 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error adding your task')
                 }
             },
-            updateTask: async (taskId: string, newProperties: Partial<Task>) => {
+            updateTask: async (orgId: string | undefined | null, taskId: string, newProperties: Partial<Task>) => {
                 console.log(`update task`)
                 const updatedTasks = get().tasks.map(task => {
                     if (task.id === taskId) {
@@ -129,7 +129,7 @@ export const useKanbanStore = create<KanbanState>()(
                     return task
                 })
 
-                const response = await updateTasks({ tasks: updatedTasks })
+                const response = await updateTasks(orgId, { tasks: updatedTasks })
                 if (response?.success && response?.data) {
                     // if task was created successfully, update zustand state
                     set({ tasks: response.data as Task[] })
@@ -141,9 +141,9 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error updating your task')
                 }
             },
-            setTasks: async (tasks: Task[]) => {
+            setTasks: async (orgId: string | undefined | null, tasks: Task[]) => {
                 console.log(`set tasks`)
-                const response = await updateTasks({ tasks })
+                const response = await updateTasks(orgId, { tasks })
                 if (response?.success && response?.data) {
                     // if task was created successfully, update zustand state
                     set({ tasks: response.data as Task[] })
@@ -155,9 +155,9 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error updating your task')
                 }
             },
-            deleteTask: async (taskId: string) => {
+            deleteTask: async (orgId: string | undefined | null, taskId: string) => {
                 console.log(`delete task`)
-                const response = await deleteTask(taskId)
+                const response = await deleteTask(orgId, taskId)
                 if (response?.success && response?.data) {
                     // if task was successfully deleted, update zustand state
                     set({ tasks: get().tasks.filter(task => task.id !== response.data.id)})

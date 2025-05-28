@@ -8,13 +8,13 @@ const kanbanSelector = (state: KanbanState) => ({
     addTask: state.addTask
 })
 
-export default function NewKanbanTaskButton({column, assignTo}: { column: Column, assignTo?: string }) {
+export default function NewKanbanTaskButton({orgId, column, assignTo}: { orgId: string | null | undefined, column: Column, assignTo?: string }) {
     const { addTask } = useKanbanStore(useShallow(kanbanSelector))
 
     async function createTask() {
         try {
-            if (assignTo) await addTask(column.id, {stakeholders: [{ userId: assignTo }]})
-            else await addTask(column.id)
+            if (assignTo) await addTask(orgId, column.id, {stakeholders: [{ userId: assignTo }]})
+            else await addTask(orgId, column.id)
         } catch (error) {
             console.error(error);
         }
