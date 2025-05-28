@@ -41,7 +41,7 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
                     toast.error(response.error)
                 }
             } else {
-                console.error(`Could not initialize active roadmap with id ${params.id}`)
+                console.error(`Could not initialize active roadmap with id ${params.id}. Error: ${response.error}`)
             }
         }
 

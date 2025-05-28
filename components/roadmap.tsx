@@ -45,6 +45,7 @@ import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "./ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import ShareDialog from "./share-dialog"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -757,7 +758,30 @@ const RoadmapHeader = ({
                             organization={organization}
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
-                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`}
+                            // embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`}
+                            embeddedResearchPlanData={{
+                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`,
+                                resarchPlanId: researchPlanId,
+                                researchPlanTitle: researchPlanDetails.title || ''
+                            }}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plan Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name,
+                            //             "Research Plan ID": researchPlanId,
+                            //             "Research Plan Title": researchPlanDetails.title
+                            //         } : undefined)
+                            //     })
+                            // }}
+                            trackShareEvent={{
+                                title: `Research Plan Shared`,
+                                additonalProperties: {
+                                    "Research Plan ID": researchPlanId,
+                                    "Research Plan Title": researchPlanDetails.title || ''
+                                }
+                            }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>

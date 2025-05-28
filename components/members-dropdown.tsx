@@ -110,7 +110,8 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 }
 
                 setIsDialogOpen(false)
-                router.refresh()
+                // router.refresh()
+                location.reload() // force full page refresh
             } else {
                 console.error(response.error)
                 toast.error(response.error)
@@ -130,11 +131,12 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                     "Role": response.data.role
                 })
                 toast.success(`Successfully deleted ${member.user.name}'s membership.`)
-                router.refresh()
             } else {
                 console.error(response.error)
                 toast.error(response.error)
             }
+
+            location.reload() // force full page refresh
         }
     }
 

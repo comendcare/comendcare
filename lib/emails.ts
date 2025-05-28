@@ -134,7 +134,7 @@ export async function sendNewOrganizationEmail(params: {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
     const msg = {
         to: ["hello@comendcare.com", "betty.trevino@comendcare.com", "flawnson@comendcare.com"],
-        from: "contact@comendcare.com",
+        from: "corporate@comendcare.com",
         html: emailTemplate,
         text: "New organization",
         subject: "A new organization has been created."

@@ -25,7 +25,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     const orgCondition = condition?.[0]?.condition || {};
     const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
 
-    const nodeTypeCount = countPublicNodeTypes(organization.Milestone)
+    const nodeTypeCount = countPublicNodeTypes(organization.milestones)
     // const nodeTypeCount = {
     //     "PROJECT": (organization.Milestone || []).filter((item: any) => !item.private).length,
     //     "ASSET": (organization.Asset || []).filter((item: any) => !item.private).length,

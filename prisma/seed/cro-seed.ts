@@ -45,20 +45,30 @@ async function main() {
                     },
 
                     services: {
-                        create: company.services?.map((service: any) => ({
-                            name: service.name,
-                            description: service.description,
+                        connectOrCreate: company.services?.map((service: any) => ({
+                            where: {
+                                name: service.name,
+                            },
+                            create: {
+                                name: service.name,
+                                description: service.description,
+                            },
                         })) || [],
                     },
 
                     certifications: {
-                        create: company.certifications?.map((cert: any) => ({
-                            name: cert.name,
-                            files: {
-                                create: cert.files?.map((file: any) => ({
-                                    fileName: file.fileName,
-                                    fileUrl: file.fileUrl,
-                                })) || [],
+                        connectOrCreate: company.certifications?.map((cert: any) => ({
+                            where: {
+                                name: cert.name,
+                            },
+                            create: {
+                                name: cert.name,
+                                files: {
+                                    create: cert.files?.map((file: any) => ({
+                                        fileName: file.fileName,
+                                        fileUrl: file.fileUrl,
+                                    })) || [],
+                                },
                             },
                         })) || [],
                     },

@@ -30,6 +30,7 @@ import {ScrollArea} from "@/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
 import ShareDialog from "@/components/share-dialog";
 import {Button} from "@/components/ui/button";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -191,6 +192,9 @@ export default async function ProfilePage() {
                                     <ShareDialog
                                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                         organization={organization}
+                                        trackShareEvent={{
+                                            title: `Organization Profile Shared`,
+                                        }}
                                     />
                                 </DialogContent>
                             </Dialog>

@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "node write-certificates.js",
     "dev": "prisma generate && next dev",
-    "build": "prisma generate && prisma db push && next build",
+    "build": "prisma generate && prisma db push --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -30,6 +30,7 @@
     "@notionhq/client": "^2.2.15",
     "@prisma/client": "^5.22.0",
     "@prisma/extension-pulse": "^1.2.0",
+    "@prisma/studio": "^0.511.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
