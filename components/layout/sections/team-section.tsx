@@ -13,7 +13,7 @@ import Foy from "@/public/profiles/Foy.jpg"
 import Pepi from "@/public/profiles/Pepi.jpg"
 import Betty from "@/public/profiles/Betty.jpeg"
 import Megan from "@/public/profiles/Megan.png"
-import Tuongvi from "@/public/profiles/Tuongvi.jpeg"
+import Ashley from "@/public/profiles/Ashley.jpeg"
 import Link from "next/link"
 import {Instagram, Linkedin} from "lucide-react"
 
@@ -299,6 +299,20 @@ const cards = [
         }
     },
     {
+        name: "Ashley Winslow",
+        title: "Advisor",
+        src: Ashley,
+        linkedInURL: "https://www.linkedin.com/in/arwinslow/",
+        instagramURL: "",
+        content: () => {
+            return (
+                <p>
+                    {`CEO and CSO of Odylia Therapeutics.`}
+                </p>
+            )
+        }
+    },
+    {
         name: "Pepi Martinez",
         title: "Head of Data Governance",
         src: Pepi,
@@ -352,23 +366,6 @@ const cards = [
         }
     },
     {
-        name: "Tuongvi Diep",
-        title: "Social Media and Community Coordinator",
-        src: Tuongvi,
-        linkedInURL: "https://www.linkedin.com/in/tuongvi-diep-17080b12b/",
-        instagramURL: "",
-        content: () => {
-            return (
-                <p>
-                    {`Hello! As part of Comend’s social media team I’m excited to support patient-led biotechs by crafting
-                    narratives that not only inform but inspire, and empowering families with rare diseases.
-                    With a background in journalism,I’m a storyteller at heart with a passion for helping others and
-                    building authentic relationships in the digital space.`}
-                </p>
-            )
-        }
-    },
-    {
         name: "Bruce Bloom",
         title: "Advisor",
         src: Bruce,
@@ -377,7 +374,7 @@ const cards = [
         content: () => {
             return (
                 <p>
-                    {`Entrepreneur based in Toronto.`}
+                    {`Founder, C-Suite Executive, Speaker, Coach - Biopharma, Non-Profit, Rare Diseases.`}
                 </p>
             )
         }
