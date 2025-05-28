@@ -27,6 +27,7 @@ import {getNewColumnFormSchema} from "@/lib/schemas";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import { Plus } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
@@ -34,6 +35,7 @@ const kanbanSelector = (state: KanbanState) => ({
 })
 
 export default function NewColumnDialog() {
+    const {data: session} = useSession()
     const { columns, addColumn } = useKanbanStore(useShallow(kanbanSelector))
     const [open, setOpen] = useState(false)
     const newMonitorFormSchema = getNewColumnFormSchema([])
@@ -55,7 +57,7 @@ export default function NewColumnDialog() {
                 name: values.keyword,
                 tasks: [],
                 kanbanPosition: columns.length - 1
-            })
+            }, session?.user.organizationId)
         } catch (error) {
             console.error(error);
         }
