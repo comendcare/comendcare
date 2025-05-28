@@ -7,7 +7,7 @@ export default async function CreateResearchPlanPage() {
             <div className="space-y-2">
                 <h1 className="text-xl font-semibold">Create a Research Plan</h1>
                 <p>
-                    {`To help create your research plan, pleae answer a few questions.`}
+                    {`To help create your research plan, please answer a few questions.`}
                 </p>
             </div>
             <Separator/>
