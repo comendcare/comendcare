@@ -1,12 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 export const dynamic = 'force-dynamic'; // Prevent caching
+import prisma from "@/lib/prisma"
 
-const initPrismaClient = () => {
-    console.log('Initializing Prisma client...');
-    const client = new PrismaClient();
-    console.log('Prisma client initialized.');
-    return client;
-};
 
 const sendTypeSenseRequest = async (
     url: string,
@@ -97,7 +91,6 @@ export const syncToTypesense = async (env: {
     console.log('Environment variables:', env);
 
     try {
-        const prisma = initPrismaClient();
 
         // Define schemas
         const organizationSchema = {

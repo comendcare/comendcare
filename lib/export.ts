@@ -1,15 +1,7 @@
 import fs from 'fs'
-import { PrismaClient } from '@prisma/client';
+import prisma from "@/lib/prisma"
 export const dynamic = 'force-dynamic'; // Prevent caching
 
-const initPrismaClient = () => {
-    console.log('Initializing Prisma client...');
-    const client = new PrismaClient();
-    console.log('Prisma client initialized.');
-    return client;
-};
-
-const prisma = initPrismaClient()
 
 async function exportResearchPlan(researchPlanId: string) {
     const researchPlan = await prisma?.roadmap.findUnique({

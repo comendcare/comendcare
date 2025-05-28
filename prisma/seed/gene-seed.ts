@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from "@/lib/prisma"
 import fs from 'fs/promises';
-
-const prisma = new PrismaClient();
 
 async function main() {
     console.log('Starting seed script...');
