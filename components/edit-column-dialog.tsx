@@ -29,12 +29,14 @@ import { useShallow } from "zustand/react/shallow"
 import { DropdownMenuItem } from "./ui/dropdown-menu"
 import { Column } from "@prisma/client"
 import { Pencil } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 const kanbanSelector = (state: KanbanState) => ({
     updateColumn: state.updateColumn
 })
 
 export default function EditColumnDialog({column}: {column: Column}) {
+    const {data: session} = useSession()
     const { updateColumn } = useKanbanStore(useShallow(kanbanSelector))
     const [open, setOpen] = useState(false)
     const newMonitorFormSchema = getNewColumnFormSchema([])
@@ -52,7 +54,7 @@ export default function EditColumnDialog({column}: {column: Column}) {
     async function onSubmit() {
         setOpen(false)
         try {
-            updateColumn(column.id, {...column, name: keyword})
+            updateColumn(column.id, {...column, name: keyword}, session?.user.organizationId)
         } catch (error) {
             console.error(error);
         }

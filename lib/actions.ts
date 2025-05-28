@@ -2878,141 +2878,145 @@ export const updateMilestones = withOrganizationAuth(
 )
 
 /* HANDLE KANBAN - create ------------------------------------------------------------------------------------------------ */
-export async function createKanban(orgId: string) {
-    try {
-        const newKanban = await prisma.kanban.create({
-            include: {columns: true},
-            data: {
-                organization: {connect: {id: orgId}},
-                columns: {
-                    create: DEFAULT_KANBAN_COLUMNS
+export const createKanban = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const newKanban = await prisma.kanban.create({
+                include: {columns: true},
+                data: {
+                    organization: {connect: {id: organization.id}},
+                    columns: {
+                        create: DEFAULT_KANBAN_COLUMNS
+                    }
                 }
-            }
-        })
+            })
 
-        return {success: true, data: newKanban}
-    } catch (error: any) {
-        logError(`Error creating task for ${orgId}`, error)
-        return {success: false, error: "Internal server error"}
+            return {success: true, data: newKanban}
+        } catch (error: any) {
+            logError(`Error creating task for ${organization.id}`, error)
+            return {success: false, error: "Internal server error"}
+        }
     }
-}
+)
 
 /* HANDLE KANBAN COLUMNS - create, update, delete ------------------------------------------------------------------------ */
-export async function kanbanSync({kanbanId, columns, tasks}: {
-    kanbanId: string | undefined,
-    columns: Column[],
-    tasks: Task[]
-}) {
-    try {
-        if (!kanbanId) return
+export const kanbanSync = withOrganizationAuth(
+    async (_: Organization, {kanbanId, columns, tasks}: {kanbanId: string | undefined, columns: Column[], tasks: Task[]}) => {
+        try {
+            if (!kanbanId) return
 
-        console.log(`kanban id`, kanbanId)
-        // return
+            console.log(`kanban id`, kanbanId)
+            // return
 
-        await prisma.column.deleteMany({
-            where: {kanbanId}
-        })
-
-        // Save or update nodes
-        await Promise.all(
-            columns.map(async (column: Column) => {
-                const c = await prisma.column.create({
-                    // here we have to re-connect all the previously created connections
-                    data: {
-                        ...column,
-                        kanbanId,
-                        metadata: undefined,
-                        tasks: {
-                            create: tasks.filter(t => t.columnId === column.id).map(task => ({
-                                ...task,
-                                metadata: undefined,
-                                columnId: undefined,
-                                column: undefined,
-                                checklist: {
-                                    create: (task.checklist || []).map((item: any) => ({
-                                        ...item,
-                                        taskId: undefined
-                                    }))
-                                },
-                                milestoneId: task.milestoneId,
-                                milestone: undefined,
-                                stakeholders: {
-                                    create: (task.stakeholders || []).map((stakeholder: any) => ({
-                                        userId: stakeholder?.user?.id || stakeholder?.userId,
-                                    }))
-                                },
-                            }))
-                        }
-                    }
-                })
+            await prisma.column.deleteMany({
+                where: {kanbanId}
             })
-        )
 
-    } catch (error: any) {
-        logError("Error syncing kanban", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
-
-export async function createColumn(column: Partial<Column>) {
-    try {
-        const {data: kanban} = await getKanbanFromOrganizationId()
-        if (!kanban) return {success: false, error: "failed to find associated task board"}
-
-        const newColumn = await prisma.column.create({
-            data: {
-                name: column.name || 'New column',
-                id: nanoid(),
-                kanban: {
-                    connect: {id: kanban.id}
-                },
-                kanbanPosition: column.kanbanPosition || 0
-            }
-        })
-
-        if (!newColumn) {
-            return {success: false, error: "failed to create column"};
-        }
-
-        // Typesense - if updating typesense, update here...
-
-        return {success: true, data: newColumn};
-    } catch (error: any) {
-        logError("Error creating column", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function updateColumns({columns}: { columns: Column[] }) {
-    try {
-        let updatedColumns: Column[] = []
-
-        await Promise.all(
-            columns.map(async (column: any) => {
-                let c = await prisma.column.update({
-                    where: {id: column?.id},
-                    data: {
-                        name: column.name,
-                        kanbanPosition: column.kanbanPosition
-                    }
+            // Save or update nodes
+            await Promise.all(
+                columns.map(async (column: Column) => {
+                    const c = await prisma.column.create({
+                        // here we have to re-connect all the previously created connections
+                        data: {
+                            ...column,
+                            kanbanId,
+                            metadata: undefined,
+                            tasks: {
+                                create: tasks.filter(t => t.columnId === column.id).map(task => ({
+                                    ...task,
+                                    metadata: undefined,
+                                    columnId: undefined,
+                                    column: undefined,
+                                    checklist: {
+                                        create: (task.checklist || []).map((item: any) => ({
+                                            ...item,
+                                            taskId: undefined
+                                        }))
+                                    },
+                                    milestoneId: task.milestoneId,
+                                    milestone: undefined,
+                                    stakeholders: {
+                                        create: (task.stakeholders || []).map((stakeholder: any) => ({
+                                            userId: stakeholder?.user?.id || stakeholder?.userId,
+                                        }))
+                                    },
+                                }))
+                            }
+                        }
+                    })
                 })
+            )
 
-                if (!c) {
-                    logError("Could not update column", column)
-                } else {
-                    updatedColumns.push(c)
+        } catch (error: any) {
+            logError("Error syncing kanban", error)
+            return {success: false, error: "Internal server error"}
+        }
+    }
+)
+
+export const createColumn = withOrganizationAuth(
+    async (_: Organization, column: Partial<Column>) => {
+        try {
+            const {data: kanban} = await getKanbanFromOrganizationId()
+            if (!kanban) return {success: false, error: "failed to find associated task board"}
+
+            const newColumn = await prisma.column.create({
+                data: {
+                    name: column.name || 'New column',
+                    id: nanoid(),
+                    kanban: {
+                        connect: {id: kanban.id}
+                    },
+                    kanbanPosition: column.kanbanPosition || 0
                 }
             })
-        )
 
-        // Typesense - if updating typesense, update here...
+            if (!newColumn) {
+                return {success: false, error: "failed to create column"};
+            }
 
-        return {success: true, data: updatedColumns}
-    } catch (error) {
-        logError("Could not update column", error)
-        return {success: false, error: "Internal server error"}
+            // Typesense - if updating typesense, update here...
+
+            return {success: true, data: newColumn};
+        } catch (error: any) {
+            logError("Error creating column", error);
+            return {success: false, error: "Internal server error"};
+        }
     }
-}
+)
+
+export const updateColumns = withOrganizationAuth(
+    async (_: Organization, {columns}: { columns: Column[] }) => {
+        try {
+            let updatedColumns: Column[] = []
+
+            await Promise.all(
+                columns.map(async (column: any) => {
+                    let c = await prisma.column.update({
+                        where: {id: column?.id},
+                        data: {
+                            name: column.name,
+                            kanbanPosition: column.kanbanPosition
+                        }
+                    })
+
+                    if (!c) {
+                        logError("Could not update column", column)
+                    } else {
+                        updatedColumns.push(c)
+                    }
+                })
+            )
+
+            // Typesense - if updating typesense, update here...
+
+            return {success: true, data: updatedColumns}
+        } catch (error) {
+            logError("Could not update column", error)
+            return {success: false, error: "Internal server error"}
+        }
+    }
+)
 
 export async function deleteColumn(columnId: string) {
     try {

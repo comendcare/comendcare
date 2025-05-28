@@ -46,6 +46,7 @@ const kanbanSelector = (state: KanbanState) => ({
 })
 
 export function KanbanView() {
+    const {data: session} = useSession()
     const { undo, redo } = useKanbanStore.temporal.getState()
     const {columns, tasks, saveState} = useKanbanStore(useShallow(kanbanSelector))
     const [sortBy, setSortBy] = useState<string>('default')
@@ -104,7 +105,7 @@ export function KanbanView() {
                         <Button onClick={() => {
                             console.log("Undo action triggered")
                             undo() // undo updates zustand state
-                            saveState() // save state to update database
+                            saveState(session?.user.organizationId) // save state to update database
                             setMountKey(prev => prev + 1)
                         }} size={"icon"} variant={"ghost"}>
                             <Undo2 />
@@ -119,7 +120,7 @@ export function KanbanView() {
                         <Button onClick={() => {
                             console.log("Redo action triggered")
                             redo() // undo updates zustand state
-                            saveState() // save state to update database
+                            saveState(session?.user.organizationId) // save state to update database
                             setMountKey(prev => prev + 1)
                         }} size={"icon"} variant={"ghost"}>
                             <Redo2 />
