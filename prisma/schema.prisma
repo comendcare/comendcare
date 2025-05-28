@@ -25,26 +25,37 @@ enum OrganizationToCompanyEngagement {
 
 model User {
   id                    String                 @id @default(cuid())
-  name                  String?
+  name                  String? /// @encrypted
+  nameHash              String?                @unique /// @encryption:hash(name)
   username              String?
   gh_username           String?
-  email                 String?                @unique
+  email                 String?                @unique /// @encrypted
+  emailHash             String?                @unique /// @encryption:hash(email)
   emailVerified         DateTime?
   image                 String?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   deletedAt             DateTime?
   kanbanLastVisit       DateTime               @default(now())
-  address1              String?
-  address2              String?
-  city                  String?
-  country               String?
-  formattedAddress      String?
+  address1              String? /// @encrypted
+  address1Hash          String?                @unique /// @encryption:hash(address1)
+  address2              String? /// @encrypted
+  address2Hash          String?                @unique /// @encryption:hash(address2)
+  city                  String? /// @encrypted
+  cityHash              String?                @unique /// @encryption:hash(city)
+  country               String? /// @encrypted
+  countryHash           String?                @unique /// @encryption:hash(country)
+  formattedAddress      String? /// @encrypted
+  formattedAddressHash  String?                @unique /// @encryption:hash(formattedAddress)
+  postalCode            String? /// @encrypted
+  postalCodeHash        String?                @unique /// @encryption:hash(postalCode)
+  region                String? /// @encrypted
+  regionHash            String?                @unique /// @encryption:hash(region)
+  lat                   Float? /// @encrypted
+  latHash               String?                @unique /// @encryption:hash(lat)
+  lng                   Float? /// @encrypted
+  lngHash               String?                @unique /// @encryption:hash(lng)
   notificationSettings  Boolean                @default(false)
-  postalCode            String?
-  region                String?
-  lat                   Float?
-  lng                   Float?
   consentSettings       Boolean                @default(false)
   accounts              Account[]
   comments              Comment[]
@@ -89,7 +100,8 @@ model Member {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   role           String       @default("member") @db.VarChar
   title          String?
-  email          String
+  email          String /// @encrypted
+  emailHash      String?      @unique /// @encryption:hash(email)
   userId         String
   invitedById    String?
   meta           Json?
@@ -106,7 +118,8 @@ model Member {
 
 model Invitation {
   id             String       @id @default(cuid())
-  email          String
+  email          String /// @encrypted
+  emailHash      String?      @unique /// @encryption:hash(email)
   role           String       @default("member") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
@@ -121,7 +134,8 @@ model Invitation {
 model MemberRequest {
   id             String       @id @default(cuid())
   userId         String
-  email          String
+  email          String /// @encrypted
+  emailHash      String?      @unique /// @encryption:hash(email)
   role           String       @default("member") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
@@ -453,9 +467,11 @@ model ExternalAttachment {
 
 model ExternalContact {
   id          String  @id @unique @default(uuid())
-  name        String
+  name        String /// @encrypted
+  nameHash    String? @unique /// @encryption:hash(name)
   role        String?
-  email       String
+  email       String /// @encrypted
+  emailHash   String? @unique /// @encryption:hash(email)
   affiliation String?
 
   assetId     String?
@@ -485,7 +501,8 @@ model Organization {
   published                 Boolean                   @default(true)
   name                      String?
   description               String?                   @db.Text
-  contactEmail              String?
+  contactEmail              String? /// @encrypted
+  contactEmailHash          String?                   @unique /// @encryption:hash(contactEmail)
   logo                      String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
   font                      String                    @default("font-cal")
   image                     String?                   @db.Text
@@ -885,7 +902,8 @@ model ReportOnReply {
 
 model Whitelist {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String   @unique /// @encrypted
+  emailHash String?  @unique /// @encryption:hash(email)
   createdAt DateTime @default(now())
   metadata  Json?
 }

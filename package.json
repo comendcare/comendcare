@@ -152,6 +152,7 @@
     "papaparse": "^5.5.2",
     "pdf-lib": "^1.17.1",
     "prism-react-renderer": "^2.4.1",
+    "prisma-field-encryption": "^1.6.0",
     "prismjs": "^1.29.0",
     "qss": "^3.0.0",
     "react": "^18.3.1",
