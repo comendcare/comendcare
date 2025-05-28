@@ -72,11 +72,11 @@ export default function InviteUserToOrgDialog() {
                 form.getValues("email"),
                 form.getValues("role"),
                 await getIp(),
-                {
-                    organizationId: organization?.id as string,
-                    organizationName: organization?.name as string,
-                    organizationImage: organization?.image as string,
-                }
+                // {
+                //     organizationId: organization?.id as string,
+                //     organizationName: organization?.name as string,
+                //     organizationImage: organization?.image as string,
+                // }
             )
 
             if (response.success) {

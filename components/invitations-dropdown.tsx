@@ -12,7 +12,7 @@ export default async function InvitationsDropdown({invitation}: { invitation: In
 
     async function revokeInvite(invitation: Invitation) {
         if (session?.data?.user.organizationId) {
-            const response = await deleteInvitation(invitation)
+            const response = await deleteInvitation(session.data.user.organizationId, invitation)
 
             if (response.success) {
                 toast.success(`Successfully deleted ${response.data.email}'s invitation.`)

@@ -19,9 +19,7 @@ import { DeleteAssetDialog } from "./delete-asset-dialog"
 
 const assetSelector = (state: AssetState) => ({
     createAsset: state.createAsset,
-    updateAsset: state.updateAsset,
-    deleteAsset: state.deleteAsset,
-    saveState: state.saveState
+    updateAsset: state.updateAsset
 })
 
 export const AssetActionsMenu = ({asset}: {asset: Asset}) => {

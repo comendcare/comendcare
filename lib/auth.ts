@@ -6,7 +6,7 @@ import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
-import {Member} from "@prisma/client";
+import {Member, Organization} from "@prisma/client";
 import {User} from "next-auth";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
@@ -313,7 +313,7 @@ export function withAuth(action: any) {
 export function withOrganizationAuth(action: any, roles?: string[]) {
     return async (
         // formData: FormData | null,
-        organizationId: string,
+        organizationId: string | null | undefined,
         ...args: any
         // roles?: string[]
     ) => {
@@ -321,6 +321,8 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
         if (!session) {
             return {error: "Not authenticated: could not find session data"}
         }
+
+        if (!organizationId) return {error: "Not authorized: organizationId not provided"}
 
         const organization = await prisma.organization.findUnique({
             where: {id: organizationId},
@@ -340,6 +342,30 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
         return action(organization, ...args)
     }
 }
+
+// export function withUserAuth(action: any) {
+//     return async (
+//         userId: string | null | undefined,
+//         ...args: any
+//     ) => {
+//         const session = await getSession()
+//         if (!session) {
+//             return {error: "Not authenticated: could not find session data"}
+//         }
+
+//         if (!userId) return {error: "Not authorized: userId not provided"}
+
+//         const user = await prisma.user.findUnique({
+//             where: {id: userId},
+//         })
+
+//         if (!user) return {error: "Not authorized: user doesn't exist"}
+
+//         // if this user didn't create this item
+
+//         return action(user, ...args)
+//     }
+// }
 
 export function withOrganizationAttributeAuth(action: any) {
     return async (

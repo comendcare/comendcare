@@ -2,12 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@/components/ui/checkbox"
 import { RESEARCH_PLAN_TYPES } from "@/lib/types"
-import { Button } from "../ui/button"
-import { Pin } from "lucide-react"
-import { createOrUpdateAsset } from "@/lib/actions"
 import { Roadmap } from "@prisma/client"
 import { Badge } from "../ui/badge"
 

@@ -13,9 +13,7 @@ import { DeleteRFPDialog } from "./delete-rfp-dialog"
 
 const rfpSelector = (state: RFPState) => ({
     createRFP: state.createRFP,
-    updateRFP: state.updateRFP,
-    deleteRFP: state.deleteRFP,
-    saveState: state.saveState
+    updateRFP: state.updateRFP
 })
 
 export const RFPActionsMenu = ({rfp}: {rfp: RFP}) => {

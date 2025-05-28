@@ -142,7 +142,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             });
 
             // Call the `updateCondition` function
-            const response = await updateCondition(formData, session.user.organizationId);
+            const response = await updateCondition(session.user.organizationId, formData);
 
             if (response.success) {
                 toast.success("Condition updated successfully!");

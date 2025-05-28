@@ -41,7 +41,7 @@ export function AssetBulkImportDialog() {
                 }
     
                 await Promise.all(result.values.map(async (asset) => {
-                    await createOrUpdateAsset(asset, session?.user.organizationId)
+                    await createOrUpdateAsset(session?.user.organizationId, asset)
                 }))
             } catch (e) {
                 toast('Error!', {

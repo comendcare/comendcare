@@ -17,7 +17,6 @@ import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
-import {deleteOrganization, deleteOrgRoadmap} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
 import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";

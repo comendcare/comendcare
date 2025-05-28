@@ -221,7 +221,7 @@ export function NavUser() {
         try {
             // Call API to deny invitation
             if (session?.user.organizationId) {
-                const response = await deleteInvitation(invitation)
+                const response = await deleteInvitation(session.user.organizationId, invitation)
 
                 if (response.success) {
                     toast.success(`Successfully deleted your invitation to ${invitations[0].organization?.name}.`)

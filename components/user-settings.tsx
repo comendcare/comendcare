@@ -42,7 +42,7 @@ export default function UserSettings() {
 
     const handleLeaveOrganization = async () => {
         try {
-            const response = await leaveOrganization(session, session?.user.organizationId || "");
+            const response = await leaveOrganization(session?.user.organizationId, session);
 
             if (session && response.success) {
                 // Fetch the latest memberships after leaving

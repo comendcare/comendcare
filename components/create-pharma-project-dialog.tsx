@@ -5,7 +5,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
-import {createPharmaProject, updateCondition} from "@/lib/actions";
+import {createPharmaProject} from "@/lib/actions";
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";

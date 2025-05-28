@@ -28,7 +28,7 @@ export function DeleteOrganizationAlertDialog({organization}: { organization: Or
         setIsDeleting(true); // Disable the button
 
         try {
-            await deleteOrganization(organization)
+            await deleteOrganization(organization.id, organization)
                 .then(async res => {
                     if (res.success) {
                         await update({

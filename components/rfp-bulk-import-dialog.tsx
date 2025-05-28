@@ -41,7 +41,7 @@ export function RFPBulkImportDialog() {
                 }
     
                 await Promise.all(result.values.map(async (rfp) => {
-                    await createOrUpdateRFP(rfp, session?.user.organizationId)
+                    await createOrUpdateRFP(session?.user.organizationId, rfp)
                 }))
             } catch (e) {
                 toast('Error!', {

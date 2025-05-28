@@ -138,7 +138,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ milestones })
 
             // update DB milestones
-            const response = await updateMilestones({ milestones })
+            const response = await updateMilestones(get().details?.organizationId, { milestones })
             if (response?.success && response?.data) {
                 return response.data as Milestone[]
             } else {
@@ -162,7 +162,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ milestones: updatedMilestones })
 
             // update DB milestones
-            const response = await updateMilestones({ milestones: updatedMilestones })
+            const response = await updateMilestones(get().details?.organizationId, { milestones: updatedMilestones })
             if (response?.success && response?.data) {
                 return response.data as Milestone[]
             } else {
@@ -178,7 +178,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ edges })
 
             // update DB edges
-            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            const response = await updateEdges(get().details?.organizationId, { roadmapId: get().roadmapId, edges })
             if (response?.success && response?.data) {
                 return response.data as Edge[]
             } else {
@@ -195,7 +195,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ edges })
 
             // update DB edges
-            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            const response = await updateEdges(get().details?.organizationId, { roadmapId: get().roadmapId, edges })
             if (response?.success && response?.data) {
                 return response.data as Edge[]
             } else {
@@ -207,7 +207,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             console.log(`set nodes`)
             set({ nodes })
 
-            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
+            const orgId = get().details?.organizationId
+            const response = await updateDBFlow(orgId, { roadmapId: get().roadmapId, nodes, edges: get().edges })
             if (response?.success && response?.data) {
                 const newNodes = response.data.nodes.map(n => ({
                     id: n.id,
@@ -226,7 +227,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ edges })
 
             // update DB edges
-            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            const response = await updateEdges(get().details?.organizationId, { roadmapId: get().roadmapId, edges })
             if (response?.success && response?.data) {
                 return response.data as Edge[]
             } else {
@@ -300,7 +301,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             })
             
             // update DB Nodes
-            const response = await createNodes({ roadmapId: get().roadmapId, nodes })
+            const response = await createNodes(get().details?.organizationId, { roadmapId: get().roadmapId, nodes })
             if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
                 response.data.milestones.forEach(milestone => {
                     mixpanelTrack("Project Created", {
@@ -324,7 +325,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ nodes, milestones, selectedNodeId: null })
 
             // update DB nodes
-            const response = await deleteNode(nodeId)
+            const response = await deleteNode(get().details?.organizationId, nodeId)
             if (response?.success && response?.data) {
                 // don't return anything
             } else {
@@ -335,8 +336,8 @@ export const useRoadmapStore = create<RoadmapState>()(
         saveState: () => {
             console.log(`save state`)
             const state = get()
-            updateDBFlow({ roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges })
-            updateMilestones({ milestones: state.milestones })
+            updateDBFlow(state.details?.organizationId, { roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges })
+            updateMilestones(state.details?.organizationId, { milestones: state.milestones })
         }
     }),
     {

@@ -52,7 +52,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {deleteCompany, deleteOrganization} from "@/lib/actions";
+import {deleteCompany} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";

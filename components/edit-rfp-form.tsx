@@ -156,7 +156,7 @@ export function EditRFPForm({
 
     const handleUndo = () => {
         undo()
-        saveState()
+        saveState(session?.user.organizationId)
         toast.dismiss("undo-toast")
     }
 
@@ -283,7 +283,7 @@ export function EditRFPForm({
         }
 
         try {
-            await deleteRFP(rfpData.id)
+            await deleteRFP(rfpData.id, session.user.organizationId)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">
