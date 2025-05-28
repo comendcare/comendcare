@@ -1,7 +1,7 @@
 import { CodeBlock } from "react-code-block"
 import { Button } from "@/components/ui/button"
 
-export default function CopyCodeBlock({ code, language }: { code: string; language: string }) {
+export default function CopyCodeBlock({ code, language, onCopyCallback }: { code: string; language: string, onCopyCallback?: () => void }) {
     const copyCode = () => {
         // Logic to copy `code`
         try {
@@ -14,7 +14,10 @@ export default function CopyCodeBlock({ code, language }: { code: string; langua
     return (
         <CodeBlock code={code} language={language}>
             <div className="relative">
-                <CodeBlock.Code className="bg-gray-900 !p-6 rounded-xl shadow-lg max-w-md overflow-y-auto">
+                <CodeBlock.Code 
+                    className="bg-gray-900 !p-6 rounded-xl shadow-lg max-w-md overflow-y-auto"
+                    onCopy={onCopyCallback}
+                >
                     <div className="table-row">
                         <CodeBlock.LineNumber className="table-cell pr-4 text-sm text-gray-500 text-right select-none" />
                         <CodeBlock.LineContent className="table-cell">

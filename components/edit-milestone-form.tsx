@@ -500,7 +500,7 @@ export function EditMilestoneForm({
                             <TabsContent value="edit" className="space-y-6 w-full h-full">
                                 <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                     <FormLabel>Visibility</FormLabel>
-                                    <div className="flex gap-2 justify-end items-center">
+                                    <div className="flex gap-2 justify-between items-center">
                                     <PrivatePublicFormField 
                                         form={form} 
                                         formData={formData} 
@@ -513,45 +513,29 @@ export function EditMilestoneForm({
                                             })
                                         }}
                                     />
-                                    <DropdownMenu modal={false}>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    e.stopPropagation()
-                                                    // setIsOpen(true)
-                                                }}
-                                                variant="ghost"
-                                                className="p-2 justify-end h-full"
-                                            >
-                                                <Ellipsis/>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
-                                            <Tooltip delayDuration={0}>
-                                                <TooltipTrigger asChild>
-                                                    <div>
-                                                        <DropdownMenuItem
-                                                            disabled={formData.isPrivate}
-                                                            onClick={(e) => {
-                                                                if (formData.isPrivate) return
-                                                                e.preventDefault()
-                                                                handleShare()
-                                                            }}
-                                                        >
-                                                            <Share />
-                                                            Share
-                                                        </DropdownMenuItem>
-                                                    </div>
-                                                </TooltipTrigger>
-                                                {formData.isPrivate && (
-                                                    <TooltipContent side={"left"}>
-                                                        <p>This project is private. Make it public to share.</p>
-                                                    </TooltipContent>
-                                                )}
-                                            </Tooltip>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <Tooltip delayDuration={0}>
+                                        <TooltipTrigger asChild>
+                                            <div>
+                                                <Button
+                                                    disabled={formData.isPrivate}
+                                                    onClick={(e) => {
+                                                        if (formData.isPrivate) return
+                                                        e.preventDefault()
+                                                        handleShare()
+                                                    }}
+                                                    variant={'secondary'}
+                                                >
+                                                    <Share />
+                                                    Share
+                                                </Button>
+                                            </div>
+                                        </TooltipTrigger>
+                                        {formData.isPrivate && (
+                                            <TooltipContent side={"top"}>
+                                                <p>This project is private. Make it public to share.</p>
+                                            </TooltipContent>
+                                        )}
+                                    </Tooltip>
                                     </div>
 
                                     <FormField
@@ -780,7 +764,29 @@ export function EditMilestoneForm({
                         organization={organization}
                         postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
                         postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
-                        embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`}
+                        embeddedProjectData={{
+                            embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
+                            projectId: milestoneData.id,
+                            projectTitle: milestoneData.title
+                        }}
+                        // trackShareEvent={(socialOption: string) => {
+                        //     mixpanelTrack(`Project Shared`, {
+                        //         "Platform": socialOption,
+                        //         ...(organization ? {
+                        //             "Organization ID": organization.id,
+                        //             "Organization Name": organization.name,
+                        //             "Project ID": milestoneData.id,
+                        //             "Project Title": milestoneData.title
+                        //         } : undefined)
+                        //     })
+                        // }}
+                        trackShareEvent={{
+                            title: `Project Shared`,
+                            additonalProperties: {
+                                "Project ID": milestoneData.id,
+                                "Project Title": milestoneData.title
+                            }
+                        }}
                     />
                 ) : (
                     <div className="text-sm text-muted-foreground">Loading organization...</div>

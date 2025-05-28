@@ -251,7 +251,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
     }
 
     return (
-        <Card className="w-full bg-gray-50">
+        <Card className="w-full bg-gray-50 onborda-research-plan-templates-section">
             <CardHeader className="relative">
                 <CardTitle>
                     Research Plan Templates
@@ -275,7 +275,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
                     </TooltipContent>
                 </Tooltip>
             </CardHeader>
-            <CardContent className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+            <CardContent className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                 <CreateEmptyResearchPlanCard setIsLoading={setIsLoading}/>
                 {templateResearchPlans.map(plan => (
                     <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId} setIsLoading={setIsLoading}/>
@@ -325,10 +325,22 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: 
                     <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
                     <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
-                    {plan.milestones.map(milestone => (
+                <CardContent className="flex flex-wrap gap-2 items-center">
+                    {plan.milestones.slice(0, 3).map(milestone => (
                         <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
                     ))}
+                    <Tooltip>
+                        <TooltipTrigger>
+                            {plan.milestones.slice(3, plan.milestones.length).length > 0 && (
+                                <p>{`+ ${plan.milestones.slice(3, plan.milestones.length).length} more`}</p>
+                            )}
+                        </TooltipTrigger>
+                        <TooltipContent className="flex flex-wrap gap-2 max-w-80 p-4">
+                            {plan.milestones.slice(3, plan.milestones.length).map(milestone => (
+                                <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
+                            ))}
+                        </TooltipContent>
+                    </Tooltip>
                 </CardContent>
             </Card>
         </button>

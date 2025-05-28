@@ -60,16 +60,16 @@ model User {
   stakeholders          TaskStakeholder[]
   platformNotifications PlatformNotification[]
   reviews               Review[]
-  repliess              Reply[]
+  replies               Reply[]
   reportOnReviews       ReportOnReview[]
-  reportOnReplys        ReportOnReply[]
+  reportOnReplies       ReportOnReply[]
   reviewFeedbacks       ReviewFeedback[]
+  metadata              Json?
 }
 
 model PlatformNotification {
   id             String       @id @default(uuid())
   type           String // Stores the notification type (e.g. "NEW_TASK", "NEW_RECOMMENDATION")
-  metadata       Json? // Stores additional information associated with this notification, e.g. for recommendations - company & milestone id
   title          String
   message        String?
   link           String?
@@ -80,6 +80,7 @@ model PlatformNotification {
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metadata       Json? // Stores additional information associated with this notification, e.g. for recommendations - company & milestone id
 
   @@index([userId, createdAt, lastViewedAt])
 }
@@ -98,6 +99,7 @@ model Member {
   invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata       Json?
 
   @@unique([userId, organizationId])
 }
@@ -111,6 +113,7 @@ model Invitation {
   updatedAt      DateTime     @default(now()) @updatedAt
   accepted       Boolean      @default(false)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metadata       Json?
 
   @@unique([email, organizationId])
 }
@@ -125,6 +128,7 @@ model MemberRequest {
   updatedAt      DateTime     @default(now()) @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata       Json?
 
   @@unique([userId, organizationId])
 }
@@ -141,6 +145,7 @@ model Client {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @default(now()) @updatedAt
   organization     Organization? @relation(fields: [organizationId], references: [id])
+  metadata         Json?
 }
 
 model Account {
@@ -160,6 +165,7 @@ model Account {
   oauth_token_secret       String?
   oauth_token              String?
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata                 Json?
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -171,6 +177,7 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata     Json?
 
   @@index([userId])
 }
@@ -180,6 +187,7 @@ model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+  metadata   Json?
 
   @@unique([identifier, token])
 }
@@ -202,6 +210,7 @@ model Roadmap {
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   modalities     String[]
+  metadata       Json?
 
   @@unique([slug, organizationId])
   @@index([organizationId])
@@ -218,6 +227,7 @@ model Node {
   roadmapId String
   data      Milestone?
   roadmap   Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  metadata  Json?
 }
 
 model Milestone {
@@ -251,6 +261,7 @@ model Milestone {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   nodeId         String?      @unique
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  metadata       Json?
 
   reviews        MilestoneToReview[]
   savedCompanies SavedCompany[]
@@ -267,6 +278,7 @@ model Asset {
   attachments ExternalAttachment[]
   private     Boolean              @default(true)
   pinned      Boolean              @default(false)
+  metadata    Json?
 
   organizationId String?
   organization   Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -280,6 +292,7 @@ model AssetToMilestone {
 
   asset     Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
   milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  metadata  Json?
 
   @@unique([assetId, milestoneId])
 }
@@ -300,6 +313,7 @@ model RFP {
   private     Boolean              @default(true)
   headerImage String?              @db.Text
   pinned      Boolean              @default(false)
+  metadata    Json?
 
   organizationId String?
   organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -313,6 +327,7 @@ model RFPToMilestone {
 
   rfp       RFP       @relation(fields: [rfpId], references: [id], onDelete: Cascade)
   milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  metadata  Json?
 
   @@unique([rfpId, milestoneId])
 }
@@ -324,6 +339,7 @@ model MilestoneToReview {
   milestone   Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   reviewId    String
   review      Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  metadata    Json?
 }
 
 model MilestoneTypeOnMilestone {
@@ -333,6 +349,7 @@ model MilestoneTypeOnMilestone {
   milestoneType   MilestoneType @relation(fields: [milestoneTypeId], references: [id], onDelete: Cascade)
   milestone       Milestone     @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   createdAt       DateTime      @default(now())
+  metadata        Json?
 
   @@unique([milestoneTypeId, milestoneId])
 }
@@ -345,6 +362,7 @@ model MilestoneType {
   services    String[]
   categories  String[]
   description String?
+  metadata    Json?
 
   milestones MilestoneTypeOnMilestone[]
 }
@@ -356,6 +374,7 @@ model Kanban {
   updatedAt      DateTime     @updatedAt
   columns        Column[]
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metadata       Json?
 }
 
 model Column {
@@ -367,6 +386,7 @@ model Column {
   kanbanPosition Int      @default(0)
   kanban         Kanban   @relation(fields: [kanbanId], references: [id], onDelete: Cascade)
   tasks          Task[]
+  metadata       Json?
 }
 
 model Task {
@@ -389,6 +409,7 @@ model Task {
   column         Column            @relation(fields: [columnId], references: [id], onDelete: Cascade)
   milestone      Milestone?        @relation(fields: [milestoneId], references: [id])
   stakeholders   TaskStakeholder[]
+  metadata       Json?
 }
 
 model TaskStakeholder {
@@ -399,8 +420,9 @@ model TaskStakeholder {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task     Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata Json?
 
   @@unique([taskId, userId]) // Ensure uniqueness of the pair
 }
@@ -412,6 +434,7 @@ model ChecklistItem {
   taskId        String
   orderPosition Int?
   task          Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  metadata      Json?
 }
 
 model ExternalAttachment {
@@ -420,11 +443,12 @@ model ExternalAttachment {
   link String
 
   assetId     String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
-  RFPId       String?
-  RFP         RFP?       @relation(fields: [RFPId], references: [id])
+  asset       Asset?     @relation(fields: [assetId], references: [id])
+  rfpId       String?
+  rfp         RFP?       @relation(fields: [rfpId], references: [id])
   milestoneId String?
-  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  metadata    Json?
 }
 
 model ExternalContact {
@@ -435,11 +459,12 @@ model ExternalContact {
   affiliation String?
 
   assetId     String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
-  RFPId       String?
-  RFP         RFP?       @relation(fields: [RFPId], references: [id])
+  asset       Asset?     @relation(fields: [assetId], references: [id])
+  rfpId       String?
+  rfp         RFP?       @relation(fields: [rfpId], references: [id])
   milestoneId String?
-  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  metadata    Json?
 }
 
 model Edge {
@@ -450,6 +475,7 @@ model Edge {
   data      Json?
   roadmapId String
   roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  metadata  Json?
 }
 
 model Organization {
@@ -493,17 +519,18 @@ model Organization {
   userId                    String?
   roadmaps                  Roadmap[]
   members                   Member[]
-  client                    Client[]
-  invitation                Invitation[]
-  membershipRequest         MemberRequest[]
-  condition                 ConditionToOrganization[]
-  Kanban                    Kanban?
-  Milestone                 Milestone[]
-  PlatformNotification      PlatformNotification[]
+  clients                   Client[]
+  invitations               Invitation[]
+  membershipRequests        MemberRequest[]
+  conditions                ConditionToOrganization[]
+  kanban                    Kanban?
+  milestones                Milestone[]
+  platformNotifications     PlatformNotification[]
   reviews                   Review[]
   savedCompanies            SavedCompany[]
-  Asset                     Asset[]
-  RFP                       RFP[]
+  assets                    Asset[]
+  rfps                      RFP[]
+  metadata                  Json?
 
   @@index([userId])
 }
@@ -516,6 +543,7 @@ model Follow {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata     Json?
 
   @@unique([userId, followedType, followedId])
 }
@@ -545,6 +573,7 @@ model Condition {
   summary                     String?
   prevalenceRatio             Float?
   organizations               ConditionToOrganization[]
+  metadata                    Json?
 }
 
 model ConditionToOrganization {
@@ -557,6 +586,7 @@ model ConditionToOrganization {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  metadata  Json?
 
   @@unique([conditionId, organizationId])
 }
@@ -569,6 +599,7 @@ model Example {
   url           String?
   image         String?
   imageBlurhash String?
+  metadata      Json?
 }
 
 model Post {
@@ -581,6 +612,7 @@ model Post {
   comments  Comment[]
   mentions  Mention[]
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  metadata  Json?
 }
 
 model Comment {
@@ -593,6 +625,7 @@ model Comment {
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   author    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   mentions  Mention[]
+  metadata  Json?
 }
 
 model Reaction {
@@ -604,6 +637,7 @@ model Reaction {
   reactableId   String
   reactableType String
   author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  metadata      Json?
 
   @@unique([authorId, reactableType, reactableId])
 }
@@ -636,6 +670,7 @@ model Mention {
 
   mentionedType String
   mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
+  metadata      Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -682,6 +717,7 @@ model Gene {
   mgdIds               String[] // Array of MGD IDs (Mouse Genome Database)
   orphanet             Int? // Orphanet ID for rare diseases
   lsdb                 String[] // Locus-Specific Database links
+  metadata             Json?
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
@@ -702,12 +738,14 @@ model Company {
   simplifiedCertifications String[]
   rfis                     RFI[]
   reviews                  Review[]
+  tags                     String[]
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
   categories               String[]
   milestoneTypes           String[]
   savedByOrganizations     SavedCompany[]
   createdAt                DateTime        @default(now())
   updatedAt                DateTime        @default(now()) @updatedAt
+  metadata                 Json?
 }
 
 model SavedCompany {
@@ -723,6 +761,7 @@ model SavedCompany {
 
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+  metadata  Json?
 
   @@unique([organizationId, companyId]) // Ensures an organization can't save the same company more than once
 }
@@ -733,22 +772,25 @@ model Site {
   address   String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
+  metadata  Json?
 }
 
 model Service {
-  id          String  @id @default(uuid())
-  name        String
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String?
-  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId   String
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId   String?
+  metadata    Json?
 }
 
 model Certification {
-  id        String  @id @default(uuid())
-  name      String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId String
+  id        String   @id @default(uuid())
+  name      String   @unique
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String?
   files     File[]
+  metadata  Json?
 }
 
 model File {
@@ -757,6 +799,7 @@ model File {
   fileUrl         String
   certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade)
   certificationId String
+  metadata        Json?
 }
 
 model RFI {
@@ -765,6 +808,7 @@ model RFI {
   submittedOn DateTime?
   company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
+  metadata    Json?
 }
 
 model Review {
@@ -784,6 +828,7 @@ model Review {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
   feedbacks      ReviewFeedback[]
+  metadata       Json?
 
   @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
 }
@@ -796,6 +841,7 @@ model ReviewFeedback {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   helpful   Boolean // true if the user found the review helpful, false otherwise
   createdAt DateTime @default(now())
+  metadata  Json?
 
   @@unique([reviewId, userId]) // Ensures a user can only provide feedback once per review
 }
@@ -810,6 +856,7 @@ model Reply {
   reports   ReportOnReply[]
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
+  metadata  Json?
 }
 
 model ReportOnReview {
@@ -821,6 +868,7 @@ model ReportOnReview {
   user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   review      Review                  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   createdAt   DateTime                @default(now())
+  metadata    Json?
 }
 
 model ReportOnReply {
@@ -832,12 +880,14 @@ model ReportOnReply {
   user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   reply       Reply                   @relation(fields: [replyId], references: [id], onDelete: Cascade)
   createdAt   DateTime                @default(now())
+  metadata    Json?
 }
 
 model Whitelist {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
+  metadata  Json?
 }
 
 model PharmaProject {
@@ -845,4 +895,5 @@ model PharmaProject {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  metadata  Json?
 }

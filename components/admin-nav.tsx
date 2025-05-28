@@ -13,7 +13,10 @@ import {
     Settings,
     ChartArea,
     Users,
-    Building
+    Building,
+    Workflow,
+    Star,
+    Megaphone
 } from "lucide-react"
 import {
     useParams,
@@ -123,12 +126,24 @@ export default function AdminNav({children}: { children: ReactNode }) {
                 isActive: segments[0] === "organizations",
                 icon: <Globe width={18}/>
             },
-            // {
-            //     name: "Research Plans",
-            //     href: "/admin/research-plans",
-            //     isActive: segments[0] === "research-plans",
-            //     icon: <FlaskConical width={18}/>
-            // },
+            {
+                name: "Research Plans",
+                href: "/admin/research-plans",
+                isActive: segments[0] === "research-plans",
+                icon: <Workflow width={18}/>
+            },
+            {
+                name: "Tools",
+                href: "/admin/tools",
+                isActive: segments[0] === "tools",
+                icon: <Star width={18}/>
+            },
+            {
+                name: "RFPs",
+                href: "/admin/rfps",
+                isActive: segments[0] === "rfps",
+                icon: <Megaphone width={18}/>
+            },
             {
                 name: "Companies",
                 href: "/admin/companies",

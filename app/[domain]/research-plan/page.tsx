@@ -1,3 +1,4 @@
+"use server"
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
@@ -16,6 +17,7 @@ import { Mail, Share } from "lucide-react"
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import { RoadmapsCard } from "@/components/public-roadmap-card"
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 export async function generateMetadata({
                                            params
@@ -179,6 +181,18 @@ export default async function OrganizationRoadmapPage({
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
                                             organization={organization}
+                                            // trackShareEvent={(socialOption: string) => {
+                                            //     mixpanelTrack(`Research Plans Table Shared`, {
+                                            //         "Platform": socialOption,
+                                            //         ...(organization ? {
+                                            //             "Organization ID": organization.id,
+                                            //             "Organization Name": organization.name
+                                            //         } : undefined)
+                                            //     })
+                                            // }}
+                                            trackShareEvent={{
+                                                title: `Research Plans Table Shared`
+                                            }}
                                         />
                                     ),
                                 },

@@ -97,7 +97,7 @@ export const PublicPageNavbar: React.FC = ({externalOpen = false}: {externalOpen
     const [visible, setVisible] = useState<boolean>(false)
 
     useMotionValueEvent(scrollY, "change", latest => {
-        setVisible(latest > 100)
+        setVisible(latest > 40)
     })
 
     return (

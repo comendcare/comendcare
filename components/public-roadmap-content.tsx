@@ -10,6 +10,7 @@ import { Mail, Share } from "lucide-react"
 import ShareDialog from "./share-dialog"
 import ContactPAGDialog from "./contact-pag-dialog"
 import { Organization } from "@prisma/client"
+import { mixpanelTrack } from "@/app/mixpanel"
 
 export function PublicRoadmapContent({organization, roadmap, subdomain, milestoneChangedCallback}: {organization: Organization, roadmap: any, subdomain: string | undefined, milestoneChangedCallback?: (milestoneId: string | undefined) => void}) {
     const searchParams = useSearchParams()
@@ -64,8 +65,26 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                     icon: <Share />,
                     dialog: (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap}`}
+                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`}
                             organization={organization}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plan Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name,
+                            //             "Research Plan ID": roadmap.id,
+                            //             "Research Plan Title": roadmap.title
+                            //         } : undefined)
+                            //     })
+                            // }}
+                            trackShareEvent={{
+                                title: `Research Plan Shared`,
+                                additonalProperties: {
+                                    "Research Plan ID": roadmap.id,
+                                    "Research Plan Title": roadmap.title
+                                }
+                            }}
                         />
                     ),
                 },

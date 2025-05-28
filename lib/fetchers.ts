@@ -4,8 +4,8 @@ import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse, CustomOrganization} from "@/lib/types";
-import {getProfileCompletionChecks, logError} from "@/lib/utils";
+import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
+import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition} from "@prisma/client";
@@ -710,7 +710,7 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
                         user: true
                     }
                 },
-                condition: {
+                conditions: {
                     include: {
                         condition: true
                     }
@@ -1180,6 +1180,142 @@ export async function getUserAnalytics() {
     };
 }
 
+export async function getResearchPlansAnalytics(orgId?: string | undefined) {
+    const allResearchPlans = await prisma.roadmap.findMany({
+        where: {
+            organizationId: orgId
+        },
+        include: {milestones: {include: {types: true}}}
+    })
+
+    // Total research plans
+    const totalResearchPlans = allResearchPlans.length
+
+    // Total research plans, by type
+    let totalResearchPlansOfType: {type: string, num: number}[] = await Promise.all(RESEARCH_PLAN_TYPES.map(async (type) => ({
+        type: type.label,
+        num: await prisma.roadmap.count({
+            where: {
+                organizationId: orgId,
+                modalities: {has: type.value}
+            }
+        })
+    })))
+
+    // Total projects, by type
+    const milestoneTypes = await prisma.milestoneType.findMany()
+    const allProjects = await prisma.milestone.findMany({
+        where: {
+            organizationId: orgId
+        },
+        include: {
+            types: true
+        }
+    })
+    let totalProjects = allProjects.length
+    let totalProjectsOfType: {type: string, num: number}[] = milestoneTypes.map((type) => (
+        {
+            type: type.label,
+            num: allProjects.filter(project => project.types.map(type => type.milestoneTypeId).includes(type.id)).length
+        }
+    ))
+
+    let totalResearchPlansByStatus = Object.values(milestoneCategories).map(({option}) => ({
+        type: option.label,
+        num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
+    }))
+
+    return {
+        totalResearchPlans,
+        totalResearchPlansOfType,
+        totalResearchPlansByStatus,
+        totalProjects,
+        totalProjectsOfType
+    };
+}
+
+export async function getToolsAnalytics(orgId?: string | undefined) {
+    const totalTools: number = (await prisma.asset.findMany({
+        where: {
+            organizationId: orgId
+        }
+    })).length
+    const totalPinnedTools: number = (await prisma.asset.findMany({
+        where: {
+            organizationId: orgId,
+            pinned: true
+        }
+    })).length
+
+    return {
+        totalTools,
+        totalPinnedTools,
+    };
+}
+
+export async function getRFPsAnalytics(orgId?: string | undefined) {
+    const allRFPs = await prisma.rFP.findMany({
+        where: {
+            organizationId: orgId
+        }
+    })
+    const totalRFPs: number = allRFPs.length
+    const totalPinnedRFPs: number = (await prisma.rFP.findMany({
+        where: {
+            organizationId: orgId,
+            pinned: true
+        }
+    })).length
+
+    const RFPsByOpenTo = await Promise.all(["CRO", "ACADEMIC"].map(async (openToKey) => ({
+        type: openToKey,
+        num: (await prisma.rFP.findMany({
+            where: {
+                organizationId: orgId,
+                openTo: {has: openToKey}
+            }
+        })).length
+    })))
+
+    const createMoneyFormatter = (cents?: boolean) => Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: cents ? 2 : 0,
+        maximumFractionDigits: cents ? 2 : 0,
+    });
+    const moneyFormatter = createMoneyFormatter(undefined)
+
+    const budgetBuckets = [50000, 100000, 500000, 1000000, 5000000]
+    let RFPsByBudget: {type: string, num: number}[] = []
+
+    for (let i = 0; i < budgetBuckets.length; i++) {
+        const min = i <= 0 ? 0 : budgetBuckets[i-1]
+        const max = budgetBuckets[i]
+
+        RFPsByBudget.push({
+            type: `${moneyFormatter.format(min)} - ${moneyFormatter.format(max - 1)}`,
+            num: allRFPs.filter(rfp => typeof rfp.budget === 'number' && rfp.budget >= min && rfp.budget < max).length
+        })
+    }
+
+    RFPsByBudget.push({
+        type: `${formatMoney(budgetBuckets[budgetBuckets.length - 1])} +`,
+        num: allRFPs.filter(rfp => typeof rfp.budget === 'number' && rfp.budget >= budgetBuckets[budgetBuckets.length - 1]).length
+    })
+
+    RFPsByBudget.push({
+        type: 'No Budget',
+        num: allRFPs.filter(rfp => rfp.budget === undefined || rfp.budget === null).length
+    })
+
+    return {
+        totalRFPs,
+        totalPinnedRFPs,
+        RFPsByOpenTo,
+        RFPsByBudget
+    };
+}
+
 export async function getOrganizationAnalytics() {
     const now = new Date();
     const startOfCurrentMonth = startOfMonth(now);
@@ -1223,7 +1359,7 @@ export async function getOrganizationAnalytics() {
 
     const allOrganizations = await prisma.organization.findMany({
         include: {
-            condition: true,
+            conditions: true,
             roadmaps: true,
         },
     });
@@ -1518,7 +1654,7 @@ export async function getAllOrganizationsWithConditions() {
                 createdAt: "desc",
             },
             include: {
-                condition: {
+                conditions: {
                     include: {
                         condition: true
                     }

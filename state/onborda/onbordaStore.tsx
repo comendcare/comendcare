@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import gif1 from "@/public/onboarding-gif-1.gif"
+import gif2 from "@/public/Screen Recording 2025-05-22 at 3.33.16 PM.gif"
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { Tour } from '@/components/onborda/types';
@@ -125,7 +126,45 @@ export const onbordaTours: Tour[] = [
             //     pointerRadius: 10
             // },
         ]
-    }
+    },
+        {
+        tour: "research-plans-page-tour",
+        steps: [
+            {
+                icon: <>👋</>,
+                title: "Start a New Research Plan",
+                content: <>{`Begin by creating from a blank template or use a curated template—either way, you’ll be able to fully customize each plan to fit your needs.`}</>,
+                selector: ".onborda-research-plan-templates-section",
+                side: "bottom-left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "View All Your Plans",
+                content: <div>
+                    {`See all your research plans organized in one table. To categorize, open any plan and select its type.`}
+                    <Image className="max-w-64" src={gif2} alt={'Research plan type selection gif.'}/>
+                </div>,
+                selector: ".onborda-existing-research-plans-section",
+                side:  "top-left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Share Your Progress",
+                content: <>{`Showcase your work by sharing on social media or embedding your research plan directly on your website!`}</>,
+                selector: ".onborda-share-research-plan",
+                side:  "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            }
+        ]
+    },
 ]
 
 export type Selector = 

@@ -1,3 +1,4 @@
+"use server"
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
 import {
@@ -19,6 +20,7 @@ import React from "react";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import {Mail, Share} from "lucide-react";
+import { mixpanelTrack } from "../mixpanel";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -143,6 +145,18 @@ export default async function OrganizationHomePage({
                             <ShareDialog
                                 url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}}`}
                                 organization={organization}
+                                // trackShareEvent={(socialOption: string) => {
+                                //     mixpanelTrack(`Organization Profile Shared`, {
+                                //         "Platform": socialOption,
+                                //         ...(organization ? {
+                                //             "Organization ID": organization.id,
+                                //             "Organization Name": organization.name
+                                //         } : undefined)
+                                //     })
+                                // }}
+                                trackShareEvent={{
+                                    title: `Organization Profile Shared`
+                                }}
                             />
                         ),
                     },

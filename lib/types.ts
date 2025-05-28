@@ -186,7 +186,7 @@ export type MembershipWithOrganization = Member & {
 };
 
 export type OrganizationsWithConditions = Organization & {
-    condition?: (ConditionToOrganization & {
+    conditions?: (ConditionToOrganization & {
         condition?: Condition | null;
     })[] | null;
 };
@@ -337,6 +337,41 @@ export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
         value: 'OTHER',
     },
 ]
+
+export const milestoneCategories = {
+    'PLANNING': {
+        option: {value: 'PLANNING', label: 'Planning', variant: 'amber'},
+        types: []
+    },
+    'DATA_COLLECTION': {
+        option: {value: 'DATA_COLLECTION', label: 'Patient Data Collection', variant: 'yellow'},
+        types: ['NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'OUTCOMEMEASURE']
+    },
+    'DISCOVERY': {
+        option: {value: 'DISCOVERY', label: 'Discovery', variant: 'lime'},
+        types: ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'BIOMARKER', 'TARGETVALIDATION', 'DRUGSCREEN']
+    },
+    'DISEASE_MODELS': {
+        option: {value: 'DISEASE_MODELS', label: 'Disease Models', variant: 'emerald'},
+        types: ['BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL']
+    },
+    'DESIGN_MANUFACTURING': {
+        option: {value: 'DESIGN_MANUFACTURING', label: 'Design & Manufacturing', variant: 'cyan'},
+        types: ['GENETHERAPYPRODUCTION', 'GPMANUFACTURING']
+    },
+    'PRECLINICAL': {
+        option: {value: 'PRECLINICA', label: 'Preclinical', variant: 'indigo'},
+        types: ['ASSAYDEVELOPMENT', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY']
+    },
+    'CLINICAL_TRIAL': {
+        option: {value: 'CLINICAL_TRIAL', label: 'Clinical Trial', variant: 'purple'},
+        types: ['SITESELECTION', 'PATIENTRECRUITMENT', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'PHASE4']
+    },
+    'REGULATORY': {
+        option: {value: 'REGULATORY', label: 'Regulatory', variant: 'pink'},
+        types: ['INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'FDAAPPROVAL']
+    },
+}
 
 export const MODALITIES: Option[] = [
     {
@@ -670,6 +705,21 @@ export const CRO_CERTIFICATIONS: { id: string; label: string; value: string; des
         label: 'United States Department of Agriculture (USDA)',
         value: 'United States Department of Agriculture (USDA)',
         description: 'A government agency regulating animal welfare, food safety, and agricultural research to ensure public health and safety.',
+    },
+];
+
+export const CRO_TAGS: { id: string; label: string; value: string; description: string }[] = [
+    {
+        id: '1',
+        label: 'Experienced in rare disease',
+        value: 'Experienced in rare disease',
+        description: 'These companies and service providers have experience working within rare disease.',
+    },
+    {
+        id: '1',
+        label: 'PAG friendly',
+        value: 'PAG friendly',
+        description: 'These companies and service providers have experience working with PAGs.',
     },
 ];
 

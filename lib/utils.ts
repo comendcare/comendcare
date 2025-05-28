@@ -6,10 +6,40 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
-import {Condition, CustomOrganization, ImportField, MilestoneKey} from "@/lib/types";
+import {Condition, CustomOrganization, ImportField, milestoneCategories, MilestoneKey} from "@/lib/types";
 import Papa from "papaparse";
-import type { Option } from "@/lib/types";
+import type { Milestone, Option } from "@/lib/types";
 import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
+
+export const getStage = (milestones: Milestone[]): {value: string, label: string, variant: string} => {
+    const relevantMilestoneTypes = milestones
+        .filter(milestone => milestone.status === "INPROGRESS" && !milestone.private)
+        .flatMap(milestone => milestone.types)
+        .map(type => type?.milestoneTypeId)
+
+    // if the research plan has no public milestones in progress we consider it in the 'planning' stage
+    // if the research plan has ONLY data collection milestones we consider it in the 'data collection' stage
+    const option = relevantMilestoneTypes
+        .filter(value => milestoneCategories['DATA_COLLECTION'].types.includes(value)).length > 0 
+            ? 'DATA_COLLECTION' 
+            : 'PLANNING'
+
+    // we've already handled Data Collection and Planning options, so filter them out of the types check
+    const categoryKeys = (Object.keys(milestoneCategories))
+        .filter(key => key !== 'DATA_COLLECTION' && key !== 'PLANNING')
+
+    // iterate from end of list to beginning - furthest along option with a relevant milestone type is returned
+    for (let i = categoryKeys.length - 1; i >= 0; i--) {
+        const key = (categoryKeys as (keyof (typeof milestoneCategories))[])[i]
+        const currentCategory = milestoneCategories[key]
+        
+        if (currentCategory.types.filter(type => relevantMilestoneTypes.includes(type)).length > 0) {
+            return currentCategory.option
+        }
+    }
+
+    return milestoneCategories[option].option
+}
 
 // get the items that are in group A but NOT in group B
 export const getExclusiveToFirstGroup = (a: {[key: string]: Option[]}, b: {[key: string]: Option[]}, key: string) => {

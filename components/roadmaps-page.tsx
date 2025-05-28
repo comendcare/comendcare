@@ -15,6 +15,7 @@ import ShareDialog from "./share-dialog";
 import { getOrganizationFromOrganizationId } from "@/lib/fetchers";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { mixpanelTrack } from "@/app/mixpanel";
 
 export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], orgId: string}) {
     const router = useRouter()
@@ -70,36 +71,22 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
-            <div className="p-6 w-full">
+            <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">Research Plans</h2>
-                    <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                }}
-                                variant="ghost"
-                                className="p-2 justify-end h-full"
-                            >
-                                <Ellipsis/>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
-                                <DropdownMenuItem
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleShare()
-                                    }}
-                                >
-                                    <Share />
-                                    Share
-                                </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        <Button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleShare()
+                            }}
+                            variant={'secondary'}
+                            className="onborda-share-research-plan"
+                        >
+                            <Share />
+                            Share
+                        </Button>
                 </div>
-                {roadmaps.length > 0 && (
+                {/* {roadmaps.length > 0 && ( */}
                     <RoadmapsTable 
                         roadmaps={roadmaps} 
                         rowClickCallback={(roadmap) => {
@@ -107,10 +94,10 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             router.push(`/app/research-plan/${roadmap.id}`)
                         }}
                     />
-                )}
-                {roadmaps.length === 0 && (
+                {/* )} */}
+                {/* {roadmaps.length === 0 && (
                     <PrivateNoResearchPlansRow />
-                )}
+                )} */}
             </div>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
@@ -121,7 +108,21 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                             organization={organization}
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
-                            embeddedProjectLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`}
+                            embeddedResearchPlansData={{
+                                embeddedResearchPlansLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`,
+                            }}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plans Table Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name
+                            //         } : undefined)
+                            //     })
+                            // }}
+                            trackShareEvent={{
+                                title: `Research Plans Table Shared`
+                            }}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
