@@ -210,7 +210,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const orgId = get().details?.organizationId
             const response = await updateDBFlow(orgId, { roadmapId: get().roadmapId, nodes, edges: get().edges })
             if (response?.success && response?.data) {
-                const newNodes = response.data.nodes.map(n => ({
+                const newNodes = response.data.nodes.map((n: any) => ({
                     id: n.id,
                     position: { x: n.positionX, y: n.positionY },
                     origin: n.origin
@@ -303,7 +303,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             // update DB Nodes
             const response = await createNodes(get().details?.organizationId, { roadmapId: get().roadmapId, nodes })
             if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
-                response.data.milestones.forEach(milestone => {
+                response.data.milestones.forEach((milestone: any) => {
                     mixpanelTrack("Project Created", {
                         "Creation Method": creationMethod,
                         "Title": milestone.title,

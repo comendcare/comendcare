@@ -30,11 +30,11 @@ export const useRFPStore = create<RFPState>()(
                     "ID": newRfp.id,
                     "Name": newRfp.title,
                     "Budget": newRfp.budget,
-                    "Linked Projects": newRfp.milestones.map(({ milestone }) => milestone),
+                    "Linked Projects": newRfp.milestones.map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
-                    "Linked Project Types": newRfp.milestones.flatMap(({ milestone }) =>
-                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    "Linked Project Types": newRfp.milestones.flatMap(({ milestone }: {milestone: any}) =>
+                        milestone.types.map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
                 
@@ -49,11 +49,11 @@ export const useRFPStore = create<RFPState>()(
                     "ID": updatedRfp.id,
                     "Name": updatedRfp.title,
                     "Budget": updatedRfp.budget,
-                    "Linked Projects": updatedRfp.milestones.map(({ milestone }) => milestone),
+                    "Linked Projects": updatedRfp.milestones.map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
-                    "Linked Project Types": updatedRfp.milestones.flatMap(({ milestone }) =>
-                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    "Linked Project Types": updatedRfp.milestones.flatMap(({ milestone }: {milestone: any}) =>
+                        milestone.types.map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
 
@@ -67,11 +67,11 @@ export const useRFPStore = create<RFPState>()(
                     "ID": deletedRfp.id,
                     "Name": deletedRfp.title,
                     "Budget": deletedRfp.budget,
-                    "Linked Projects": deletedRfp.milestones.map(({ milestone }) => milestone),
+                    "Linked Projects": deletedRfp.milestones.map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
-                    "Linked Project Types": deletedRfp.milestones.flatMap(({ milestone }) =>
-                        milestone.types.map(type => type.milestoneType.label || type.milestoneType.id)
+                    "Linked Project Types": deletedRfp.milestones.flatMap(({ milestone }: {milestone: any}) =>
+                        milestone.types.map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
 
