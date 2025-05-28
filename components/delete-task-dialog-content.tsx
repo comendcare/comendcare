@@ -11,6 +11,7 @@ import {
 } from "./ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
+import { useSession } from "next-auth/react"
 
 const selector = (state: KanbanState) => ({
     deleteTask: state.deleteTask
@@ -21,11 +22,12 @@ export function DeleteTaskDialogContent({
 }: {
     taskData: any
 }) {
+    const {data: session} = useSession()
     const { deleteTask } = useKanbanStore(useShallow(selector))
 
     const handleDeleteTask = (e: React.MouseEvent<HTMLElement>) => {
         console.log(`Handle Task Delete...`)
-        deleteTask(taskData?.id)
+        deleteTask(session?.user?.organizationId, taskData?.id)
     }
 
     return (

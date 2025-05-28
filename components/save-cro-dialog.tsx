@@ -99,7 +99,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                 return
             }
 
-            const response = await saveCRO(cro.id, data.milestones[0].id)
+            const response = await saveCRO(data.milestones[0].organizationId, cro.id, data.milestones[0].id)
 
             if (response.success && response.data) {
                 va.track("Shortlisted CRO");

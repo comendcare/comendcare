@@ -80,7 +80,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
 
     async function handleDeleteReview(review: ReviewWithAuthor) {
         try {
-            const response = await deleteReview(review);
+            const response = await deleteReview(review.organizationId, review);
 
             if (response.success) {
                 va.track("Deleted review");

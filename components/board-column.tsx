@@ -97,7 +97,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter, mountKey }: Boar
 
     async function handleDelete () {
         try {
-            deleteColumn(column.id)
+            deleteColumn(column.id, session?.user?.organizationId)
         } catch (error) {
             console.error(error);
         }
@@ -183,7 +183,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter, mountKey }: Boar
                             <TaskCard key={task.id} task={task} mountKey={mountKey}/>
                         ))}
                     </SortableContext>
-                    <NewKanbanTaskButton column={column} assignTo={session?.user?.id && filter === 'personal' ? session.user.id : undefined}/>
+                    <NewKanbanTaskButton orgId={session?.user?.organizationId} column={column} assignTo={session?.user?.id && filter === 'personal' ? session.user.id : undefined}/>
                 </CardContent>
             </ScrollArea>
         </Card>
