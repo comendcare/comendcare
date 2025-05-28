@@ -51,9 +51,9 @@ model User {
   postalCodeHash        String?                @unique /// @encryption:hash(postalCode)
   region                String? /// @encrypted
   regionHash            String?                @unique /// @encryption:hash(region)
-  lat                   Float? /// @encrypted
+  lat                   String? /// @encrypted
   latHash               String?                @unique /// @encryption:hash(lat)
-  lng                   Float? /// @encrypted
+  lng                   String? /// @encrypted
   lngHash               String?                @unique /// @encryption:hash(lng)
   notificationSettings  Boolean                @default(false)
   consentSettings       Boolean                @default(false)
