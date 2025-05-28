@@ -15,7 +15,7 @@ import {
     SavedCompany, Company
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
+import {withAuth, withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -68,367 +68,375 @@ const nanoid = customAlphabet(
     7
 ) // 7-character random string
 
-export const createMemberRequest = async (organizationId: string): Promise<ApiResponse<any>> => {
-    const session = await getSession()
-    if (!session?.user.id) {
-        throw new Error("You must be signed in to perform this action")
-    }
-
-    try {
-        // Check if a member request already exists
-        const existingRequest = await prisma.memberRequest.findUnique({
-            where: {
-                userId_organizationId: {
-                    userId: session.user.id,
-                    organizationId: organizationId,
-                }
-            }
-        });
-
-        if (existingRequest) {
-            return {success: false, error: "You have already sent a request to join this organization."};
+export const createMemberRequest = withAuth(
+    async (organizationId: string): Promise<ApiResponse<any>> => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            throw new Error("You must be signed in to perform this action")
         }
 
-        const memberRequest = await prisma.memberRequest.create({
-            data: {
-                email: session.user.email,
-                role: "member",
-                user: {
-                    connect: {
-                        id: session.user.id
+        try {
+            // Check if a member request already exists
+            const existingRequest = await prisma.memberRequest.findUnique({
+                where: {
+                    userId_organizationId: {
+                        userId: session.user.id,
+                        organizationId: organizationId,
                     }
+                }
+            });
+
+            if (existingRequest) {
+                return {success: false, error: "You have already sent a request to join this organization."};
+            }
+
+            const memberRequest = await prisma.memberRequest.create({
+                data: {
+                    email: session.user.email,
+                    role: "member",
+                    user: {
+                        connect: {
+                            id: session.user.id
+                        }
+                    },
+                    organization: {
+                        connect: {
+                            id: organizationId
+                        }
+                    }
+                }
+            })
+
+            const organization = await prisma.organization.findUnique({
+                where: {
+                    id: organizationId
                 },
-                organization: {
-                    connect: {
-                        id: organizationId
+                include: {
+                    user: true,
+                    members: {
+                        where: {role: 'owner'},
+                        include: {user: true}
                     }
                 }
-            }
-        })
+            })
 
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: organizationId
-            },
-            include: {
-                user: true,
-                members: {
-                    where: {role: 'owner'},
-                    include: {user: true}
+            const requester = await prisma.organization.findUnique({
+                where: {id: session.user.id}
+            })
+
+            console.log(`requester`, requester)
+
+            if (organization) {
+                await sendMemberRequestCreatedEmail(
+                    {
+                        user: {
+                            name: requester?.name || session.user.name,
+                            email: requester?.contactEmail || session.user.email,
+                            image: requester?.image || session.user.image,
+                        },
+                        owners: organization.members.map(member => ({
+                            name: member.user?.name,
+                            email: member.user?.email,
+                        })),
+                        organizationName: organization.name || "",
+                        organizationImage: organization.image || "",
+                    }
+                ).then(() => {
+                    console.log("email sent")
+                })
+            }
+
+            if (!memberRequest) {
+                console.error("Error creating member request.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            return {success: true, data: memberRequest}
+        } catch (error: any) {
+            console.error("Error creating member request:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
+
+export const createCondition = withAuth(
+    async (formData: FormData) => {
+        const session = await getSession();
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            };
+        }
+
+        const name = formData.get("name") as string;
+        const summary = formData.get("summary") as string;
+        const slug = toKebabCase(name);
+        const diseaseCategories = formData.get("diseaseCategories")
+            ? (formData.get("diseaseCategories") as string).split(",")
+            : [];
+        const prevalenceNumerator = formData.get("prevalenceNumerator")
+            ? parseInt(formData.get("prevalenceNumerator") as string, 10)
+            : null;
+        const prevalenceDenominator = formData.get("prevalenceDenominator")
+            ? parseInt(formData.get("prevalenceDenominator") as string, 10)
+            : null;
+        const numberOfPatientsEngaged = formData.get("numberOfPatientsEngaged")
+            ? parseInt(formData.get("numberOfPatientsEngaged") as string, 10)
+            : null;
+        const nationalEstimatedPopulation = formData.get("nationalEstimatedPopulation")
+            ? parseInt(formData.get("nationalEstimatedPopulation") as string, 10)
+            : null;
+        const globalEstimatedPopulation = formData.get("globalEstimatedPopulation")
+            ? parseInt(formData.get("globalEstimatedPopulation") as string, 10)
+            : null;
+        const relevantDiseaseMechanisms = formData.get("relevantDiseaseMechanisms")
+            ? (formData.get("relevantDiseaseMechanisms") as string).split(",")
+            : [];
+        const causalGenes = formData.get("causalGenes")
+            ? (formData.get("causalGenes") as string).split(",")
+            : [];
+        const associatedGenes = formData.get("associatedGenes")
+            ? (formData.get("associatedGenes") as string).split(",")
+            : [];
+        const associatedSystems = formData.get("associatedSystems")
+            ? (formData.get("associatedSystems") as string).split(",")
+            : [];
+        const associatedSignsAndSymptoms = formData.get("associatedSignsAndSymptoms")
+            ? (formData.get("associatedSignsAndSymptoms") as string).split(",")
+            : [];
+        const existingDatabasesAndStudies = formData.get("existingDatabasesAndStudies")
+            ? (formData.get("existingDatabasesAndStudies") as string).split(",")
+            : [];
+        const assetsUnderDevelopment = formData.get("assetsUnderDevelopment")
+            ? (formData.get("assetsUnderDevelopment") as string).split(",")
+            : [];
+
+        try {
+            const condition = await prisma.condition.create({
+                data: {
+                    name,
+                    summary,
+                    slug,
+                    diseaseCategories,
+                    prevalenceNumerator,
+                    prevalenceDenominator,
+                    numberOfPatientsEngaged,
+                    nationalEstimatedPopulation,
+                    globalEstimatedPopulation,
+                    relevantDiseaseMechanisms,
+                    causalGenes,
+                    associatedGenes,
+                    associatedSystems,
+                    associatedSignsAndSymptoms,
+                    existingDatabasesAndStudies,
+                    assetsUnderDevelopment,
+                }
+            });
+
+            if (!condition) {
+                console.error("Error creating condition.");
+                return {success: false, error: "Database error. Please try again later."};
+            }
+
+            return {success: true, data: condition};
+        } catch (error: any) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === "P2002") {
+                    return {success: false, error: "A condition with this name already exists."};
                 }
             }
-        })
 
-        const requester = await prisma.organization.findUnique({
-            where: {id: session.user.id}
-        })
+            console.error("Error creating condition:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
 
-        console.log(`requester`, requester)
+export const connectOrganizationToCondition = withAuth(
+    async (organizationId: string | null | undefined, conditionId: string) => {
+        const session = await getSession();
+        if (!session?.user?.id) {
+            return {
+                error: "Not authenticated",
+            };
+        }
 
-        if (organization) {
-            await sendMemberRequestCreatedEmail(
+        if (!organizationId) {
+            return {
+                error: "No organization Id",
+            };
+        }
+
+        try {
+            const conditionOrganization = await prisma.conditionToOrganization.create({
+                data: {
+                    conditionId: conditionId, // Specify the condition ID
+                    organizationId: organizationId, // Specify the organization ID
+                },
+            });
+
+            if (!conditionOrganization) {
+                console.error("Error creating condition connection to organization.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            return {success: true, data: conditionOrganization}
+        } catch (error: any) {
+            console.error("Error creating condition connection to organization:", error)
+            return {
+                success: false,
+                error: error.message || "An error occurred while connecting the organization to the condition"
+            }
+        }
+    }
+)
+
+export const createOrganization = withAuth(
+    async (formData: FormData) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
+        }
+
+        const name = formData.get("orgName") as string;
+        const description = formData.get("description") as string;
+        const subdomain = formData.get("subdomain") as string;
+        const website = formData.get("website") as string | null;
+        const contactEmail = formData.get("contactEmail") as string | null;
+        const title = formData.get("title") as string | null;
+        const founded = formData.get("founded") as string | null;
+        const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
+        const address1 = formData.get("address1") as string | null;
+        const address2 = formData.get("address2") as string | null;
+        const formattedAddress = formData.get("formattedAddress") as string | null;
+        const city = formData.get("city") as string | null;
+        const region = formData.get("region") as string | null;
+        const postalCode = formData.get("postalCode") as string | null;
+        const country = formData.get("country") as string | null;
+        const lat = formData.get("lat") as string | null;
+        const lng = formData.get("lng") as string | null;
+        const image = formData.get("image") as string | null;
+        const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
+            ? (formData.get("therapeuticsInDevelopment") as string).split(",")
+            : [];
+        const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
+            ? (formData.get("therapeuticsOfInterest") as string).split(",")
+            : [];
+
+        try {
+            const organization = await prisma.organization.upsert({
+                where: {
+                    subdomain,
+                },
+                update: {
+                    name,
+                    description,
+                    subdomain,
+                    yearFounded: founded?.toString(),
+                    contactEmail,
+                    website,
+                    incorporationStatus,
+                    therapeuticsInDevelopment,
+                    therapeuticsOfInterest,
+                    address1,
+                    address2,
+                    formattedAddress,
+                    city,
+                    region,
+                    postalCode,
+                    country,
+                    lat,
+                    lng,
+                    image,
+                    verified: true,  // Default verified to true for beta testing
+                },
+                create: {
+                    name,
+                    description,
+                    subdomain,
+                    yearFounded: founded?.toString(),
+                    contactEmail,
+                    website,
+                    incorporationStatus,
+                    therapeuticsInDevelopment,
+                    therapeuticsOfInterest,
+                    address1,
+                    address2,
+                    formattedAddress,
+                    city,
+                    region,
+                    postalCode,
+                    country,
+                    lat,
+                    lng,
+                    image,
+                    user: {
+                        connect: {
+                            id: session.user.id,
+                        },
+                    },
+                    verified: true,  // Default verified to true for beta testing
+                },
+            });
+
+            const membership = await prisma.member.create({
+                data: {
+                    userId: session.user.id,
+                    email: session.user.email,
+                    role: "owner", // Creator of organization is owner by default
+                    title: title,
+                    organizationId: organization.id
+                }
+            })
+
+            if (organization.verified && organization.published) {
+                await addTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    organization,
+                    'organizations'
+                );
+            }
+
+            await revalidateTag(
+                `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+
+            await sendNewOrganizationEmail(
                 {
                     user: {
-                        name: requester?.name || session.user.name,
-                        email: requester?.contactEmail || session.user.email,
-                        image: requester?.image || session.user.image,
+                        name: session.user.name,
+                        email: session.user.email
                     },
-                    owners: organization.members.map(member => ({
-                        name: member.user?.name,
-                        email: member.user?.email,
-                    })),
-                    organizationName: organization.name || "",
-                    organizationImage: organization.image || "",
+                    organization: {
+                        name: organization.name,
+                        subdomain: organization.subdomain
+                    }
                 }
             ).then(() => {
                 console.log("email sent")
             })
-        }
 
-        if (!memberRequest) {
-            console.error("Error creating member request.")
-            return {success: false, error: "Database error. please try again later."}
-        }
-
-        return {success: true, data: memberRequest}
-    } catch (error: any) {
-        console.error("Error creating member request:", error)
-        return {success: false, error: "Database error. please try again later."}
-    }
-}
-
-export const createCondition = async (formData: FormData) => {
-    const session = await getSession();
-    if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        };
-    }
-
-    const name = formData.get("name") as string;
-    const summary = formData.get("summary") as string;
-    const slug = toKebabCase(name);
-    const diseaseCategories = formData.get("diseaseCategories")
-        ? (formData.get("diseaseCategories") as string).split(",")
-        : [];
-    const prevalenceNumerator = formData.get("prevalenceNumerator")
-        ? parseInt(formData.get("prevalenceNumerator") as string, 10)
-        : null;
-    const prevalenceDenominator = formData.get("prevalenceDenominator")
-        ? parseInt(formData.get("prevalenceDenominator") as string, 10)
-        : null;
-    const numberOfPatientsEngaged = formData.get("numberOfPatientsEngaged")
-        ? parseInt(formData.get("numberOfPatientsEngaged") as string, 10)
-        : null;
-    const nationalEstimatedPopulation = formData.get("nationalEstimatedPopulation")
-        ? parseInt(formData.get("nationalEstimatedPopulation") as string, 10)
-        : null;
-    const globalEstimatedPopulation = formData.get("globalEstimatedPopulation")
-        ? parseInt(formData.get("globalEstimatedPopulation") as string, 10)
-        : null;
-    const relevantDiseaseMechanisms = formData.get("relevantDiseaseMechanisms")
-        ? (formData.get("relevantDiseaseMechanisms") as string).split(",")
-        : [];
-    const causalGenes = formData.get("causalGenes")
-        ? (formData.get("causalGenes") as string).split(",")
-        : [];
-    const associatedGenes = formData.get("associatedGenes")
-        ? (formData.get("associatedGenes") as string).split(",")
-        : [];
-    const associatedSystems = formData.get("associatedSystems")
-        ? (formData.get("associatedSystems") as string).split(",")
-        : [];
-    const associatedSignsAndSymptoms = formData.get("associatedSignsAndSymptoms")
-        ? (formData.get("associatedSignsAndSymptoms") as string).split(",")
-        : [];
-    const existingDatabasesAndStudies = formData.get("existingDatabasesAndStudies")
-        ? (formData.get("existingDatabasesAndStudies") as string).split(",")
-        : [];
-    const assetsUnderDevelopment = formData.get("assetsUnderDevelopment")
-        ? (formData.get("assetsUnderDevelopment") as string).split(",")
-        : [];
-
-    try {
-        const condition = await prisma.condition.create({
-            data: {
-                name,
-                summary,
-                slug,
-                diseaseCategories,
-                prevalenceNumerator,
-                prevalenceDenominator,
-                numberOfPatientsEngaged,
-                nationalEstimatedPopulation,
-                globalEstimatedPopulation,
-                relevantDiseaseMechanisms,
-                causalGenes,
-                associatedGenes,
-                associatedSystems,
-                associatedSignsAndSymptoms,
-                existingDatabasesAndStudies,
-                assetsUnderDevelopment,
-            }
-        });
-
-        if (!condition) {
-            console.error("Error creating condition.");
-            return {success: false, error: "Database error. Please try again later."};
-        }
-
-        return {success: true, data: condition};
-    } catch (error: any) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return {organization, membership};
+        } catch (error: any) {
             if (error.code === "P2002") {
-                return {success: false, error: "A condition with this name already exists."};
-            }
-        }
-
-        console.error("Error creating condition:", error);
-        return {success: false, error: "Database error. Please try again later."};
-    }
-}
-
-export const connectOrganizationToCondition = async (organizationId: string | null | undefined, conditionId: string) => {
-    const session = await getSession();
-    if (!session?.user?.id) {
-        return {
-            error: "Not authenticated",
-        };
-    }
-
-    if (!organizationId) {
-        return {
-            error: "No organization Id",
-        };
-    }
-
-    try {
-        const conditionOrganization = await prisma.conditionToOrganization.create({
-            data: {
-                conditionId: conditionId, // Specify the condition ID
-                organizationId: organizationId, // Specify the organization ID
-            },
-        });
-
-        if (!conditionOrganization) {
-            console.error("Error creating condition connection to organization.")
-            return {success: false, error: "Database error. please try again later."}
-        }
-
-        return {success: true, data: conditionOrganization}
-    } catch (error: any) {
-        console.error("Error creating condition connection to organization:", error)
-        return {
-            success: false,
-            error: error.message || "An error occurred while connecting the organization to the condition"
-        }
-    }
-};
-
-export const createOrganization = async (formData: FormData) => {
-    const session = await getSession()
-    if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        }
-    }
-
-    const name = formData.get("orgName") as string;
-    const description = formData.get("description") as string;
-    const subdomain = formData.get("subdomain") as string;
-    const website = formData.get("website") as string | null;
-    const contactEmail = formData.get("contactEmail") as string | null;
-    const title = formData.get("title") as string | null;
-    const founded = formData.get("founded") as string | null;
-    const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
-    const address1 = formData.get("address1") as string | null;
-    const address2 = formData.get("address2") as string | null;
-    const formattedAddress = formData.get("formattedAddress") as string | null;
-    const city = formData.get("city") as string | null;
-    const region = formData.get("region") as string | null;
-    const postalCode = formData.get("postalCode") as string | null;
-    const country = formData.get("country") as string | null;
-    const lat = formData.get("lat") as string | null;
-    const lng = formData.get("lng") as string | null;
-    const image = formData.get("image") as string | null;
-    const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
-        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
-        : [];
-    const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
-        ? (formData.get("therapeuticsOfInterest") as string).split(",")
-        : [];
-
-    try {
-        const organization = await prisma.organization.upsert({
-            where: {
-                subdomain,
-            },
-            update: {
-                name,
-                description,
-                subdomain,
-                yearFounded: founded?.toString(),
-                contactEmail,
-                website,
-                incorporationStatus,
-                therapeuticsInDevelopment,
-                therapeuticsOfInterest,
-                address1,
-                address2,
-                formattedAddress,
-                city,
-                region,
-                postalCode,
-                country,
-                lat,
-                lng,
-                image,
-                verified: true,  // Default verified to true for beta testing
-            },
-            create: {
-                name,
-                description,
-                subdomain,
-                yearFounded: founded?.toString(),
-                contactEmail,
-                website,
-                incorporationStatus,
-                therapeuticsInDevelopment,
-                therapeuticsOfInterest,
-                address1,
-                address2,
-                formattedAddress,
-                city,
-                region,
-                postalCode,
-                country,
-                lat,
-                lng,
-                image,
-                user: {
-                    connect: {
-                        id: session.user.id,
-                    },
-                },
-                verified: true,  // Default verified to true for beta testing
-            },
-        });
-
-        const membership = await prisma.member.create({
-            data: {
-                userId: session.user.id,
-                email: session.user.email,
-                role: "owner", // Creator of organization is owner by default
-                title: title,
-                organizationId: organization.id
-            }
-        })
-
-        if (organization.verified && organization.published) {
-            await addTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                (
-                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                        : process.env.TYPESENSE_ADMIN_API_KEY
-                )!,
-                organization,
-                'organizations'
-            );
-        }
-
-        await revalidateTag(
-            `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-        )
-
-        await sendNewOrganizationEmail(
-            {
-                user: {
-                    name: session.user.name,
-                    email: session.user.email
-                },
-                organization: {
-                    name: organization.name,
-                    subdomain: organization.subdomain
+                return {
+                    error: `This subdomain is already taken`
+                }
+            } else {
+                return {
+                    error: error.message
                 }
             }
-        ).then(() => {
-            console.log("email sent")
-        })
-
-        return {organization, membership};
-    } catch (error: any) {
-        if (error.code === "P2002") {
-            return {
-                error: `This subdomain is already taken`
-            }
-        } else {
-            return {
-                error: error.message
-            }
         }
     }
-}
+)
 
 export const toggleBiopharmaConsentSettings = withOrganizationAuth(
     async (organization: Organization) => {
@@ -886,77 +894,79 @@ export async function deleteOrganization(organization: Organization) {
 // )
 
 // creating a separate function for this because we're not using FormData
-export const updateRoadmap = async (data: Partial<Roadmap>) => {
-    const session = await getSession()
-    if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
+export const updateRoadmap = withOrganizationAuth(
+    async (organizationId: string, data: Partial<Roadmap>) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
         }
-    }
-    const roadmap = await prisma.roadmap.findUnique({
-        where: {
-            id: data.id
-        },
-        include: {
-            nodes: {
-                include: {data: true},
-                orderBy: [{createdAt: "desc"}]
-            },
-            milestones: {
-                include: {
-                    node: true,
-                    contacts: true,
-                    attachments: true,
-                    types: {include: {milestoneType: true}},
-                    assets: {include: {asset: true}},
-                    rfps: {include: {rfp: true}}
-                },
-                orderBy: [{createdAt: "desc"}]
-            },
-            edges: true,
-            organization: true
-        }
-    })
-
-    if (!roadmap) return {error: "Roadmap not found"}
-
-    try {
-        const response = await prisma.roadmap.update({
+        const roadmap = await prisma.roadmap.findUnique({
             where: {
                 id: data.id
             },
-            data: {
-                title: data.title,
-                description: data.description,
-                content: data.content,
-                modalities: data.modalities,
-                ...(data.metadata ? {metadata: data.metadata} : undefined)
+            include: {
+                nodes: {
+                    include: {data: true},
+                    orderBy: [{createdAt: "desc"}]
+                },
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
+                    },
+                    orderBy: [{createdAt: "desc"}]
+                },
+                edges: true,
+                organization: true
             }
         })
 
-        await revalidateTag(
-            `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmap`
-        )
-        await revalidateTag(
-            `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${roadmap.slug}`
-        )
+        if (!roadmap) return {error: "Roadmap not found"}
 
-        // if the organization has a custom domain, we need to revalidate those tags too
-        roadmap.organization?.customDomain &&
-        (await revalidateTag(
-            `${roadmap.organization?.customDomain}-roadmaps`
-        ),
+        try {
+            const response = await prisma.roadmap.update({
+                where: {
+                    id: data.id
+                },
+                data: {
+                    title: data.title,
+                    description: data.description,
+                    content: data.content,
+                    modalities: data.modalities,
+                    ...(data.metadata ? {metadata: data.metadata} : undefined)
+                }
+            })
+
             await revalidateTag(
-                `${roadmap.organization?.customDomain}-${roadmap.slug}`
-            ))
+                `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmap`
+            )
+            await revalidateTag(
+                `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${roadmap.slug}`
+            )
 
-        return response
-    } catch (error: any) {
-        return {
-            error: error.message
+            // if the organization has a custom domain, we need to revalidate those tags too
+            roadmap.organization?.customDomain &&
+            (await revalidateTag(
+                `${roadmap.organization?.customDomain}-roadmaps`
+            ),
+                await revalidateTag(
+                    `${roadmap.organization?.customDomain}-${roadmap.slug}`
+                ))
+
+            return response
+        } catch (error: any) {
+            return {
+                error: error.message
+            }
         }
     }
-}
+)
 
 export const updateRoadmapMetadata = withRoadmapAuth(
     async (
@@ -1085,115 +1095,119 @@ export const editUser = async (
 };
 
 // Invite user function with updated Organization model
-export async function inviteUser(
-    session: Session | null,
-    email: string = "therealflawnsontong@gmail.com",
-    role: string = "member",
-    ip: string,
-    organization: {
-        organizationId: string
-        organizationName: string
-        organizationImage: string
-    }
-): Promise<ApiResponse<any>> {
-    try {
-        if (!session) {
-            throw new Error("You must be signed in to perform this action")
+export const inviteUser = withOrganizationAuth(
+    async (
+        organizationId: string,
+        session: Session | null,
+        email: string = "therealflawnsontong@gmail.com",
+        role: string = "member",
+        ip: string,
+        organization: {
+            organizationId: string
+            organizationName: string
+            organizationImage: string
         }
-
-        if (email === session.user.email) {
-            return {success: false, error: "Cannot send invitation to yourself."}
-        }
-
-        const lowerCaseEmail = email.toLowerCase()
-
-        const isDomainValid = await validateEmailDomain(lowerCaseEmail);
-        if (!isDomainValid) {
-            return {success: false, error: "Email domain is invalid or cannot receive emails."};
-        }
-
-        // Check if the user is already a member of the organization
-        const existingMember = await prisma.member.findFirst({
-            where: {
-                email: lowerCaseEmail,
-                organizationId: organization.organizationId
+    ): Promise<ApiResponse<any>> => {
+        try {
+            if (!session) {
+                throw new Error("You must be signed in to perform this action")
             }
-        });
 
-        if (existingMember) {
-            return {success: false, error: "User is already a member of this organization."}
-        }
-
-        // Check if an invitation has already been sent to this email for the same organization
-        const existingInvitation = await prisma.invitation.findFirst({
-            where: {
-                email: lowerCaseEmail,
-                organizationId: organization.organizationId
+            if (email === session.user.email) {
+                return {success: false, error: "Cannot send invitation to yourself."}
             }
-        });
 
-        if (existingInvitation) {
-            return {success: false, error: "An invitation has already been sent to this email."}
-        }
+            const lowerCaseEmail = email.toLowerCase()
 
-        let invitationId: string | undefined
-        const invitation = await prisma.invitation.create({
-            data: {
-                email: lowerCaseEmail,
-                role: role,
-                organizationId: organization.organizationId
+            const isDomainValid = await validateEmailDomain(lowerCaseEmail);
+            if (!isDomainValid) {
+                return {success: false, error: "Email domain is invalid or cannot receive emails."};
             }
-        }).then((res) => {
 
-            return res
-        })
-        invitationId = invitation.id
+            // Check if the user is already a member of the organization
+            const existingMember = await prisma.member.findFirst({
+                where: {
+                    email: lowerCaseEmail,
+                    organizationId: organization.organizationId
+                }
+            });
 
-        // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
-        await prisma.whitelist.upsert({
-            where: {email: lowerCaseEmail},
-            update: {}, // No fields to update
-            create: {email: lowerCaseEmail},
-        });
-
-        const inviter = await prisma.user.findUnique({
-            where: {id: session?.user.id}
-        })
-
-        await sendInviteEmail(
-            {
-                invitee: {
-                    name: "",
-                    email: email,
-                    image: ""
-                },
-                inviter: {
-                    name: inviter?.name || session?.user.name,
-                    email: inviter?.email || session?.user.email,
-                    image: inviter?.image || session?.user.image,
-                    organizationName: organization.organizationName,
-                    organizationImage: organization.organizationImage,
-                    ip: ip,
-                },
-                inviteLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login?invitationId=${invitationId}`
+            if (existingMember) {
+                return {success: false, error: "User is already a member of this organization."}
             }
-        ).then(() => {
-            console.log("email sent")
-        })
 
-        if (!invitation) {
-            console.error("Error inviting user.")
+            // Check if an invitation has already been sent to this email for the same organization
+            const existingInvitation = await prisma.invitation.findFirst({
+                where: {
+                    email: lowerCaseEmail,
+                    organizationId: organization.organizationId
+                }
+            });
+
+            if (existingInvitation) {
+                return {success: false, error: "An invitation has already been sent to this email."}
+            }
+
+            let invitationId: string | undefined
+            const invitation = await prisma.invitation.create({
+                data: {
+                    email: lowerCaseEmail,
+                    role: role,
+                    organizationId: organization.organizationId
+                }
+            }).then((res) => {
+
+                return res
+            })
+            invitationId = invitation.id
+
+            // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
+            await prisma.whitelist.upsert({
+                where: {email: lowerCaseEmail},
+                update: {}, // No fields to update
+                create: {email: lowerCaseEmail},
+            });
+
+            const inviter = await prisma.user.findUnique({
+                where: {id: session?.user.id}
+            })
+
+            await sendInviteEmail(
+                {
+                    invitee: {
+                        name: "",
+                        email: email,
+                        image: ""
+                    },
+                    inviter: {
+                        name: inviter?.name || session?.user.name,
+                        email: inviter?.email || session?.user.email,
+                        image: inviter?.image || session?.user.image,
+                        organizationName: organization.organizationName,
+                        organizationImage: organization.organizationImage,
+                        ip: ip,
+                    },
+                    inviteLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login?invitationId=${invitationId}`
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
+
+            if (!invitation) {
+                console.error("Error inviting user.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            revalidatePath("/app/analytics")
+
+            return {success: true, data: invitation}
+        } catch (error: any) {
+            console.error("Error inviting user:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-
-        revalidatePath("/app/analytics")
-
-        return {success: true, data: invitation}
-    } catch (error: any) {
-        console.error("Error inviting user:", error)
-        return {success: false, error: "Database error. please try again later."}
-    }
-}
+    },
+    ['owner'] // this function is only available to owners of this organization
+)
 
 // Create or get organization (replaces organization logic with organization logic)
 export async function createOrGetOrganization(

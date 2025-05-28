@@ -34,7 +34,11 @@ export default function Editor({
             if (e.metaKey && e.key === "s") {
                 e.preventDefault()
                 startTransitionSaving(async () => {
-                    await updateRoadmap(data)
+                    if (!roadmap.organizationId) {
+                        console.error(`Error: no organization id provided`)
+                        return
+                    }
+                    await updateRoadmap(roadmap.organizationId, data)
                 })
             }
         }
@@ -136,7 +140,11 @@ export default function Editor({
                         return
                     }
                     startTransitionSaving(async () => {
-                        await updateRoadmap(data)
+                        if (!roadmap.organizationId) {
+                            console.error(`Error: no organization id provided`)
+                            return
+                        }
+                        await updateRoadmap(roadmap.organizationId, data)
                     })
                 }}
             />

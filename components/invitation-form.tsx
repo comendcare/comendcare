@@ -44,6 +44,7 @@ export default function InvitationForm() {
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
         try {
             const response = await inviteUser(
+                params?.id as string, // organizationId
                 session.data,
                 form.getValues("email"),
                 "member",

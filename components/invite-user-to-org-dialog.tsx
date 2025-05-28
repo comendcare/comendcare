@@ -67,6 +67,7 @@ export default function InviteUserToOrgDialog() {
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
         try {
             const response = await inviteUser(
+                organization?.id as string, // organizationId
                 session.data,
                 form.getValues("email"),
                 form.getValues("role"),
