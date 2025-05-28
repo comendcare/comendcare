@@ -53,12 +53,12 @@ export const useNotificationsStore = create<NotificationsState>()(
             console.log(`set notifications viewed`, notifications)
             const response = await notificationsViewed({notifications})
             if (response.success && response.data) {
-                const viewedNotificationIds = response.data.map(notification => notification.id)
+                const viewedNotificationIds = response.data.map((notification: any) => notification.id)
                 set({
                     notifications: get().notifications.map(notification => {
                         if (!viewedNotificationIds.includes(notification.id)) return notification
 
-                        const updatedNotification = response.data.find(newNotification => newNotification.id === notification.id)
+                        const updatedNotification = response.data.find((newNotification: any) => newNotification.id === notification.id)
                         if (!updatedNotification) return notification
 
                         return {
