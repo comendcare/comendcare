@@ -32,9 +32,8 @@ import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDesc
 import va from "@vercel/analytics"
 import {editSavedCRO, unsaveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
-import {Milestone, SavedCompanyData} from "@/lib/types";
+import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
-import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 import { mixpanelTrack } from "@/app/mixpanel";
 import ProjectMultipleSelector from "../project-multiple-selector";
 

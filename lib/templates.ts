@@ -1,5 +1,4 @@
-import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options"
-import { MODALITIES } from "./types"
+import {MILESTONE_TYPE_OPTIONS, MODALITIES} from "./types"
 import ASOResearchPlan from '@/data/research-plan-templates/ASO Research Plan-cmaqujvbw00007u8av9kl1u60.json'
 import GeneTherapyResearchPlan from '@/data/research-plan-templates/Gene-Therapy-Template.json'
 import DrugScreenResearchPlan from '@/data/research-plan-templates/Drug-Screen-Template.json'

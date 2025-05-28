@@ -25,10 +25,9 @@ import {saveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
 import { mixpanelTrack } from "@/app/mixpanel";
 import MultipleSelector from "./ui/multiple-selector";
-import { Option } from "@/lib/types"
+import {MILESTONE_TYPE_OPTIONS, Option} from "@/lib/types"
 import ProjectMultipleSelector from "./project-multiple-selector";
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
