@@ -16,7 +16,8 @@ import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import mixpanel from "mixpanel-browser";
-import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/seed-options";
+
+import {MILESTONE_TYPE_OPTIONS} from "@/lib/types";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones

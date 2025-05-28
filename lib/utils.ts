@@ -6,10 +6,16 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
-import {Condition, CustomOrganization, ImportField, milestoneCategories, MilestoneKey} from "@/lib/types";
+import {
+    Condition,
+    CustomOrganization,
+    ImportField,
+    MILESTONE_TYPE_OPTIONS,
+    milestoneCategories,
+    MilestoneKey
+} from "@/lib/types";
 import Papa from "papaparse";
 import type { Milestone, Option } from "@/lib/types";
-import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
 
 export const getStage = (milestones: Milestone[]): {value: string, label: string, variant: string} => {
     const relevantMilestoneTypes = milestones

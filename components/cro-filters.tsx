@@ -17,14 +17,13 @@ import {DoubleSliderBarChart} from "./ui/slider-double"
 import {ScrollArea} from "./ui/scroll-area"
 import {Button} from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
+import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, MILESTONE_TYPE_OPTIONS} from "@/lib/types"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import {useEffect} from "react"
 import {Info} from "lucide-react"
 import {useQueryState} from "nuqs"
-import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
 import { badgeVariants } from "./ui/badge"
 import { usePathname, useSearchParams } from "next/navigation"
 
