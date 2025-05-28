@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client"
+import { fieldEncryptionExtension } from 'prisma-field-encryption'
 import { tmpdir } from "os"
 import fs from "fs"
 
@@ -40,14 +41,22 @@ if (process.env.NODE_ENV === "production") {
     }
 }
 
+const extendedPrisma = new PrismaClient().$extends(
+    fieldEncryptionExtension({
+        encryptionKey: process.env.PRISMA_FIELD_ENCRYPTION_KEY
+    })
+)
+
+type ExtendedPrismaClient = typeof extendedPrisma
+
 // Use global caching to prevent multiple instances of Prisma in development
 declare global {
-    var prisma: PrismaClient | undefined
+    var prisma: ExtendedPrismaClient | undefined
 }
 
 // Use global caching for Prisma in development
 const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined
+    prisma: ExtendedPrismaClient | undefined
 }
 
 export const db =
@@ -57,6 +66,10 @@ export const db =
             process.env.NODE_ENV === "development"
                 ? ["info", "query", "error", "warn"]
                 : ["error"]
-    })
+    }).$extends(
+        fieldEncryptionExtension({
+            encryptionKey: process.env.PRISMA_FIELD_ENCRYPTION_KEY
+        })
+    )
 
 if (process.env.NODE_ENV === "development") globalForPrisma.prisma = db
