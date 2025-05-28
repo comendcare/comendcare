@@ -16,7 +16,7 @@ export type KanbanState = {
     addColumn: (column: any, orgId: string | undefined | null) => Promise<Column | void>,
     deleteColumn: (columnId: string, orgId: string | undefined | null) => Promise<Column | void>
     updateColumn: (columnId: string, newProperties: any, orgId: string | undefined | null) => Promise<Column[] | void>,
-    setColumns: (columns: Column[]) => Promise<Column[] | void>,
+    setColumns: (orgId: string | undefined | null, columns: Column[]) => Promise<Column[] | void>,
     addTask: (orgId: string | undefined | null, columnId: string, properties?: any) => Promise<Task | void>,
     updateTask: (orgId: string | undefined | null, taskId: string, newProperties: any) => Promise<Task[] | void>,
     setTasks: (orgId: string | undefined | null, tasks: any[]) => Promise<Task[] | void>,
@@ -86,9 +86,9 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error updating your column')
                 }
             },
-            setColumns: async (columns: Column[]) => {
+            setColumns: async (orgId: string | undefined | null, columns: Column[]) => {
                 console.log(`set columns`)
-                const response = await updateColumns({ columns })
+                const response = await updateColumns(orgId, {columns})
                 if (response?.success && response?.data) {
                     // if task was created successfully, update zustand state
                     set({ columns: response.data as Column[] })

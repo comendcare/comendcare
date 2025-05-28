@@ -386,7 +386,7 @@ function Kanban({initColumns, initTasks, filter, sortBy, mountKey}: {
         setActiveTask(null)
 
         if (event?.active?.data?.current?.type === "Column") {
-            setDbColumns(columns.map((col, index) => (
+            setDbColumns(session?.user?.organizationId, columns.map((col, index) => (
                 {...col, kanbanPosition: index}
             )))
             return
