@@ -39,8 +39,8 @@ const userFormSchema = z.object({
     region: z.string().optional(),
     postalCode: z.string().optional(),
     country: z.string().optional(),
-    lat: z.number().optional(),
-    lng: z.number().optional(),
+    lat: z.string().optional(),
+    lng: z.string().optional(),
     image: z.string().optional(),
 });
 
@@ -155,8 +155,8 @@ export default function UserOnboardingForm() {
                         region: userData.region || "",
                         postalCode: userData.postalCode || "",
                         country: userData.country || "",
-                        lat: userData.lat || 0,
-                        lng: userData.lng || 0,
+                        lat: userData.lat?.toString() || "0",
+                        lng: userData.lng?.toString() || "0",
                         image: userData.image || "",
                     };
 
@@ -175,7 +175,11 @@ export default function UserOnboardingForm() {
                     }
 
                     setDefaultValues(fetchedValues);
-                    setAddress(fetchedValues); // Set address state as well
+                    setAddress({
+                        ...fetchedValues,
+                        lat: parseFloat(fetchedValues.lat),
+                        lng: parseFloat(fetchedValues.lng)
+                    }); // Set address state as well
                     form.reset(fetchedValues); // Reset form with fetched data
                 }
             }
@@ -192,8 +196,8 @@ export default function UserOnboardingForm() {
         form.setValue("region", address.region);
         form.setValue("postalCode", address.postalCode);
         form.setValue("country", address.country);
-        form.setValue("lat", address.lat);
-        form.setValue("lng", address.lng);
+        form.setValue("lat", address.lat.toString());
+        form.setValue("lng", address.lng.toString());
     }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
