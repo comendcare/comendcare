@@ -1,10 +1,9 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
-import {PrismaClient} from '@prisma/client'
+import prisma from "@/lib/prisma"
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@/lib/utils";
 import { DEFAULT_KANBAN_COLUMNS } from '@/lib/types';
 import { MILESTONE_TYPE_OPTIONS } from './seed-options';
 
-const prisma = new PrismaClient()
 
 async function main() {
 
