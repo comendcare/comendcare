@@ -35,7 +35,7 @@ export default async function AdminOrganizationPage({
     const handleDeleteOrganization = async () => {
 
         try {
-            await deleteOrganization(data)
+            await deleteOrganization(data.id, data)
                 .then(async res => {
                     if (res.success) {
                         mixpanelTrack("Organization Deleted", {

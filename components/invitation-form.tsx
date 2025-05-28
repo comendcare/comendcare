@@ -49,11 +49,11 @@ export default function InvitationForm() {
                 form.getValues("email"),
                 "member",
                 await getIp(),
-                {
-                    organizationId: params?.id as string,
-                    organizationName: organization?.name as string,
-                    organizationImage: organization?.image as string,
-                }
+                // {
+                //     organizationId: params?.id as string,
+                //     organizationName: organization?.name as string,
+                //     organizationImage: organization?.image as string,
+                // }
             )
 
             if (response.success) {

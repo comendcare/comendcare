@@ -21,7 +21,7 @@ export const DeleteAssetDialog = ({assetId, closeDialog}: {assetId: string | und
 
     const handleUndo = () => {
         undo()
-        saveState()
+        saveState(session?.user?.organizationId)
         toast.dismiss("undo-toast")
     }
 
@@ -43,7 +43,7 @@ export const DeleteAssetDialog = ({assetId, closeDialog}: {assetId: string | und
         }
 
         try {
-            await deleteAsset(assetId)
+            await deleteAsset(assetId, session.user.organizationId)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">

@@ -11,8 +11,8 @@ export interface RFPState {
     initState: (rfps: RFP[]) => void,
     createRFP: (rfp: Partial<RFP>, orgId: string) => Promise<void>,
     updateRFP: (rfp: Partial<RFP>, orgId: string) => Promise<void>,
-    deleteRFP: (rfpId: string) => Promise<void>,
-    saveState: () => void,
+    deleteRFP: (rfpId: string, orgId: string) => Promise<void>,
+    saveState: (orgId: string | null | undefined) => void,
 }
 
 export const useRFPStore = create<RFPState>()(
@@ -23,7 +23,7 @@ export const useRFPStore = create<RFPState>()(
                 set({rfps, initialized: true})
             },
             createRFP: async (rfp: Partial<RFP>, orgId: string) => {
-                const newRfp = await createOrUpdateRFP(rfp, orgId)
+                const newRfp = await createOrUpdateRFP(orgId, rfp)
                 console.log(`new rfp`, newRfp)
 
                 mixpanelTrack("RFP Created", {
@@ -42,7 +42,7 @@ export const useRFPStore = create<RFPState>()(
                 set({ rfps: [newRfp, ...get().rfps]})
             },
             updateRFP: async (rfp: Partial<RFP>, orgId: string) => {
-                const updatedRfp = await createOrUpdateRFP(rfp, orgId)
+                const updatedRfp = await createOrUpdateRFP(orgId, rfp)
                 console.log(`updated rfp`, updatedRfp)
 
                 mixpanelTrack("RFP Updated", {
@@ -59,8 +59,8 @@ export const useRFPStore = create<RFPState>()(
 
                 set({ rfps: get().rfps.map(rfp => rfp.id === updatedRfp.id ? updatedRfp : rfp) })
             },
-            deleteRFP: async (rfpId: string) => {
-                const deletedRfp = await deleteRFP(rfpId)
+            deleteRFP: async (rfpId: string, orgId: string) => {
+                const deletedRfp = await deleteRFP(orgId, rfpId)
                 console.log(`deleted rfp`, deletedRfp)
 
                 mixpanelTrack("RFP Deleted", {
@@ -77,9 +77,9 @@ export const useRFPStore = create<RFPState>()(
 
                 set({ rfps: get().rfps.filter(rfp => rfp.id !== deletedRfp.id) })
             },
-            saveState: () => {
+            saveState: (orgId: string | null | undefined) => {
                 console.log(`save state`)
-                syncDBRFPs({ rfps: get().rfps })
+                syncDBRFPs(orgId, { rfps: get().rfps })
             }
         }),
         {

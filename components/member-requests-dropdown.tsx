@@ -15,7 +15,7 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
 
     async function approveMemberRequest(memberRequest: MemberRequestWithUser) {
         if (session?.data?.user.organizationId) {
-            const response = await approveMemberRequestAndCreateMember(memberRequest)
+            const response = await approveMemberRequestAndCreateMember(session.data.user.organizationId, memberRequest)
 
             if (response.success) {
                 mixpanelTrack("Membership Request Approved", {
@@ -37,7 +37,7 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
 
     async function denyMemberRequest(memberRequest: MemberRequestWithUser) {
         if (session?.data?.user.organizationId) {
-            const response = await deleteMemberRequest(memberRequest)
+            const response = await deleteMemberRequest(session.data.user.organizationId, memberRequest)
 
             if (response.success) {
                 mixpanelTrack("Membership Request Denied", {

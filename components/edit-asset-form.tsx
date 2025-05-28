@@ -76,9 +76,7 @@ const editAssetForm = z.object({
 
 const assetSelector = (state: AssetState) => ({
     createAsset: state.createAsset,
-    updateAsset: state.updateAsset,
-    deleteAsset: state.deleteAsset,
-    saveState: state.saveState
+    updateAsset: state.updateAsset
 })
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>

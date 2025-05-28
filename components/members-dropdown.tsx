@@ -83,7 +83,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
 
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
         if (session?.user.organizationId) {
-            const response = await updateMember(member.id, values)
+            const response = await updateMember(session?.user.organizationId, member.id, values)
 
             if (response.success && response.data) {
                 const isSelf = session.user.id === member.user.id;
@@ -121,7 +121,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
 
     async function revokeMembership(member: MemberWithUser) {
         if (session?.user.organizationId) {
-            const response = await deleteMember(member.id)
+            const response = await deleteMember(session?.user.organizationId, member.id)
 
             if (response.success && response.data) {
                 mixpanelTrack("Membership Revoked", {
@@ -142,7 +142,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
 
     const handleLeaveOrganization = async () => {
         try {
-            const response = await leaveOrganization(session, session?.user.organizationId || "");
+            const response = await leaveOrganization(session?.user.organizationId, session);
 
             if (session && response.success) {
                 // Fetch the latest memberships after leaving

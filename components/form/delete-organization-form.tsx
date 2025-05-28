@@ -27,7 +27,7 @@ export default function DeleteOrganizationForm({
                     )
                 ) {
                     try {
-                        const response = await deleteOrganization(organization);
+                        const response = await deleteOrganization(organization.id, organization);
 
                         if (response.success) {
                             await update({

@@ -21,7 +21,7 @@ export const DeleteRFPDialog = ({rfpId, closeDialog}: {rfpId: string | undefined
 
     const handleUndo = () => {
         undo()
-        saveState()
+        saveState(session?.user?.organizationId)
         toast.dismiss("undo-toast")
     }
 
@@ -43,7 +43,7 @@ export const DeleteRFPDialog = ({rfpId, closeDialog}: {rfpId: string | undefined
         }
 
         try {
-            await deleteRFP(rfpId)
+            await deleteRFP(rfpId, session.user.organizationId)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">
