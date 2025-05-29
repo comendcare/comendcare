@@ -8,21 +8,21 @@ import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { columns } from "@/components/assets-data-table/assets-data-columns";
 import { AssetsDataTable } from "./assets-data-table/assets-data-table"
 
-const assetSelector = (state: AssetState) => ({
-    assets: state.assets
+const toolSelector = (state: AssetState) => ({
+    tools: state.tools
 })
 
 export const PrivateAssetsPage = () => {
-    const { assets } = useAssetStore(useShallow(assetSelector))
+    const { tools } = useAssetStore(useShallow(toolSelector))
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
         <div className="flex gap-2 w-full justify-end">
-            <NewAssetDialog iconOnly={true} numAssetsPinned={assets.filter(asset => asset.pinned).length}/>
+            <NewAssetDialog iconOnly={true} numAssetsPinned={tools.filter(tool => tool.pinned).length}/>
             <AssetBulkImportDialog />
         </div>
 
-        {assets.length <= 0 && (
+        {tools.length <= 0 && (
             <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                 <h1 className="font-cal text-4xl">You do not have any Tools</h1>
                 <Image
@@ -34,11 +34,11 @@ export const PrivateAssetsPage = () => {
                 <p className="text-lg text-stone-500">
                     A tool is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                 </p>
-                <NewAssetDialog numAssetsPinned={assets.filter(asset => asset.pinned).length}/>
+                <NewAssetDialog numAssetsPinned={tools.filter(tool => tool.pinned).length}/>
             </div>
         )}
-        {assets.length > 0 && (
-            <AssetsDataTable data={assets} columns={columns}/>
+        {tools.length > 0 && (
+            <AssetsDataTable data={tools} columns={columns}/>
         )}
         </main>
     )

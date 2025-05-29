@@ -1,9 +1,9 @@
 /*
   Warnings:
 
-  - You are about to drop the column `assetsUnderDevelopment` on the `Condition` table. All the data in the column will be lost.
-  - You are about to drop the column `assetId` on the `ExternalAttachment` table. All the data in the column will be lost.
-  - You are about to drop the column `assetId` on the `ExternalContact` table. All the data in the column will be lost.
+  - You are about to drop the column `toolsUnderDevelopment` on the `Condition` table. All the data in the column will be lost.
+  - You are about to drop the column `toolId` on the `ExternalAttachment` table. All the data in the column will be lost.
+  - You are about to drop the column `toolId` on the `ExternalContact` table. All the data in the column will be lost.
   - You are about to drop the `Asset` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `AssetToMilestone` table. If the table is not empty, all the data it contains will be lost.
 
@@ -12,27 +12,27 @@
 -- ALTER TABLE "Asset" DROP CONSTRAINT "Asset_organizationId_fkey";
 
 -- -- DropForeignKey
--- ALTER TABLE "AssetToMilestone" DROP CONSTRAINT "AssetToMilestone_assetId_fkey";
+-- ALTER TABLE "AssetToMilestone" DROP CONSTRAINT "AssetToMilestone_toolId_fkey";
 
 -- -- DropForeignKey
 -- ALTER TABLE "AssetToMilestone" DROP CONSTRAINT "AssetToMilestone_milestoneId_fkey";
 
 -- -- DropForeignKey
--- ALTER TABLE "ExternalAttachment" DROP CONSTRAINT "ExternalAttachment_assetId_fkey";
+-- ALTER TABLE "ExternalAttachment" DROP CONSTRAINT "ExternalAttachment_toolId_fkey";
 
 -- -- DropForeignKey
--- ALTER TABLE "ExternalContact" DROP CONSTRAINT "ExternalContact_assetId_fkey";
+-- ALTER TABLE "ExternalContact" DROP CONSTRAINT "ExternalContact_toolId_fkey";
 
 -- -- AlterTable
--- ALTER TABLE "Condition" DROP COLUMN "assetsUnderDevelopment",
+-- ALTER TABLE "Condition" DROP COLUMN "toolsUnderDevelopment",
 -- ADD COLUMN     "toolsUnderDevelopment" TEXT[];
 
 -- -- AlterTable
--- ALTER TABLE "ExternalAttachment" DROP COLUMN "assetId",
+-- ALTER TABLE "ExternalAttachment" DROP COLUMN "toolId",
 -- ADD COLUMN     "toolId" TEXT;
 
 -- -- AlterTable
--- ALTER TABLE "ExternalContact" DROP COLUMN "assetId",
+-- ALTER TABLE "ExternalContact" DROP COLUMN "toolId",
 -- ADD COLUMN     "toolId" TEXT;
 
 -- -- DropTable
@@ -91,21 +91,21 @@
   CUSTOM SQL - to prevend data loss, change drop/create to rename
 */
 -- Drop existing foreign keys to avoid reference issues
-ALTER TABLE "AssetToMilestone" DROP CONSTRAINT IF EXISTS "AssetToMilestone_assetId_fkey";
+ALTER TABLE "AssetToMilestone" DROP CONSTRAINT IF EXISTS "AssetToMilestone_toolId_fkey";
 ALTER TABLE "AssetToMilestone" DROP CONSTRAINT IF EXISTS "AssetToMilestone_milestoneId_fkey";
 ALTER TABLE "Asset" DROP CONSTRAINT IF EXISTS "Asset_organizationId_fkey";
-ALTER TABLE "ExternalAttachment" DROP CONSTRAINT IF EXISTS "ExternalAttachment_assetId_fkey";
-ALTER TABLE "ExternalContact" DROP CONSTRAINT IF EXISTS "ExternalContact_assetId_fkey";
+ALTER TABLE "ExternalAttachment" DROP CONSTRAINT IF EXISTS "ExternalAttachment_toolId_fkey";
+ALTER TABLE "ExternalContact" DROP CONSTRAINT IF EXISTS "ExternalContact_toolId_fkey";
 
 -- Rename tables
 ALTER TABLE "Asset" RENAME TO "Tool";
 ALTER TABLE "AssetToMilestone" RENAME TO "ToolToMilestone";
 
 -- Rename columns
-ALTER TABLE "Condition" RENAME COLUMN "assetsUnderDevelopment" TO "toolsUnderDevelopment";
-ALTER TABLE "ExternalAttachment" RENAME COLUMN "assetId" TO "toolId";
-ALTER TABLE "ExternalContact" RENAME COLUMN "assetId" TO "toolId";
-ALTER TABLE "ToolToMilestone" RENAME COLUMN "assetId" TO "toolId";
+ALTER TABLE "Condition" RENAME COLUMN "toolsUnderDevelopment" TO "toolsUnderDevelopment";
+ALTER TABLE "ExternalAttachment" RENAME COLUMN "toolId" TO "toolId";
+ALTER TABLE "ExternalContact" RENAME COLUMN "toolId" TO "toolId";
+ALTER TABLE "ToolToMilestone" RENAME COLUMN "toolId" TO "toolId";
 
 -- Re-add foreign keys (now that tables/columns are in place)
 ALTER TABLE "Tool" ADD CONSTRAINT "Tool_organizationId_fkey"
@@ -125,4 +125,4 @@ ALTER TABLE "ExternalContact" ADD CONSTRAINT "ExternalContact_toolId_fkey"
 
 -- Optional: rename indexes
 ALTER INDEX IF EXISTS "Asset_id_key" RENAME TO "Tool_id_key";
-ALTER INDEX IF EXISTS "AssetToMilestone_assetId_milestoneId_key" RENAME TO "ToolToMilestone_toolId_milestoneId_key";
+ALTER INDEX IF EXISTS "AssetToMilestone_toolId_milestoneId_key" RENAME TO "ToolToMilestone_toolId_milestoneId_key";

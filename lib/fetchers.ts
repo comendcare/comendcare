@@ -133,7 +133,7 @@ export async function getPublicAssetsForOrganization(domain: string) {
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
-    const assets = await prisma.asset.findMany({
+    const tools = await prisma.tool.findMany({
         where: {
             organization: {
                 subdomain: subdomain
@@ -154,7 +154,7 @@ export async function getPublicAssetsForOrganization(domain: string) {
         orderBy: [{createdAt: "desc"}]
     })
 
-    return assets
+    return tools
 }
 
 export async function getPublicRFPsForOrganization(domain: string) {
@@ -215,9 +215,9 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             contacts: true,
                             attachments: true,
                             types: { include: { milestoneType: true } },
-                            assets: { 
+                            tools: { 
                                 include: { 
-                                    asset: {
+                                    tool: {
                                         include: { 
                                             milestones: {
                                                 include: {
@@ -235,7 +235,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                                     }, 
                                 }, 
                                 where: { 
-                                    asset: {
+                                    tool: {
                                         private: {
                                             equals: false
                                         }
@@ -287,9 +287,9 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                     contacts: true,
                     attachments: true,
                     types: { include: { milestoneType: true } },
-                    assets: { 
+                    tools: { 
                         include: { 
-                            asset: {
+                            tool: {
                                 include: { 
                                     milestones: {
                                         include: {
@@ -307,7 +307,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             }, 
                         }, 
                         where: { 
-                            asset: {
+                            tool: {
                                 private: {
                                     equals: false
                                 }
@@ -431,7 +431,7 @@ export async function getAssets(organizationId: string | undefined) {
     }
 
     try {
-        const fetchedAssets = await prisma?.asset.findMany({
+        const fetchedAssets = await prisma?.tool.findMany({
             where: {organizationId},
             include: {
                 contacts: true,
@@ -677,7 +677,7 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
                         contacts: true,
                         attachments: true,
                         types: {include: { milestoneType: true }},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     orderBy: [{ createdAt: "desc" }]
@@ -917,9 +917,9 @@ export async function getPublicMilestoneDetails(id: string) {
                 contacts: true,
                 attachments: true,
                 types: { include: { milestoneType: true } },
-                assets: { 
+                tools: { 
                     include: { 
-                        asset: {
+                        tool: {
                             include: { 
                                 milestones: {
                                     include: {
@@ -937,7 +937,7 @@ export async function getPublicMilestoneDetails(id: string) {
                         }, 
                     }, 
                     where: { 
-                        asset: {
+                        tool: {
                             private: {
                                 equals: false
                             }
@@ -1235,12 +1235,12 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
 }
 
 export async function getToolsAnalytics(orgId?: string | undefined) {
-    const totalTools: number = (await prisma.asset.findMany({
+    const totalTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId
         }
     })).length
-    const totalPinnedTools: number = (await prisma.asset.findMany({
+    const totalPinnedTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId,
             pinned: true

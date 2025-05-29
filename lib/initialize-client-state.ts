@@ -80,12 +80,12 @@ export function initializeNotificationsState(initData: {
     }
 }
 
-export function initializeAssetsStore(assets: Asset[]) {
+export function initializeAssetsStore(tools: Asset[]) {
     if (typeof window !== "undefined") {
         const initAssetState = useAssetStore.getState().initState;
 
         // Call Zustand's initState directly
-        initAssetState(assets)
+        initAssetState(tools)
     }
 }
 
