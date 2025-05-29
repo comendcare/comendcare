@@ -8,126 +8,14 @@ import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPE
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
-import {Condition} from "@prisma/client";
+import {Condition, Prisma} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
+import { InternalArgs } from "@prisma/client/runtime/library"
 
-export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
-    try {
-        const condition = await prisma.condition.findUnique({
-            where: {slug},
-            include: {
-                organizations: {
-                    select: {
-                        organization: true
-                    }
-                }
-            },
-        });
-
-        if (!condition) {
-            return {success: false, error: "Condition not found"};
-        }
-
-        return {success: true, data: condition};
-    } catch (error: any) {
-        logError("Error fetching condition data", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getConditionsDataFromOrgId(organizationId: string): Promise<ApiResponse<any[]>> {
-    try {
-        const conditions = await prisma.condition.findMany({
-            where: {
-                organizations: {some: {organizationId}},
-            },
-            include: {organizations: true},
-        });
-
-        return {success: true, data: conditions};
-    } catch (error: any) {
-        logError("Error fetching conditions data from organization ID", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getOrganizationData(domain: string) {
-    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : domain
-
-    return await unstable_cache(
-        async () => {
-            let organization = await prisma.organization.findUnique({
-                where: subdomain ? {subdomain} : {customDomain: domain},
-                include: {
-                    user: true,
-                    roadmaps: true,
-                    members: {
-                        orderBy: {
-                            createdAt: 'asc'
-                        },
-                        include: {
-                            user: true
-                        }
-                    }
-                }
-            })
-
-            if (!organization) return organization
-
-            // sort members list - move org owners to the beginning of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.role === 'owner' && b.role !== 'owner') return -1
-                if (b.role === 'owner' && a.role !== 'owner') return 1
-                return 0
-            })
-
-            // sort members list - move comend users to the end of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-                return 0
-            })
-
-            return organization
-        },
-        [`${domain}-metadata`],
-        {
-            revalidate: 900,
-            tags: [`${domain}-metadata`]
-        }
-    )()
-}
-
-export async function getCROData(id: string) {
-    return prisma.company.findUnique({
-        where: {
-            id: id
-        },
-        include: {
-            services: true,
-            sites: true,
-            certifications: {
-                include: {
-                    files: true
-                }
-            },
-            rfis: true,
-            reviews: {
-                include: {
-                    author: true,
-                    organization: true,
-                    feedbacks: true
-                },
-            }
-        }
-    })
-}
-
+/* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
@@ -157,7 +45,15 @@ export async function getPublicAssetsForOrganization(domain: string) {
     return assets
 }
 
-export async function getPublicRFPsForOrganization(domain: string) {
+export async function getPublicRFPsForOrganization(
+    domain: string, 
+    select: Prisma.RFPSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -169,13 +65,13 @@ export async function getPublicRFPsForOrganization(domain: string) {
             },
             private: {equals: false}
         },
-        include: {
-            contacts: true,
-            attachments: true,
-            milestones: {
+        select:{
+            ...select,
+            // filter out any private milestones if the user has requested to access milestones
+            milestones: select.milestones ? ({
                 include: {milestone: true},
                 where: {milestone: {private: {equals: false}}}
-            }
+            }) : undefined
         },
         orderBy: [{createdAt: "desc"}]
     })
@@ -399,6 +295,120 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
     // )()
 }
 
+export async function getPublicConditionData(slug: string): Promise<ApiResponse<any>> {
+    try {
+        const condition = await prisma.condition.findUnique({
+            where: {slug},
+            include: {
+                organizations: {
+                    select: {
+                        organization: true
+                    }
+                }
+            },
+        });
+
+        if (!condition) {
+            return {success: false, error: "Condition not found"};
+        }
+
+        return {success: true, data: condition};
+    } catch (error: any) {
+        logError("Error fetching condition data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getConditionsDataFromOrgId(organizationId: string): Promise<ApiResponse<any[]>> {
+    try {
+        const conditions = await prisma.condition.findMany({
+            where: {
+                organizations: {some: {organizationId}},
+            },
+            include: {organizations: true},
+        });
+
+        return {success: true, data: conditions};
+    } catch (error: any) {
+        logError("Error fetching conditions data from organization ID", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getOrganizationData(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    return await unstable_cache(
+        async () => {
+            let organization = await prisma.organization.findUnique({
+                where: subdomain ? {subdomain} : {customDomain: domain},
+                include: {
+                    user: true,
+                    roadmaps: true,
+                    members: {
+                        orderBy: {
+                            createdAt: 'asc'
+                        },
+                        include: {
+                            user: true
+                        }
+                    }
+                }
+            })
+
+            if (!organization) return organization
+
+            // sort members list - move org owners to the beginning of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.role === 'owner' && b.role !== 'owner') return -1
+                if (b.role === 'owner' && a.role !== 'owner') return 1
+                return 0
+            })
+
+            // sort members list - move comend users to the end of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+                return 0
+            })
+
+            return organization
+        },
+        [`${domain}-metadata`],
+        {
+            revalidate: 900,
+            tags: [`${domain}-metadata`]
+        }
+    )()
+}
+
+export async function getCROData(id: string) {
+    return prisma.company.findUnique({
+        where: {
+            id: id
+        },
+        include: {
+            services: true,
+            sites: true,
+            certifications: {
+                include: {
+                    files: true
+                }
+            },
+            rfis: true,
+            reviews: {
+                include: {
+                    author: true,
+                    organization: true,
+                    feedbacks: true
+                },
+            }
+        }
+    })
+}
+
 export async function getMembers(organizationId: string | null | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
@@ -425,6 +435,7 @@ export async function getMembers(organizationId: string | null | undefined) {
     }
 }
 
+/* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
 export async function getAssets(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};

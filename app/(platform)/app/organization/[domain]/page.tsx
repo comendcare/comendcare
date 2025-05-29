@@ -13,6 +13,7 @@ import Link from "next/link";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
 import { PublicNoResearchPlans } from "@/components/no-research-plans";
+import { Prisma } from "@prisma/client";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -49,7 +50,19 @@ export default async function OrganizationHomePage({
         getOrganizationData(domain),
         getPublicRoadmapsForOrganization(domain),
         getPublicAssetsForOrganization(domain),
-        getPublicRFPsForOrganization(domain)
+        getPublicRFPsForOrganization(domain, {
+            title: true,
+            description: true,
+            openTo: true,
+            startDate: true,
+            endDate: true,
+            budget: true,
+            headerImage: true,
+            pinned: true,
+            contacts: true,
+            attachments: true,
+            milestones: true
+        })
     ])
 
     if (!organization) {

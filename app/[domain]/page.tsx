@@ -57,7 +57,19 @@ export default async function OrganizationHomePage({
         getOrganizationData(domain),
         getPublicRoadmapsForOrganization(domain),
         getPublicAssetsForOrganization(domain),
-        getPublicRFPsForOrganization(domain)
+        getPublicRFPsForOrganization(domain, {
+            title: true,
+            description: true,
+            openTo: true,
+            startDate: true,
+            endDate: true,
+            budget: true,
+            headerImage: true,
+            pinned: true,
+            contacts: true,
+            attachments: true,
+            milestones: true
+        })
     ])
 
     if (!organization) {

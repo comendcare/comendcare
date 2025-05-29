@@ -60,7 +60,19 @@ export default async function ProfilePage() {
         const [roadmaps, assets, rfps] = await Promise.all([
             getPublicRoadmapsForOrganization(organization.subdomain),
             getPublicAssetsForOrganization(organization.subdomain),
-            getPublicRFPsForOrganization(organization.subdomain)
+            getPublicRFPsForOrganization(organization.subdomain, {
+                title: true,
+                description: true,
+                openTo: true,
+                startDate: true,
+                endDate: true,
+                budget: true,
+                headerImage: true,
+                pinned: true,
+                contacts: true,
+                attachments: true,
+                milestones: true
+            })
         ])
 
         // Existing verified organization rendering logic
