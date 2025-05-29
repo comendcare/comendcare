@@ -1,7 +1,6 @@
 "use client"
 
 import Image from "next/image";
-import LoginForm from "@/components/login-form";
 import {Suspense, useEffect} from "react";
 import logo from "@/public/logos/comend-logo.png"
 import {useSearchParams} from "next/navigation";

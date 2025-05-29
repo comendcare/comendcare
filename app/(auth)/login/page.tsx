@@ -2,20 +2,64 @@
 
 import Image from "next/image";
 import LoginForm from "@/components/login-form";
-import {Suspense, useEffect} from "react";
+import {Suspense, useEffect, useState, useRef} from "react";
 import fullLogo from "@/public/logos/affiliations/comend-full-logo.svg"
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 export default function LoginPage() {
     const {data: session} = useSession()
     const router = useRouter();
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
+    const [requireCaptcha, setRequireCaptcha] = useState(false)
+    const [isVerified, setIsVerified] = useState(false);
+
+    async function handleCaptchaSubmission(token: string | null) {
+        try {
+            if (token) {
+                await fetch("/api/recaptcha", {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({token}),
+                })
+
+                setIsVerified(true)
+                setRequireCaptcha(true)
+            }
+        } catch (e) {
+            setIsVerified(false)
+        }
+    }
+
+    const handleChange = (token: string | null) => {
+        handleCaptchaSubmission(token);
+    };
+
+    function handleExpired() {
+        setIsVerified(false);
+    }
 
     useEffect(() => {
         if (session) {
             // Redirect to /app/marketplace/cro if the user is signed in
             router.push("/app/marketplace/service-providers")
         }
+
+        // Check cookie manually
+        const cookieValue = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("require_captcha="))
+            ?.split("=")[1]
+
+        const needsCaptcha = cookieValue === "true";
+        setRequireCaptcha(needsCaptcha);
+        setIsVerified(!needsCaptcha)
+
     }, [session])
 
     return (
@@ -56,6 +100,17 @@ export default function LoginPage() {
                 </div>
 
                 <div className="mx-auto w-11/12 max-w-xs sm:w-full">
+                    {requireCaptcha &&
+                        <ReCAPTCHA
+                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                            ref={recaptchaRef}
+                            onChange={handleChange}
+                            onExpired={handleExpired}
+                        />
+                    }
+                </div>
+
+                <div className="mx-auto w-11/12 max-w-xs sm:w-full">
                     <Suspense
                         fallback={
                             <div
@@ -64,6 +119,7 @@ export default function LoginPage() {
                     >
                         <LoginForm
                             callback="/app/marketplace/service-providers"
+                            isCaptchaVerified={isVerified}
                         />
                     </Suspense>
                 </div>
