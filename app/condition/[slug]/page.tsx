@@ -1,6 +1,6 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getConditionData} from "@/lib/fetchers"
+import {getPublicConditionData} from "@/lib/fetchers"
 import {cn, toDateString} from "@/lib/utils"
 import {
     DialogDescription,
@@ -55,7 +55,7 @@ export async function generateMetadata({
     const slug = decodeURIComponent(params.slug)
 
     let data = null
-    const response = await getConditionData(slug)
+    const response = await getPublicConditionData(slug)
     if (response.success) {
         data = response.data
     } else {
@@ -205,7 +205,7 @@ export default async function ConditionPage({
     let data: Condition & {
         organizations: { organization: Organization }[];
     } | null = null
-    const response = await getConditionData(slug)
+    const response = await getPublicConditionData(slug)
     if (response.success) {
         data = response.data
     } else {
