@@ -35,8 +35,10 @@ export default async function middleware(req: NextRequest) {
 
     const url = req.nextUrl
 
+    const isPageNavigation = req.method === "GET" && req.headers.get("accept")?.includes("text/html")
+
     // Skip rate limiting in local/dev
-    if (!isLocal && process.env.NODE_ENV !== 'development') {
+    if (isPageNavigation && !isLocal && process.env.NODE_ENV !== 'development') {
         const redisKey = `rate-limit:${ip}`;
         const count = await redis.incr(redisKey);
 
