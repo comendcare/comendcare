@@ -35,13 +35,13 @@ export function AssetBulkImportDialog() {
                     toast('Warning!', {
                         position: "bottom-left",
                         duration: 6000,
-                        description: `Missing fields in import file: A title is required for each Tool. Edit the asset to add title.`
+                        description: `Missing fields in import file: A title is required for each Tool. Edit the tool to add title.`
                     })
-                    console.error("Error: imported assets are missing required fields", result.errors)
+                    console.error("Error: imported tools are missing required fields", result.errors)
                 }
     
-                await Promise.all(result.values.map(async (asset) => {
-                    await createOrUpdateAsset(session?.user.organizationId, asset)
+                await Promise.all(result.values.map(async (tool) => {
+                    await createOrUpdateAsset(session?.user.organizationId, tool)
                 }))
             } catch (e) {
                 toast('Error!', {
