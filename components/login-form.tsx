@@ -16,7 +16,7 @@ const signinFormSchema = z.object({
     email: z.string({required_error: "Email is required"}).email({message: "Invalid email format"}) // Custom error message is optional
 })
 
-export default function LoginForm({callback = "/"}: { callback?: string }) {
+export default function LoginForm({callback = "/", isCaptchaVerified = true}: { callback?: string, isCaptchaVerified?: boolean }) {
     const {data: session} = useSession()
     const router = useRouter()
 
@@ -94,7 +94,7 @@ export default function LoginForm({callback = "/"}: { callback?: string }) {
                             }
                             setLoading(false);
                         }}
-                        disabled={!canSubmit || !form.formState.isValid}
+                        disabled={!canSubmit || !form.formState.isValid || !isCaptchaVerified}
                         className="w-full"
                     >
                         {`Sign in`}
@@ -114,7 +114,7 @@ export default function LoginForm({callback = "/"}: { callback?: string }) {
             <div className="flex flex-col space-y-2">
                 <Button
                     variant="outline"
-                    disabled={loading}
+                    disabled={loading || !isCaptchaVerified}
                     onClick={() => {
                         setLoading(true)
                         signIn("google", {
@@ -154,7 +154,7 @@ export default function LoginForm({callback = "/"}: { callback?: string }) {
 
                 <Button
                     variant="outline"
-                    disabled={loading}
+                    disabled={loading || !isCaptchaVerified}
                     onClick={() => {
                         setLoading(true)
                         signIn("facebook", {
@@ -186,7 +186,7 @@ export default function LoginForm({callback = "/"}: { callback?: string }) {
 
                 <Button
                     variant="outline"
-                    disabled={loading}
+                    disabled={loading || !isCaptchaVerified}
                     onClick={() => {
                         setLoading(true)
                         signIn("linkedin", {

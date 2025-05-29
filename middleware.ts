@@ -1,5 +1,11 @@
+import { redis } from '@/lib/redis'
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
+
+const RATE_LIMIT = 60        // max requests
+const WINDOW_SECONDS = 60    // per this many seconds
+const MAX_LOGIN_PAGE_VISITS = 5        // max login page visits
+const MAX_LOGIN_PAGE_VISITS_RESET_TIME = 300    // per this many seconds
 
 export const config = {
     matcher: [
@@ -15,7 +21,40 @@ export const config = {
 }
 
 export default async function middleware(req: NextRequest) {
+    const forwarded = req.headers.get('x-forwarded-for')
+    const ip =
+        req.ip ??
+        (forwarded ? forwarded.split(',')[0].trim() : null) ??
+        '127.0.0.1';
+
+    const isLocal =
+        ip === '127.0.0.1' ||
+        ip === '::1' ||
+        ip === 'localhost' ||
+        req.headers.get("host")?.includes("localhost");
+
     const url = req.nextUrl
+
+    // Skip rate limiting in local/dev
+    if (!isLocal && process.env.NODE_ENV !== 'development') {
+        const redisKey = `rate-limit:${ip}`;
+        const count = await redis.incr(redisKey);
+
+        if (count === 1) {
+            await redis.expire(redisKey, WINDOW_SECONDS);
+        }
+
+        if (count > RATE_LIMIT) {
+            console.warn(`Blocked IP: ${ip} for excessive requests (${count} in ${WINDOW_SECONDS}s)`);
+
+            return new Response('Too many requests', {
+                status: 429,
+                headers: {
+                    'Retry-After': WINDOW_SECONDS.toString(),
+                },
+            });
+        }
+    }
 
     // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
     let hostname = req.headers
@@ -39,6 +78,33 @@ export default async function middleware(req: NextRequest) {
     const path = `${url.pathname}${
         searchParams.length > 0 ? `?${searchParams}` : ""
     }`
+
+    // Only count visits to the login page
+    if (path.startsWith("/login")) {
+        const loginKey = `login-hits:${ip}`
+        const loginCount = await redis.incr(loginKey)
+        if (loginCount === 1) {
+            await redis.expire(loginKey, MAX_LOGIN_PAGE_VISITS_RESET_TIME) // 5-minute window
+        }
+
+        const res = NextResponse.next()
+
+        if (loginCount >= MAX_LOGIN_PAGE_VISITS) {
+            res.cookies.set("require_captcha", "true", {
+                path: "/",
+                maxAge: MAX_LOGIN_PAGE_VISITS_RESET_TIME,
+                httpOnly: false,
+            })
+        } else {
+            res.cookies.set("require_captcha", "false", {
+                path: "/",
+                maxAge: MAX_LOGIN_PAGE_VISITS_RESET_TIME,
+                httpOnly: false,
+            })
+        }
+
+        return res
+    }
 
     // DON'T do rewrites for app pages
     if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
