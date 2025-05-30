@@ -120,10 +120,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             }
         });
 
-        console.log("Submitting FormData:");
-        for (const pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
+        console.log("Submitting FormData:", formData);
 
         try {
             await updateOrganization(session.user.organizationId, formData);
