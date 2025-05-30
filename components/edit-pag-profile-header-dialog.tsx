@@ -44,8 +44,6 @@ const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
     founded: z.string().optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
-    description: z.string().max(500).optional(),
-    website: z.string().url().optional(),
     raised: z.number().optional(),
     deployed: z.number().optional(),
     budget: z.number().optional()
@@ -63,8 +61,6 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             name: organization.name || "",
             founded: organization.yearFounded || "",
             incorporationStatus: organization.incorporationStatus || undefined,
-            description: organization.description || "",
-            website: organization.website || "",
             raised: organization.moneyRaised || 0,
             deployed: organization.moneyDeployed || 0,
             budget: organization.researchBudget || 0
@@ -77,8 +73,6 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             name: organization.name || "",
             founded: organization.yearFounded || "",
             incorporationStatus: organization.incorporationStatus || undefined,
-            description: organization.description || "",
-            website: organization.website || "",
             raised: organization.moneyRaised || 0,
             deployed: organization.moneyDeployed || 0,
             budget: organization.researchBudget || 0
@@ -101,8 +95,6 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             subdomain: "subdomain",
             looking: "interestedModalities",
             founded: "yearFounded",
-            description: "description",
-            website: "website",
             incorporationStatus: "incorporationStatus",
             raised: "moneyRaised",
             budget: "researchBudget",
