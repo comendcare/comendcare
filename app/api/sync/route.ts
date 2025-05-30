@@ -451,7 +451,7 @@ const syncToTypesense = async (env: {
                         conditions: {include: {condition: true}},
                         roadmaps: true,
                         milestones: true,
-                        assets: true,
+                        tools: true,
                         rfps: true
                     }
                 })
@@ -467,7 +467,7 @@ const syncToTypesense = async (env: {
                 const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
                     organization.roadmaps.map(roadmap => roadmap.updatedAt.valueOf()),
                     organization.milestones.map(milestone => milestone.updatedAt.valueOf()),
-                    organization.assets.map(asset => asset.updatedAt.valueOf()),
+                    organization.tools.map(tool => tool.updatedAt.valueOf()),
                     organization.rfps.map(rfp => rfp.updatedAt.valueOf())
                 ))
 

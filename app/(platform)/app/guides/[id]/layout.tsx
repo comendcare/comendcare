@@ -21,7 +21,7 @@ export default async function GuideArticleLayout({
 
     return (
         <div>
-            <header className="mt-6 flex flex-col gap-8 p-4">
+            <header className="mt-6 flex flex-col p-4 gap-6">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -60,6 +60,7 @@ export default async function GuideArticleLayout({
                         </p>
                     </div>
                 </div>
+
                 <div>
                     <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                         {title}

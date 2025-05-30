@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { getNotionDatabaseAndContents } from "@/lib/notion"
+import { fi } from "@faker-js/faker"
 import { filter } from "lodash"
 import Link from "next/link"
 
@@ -9,7 +10,7 @@ export default async function FAQLayout({
     children: React.ReactNode
 }>) {
     const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
-    const {database, content, pages} = await getNotionDatabaseAndContents(faqDBKey)
+    const {database, content, pages} = await getNotionDatabaseAndContents(faqDBKey, {sorts: [{property: 'Order', direction: 'ascending'}]})
 
     const filteredPages: any[] = pages
         .map((page: any) => {
@@ -28,6 +29,9 @@ export default async function FAQLayout({
             return page
         })
         .filter((page) => page !== null)
+        // .sort((a, b) => (
+        //     (a.properties?.["Order Position"]?.number || 0) - (b.properties?.["Order Position"]?.number || 0)
+        // ))
     const filteredSections = database.properties.Section.type === 'select' 
         ? database.properties.Section.select.options.filter(option => filteredPages.filter(page => page.properties.Section.type === 'select' && page.properties.Section.select.name === option.name).length > 0)
         : []

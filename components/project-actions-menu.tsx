@@ -86,7 +86,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
             // description: milestone.description,
             // types: milestone.types || [],
             // status: milestone.status,
-            // assets: milestone.assets,
+            // tools: milestone.tools,
             // rfps: milestone.rfps,
             // contacts: milestone.contacts,
             ...milestone

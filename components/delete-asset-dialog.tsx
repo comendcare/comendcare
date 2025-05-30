@@ -7,16 +7,16 @@ import { useShallow } from "zustand/react/shallow"
 import { Button } from "./ui/button"
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "./ui/dialog"
 
-const assetSelector = (state: AssetState) => ({
+const toolSelector = (state: AssetState) => ({
     createAsset: state.createAsset,
     updateAsset: state.updateAsset,
     deleteAsset: state.deleteAsset,
     saveState: state.saveState
 })
 
-export const DeleteAssetDialog = ({assetId, closeDialog}: {assetId: string | undefined, closeDialog?: () => void}) => {
+export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undefined, closeDialog?: () => void}) => {
     const {data: session} = useSession()
-    const { deleteAsset, saveState } = useAssetStore(useShallow(assetSelector))
+    const { deleteAsset, saveState } = useAssetStore(useShallow(toolSelector))
     const { undo } = useAssetStore.temporal.getState()
 
     const handleUndo = () => {
@@ -34,7 +34,7 @@ export const DeleteAssetDialog = ({assetId, closeDialog}: {assetId: string | und
             return
         }
 
-        if (!assetId) {
+        if (!toolId) {
             toast.error(
                 "This tool does not have an id.",
                 {position: "bottom-left"}
@@ -43,7 +43,7 @@ export const DeleteAssetDialog = ({assetId, closeDialog}: {assetId: string | und
         }
 
         try {
-            await deleteAsset(assetId, session.user.organizationId)
+            await deleteAsset(toolId, session.user.organizationId)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">

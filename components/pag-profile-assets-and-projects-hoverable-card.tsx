@@ -35,15 +35,15 @@ import { formatMoney } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
 
-export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
-    if (assets && rfps) {
+export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }: { tools: any[], rfps: any[], isPrivate: boolean }) => {
+    if (tools && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
                 <CardContent className="mt-8">
                     <Tabs defaultValue="rfps" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="rfps">Requests for Proposals</TabsTrigger>
-                            <TabsTrigger value="assets">Tools</TabsTrigger>
+                            <TabsTrigger value="tools">Tools</TabsTrigger>
                         </TabsList>
                         <TabsContent value="rfps">
                             {rfps.filter(rfp => rfp.pinned).length > 0 && (
@@ -86,8 +86,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     : <PublicNoPinnedRFPs />
                             )}
                         </TabsContent>
-                        <TabsContent value="assets">
-                            {assets.filter(asset => asset.pinned).length > 0 && (
+                        <TabsContent value="tools">
+                            {tools.filter(tool => tool.pinned).length > 0 && (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -98,34 +98,34 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {assets.filter(asset => asset.pinned).map((asset) => (
+                                        {tools.filter(tool => tool.pinned).map((tool) => (
                                             <Dialog>
                                                 <DialogTrigger asChild onClick={() => {
                                                     mixpanelTrack("Tool Details Viewed", {
-                                                        "ID": asset.id,
-                                                        "Tool Name": asset.title,
-                                                        "Linked Projects": asset.milestones.map(({ milestone }: any) => milestone),
+                                                        "ID": tool.id,
+                                                        "Tool Name": tool.title,
+                                                        "Linked Projects": tool.milestones.map(({ milestone }: any) => milestone),
                                                         // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                         // we flatten them into a single list that can be parsed
-                                                        "Linked Project Types": asset.milestones.flatMap(({ milestone }: any) =>
+                                                        "Linked Project Types": tool.milestones.flatMap(({ milestone }: any) =>
                                                             (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                                                         )
                                                     })
                                                 }}>
-                                                    <TableRow key={asset.id} className="cursor-pointer">
+                                                    <TableRow key={tool.id} className="cursor-pointer">
                                                         <TableCell>
                                                             <div>
-                                                                {asset.title} {asset.private && <PrivateBadge iconOnly={true} />}
+                                                                {tool.title} {tool.private && <PrivateBadge iconOnly={true} />}
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>
                                                             <div className="line-clamp-3">
-                                                                {asset.description}
+                                                                {tool.description}
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>
                                                             <ul className="flex flex-col gap-2">
-                                                                {asset.contacts.map((contact: any, index: number) => (
+                                                                {tool.contacts.map((contact: any, index: number) => (
                                                                     <li key={index}>
                                                                         {contact.name || contact.email || contact.affiliation}
                                                                     </li>
@@ -138,14 +138,14 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     </TableRow>
                                                 </DialogTrigger>
                                                 <DialogContent>
-                                                    <AssetDetails asset={asset} />
+                                                    <AssetDetails tool={tool} />
                                                 </DialogContent>
                                             </Dialog>
                                         ))}
                                     </TableBody>
                                 </Table>
                             )}
-                            {assets.filter(asset => asset.pinned).length <= 0 && (
+                            {tools.filter(tool => tool.pinned).length <= 0 && (
                                 isPrivate
                                     ? <PrivateNoPinnedAssets /> 
                                     : <PublicNoPinnedAssets />
@@ -158,16 +158,16 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
     }
 }
 
-export const AssetDetails = ({asset}: {asset: any}) => {
+export const AssetDetails = ({tool}: {tool: any}) => {
     return (
         <ScrollArea className={"max-h-[600px] -mr-2 pr-3"}>
             <DialogHeader>
-                <DialogTitle>{asset.title}</DialogTitle>
-                <DialogDescription>{asset.description}</DialogDescription>
+                <DialogTitle>{tool.title}</DialogTitle>
+                <DialogDescription>{tool.description}</DialogDescription>
             </DialogHeader>
 
             <ul className="pt-2 w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                {(asset.milestones || []).map((milestone: any, index: number) => {
+                {(tool.milestones || []).map((milestone: any, index: number) => {
                     return (
                         <li key={index}>
                             <PropertyBadge icon={FileText}>
@@ -177,7 +177,7 @@ export const AssetDetails = ({asset}: {asset: any}) => {
                     )
                 })}
 
-                {(asset.contacts || []).map((contact: any, index: number) => {
+                {(tool.contacts || []).map((contact: any, index: number) => {
                     return (
                         <li key={index}>
                             <PropertyBadge icon={User}>
@@ -189,7 +189,7 @@ export const AssetDetails = ({asset}: {asset: any}) => {
                     )
                 })}
 
-                {(asset.attachments || []).map((attachment: any, index: number) => {
+                {(tool.attachments || []).map((attachment: any, index: number) => {
                     return (
                         <li key={index}>
                             <PropertyBadge icon={LinkIcon}>
