@@ -131,39 +131,39 @@ export async function getMembers(organizationId: string | null | undefined) {
 }
 
 /* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
-export async function getAssets(organizationId: string | undefined) {
-    if (!organizationId) {
-        return {success: false, error: "No organization id provided."};
-    }
+// export async function getAssets(organizationId: string | undefined) {
+//     if (!organizationId) {
+//         return {success: false, error: "No organization id provided."};
+//     }
 
-    try {
-        const fetchedAssets = await prisma?.asset.findMany({
-            where: {organizationId},
-            include: {
-                contacts: true,
-                attachments: true,
-                milestones: {
-                    include: {
-                        milestone: true
-                    }
-                }
-            },
-            orderBy: [{ createdAt: "desc" }]
-        })
+//     try {
+//         const fetchedAssets = await prisma?.asset.findMany({
+//             where: {organizationId},
+//             include: {
+//                 contacts: true,
+//                 attachments: true,
+//                 milestones: {
+//                     include: {
+//                         milestone: true
+//                     }
+//                 }
+//             },
+//             orderBy: [{ createdAt: "desc" }]
+//         })
 
-        if (!fetchedAssets) {
-            return {success: false, error: "tools not found"}
-        }
+//         if (!fetchedAssets) {
+//             return {success: false, error: "tools not found"}
+//         }
 
-        return {
-            success: true,
-            data: fetchedAssets
-        }
-    } catch (error: any) {
-        logError("Error fetching tools", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
+//         return {
+//             success: true,
+//             data: fetchedAssets
+//         }
+//     } catch (error: any) {
+//         logError("Error fetching tools", error);
+//         return {success: false, error: "Internal server error"};
+//     }
+// }
 
 export async function getRFPs(organizationId: string | undefined) {
     if (!organizationId) {
@@ -383,7 +383,7 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
                         contacts: true,
                         attachments: true,
                         types: {include: { milestoneType: true }},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     orderBy: [{ createdAt: "desc" }]
@@ -867,12 +867,12 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
 }
 
 export async function getToolsAnalytics(orgId?: string | undefined) {
-    const totalTools: number = (await prisma.asset.findMany({
+    const totalTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId
         }
     })).length
-    const totalPinnedTools: number = (await prisma.asset.findMany({
+    const totalPinnedTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId,
             pinned: true
