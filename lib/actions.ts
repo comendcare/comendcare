@@ -207,8 +207,8 @@ export const createCondition = withAuth(
         const existingDatabasesAndStudies = formData.get("existingDatabasesAndStudies")
             ? (formData.get("existingDatabasesAndStudies") as string).split(",")
             : [];
-        const assetsUnderDevelopment = formData.get("assetsUnderDevelopment")
-            ? (formData.get("assetsUnderDevelopment") as string).split(",")
+        const toolsUnderDevelopment = formData.get("toolsUnderDevelopment")
+            ? (formData.get("toolsUnderDevelopment") as string).split(",")
             : [];
 
         try {
@@ -229,7 +229,7 @@ export const createCondition = withAuth(
                     associatedSystems,
                     associatedSignsAndSymptoms,
                     existingDatabasesAndStudies,
-                    assetsUnderDevelopment,
+                    toolsUnderDevelopment,
                 }
             });
 
@@ -920,7 +920,7 @@ export const updateRoadmap = withOrganizationAuth(
                         contacts: true,
                         attachments: true,
                         types: {include: {milestoneType: true}},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     orderBy: [{createdAt: "desc"}]
@@ -1760,10 +1760,10 @@ export const updateCondition = withOrganizationAuth(
 )
 
 export const deleteAsset = withOrganizationAuth(
-    async (_: Organization, assetId: string) => {
+    async (_: Organization, toolId: string) => {
         try {
-            const response = await prisma.asset.delete({
-                where: {id: assetId},
+            const response = await prisma.tool.delete({
+                where: {id: toolId},
                 include: {
                     contacts: true,
                     attachments: true,
@@ -1786,15 +1786,15 @@ export const deleteAsset = withOrganizationAuth(
 )
 
 export const createOrUpdateAsset = withOrganizationAuth(
-    async (organization: Organization, assetData: Partial<Asset>) => {
+    async (organization: Organization, toolData: Partial<Asset>) => {
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
 
-            const response = await prisma.asset.upsert({
+            const response = await prisma.tool.upsert({
                 where: {
-                    id: assetData.id || nanoid()
+                    id: toolData.id || nanoid()
                 },
                 include: {
                     contacts: true,
@@ -1808,12 +1808,12 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     }
                 },
                 update: {
-                    title: assetData.title,
-                    description: assetData.description,
+                    title: toolData.title,
+                    description: toolData.description,
                     attachments: {
                         deleteMany: {}, // clear all existing attachments
                         createMany: {
-                            data: (assetData?.attachments || []).map((attachment: any) => ({
+                            data: (toolData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
                                 ...(attachment.name ? {name: attachment.name} : undefined)
                             }))
@@ -1822,7 +1822,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     contacts: {
                         deleteMany: {},
                         createMany: {
-                            data: (assetData?.contacts || []).map((contact: any) => ({
+                            data: (toolData?.contacts || []).map((contact: any) => ({
                                 name: contact.name,
                                 email: contact.email,
                                 ...(contact.role ? {role: contact.role} : undefined),
@@ -1832,24 +1832,24 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     },
                     milestones: {
                         deleteMany: {},
-                        create: (assetData.milestones || []).map((milestone: any) => ({
+                        create: (toolData.milestones || []).map((milestone: any) => ({
                             milestone: {
                                 connect: {id: milestone.milestoneId}
                             }
                         }))
                     },
-                    private: assetData.private || false,
-                    pinned: assetData.pinned || false,
+                    private: toolData.private || false,
+                    pinned: toolData.pinned || false,
                 },
                 create: {
                     // create with the given id if it's available. This is useful for situations like 'undo'
-                    // where we're re-creating a pre-existing asset, and the id should match the id in our zustand state
-                    ...(assetData.id ? {id: assetData.id} : undefined),
-                    title: assetData.title || "",
-                    description: assetData.description,
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(toolData.id ? {id: toolData.id} : undefined),
+                    title: toolData.title || "",
+                    description: toolData.description,
                     attachments: {
                         createMany: {
-                            data: (assetData?.attachments || []).map((attachment: any) => ({
+                            data: (toolData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
                                 ...(attachment.name ? {name: attachment.name} : undefined)
                             }))
@@ -1857,7 +1857,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     },
                     contacts: {
                         createMany: {
-                            data: (assetData?.contacts || []).map((contact: any) => ({
+                            data: (toolData?.contacts || []).map((contact: any) => ({
                                 name: contact.name,
                                 email: contact.email,
                                 ...(contact.role ? {role: contact.role} : undefined),
@@ -1866,14 +1866,14 @@ export const createOrUpdateAsset = withOrganizationAuth(
                         }
                     },
                     milestones: {
-                        create: (assetData.milestones || []).map((milestone: any) => ({
+                        create: (toolData.milestones || []).map((milestone: any) => ({
                             milestone: {
                                 connect: {id: milestone.milestoneId}
                             }
                         }))
                     },
-                    private: assetData.private || false,
-                    pinned: assetData.pinned || false,
+                    private: toolData.private || false,
+                    pinned: toolData.pinned || false,
                     organization: {connect: {id: organization.id}}
                 },
             })
@@ -2157,7 +2157,7 @@ export const createRoadmap = withOrganizationAuth(
                         contacts: true,
                         attachments: true,
                         types: {include: {milestoneType: true}},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     }
                 },
@@ -2324,7 +2324,7 @@ export const updateDBFlow = withOrganizationAuth(
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
-                    assets: {include: {asset: true}},
+                    tools: {include: {tool: true}},
                     rfps: {include: {rfp: true}}
                 },
                 where: {roadmapId}
@@ -2368,7 +2368,7 @@ export const createMilestones = withOrganizationAuth(
                             attachments: true,
                             roadmap: true,
                             types: {include: {milestoneType: true}},
-                            assets: {include: {asset: true}},
+                            tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
                         data: {
@@ -2387,10 +2387,10 @@ export const createMilestones = withOrganizationAuth(
                                     }
                                 }))
                             },
-                            assets: {
-                                create: (milestone?.assets || []).map((asset: any) => ({
-                                    asset: {
-                                        connect: {id: asset.assetId}
+                            tools: {
+                                create: (milestone?.tools || []).map((tool: any) => ({
+                                    tool: {
+                                        connect: {id: tool.toolId}
                                     }
                                 }))
                             },
@@ -2530,7 +2530,7 @@ export const createNodes = withOrganizationAuth(
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
-                    assets: {include: {asset: true}},
+                    tools: {include: {tool: true}},
                     rfps: {include: {rfp: true}}
                 },
                 where: {roadmapId}
@@ -2544,7 +2544,7 @@ export const createNodes = withOrganizationAuth(
             //         const document = response.map((r: any) => ({
             //             ...r,
             //             RFPId_exists: response.RFP ? true : false,
-            //             assetId_exists: response.asset ? true : false
+            //             toolId_exists: response.tool ? true : false
             //         }))
             //         console.log(`Add typesense document`, document)
             //         await addTypeSenseDocument(
@@ -2649,7 +2649,7 @@ export const updateEdges = withOrganizationAuth(
 
 /* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
 export const syncDBAssets = withOrganizationAuth(
-    async (_: Organization, {assets}: { assets: Asset[] }) => {
+    async (_: Organization, {tools}: { tools: Asset[] }) => {
         try {
             let updateAssets: Asset[] = []
             const session = await getSession()
@@ -2657,9 +2657,9 @@ export const syncDBAssets = withOrganizationAuth(
             if (!session?.user.organizationId) throw new Error("No session available")
 
             await Promise.all(
-                assets.map(async (asset: Asset) => {
-                    const previousAsset: Asset | null = await prisma.asset.findUnique({
-                        where: {id: asset.id},
+                tools.map(async (tool: Asset) => {
+                    const previousAsset: Asset | null = await prisma.tool.findUnique({
+                        where: {id: tool.id},
                         include: {
                             contacts: true,
                             attachments: true,
@@ -2672,20 +2672,20 @@ export const syncDBAssets = withOrganizationAuth(
                     })
 
                     if (!previousAsset) {
-                        // if the asset does not exist, re-create it
-                        const a = await createOrUpdateAsset(session.user.organizationId, asset)
+                        // if the tool does not exist, re-create it
+                        const a = await createOrUpdateAsset(session.user.organizationId, tool)
                         updateAssets = [...updateAssets, a]
                     } else {
-                        // if the asset does exist, update it's properties
+                        // if the tool does exist, update it's properties
                         updateAssets = [...updateAssets, previousAsset]
                     }
                 })
             )
 
-            // delete any assets that no longer exist
-            // const dbAssetIds = await prisma.asset.findMany({
+            // delete any tools that no longer exist
+            // const dbAssetIds = await prisma.tool.findMany({
             //     where: {organizationId: session.user.organizationId}
-            // }).map(asset => )
+            // }).map(tool => )
 
             return {success: true, data: updateAssets}
         } catch (e) {
@@ -2722,7 +2722,7 @@ export const syncDBRFPs = withOrganizationAuth(
                         const r = await createOrUpdateRFP(session.user.organizationId, rfp)
                         updateRfps = [...updateRfps, r]
                     } else {
-                        // if the asset does exist, update it's properties
+                        // if the tool does exist, update it's properties
                         updateRfps = [...updateRfps, previousRfp]
                     }
                 })
@@ -2757,7 +2757,7 @@ export const updateMilestones = withOrganizationAuth(
                             contacts: true,
                             attachments: true,
                             types: {include: {milestoneType: true}},
-                            assets: {include: {asset: true}},
+                            tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         }
                     })
@@ -2776,7 +2776,7 @@ export const updateMilestones = withOrganizationAuth(
                             attachments: true,
                             roadmap: true,
                             types: {include: {milestoneType: true}},
-                            assets: {include: {asset: true}},
+                            tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
                         data: {
@@ -2789,11 +2789,11 @@ export const updateMilestones = withOrganizationAuth(
                                     }
                                 }))
                             },
-                            assets: {
+                            tools: {
                                 deleteMany: {},
-                                create: (milestone.assets || []).map((asset: any) => ({
-                                    asset: {
-                                        connect: {id: asset.assetId || asset.asset.id}
+                                create: (milestone.tools || []).map((tool: any) => ({
+                                    tool: {
+                                        connect: {id: tool.toolId || tool.tool.id}
                                     }
                                 }))
                             },
@@ -2852,7 +2852,7 @@ export const updateMilestones = withOrganizationAuth(
             //         const document = response.map((r: any) => ({
             //             ...r,
             //             RFPId_exists: response.RFP ? true : false,
-            //             assetId_exists: response.asset ? true : false
+            //             toolId_exists: response.tool ? true : false
             //         }))
             //         console.log(`Update typesense document`, document)
             //         await updateTypeSenseDocument(

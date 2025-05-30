@@ -44,7 +44,7 @@ import { useShallow } from "zustand/react/shallow"
 import mixpanel from "mixpanel-browser"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
-// import { DeleteAssetDialog } from "./delete-asset-dialog"
+// import { DeleteAssetDialog } from "./delete-tool-dialog"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -74,7 +74,7 @@ const editAssetForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional()
 })
 
-const assetSelector = (state: AssetState) => ({
+const toolSelector = (state: AssetState) => ({
     createAsset: state.createAsset,
     updateAsset: state.updateAsset
 })
@@ -82,11 +82,11 @@ const assetSelector = (state: AssetState) => ({
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditAssetForm({
-    assetData,
+    toolData,
     numAssetsPinned,
     closeDialog
 }: {
-    assetData: Partial<Asset>,
+    toolData: Partial<Asset>,
     numAssetsPinned: number,
     closeDialog?: () => void
 }) {
@@ -94,20 +94,20 @@ export function EditAssetForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
-    const { createAsset, updateAsset } = useAssetStore(useShallow(assetSelector))
+    const { createAsset, updateAsset } = useAssetStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editAssetForm>>({
         mode: "onChange",
         resolver: zodResolver(editAssetForm),
         defaultValues: {
-            title: assetData?.title || "",
-            description: assetData?.description || "",
-            attachments: assetData?.attachments || undefined,
-            isPinned: assetData?.pinned || false,
-            isPrivate: assetData?.private !== undefined ? assetData?.private : true,
-            contacts: assetData?.contacts || undefined,
-            milestones: (assetData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+            title: toolData?.title || "",
+            description: toolData?.description || "",
+            attachments: toolData?.attachments || undefined,
+            isPinned: toolData?.pinned || false,
+            isPrivate: toolData?.private !== undefined ? toolData?.private : true,
+            contacts: toolData?.contacts || undefined,
+            milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
         }
     })
 
@@ -136,14 +136,14 @@ export function EditAssetForm({
         console.log(`save`, values)
 
         const updateData: Partial<Asset> = {
-            ...assetData,
+            ...toolData,
             title,
-            pinned: (isPrivate === false && isPinned) || false, // only save pinned if asset is public
+            pinned: (isPrivate === false && isPinned) || false, // only save pinned if tool is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
                     milestoneId: milestone.id,
-                    assetId: assetData.id  || '',
+                    toolId: toolData.id  || '',
                 })
             }),
             ...(description !== undefined && description !== null ? {description} : undefined),
@@ -162,7 +162,7 @@ export function EditAssetForm({
         }
 
         try {
-            if (assetData.id) {
+            if (toolData.id) {
                 await updateAsset(updateData, session.user.organizationId)
                 toast.success(
                     "Tool updated successfully!",
@@ -202,8 +202,8 @@ export function EditAssetForm({
                 console.error(milestonesResponse.error)
             }
 
-            // trigger a form validation if we're editing an asset, if the imported data is not valid, let the user know right away
-            if (Object.keys(assetData).length > 0) form.trigger()
+            // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
+            if (Object.keys(toolData).length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -286,7 +286,7 @@ export function EditAssetForm({
                                             </div>
                                             <FormControl className="justify-self-end">
                                                 <Button 
-                                                    disabled={!assetData.pinned && numAssetsPinned >= 5}
+                                                    disabled={!toolData.pinned && numAssetsPinned >= 5}
                                                     variant="ghost" 
                                                     onClick={(e) => {
                                                         e.preventDefault()
@@ -301,7 +301,7 @@ export function EditAssetForm({
                                     )}
                                 />
                             </TooltipTrigger>
-                            {!assetData.pinned && numAssetsPinned >= 5 && (
+                            {!toolData.pinned && numAssetsPinned >= 5 && (
                                 <TooltipContent className="max-w-[200px]">
                                     <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
                                 </TooltipContent>
@@ -340,7 +340,7 @@ export function EditAssetForm({
                             Delete Tool
                         </Button>
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            <DeleteAssetDialog assetId={assetData.id} closeDialog={closeDialog}/>
+                            <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
                         <DialogClose disabled={!form.formState.isValid}>
                             <Button

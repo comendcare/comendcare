@@ -51,7 +51,7 @@ const data = {
                 //     title: "Assets",
                 //     icon: Star,
                 //     variant: "ghost",
-                //     url: `/app/assets`,
+                //     url: `/app/tools`,
                 //     subPages: []
                 // },
                 // {

@@ -33,7 +33,7 @@ import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import { Calendar, CircleDollarSign, Ellipsis, ExternalLink, Megaphone, Plus, Star, Trash, User } from "lucide-react"
-import { Asset as DBAsset, RFP as DBRFP } from "@prisma/client"
+import { Tool as DBAsset, RFP as DBRFP } from "@prisma/client"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
 
@@ -234,10 +234,10 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                             </PropertyBadge>
                         </li>
                     )}
-                    {(props.data?.assets || []).map((asset, index) => (
+                    {(props.data?.tools || []).map((tool, index) => (
                         <li key={index}>
                             <PropertyBadge icon={Star}>
-                                <p>{asset.asset?.title}</p>
+                                <p>{tool.tool?.title}</p>
                             </PropertyBadge>
                         </li>
                     ))}

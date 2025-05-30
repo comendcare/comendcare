@@ -832,7 +832,7 @@ async function createConditions(organizationIds: string[]) {
             associatedGenes: ["GEL3", "M4SF"],
             associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
             existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
-            assetsUnderDevelopment: ["Mouse model", "Cell line"],
+            toolsUnderDevelopment: ["Mouse model", "Cell line"],
             organizations: {
                 create: {
                     organizationId: organizationIds[0]
@@ -859,7 +859,7 @@ async function createConditions(organizationIds: string[]) {
             associatedGenes: ["ARC1", "NEU4"],
             associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],
             existingDatabasesAndStudies: ["Arcadion Patient Registry", "Arcadion Disease Natural History Study"],
-            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"],
+            toolsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"],
             organizations: {
                 create: {
                     organizationId: organizationIds[1]
