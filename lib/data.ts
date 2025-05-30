@@ -1,6 +1,6 @@
 import { Briefcase, FlaskConical, Users } from "lucide-react"
 
-export const bioassets = [
+export const biotools = [
     {
         "image": "https://github.com/vercel.png",
         "name": "Patient-Derived Cell Lines",

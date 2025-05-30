@@ -43,7 +43,7 @@ export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: 
                         {`Create your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditAssetForm toolData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
             </DialogContent>
         </Dialog>
     )
@@ -71,7 +71,7 @@ export const EditAssetDialog = ({children, data, numAssetsPinned}: {children: Re
                         {`Edit your Tool here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditAssetForm toolData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
             </DialogContent>
         </Dialog>
     )

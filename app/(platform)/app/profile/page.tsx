@@ -57,7 +57,7 @@ export default async function ProfilePage() {
     }
 
     if (organization && organization?.subdomain) {
-        const [roadmaps, assets, rfps] = await Promise.all([
+        const [roadmaps, tools, rfps] = await Promise.all([
             getPublicRoadmapsForOrganization(organization.subdomain),
             getPublicAssetsForOrganization(organization.subdomain),
             getPublicRFPsForOrganization(organization.subdomain, {
@@ -160,7 +160,7 @@ export default async function ProfilePage() {
                                     <div className="flex flex-col gap-4 relative">
                                         <PAGProfileAssetsAndRFPsHoverableCard
                                             isPrivate={true}
-                                            assets={assets}
+                                            tools={tools}
                                             rfps={rfps}
                                         />
                                         <RoadmapsCard roadmaps={roadmaps} organization={organization}/>

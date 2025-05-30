@@ -67,7 +67,7 @@ const newPharmaProjectSchema = z.object({
     systems: z.array(optionSchema).optional(),
     symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
-    assets: z.array(optionSchema).optional(),
+    tools: z.array(optionSchema).optional(),
 })
 
 

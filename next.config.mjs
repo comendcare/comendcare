@@ -31,7 +31,7 @@ const nextConfig = {
             },
             {
                 protocol: "https",
-                hostname: "assets.aceternity.com",
+                hostname: "tools.aceternity.com",
                 port: "",
                 pathname: "**"
             },

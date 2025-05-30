@@ -16,7 +16,7 @@ declare module "@tanstack/react-table" {
 
 export const columns: ColumnDef<Asset>[] = [
     {
-        accessorKey: "asset.title",
+        accessorKey: "tool.title",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Name" />
         ),
@@ -29,7 +29,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Name" }
     },
     {
-        accessorKey: "asset.description",
+        accessorKey: "tool.description",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Description" />
         ),
@@ -42,7 +42,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Description" }
     },
     {
-        accessorKey: "asset.private",
+        accessorKey: "tool.private",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Visibility" />
         ),
@@ -55,7 +55,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Private" }
     },
     {
-        accessorKey: "asset.milestones",
+        accessorKey: "tool.milestones",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Linked Projects" />
         ),
@@ -72,7 +72,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Linked Projects" }
     },
     {
-        accessorKey: "asset.contacts",
+        accessorKey: "tool.contacts",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Contacts" />
         ),
@@ -89,7 +89,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Contacts" }
     },
     {
-        accessorKey: "asset.links",
+        accessorKey: "tool.links",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Links" />
         ),
@@ -106,7 +106,7 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Links" }
     },
     {
-        accessorKey: "asset.pinned",
+        accessorKey: "tool.pinned",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Pinned"/>
         ),
@@ -120,7 +120,7 @@ export const columns: ColumnDef<Asset>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => <AssetActionsMenu asset={row.original}/>,
+        cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,
         enableHiding: false,
         meta: { name: "Actions" }
     },

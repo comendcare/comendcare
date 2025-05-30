@@ -1,5 +1,5 @@
 import {
-    Asset as DBAsset,
+    Tool as DBAsset,
     Comment,
     Company,
     ConditionToOrganization,
@@ -71,7 +71,7 @@ export type Roadmap = Prisma.RoadmapGetPayload<{
                 contacts: true,
                 attachments: true,
                 types: {include: { milestoneType: true }},
-                assets: {include: {asset: true}},
+                tools: {include: {tool: true}},
                 rfps: {include: {rfp: true}}
             },
             orderBy: [{ createdAt: "desc" }]
@@ -81,7 +81,7 @@ export type Roadmap = Prisma.RoadmapGetPayload<{
     }
 }>
 
-export type Asset = Omit<Prisma.AssetGetPayload<{
+export type Asset = Omit<Prisma.ToolGetPayload<{
     include: {
         contacts: true,
         attachments: true,
@@ -95,8 +95,8 @@ export type Asset = Omit<Prisma.AssetGetPayload<{
     }
 }>, "milestones"> & {
     milestones: Array<{
-        asset?: DBAsset,
-        assetId: string,
+        tool?: DBAsset,
+        toolId: string,
         milestone?: DBMilestone,
         milestoneId: string,
     }>
@@ -129,19 +129,19 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         roadmap: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
-        assets: { include: { asset: true, assetId: true, milestoneId: true } },
+        tools: { include: { tool: true, toolId: true, milestoneId: true } },
         rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
     }
-}>, ("types" | "assets" | "rfps")> & {
+}>, ("types" | "tools" | "rfps")> & {
     types: Array<{
         milestoneType?: MilestoneType; // Optional
         milestoneId?: string; // Optional
         milestoneTypeId: string; // Required
     }>,
-    assets: Array<{
-        asset?: DBAsset,
+    tools: Array<{
+        tool?: DBAsset,
         milestoneId?: string,
-        assetId: string
+        toolId: string
     }>,
     rfps: Array<{
         rfp?: DBRFP,
@@ -168,7 +168,7 @@ export const optionSchema = z.object({
 })
 
 export type AssetTableData = Asset & {
-    asset: Asset
+    tool: Asset
 }
 
 export type SavedCompanyData = SavedCompany & {

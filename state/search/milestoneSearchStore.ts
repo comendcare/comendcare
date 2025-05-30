@@ -66,8 +66,8 @@ function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
     // }
 
     // if (filters.hasAsset) {
-    //     filtersList.push(`assetId_exists:=true`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}assetId_exists:=true`)
+    //     filtersList.push(`toolId_exists:=true`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}toolId_exists:=true`)
     // }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
