@@ -20,7 +20,7 @@ export default function FAQ() {
     useEffect(() => {
         const init = async () => {
             const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
-            const {pages} = await getNotionDatabaseAndContents(faqDBKey)
+            const {pages} = await getNotionDatabaseAndContents(faqDBKey, {sorts: [{property: 'Order', direction: 'ascending'}]})
 
             const filteredPages: Blog[] = pages
                 .map((page: any) => {

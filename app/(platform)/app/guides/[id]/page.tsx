@@ -71,7 +71,11 @@ export default async function NotionDynamicPage({
 	const json = await res.json()
 
 	try {
-		return <NotionPage recordMap={json.recordMap} rootPageId={params.id} />
+		return (
+			<div className="-mt-[68px]">
+				<NotionPage recordMap={json.recordMap} rootPageId={params.id} />
+			</div>
+		)
 	} catch (error) {
 			console.error('Failed to fetch page:', error)
 	}

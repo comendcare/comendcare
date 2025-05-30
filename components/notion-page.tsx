@@ -53,15 +53,15 @@ export function NotionPage({
 
 	return (
 		<NotionRenderer
-			className="-mt-12 bg-transparent"
+			className="bg-transparent"
 			recordMap={recordMap}
 			fullPage={true}
 			darkMode={false}
 			rootPageId={rootPageId}
 			disableHeader={true}
-			// header={(<></>)}
-			// pageHeader={(<></>)}
-			// pageTitle={(<></>)}
+			header={(<></>)}
+			pageHeader={(<></>)}
+			pageTitle={(<></>)}
 		/>
 	)
 }
