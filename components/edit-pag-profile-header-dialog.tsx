@@ -9,12 +9,25 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from "@/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Button} from "@/components/ui/button";
 import {updateOrganization} from "@/lib/actions";
@@ -25,7 +38,7 @@ import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import MoneyInput from "@/components/money-input";
 import {years} from "@/lib/utils";
-import { Pencil } from "lucide-react";
+import {Pencil} from "lucide-react";
 
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
@@ -59,6 +72,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     });
 
     useEffect(() => {
+        console.log("Resetting form with organization data:", organization);
         editOrgForm.reset({
             name: organization.name || "",
             founded: organization.yearFounded || "",
@@ -72,14 +86,16 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     }, [organization, editOrgForm]);
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        console.log("Form submitted with values:", values);
+
         if (!session?.user?.organizationId) {
+            console.error("No organization ID found in session.");
             toast.error("You're not signed into an organization right now.");
             return;
         }
 
         const formData = new FormData();
 
-        // Map form values to Prisma schema fields
         const fieldMapping: Record<string, string> = {
             name: "name",
             subdomain: "subdomain",
@@ -88,19 +104,15 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             description: "description",
             website: "website",
             incorporationStatus: "incorporationStatus",
-            image: "image",
-            headerImage: "headerImage",
             raised: "moneyRaised",
             budget: "researchBudget",
             deployed: "moneyDeployed",
         };
 
-        // Populate FormData with mapped fields
         Object.entries(values).forEach(([key, value]) => {
             const mappedKey = fieldMapping[key];
             if (mappedKey && value !== undefined && value !== null) {
                 if (Array.isArray(value)) {
-                    // Handle array fields (e.g., `interestedModalities`)
                     formData.append(mappedKey, JSON.stringify(value));
                 } else {
                     formData.append(mappedKey, value.toString());
@@ -108,8 +120,11 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             }
         });
 
+        console.log("Submitting FormData:", [...formData.entries()]);
+
         try {
             await updateOrganization(session.user.organizationId, formData);
+            console.log("Organization update success");
             toast.success("Organization profile updated successfully!");
             setOpen(false);
             router.refresh();
@@ -120,23 +135,23 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(state) => {
+            console.log("Dialog open state changed:", state);
+            setOpen(state);
+        }}>
             <DialogTrigger asChild>
                 <Button
                     variant="ghost"
                     className="organization-profile-tour-step3"
+                    onClick={() => console.log("DialogTrigger clicked")}
                 >
-                    <Pencil />
+                    <Pencil/>
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        Edit Organization Profile
-                    </DialogTitle>
-                    <DialogDescription>
-                        {`Update your organization's details.`}
-                    </DialogDescription>
+                    <DialogTitle>Edit Organization Profile</DialogTitle>
+                    <DialogDescription>Update your organization's details.</DialogDescription>
                 </DialogHeader>
                 <Tabs defaultValue="organization">
                     <TabsList>
@@ -153,19 +168,18 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                         <FormMessage/>
                                     </FormItem>
                                 )}/>
-
                                 <FormField
                                     control={editOrgForm.control}
                                     name="founded"
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Year Founded</FormLabel>
-                                            {/*<FormDescription>*/}
-                                            {/*    Select the year your organization was founded.*/}
-                                            {/*</FormDescription>*/}
                                             <Select
-                                                onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
-                                                defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
+                                                onValueChange={(value) => {
+                                                    console.log("Year selected:", value);
+                                                    field.onChange(`${value}-01-01`);
+                                                }}
+                                                defaultValue={field.value?.split("-")[0]}
                                             >
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -174,10 +188,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                 </FormControl>
                                                 <SelectContent>
                                                     {years.map((year) => (
-                                                        <SelectItem
-                                                            key={year}
-                                                            value={year.toString()}
-                                                        >
+                                                        <SelectItem key={year} value={year.toString()}>
                                                             {year}
                                                         </SelectItem>
                                                     ))}
@@ -187,17 +198,18 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                         </FormItem>
                                     )}
                                 />
-
                                 <FormField
                                     control={editOrgForm.control}
                                     name="incorporationStatus"
                                     render={({field}) => (
                                         <FormItem className="space-y-3">
-                                            <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
-                                            {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
+                                            <FormLabel>What is your 501(c)(3) status?</FormLabel>
                                             <FormControl>
                                                 <RadioGroup
-                                                    onValueChange={field.onChange}
+                                                    onValueChange={(value) => {
+                                                        console.log("Radio selected:", value);
+                                                        field.onChange(value);
+                                                    }}
                                                     defaultValue={field.value}
                                                     value={field.value}
                                                     className="flex flex-col space-y-1"
@@ -207,7 +219,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="YES"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`Yes, I have a 501(c)(3)`}
+                                                            Yes, I have a 501(c)(3)
                                                         </FormLabel>
                                                     </FormItem>
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
@@ -215,7 +227,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="INPROGRESS"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`No, but I'm working on it`}
+                                                            No, but I'm working on it
                                                         </FormLabel>
                                                     </FormItem>
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
@@ -223,7 +235,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="NO"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`No, I don't have a 501(c)(3)`}
+                                                            No, I don't have a 501(c)(3)
                                                         </FormLabel>
                                                     </FormItem>
                                                 </RadioGroup>
@@ -232,7 +244,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                         </FormItem>
                                     )}
                                 />
-                                <Button type="submit">Save</Button>
+                                <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>
+                                    Save
+                                </Button>
                             </form>
                         </Form>
                     </TabsContent>
@@ -245,22 +259,21 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                     description="The total amount of funding raised to date by your patient group."
                                     name="raised"
                                 />
-
                                 <MoneyInput
                                     form={editOrgForm}
                                     label="Total funds deployed to research"
                                     description="The total amount of money deployed to research to date."
                                     name="deployed"
                                 />
-
                                 <MoneyInput
                                     form={editOrgForm}
                                     label="Annual research budget"
                                     description="The amount of money allocated to advancing research this year."
                                     name="budget"
                                 />
-
-                                <Button type="submit">Save</Button>
+                                <Button type="submit" onClick={() => console.log("Save (Finances tab) clicked")}>
+                                    Save
+                                </Button>
                             </form>
                         </Form>
                     </TabsContent>
