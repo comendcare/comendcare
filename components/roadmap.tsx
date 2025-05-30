@@ -28,7 +28,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "./ui/dialog"
-import { ArrowLeft, Ellipsis, ExternalLink, Import, Info, Pencil, Plus, Redo2, Share, Undo2, Wand2, Workflow } from "lucide-react"
+import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Import, Info, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -639,6 +639,16 @@ const RoadmapHeader = ({
                     </TooltipContent>
                 </Tooltip>
                 <StageOfActivityBadge milestones={milestones} />
+                {milestones.filter(milestone => !milestone.private).length <= 0 && (
+                    <Tooltip>
+                        <TooltipTrigger className="px-2">
+                            <TriangleAlert className="text-orange-600"/>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-80">
+                            {`All of the projects in your research plan are private. This research plan will appear as 'under development' on your public profile. Change a project's visibility to public, to show it off on your public profile.`}
+                        </TooltipContent>
+                    </Tooltip>
+                )}
             </span>
 
             <span className="onborda-create-a-project flex flex-row items-center gap-x-1 justify-end">
