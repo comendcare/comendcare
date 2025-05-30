@@ -240,7 +240,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                                 onClick={async () => {
                                                     // delete research plan, and reroute the user back to the research plans page
                                                     if (researchPlanData?.id) {
-                                                        await deleteRoadmap(new FormData(), researchPlanData.id, null)
+                                                        await deleteRoadmap(session?.user.organizationId, researchPlanData.id, null)
                                                         router.push('/app/research-plan')
                                                         router.refresh()
                                                     }

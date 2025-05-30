@@ -290,7 +290,7 @@ export function withAuth(action: any) {
         ...args: any
     ) => {
         const session = await getSession()
-        if (!session) {
+        if (!session || !session?.user?.id) {
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -343,30 +343,6 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
     }
 }
 
-// export function withUserAuth(action: any) {
-//     return async (
-//         userId: string | null | undefined,
-//         ...args: any
-//     ) => {
-//         const session = await getSession()
-//         if (!session) {
-//             return {error: "Not authenticated: could not find session data"}
-//         }
-
-//         if (!userId) return {error: "Not authorized: userId not provided"}
-
-//         const user = await prisma.user.findUnique({
-//             where: {id: userId},
-//         })
-
-//         if (!user) return {error: "Not authorized: user doesn't exist"}
-
-//         // if this user didn't create this item
-
-//         return action(user, ...args)
-//     }
-// }
-
 export function withOrganizationAttributeAuth(action: any) {
     return async (
         formData: FormData | null,
@@ -391,35 +367,5 @@ export function withOrganizationAttributeAuth(action: any) {
         }
 
         return action(formData, organization, key)
-    }
-}
-
-export function withRoadmapAuth(action: any) {
-    return async (
-        formData: FormData | null,
-        roadmapId: string,
-        key: string | null
-    ) => {
-        const session = await getSession()
-        if (!session?.user.id) {
-            return {
-                error: "Not authenticated"
-            }
-        }
-        const roadmap = await prisma.roadmap.findUnique({
-            where: {
-                id: roadmapId
-            },
-            include: {
-                organization: true,
-            }
-        })
-        if (!roadmap) {
-            return {
-                error: "Roadmap not found"
-            }
-        }
-
-        return action(formData, roadmap, key)
     }
 }
