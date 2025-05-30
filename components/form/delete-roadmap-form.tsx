@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { deleteRoadmap } from "@/lib/actions"
 import va from "@vercel/analytics"
 import { initializeRoadmapState } from "@/lib/initialize-client-state"
+import { useSession } from "next-auth/react"
 
 export default function DeleteRoadmapForm({
     roadmapName
@@ -16,13 +17,14 @@ export default function DeleteRoadmapForm({
 }) {
     const { id } = useParams() as { id: string }
     const router = useRouter()
+    const {data: session} = useSession()
     return (
         <form
             action={async (data: FormData) => {
                 window.confirm(
                     "Are you sure you want to delete your roadmap?"
                 ) &&
-                (await deleteRoadmap(data, id, "delete").then(res => {
+                (await deleteRoadmap(session?.user?.organizationId, id, "delete").then(res => {
                     if (res.error) {
                         toast.error(res.error)
                     } else {
