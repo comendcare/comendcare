@@ -2,6 +2,7 @@ import { ProfilePhoto } from "@/components/profile-photo"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { getNotionPage } from "@/lib/notion"
 import { House } from "lucide-react"
+import FAQFeedback from "../components/faq-feedback"
 
 export default async function GuideArticleLayout({
     params,
@@ -73,6 +74,7 @@ export default async function GuideArticleLayout({
                 </div>
             </header>
             {children}
+            <FAQFeedback title={title} description={description}/>
         </div>
     )
 }

@@ -39,7 +39,7 @@ export default function FAQFeedbackThumbs({
                 >
                     <div className="flex flex-row items-center space-x-4">
                         <ThumbsDown className="w-12 h-12" />
-                        <h3 className="text-base font-semibold leading-6 text-gray-900 m-0">
+                        <h3 className="text-base leading-6 text-gray-900 m-0">
                             No
                         </h3>
                     </div>
