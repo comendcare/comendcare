@@ -867,12 +867,12 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
 }
 
 export async function getToolsAnalytics(orgId?: string | undefined) {
-    const totalTools: number = (await prisma.asset.findMany({
+    const totalTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId
         }
     })).length
-    const totalPinnedTools: number = (await prisma.asset.findMany({
+    const totalPinnedTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId,
             pinned: true

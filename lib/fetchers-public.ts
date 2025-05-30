@@ -115,7 +115,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             types: { include: { milestoneType: true } },
                             tools: { 
                                 include: { 
-                                    asset: {
+                                    tool: {
                                         include: { 
                                             milestones: {
                                                 include: {
@@ -133,7 +133,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                                     }, 
                                 }, 
                                 where: { 
-                                    asset: {
+                                    tool: {
                                         private: {
                                             equals: false
                                         }
@@ -187,7 +187,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                     types: { include: { milestoneType: true } },
                     tools: { 
                         include: { 
-                            asset: {
+                            tool: {
                                 include: { 
                                     milestones: {
                                         include: {
@@ -205,7 +205,7 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             }, 
                         }, 
                         where: { 
-                            asset: {
+                            tool: {
                                 private: {
                                     equals: false
                                 }
@@ -332,7 +332,7 @@ export async function getPublicMilestoneDetails(id: string) {
                 types: { include: { milestoneType: true } },
                 tools: { 
                     include: { 
-                        asset: {
+                        tool: {
                             include: { 
                                 milestones: {
                                     include: {
@@ -350,7 +350,7 @@ export async function getPublicMilestoneDetails(id: string) {
                         }, 
                     }, 
                     where: { 
-                        asset: {
+                        tool: {
                             private: {
                                 equals: false
                             }
