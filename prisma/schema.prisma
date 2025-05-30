@@ -26,7 +26,7 @@ enum OrganizationToCompanyEngagement {
 model User {
   id                    String                 @id @default(cuid())
   name                  String? /// @encrypted
-  nameHash              String?                @unique /// @encryption:hash(name)
+  nameHash              String? /// @encryption:hash(name)
   username              String?
   gh_username           String?
   email                 String?                @unique /// @encrypted
@@ -38,23 +38,23 @@ model User {
   deletedAt             DateTime?
   kanbanLastVisit       DateTime               @default(now())
   address1              String? /// @encrypted
-  address1Hash          String?                @unique /// @encryption:hash(address1)
+  address1Hash          String? /// @encryption:hash(address1)
   address2              String? /// @encrypted
-  address2Hash          String?                @unique /// @encryption:hash(address2)
+  address2Hash          String? /// @encryption:hash(address2)
   city                  String? /// @encrypted
-  cityHash              String?                @unique /// @encryption:hash(city)
+  cityHash              String? /// @encryption:hash(city)
   country               String? /// @encrypted
-  countryHash           String?                @unique /// @encryption:hash(country)
+  countryHash           String? /// @encryption:hash(country)
   formattedAddress      String? /// @encrypted
-  formattedAddressHash  String?                @unique /// @encryption:hash(formattedAddress)
+  formattedAddressHash  String? /// @encryption:hash(formattedAddress)
   postalCode            String? /// @encrypted
-  postalCodeHash        String?                @unique /// @encryption:hash(postalCode)
+  postalCodeHash        String? /// @encryption:hash(postalCode)
   region                String? /// @encrypted
-  regionHash            String?                @unique /// @encryption:hash(region)
+  regionHash            String? /// @encryption:hash(region)
   lat                   String? /// @encrypted
-  latHash               String?                @unique /// @encryption:hash(lat)
+  latHash               String? /// @encryption:hash(lat)
   lng                   String? /// @encrypted
-  lngHash               String?                @unique /// @encryption:hash(lng)
+  lngHash               String? /// @encryption:hash(lng)
   notificationSettings  Boolean                @default(false)
   consentSettings       Boolean                @default(false)
   accounts              Account[]
@@ -101,7 +101,7 @@ model Member {
   role           String       @default("member") @db.VarChar
   title          String?
   email          String /// @encrypted
-  emailHash      String?      @unique /// @encryption:hash(email)
+  emailHash      String? /// @encryption:hash(email)
   userId         String
   invitedById    String?
   meta           Json?
@@ -468,7 +468,7 @@ model ExternalAttachment {
 model ExternalContact {
   id          String  @id @unique @default(uuid())
   name        String /// @encrypted
-  nameHash    String? @unique /// @encryption:hash(name)
+  nameHash    String? /// @encryption:hash(name)
   role        String?
   email       String /// @encrypted
   emailHash   String? @unique /// @encryption:hash(email)
@@ -501,7 +501,7 @@ model Organization {
   published                 Boolean                   @default(true)
   name                      String?
   description               String?                   @db.Text
-  contactEmail              String? /// @encrypted
+  contactEmail              String?                   @unique /// @encrypted
   contactEmailHash          String?                   @unique /// @encryption:hash(contactEmail)
   logo                      String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
   font                      String                    @default("font-cal")
