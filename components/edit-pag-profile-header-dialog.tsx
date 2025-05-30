@@ -120,7 +120,10 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             }
         });
 
-        console.log("Submitting FormData:", [...formData.entries()]);
+        console.log("Submitting FormData:");
+        for (const pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+        }
 
         try {
             await updateOrganization(session.user.organizationId, formData);
@@ -151,7 +154,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>
-                    <DialogDescription>Update your organization's details.</DialogDescription>
+                    <DialogDescription>{`Update your organization's details.`}</DialogDescription>
                 </DialogHeader>
                 <Tabs defaultValue="organization">
                     <TabsList>
@@ -227,7 +230,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="INPROGRESS"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            No, but I'm working on it
+                                                            {`No, but I'm working on it`}
                                                         </FormLabel>
                                                     </FormItem>
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
@@ -235,7 +238,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="NO"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            No, I don't have a 501(c)(3)
+                                                            {`No, I don't have a 501(c)(3)`}
                                                         </FormLabel>
                                                     </FormItem>
                                                 </RadioGroup>
