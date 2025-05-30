@@ -13,6 +13,7 @@ import Link from "next/link";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
 import { PublicNoResearchPlans } from "@/components/no-research-plans";
+import { Prisma } from "@prisma/client";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -45,11 +46,23 @@ export default async function OrganizationHomePage({
     params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const [organization, roadmaps, assets, rfps] = await Promise.all([
+    const [organization, roadmaps, tools, rfps] = await Promise.all([
         getOrganizationData(domain),
         getPublicRoadmapsForOrganization(domain),
         getPublicAssetsForOrganization(domain),
-        getPublicRFPsForOrganization(domain)
+        getPublicRFPsForOrganization(domain, {
+            title: true,
+            description: true,
+            openTo: true,
+            startDate: true,
+            endDate: true,
+            budget: true,
+            headerImage: true,
+            pinned: true,
+            contacts: true,
+            attachments: true,
+            milestones: true
+        })
     ])
 
     if (!organization) {
@@ -64,7 +77,7 @@ export default async function OrganizationHomePage({
             contacts: true,
             attachments: true,
             types: { include: { milestoneType: true } },
-            assets: { include: { asset: true } },
+            tools: { include: { tool: true } },
             rfps: { include: { rfp: true } }
         }
     })
@@ -119,10 +132,10 @@ export default async function OrganizationHomePage({
                         </div>
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
-                            {(assets.filter(a => a.pinned).length > 0 || rfps.filter(r => r.pinned).length > 0) && (
+                            {(tools.filter(a => a.pinned).length > 0 || rfps.filter(r => r.pinned).length > 0) && (
                                 <PAGProfileAssetsAndRFPsHoverableCard
                                     isPrivate={false}
-                                    assets={assets}
+                                    tools={tools}
                                     rfps={rfps}
                                 />
                             )}

@@ -12,7 +12,7 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
         contacts: true,
         attachments: true,
         types: { include: { milestoneType: true } }
-        assets: { include: { asset: true } },
+        tools: { include: { tool: true } },
         rfps: { include: { rfp: true } }
     }
 }>

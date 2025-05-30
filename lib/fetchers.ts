@@ -8,13 +8,294 @@ import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPE
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
-import {Condition} from "@prisma/client";
+import {Condition, Prisma} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
+import { InternalArgs } from "@prisma/client/runtime/library"
 
-export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
+/* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
+export async function getPublicAssetsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const tools = await prisma.tool.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            },
+            private: {equals: false}
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {
+                    milestone: {
+                        include: { types: { include: { milestoneType: true } } }
+                    }
+                }
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return tools
+}
+
+export async function getPublicRFPsForOrganization(
+    domain: string, 
+    select: Prisma.RFPSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const rfps = await prisma.rFP.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            },
+            private: {equals: false}
+        },
+        select:{
+            ...select,
+            // filter out any private milestones if the user has requested to access milestones
+            milestones: select.milestones ? ({
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
+            }) : undefined
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return rfps
+}
+
+export async function getPublicRoadmapsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const roadmaps = prisma.roadmap.findMany({
+        where: {
+            // organization: subdomain
+            //     ? {subdomain}
+            //     : {customDomain: domain},
+            organization: {
+                subdomain: subdomain,
+            },
+            // published: true
+        },
+        // select: {
+        //     title: true,
+        //     description: true,
+        //     slug: true,
+        //     image: true,
+        //     imageBlurhash: true,
+        //     createdAt: true,
+        // },
+        include: {
+            nodes: {
+                include: {
+                    data: {
+                        include: {
+                            node: true,
+                            contacts: true,
+                            attachments: true,
+                            types: { include: { milestoneType: true } },
+                            tools: { 
+                                include: { 
+                                    tool: {
+                                        include: { 
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    tool: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            },
+                            rfps: { 
+                                include: { 
+                                    rfp: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    rfp: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            }
+                        }
+                    }
+                },
+                where: {
+                    data: {private: false}
+                },
+                orderBy: [{ createdAt: "desc" }]
+            },
+            edges: true,
+            milestones: {
+                where: {
+                    private: false
+                },
+                include: {
+                    node: true,
+                    contacts: true,
+                    attachments: true,
+                    types: { include: { milestoneType: true } },
+                    tools: { 
+                        include: { 
+                            tool: {
+                                include: { 
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            tool: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    },
+                    rfps: { 
+                        include: { 
+                            rfp: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            rfp: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    }
+                },
+                orderBy: [{ createdAt: "desc" }]
+            },
+        },
+        orderBy: [{ createdAt: "desc" }]
+    })
+    return roadmaps
+
+    // return await unstable_cache(
+    //     async () => {
+    //         const roadmaps = prisma.roadmap.findMany({
+    //             where: {
+    //                 // organization: subdomain
+    //                 //     ? {subdomain}
+    //                 //     : {customDomain: domain},
+    //                 organization: {
+    //                     subdomain: subdomain,
+    //                 },
+    //                 // published: true
+    //             },
+    //             // select: {
+    //             //     title: true,
+    //             //     description: true,
+    //             //     slug: true,
+    //             //     image: true,
+    //             //     imageBlurhash: true,
+    //             //     createdAt: true,
+    //             // },
+    //             include: {
+    //                 nodes: {
+    //                     include: {
+    //                         data: true
+    //                     }
+    //                 },
+    //                 edges: true,
+    //                 milestones: {
+    //                     where: {
+    //                         private: false
+    //                     }
+    //                 },
+    //             },
+    //             orderBy: [
+    //                 {
+    //                     createdAt: "desc"
+    //                 }
+    //             ]
+    //         })
+    //         console.log(`roadmaps`, roadmaps)
+    //         return roadmaps
+    //     },
+    //     [`${domain}-roadmaps`],
+    //     {
+    //         revalidate: 900,
+    //         tags: [`${domain}-roadmaps`]
+    //     }
+    // )()
+}
+
+export async function getPublicConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
         const condition = await prisma.condition.findUnique({
             where: {slug},
@@ -128,277 +409,6 @@ export async function getCROData(id: string) {
     })
 }
 
-export async function getPublicAssetsForOrganization(domain: string) {
-    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : domain
-
-    const assets = await prisma.asset.findMany({
-        where: {
-            organization: {
-                subdomain: subdomain
-            },
-            private: {equals: false}
-        },
-        include: {
-            contacts: true,
-            attachments: true,
-            milestones: {
-                include: {
-                    milestone: {
-                        include: { types: { include: { milestoneType: true } } }
-                    }
-                }
-            }
-        },
-        orderBy: [{createdAt: "desc"}]
-    })
-
-    return assets
-}
-
-export async function getPublicRFPsForOrganization(domain: string) {
-    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : domain
-
-    const rfps = await prisma.rFP.findMany({
-        where: {
-            organization: {
-                subdomain: subdomain
-            },
-            private: {equals: false}
-        },
-        include: {
-            contacts: true,
-            attachments: true,
-            milestones: {
-                include: {milestone: true},
-                where: {milestone: {private: {equals: false}}}
-            }
-        },
-        orderBy: [{createdAt: "desc"}]
-    })
-
-    return rfps
-}
-
-export async function getPublicRoadmapsForOrganization(domain: string) {
-    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : domain
-
-    const roadmaps = prisma.roadmap.findMany({
-        where: {
-            // organization: subdomain
-            //     ? {subdomain}
-            //     : {customDomain: domain},
-            organization: {
-                subdomain: subdomain,
-            },
-            // published: true
-        },
-        // select: {
-        //     title: true,
-        //     description: true,
-        //     slug: true,
-        //     image: true,
-        //     imageBlurhash: true,
-        //     createdAt: true,
-        // },
-        include: {
-            nodes: {
-                include: {
-                    data: {
-                        include: {
-                            node: true,
-                            contacts: true,
-                            attachments: true,
-                            types: { include: { milestoneType: true } },
-                            assets: { 
-                                include: { 
-                                    asset: {
-                                        include: { 
-                                            milestones: {
-                                                include: {
-                                                    milestone: true
-                                                },
-                                                where: {
-                                                    milestone: {
-                                                        private: {
-                                                            equals: false
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }, 
-                                }, 
-                                where: { 
-                                    asset: {
-                                        private: {
-                                            equals: false
-                                        }
-                                    }
-                                } 
-                            },
-                            rfps: { 
-                                include: { 
-                                    rfp: {
-                                        include: {
-                                            milestones: {
-                                                include: {
-                                                    milestone: true
-                                                },
-                                                where: {
-                                                    milestone: {
-                                                        private: {
-                                                            equals: false
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }, 
-                                }, 
-                                where: { 
-                                    rfp: {
-                                        private: {
-                                            equals: false
-                                        }
-                                    }
-                                } 
-                            }
-                        }
-                    }
-                },
-                where: {
-                    data: {private: false}
-                },
-                orderBy: [{ createdAt: "desc" }]
-            },
-            edges: true,
-            milestones: {
-                where: {
-                    private: false
-                },
-                include: {
-                    node: true,
-                    contacts: true,
-                    attachments: true,
-                    types: { include: { milestoneType: true } },
-                    assets: { 
-                        include: { 
-                            asset: {
-                                include: { 
-                                    milestones: {
-                                        include: {
-                                            milestone: true
-                                        },
-                                        where: {
-                                            milestone: {
-                                                private: {
-                                                    equals: false
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }, 
-                        }, 
-                        where: { 
-                            asset: {
-                                private: {
-                                    equals: false
-                                }
-                            }
-                        } 
-                    },
-                    rfps: { 
-                        include: { 
-                            rfp: {
-                                include: {
-                                    milestones: {
-                                        include: {
-                                            milestone: true
-                                        },
-                                        where: {
-                                            milestone: {
-                                                private: {
-                                                    equals: false
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }, 
-                        }, 
-                        where: { 
-                            rfp: {
-                                private: {
-                                    equals: false
-                                }
-                            }
-                        } 
-                    }
-                },
-                orderBy: [{ createdAt: "desc" }]
-            },
-        },
-        orderBy: [{ createdAt: "desc" }]
-    })
-    return roadmaps
-
-    // return await unstable_cache(
-    //     async () => {
-    //         const roadmaps = prisma.roadmap.findMany({
-    //             where: {
-    //                 // organization: subdomain
-    //                 //     ? {subdomain}
-    //                 //     : {customDomain: domain},
-    //                 organization: {
-    //                     subdomain: subdomain,
-    //                 },
-    //                 // published: true
-    //             },
-    //             // select: {
-    //             //     title: true,
-    //             //     description: true,
-    //             //     slug: true,
-    //             //     image: true,
-    //             //     imageBlurhash: true,
-    //             //     createdAt: true,
-    //             // },
-    //             include: {
-    //                 nodes: {
-    //                     include: {
-    //                         data: true
-    //                     }
-    //                 },
-    //                 edges: true,
-    //                 milestones: {
-    //                     where: {
-    //                         private: false
-    //                     }
-    //                 },
-    //             },
-    //             orderBy: [
-    //                 {
-    //                     createdAt: "desc"
-    //                 }
-    //             ]
-    //         })
-    //         console.log(`roadmaps`, roadmaps)
-    //         return roadmaps
-    //     },
-    //     [`${domain}-roadmaps`],
-    //     {
-    //         revalidate: 900,
-    //         tags: [`${domain}-roadmaps`]
-    //     }
-    // )()
-}
-
 export async function getMembers(organizationId: string | null | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
@@ -425,13 +435,14 @@ export async function getMembers(organizationId: string | null | undefined) {
     }
 }
 
+/* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
 export async function getAssets(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
     }
 
     try {
-        const fetchedAssets = await prisma?.asset.findMany({
+        const fetchedAssets = await prisma?.tool.findMany({
             where: {organizationId},
             include: {
                 contacts: true,
@@ -677,7 +688,7 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
                         contacts: true,
                         attachments: true,
                         types: {include: { milestoneType: true }},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     orderBy: [{ createdAt: "desc" }]
@@ -917,9 +928,9 @@ export async function getPublicMilestoneDetails(id: string) {
                 contacts: true,
                 attachments: true,
                 types: { include: { milestoneType: true } },
-                assets: { 
+                tools: { 
                     include: { 
-                        asset: {
+                        tool: {
                             include: { 
                                 milestones: {
                                     include: {
@@ -937,7 +948,7 @@ export async function getPublicMilestoneDetails(id: string) {
                         }, 
                     }, 
                     where: { 
-                        asset: {
+                        tool: {
                             private: {
                                 equals: false
                             }
@@ -1235,12 +1246,12 @@ export async function getResearchPlansAnalytics(orgId?: string | undefined) {
 }
 
 export async function getToolsAnalytics(orgId?: string | undefined) {
-    const totalTools: number = (await prisma.asset.findMany({
+    const totalTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId
         }
     })).length
-    const totalPinnedTools: number = (await prisma.asset.findMany({
+    const totalPinnedTools: number = (await prisma.tool.findMany({
         where: {
             organizationId: orgId,
             pinned: true

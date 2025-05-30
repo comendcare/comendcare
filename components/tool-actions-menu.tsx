@@ -17,20 +17,20 @@ import { useSession } from "next-auth/react"
 import { Dialog, DialogPortal } from "./ui/dialog"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 
-const assetSelector = (state: AssetState) => ({
+const toolSelector = (state: AssetState) => ({
     createAsset: state.createAsset,
     updateAsset: state.updateAsset
 })
 
-export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
+export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
     const {data: session} = useSession()
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
-    const { createAsset } = useAssetStore(useShallow(assetSelector))
+    const { createAsset } = useAssetStore(useShallow(toolSelector))
 
     const handleDuplicate = () => {
-        if (session?.user?.organizationId) createAsset({...asset, id: undefined}, session.user.organizationId)
+        if (session?.user?.organizationId) createAsset({...tool, id: undefined}, session.user.organizationId)
     }
 
     const handleDelete = () => {
@@ -105,7 +105,7 @@ export const AssetActionsMenu = ({asset}: {asset: Asset}) => {
             <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
-                        <DeleteAssetDialog assetId={asset.id} />
+                        <DeleteAssetDialog toolId={tool.id} />
                     </div>
                 </DialogPortal>
             </Dialog>

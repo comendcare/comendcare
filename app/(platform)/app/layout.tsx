@@ -227,14 +227,14 @@ export default function AppLayout({children}: AppLayoutProps) {
             //     toast.error(response.error)
             // }
 
-            // init asset store
-            let assetResponse = await getAssets(session.user.organizationId)
-            if (assetResponse.success) {
-                initializeAssetsStore(assetResponse.data || [])
+            // init tool store
+            let toolResponse = await getAssets(session.user.organizationId)
+            if (toolResponse.success) {
+                initializeAssetsStore(toolResponse.data || [])
                 console.log(`Tools initialized...`)
             } else {
-                console.error(assetResponse.error)
-                toast.error(assetResponse.error)
+                console.error(toolResponse.error)
+                toast.error(toolResponse.error)
             }
 
             // init rfp store

@@ -226,10 +226,13 @@ export async function getNotionPage(id: string) {
         }
 }
 
-export async function getNotionDatabaseAndContents(id: string) {
+export async function getNotionDatabaseAndContents(id: string, sortBy?: {sorts: {property: string, direction: "ascending" | "descending"}[]}) {
     const client = new Client({ auth: process.env.NOTION_API_KEY })
     const database = await client.databases.retrieve({ database_id: id })
-    const content = await client.databases.query({database_id: id})
+    const content = await client.databases.query({
+        database_id: id,
+        ...(sortBy ? sortBy : undefined)
+    })
 
     // add page details to each page
     const pages = await Promise.all(content.results.map(async (result) => {

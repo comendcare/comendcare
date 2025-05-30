@@ -37,7 +37,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
-import {AssetToMilestone, MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
+import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
 import {getAssets, getOrganizationFromOrganizationId, getRFPs} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -131,7 +131,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
-    assets: z.array(z.custom<Asset>()).optional(),
+    tools: z.array(z.custom<Asset>()).optional(),
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
 }).refine(
@@ -185,7 +185,7 @@ export function EditMilestoneForm({
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || [],
-            assets: (milestoneData?.assets || []).map((asset: any) => asset.asset) || [],
+            tools: (milestoneData?.tools || []).map((tool: any) => tool.tool) || [],
             rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
@@ -205,7 +205,7 @@ export function EditMilestoneForm({
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo"),
-        assets: form.watch("assets"),
+        tools: form.watch("tools"),
         rfps: form.watch("rfps"),
         notes: form.watch("notes")
     }
@@ -229,7 +229,7 @@ export function EditMilestoneForm({
             isPrivate,
             contacts,
             openTo,
-            assets,
+            tools,
             rfps,
             notes
         } = values;
@@ -259,13 +259,13 @@ export function EditMilestoneForm({
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
-            assets: (assets || []).map((asset) => {
+            tools: (tools || []).map((tool) => {
                 return ({
                     milestoneId: milestoneData.id,
-                    assetId: asset.id,
-                    asset: asset
+                    toolId: tool.id,
+                    tool: tool
                 })
-            }).filter((asset) => asset !== undefined),
+            }).filter((tool) => tool !== undefined),
             rfps: (rfps || []).map((rfp) => {
                 return ({
                     milestoneId: milestoneData.id,
@@ -348,9 +348,9 @@ export function EditMilestoneForm({
                 //     setOrgIsPublished(response.data.published)
                 // }
 
-                const assetsResponse = await getAssets(session.user.organizationId)
-                if (assetsResponse.success && assetsResponse.data) {
-                    setFetchedAssets(assetsResponse.data || [])
+                const toolsResponse = await getAssets(session.user.organizationId)
+                if (toolsResponse.success && toolsResponse.data) {
+                    setFetchedAssets(toolsResponse.data || [])
                 }
 
                 const rfpsResponse = await getRFPs(session.user.organizationId)
@@ -594,15 +594,15 @@ export function EditMilestoneForm({
                                     <FormLabel>Linked Tools</FormLabel>
                                     <FormField
                                         control={form.control}
-                                        name="assets"
+                                        name="tools"
                                         render={({field}) => (
                                             <FormItem className="w-full">
                                                 <FormControl>
                                                     <MultipleSelector
-                                                        value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
+                                                        value={field.value?.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
                                                         onChange={field.onChange}
-                                                        defaultOptions={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
-                                                        options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
+                                                        defaultOptions={fetchedAssets.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
+                                                        options={fetchedAssets.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
                                                         hidePlaceholderWhenSelected={true}
                                                         showHoverCard={false}
                                                         placeholder="Link tools"

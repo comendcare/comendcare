@@ -5,24 +5,24 @@ import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@/lib/actions';
 import { mixpanelTrack } from '@/app/mixpanel';
 
 export interface AssetState {
-    assets: Asset[],
+    tools: Asset[],
     initialized: boolean,
-    initState: (assets: Asset[]) => void,
-    createAsset: (asset: Partial<Asset>, orgId: string) => Promise<void>,
-    updateAsset: (asset: Partial<Asset>, orgId: string) => Promise<void>,
-    deleteAsset: (assetId: string, orgId: string) => Promise<void>,
+    initState: (tools: Asset[]) => void,
+    createAsset: (tool: Partial<Asset>, orgId: string) => Promise<void>,
+    updateAsset: (tool: Partial<Asset>, orgId: string) => Promise<void>,
+    deleteAsset: (toolId: string, orgId: string) => Promise<void>,
     saveState: (orgId: string | null | undefined) => void,
 }
 
 export const useAssetStore = create<AssetState>()(
     temporal((set, get) => ({
-            assets: [],
+            tools: [],
             initialized: false,
-            initState: (assets: Asset[]) => {
-                set({assets, initialized: true})
+            initState: (tools: Asset[]) => {
+                set({tools, initialized: true})
             },
-            createAsset: async (asset: Partial<Asset>, orgId: string) => {
-                const newAsset = await createOrUpdateAsset(orgId, asset)
+            createAsset: async (tool: Partial<Asset>, orgId: string) => {
+                const newAsset = await createOrUpdateAsset(orgId, tool)
 
                 mixpanelTrack("Tool Created", {
                     "ID": newAsset.id,
@@ -36,11 +36,11 @@ export const useAssetStore = create<AssetState>()(
                 })
 
                 // new Tool first, because Tools are displayed in decending order by creation date
-                set({ assets: [newAsset, ...get().assets]})
+                set({ tools: [newAsset, ...get().tools]})
             },
-            updateAsset: async (asset: Partial<Asset>, orgId: string) => {
-                const updatedAsset = await createOrUpdateAsset(orgId, asset)
-                console.log(`updated asset`, updatedAsset)
+            updateAsset: async (tool: Partial<Asset>, orgId: string) => {
+                const updatedAsset = await createOrUpdateAsset(orgId, tool)
+                console.log(`updated tool`, updatedAsset)
 
                 mixpanelTrack("Tool Updated", {
                     "ID": updatedAsset.id,
@@ -52,10 +52,10 @@ export const useAssetStore = create<AssetState>()(
                         (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
-                set({ assets: get().assets.map(asset => asset.id === updatedAsset.id ? updatedAsset : asset) })
+                set({ tools: get().tools.map(tool => tool.id === updatedAsset.id ? updatedAsset : tool) })
             },
-            deleteAsset: async (assetId: string, orgId: string) => {
-                const deletedAsset = await deleteAsset(orgId, assetId)
+            deleteAsset: async (toolId: string, orgId: string) => {
+                const deletedAsset = await deleteAsset(orgId, toolId)
 
                 mixpanelTrack("Tool Deleted", {
                     "ID": deletedAsset.id,
@@ -67,17 +67,17 @@ export const useAssetStore = create<AssetState>()(
                         (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
-                set({ assets: get().assets.filter(asset => asset.id !== deletedAsset.id) })
+                set({ tools: get().tools.filter(tool => tool.id !== deletedAsset.id) })
             },
             saveState: (orgId: string | null | undefined) => {
                 console.log(`save state`)
-                syncDBAssets(orgId, { assets: get().assets })
+                syncDBAssets(orgId, { tools: get().tools })
             }
         }),
         {
             limit: 1, // limit the stored history states to 1 since we're only using this for the undo button right now
             onSave: (pastState, currentState) => {
-                console.log(`Saved assets state: `, currentState)
+                console.log(`Saved tools state: `, currentState)
                 return
             },
         })
