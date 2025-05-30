@@ -29,8 +29,6 @@ export const PublicFlowView = ({
     }
     const { fitView } = useReactFlow()
 
-    console.log(roadmap)
-
     useEffect(() => {
         if (urlMilestone && roadmap?.nodes) {
             const timer = setTimeout(() => {
