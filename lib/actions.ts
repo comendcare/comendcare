@@ -15,7 +15,7 @@ import {
     SavedCompany, Company
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAdminAuth, withAuth, withOrganizationAttributeAuth, withOrganizationAuth} from "./auth"
+import {withAdminAuth, withAuth, withOrganizationAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -682,7 +682,7 @@ export const updateOrganization = withOrganizationAuth(
     }
 );
 
-export const updateOrganizationAttribute = withOrganizationAttributeAuth(
+export const adminUpdateOrganizationAttribute = withAdminAuth(
     async (formData: FormData, organization: Organization, key: string) => {
         const value = formData.get(key) as string
 
