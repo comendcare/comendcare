@@ -12,7 +12,7 @@ import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
 import { customerIOTrack } from "@/lib/customer-io"
 import { mixpanelTrack, useMixpanelContext } from "@/app/mixpanel"
-import { createFAQFeedbackTicket } from "@/lib/notion"
+import { createGuidesFeedbackTicket } from "@/lib/notion"
 
 interface FAQFeedbackType {
     helpful?: boolean
@@ -38,7 +38,7 @@ export default function FAQFeedback({title, description}: {title: string, descri
     const handleSubmitFeedback = async (feedback: FAQFeedbackType) => {
         try {
             const path = window.location.toString()
-            mixpanelTrack("FAQ Feedback", {
+            mixpanelTrack("Guides Feedback", {
                 helpful: feedback.helpful,
                 ...(feedback.issueType
                     ? { issueType: feedback.issueType }
@@ -55,7 +55,7 @@ export default function FAQFeedback({title, description}: {title: string, descri
 
             await customerIOTrack({
                 userId: mixpanelContext?.distinctId,
-                event: "faq_feedback_sent",
+                event: "guides_feedback_sent",
                 properties: {
                     helpful: feedback.helpful ? "true" : "false",
                     name: feedback.name,
@@ -69,7 +69,7 @@ export default function FAQFeedback({title, description}: {title: string, descri
             })
 
             if (feedback.issueDescription) {
-                await createFAQFeedbackTicket({
+                await createGuidesFeedbackTicket({
                     name: feedback.name || "",
                     email: feedback.email || "",
                     helpful: feedback.helpful ? true : false,
