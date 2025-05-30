@@ -383,7 +383,7 @@ export async function getRoadmap(orgId: string | null | undefined, roadmapId: st
                         contacts: true,
                         attachments: true,
                         types: {include: { milestoneType: true }},
-                        assets: {include: {asset: true}},
+                        tools: {include: {tool: true}},
                         rfps: {include: {rfp: true}}
                     },
                     orderBy: [{ createdAt: "desc" }]
