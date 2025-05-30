@@ -31,7 +31,7 @@ ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
 -- CreateTable
 CREATE TABLE "AssetToMilestone" (
     "id" TEXT NOT NULL,
-    "toolId" TEXT,
+    "assetId" TEXT,
     "milestoneId" TEXT,
 
     CONSTRAINT "AssetToMilestone_pkey" PRIMARY KEY ("id")
@@ -47,7 +47,7 @@ CREATE TABLE "RFPToMilestone" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AssetToMilestone_toolId_milestoneId_key" ON "AssetToMilestone"("toolId", "milestoneId");
+CREATE UNIQUE INDEX "AssetToMilestone_assetId_milestoneId_key" ON "AssetToMilestone"("assetId", "milestoneId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RFPToMilestone_rfpId_milestoneId_key" ON "RFPToMilestone"("rfpId", "milestoneId");
@@ -56,7 +56,7 @@ CREATE UNIQUE INDEX "RFPToMilestone_rfpId_milestoneId_key" ON "RFPToMilestone"("
 ALTER TABLE "Asset" ADD CONSTRAINT "Asset_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AssetToMilestone" ADD CONSTRAINT "AssetToMilestone_toolId_fkey" FOREIGN KEY ("toolId") REFERENCES "Asset"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AssetToMilestone" ADD CONSTRAINT "AssetToMilestone_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AssetToMilestone" ADD CONSTRAINT "AssetToMilestone_milestoneId_fkey" FOREIGN KEY ("milestoneId") REFERENCES "Milestone"("id") ON DELETE CASCADE ON UPDATE CASCADE;
