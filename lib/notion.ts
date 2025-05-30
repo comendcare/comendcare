@@ -22,7 +22,7 @@ interface FAQFeedbackTicketData {
     article_path: string
 }
 
-export async function createFAQFeedbackTicket(data: FAQFeedbackTicketData) {
+export async function createGuidesFeedbackTicket(data: FAQFeedbackTicketData) {
     const client = new Client({ auth: process.env.NOTION_API_KEY })
     const newTicket = await client.pages.create({
         parent: {
@@ -34,7 +34,7 @@ export async function createFAQFeedbackTicket(data: FAQFeedbackTicketData) {
                 title: [
                     {
                         text: {
-                            content: `FAQ Feedback from ${data.name}`
+                            content: `Guides Feedback from ${data.name}`
                         }
                     }
                 ]
@@ -95,7 +95,7 @@ export async function createFAQFeedbackTicket(data: FAQFeedbackTicketData) {
                     rich_text: [
                         {
                             text: {
-                                content: "FAQ Article"
+                                content: "Guides Article"
                             }
                         }
                     ]
@@ -116,7 +116,7 @@ export async function createFAQFeedbackTicket(data: FAQFeedbackTicketData) {
         ]
     })
 
-    console.log(`New FAQ Feedback ticket created`, newTicket)
+    console.log(`New Guides Feedback ticket created`, newTicket)
 }
 
 export async function createFeedbackTicket(data: FeedbackTicketData) {

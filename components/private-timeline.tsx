@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import { cn } from "@/lib/utils"
@@ -188,12 +188,12 @@ const DraggableTimelineItem = ({
     milestone, 
     index, 
     selectedNodeId, 
-    disabled
+    disabled,
 }: {
     milestone: Milestone, 
     index: number, 
     selectedNodeId: string | null, 
-    disabled: boolean
+    disabled: boolean,
 }) => {
     const {
         attributes,
@@ -204,6 +204,7 @@ const DraggableTimelineItem = ({
         isDragging
     } = useSortable({id: milestone.id})
     const {setSelectedNodeId} = useRoadmapStore(useShallow(selector))
+    const elementRef = useRef<HTMLDivElement>(null);
 
     const style = {
         transition,
@@ -211,6 +212,25 @@ const DraggableTimelineItem = ({
         touchAction: "none",
         userSelect: "none" as any,
     }
+
+    useEffect(() => {
+        if (selectedNodeId && selectedNodeId === milestone.nodeId) {
+            console.log(`scroll to timeline element`)
+                const el = elementRef.current;
+                if (!el) return;
+
+                const rect = el.getBoundingClientRect();
+                const isVisible =
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+
+                if (!isVisible) {
+                    el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+        }
+    }, [selectedNodeId])
 
     return (
         <li 
@@ -261,6 +281,7 @@ const DraggableTimelineItem = ({
                 <TypeBadge iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
             </span>
             <div 
+                ref={elementRef}
                 className={cn(
                     "bg-card hover:bg-secondary w-full p-4 rounded-md", 
                     selectedNodeId === milestone.nodeId ? "border-primary border-2" : ""

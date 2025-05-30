@@ -12,7 +12,7 @@ import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
 import { customerIOTrack } from "@/lib/customer-io"
 import { mixpanelTrack, useMixpanelContext } from "@/app/mixpanel"
-import { createFAQFeedbackTicket } from "@/lib/notion"
+import { createGuidesFeedbackTicket } from "@/lib/notion"
 
 interface FAQFeedbackType {
     helpful?: boolean
@@ -27,7 +27,7 @@ interface FAQFeedbackType {
     issueDescription?: string
 }
 
-export default function FAQFeedback() {
+export default function FAQFeedback({title, description}: {title: string, description: string}) {
     const pathWithoutAnchor = usePathname().split("#")[0]
     const [submitted, setSubmitted] = useState(false)
     const { mixpanelContext } = useMixpanelContext()
@@ -35,25 +35,10 @@ export default function FAQFeedback() {
     // thumbs up/down, radio buttons (for more details), feedback text form, for even more details
     const [feedback, setFeedback] = useState<FAQFeedbackType>({})
 
-    const getArticleData = (): {
-        prompt: string | undefined
-        description: string | undefined
-        href: string
-    } => {
-        const articleData = articles.find(
-            article => article.href === pathWithoutAnchor
-        )
-        return {
-            prompt: articleData?.prompt,
-            description: articleData?.description,
-            href: window.location.toString()
-        }
-    }
-
     const handleSubmitFeedback = async (feedback: FAQFeedbackType) => {
         try {
-            const article = getArticleData()
-            mixpanelTrack("FAQ Feedback", {
+            const path = window.location.toString()
+            mixpanelTrack("Guides Feedback", {
                 helpful: feedback.helpful,
                 ...(feedback.issueType
                     ? { issueType: feedback.issueType }
@@ -63,36 +48,36 @@ export default function FAQFeedback() {
                 ...(feedback.issueDescription
                     ? { issueDescription: feedback.issueDescription }
                     : undefined),
-                article_prompt: article.prompt,
-                article_description: article.description,
-                article_path: article.href
+                article_prompt: title,
+                article_description: description,
+                article_path: path
             })
 
             await customerIOTrack({
                 userId: mixpanelContext?.distinctId,
-                event: "faq_feedback_sent",
+                event: "guides_feedback_sent",
                 properties: {
                     helpful: feedback.helpful ? "true" : "false",
                     name: feedback.name,
                     email: feedback.email,
                     issue_type: feedback.issueType,
                     issue_description: feedback.issueDescription,
-                    article_prompt: article.prompt,
-                    article_description: article.description,
-                    article_path: article.href
+                    article_prompt: title,
+                    article_description: description,
+                    article_path: path
                 }
             })
 
             if (feedback.issueDescription) {
-                await createFAQFeedbackTicket({
+                await createGuidesFeedbackTicket({
                     name: feedback.name || "",
                     email: feedback.email || "",
                     helpful: feedback.helpful ? true : false,
                     issue_type: feedback.issueType || "",
                     issue_description: feedback.issueDescription || "",
-                    article_prompt: article.prompt || "",
-                    article_path: article.href || "",
-                    article_description: article.description || ""
+                    article_prompt: title || "",
+                    article_path: path || "",
+                    article_description: description || ""
                 })
             }
 
@@ -175,7 +160,6 @@ export default function FAQFeedback() {
                     <FAQFeedbackForm
                         issueType={feedback.issueType}
                         cancelCallback={() => {
-                            // console.log(`Canceled...`)
                             setFeedback({})
                         }}
                         feedbackCallback={(name, email, issueDescription) => {
