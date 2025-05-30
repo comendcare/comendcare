@@ -15,7 +15,7 @@ import {
     SavedCompany, Company
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAdminAuth, withAuth, withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
+import {withAdminAuth, withAuth, withOrganizationAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -682,7 +682,7 @@ export const updateOrganization = withOrganizationAuth(
     }
 );
 
-export const updateOrganizationAttribute = withOrganizationAttributeAuth(
+export const adminUpdateOrganizationAttribute = withAdminAuth(
     async (formData: FormData, organization: Organization, key: string) => {
         const value = formData.get(key) as string
 
@@ -871,31 +871,6 @@ export const deleteOrganization = withOrganizationAuth(
     ['owner']
 )
 
-// export const createRoadmap = withOrganizationAuth(
-//     async (_: FormData, organization: Organization) => {
-//         const session = await getSession()
-//         if (!session?.user.id) {
-//             return {
-//                 error: "Not authenticated"
-//             }
-//         }
-//         const response = await prisma.roadmap.create({
-//             data: {
-//                 organizationId: organization.id,
-//                 userId: session.user.id
-//             }
-//         })
-
-//         await revalidateTag(
-//             `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`
-//         )
-//         organization.customDomain &&
-//             (await revalidateTag(`${organization.customDomain}-roadmaps`))
-
-//         return response
-//     }
-// )
-
 // creating a separate function for this because we're not using FormData
 export const updateRoadmap = withOrganizationAuth(
     async (organizationId: string, data: Partial<Roadmap>) => {
@@ -971,8 +946,9 @@ export const updateRoadmap = withOrganizationAuth(
     }
 )
 
-export const updateRoadmapMetadata = withRoadmapAuth(
+export const updateRoadmapMetadata = withOrganizationAuth(
     async (
+        _: Organization,
         formData: FormData,
         roadmap: Roadmap & {
             organization: Organization
@@ -1044,8 +1020,8 @@ export const updateRoadmapMetadata = withRoadmapAuth(
     }
 )
 
-export const deleteRoadmap = withRoadmapAuth(
-    async (_: FormData, roadmap: Roadmap) => {
+export const deleteRoadmap = withOrganizationAuth(
+    async (_: Organization, roadmap: Roadmap) => {
         try {
             const response = await prisma.roadmap.delete({
                 where: {
@@ -1061,41 +1037,41 @@ export const deleteRoadmap = withRoadmapAuth(
                 error: error.message
             }
         }
-    }
+    },
+    ['owner']
 )
 
-export const editUser = async (
-    _id: unknown,
-    data: { [key: string]: unknown }
-) => {
-    const session = await getSession();
-    if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        };
-    }
-
-    try {
-        const response = await prisma.user.update({
-            where: {
-                id: session.user.id
-            },
-            data: data, // Pass the data object directly
-        });
-        return response;
-    } catch (error: any) {
-        if (error.code === "P2002") {
-            const field = Object.keys(data)[0]; // Identify which field caused the conflict
+export const editUser = withAuth(
+    async (_id: unknown, data: { [key: string]: unknown }) => {
+        const session = await getSession();
+        if (!session?.user.id) {
             return {
-                error: `This ${field} is already in use`
-            };
-        } else {
-            return {
-                error: error.message
+                error: "Not authenticated"
             };
         }
+
+        try {
+            const response = await prisma.user.update({
+                where: {
+                    id: session.user.id
+                },
+                data: data, // Pass the data object directly
+            });
+            return response;
+        } catch (error: any) {
+            if (error.code === "P2002") {
+                const field = Object.keys(data)[0]; // Identify which field caused the conflict
+                return {
+                    error: `This ${field} is already in use`
+                };
+            } else {
+                return {
+                    error: error.message
+                };
+            }
+        }
     }
-};
+)
 
 // Invite user function with updated Organization model
 export const inviteUser = withOrganizationAuth(
@@ -1560,7 +1536,8 @@ export const createPost = withAuth(
 export const deletePost = withAuth(
     async (postId: string) => {
         try {
-            const post = prisma.post.delete({
+            const session = await getSession()
+            const post = await prisma.post.delete({
                 where: {
                     id: postId
                 }
@@ -1568,6 +1545,11 @@ export const deletePost = withAuth(
 
             if (!post) {
                 return {success: false, error: "failed to delete post"};
+            }
+
+            // extra auth logic
+            if (post.authorId !== session?.user?.id) {
+                return {success: false, error: "Not authorized: only the user who created this post can delete it."}
             }
 
             return {success: true, data: post};
@@ -1670,6 +1652,11 @@ export const acceptInvitation = withAuth(
                     id: invitationId,
                 },
             });
+
+            // extra auth logic
+            if (invitation?.email !== session.user.email) {
+                return {success: false, error: "Error accepting invitation: active user email does not match the invite email."}
+            }
 
             if (!invitation || invitation.accepted) {
                 console.log("No valid invitation found or it has already been accepted.");
@@ -2174,31 +2161,6 @@ export const createRoadmap = withOrganizationAuth(
         // })
 
         // return finalRoadmap
-    }
-)
-
-export const deleteOrgRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapId: string) => {
-        try {
-            const response = await prisma.roadmap.delete({
-                where: {
-                    id: roadmapId,
-                    organizationId: organization.id
-                }
-            })
-
-            if (!response) {
-                return {success: false, error: 'roadmap not found'}
-            }
-
-            // Typesense - if updating typesense, update here...
-            // delete all roadmap milestones from typesense
-
-            return {success: true, data: response}
-        } catch (error: any) {
-            logError("Error deleting roadmap", error)
-            return {success: false, error: "Internal server error"}
-        }
     }
 )
 
@@ -3432,6 +3394,11 @@ export const editReview = withAuth(
                 return {success: false, error: "No existing review found to update."};
             }
 
+            // extra auth logic here
+            if (existingReview.authorId !== session.user.id) {
+                return {success: false, error: "Not authorized: only the user who created this review can edit it."}
+            }
+
             const title = formData.get("title") as string;
             const body = formData.get("body") as string;
             const rating = parseInt(formData.get("rating") as string);
@@ -3493,9 +3460,15 @@ export const editReview = withAuth(
 export const deleteReview = withOrganizationAuth(
     async (_: Organization, review: Review) => {
         try {
-            const response = prisma.review.delete({
+            const session = await getSession()
+            const response = await prisma.review.delete({
                 where: {id: review.id},
             });
+
+            // extra auth logic
+            if (response.authorId !== session?.user.id) {
+                return {success: false, error: "Not authorized: only the user who created this review can delete it."}
+            }
 
             if (!response) {
                 console.error("Error deleting review.")
@@ -3511,9 +3484,7 @@ export const deleteReview = withOrganizationAuth(
 )
 
 export const saveCRO = withOrganizationAuth(
-    async (_: Organization, croId: string, milestoneId: string) => {
-        const session = await getSession()
-
+    async (organization: Organization, croId: string, milestoneId: string) => {
         try {
             const response = await prisma.savedCompany.create({
                 include: {
@@ -3528,7 +3499,7 @@ export const saveCRO = withOrganizationAuth(
                     },
                     organization: {
                         connect: {
-                            id: session?.user.organizationId
+                            id: organization.id
                         }
                     },
                     milestone: {
@@ -3557,8 +3528,6 @@ export const saveCRO = withOrganizationAuth(
 
 export const editSavedCRO = withOrganizationAuth(
     async (_: Organization, savedCROId: string, milestoneId: string) => {
-        const session = await getSession()
-
         try {
             const response = await prisma.savedCompany.update({
                 where: {
@@ -3703,11 +3672,6 @@ export const removeEmailFromWhitelist = withAdminAuth(
 
 export const createCompany = withAdminAuth(
     async (formData: FormData) => {
-        const session = await getSession()
-        if (!session?.user.id) {
-            return {error: "Not authenticated"}
-        }
-
         const title = formData.get("orgName") as string
         const description = formData.get("description") as string
         const yearEstablished = parseInt(formData.get("founded") as string)
@@ -3813,13 +3777,6 @@ export const deleteCompany = withAdminAuth(
 
 export const createPharmaProject = withAuth(
     async (formData: FormData) => {
-        const session = await getSession()
-        if (!session?.user.id) {
-            return {
-                error: "Not authenticated"
-            }
-        }
-
         const name = formData.get("name") as string;
 
         try {

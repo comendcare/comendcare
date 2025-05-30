@@ -8,6 +8,7 @@ import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
 import {User} from "next-auth";
+import { toast } from "sonner"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
@@ -261,14 +262,21 @@ export function withAdminAuth(action: any) {
     ) => {
         const session = await getSession()
         if (!session) {
+            toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
         const user = await prisma.user.findUnique({
             where: {id: session.user.id}
         })
-        if (!user) return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
-        if (!user.email) return {error: `Not authenticated: could not find email address in the database for user ${session.user.id}`}
+        if (!user) {
+            toast.error(`Not authenticated: could not find user data in the database for user ${session.user.id}`)
+            return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
+        }
+        if (!user.email) {
+            toast.error(`Not authenticated: could not find email address in the database for user ${session.user.id}`)
+            return {error: `Not authenticated: could not find email address in the database for user ${session.user.id}`}
+        }
 
         const adminUserEmailsList = process.env.ADMIN_WHITELIST?.split(",")
         if (!adminUserEmailsList?.includes(user.email)) return {error: `Not authenticated: email ${user.email} is not included in the admin whitelist.`}
@@ -290,7 +298,8 @@ export function withAuth(action: any) {
         ...args: any
     ) => {
         const session = await getSession()
-        if (!session) {
+        if (!session || !session?.user?.id) {
+            toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -319,6 +328,7 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
     ) => {
         const session = await getSession()
         if (!session) {
+            toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -330,8 +340,14 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
         })
         const membership = organization?.members.find(member => member.userId === session.user.id)
 
-        if (!organization) return {error: "Not authorized: organization doesn't exist"}
-        if (!membership) return {error: "Not authorized: user is not a member of this organziation"}
+        if (!organization) {
+            toast.error("Not authorized: organization doesn't exist")
+            return {error: "Not authorized: organization doesn't exist"}
+        }
+        if (!membership) {
+            toast.error("Not authorized: user is not a member of this organziation")
+            return {error: "Not authorized: user is not a member of this organziation"}
+        }
 
         if (roles) {
             if (!roles.includes(membership.role)) {
@@ -340,86 +356,5 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
         }
 
         return action(organization, ...args)
-    }
-}
-
-// export function withUserAuth(action: any) {
-//     return async (
-//         userId: string | null | undefined,
-//         ...args: any
-//     ) => {
-//         const session = await getSession()
-//         if (!session) {
-//             return {error: "Not authenticated: could not find session data"}
-//         }
-
-//         if (!userId) return {error: "Not authorized: userId not provided"}
-
-//         const user = await prisma.user.findUnique({
-//             where: {id: userId},
-//         })
-
-//         if (!user) return {error: "Not authorized: user doesn't exist"}
-
-//         // if this user didn't create this item
-
-//         return action(user, ...args)
-//     }
-// }
-
-export function withOrganizationAttributeAuth(action: any) {
-    return async (
-        formData: FormData | null,
-        organizationId: string,
-        key: string | null
-    ) => {
-        const session = await getSession()
-        if (!session) {
-            return {
-                error: "Not authenticated"
-            }
-        }
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: organizationId
-            }
-        })
-        if (!organization || organization.userId !== session.user.id) {
-            return {
-                error: "Not authorized"
-            }
-        }
-
-        return action(formData, organization, key)
-    }
-}
-
-export function withRoadmapAuth(action: any) {
-    return async (
-        formData: FormData | null,
-        roadmapId: string,
-        key: string | null
-    ) => {
-        const session = await getSession()
-        if (!session?.user.id) {
-            return {
-                error: "Not authenticated"
-            }
-        }
-        const roadmap = await prisma.roadmap.findUnique({
-            where: {
-                id: roadmapId
-            },
-            include: {
-                organization: true,
-            }
-        })
-        if (!roadmap) {
-            return {
-                error: "Roadmap not found"
-            }
-        }
-
-        return action(formData, roadmap, key)
     }
 }

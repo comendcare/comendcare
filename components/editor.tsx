@@ -71,6 +71,7 @@ export default function Editor({
                         formData.append("published", String(!data.published))
                         startTransitionPublishing(async () => {
                             await updateRoadmapMetadata(
+                                roadmap.organizationId,
                                 formData,
                                 roadmap.id,
                                 "published"
