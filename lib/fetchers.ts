@@ -1548,6 +1548,27 @@ export async function getUserWhitelist() {
     }
 }
 
+export async function getUserBlacklist() {
+    try {
+        const blacklist = await prisma.blacklist.findMany({
+            orderBy: { createdAt: "desc" },
+        })
+
+
+        if (!blacklist) {
+            return {success: false, error: "User blacklist not found"};
+        }
+
+        return {
+            success: true,
+            data: blacklist
+        };
+    } catch (error: any) {
+        logError("Error fetching blacklisted users", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getOverviewAnalytics() {
     const totalUsers = await prisma.user.count();
     const totalOrganizations = await prisma.organization.count();

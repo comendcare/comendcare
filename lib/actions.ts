@@ -3649,6 +3649,28 @@ export const addEmailToWhitelist = withAdminAuth(
     }
 )
 
+export const addEmailToBlacklist = withAdminAuth(
+    async (email: string) => {
+        try {
+            // Check if the user has already provided feedback for this review
+            // Otherwise, create new feedback
+            const response = await prisma.blacklist.create({
+                data: {
+                    email: email
+                },
+            });
+
+            revalidatePath("/admin/users/blacklist")
+
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error adding email to blacklist:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
+
 export const removeEmailFromWhitelist = withAdminAuth(
     async (email: string) => {
         try {
@@ -3665,6 +3687,27 @@ export const removeEmailFromWhitelist = withAdminAuth(
             return {success: true, data: response};
         } catch (error: any) {
             console.error("Error removing email to whitelist:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
+export const removeEmailFromBlacklist = withAdminAuth(
+    async (email: string) => {
+        try {
+            // Check if the user has already provided feedback for this review
+            // Otherwise, create new feedback
+            const response = await prisma.blacklist.delete({
+                where: {
+                    email: email
+                }
+            });
+
+            revalidatePath("/admin/users/blacklist")
+
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error removing email to blacklist:", error);
             return {success: false, error: "Database error. Please try again later."};
         }
     }
