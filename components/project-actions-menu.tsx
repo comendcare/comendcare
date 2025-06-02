@@ -16,7 +16,7 @@ import {Dialog, DialogContent, DialogPortal} from "./ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import ShareDialog from "@/components/share-dialog";
 import {toast} from "sonner";
-import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import {

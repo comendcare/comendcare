@@ -358,3 +358,29 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
         return action(organization, ...args)
     }
 }
+
+export function withUserAuth(action: any) {
+    return async (
+        userId: string | null | undefined,
+        ...args: any
+    ) => {
+        const session = await getSession()
+        if (!session) {
+            toast.error("Not authenticated: could not find session data")
+            return {error: "Not authenticated: could not find session data"}
+        }
+
+        if (!userId) return {error: "Not authorized: userId not provided"}
+        if (userId !== session.user.id) return {error: "Not authorized: provided userId does not matche userId in session"}
+
+        const user = await prisma.user.findUnique({
+            where: {id: userId}
+        })
+        if (!user) {
+            toast.error("Not authorized: user doesn't exist")
+            return {error: "Not authorized: user doesn't exist"}
+        }
+
+        return action(user, ...args)
+    }
+}

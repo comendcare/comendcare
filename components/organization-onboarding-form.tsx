@@ -33,7 +33,6 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {
     checkSubdomainAvailability,
     getAllNonMemberOrganizations,
-    getAllOrganizations,
     getOrganizationFromOrganizationId
 } from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";

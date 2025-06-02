@@ -4,16 +4,17 @@ import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
+import {ApiResponse, Asset, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
-import {getSession} from "@/lib/auth";
+import {getSession, withOrganizationAuth, withUserAuth} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
-import {Condition, Prisma} from "@prisma/client";
+import {Condition, Organization, Prisma, User} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 import { InternalArgs } from "@prisma/client/runtime/library"
+import { organizations } from "@/data/sample-pags"
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -395,102 +396,224 @@ export async function getMembers(organizationId: string | null | undefined) {
     }
 }
 
-/* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
-export async function getAssets(organizationId: string | undefined) {
-    if (!organizationId) {
-        return {success: false, error: "No organization id provided."};
-    }
-
+export async function getPublicUser(
+    userId: string,
+    select: Prisma.ConditionSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     try {
-        const fetchedAssets = await prisma?.tool.findMany({
-            where: {organizationId},
-            include: {
-                contacts: true,
-                attachments: true,
-                milestones: {
-                    include: {
-                        milestone: true
-                    }
-                }
-            },
-            orderBy: [{ createdAt: "desc" }]
+        const user = await prisma.user.findUnique({
+            // include: {organizations: true},
+            where: {id: userId},
+            select: {
+                
+            }
         })
 
-        if (!fetchedAssets) {
-            return {success: false, error: "tools not found"}
+        if (!user) {
+            return {success: false, error: "user not found"};
         }
 
         return {
             success: true,
-            data: fetchedAssets
-        }
-    } catch (error: any) {
-        logError("Error fetching tools", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getRFPs(organizationId: string | undefined) {
-    if (!organizationId) {
-        return {success: false, error: "No organization id provided."};
-    }
-
-    try {
-        const fetchedRFPs = await prisma?.rFP.findMany({
-            where: {organizationId},
-            include: {
-                contacts: true,
-                attachments: true,
-                milestones: {
-                    include: {
-                        milestone: true
-                    }
-                }
-            },
-            orderBy: [{ createdAt: "desc" }]
-        })
-
-        if (!fetchedRFPs) {
-            return {success: false, error: "RFPs not found"}
-        }
-
-        return {
-            success: true,
-            data: fetchedRFPs
-        }
-    } catch (error: any) {
-        logError("Error fetching RFPs", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getMilestones(organizationId: string | undefined) {
-    if (!organizationId) {
-        return {success: false, error: "No organization id provided."};
-    }
-
-    try {
-        const fetchedMilestones = await prisma?.milestone.findMany({
-            // include: {user: true},
-            where: {organizationId},
-            include: {roadmap: true}
-        })
-
-        if (!fetchedMilestones) {
-            return {success: false, error: "milestones not found"};
-        }
-
-        return {
-            success: true,
-            data: fetchedMilestones
+            data: user
         };
     } catch (error: any) {
-        logError("Error fetching members", error);
+        logError("Error fetching user", error);
         return {success: false, error: "Internal server error"};
     }
 }
 
-export async function getInvitations() {
+export async function getMilestoneTypes() {
+    try {
+        const types = await prisma.milestoneType.findMany({})
+
+        return {success: true, data: types}
+    } catch (error: any) {
+        console.error("Database error finding milestone types:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getPublicMilestoneDetails(id: string) {
+    try {
+        const milestone = await prisma.milestone.findUnique({
+            where: {id},
+            include: {
+                node: true,
+                contacts: true,
+                attachments: true,
+                types: { include: { milestoneType: true } },
+                tools: { 
+                    include: { 
+                        tool: {
+                            include: { 
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        tool: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                },
+                rfps: { 
+                    include: { 
+                        rfp: {
+                            include: {
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        rfp: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                }
+            }
+        })
+
+        return {success: true, data: milestone}
+    } catch (error: any) {
+        console.error("Database error finding milestone details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function checkSubdomainAvailability(nickname: string) {
+    try {
+        const existingOrg = await prisma.organization.findUnique({
+            where: {subdomain: nickname},
+        });
+
+        return !existingOrg
+    } catch (error: any) {
+        console.error("Database error checking subdomain availability:", error);
+        return {error: "Database error. Please try again later."};
+    }
+}
+
+/* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
+export const getAssets = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const fetchedAssets = await prisma?.tool.findMany({
+                where: {organizationId: organization.id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: true
+                        }
+                    }
+                },
+                orderBy: [{ createdAt: "desc" }]
+            })
+
+            if (!fetchedAssets) {
+                return {success: false, error: "tools not found"}
+            }
+
+            return {
+                success: true,
+                data: fetchedAssets
+            }
+        } catch (error: any) {
+            logError("Error fetching tools", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getRFPs = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const fetchedRFPs = await prisma?.rFP.findMany({
+                where: {organizationId: organization.id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: true
+                        }
+                    }
+                },
+                orderBy: [{ createdAt: "desc" }]
+            })
+
+            if (!fetchedRFPs) {
+                return {success: false, error: "RFPs not found"}
+            }
+
+            return {
+                success: true,
+                data: fetchedRFPs
+            }
+        } catch (error: any) {
+            logError("Error fetching RFPs", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getMilestones = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const fetchedMilestones = await prisma?.milestone.findMany({
+                where: {organizationId: organization.id},
+                include: {roadmap: true}
+            })
+
+            if (!fetchedMilestones) {
+                return {success: false, error: "milestones not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedMilestones
+            };
+        } catch (error: any) {
+            logError("Error fetching members", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getInvitations = async () => {
     const session = await getSession()
 
     try {
@@ -519,151 +642,148 @@ export async function getInvitations() {
     }
 }
 
-export async function getInvitees(organizationId: string | undefined) {
-    if (!organizationId) {
-        return {success: false, error: "No organization id provided."};
-    }
+export const getInvitees = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const fetchedInvitees = await prisma?.invitation.findMany({
+                where: {organizationId: organization.id, accepted: false},
+            })
 
-    try {
-        const fetchedInvitees = await prisma?.invitation.findMany({
-            where: {organizationId, accepted: false},
-        })
-
-        if (!fetchedInvitees) {
-            return {success: false, error: "invitees not found"};
-        }
-
-        return {
-            success: true,
-            data: fetchedInvitees
-        };
-    } catch (error: any) {
-        logError("Error fetching invitees", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getMemberRequestsWithUsers(organizationId: string | undefined): Promise<ApiResponse<any>> {
-    if (!organizationId) {
-        return {success: false, error: "No organization id provided."};
-    }
-
-    try {
-        const fetchedMemberRequests = await prisma?.memberRequest.findMany({
-            include: {user: true},
-            where: {
-                organizationId,
-            },
-        })
-
-        // return {fetchedMemberRequests}
-
-        if (!fetchedMemberRequests) {
-            return {success: false, error: "user not found"};
-        }
-
-        return {
-            success: true,
-            data: {fetchedMemberRequests}
-        };
-    } catch (error: any) {
-        logError("Error fetching member requests", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getUser(userId: string) {
-    try {
-        const user = await prisma.user.findUnique({
-            include: {organizations: true},
-            where: {id: userId}
-        })
-
-        if (!user) {
-            return {success: false, error: "user not found"};
-        }
-
-        return {
-            success: true,
-            data: user
-        };
-    } catch (error: any) {
-        logError("Error fetching user", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getRoadmaps(orgId: string | null | undefined) {
-    if (!orgId) {
-        return {success: false, error: "No organization id provided."};
-    }
-
-    try {
-        const organization = await prisma.organization.findUnique({
-            include: {roadmaps: {include: {milestones: true}}},
-            where: {
-                id: decodeURIComponent(orgId)
+            if (!fetchedInvitees) {
+                return {success: false, error: "invitees not found"};
             }
-        })
 
-        if (!organization) {
-            return {success: false, error: "organization not found"};
+            return {
+                success: true,
+                data: fetchedInvitees
+            };
+        } catch (error: any) {
+            logError("Error fetching invitees", error);
+            return {success: false, error: "Internal server error"};
         }
-
-        return {
-            success: true,
-            data: organization?.roadmaps
-        };
-    } catch (error: any) {
-        logError("Error fetching roadmap id", error);
-        return {success: false, error: "Internal server error"};
     }
-}
+)
 
-export async function getRoadmap(orgId: string | null | undefined, roadmapId: string | null | undefined) {
-    if (!orgId) return {success: false, error: "No organization id provided."}
-    if (!roadmapId) return {success: false, error: "No roadmap id provided."}
-
-    try {
-        const organization = await prisma.organization.findUnique({
-            include: {roadmaps: true},
-            where: {id: decodeURIComponent(orgId)}
-        })
-
-        if (!organization) return {success: false, error: "Organization not found."}
-
-        const roadmap = await prisma.roadmap.findFirst({
-            where: {
-                organizationId: organization.id,
-                id: roadmapId
-            },
-            include: {
-                nodes: {
-                    include: {data: true},
-                    orderBy: [{ createdAt: "desc" }]
+export const getMemberRequestsWithUsers = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const fetchedMemberRequests = await prisma?.memberRequest.findMany({
+                include: {user: true},
+                where: {
+                    organizationId: organization.id,
                 },
-                milestones: {
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: {include: { milestoneType: true }},
-                        tools: {include: {tool: true}},
-                        rfps: {include: {rfp: true}}
+            })
+
+            // return {fetchedMemberRequests}
+
+            if (!fetchedMemberRequests) {
+                return {success: false, error: "user not found"};
+            }
+
+            return {
+                success: true,
+                data: {fetchedMemberRequests}
+            };
+        } catch (error: any) {
+            logError("Error fetching member requests", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getUser = withUserAuth(
+    async (user: User) => {
+        try {
+            const fetchedUser = await prisma.user.findUnique({
+                where: {id: user.id},
+                include: {organizations: true},
+            })
+
+            if (!fetchedUser) {
+                return {success: false, error: "user not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedUser
+            };
+        } catch (error: any) {
+            logError("Error fetching user", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getRoadmaps = withOrganizationAuth(
+    async (organization: Organization) => {
+        try {
+            const fetchedOrganization = await prisma.organization.findUnique({
+                include: {roadmaps: {include: {milestones: true}}},
+                where: {
+                    id: decodeURIComponent(organization.id)
+                }
+            })
+
+            if (!fetchedOrganization) {
+                return {success: false, error: "organization not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedOrganization?.roadmaps
+            };
+        } catch (error: any) {
+            logError("Error fetching roadmap id", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getRoadmap = withOrganizationAuth(
+    async (authOrg: Organization, roadmapId: string | null | undefined) => {
+        if (!roadmapId) return {success: false, error: "No roadmap id provided."}
+
+        try {
+            const organization = await prisma.organization.findUnique({
+                where: {id: decodeURIComponent(authOrg.id)},
+                include: {roadmaps: true},
+            })
+
+            if (!organization) return {success: false, error: "Organization not found."}
+
+            const roadmap = await prisma.roadmap.findFirst({
+                where: {
+                    organizationId: organization.id,
+                    id: roadmapId
+                },
+                include: {
+                    nodes: {
+                        include: {data: true},
+                        orderBy: [{ createdAt: "desc" }]
                     },
-                    orderBy: [{ createdAt: "desc" }]
-                },
-                edges: true,
-                organization: true
-            }
-        })
+                    milestones: {
+                        include: {
+                            node: true,
+                            contacts: true,
+                            attachments: true,
+                            types: {include: { milestoneType: true }},
+                            tools: {include: {tool: true}},
+                            rfps: {include: {rfp: true}}
+                        },
+                        orderBy: [{ createdAt: "desc" }]
+                    },
+                    edges: true,
+                    organization: true
+                }
+            })
 
-        return {success: true, data: roadmap}
-    } catch (error: any) {
-        logError("Error fetching roadmap", error);
-        return {success: false, error: "Internal server error."};
+            return {success: true, data: roadmap}
+        } catch (error: any) {
+            logError("Error fetching roadmap", error);
+            return {success: false, error: "Internal server error."};
+        }
     }
-}
+)
 
 export const getOrganizationFromOrganizationId = async (organizationId: string) => {
     try {
@@ -769,49 +889,31 @@ export const getAllNonMemberOrganizations = async () => {
         logError("Error fetching membership data", error);
         return {success: false, error: "Internal server error"};
     }
-};
+}
 
-export const getAllOrganizations = async () => {
-    try {
-        const organizations = await prisma.organization.findMany({
+export const getAllMembershipsFromUserId = withUserAuth(
+    async (user: User) => {
+        try {
+            const memberships = await prisma.member.findMany({
+                where: {
+                    userId: user.id
+                },
+                include: {
+                    organization: true
+                }
+            });
 
-            orderBy: {
-                createdAt: "asc"
-            },
-        })
-
-        if (!organizations) {
-            return {success: false, error: "organizations not found"};
-        }
-
-        return {success: true, data: organizations};
-    } catch (error: any) {
-        logError("Error fetching membership data", error);
-        return {success: false, error: "Internal server error"};
-    }
-};
-
-export const getAllMembershipsFromUserId = async (userId: string) => {
-    try {
-        const memberships = await prisma.member.findMany({
-            where: {
-                userId: userId
-            },
-            include: {
-                organization: true
+            if (!memberships) {
+                return {success: false, error: "memberships not found"};
             }
-        });
 
-        if (!memberships) {
-            return {success: false, error: "memberships not found"};
+            return {success: true, data: memberships};
+        } catch (error: any) {
+            logError("Error fetching membership data", error);
+            return {success: false, error: "Internal server error"};
         }
-
-        return {success: true, data: memberships};
-    } catch (error: any) {
-        logError("Error fetching membership data", error);
-        return {success: false, error: "Internal server error"};
     }
-};
+)
 
 export const getAllNotifications = async () => {
     try {
@@ -851,104 +953,6 @@ export const getOrganizationFromRoadmapId = async (roadmapId: string): Promise<A
     } catch (error: any) {
         logError("Error fetching roadmap data", error);
         return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function checkSubdomainAvailability(nickname: string) {
-    try {
-        const existingOrg = await prisma.organization.findUnique({
-            where: {subdomain: nickname},
-        });
-
-        return !existingOrg
-    } catch (error: any) {
-        console.error("Database error checking subdomain availability:", error);
-        return {error: "Database error. Please try again later."};
-    }
-}
-
-export async function getMilestoneTypes() {
-    try {
-        const types = await prisma.milestoneType.findMany({})
-
-        return {success: true, data: types}
-    } catch (error: any) {
-        console.error("Database error finding milestone types:", error)
-        return {success: false, error: "Database error. please try again later."}
-    }
-}
-
-
-export async function getPublicMilestoneDetails(id: string) {
-    try {
-        const milestone = await prisma.milestone.findUnique({
-            where: {id},
-            include: {
-                node: true,
-                contacts: true,
-                attachments: true,
-                types: { include: { milestoneType: true } },
-                tools: { 
-                    include: { 
-                        tool: {
-                            include: { 
-                                milestones: {
-                                    include: {
-                                        milestone: true
-                                    },
-                                    where: {
-                                        milestone: {
-                                            private: {
-                                                equals: false
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }, 
-                    }, 
-                    where: { 
-                        tool: {
-                            private: {
-                                equals: false
-                            }
-                        }
-                    } 
-                },
-                rfps: { 
-                    include: { 
-                        rfp: {
-                            include: {
-                                milestones: {
-                                    include: {
-                                        milestone: true
-                                    },
-                                    where: {
-                                        milestone: {
-                                            private: {
-                                                equals: false
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }, 
-                    }, 
-                    where: { 
-                        rfp: {
-                            private: {
-                                equals: false
-                            }
-                        }
-                    } 
-                }
-            }
-        })
-
-        return {success: true, data: milestone}
-    } catch (error: any) {
-        console.error("Database error finding milestone details:", error)
-        return {success: false, error: "Database error. please try again later."}
     }
 }
 

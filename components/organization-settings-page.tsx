@@ -1,28 +1,11 @@
 "use client"
 
-import {useState} from "react";
-import {getRoadmaps} from "@/lib/fetchers";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
-import {Button} from "@/components/ui/button";
-import {toast} from "sonner";
-import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
 import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-4 space-y-8">
