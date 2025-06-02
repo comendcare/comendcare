@@ -48,8 +48,24 @@ export default async function OrganizationHomePage({
     const domain = decodeURIComponent(params.domain)
     const [organization, roadmaps, tools, rfps] = await Promise.all([
         getOrganizationData(domain),
-        getPublicRoadmapsForOrganization(domain),
-        getPublicAssetsForOrganization(domain),
+        getPublicRoadmapsForOrganization(domain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
+        getPublicAssetsForOrganization(domain, {
+            title: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            pinned: true,
+            milestones: true
+        }),
         getPublicRFPsForOrganization(domain, {
             title: true,
             description: true,
@@ -68,19 +84,6 @@ export default async function OrganizationHomePage({
     if (!organization) {
         notFound()
     }
-
-    let dbMilestones = []
-    dbMilestones = await prisma.milestone.findMany({
-        where: {roadmapId: organization.roadmaps?.[0]?.id},
-        include: {
-            node: true,
-            contacts: true,
-            attachments: true,
-            types: { include: { milestoneType: true } },
-            tools: { include: { tool: true } },
-            rfps: { include: { rfp: true } }
-        }
-    })
 
     let conditions = null
     if (organization) {

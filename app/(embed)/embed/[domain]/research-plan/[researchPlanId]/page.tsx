@@ -12,7 +12,16 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 export default async function EmbeddedResearchPlanPage({params}: {params: {domain: string, researchPlanId: string}}) {
     const [organization, roadmaps] = await Promise.all([
         getOrganizationData(params.domain),
-        getPublicRoadmapsForOrganization(params.domain),
+        getPublicRoadmapsForOrganization(params.domain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
     ])
 
     if (!organization) {

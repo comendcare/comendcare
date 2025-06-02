@@ -58,8 +58,24 @@ export default async function ProfilePage() {
 
     if (organization && organization?.subdomain) {
         const [roadmaps, tools, rfps] = await Promise.all([
-            getPublicRoadmapsForOrganization(organization.subdomain),
-            getPublicAssetsForOrganization(organization.subdomain),
+            getPublicRoadmapsForOrganization(organization.subdomain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
+            getPublicAssetsForOrganization(organization.subdomain, {
+                title: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                pinned: true,
+                milestones: true
+            }),
             getPublicRFPsForOrganization(organization.subdomain, {
                 title: true,
                 description: true,
