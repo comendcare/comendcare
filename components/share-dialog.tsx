@@ -253,11 +253,12 @@ export default function ShareDialog({
                                 <CopyCodeBlock 
                                     code={embedCode(embeddedResearchPlansData.embeddedResearchPlansLink)} 
                                     language={"JavaScript"}
-                                    onCopyCallback={() => {
+                                    onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Research Plans Table Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
-                                                "Organization Name": organization.name
+                                                "Organization Name": organization.name,
+                                                "Copy Method": location
                                             } : undefined),
                                         })
                                     }}
@@ -274,13 +275,14 @@ export default function ShareDialog({
                                 <CopyCodeBlock 
                                     code={embedCode(embeddedResearchPlanData.embeddedResearchPlanLink)} 
                                     language={"JavaScript"}
-                                    onCopyCallback={() => {
+                                    onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Research Plan Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
                                                 "Organization Name": organization.name,
                                                 "Research Plan ID": embeddedResearchPlanData.resarchPlanId,
-                                                "Research Plan Title": embeddedResearchPlanData.researchPlanTitle
+                                                "Research Plan Title": embeddedResearchPlanData.researchPlanTitle,
+                                                "Copy Method": location
                                             } : undefined),
                                         })
                                     }}
@@ -297,13 +299,14 @@ export default function ShareDialog({
                                 <CopyCodeBlock 
                                     code={embedCode(embeddedProjectData.embeddedProjectLink)} 
                                     language={"JavaScript"}
-                                    onCopyCallback={() => {
+                                    onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Project Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
                                                 "Organization Name": organization.name,
                                                 "Project ID": embeddedProjectData.projectId,
-                                                "Project Title": embeddedProjectData.projectTitle
+                                                "Project Title": embeddedProjectData.projectTitle,
+                                                "Copy Method": location
                                             } : undefined),
                                         })
                                     }}
