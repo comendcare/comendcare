@@ -5,7 +5,7 @@ import {useOnboardingStore} from '@/state/onboarding/onboardingStore';
 import {useSession} from 'next-auth/react';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {useEffect, useState} from "react";
-import {getInvitations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getInvitations, getOrganizationFromOrganizationId, getPublicOrganizationData} from "@/lib/fetchers";
 import { Check } from 'lucide-react';
 
 type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';
@@ -92,7 +92,7 @@ export default function OnboardingSteps() {
                 if (response.success && response.data) {
                     const invitationsWithDetails = await Promise.all(
                         response.data.map(async (invitation) => {
-                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
+                            const orgResponse = await getPublicOrganizationData(invitation.organizationId);
                             return {
                                 ...invitation,
                                 organization: orgResponse.success ? orgResponse.data : null,

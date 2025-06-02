@@ -359,7 +359,7 @@ export default function OrganizationOnboardingForm(
                 if (organizationData) {
                     // Find the current user's title from the members list
                     const currentUserMember = organizationData.members?.find(
-                        (member) => member.userId === session.user.id
+                        (member: any) => member.userId === session.user.id
                     );
                     const currentUserTitle = currentUserMember?.title || "";
 
@@ -372,12 +372,12 @@ export default function OrganizationOnboardingForm(
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
                         contactEmail: organizationData.contactEmail || "",
-                        therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic) => ({
+                        therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic: any) => ({
                             label: therapeutic,
                             value: therapeutic
                         })),
                         otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
-                        therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality) => ({
+                        therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality: any) => ({
                             label: modality,
                             value: modality
                         })),

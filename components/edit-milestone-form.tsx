@@ -38,7 +38,7 @@ import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
 import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
-import {getAssets, getOrganizationFromOrganizationId, getRFPs} from "@/lib/fetchers"
+import {getAssets, getRFPs} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"

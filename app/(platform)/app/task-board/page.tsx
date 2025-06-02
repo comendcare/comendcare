@@ -17,7 +17,7 @@ export default async function KanbanPage({params}: {
         )
     }
 
-    let response = await getKanbanFromOrganizationId()
+    let response = await getKanbanFromOrganizationId(session.user.organizationId)
 
     if (response.success && !response.data) {
         // kanban doesn't exist, automatically create it

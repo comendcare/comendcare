@@ -11,7 +11,7 @@ import {z} from "zod";
 import {toast} from "sonner";
 import {updateOrganization} from "@/lib/actions";
 import {useEffect, useState} from "react";
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import Link from "next/link"
 import {useForm} from "react-hook-form";
