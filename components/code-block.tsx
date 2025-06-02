@@ -1,7 +1,7 @@
 import { CodeBlock } from "react-code-block"
 import { Button } from "@/components/ui/button"
 
-export default function CopyCodeBlock({ code, language, onCopyCallback }: { code: string; language: string, onCopyCallback?: () => void }) {
+export default function CopyCodeBlock({ code, language, onCopyCallback }: { code: string; language: string, onCopyCallback?: (location?: string) => void }) {
     const copyCode = () => {
         // Logic to copy `code`
         try {
@@ -16,7 +16,11 @@ export default function CopyCodeBlock({ code, language, onCopyCallback }: { code
             <div className="relative">
                 <CodeBlock.Code 
                     className="bg-gray-900 !p-6 rounded-xl shadow-lg max-w-md overflow-y-auto"
-                    onCopy={onCopyCallback}
+                    onCopy={() => {
+                        if (onCopyCallback) {
+                            onCopyCallback('keyboard')
+                        }
+                    }}
                 >
                     <div className="table-row">
                         <CodeBlock.LineNumber className="table-cell pr-4 text-sm text-gray-500 text-right select-none" />
@@ -30,7 +34,7 @@ export default function CopyCodeBlock({ code, language, onCopyCallback }: { code
                     className="bg-gray-500 rounded-full px-3.5 py-1.5 absolute top-2 right-5 text-sm font-semibold"
                     onClick={() => {
                         copyCode()
-                        if (onCopyCallback) onCopyCallback()
+                        if (onCopyCallback) onCopyCallback('button')
                     }}
                 >
                     Copy code
