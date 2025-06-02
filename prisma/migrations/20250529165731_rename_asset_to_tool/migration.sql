@@ -1,13 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `assetsUnderDevelopment` on the `Condition` table. All the data in the column will be lost.
-  - You are about to drop the column `assetId` on the `ExternalAttachment` table. All the data in the column will be lost.
-  - You are about to drop the column `assetId` on the `ExternalContact` table. All the data in the column will be lost.
-  - You are about to drop the `Asset` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `AssetToMilestone` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- -- DropForeignKey
 -- ALTER TABLE "Asset" DROP CONSTRAINT "Asset_organizationId_fkey";
 
@@ -87,9 +77,6 @@
 -- -- AddForeignKey
 -- ALTER TABLE "ExternalContact" ADD CONSTRAINT "ExternalContact_toolId_fkey" FOREIGN KEY ("toolId") REFERENCES "Tool"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
-/*
-  CUSTOM SQL - to prevend data loss, change drop/create to rename
-*/
 -- Drop existing foreign keys to avoid reference issues
 ALTER TABLE "AssetToMilestone" DROP CONSTRAINT IF EXISTS "AssetToMilestone_assetId_fkey";
 ALTER TABLE "AssetToMilestone" DROP CONSTRAINT IF EXISTS "AssetToMilestone_milestoneId_fkey";
