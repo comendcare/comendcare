@@ -55,8 +55,24 @@ export default async function OrganizationHomePage({
     const domain = decodeURIComponent(params.domain)
     const [organization, roadmaps, tools, rfps] = await Promise.all([
         getOrganizationData(domain),
-        getPublicRoadmapsForOrganization(domain),
-        getPublicAssetsForOrganization(domain),
+        getPublicRoadmapsForOrganization(domain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
+        getPublicAssetsForOrganization(domain, {
+            title: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            pinned: true,
+            milestones: true
+        }),
         getPublicRFPsForOrganization(domain, {
             title: true,
             description: true,

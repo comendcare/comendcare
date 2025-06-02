@@ -16,7 +16,15 @@ import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, 
 import { InternalArgs } from "@prisma/client/runtime/library"
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
-export async function getPublicAssetsForOrganization(domain: string) {
+export async function getPublicAssetsForOrganization(
+    domain: string,
+    select: Prisma.ToolSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -28,16 +36,14 @@ export async function getPublicAssetsForOrganization(domain: string) {
             },
             private: {equals: false}
         },
-        include: {
-            contacts: true,
-            attachments: true,
-            milestones: {
-                include: {
-                    milestone: {
-                        include: { types: { include: { milestoneType: true } } }
-                    }
-                }
-            }
+        select: {
+            ...select,
+            // filter out any private milestones if the user has requested to access milestones
+            milestones: select.milestones ? ({
+                // include: {milestone: {include: {types: {include: {milestoneType: true}}}}},
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
+            }) : undefined
         },
         orderBy: [{createdAt: "desc"}]
     })
@@ -79,31 +85,28 @@ export async function getPublicRFPsForOrganization(
     return rfps
 }
 
-export async function getPublicRoadmapsForOrganization(domain: string) {
+export async function getPublicRoadmapsForOrganization(
+    domain: string,
+    select: Prisma.RoadmapSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
     const roadmaps = prisma.roadmap.findMany({
         where: {
-            // organization: subdomain
-            //     ? {subdomain}
-            //     : {customDomain: domain},
             organization: {
                 subdomain: subdomain,
             },
-            // published: true
         },
-        // select: {
-        //     title: true,
-        //     description: true,
-        //     slug: true,
-        //     image: true,
-        //     imageBlurhash: true,
-        //     createdAt: true,
-        // },
-        include: {
-            nodes: {
+        select: {
+            ...select,
+            nodes: select.nodes ? ({
                 include: {
                     data: {
                         include: {
@@ -172,9 +175,8 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                     data: {private: false}
                 },
                 orderBy: [{ createdAt: "desc" }]
-            },
-            edges: true,
-            milestones: {
+            }): undefined,
+            milestones: select.milestones ? ({
                 where: {
                     private: false
                 },
@@ -239,73 +241,31 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                     }
                 },
                 orderBy: [{ createdAt: "desc" }]
-            },
+            }) : undefined
         },
         orderBy: [{ createdAt: "desc" }]
     })
     return roadmaps
-
-    // return await unstable_cache(
-    //     async () => {
-    //         const roadmaps = prisma.roadmap.findMany({
-    //             where: {
-    //                 // organization: subdomain
-    //                 //     ? {subdomain}
-    //                 //     : {customDomain: domain},
-    //                 organization: {
-    //                     subdomain: subdomain,
-    //                 },
-    //                 // published: true
-    //             },
-    //             // select: {
-    //             //     title: true,
-    //             //     description: true,
-    //             //     slug: true,
-    //             //     image: true,
-    //             //     imageBlurhash: true,
-    //             //     createdAt: true,
-    //             // },
-    //             include: {
-    //                 nodes: {
-    //                     include: {
-    //                         data: true
-    //                     }
-    //                 },
-    //                 edges: true,
-    //                 milestones: {
-    //                     where: {
-    //                         private: false
-    //                     }
-    //                 },
-    //             },
-    //             orderBy: [
-    //                 {
-    //                     createdAt: "desc"
-    //                 }
-    //             ]
-    //         })
-    //         console.log(`roadmaps`, roadmaps)
-    //         return roadmaps
-    //     },
-    //     [`${domain}-roadmaps`],
-    //     {
-    //         revalidate: 900,
-    //         tags: [`${domain}-roadmaps`]
-    //     }
-    // )()
 }
 
-export async function getPublicConditionData(slug: string): Promise<ApiResponse<any>> {
+export async function getPublicConditionData(
+    slug: string,
+    select: Prisma.ConditionSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+): Promise<ApiResponse<any>> {
     try {
         const condition = await prisma.condition.findUnique({
             where: {slug},
-            include: {
-                organizations: {
-                    select: {
-                        organization: true
-                    }
-                }
-            },
+            select: {
+                ...select,
+                organizations: select.organizations ? ({
+                    select: {organization: true}
+                }) : undefined
+            }
         });
 
         if (!condition) {
@@ -1463,6 +1423,26 @@ export async function getCompanyAndReviewAnalytics() {
         totalReviews,
         newReviewsThisMonth,
     };
+}
+
+export async function getCompanies(ids: string[]) {
+    const results = await prisma.company.findMany({
+        where: {
+            id: { in: ids },
+        },
+        include: {
+            services: true,
+            sites: true,
+            certifications: {
+                include: {
+                    files: true,
+                },
+            },
+            rfis: true,
+            reviews: true,
+        },
+    });
+    return results
 }
 
 export async function getCompanyChartAnalytics() {

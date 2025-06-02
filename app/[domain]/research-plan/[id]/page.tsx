@@ -138,7 +138,16 @@ export default async function OrganizationRoadmapPage({
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
         getOrganizationData(domain),
-        getPublicRoadmapsForOrganization(domain),
+        getPublicRoadmapsForOrganization(domain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
     ])
 
     if (!organization) {

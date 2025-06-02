@@ -6,6 +6,7 @@ import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
 import mixpanel from 'mixpanel-browser';
 import { getExclusiveToFirstGroup } from '@/lib/utils';
 import { mixpanelTrack } from '@/app/mixpanel';
+import { getCompanies } from '@/lib/fetchers';
 
 export const sampleCROs: any[] = [
     {
