@@ -13,6 +13,10 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
         select: { email: true },
     });
 
+    const blacklist = await prisma.blacklist.findMany({
+        select: { email: true },
+    });
+
     const email = session?.user?.email?.toLowerCase();
 
     // Env variable whitelisting
@@ -23,12 +27,18 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
     // Database whitelisting
     const isWhitelisted = whitelist.some(
         (entry) => entry.email.toLowerCase() === email
-    ) || email?.endsWith("@comendcare.com");
+    ) || email?.endsWith("@comendcare.com")
+
+    const isBlacklisted = blacklist.some(
+        (entry) => entry.email.toLowerCase() === email
+    )
 
     if (!session) {
         redirect("/");
     } else if (!isWhitelisted) {
         redirect("/signed-out?reason=not_whitelisted");
+    } else if (isBlacklisted) {
+        redirect("/signed-out?reason=blacklisted");
     } else if (session.terminate) {
         redirect("/signed-out?reason=terminated");
     } else if (session.roleChanged) {

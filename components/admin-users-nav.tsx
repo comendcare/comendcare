@@ -17,6 +17,11 @@ const links = [
         href: "/whitelist",
         comingSoon: false
     },
+    {
+        name: "Blacklist",
+        href: "/blacklist",
+        comingSoon: false
+    },
 ]
 
 export function AdminUsersNav({
