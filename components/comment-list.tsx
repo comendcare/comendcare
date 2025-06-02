@@ -7,7 +7,7 @@ import {cn} from "@/lib/utils"
 import {CommentItem} from "./comment-item";
 import {setTransition} from "@/lib/transition";
 import {useEffect, useState} from "react";
-import {getPostComments, getUser} from "@/lib/fetchers";
+import {getPostComments} from "@/lib/fetchers";
 import {useSession} from "next-auth/react"
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
