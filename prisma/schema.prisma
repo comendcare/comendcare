@@ -119,7 +119,7 @@ model Member {
 model Invitation {
   id             String       @id @default(cuid())
   email          String /// @encrypted
-  emailHash      String?      @unique /// @encryption:hash(email)
+  emailHash      String? /// @encryption:hash(email)
   role           String       @default("member") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
@@ -128,14 +128,14 @@ model Invitation {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   metadata       Json?
 
-  @@unique([email, organizationId])
+  @@unique([emailHash, organizationId])
 }
 
 model MemberRequest {
   id             String       @id @default(cuid())
   userId         String
   email          String /// @encrypted
-  emailHash      String?      @unique /// @encryption:hash(email)
+  emailHash      String? /// @encryption:hash(email)
   role           String       @default("member") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
