@@ -28,7 +28,10 @@ export default function CopyCodeBlock({ code, language, onCopyCallback }: { code
 
                 <Button
                     className="bg-gray-500 rounded-full px-3.5 py-1.5 absolute top-2 right-5 text-sm font-semibold"
-                    onClick={() => copyCode()}
+                    onClick={() => {
+                        copyCode()
+                        if (onCopyCallback) onCopyCallback()
+                    }}
                 >
                     Copy code
                 </Button>
