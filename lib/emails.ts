@@ -26,7 +26,10 @@ const getIp = async () => {
 
 const sendEmail = async (message: {
     to: string | string[];
-    from: string;
+    from: {
+        name: string,
+        email: string,
+    };
     subject: string;
     text?: string;
     html: string
@@ -61,7 +64,10 @@ export async function sendContactEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: "hello@comendcare.com",
-            from: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: "Contact form message"
@@ -82,7 +88,10 @@ export async function sendBetaSignupEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: "hello@comendcare.com",
-            from: "megan@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "Add this user to the waitlist",
             subject: "[WAITLIST] Beta tester waitlist request"
@@ -103,7 +112,10 @@ export async function sendPAGContactEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: params.organizationEmail,
-            from: "contact@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "Someone is reaching out on Comend",
             subject: "Someone is reaching out on Comend"
@@ -134,7 +146,10 @@ export async function sendNewOrganizationEmail(params: {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
     const msg = {
         to: ["hello@comendcare.com", "betty.trevino@comendcare.com", "flawnson@comendcare.com"],
-        from: "corporate@comendcare.com",
+        from: {
+            name: "Comend Team",
+            email: "corporate@comendcare.com"
+        },
         html: emailTemplate,
         text: "New organization",
         subject: "A new organization has been created."
@@ -178,7 +193,10 @@ export async function sendInviteEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: params.invitee.email,
-            from: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: `Join ${params.inviter.name} on Comend`
@@ -209,7 +227,10 @@ export async function sendMemberDeletedEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: params.email,
-            from: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: `Your membership to ${params.organizationName} has been removed`
@@ -217,7 +238,6 @@ export async function sendMemberDeletedEmail(params: {
         await sendEmail(msg)
     }
 }
-
 
 export async function sendMemberRequestCreatedEmail(params: {
     user: {
@@ -249,7 +269,10 @@ export async function sendMemberRequestCreatedEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: params.owners.map(owner => owner.email).filter(email => typeof email === 'string'),
-            from: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: `${params.user.name} is requesting to join you on Comend`
@@ -257,7 +280,6 @@ export async function sendMemberRequestCreatedEmail(params: {
         await sendEmail(msg)
     }
 }
-
 
 export async function sendMemberRequestApprovedEmail(params: {
     name: string | null | undefined
@@ -281,7 +303,10 @@ export async function sendMemberRequestApprovedEmail(params: {
     if (params.email) {
         const msg = {
             to: params.email,
-            from: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: `Your request to join ${params.organizationName} has been approved.`,
@@ -312,7 +337,10 @@ export async function sendMemberRequestDeniedEmail(params: {
     if (params.email) {
         const msg = {
             to: params.email,
-            from: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: `Your request to join ${params.organizationName} has been denied.`,
