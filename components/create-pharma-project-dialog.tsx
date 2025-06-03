@@ -14,7 +14,6 @@ import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {getConditionsFromOrganizationId} from "@/lib/fetchers";
 import {
     Dialog,
     DialogContent,

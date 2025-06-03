@@ -61,13 +61,13 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                     const conditions = response.data;
 
                     if (conditions && conditions.length > 0) {
-                        const fetchedValues = conditions.map((condition) => ({
+                        const fetchedValues = conditions.map((condition: any) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
-                            categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
-                            causal: condition.causalGenes.map((gene) => ({label: gene, value: gene})) || [],
-                            genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
-                            systems: condition.associatedSystems.map((system) => ({
+                            categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
+                            causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
+                            genes: condition.associatedGenes.map((gene: any) => ({label: gene, value: gene})) || [],
+                            systems: condition.associatedSystems.map((system: any) => ({
                                 label: system,
                                 value: system
                             })) || [],

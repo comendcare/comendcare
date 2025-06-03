@@ -22,7 +22,11 @@ export async function generateMetadata({
     const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
 
-    const organizationData = await getOrganizationData(domain)
+    const organizationData = await getOrganizationData(domain, {
+        name: true,
+        description: true,
+        customDomain: true,
+    })
 
     // Fallback to avoid passing null to title or description
     const title = organizationData?.name || "Default Title" // Use a fallback title
@@ -145,8 +149,19 @@ export default async function OrganizationRoadmapPage({
 
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
-        getOrganizationData(domain),
-        getPublicRoadmapsForOrganization(domain),
+        getOrganizationData(domain, {
+
+        }),
+        getPublicRoadmapsForOrganization(domain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
     ])
 
     if (!organization) {
@@ -194,15 +209,15 @@ export default async function OrganizationRoadmapPage({
                                         />
                                     ),
                                 },
-                                ...(organization.contactEmail
-                                    ? [
-                                        {
-                                            title: "Contact patient group",
-                                            icon: <Mail/>,
-                                            dialog: <ContactPAGDialog organization={organization} />,
-                                        },
-                                    ]
-                                    : []),
+                                // ...(organization.contactEmail
+                                //     ? [
+                                //         {
+                                //             title: "Contact patient group",
+                                //             icon: <Mail/>,
+                                //             dialog: <ContactPAGDialog organization={organization} />,
+                                //         },
+                                //     ]
+                                //     : []),
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"

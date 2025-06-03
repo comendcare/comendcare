@@ -55,7 +55,21 @@ export async function generateMetadata({
     const slug = decodeURIComponent(params.slug)
 
     let data = null
-    const response = await getPublicConditionData(slug)
+    const response = await getPublicConditionData(slug, {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        diseaseCategories: true,
+        prevalenceNumerator: true,
+        prevalenceDenominator: true,
+        numberOfPatientsEngaged: true,
+        relevantDiseaseMechanisms: true,
+        causalGenes: true,
+        associatedGenes: true,
+        associatedSystems: true,
+        organizations: true
+    })
     if (response.success) {
         data = response.data
     } else {
@@ -205,7 +219,21 @@ export default async function ConditionPage({
     let data: Condition & {
         organizations: { organization: Organization }[];
     } | null = null
-    const response = await getPublicConditionData(slug)
+    const response = await getPublicConditionData(slug, {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        diseaseCategories: true,
+        prevalenceNumerator: true,
+        prevalenceDenominator: true,
+        numberOfPatientsEngaged: true,
+        relevantDiseaseMechanisms: true,
+        causalGenes: true,
+        associatedGenes: true,
+        associatedSystems: true,
+        organizations: true
+    })
     if (response.success) {
         data = response.data
     } else {

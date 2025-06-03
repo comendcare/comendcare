@@ -11,7 +11,7 @@ import {z} from "zod";
 import {toast} from "sonner";
 import {updateOrganization} from "@/lib/actions";
 import {useEffect, useState} from "react";
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import Link from "next/link"
 import {useForm} from "react-hook-form";
@@ -440,7 +440,19 @@ export default function EditConditionProfileDialog() {
         async function fetchConditionData() {
             if (session?.user?.organizationId) {
                 let conditionData
-                const response = await getConditionsDataFromOrgId(session.user.organizationId);
+                const response = await getConditionsDataFromOrgId(session.user.organizationId, {
+                    id: true,
+                    name: true,
+                    summary: true,
+                    prevalenceNumerator: true,
+                    prevalenceDenominator: true,
+                    numberOfPatientsEngaged: true,
+                    nationalEstimatedPopulation: true,
+                    globalEstimatedPopulation: true,
+                    diseaseCategories: true,
+                    causalGenes: true,
+                    associatedGenes: true
+                });
                 if (response.success) {
                     conditionData = response.data
                 } else {

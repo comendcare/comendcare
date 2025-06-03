@@ -101,7 +101,7 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
             </div>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
-                <DialogContent>
+                <DialogContent className="min-w-fit">
                     { "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
