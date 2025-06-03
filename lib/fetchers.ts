@@ -280,13 +280,21 @@ export async function getPublicConditionData(
     }
 }
 
-export async function getConditionsDataFromOrgId(organizationId: string): Promise<ApiResponse<any[]>> {
+export async function getConditionsDataFromOrgId(
+    organizationId: string,
+    select: Prisma.ConditionSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+): Promise<ApiResponse<Partial<Condition>[]>> {
     try {
         const conditions = await prisma.condition.findMany({
             where: {
                 organizations: {some: {organizationId}},
             },
-            include: {organizations: true},
+            select
         });
 
         return {success: true, data: conditions};
@@ -296,7 +304,15 @@ export async function getConditionsDataFromOrgId(organizationId: string): Promis
     }
 }
 
-export async function getOrganizationData(domain: string) {
+export async function getOrganizationData(
+    domain: string,
+    select: Prisma.OrganizationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+)  {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -305,35 +321,32 @@ export async function getOrganizationData(domain: string) {
         async () => {
             let organization = await prisma.organization.findUnique({
                 where: subdomain ? {subdomain} : {customDomain: domain},
-                include: {
-                    user: true,
-                    roadmaps: true,
-                    members: {
-                        orderBy: {
-                            createdAt: 'asc'
-                        },
-                        include: {
-                            user: true
-                        }
-                    }
+                select: {
+                    ...select,
+                    members: select.members ? ({
+                        include: {user: true},
+                        orderBy: {createdAt: 'asc'},
+                    }) : undefined
                 }
             })
 
             if (!organization) return organization
 
-            // sort members list - move org owners to the beginning of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.role === 'owner' && b.role !== 'owner') return -1
-                if (b.role === 'owner' && a.role !== 'owner') return 1
-                return 0
-            })
+            if (organization.members) {
+                // sort members list - move org owners to the beginning of the list
+                organization.members = organization.members.sort((a, b) => {
+                    if (a.role === 'owner' && b.role !== 'owner') return -1
+                    if (b.role === 'owner' && a.role !== 'owner') return 1
+                    return 0
+                })
 
-            // sort members list - move comend users to the end of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-                return 0
-            })
+                // sort members list - move comend users to the end of the list
+                organization.members = organization.members.sort((a, b) => {
+                    if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+                    if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+                    return 0
+                })
+            }
 
             return organization
         },

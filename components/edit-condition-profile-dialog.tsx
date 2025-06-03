@@ -440,7 +440,19 @@ export default function EditConditionProfileDialog() {
         async function fetchConditionData() {
             if (session?.user?.organizationId) {
                 let conditionData
-                const response = await getConditionsDataFromOrgId(session.user.organizationId);
+                const response = await getConditionsDataFromOrgId(session.user.organizationId, {
+                    id: true,
+                    name: true,
+                    summary: true,
+                    prevalenceNumerator: true,
+                    prevalenceDenominator: true,
+                    numberOfPatientsEngaged: true,
+                    nationalEstimatedPopulation: true,
+                    globalEstimatedPopulation: true,
+                    diseaseCategories: true,
+                    causalGenes: true,
+                    associatedGenes: true
+                });
                 if (response.success) {
                     conditionData = response.data
                 } else {

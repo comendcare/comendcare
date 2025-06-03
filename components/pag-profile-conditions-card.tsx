@@ -14,7 +14,7 @@ export const PAGProfileConditionsCard = ({
     showEditDialog, 
     isPrivate = false
 }: { 
-    conditions: Condition[] | null, 
+    conditions: Partial<Condition>[] | null, 
     organization: Organization, 
     showEditDialog: boolean,
     isPrivate?: boolean
@@ -34,9 +34,9 @@ export const PAGProfileConditionsCard = ({
                     </CardHeader>
 
                     <CardContent>
-                        {conditions.length > 0 ? conditions.map((condition: Condition) =>
+                        {conditions.length > 0 ? conditions.map((condition: Partial<Condition>) =>
                             <div
-                                key={condition.id}
+                                key={condition?.id}
                                 className="flex flex-col space-y-4"
                             >
                                 <div className="space-y-2">
@@ -46,13 +46,13 @@ export const PAGProfileConditionsCard = ({
                                         {/*    className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"*/}
                                         {/*>*/}
                                         <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                                            {condition.name}
+                                            {condition?.name}
                                         </h3>
                                         {/*    <ExternalLink />*/}
                                         {/*</Link>*/}
                                     </div>
                                     <p>
-                                        {condition.summary}
+                                        {condition?.summary}
                                     </p>
                                 </div>
 
@@ -120,7 +120,7 @@ export const PAGProfileConditionsCard = ({
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
     
-                                                if (condition?.diseaseCategories.length === 0) {
+                                                if (condition?.diseaseCategories?.length === 0) {
                                                     return (
                                                         <p className="text-gray-400">
                                                             {`No relevant badges.`}
@@ -130,7 +130,7 @@ export const PAGProfileConditionsCard = ({
     
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {condition?.diseaseCategories.map((item, index) => (
+                                                        {condition?.diseaseCategories?.map((item, index) => (
                                                             <span key={index}>
                                                                 <Badge className="text-sm inline">
                                                                     {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -154,7 +154,7 @@ export const PAGProfileConditionsCard = ({
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
 
-                                                if (condition?.causalGenes.length === 0) {
+                                                if (condition?.causalGenes?.length === 0) {
                                                     return (
                                                         <p className="text-gray-400">
                                                             {`No relevant badges.`}
@@ -164,7 +164,7 @@ export const PAGProfileConditionsCard = ({
 
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {condition?.causalGenes.map((item, index) => (
+                                                        {condition?.causalGenes?.map((item, index) => (
                                                             <span key={index}>
                                                                 <Badge className="text-sm inline">
                                                                     {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -188,7 +188,7 @@ export const PAGProfileConditionsCard = ({
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
 
-                                                if (condition?.associatedGenes.length === 0) {
+                                                if (condition?.associatedGenes?.length === 0) {
                                                     return (
                                                         <p className="text-gray-400">
                                                             {`No relevant badges.`}
@@ -198,7 +198,7 @@ export const PAGProfileConditionsCard = ({
 
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {condition?.associatedGenes.map((item, index) => (
+                                                        {condition?.associatedGenes?.map((item, index) => (
                                                             <span key={index}>
                                                                 <Badge className="text-sm inline">
                                                                     {item.charAt(0).toUpperCase() + item.slice(1)}
