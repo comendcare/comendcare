@@ -22,7 +22,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {AddressType} from "@/lib/types";
 import {useEffect, useState} from "react";
 import {FileWithPreview} from "@/components/image-selector";
-import {getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {getInvitations, getOrganizationFromOrganizationId, getPublicOrganizationData, getUser} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { getPublicFile } from "@/lib/utils";
@@ -64,7 +64,7 @@ export default function UserOnboardingForm() {
                 if (response.success && response.data) {
                     const invitationsWithDetails = await Promise.all(
                         response.data.map(async (invitation) => {
-                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
+                            const orgResponse = await getPublicOrganizationData(invitation.organizationId);
                             return {
                                 ...invitation,
                                 organization: orgResponse.success ? orgResponse.data : null,

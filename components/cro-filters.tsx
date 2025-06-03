@@ -141,13 +141,13 @@ export function CROFilters() {
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                    Milestone types
+                                    Project types
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <Info className="h-4 w-4"/>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                            {`The milestone types the CRO has services for.`}
+                                            {`The project types the provider has services for.`}
                                         </TooltipContent>
                                     </Tooltip>
                                 </FormLabel>
@@ -157,7 +157,7 @@ export function CROFilters() {
                                         badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                         hidePlaceholderWhenSelected={true}
-                                        placeholder="Select associated milestone types..."
+                                        placeholder="Select associated project types..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.

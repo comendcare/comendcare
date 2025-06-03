@@ -102,7 +102,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
             if (milestonesResponse.success) {
                 const filteredMilestones = milestonesResponse?.data?.filter(
-                    item => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private
+                    (item: any) => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private
                 )
                 setFetchedMilestones(filteredMilestones as Milestone[])
             } else {

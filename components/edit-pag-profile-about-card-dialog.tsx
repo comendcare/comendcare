@@ -45,12 +45,10 @@ const editOrgFormSchema = z.object({
     otherTherapeuticsOfInterest: z.string().optional(),
 });
 
-export default function EditPagProfileAboutCardDialog({organization}: { organization: Organization & { members: (Member & { user: User })[] }}) {
+export default function EditPagProfileAboutCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session} = useSession();
     const router = useRouter();
     const [open, setOpen] = useState(false);
-    console.log(organization.therapeuticsInDevelopment)
-    console.log(organization.therapeuticsOfInterest)
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
@@ -58,9 +56,9 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         defaultValues: {
             description: organization.description || "",
             website: organization.website || "",
-            therapeuticsInDevelopment: organization.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
+            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({label: ther, value: ther})) || [],
             otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
-            therapeuticsOfInterest: organization.therapeuticsOfInterest.map((ther) => ({label: ther, value: ther})) || [],
+            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({label: ther, value: ther})) || [],
             otherTherapeuticsOfInterest: typeof organization.metadata == 'object'? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
         }
     });
@@ -69,9 +67,9 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         editOrgForm.reset({
             description: organization.description || "",
             website: organization.website || "",
-            therapeuticsInDevelopment: organization.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
+            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({label: ther, value: ther})) || [],
             otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
-            therapeuticsOfInterest: organization.therapeuticsOfInterest.map((ther) => ({label: ther, value: ther})) || [],
+            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({label: ther, value: ther})) || [],
             otherTherapeuticsOfInterest: typeof organization.metadata == 'object'? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
         });
     }, [organization, editOrgForm]);

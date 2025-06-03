@@ -35,7 +35,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import Loading from "@/app/loading";
-import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getPublicOrganizationData, getUser} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {acceptInvitation, deleteInvitation} from "@/lib/actions";
 import {Invitation, Member, Organization} from "@prisma/client";
@@ -85,7 +85,7 @@ export function NavUser() {
                     if (response.success && response.data) {
                         const invitationsWithDetails = await Promise.all(
                             response.data.map(async (invitation) => {
-                                const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
+                                const orgResponse = await getPublicOrganizationData(invitation.organizationId);
                                 return {
                                     ...invitation,
                                     organization: orgResponse.success ? orgResponse.data : null,

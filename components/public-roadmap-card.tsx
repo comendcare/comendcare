@@ -26,7 +26,7 @@ export const RoadmapsCard = ({
     organization,
 }: {
     roadmaps: any[],
-    organization: Organization,
+    organization: Partial<Organization>,
 }) => {
     const router = useRouter()
     const pathname = usePathname()
