@@ -147,7 +147,7 @@ export function CROFilters() {
                                             <Info className="h-4 w-4"/>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                            {`The project types the CRO has services for.`}
+                                            {`The project types the Service Provider has services for.`}
                                         </TooltipContent>
                                     </Tooltip>
                                 </FormLabel>
