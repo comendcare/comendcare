@@ -14,7 +14,7 @@ export default async function EmbedLayout({
     children: ReactNode
 }) {
     const domain = decodeURIComponent(params.domain)
-    const data = await getOrganizationData(domain)
+    const data = await getOrganizationData(domain, {font: true})
 
     if (!data) {
         notFound()

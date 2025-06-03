@@ -48,7 +48,19 @@ export default async function ProfilePage() {
     let conditions = null
     if (session?.user.organizationId) {
         console.log(`GET CONDITION FROM ORG ID`, session?.user.organizationId)
-        const response = await getConditionsDataFromOrgId(session?.user.organizationId)
+        const response = await getConditionsDataFromOrgId(session?.user.organizationId, {
+            id: true,
+            name: true,
+            summary: true,
+            prevalenceNumerator: true,
+            prevalenceDenominator: true,
+            numberOfPatientsEngaged: true,
+            nationalEstimatedPopulation: true,
+            globalEstimatedPopulation: true,
+            diseaseCategories: true,
+            causalGenes: true,
+            associatedGenes: true
+        })
         if (response.success) {
             conditions = response.data
         } else {
@@ -58,8 +70,24 @@ export default async function ProfilePage() {
 
     if (organization && organization?.subdomain) {
         const [roadmaps, tools, rfps] = await Promise.all([
-            getPublicRoadmapsForOrganization(organization.subdomain),
-            getPublicAssetsForOrganization(organization.subdomain),
+            getPublicRoadmapsForOrganization(organization.subdomain, {
+                id: true,
+                title: true,
+                description: true,
+                slug: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true
+            }),
+            getPublicAssetsForOrganization(organization.subdomain, {
+                title: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                pinned: true,
+                milestones: true
+            }),
             getPublicRFPsForOrganization(organization.subdomain, {
                 title: true,
                 description: true,
@@ -200,7 +228,7 @@ export default async function ProfilePage() {
                                         Share public profile
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className="min-w-fit">
                                     <ShareDialog
                                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                         organization={organization}

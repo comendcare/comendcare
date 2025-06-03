@@ -7,7 +7,7 @@ import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId, getPublicOrganizationData} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import Image from "next/image"
@@ -29,7 +29,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     const [organization, setOrganization] = useState<Organization | null>();
 
     useEffect(() => {
-        session?.user?.organizationId ? getOrganizationFromOrganizationId(session.user?.organizationId).then((response) => {
+        session?.user?.organizationId ? getPublicOrganizationData(session.user?.organizationId).then((response) => {
             if (response.success) {
                 const organization = response.data
                 setOrganization(organization)

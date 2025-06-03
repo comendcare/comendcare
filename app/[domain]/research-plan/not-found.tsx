@@ -7,7 +7,14 @@ export default async function NotFound() {
     const domain = headersList
         .get("host")
         ?.replace(".localhost:3000", `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-    const data = await getOrganizationData(domain as string)
+    const data = await getOrganizationData(domain as string, {
+            description: true,
+            website: true,
+            therapeuticsInDevelopment: true,
+            therapeuticsOfInterest: true,
+            metadata: true,
+            members: true
+        })
 
     return (
         <div className="flex flex-col items-center justify-center">
