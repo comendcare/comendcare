@@ -784,6 +784,37 @@ export const getInvitees = withOrganizationAuth(
     }
 )
 
+export const getUserMemberRequests = withUserAuth(
+    async (user: User) => {
+        const session = await getSession()
+
+        try {
+            if (!session) {
+                return {success: false, error: "Session not found."};
+            }
+
+            const fetchedMemberRequests = await prisma?.memberRequest.findMany({
+                include: {organization: true},
+                where: {
+                    userId: session.user.id,
+                },
+            })
+
+            if (!fetchedMemberRequests) {
+                return {success: false, error: "user not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedMemberRequests
+            };
+        } catch (error: any) {
+            logError("Error fetching member requests", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const getMemberRequestsWithUsers = withOrganizationAuth(
     async (organization: Organization) => {
         try {
@@ -1000,7 +1031,8 @@ export const getAllMembershipsFromUserId = withUserAuth(
                     userId: user.id
                 },
                 include: {
-                    organization: true
+                    organization: true,
+                    user: true
                 }
             });
 

@@ -41,7 +41,7 @@ import mixpanel from "mixpanel-browser";
 import {Member, Organization} from "@prisma/client";
 import {Calendar, Building2} from "lucide-react";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import { mixpanelTrack } from "@/app/mixpanel";
+import {mixpanelTrack} from "@/app/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -248,21 +248,28 @@ export default function OrganizationOnboardingForm(
     }
 
     async function joinOrgOnSubmit() {
-        const orgValue = joinOrgForm.watch("org")?.[0]?.value;
-        if (typeof orgValue === "string") {
-            const response = await createMemberRequest(orgValue);
+        setLoading(true)
+        try {
+            const orgValue = joinOrgForm.watch("org")?.[0]?.value;
+            if (typeof orgValue === "string") {
+                const response = await createMemberRequest(orgValue);
 
-            if (response.success) {
-                toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+                if (response.success) {
+                    toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
+                router.push("/app/profile")
             } else {
-                console.error(response.error)
-                toast.error(response.error)
+                console.error("Organization value is undefined or invalid.");
+                toast.error("Organization value is undefined or invalid.")
             }
-
-            router.push("/app/profile")
-        } else {
-            console.error("Organization value is undefined or invalid.");
-            toast.error("Organization value is undefined or invalid.")
+        } catch (error) {
+            toast.error("An error occurred while sending a member request.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -376,12 +383,16 @@ export default function OrganizationOnboardingForm(
                             label: therapeutic,
                             value: therapeutic
                         })),
-                        otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
+                        otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
+                            [key: string]: any
+                        })?.otherTherapeuticsInDevelopment : undefined,
                         therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality: any) => ({
                             label: modality,
                             value: modality
                         })),
-                        otherTherapeuticsOfInterest: typeof organizationData?.metadata == 'object'? (organizationData?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
+                        otherTherapeuticsOfInterest: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
+                            [key: string]: any
+                        })?.otherTherapeuticsOfInterest : undefined,
                         address1: organizationData.address1 || "",
                         address2: organizationData.address2 || "",
                         formattedAddress: organizationData.formattedAddress || "",
@@ -695,11 +706,11 @@ export default function OrganizationOnboardingForm(
                                                     {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
                                                 </FormDescription>
                                                 <FormControl>
-                                                        <Input
-                                                            type="text"
-                                                            id="modalities-other"
-                                                            {...field}
-                                                        />
+                                                    <Input
+                                                        type="text"
+                                                        id="modalities-other"
+                                                        {...field}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>
@@ -944,9 +955,9 @@ export default function OrganizationOnboardingForm(
                                     <div className="flex flex-row justify-between">
                                         <Button
                                             type="submit"
-                                            disabled={!joinOrgForm.formState.isDirty || !joinOrgForm.formState.isDirty}
+                                            disabled={loading || !joinOrgForm.formState.isDirty || !joinOrgForm.formState.isDirty}
                                         >
-                                            Join Organization
+                                            {loading ? <LoadingDots color="#808080"/> : "Join Organization"}
                                         </Button>
                                         {showSkip &&
                                             <Button variant="ghost"
