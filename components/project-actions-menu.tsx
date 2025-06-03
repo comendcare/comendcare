@@ -200,7 +200,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
             </DropdownMenu>
 
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
-                <DialogContent>
+                <DialogContent className="min-w-fit">
                     { "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}

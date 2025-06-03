@@ -228,7 +228,7 @@ export default async function ProfilePage() {
                                         Share public profile
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className="min-w-fit">
                                     <ShareDialog
                                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                         organization={organization}

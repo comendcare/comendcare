@@ -762,7 +762,7 @@ export function EditMilestoneForm({
             </ScrollArea>
         </Form>
         <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
-            <DialogContent>
+            <DialogContent className="min-w-fit">
                 { organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                     <ShareDialog
                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
