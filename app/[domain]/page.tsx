@@ -54,17 +54,35 @@ export default async function OrganizationHomePage({
 }) {
     const domain = decodeURIComponent(params.domain)
     const [organization, roadmaps, tools, rfps] = await Promise.all([
-        getOrganizationData(domain),
+        getOrganizationData(domain, {
+            id: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            image: true,
+            headerImage: true,
+            subdomain: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            members: true,
+            conditions: true,
+        }),
         getPublicRoadmapsForOrganization(domain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true
-            }),
+            id: true,
+            title: true,
+            description: true,
+            slug: true,
+            edges: true,
+            milestones: true,
+            nodes: true,
+            modalities: true
+        }),
         getPublicAssetsForOrganization(domain, {
             title: true,
             description: true,
@@ -107,7 +125,19 @@ export default async function OrganizationHomePage({
 
     let conditions = null
     if (organization) {
-        const response = await getConditionsDataFromOrgId(organization?.id)
+        const response = await getConditionsDataFromOrgId(organization?.id, {
+            id: true,
+            name: true,
+            summary: true,
+            prevalenceNumerator: true,
+            prevalenceDenominator: true,
+            numberOfPatientsEngaged: true,
+            nationalEstimatedPopulation: true,
+            globalEstimatedPopulation: true,
+            diseaseCategories: true,
+            causalGenes: true,
+            associatedGenes: true
+        })
         if (response.success) {
             conditions = response.data
         } else {
@@ -139,7 +169,7 @@ export default async function OrganizationHomePage({
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
                                 <PagProfileAboutCard
-                                    organization={organization}
+                                    organization={organization as any}
                                     editable={false}
                                 />
                                 <PAGProfileConditionsCard

@@ -9,7 +9,10 @@ import { notFound } from "next/navigation";
 
 export default async function EmbeddedResearchPlansPage({params}: {params: {domain: string}}) {
     const [organization, roadmaps] = await Promise.all([
-        getOrganizationData(params.domain),
+        getOrganizationData(params.domain, {
+            subdomain: true,
+            name: true
+        }),
         getPublicRoadmapsForOrganization(params.domain, {
                 id: true,
                 title: true,

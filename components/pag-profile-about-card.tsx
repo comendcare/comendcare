@@ -17,7 +17,7 @@ import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
 
 export const PagProfileAboutCard = ({organization, editable, isPrivate = false}: {
-    organization: Organization & { members: (Member & { user: User })[] } | null
+    organization: Partial<Organization> & { members: (Member & { user: User })[] } | null
     editable: boolean
     isPrivate?: boolean
 }) => {
@@ -125,7 +125,7 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}
     
                                 return (
                                     <div className="flex flex-wrap gap-1">
-                                        {organization?.therapeuticsOfInterest.map((item, index) => (
+                                        {organization?.therapeuticsOfInterest?.map((item, index) => (
                                             <span key={index}>
                                                                 <Badge className="text-sm inline">
                                                                     {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -149,7 +149,7 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}
                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                             {(() => {
     
-                                if (organization?.therapeuticsInDevelopment.length === 0) {
+                                if (organization?.therapeuticsInDevelopment?.length === 0) {
                                     return (
                                         <p className="text-gray-400">
                                             {`No relevant badges.`}
@@ -159,7 +159,7 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}
     
                                 return (
                                     <div className="flex flex-wrap gap-1">
-                                        {organization?.therapeuticsInDevelopment.map((item, index) => (
+                                        {organization?.therapeuticsInDevelopment?.map((item, index) => (
                                             <span key={index}>
                                                                 <Badge className="text-sm inline">
                                                                     {item.charAt(0).toUpperCase() + item.slice(1)}

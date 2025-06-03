@@ -13,7 +13,14 @@ export async function generateMetadata({
     params: { domain: string }
 }): Promise<Metadata | null> {
     const domain = decodeURIComponent(params.domain)
-    const data = await getOrganizationData(domain)
+    const data = await getOrganizationData(domain, {
+             description: true,
+            website: true,
+            therapeuticsInDevelopment: true,
+            therapeuticsOfInterest: true,
+            metadata: true,
+            members: true
+        })
     if (!data) {
         return null
     }
