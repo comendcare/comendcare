@@ -17,7 +17,12 @@ export async function generateMetadata({
     params: { domain: string }
 }): Promise<Metadata | null> {
     const domain = decodeURIComponent(params.domain)
-    const data = await getOrganizationData(domain)
+    const data = await getOrganizationData(domain, {
+        name: true,
+        description: true,
+        image: true,
+        logo: true
+    })
     if (!data) {
         return null
     }
@@ -68,7 +73,10 @@ export default async function SiteLayout({
     children: ReactNode
 }) {
     const domain = decodeURIComponent(params.domain)
-    const data = await getOrganizationData(domain)
+    const data = await getOrganizationData(domain, {
+        customDomain: true,
+        font: true
+    })
 
     if (!data) {
         notFound()

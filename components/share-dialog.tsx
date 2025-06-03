@@ -156,6 +156,19 @@ export default function ShareDialog({
                                 </svg>
                             </a>
                             <a
+                                className="border hover:bg-[#1186e6] w-12 h-12 fill-[#1186e6] hover:fill-white border-blue-200 rounded-full flex items-center justify-center shadow-md hover:shadow-blue-500/50 cursor-pointer pl-0.5 pt-1"
+                                href={`https://bsky.app/intent/compose?text=${encodeURIComponent(`Check this out on Comend: ${url}`)}`}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                onClick={() => {
+                                    if (trackShareEvent) trackMixpanelShareEvent("Bluesky")
+                                }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 70 70">
+                                    <path fill="#0085ff" d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55v15.882c0-.338-.13.044-.41.867-1.512 4.456-7.418 21.847-20.923 7.944-7.111-7.32-3.819-14.64 9.125-16.85-7.405 1.264-15.73-.825-18.014-9.015C1.12 23.022 0 8.51 0 6.55 0-3.268 8.579-.182 13.873 3.805zm36.254 0C42.79 9.332 34.897 20.537 32 26.55v15.882c0-.338.13.044.41.867 1.512 4.456 7.418 21.847 20.923 7.944 7.111-7.32 3.819-14.64-9.125-16.85 7.405 1.264 15.73-.825 18.014-9.015C62.88 23.022 64 8.51 64 6.55c0-9.818-8.578-6.732-13.873-2.745z"/>
+                                </svg>
+                            </a>
+                            <a
                                 className="border hover:bg-[#ff5700] w-12 h-12 fill-[#ff5700] hover:fill-white border-orange-200 rounded-full flex items-center justify-center shadow-md hover:shadow-pink-500/50 cursor-pointer"
                                 href={`https://reddit.com/submit?url=${url}&title=${url}`}
                                 rel="noopener noreferrer"
@@ -253,11 +266,12 @@ export default function ShareDialog({
                                 <CopyCodeBlock 
                                     code={embedCode(embeddedResearchPlansData.embeddedResearchPlansLink)} 
                                     language={"JavaScript"}
-                                    onCopyCallback={() => {
+                                    onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Research Plans Table Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
-                                                "Organization Name": organization.name
+                                                "Organization Name": organization.name,
+                                                "Copy Method": location
                                             } : undefined),
                                         })
                                     }}
@@ -274,13 +288,14 @@ export default function ShareDialog({
                                 <CopyCodeBlock 
                                     code={embedCode(embeddedResearchPlanData.embeddedResearchPlanLink)} 
                                     language={"JavaScript"}
-                                    onCopyCallback={() => {
+                                    onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Research Plan Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
                                                 "Organization Name": organization.name,
                                                 "Research Plan ID": embeddedResearchPlanData.resarchPlanId,
-                                                "Research Plan Title": embeddedResearchPlanData.researchPlanTitle
+                                                "Research Plan Title": embeddedResearchPlanData.researchPlanTitle,
+                                                "Copy Method": location
                                             } : undefined),
                                         })
                                     }}
@@ -297,13 +312,14 @@ export default function ShareDialog({
                                 <CopyCodeBlock 
                                     code={embedCode(embeddedProjectData.embeddedProjectLink)} 
                                     language={"JavaScript"}
-                                    onCopyCallback={() => {
+                                    onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Project Embed Copied`, {
                                             ...(organization ? {
                                                 "Organization ID": organization.id,
                                                 "Organization Name": organization.name,
                                                 "Project ID": embeddedProjectData.projectId,
-                                                "Project Title": embeddedProjectData.projectTitle
+                                                "Project Title": embeddedProjectData.projectTitle,
+                                                "Copy Method": location
                                             } : undefined),
                                         })
                                     }}

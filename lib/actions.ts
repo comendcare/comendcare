@@ -2917,9 +2917,9 @@ export const kanbanSync = withOrganizationAuth(
 )
 
 export const createColumn = withOrganizationAuth(
-    async (_: Organization, column: Partial<Column>) => {
+    async (organization: Organization, column: Partial<Column>) => {
         try {
-            const {data: kanban} = await getKanbanFromOrganizationId()
+            const {data: kanban} = await getKanbanFromOrganizationId(organization.id)
             if (!kanban) return {success: false, error: "failed to find associated task board"}
 
             const newColumn = await prisma.column.create({

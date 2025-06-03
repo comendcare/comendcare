@@ -266,7 +266,7 @@ function IconContainer({
                         </AnimatePresence>
                     </motion.div>
                 </DialogTrigger>
-                <DialogContent className="">{dialog}</DialogContent>
+                <DialogContent className="min-w-fit">{dialog}</DialogContent>
             </Dialog>
         );
     }
