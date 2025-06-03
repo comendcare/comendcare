@@ -371,7 +371,7 @@ export function withUserAuth(action: any) {
         }
 
         if (!userId) return {error: "Not authorized: userId not provided"}
-        if (userId !== session.user.id) return {error: "Not authorized: provided userId does not matche userId in session"}
+        if (userId !== session.user.id) return {error: "Not authorized: provided userId does not match userId in session"}
 
         const user = await prisma.user.findUnique({
             where: {id: userId}

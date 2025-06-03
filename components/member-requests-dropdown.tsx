@@ -2,7 +2,7 @@
 
 
 import {MemberRequestWithUser} from "@/lib/types";
-import {approveMemberRequestAndCreateMember, deleteMemberRequest} from "@/lib/actions";
+import {approveMemberRequestAndCreateMember, denyMemberRequest} from "@/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
@@ -13,7 +13,7 @@ import { mixpanelTrack } from "@/app/mixpanel";
 export default async function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
     const session = useSession()
 
-    async function approveMemberRequest(memberRequest: MemberRequestWithUser) {
+    async function approveMemberRequestClick(memberRequest: MemberRequestWithUser) {
         if (session?.data?.user.organizationId) {
             const response = await approveMemberRequestAndCreateMember(session.data.user.organizationId, memberRequest)
 
@@ -35,9 +35,9 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
         }
     }
 
-    async function denyMemberRequest(memberRequest: MemberRequestWithUser) {
+    async function denyMemberRequestClick(memberRequest: MemberRequestWithUser) {
         if (session?.data?.user.organizationId) {
-            const response = await deleteMemberRequest(session.data.user.organizationId, memberRequest)
+            const response = await denyMemberRequest(session.data.user.organizationId, memberRequest)
 
             if (response.success) {
                 mixpanelTrack("Membership Request Denied", {
@@ -64,13 +64,13 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem
-                    onClick={() => approveMemberRequest(memberRequest)}
+                    onClick={() => approveMemberRequestClick(memberRequest)}
                 >
                     <UserCheck />
                     Approve request
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                    onClick={() => denyMemberRequest(memberRequest)}
+                    onClick={() => denyMemberRequestClick(memberRequest)}
                     className="text-red-600 hover:text-red-800"
                 >
                     <UserX />

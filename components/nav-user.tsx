@@ -35,9 +35,16 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import Loading from "@/app/loading";
-import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getPublicOrganizationData, getUser} from "@/lib/fetchers";
+import {
+    getAllMembershipsFromUserId,
+    getInvitations,
+    getOrganizationFromOrganizationId,
+    getPublicOrganizationData,
+    getUser,
+    getUserMemberRequests
+} from "@/lib/fetchers";
 import {toast} from "sonner";
-import {acceptInvitation, deleteInvitation} from "@/lib/actions";
+import {acceptInvitation, deleteInvitation, deleteMemberRequest} from "@/lib/actions";
 import {Invitation, Member, Organization} from "@prisma/client";
 import {
     Dialog,
@@ -54,7 +61,7 @@ import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import UserEditForm from "@/components/user-edit-form";
 import UserSettings from "@/components/user-settings";
-import {MembershipWithOrganization} from "@/lib/types";
+import {MemberRequestWithUser, MembershipWithOrganization} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 import { mixpanelReset, mixpanelTrack } from "@/app/mixpanel";
 
@@ -66,6 +73,7 @@ export function NavUser() {
     const [userData, setUserData] = useState<any>(null);
     const [memberships, setMemberships] = useState<MembershipWithOrganization[]>();
     const [invitations, setInvitations] = useState<any[]>([]);
+    const [memberRequests, setMemberRequests] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -184,9 +192,29 @@ export function NavUser() {
             }
         }
 
+        async function fetchMemberRequestData() {
+            try {
+                const response = await getUserMemberRequests(session?.user.id);
+
+                if (response.success && response.data) {
+                    setMemberRequests(response.data);
+                } else if (response.error) {
+                    console.error(response.error);
+                    toast.error(response.error);
+                } else {
+                    console.error("Unexpected response structure:", response);
+                    toast.error("Couldn't fetch member requests. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching member requests:", error);
+                toast.error("An unexpected error occurred while fetching member requests.");
+            }
+        }
+
         fetchUserData()
         fetchOrgData()
         fetchInvitationData()
+        fetchMemberRequestData()
     }, [status, session, router]);
 
     async function handleAcceptInvitation(invitationId: string) {
@@ -258,6 +286,22 @@ export function NavUser() {
         }
     };
 
+    const handleClose = async (memberRequest: MemberRequestWithUser) => {
+        try {
+            const response = await deleteMemberRequest(session?.user.id, memberRequest);
+
+            if (response.success && response.data) {
+                // mixpanel track stuff
+            } else {
+                toast.error(response.error || "Failed to delete approved member request.");
+            }
+        } catch (error) {
+            toast.error("Failed to delete approved member request.");
+        } finally {
+            setIsDialogOpen(false);
+        }
+    };
+
     if (status === "loading") {
         return <Loading/>;
     }
@@ -287,6 +331,25 @@ export function NavUser() {
                             </AlertDialogCancel>
                             <AlertDialogAction onClick={() => handleAccept(invitations[0])}>
                                 Accept and join
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+
+            {memberRequests[0]?.approved && (
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Your member request
+                                to {memberRequests[0].organization?.name} has been approved</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                You can start viewing and making changes to {memberRequests[0].organization?.name} on Comend.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogAction onClick={() => handleClose(memberRequests[0])}>
+                                Close
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

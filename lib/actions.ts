@@ -12,10 +12,10 @@ import {
     TaskStakeholder, Invitation,
     PlatformNotification,
     Review,
-    SavedCompany, Company
+    SavedCompany, Company, MemberRequest
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAdminAuth, withAuth, withOrganizationAuth} from "./auth"
+import {withAdminAuth, withAuth, withOrganizationAuth, withUserAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -1226,10 +1226,18 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
         try {
 
             const [, createdMember] = await Promise.all([
-                prisma.memberRequest.delete({
+                // prisma.memberRequest.delete({
+                //     where: {
+                //         id: memberRequest.id,
+                //     },
+                // }),
+                prisma.memberRequest.update({
                     where: {
                         id: memberRequest.id,
                     },
+                    data: {
+                        approved: true
+                    }
                 }),
                 prisma.member.create({
                     data: {
@@ -1273,7 +1281,33 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
     ['owner']
 )
 
-export const deleteMemberRequest = withOrganizationAuth(
+export const deleteMemberRequest = withUserAuth(
+    async (user: User, memberRequest: MemberRequestWithUser) => {
+        if (!memberRequest) {
+            throw new Error("Invalid member request");
+        }
+        try {
+            // Ensure the composite key is valid or fallback to another unique identifier like `id`
+            const deletedMemberRequest = await prisma.memberRequest.delete({
+                where: {
+                    id: memberRequest.id
+                },
+            });
+
+            if (!deletedMemberRequest) {
+                return {success: false, error: "Failed to delete member request. Request not found."};
+            }
+
+            return {success: true, data: deletedMemberRequest};
+
+        } catch (error) {
+            console.error("Error deleting member request:", error);
+            return {success: false, error: "Failed to delete member request."};
+        }
+    },
+)
+
+export const denyMemberRequest = withOrganizationAuth(
     async (_: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
         if (!memberRequest) {
             throw new Error("Invalid member request");
