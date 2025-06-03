@@ -171,7 +171,7 @@ export default async function OrganizationHomePage({
                         icon: <Share />,
                         dialog: (
                             <ShareDialog
-                                url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}}`}
+                                url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 organization={organization}
                                 // trackShareEvent={(socialOption: string) => {
                                 //     mixpanelTrack(`Organization Profile Shared`, {
