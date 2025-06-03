@@ -85,7 +85,28 @@ export function NavUser() {
                     if (response.success && response.data) {
                         const invitationsWithDetails = await Promise.all(
                             response.data.map(async (invitation) => {
-                                const orgResponse = await getPublicOrganizationData(invitation.organizationId);
+                                const orgResponse = await getPublicOrganizationData(invitation.organizationId, {
+                                    id: true,
+                                    name: true,
+                                    published: true,
+                                    verified: true,
+                                    public: true,
+                                    description: true,
+                                    contactEmail: true,
+                                    image: true,
+                                    headerImage: true,
+                                    subdomain: true,
+                                    yearFounded: true,
+                                    incorporationStatus: true,
+                                    therapeuticsOfInterest: true,
+                                    therapeuticsInDevelopment: true,
+                                    website: true,
+                                    moneyRaised: true,
+                                    moneyDeployed: true,
+                                    researchBudget: true,
+                                    members: true,
+                                    conditions: true,
+                                });
                                 return {
                                     ...invitation,
                                     organization: orgResponse.success ? orgResponse.data : null,

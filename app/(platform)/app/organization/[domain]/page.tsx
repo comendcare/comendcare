@@ -50,6 +50,9 @@ export default async function OrganizationHomePage({
         getOrganizationData(domain, {
             id: true,
             name: true,
+            published: true,
+            verified: true,
+            public: true,
             description: true,
             contactEmail: true,
             image: true,
