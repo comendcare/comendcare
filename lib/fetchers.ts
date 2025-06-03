@@ -358,63 +358,72 @@ export async function getOrganizationData(
     )()
 }
 
-export const getPublicOrganizationData = async (orgId: string) => {
+export const getPublicOrganizationData = async (
+    orgId: string,
+    select: Prisma.OrganizationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) => {
     let organization = await prisma.organization.findUnique({
         where: {id: orgId},
-        include: {
-            user: true,
-            roadmaps: true,
-            members: {
-                orderBy: {
-                    createdAt: 'asc'
-                },
-                include: {
-                    user: true
-                }
-            }
+        select: {
+            ...select,
+            members: select.members ? ({
+                include: {user: true},
+                orderBy: {createdAt: 'asc'},
+            }) : undefined
         }
     })
 
     if (!organization) return {success: false, error: "Could not find organization"}
 
-    // sort members list - move org owners to the beginning of the list
-    organization.members = organization.members.sort((a, b) => {
-        if (a.role === 'owner' && b.role !== 'owner') return -1
-        if (b.role === 'owner' && a.role !== 'owner') return 1
-        return 0
-    })
+    if (organization.members) {
+        // sort members list - move org owners to the beginning of the list
+        organization.members = organization.members.sort((a, b) => {
+            if (a.role === 'owner' && b.role !== 'owner') return -1
+            if (b.role === 'owner' && a.role !== 'owner') return 1
+            return 0
+        })
 
-    // sort members list - move comend users to the end of the list
-    organization.members = organization.members.sort((a, b) => {
-        if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-        if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-        return 0
-    })
+        // sort members list - move comend users to the end of the list
+        organization.members = organization.members.sort((a, b) => {
+            if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+            if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+            return 0
+        })
+    }
 
     return {success: true, data: organization}
 }
 
-export async function getCROData(id: string) {
+export async function getCROData(
+    id: string,
+    select: Prisma.CompanySelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     return prisma.company.findUnique({
         where: {
             id: id
         },
-        include: {
-            services: true,
-            sites: true,
-            certifications: {
-                include: {
-                    files: true
-                }
-            },
-            rfis: true,
-            reviews: {
+        select: {
+            ...select,
+            certifications: select.certifications ? ({
+                include: {files: true}
+            }) : undefined,
+            reviews: select.reviews ? ({
                 include: {
                     author: true,
                     organization: true,
                     feedbacks: true
-                },
-            }
+                }
+            }) : undefined
         }
     })
 }

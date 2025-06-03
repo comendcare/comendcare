@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/sidebar"
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
-import {getCROData, getPharmaProjects} from "@/lib/fetchers";
+import {getPharmaProjects} from "@/lib/fetchers";
 
 const data = {
     user: {

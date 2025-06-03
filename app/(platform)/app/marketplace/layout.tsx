@@ -29,7 +29,28 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     const [organization, setOrganization] = useState<Organization | null>();
 
     useEffect(() => {
-        session?.user?.organizationId ? getPublicOrganizationData(session.user?.organizationId).then((response) => {
+        session?.user?.organizationId ? getPublicOrganizationData(session.user?.organizationId, {
+            id: true,
+            published: true,
+            verified: true,
+            public: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            image: true,
+            headerImage: true,
+            subdomain: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            members: true,
+            conditions: true,
+        }).then((response) => {
             if (response.success) {
                 const organization = response.data
                 setOrganization(organization)
