@@ -2,9 +2,7 @@
 
 import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
-import {serialize} from "next-mdx-remote/serialize"
-import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse, Asset, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
+import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
 import {getSession, withAdminAuth, withOrganizationAuth, withUserAuth} from "@/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
@@ -14,7 +12,6 @@ import path from "path";
 import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 import { InternalArgs } from "@prisma/client/runtime/library"
-import { organizations } from "@/data/sample-pags"
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -428,15 +425,23 @@ export async function getCROData(
     })
 }
 
-export async function getMembers(organizationId: string | null | undefined) {
+export async function getMembers(
+    organizationId: string | null | undefined,
+    select: Prisma.MemberSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
     }
 
     try {
         const fetchedMembers = await prisma?.member.findMany({
-            include: {user: true},
             where: {organizationId},
+            select
         })
 
 
@@ -456,7 +461,7 @@ export async function getMembers(organizationId: string | null | undefined) {
 
 export async function getPublicUser(
     userId: string,
-    select: Prisma.ConditionSelect<InternalArgs & {
+    select: Prisma.UserSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
@@ -465,11 +470,8 @@ export async function getPublicUser(
 ) {
     try {
         const user = await prisma.user.findUnique({
-            // include: {organizations: true},
             where: {id: userId},
-            select: {
-                
-            }
+            select
         })
 
         if (!user) {
