@@ -153,8 +153,6 @@ export default async function ProfilePage() {
             })
         ])
 
-        console.log(`roadmaps data`, roadmaps)
-
         // Existing verified organization rendering logic
         return (
             <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
