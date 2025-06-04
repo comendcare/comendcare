@@ -26,7 +26,9 @@ export default function MarketplaceBreadcrumb({ organization, roadmap, marketpla
 
     useEffect(() => {
         if (urlMilestone) {
-            getPublicMilestoneDetails(urlMilestone).then(response => {
+            getPublicMilestoneDetails(urlMilestone, {
+                title: true,
+            }).then(response => {
                 if (response?.success && response?.data) {
                     setMilestone(response.data);
                 } else {
