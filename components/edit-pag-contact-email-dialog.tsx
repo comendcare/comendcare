@@ -68,7 +68,17 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    editEmailForm.reset({
+                        contactEmail: organization.contactEmail || ""
+                    });
+                }
+                setOpen(state);
+            }}
+        >
             <DialogTrigger asChild>
                 <Button variant="ghost">
                     <Pencil />
