@@ -251,7 +251,13 @@ export const useRoadmapStore = create<RoadmapState>()(
             // let centerY =
             //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
 
-            const milestoneTypes = await getMilestoneTypes()
+            const milestoneTypes = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
     
             const milestonesAlongXAxis = get().nodes.sort((a, b) => {
                 return a?.position?.x - b?.position?.x
