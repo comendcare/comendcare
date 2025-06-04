@@ -31,7 +31,13 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
     useEffect(() => {
         const init = async () => {    
             // get milestone types from database
-            const response = await getMilestoneTypes()
+            const response = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }

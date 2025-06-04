@@ -360,7 +360,13 @@ export function EditMilestoneForm({
             }
 
             // get milestone types from database
-            const response = await getMilestoneTypes()
+            const response = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
@@ -465,7 +471,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="flex flex-col gap-4 mt-2 px-1"
+                    className="flex flex-col gap-4 mt-2 px-1 pb-12"
                 >
                     <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
                         e.preventDefault()

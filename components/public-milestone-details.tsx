@@ -23,7 +23,20 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
     useEffect(() => {
         const init = async () => {
             if (urlMilestone) {
-                await getPublicMilestoneDetails(urlMilestone).then(response => {
+                await getPublicMilestoneDetails(urlMilestone, {
+                    id: true,
+                    title: true,
+                    nodeType: true,
+                    description: true,
+                    startDate: true,
+                    endDate: true,
+                    budget: true,
+                    status: true,
+                    types: true,
+                    attachments: true,
+                    rfps: true,
+                    tools: true,
+                }).then(response => {
                     if (response.success) {
                         console.log(`fetched milestone`, response.data)
                         setMilestone(response.data)

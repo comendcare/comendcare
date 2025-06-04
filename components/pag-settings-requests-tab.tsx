@@ -9,6 +9,7 @@ import { ProfilePhoto } from "./profile-photo"
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button"
 import MemberRequestsDropdown from "@/components/member-requests-dropdown"
 import Loading from "@/app/loading";
+import {MemberRequest} from "@prisma/client";
 
 export default function PAGSettingsRequestsTab() {
     const {data: session} = useSession()
@@ -27,7 +28,8 @@ export default function PAGSettingsRequestsTab() {
             const response = await getMemberRequestsWithUsers(session.user.organizationId)
 
             if (response.success) {
-                setMemberRequests(response.data?.fetchedMemberRequests ?? [])
+                const unapprovedMemberRequests = response.data?.fetchedMemberRequests.filter((r: MemberRequest) => !r.approved)
+                setMemberRequests(unapprovedMemberRequests ?? [])
             } else {
                 console.error(response.error)
                 toast.error(response.error)

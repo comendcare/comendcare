@@ -21,7 +21,13 @@ export default function PAGSettingsMembersTab() {
             setLoading(true)
 
             if (session?.user?.organizationId) {
-                const response = await getMembers(session?.user.organizationId)
+                const response = await getMembers(session?.user.organizationId, {
+                    id: true,
+                    role: true,
+                    title: true,
+                    email: true,
+                    user: true,
+                })
 
                 if (response.success) {
                     setMembers(response.data || [])
