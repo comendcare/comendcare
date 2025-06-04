@@ -14,7 +14,24 @@ export default async function RoadmapPage() {
 
     let roadmaps: Roadmap[] = []
 
-    const response = await getRoadmaps(orgId)
+    const response = await getRoadmaps(orgId, {
+        id: true,
+        title: true,
+        description: true,
+        content: true,
+        slug: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        published: true,
+        organizationId: true,
+        organization: true,
+        user: true,
+        edges: true,
+        milestones: true,
+        nodes: true,
+        modalities: true
+    })
     if (response.success && response.data) {
         roadmaps = response.data
     }

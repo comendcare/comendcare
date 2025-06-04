@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { getMilestones, getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
+import { getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
 import va from "@vercel/analytics"
@@ -55,7 +55,6 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
     const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([]);
     const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
     const [isSaved, setIsSaved] = useState(false);
     const [open, setOpen] = useState(false); // New state for dialog open/close
@@ -70,13 +69,6 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
 
     useEffect(() => {
         async function fetchData() {
-            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined);
-            if (milestonesResponse.success) {
-                setFetchedMilestones(milestonesResponse.data as Milestone[])
-            } else {
-                console.error(milestonesResponse.error);
-            }
-
             const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined);
             if (savedCompaniesResponse.success) {
                 const savedCompaniesData = savedCompaniesResponse.data as SavedCompany[];

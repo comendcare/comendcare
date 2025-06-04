@@ -234,7 +234,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             // }
 
             // init tool store
-            let toolResponse = await getAssets(session.user.organizationId)
+            let toolResponse = await getAssets(session.user.organizationId, {
+                id: true,
+                title: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                private: true,
+                pinned: true,
+                milestones: true
+            })
             if (toolResponse.success) {
                 initializeAssetsStore(toolResponse.data || [])
                 console.log(`Tools initialized...`)
@@ -244,7 +253,21 @@ export default function AppLayout({children}: AppLayoutProps) {
             }
 
             // init rfp store
-            let rfpResponse = await getRFPs(session.user.organizationId)
+            let rfpResponse = await getRFPs(session.user.organizationId, {
+                id: true,
+                title: true,
+                description: true,
+                openTo: true,
+                startDate: true,
+                endDate: true,
+                contacts: true,
+                attachments: true,
+                budget: true,
+                private: true,
+                headerImage: true,
+                pinned: true,
+                milestones: true
+            })
             if (rfpResponse.success) {
                 initializeRFPStore(rfpResponse.data || [])
                 console.log(`RFPs initialized...`)

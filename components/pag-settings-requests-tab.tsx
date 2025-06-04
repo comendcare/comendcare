@@ -25,10 +25,19 @@ export default function PAGSettingsRequestsTab() {
                 return
             }
 
-            const response = await getMemberRequestsWithUsers(session.user.organizationId)
+            const response = await getMemberRequestsWithUsers(session.user.organizationId, {
+                id: true,
+                email: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+                approved: true,
+                organization: true,
+                user: true
+            })
 
             if (response.success) {
-                const unapprovedMemberRequests = response.data?.fetchedMemberRequests.filter((r: MemberRequest) => !r.approved)
+                const unapprovedMemberRequests = response.data?.filter((r: MemberRequest) => !r.approved)
                 setMemberRequests(unapprovedMemberRequests ?? [])
             } else {
                 console.error(response.error)

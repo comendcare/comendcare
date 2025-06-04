@@ -66,7 +66,6 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
     const router = useRouter()
     const {data: session} = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([]);
     const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
     const [isSaved, setIsSaved] = useState(false);
     console.log(row)
@@ -82,13 +81,6 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
 
     useEffect(() => {
         async function fetchData() {
-            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined);
-            if (milestonesResponse.success) {
-                setFetchedMilestones(milestonesResponse.data as Milestone[]);
-            } else {
-                console.error(milestonesResponse.error);
-            }
-
             const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined);
             if (savedCompaniesResponse.success) {
                 const savedCompaniesData = savedCompaniesResponse.data as SavedCompany[];
