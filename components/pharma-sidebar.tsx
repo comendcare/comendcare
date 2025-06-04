@@ -115,7 +115,13 @@ export function PharmaSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const result = await getPharmaProjects()
+            const result = await getPharmaProjects({
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                metadata: true
+            })
             if (result.success && result.data) {
                 // Map DB projects to match NavProjects expected format
                 const formatted = result.data.map((project: any) => ({

@@ -31,6 +31,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
@@ -39,8 +40,7 @@ const invitationFormSchema = z.object({
 
 export default function InviteUserToOrgDialog() {
     const session = useSession();
-    const router = useRouter()
-
+    const [loading, setLoading] = useState(false);
     const [organization, setOrganization] = useState<Organization | null>();
     const [isOpen, setIsOpen] = useState(false); // Control dialog state
 
@@ -116,6 +116,7 @@ export default function InviteUserToOrgDialog() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+        setLoading(true)
         try {
             const response = await inviteUser(
                 organization?.id as string, // organizationId
@@ -146,6 +147,8 @@ export default function InviteUserToOrgDialog() {
             }
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -214,7 +217,9 @@ export default function InviteUserToOrgDialog() {
                             )}
                         />
 
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit">
+                            {loading ? <LoadingDots color="#808080"/> : "Submit"}
+                        </Button>
                     </form>
                 </Form>
             </DialogContent>
