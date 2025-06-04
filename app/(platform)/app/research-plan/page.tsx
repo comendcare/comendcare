@@ -25,12 +25,14 @@ export default async function RoadmapPage() {
         updatedAt: true,
         published: true,
         organizationId: true,
-        organization: true,
-        user: true,
+        userId: true,
         edges: true,
         milestones: true,
         nodes: true,
-        modalities: true
+        organization: true,
+        user: true,
+        modalities: true,
+        metadata: true,
     })
     if (response.success && response.data) {
         roadmaps = response.data
