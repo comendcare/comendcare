@@ -1272,12 +1272,19 @@ export const getSavedCompaniesFromOrganizationId = withOrganizationAuth(
 /* USER FETCHERS - only the active user has access to these functions, usually fetching their own user data in some capacity */
 export const getUser = withUserAuth(
     async (
-        user: User
+        user: User,
+        select: Prisma.UserSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
     ) => {
         try {
             const fetchedUser = await prisma.user.findUnique({
                 where: {id: user.id},
-                include: {organizations: true},
+                // include: {organizations: true},
+                select
             })
 
             if (!fetchedUser) {
@@ -1320,7 +1327,14 @@ export async function isUserFollowing(id: string) {
     }
 }
 
-export const getAllNotifications = async () => {
+export const getAllNotifications = async (
+    select: Prisma.PlatformNotificationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) => {
     try {
         const session = await getSession()
         if (!session?.user.id) throw new Error("User ID or Organization ID not in session")
@@ -1329,7 +1343,8 @@ export const getAllNotifications = async () => {
             where: {
                 userId: session.user.id,
                 organizationId: session.user.organizationId
-            }
+            },
+            select
         })
 
         return {success: true, data: notifications}
@@ -1341,15 +1356,14 @@ export const getAllNotifications = async () => {
 
 /* ADMIN PANEL FETCHERS - require admin priviledges to access these functions */
 export const getOrganizationFromRoadmapId = withAdminAuth(
-    async (roadmapId: string): Promise<ApiResponse<any>> => {
+    async (
+        roadmapId: string,
+    ): Promise<ApiResponse<any>> => {
         try {
             const roadmap = await prisma.roadmap.findUnique({
                 where: {
                     id: roadmapId
                 },
-                select: {
-                    organizationId: true
-                }
             })
 
             if (!roadmap) {
@@ -1795,10 +1809,18 @@ export const getUserChartAnalytics = withAdminAuth(
 )
 
 export const getUserWhitelist = withAdminAuth(
-    async () => {
+    async (
+        select: Prisma.PlatformNotificationSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const whitelist = await prisma.whitelist.findMany({
                 orderBy: { createdAt: "desc" },
+                select
             })
 
 
@@ -1818,7 +1840,14 @@ export const getUserWhitelist = withAdminAuth(
 )
 
 export const getUserBlacklist = withAdminAuth(
-    async () =>  {
+    async (
+        select: Prisma.PlatformNotificationSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) =>  {
         try {
             const blacklist = await prisma.blacklist.findMany({
                 orderBy: { createdAt: "desc" },
@@ -1858,10 +1887,18 @@ export const getOverviewAnalytics = withAdminAuth(
 
 /* PHARMA PROTOTYPE FETCHERS - tbd how we want to use auth on these */
 
-export async function getPharmaProjects() {
+export async function getPharmaProjects(
+    select: Prisma.PharmaProjectSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
     try {
         const projects = await prisma.pharmaProject.findMany({
             orderBy: { createdAt: "desc" },
+            select
         })
 
         return {
@@ -1946,27 +1983,49 @@ export async function getIPData() {
     }
 }
 
-export async function getPharmaProjectData(id: string) {
+export async function getPharmaProjectData(
+    id: string,
+    select: Prisma.PharmaProjectSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
     return prisma.pharmaProject.findUnique({
         where: {
             id: id
         },
+        select
     })
 }
 
-export async function getAllOrganizationsWithConditions() {
+export async function getAllOrganizationsWithConditions(
+    select: Prisma.OrganizationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
     try {
         const organizations = await prisma.organization.findMany({
             orderBy: {
                 createdAt: "desc",
             },
-            include: {
-                conditions: {
-                    include: {
-                        condition: true
-                    }
-                },
-            },
+            // include: {
+            //     conditions: {
+            //         include: {
+            //             condition: true
+            //         }
+            //     },
+            // },
+            select: {
+                ...select,
+                conditions: select.conditions ? ({
+                    include: {condition: true}
+                }) : undefined
+            }
         })
 
         return {

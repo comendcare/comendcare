@@ -110,6 +110,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                     updatedAt: true,
                     invitedBy: true,
                     organization: true,
+                    organizationId: true,
                     user: true,
                     metadata: true
                 });

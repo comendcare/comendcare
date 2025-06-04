@@ -222,7 +222,11 @@ export function BlacklistDataTable() {
 
     useEffect(() => {
         async function fetchData() {
-            const response = await getUserBlacklist();
+            const response = await getUserBlacklist({
+                id: true,
+                email: true,
+                createdAt: true
+            });
             if (response.success) {
                 setData(response.data ?? [])
             } else {
