@@ -25,7 +25,15 @@ export default function PAGSettingsInvitationsTab() {
                 return
             }
 
-            const response = await getInvitees(session.user.organizationId)
+            const response = await getInvitees(session.user.organizationId, {
+                id: true,
+                email: true,
+                role: true,
+                organizationId: true,
+                createdAt: true,
+                updatedAt: true,
+                accepted: true,
+            })
 
             if (response.success) {
                 setInvitees(response.data ?? [])

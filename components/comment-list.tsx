@@ -28,7 +28,12 @@ export function CommentList({postId}: PostCommentProps) {
         const fetchPostComments = async () => {
             if (status === "authenticated" && session?.user?.id) {
                 try {
-                    const response = await getPostComments(postId);
+                    const response = await getPostComments(postId, {
+                        id: true,
+                        text: true,
+                        author: true,
+                        createdAt: true,
+                    });
                     if (response.success && response.data) {
                         setComments(response.data);
                     } else {

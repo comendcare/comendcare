@@ -1,19 +1,14 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
-import {getOrganizationData, getConditionsDataFromOrgId, getRFPs, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
+import {getOrganizationData, getConditionsDataFromOrgId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapCard, RoadmapsCard} from "@/components/public-roadmap-card";
+import {RoadmapsCard} from "@/components/public-roadmap-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import {Card, CardContent} from "@/components/ui/card";
-import Image from "next/image";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
-import Link from "next/link";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
-import { PublicNoResearchPlans } from "@/components/no-research-plans";
-import { Prisma } from "@prisma/client";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({

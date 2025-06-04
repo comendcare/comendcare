@@ -9,9 +9,6 @@ import {useSession} from "next-auth/react"
 import {inviteUser} from "@/lib/actions";
 import {useParams} from "next/navigation";
 import {getIp} from "@/lib/utils";
-import {useEffect, useState} from "react";
-import {Organization} from "@prisma/client";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {toast} from "sonner";
 
 const invitationFormSchema = z.object({
@@ -21,20 +18,6 @@ const invitationFormSchema = z.object({
 export default function InvitationForm() {
     const session = useSession()
     const params = useParams()
-
-    const [organization, setOrganization] = useState<Organization | null>();
-
-    useEffect(() => {
-        getOrganizationFromOrganizationId(params?.id as string).then((response) => {
-            if (response.success) {
-                const organization = response.data
-                setOrganization(organization)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-        })
-    }, [params?.id, setOrganization]);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
