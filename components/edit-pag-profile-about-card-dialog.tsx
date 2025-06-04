@@ -96,10 +96,6 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
 
     const formData = editOrgForm.watch()
 
-    useEffect(() => {
-        console.log(`form data`, formData)
-    }, [formData])
-
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
