@@ -1158,10 +1158,19 @@ export const getAllMembershipsFromUserId = withUserAuth(
 )
 
 export const getKanbanFromOrganizationId = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.KanbanSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const kanban = await prisma.kanban.findUnique({
-                where: {organizationId: organization.id}
+                where: {organizationId: organization.id},
+                select
             })
 
             return {success: true, data: kanban}
@@ -1173,7 +1182,15 @@ export const getKanbanFromOrganizationId = withOrganizationAuth(
 )
 
 export const getColumns = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.ColumnSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const dbColumns = await prisma.column.findMany({
                 where: {
@@ -1186,15 +1203,26 @@ export const getColumns = withOrganizationAuth(
                 orderBy: [
                     {kanbanPosition: 'asc'},
                 ],
-                include: {
-                    tasks: {
+                // include: {
+                //     tasks: {
+                //         orderBy: [{kanbanPosition: 'asc'}],
+                //         include: {
+                //             checklist: true,
+                //             stakeholders: {include: {user: true}},
+                //             milestone: true
+                //         }
+                //     }
+                // }
+                select: {
+                    ...select,
+                    tasks: select.tasks ? ({
                         orderBy: [{kanbanPosition: 'asc'}],
                         include: {
                             checklist: true,
                             stakeholders: {include: {user: true}},
                             milestone: true
                         }
-                    }
+                    }) : undefined
                 }
             })
 
@@ -1207,14 +1235,23 @@ export const getColumns = withOrganizationAuth(
 )
 
 export const getSavedCompaniesFromOrganizationId = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.SavedCompanySelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const savedCompanies = await prisma?.savedCompany.findMany({
                 where: {organizationId: organization.id},
-                include: {
-                    company: true,
-                    milestone: true
-                }
+                // include: {
+                //     company: true,
+                //     milestone: true
+                // }
+                select
             })
 
             if (!savedCompanies) {
@@ -1234,7 +1271,9 @@ export const getSavedCompaniesFromOrganizationId = withOrganizationAuth(
 
 /* USER FETCHERS - only the active user has access to these functions, usually fetching their own user data in some capacity */
 export const getUser = withUserAuth(
-    async (user: User) => {
+    async (
+        user: User
+    ) => {
         try {
             const fetchedUser = await prisma.user.findUnique({
                 where: {id: user.id},
