@@ -1464,7 +1464,10 @@ export const updateMember = withOrganizationAuth(
 
 // Invite user function with updated Organization model
 export const deleteMember = withOrganizationAuth(
-    async (membershipId: string) => {
+    async (
+        _: Organization,
+        membershipId: string
+    ) => {
         const session = await getSession()
 
         try {
