@@ -32,7 +32,35 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
 
             if (status === "authenticated" && session?.user?.id) {
                 try {
-                    const userData = await getUser(session.user.id);
+                    const userData = await getUser(session.user.id, {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        notificationSettings: true,
+                        consentSettings: true,
+                        accounts: true,
+                        comments: true,
+                        follows: true,
+                        sentInvitations: true,
+                        memberships: true,
+                        membershipRequests: true,
+                        organizations: true,
+                        posts: true,
+                        reactions: true,
+                        roadmaps: true,
+                        sessions: true,
+                        stakeholders: true,
+                        platformNotifications: true,
+                        reviews: true,
+                        replies: true,
+                        reportOnReviews: true,
+                        reportOnReplies: true,
+                        reviewFeedbacks: true,
+                        metadata: true,
+                    });
                     setUserData(userData);
                 } catch (error) {
                     console.error("Failed to fetch user data:", error);

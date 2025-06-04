@@ -38,7 +38,35 @@ export default function UserProfilePage() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.id) {
-                const response = await getUser(session.user.id);
+                const response = await getUser(session.user.id, {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    notificationSettings: true,
+                    consentSettings: true,
+                    accounts: true,
+                    comments: true,
+                    follows: true,
+                    sentInvitations: true,
+                    memberships: true,
+                    membershipRequests: true,
+                    organizations: true,
+                    posts: true,
+                    reactions: true,
+                    roadmaps: true,
+                    sessions: true,
+                    stakeholders: true,
+                    platformNotifications: true,
+                    reviews: true,
+                    replies: true,
+                    reportOnReviews: true,
+                    reportOnReplies: true,
+                    reviewFeedbacks: true,
+                    metadata: true,
+                });
                 if (response.success) {
                     const userData = response.data
                     setUser(userData);
