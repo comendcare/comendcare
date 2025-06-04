@@ -137,7 +137,33 @@ export async function ProfileCompletionCard() {
         });
         if (orgResponse.success) organization = orgResponse.data as unknown as Organization;
 
-        const condResponse = await getConditionsFromOrganizationId(session.user.organizationId);
+        const condResponse = await getConditionsFromOrganizationId(session.user.organizationId, {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            diseaseCategories: true,
+            prevalenceNumerator: true,
+            prevalenceDenominator: true,
+            numberOfPatientsEngaged: true,
+            nationalEstimatedPopulation: true,
+            globalEstimatedPopulation: true,
+            relevantDiseaseMechanisms: true,
+            causalGenes: true,
+            associatedGenes: true,
+            associatedSystems: true,
+            associatedSignsAndSymptoms: true,
+            existingDatabasesAndStudies: true,
+            toolsUnderDevelopment: true,
+            createdAt: true,
+            updatedAt: true,
+            gardURL: true,
+            nordURL: true,
+            summary: true,
+            prevalenceRatio: true,
+            organizations: true,
+            metadata: true,
+        });
         if (condResponse.success) conditions = (condResponse.data ?? []) as Condition[];
     }
 

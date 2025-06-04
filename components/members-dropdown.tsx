@@ -152,7 +152,18 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
 
             if (session && response.success) {
                 // Fetch the latest memberships after leaving
-                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id);
+                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id, {
+                    id: true,
+                    role: true,
+                    title: true,
+                    email: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    invitedBy: true,
+                    organization: true,
+                    user: true,
+                    metadata: true
+                });
 
                 if (updatedMembershipsResponse.success && updatedMembershipsResponse.data) {
                     if (updatedMembershipsResponse.data.length > 0) {

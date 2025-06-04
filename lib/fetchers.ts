@@ -1048,7 +1048,15 @@ export const getOrganizationFromOrganizationId = withOrganizationAuth(
 )
 
 export const getConditionsFromOrganizationId = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.ConditionSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const conditions = await prisma.condition.findMany({
                 where: {
@@ -1058,9 +1066,10 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
                         },
                     },
                 },
-                include: {
-                    organizations: true, // Include related ConditionToOrganization data if needed
-                },
+                // include: {
+                //     organizations: true, // Include related ConditionToOrganization data if needed
+                // },
+                select
             });
 
             if (!conditions || conditions.length === 0) {
@@ -1075,7 +1084,14 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
     }
 )
 
-export const getAllNonMemberOrganizations = async () => {
+export const getAllNonMemberOrganizations = async (
+    select: Prisma.OrganizationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) => {
     const session = await getSession()
     try {
         if (!session) {
@@ -1090,6 +1106,7 @@ export const getAllNonMemberOrganizations = async () => {
                     },
                 },
             },
+            select,
             orderBy: {
                 createdAt: "asc"
             },
@@ -1107,16 +1124,25 @@ export const getAllNonMemberOrganizations = async () => {
 }
 
 export const getAllMembershipsFromUserId = withUserAuth(
-    async (user: User) => {
+    async (
+        user: User,
+        select: Prisma.MemberSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const memberships = await prisma.member.findMany({
                 where: {
                     userId: user.id
                 },
-                include: {
-                    organization: true,
-                    user: true
-                }
+                // include: {
+                //     organization: true,
+                //     user: true
+                // },
+                select
             });
 
             if (!memberships) {
@@ -1546,7 +1572,33 @@ export const getOrganizationAnalytics = withAdminAuth(
 
         for (const org of allOrganizations) {
             let conditions: Condition[] = [];
-            const condResponse = await getConditionsFromOrganizationId(org.id);
+            const condResponse = await getConditionsFromOrganizationId(org.id, {
+                id: true,
+                name: true,
+                slug: true,
+                description: true,
+                diseaseCategories: true,
+                prevalenceNumerator: true,
+                prevalenceDenominator: true,
+                numberOfPatientsEngaged: true,
+                nationalEstimatedPopulation: true,
+                globalEstimatedPopulation: true,
+                relevantDiseaseMechanisms: true,
+                causalGenes: true,
+                associatedGenes: true,
+                associatedSystems: true,
+                associatedSignsAndSymptoms: true,
+                existingDatabasesAndStudies: true,
+                toolsUnderDevelopment: true,
+                createdAt: true,
+                updatedAt: true,
+                gardURL: true,
+                nordURL: true,
+                summary: true,
+                prevalenceRatio: true,
+                organizations: true,
+                metadata: true,
+            });
             if (condResponse.success) conditions = (condResponse.data ?? []) as Condition[];
             const checks = getProfileCompletionChecks(org as any, conditions as any);
             const isComplete = Object.values(checks).every(Boolean);

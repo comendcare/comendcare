@@ -142,7 +142,18 @@ export function NavUser() {
         async function fetchOrgData() {
             if (session) {
                 try {
-                    const response = await getAllMembershipsFromUserId(session.user.id);
+                    const response = await getAllMembershipsFromUserId(session.user.id, {
+                    id: true,
+                    role: true,
+                    title: true,
+                    email: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    invitedBy: true,
+                    organization: true,
+                    user: true,
+                    metadata: true
+                });
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {

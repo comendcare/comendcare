@@ -55,7 +55,33 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             try {
                 // Fetch conditions for the given organization ID
-                const response = await getConditionsFromOrganizationId(session.user.organizationId);
+                const response = await getConditionsFromOrganizationId(session.user.organizationId, {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    description: true,
+                    diseaseCategories: true,
+                    prevalenceNumerator: true,
+                    prevalenceDenominator: true,
+                    numberOfPatientsEngaged: true,
+                    nationalEstimatedPopulation: true,
+                    globalEstimatedPopulation: true,
+                    relevantDiseaseMechanisms: true,
+                    causalGenes: true,
+                    associatedGenes: true,
+                    associatedSystems: true,
+                    associatedSignsAndSymptoms: true,
+                    existingDatabasesAndStudies: true,
+                    toolsUnderDevelopment: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    gardURL: true,
+                    nordURL: true,
+                    summary: true,
+                    prevalenceRatio: true,
+                    organizations: true,
+                    metadata: true,
+                });
 
                 if (response.success) {
                     const conditions = response.data;

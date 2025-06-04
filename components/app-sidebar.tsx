@@ -101,7 +101,18 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     useEffect(() => {
         const fetchOrganizations = async () => {
             if (session) {
-                const response = await getAllMembershipsFromUserId(session.user.id);
+                const response = await getAllMembershipsFromUserId(session.user.id, {
+                    id: true,
+                    role: true,
+                    title: true,
+                    email: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    invitedBy: true,
+                    organization: true,
+                    user: true,
+                    metadata: true
+                });
                 if (response.success) {
                     const orgs = response.data ?? []
                     setMemberships(orgs)
