@@ -113,7 +113,10 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
     useEffect(() => {
         const identifyUser = async () => {
             if (isMixpanelInitialized && session?.user?.email && session?.user?.id) {
-                const userData = await getUser(session?.user?.id)
+                const userData = await getUser(session?.user?.id, {
+                    id: true,
+                    consentSettings: true
+                })
                 if (userData.success && userData.data) {
 
                     // handle opt-opt in option

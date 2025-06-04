@@ -222,7 +222,11 @@ export function WhitelistDataTable() {
 
     useEffect(() => {
         async function fetchData() {
-            const response = await getUserWhitelist();
+            const response = await getUserWhitelist({
+                id: true,
+                email: true,
+                createdAt: true
+            });
             if (response.success) {
                 setData(response.data ?? [])
             } else {

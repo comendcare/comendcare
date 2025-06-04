@@ -135,7 +135,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Start initialization... for org ${session.user.organizationId}`)
 
             // Init notifications
-            let notifications = await getAllNotifications()
+            let notifications = await getAllNotifications({
+                id: true,
+                type: true,
+                title: true,
+                message: true,
+                link: true,
+                createdAt: true,
+                updatedAt: true,
+                lastViewedAt: true,
+            })
             if (notifications.success && notifications.data) {
                 initializeNotificationsState({
                     notifications: notifications.data
