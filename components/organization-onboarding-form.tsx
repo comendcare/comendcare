@@ -732,7 +732,7 @@ export default function OrganizationOnboardingForm(
                                                     {/*disabled to make the tooltip unclickable*/}
                                                     <TooltipTrigger disabled>
                                                         <Info
-                                                            className="text-black h-4 inline-block align-baseline mx-1 h-4 w-4"/>
+                                                            className="text-black inline-block align-baseline mx-1 h-4 w-4"/>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
                                                         <p>

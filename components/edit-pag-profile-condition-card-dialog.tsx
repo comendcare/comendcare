@@ -294,7 +294,19 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     <FormItem>
                                         <FormLabel>Causal genes</FormLabel>
                                         <FormDescription>
-                                            Select all that apply.
+                                            {`Select all that apply.`}
+                                            <Tooltip delayDuration={0}>
+                                                {/*disabled to make the tooltip unclickable*/}
+                                                <TooltipTrigger disabled>
+                                                    <Info
+                                                        className="text-black inline-block align-baseline mx-1 h-4 w-4"/>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        {`Causal genes are those that are known to directly cause your disorder.`}
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
                                         </FormDescription>
                                         <FormControl>
                                             <MultipleSelector
@@ -319,9 +331,20 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     <FormItem>
                                         <FormLabel>Associated genes</FormLabel>
                                         <FormDescription>
-                                            Select all that apply.
+                                            {`Select all that apply.`}
+                                            <Tooltip delayDuration={0}>
+                                                {/*disabled to make the tooltip unclickable*/}
+                                                <TooltipTrigger disabled>
+                                                    <Info
+                                                        className="text-black inline-block align-baseline mx-1 h-4 w-4"/>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        {`Associated genes are those that may tangentially be related to your disorder.`}
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
                                         </FormDescription>
-                                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
