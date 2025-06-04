@@ -488,9 +488,16 @@ export async function getPublicUser(
     }
 }
 
-export async function getMilestoneTypes() {
+export async function getMilestoneTypes(
+    select: Prisma.MilestoneTypeSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     try {
-        const types = await prisma.milestoneType.findMany({})
+        const types = await prisma.milestoneType.findMany({select})
 
         return {success: true, data: types}
     } catch (error: any) {
@@ -499,69 +506,49 @@ export async function getMilestoneTypes() {
     }
 }
 
-export async function getPublicMilestoneDetails(id: string) {
+export async function getPublicMilestoneDetails(
+    id: string,
+    select: Prisma.MilestoneSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     try {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
-            include: {
-                node: true,
-                contacts: true,
-                attachments: true,
-                types: { include: { milestoneType: true } },
-                tools: { 
+            select: {
+                ...select,
+                types: select.types ? ({include: {milestoneType: true}}) : undefined,
+                tools: select.tools ? ({ 
                     include: { 
                         tool: {
                             include: { 
                                 milestones: {
-                                    include: {
-                                        milestone: true
-                                    },
-                                    where: {
-                                        milestone: {
-                                            private: {
-                                                equals: false
-                                            }
-                                        }
-                                    }
+                                    include: {milestone: true},
+                                    where: {milestone: {private: {equals: false}}}
                                 }
                             }
                         }, 
                     }, 
-                    where: { 
-                        tool: {
-                            private: {
-                                equals: false
-                            }
-                        }
-                    } 
-                },
-                rfps: { 
+                    where: {tool: {private: {equals: false}}} 
+                }) : undefined,
+                rfps: select.rfps ? ({ 
                     include: { 
                         rfp: {
                             include: {
                                 milestones: {
-                                    include: {
-                                        milestone: true
-                                    },
-                                    where: {
-                                        milestone: {
-                                            private: {
-                                                equals: false
-                                            }
-                                        }
-                                    }
+                                    include: {milestone: true},
+                                    where: {milestone: {private: {equals: false}}}
                                 }
                             }
                         }, 
                     }, 
                     where: { 
-                        rfp: {
-                            private: {
-                                equals: false
-                            }
-                        }
+                        rfp: {private: {equals: false}}
                     } 
-                }
+                }) : undefined
             }
         })
 
@@ -572,7 +559,9 @@ export async function getPublicMilestoneDetails(id: string) {
     }
 }
 
-export async function checkSubdomainAvailability(nickname: string) {
+export async function checkSubdomainAvailability(
+    nickname: string,
+): Promise<Boolean | {error: string}> {
     try {
         const existingOrg = await prisma.organization.findUnique({
             where: {subdomain: nickname},
@@ -583,26 +572,6 @@ export async function checkSubdomainAvailability(nickname: string) {
         console.error("Database error checking subdomain availability:", error);
         return {error: "Database error. Please try again later."};
     }
-}
-
-export async function getCompanies(ids: string[]) {
-    const results = await prisma.company.findMany({
-        where: {
-            id: { in: ids },
-        },
-        include: {
-            services: true,
-            sites: true,
-            certifications: {
-                include: {
-                    files: true,
-                },
-            },
-            rfis: true,
-            reviews: true,
-        },
-    });
-    return results
 }
 
 export async function getPostComments(postId: string) {

@@ -148,7 +148,13 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Notificaions initialized...`)
 
             // init CRO Search store
-            const milestoneTypes = await getMilestoneTypes()
+            const milestoneTypes = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
             const parsedCROFilters = {
                 categories: parseQuery(queryCategories),
                 milestoneTypes: parseQuery(queryMilestoneTypes)
