@@ -11,7 +11,58 @@ export default async function FeedPage() {
 
     let organization = null
     if (session?.user.organizationId) {
-        const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {
+            id: true,
+            public: true,
+            verified: true,
+            published: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            logo: true,
+            font: true,
+            image: true,
+            headerImage: true,
+            biopharmaConsentSettings: true,
+            subdomain: true,
+            customDomain: true,
+            statedGoal: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
+            members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
+            conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
+        })
         if (response.success) {
             organization = response.data
         } else {
@@ -19,7 +70,14 @@ export default async function FeedPage() {
         }
     }
 
-    const posts = await getPosts()
+    const posts = await getPosts({
+        id: true,
+        content: true,
+        createdAt: true,
+        text: true,
+        author: true,
+        mentions: true,
+    })
     console.log(posts)
 
     if (organization) {

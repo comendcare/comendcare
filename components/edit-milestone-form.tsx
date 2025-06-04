@@ -348,12 +348,35 @@ export function EditMilestoneForm({
                 //     setOrgIsPublished(response.data.published)
                 // }
 
-                const toolsResponse = await getAssets(session.user.organizationId)
+                const toolsResponse = await getAssets(session.user.organizationId, {
+                    id: true,
+                    title: true,
+                    description: true,
+                    contacts: true,
+                    attachments: true,
+                    private: true,
+                    pinned: true,
+                    milestones: true
+                })
                 if (toolsResponse.success && toolsResponse.data) {
                     setFetchedAssets(toolsResponse.data || [])
                 }
 
-                const rfpsResponse = await getRFPs(session.user.organizationId)
+                const rfpsResponse = await getRFPs(session.user.organizationId, {
+                    id: true,
+                    title: true,
+                    description: true,
+                    openTo: true,
+                    startDate: true,
+                    endDate: true,
+                    contacts: true,
+                    attachments: true,
+                    budget: true,
+                    private: true,
+                    headerImage: true,
+                    pinned: true,
+                    milestones: true
+                })
                 if (rfpsResponse.success && rfpsResponse.data) {
                     setFetchedRFPs(rfpsResponse.data || [])
                 }
