@@ -85,7 +85,35 @@ export function NavUser() {
 
             if (status === "authenticated" && session?.user?.id) {
                 try {
-                    const userData = await getUser(session.user.id);
+                    const userData = await getUser(session.user.id, {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        notificationSettings: true,
+                        consentSettings: true,
+                        accounts: true,
+                        comments: true,
+                        follows: true,
+                        sentInvitations: true,
+                        memberships: true,
+                        membershipRequests: true,
+                        organizations: true,
+                        posts: true,
+                        reactions: true,
+                        roadmaps: true,
+                        sessions: true,
+                        stakeholders: true,
+                        platformNotifications: true,
+                        reviews: true,
+                        replies: true,
+                        reportOnReviews: true,
+                        reportOnReplies: true,
+                        reviewFeedbacks: true,
+                        metadata: true,
+                    });
                     setUserData(userData);
 
                     const response = await getInvitations({
