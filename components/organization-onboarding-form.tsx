@@ -165,7 +165,11 @@ export default function OrganizationOnboardingForm(
 
         const fetchOrganizations = async () => {
             try {
-                await getAllNonMemberOrganizations().then((response) => {
+                await getAllNonMemberOrganizations({
+                    id: true,
+                    name: true,
+                    description: true
+                }).then((response) => {
                     if (response.success && response.data) {
                         const options: Option[] = response.data.map((org, index) => ({
                             value: org.id || index.toString(),
