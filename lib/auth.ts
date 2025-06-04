@@ -8,7 +8,7 @@ import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
 import {User} from "next-auth";
-import { toast } from "sonner"
+import {toast} from "sonner"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
@@ -154,15 +154,29 @@ export const authOptions: NextAuthOptions = {
             // Check if the user still exists in the database
             const dbUser = await prisma.user.findUnique({
                 where: {id: token.sub},
-                include: { memberships: true }, // Ensure we get latest memberships
+                include: {memberships: true}, // Ensure we get latest memberships
             });
 
             const organizationIds = dbUser?.memberships.map((m) => m.organizationId);
 
             // Storing both the current organizationId AND the membership object is redundant
             // The membership object has the organizationId
-            let activeOrganizationId = token.organizationId as string | null;
-            let membership = token.membership as Member | null
+            // Prefer the token's organizationId if the user still has access to it
+            let membership: Member | null = null;
+            let activeOrganizationId: string | null = null;
+
+            if (dbUser?.memberships.length) {
+                const validOrgIds = dbUser.memberships.map(m => m.organizationId);
+
+                if (typeof token.organizationId === "string" && validOrgIds.includes(token.organizationId)) {
+                    activeOrganizationId = token.organizationId;
+                    membership = dbUser.memberships.find(m => m.organizationId === token.organizationId) || null;
+                } else {
+                    // fallback to first available membership
+                    membership = dbUser.memberships[0];
+                    activeOrganizationId = membership.organizationId;
+                }
+            }
 
             if (organizationIds) {
                 // If activeOrganizationId is null but the user has memberships, use the first membership
@@ -258,7 +272,7 @@ export function getSession() {
     3. The user's email is included in our admin whitelist
 */
 export function withAdminAuth(action: any) {
-    return async(
+    return async (
         ...args: any
     ) => {
         const session = await getSession()
@@ -352,7 +366,7 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
 
         if (roles) {
             if (!roles.includes(membership.role)) {
-                return { error: `Not authorized: role ${membership.role} doesn't have access to this action`}
+                return {error: `Not authorized: role ${membership.role} doesn't have access to this action`}
             }
         }
 
