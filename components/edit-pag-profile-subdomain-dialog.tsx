@@ -129,7 +129,18 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    // Reset form to current organization's subdomain when dialog is closed
+                    editOrgForm.reset({
+                        subdomain: organization?.subdomain || ""
+                    });
+                }
+                setOpen(state);
+            }}
+        >
             <DialogTrigger asChild>
                 <Button
                     variant="ghost"

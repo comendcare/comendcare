@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata | null> {
     const domain = decodeURIComponent(params.domain)
     const data = await getOrganizationData(domain, {
-             description: true,
+            description: true,
             website: true,
             therapeuticsInDevelopment: true,
             therapeuticsOfInterest: true,
