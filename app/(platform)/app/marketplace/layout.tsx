@@ -7,7 +7,7 @@ import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
-import {getOrganizationFromOrganizationId, getPublicOrganizationData} from "@/lib/fetchers";
+import {getPublicOrganizationData} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import Image from "next/image"

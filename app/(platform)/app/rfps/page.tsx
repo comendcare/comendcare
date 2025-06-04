@@ -9,7 +9,7 @@ export default async function RFPsPage() {
 
     let organization = null
     if (session?.user.organizationId) {
-        const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {id: true})
         if (response.success) {
             organization = response.data
         } else {

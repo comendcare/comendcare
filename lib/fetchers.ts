@@ -574,15 +574,21 @@ export async function checkSubdomainAvailability(
     }
 }
 
-export async function getPostComments(postId: string) {
+export async function getPostComments(
+    postId: string,
+    select: Prisma.CommentSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
     try {
         const comments = await prisma.comment.findMany({
             where: {
                 postId: postId
             },
-            include: {
-                author: true,
-            },
+            select,
             orderBy: {
                 createdAt: "desc"
             }
@@ -595,13 +601,17 @@ export async function getPostComments(postId: string) {
     }
 }
 
-export async function getPosts() {
+export async function getPosts(    
+    select: Prisma.PostSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
     try {
         const posts = await prisma.post.findMany({
-            include: {
-                author: true,
-                comments: true,
-            },
+            select,
             orderBy: {
                 createdAt: "desc"
             }
@@ -616,18 +626,23 @@ export async function getPosts() {
 
 /* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
 export const getAssets = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.ToolSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const fetchedAssets = await prisma?.tool.findMany({
                 where: {organizationId: organization.id},
-                include: {
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: true
-                        }
-                    }
+                select: {
+                    ...select,
+                    milestones: select.milestones ? ({
+                        include: {milestone: true}
+                    }) : undefined
                 },
                 orderBy: [{ createdAt: "desc" }]
             })
@@ -648,18 +663,21 @@ export const getAssets = withOrganizationAuth(
 )
 
 export const getRFPs = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.RFPSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const fetchedRFPs = await prisma?.rFP.findMany({
                 where: {organizationId: organization.id},
-                include: {
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: true
-                        }
-                    }
+                select: {
+                    ...select,
+                    milestones: {include: {milestone: true}}
                 },
                 orderBy: [{ createdAt: "desc" }]
             })
@@ -680,11 +698,20 @@ export const getRFPs = withOrganizationAuth(
 )
 
 export const getMilestones = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.MilestoneSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const fetchedMilestones = await prisma?.milestone.findMany({
                 where: {organizationId: organization.id},
-                include: {roadmap: true}
+                // include: {roadmap: true}
+                select
             })
 
             if (!fetchedMilestones) {
@@ -702,7 +729,14 @@ export const getMilestones = withOrganizationAuth(
     }
 )
 
-export const getInvitations = async () => {
+export const getInvitations = async (
+    select: Prisma.InvitationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) => {
     const session = await getSession()
 
     try {
@@ -715,6 +749,7 @@ export const getInvitations = async () => {
                 email: session.user.email,
                 accepted: false
             },
+            select
         })
 
         if (!invitations) {
@@ -732,10 +767,19 @@ export const getInvitations = async () => {
 }
 
 export const getInvitees = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.InvitationSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const fetchedInvitees = await prisma?.invitation.findMany({
                 where: {organizationId: organization.id, accepted: false},
+                select
             })
 
             if (!fetchedInvitees) {
@@ -754,7 +798,15 @@ export const getInvitees = withOrganizationAuth(
 )
 
 export const getUserMemberRequests = withUserAuth(
-    async (user: User) => {
+    async (
+        user: User,
+        select: Prisma.MemberRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         const session = await getSession()
 
         try {
@@ -763,10 +815,11 @@ export const getUserMemberRequests = withUserAuth(
             }
 
             const fetchedMemberRequests = await prisma?.memberRequest.findMany({
-                include: {organization: true},
+                // include: {organization: true},
                 where: {
                     userId: session.user.id,
                 },
+                select
             })
 
             if (!fetchedMemberRequests) {
@@ -785,13 +838,22 @@ export const getUserMemberRequests = withUserAuth(
 )
 
 export const getMemberRequestsWithUsers = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.MemberRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             const fetchedMemberRequests = await prisma?.memberRequest.findMany({
-                include: {user: true},
+                // include: {user: true},
                 where: {
                     organizationId: organization.id,
                 },
+                select
             })
 
             // return {fetchedMemberRequests}
@@ -802,7 +864,7 @@ export const getMemberRequestsWithUsers = withOrganizationAuth(
 
             return {
                 success: true,
-                data: {fetchedMemberRequests}
+                data: fetchedMemberRequests
             };
         } catch (error: any) {
             logError("Error fetching member requests", error);
@@ -812,22 +874,27 @@ export const getMemberRequestsWithUsers = withOrganizationAuth(
 )
 
 export const getRoadmaps = withOrganizationAuth(
-    async (organization: Organization) => {
+    async (
+        organization: Organization,
+        select: Prisma.RoadmapSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
-            const fetchedOrganization = await prisma.organization.findUnique({
-                include: {roadmaps: {include: {milestones: true}}},
+            const roadmaps = await prisma.roadmap.findMany({
+                // include: {roadmaps: {include: {milestones: true}}},
                 where: {
-                    id: decodeURIComponent(organization.id)
-                }
+                    organizationId: decodeURIComponent(organization.id)
+                },
+                select
             })
-
-            if (!fetchedOrganization) {
-                return {success: false, error: "organization not found"};
-            }
 
             return {
                 success: true,
-                data: fetchedOrganization?.roadmaps
+                data: roadmaps
             };
         } catch (error: any) {
             logError("Error fetching roadmap id", error);
@@ -837,7 +904,16 @@ export const getRoadmaps = withOrganizationAuth(
 )
 
 export const getRoadmap = withOrganizationAuth(
-    async (authOrg: Organization, roadmapId: string | null | undefined) => {
+    async (
+        authOrg: Organization, 
+        roadmapId: string | null | undefined,
+        select: Prisma.RoadmapSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         if (!roadmapId) return {success: false, error: "No roadmap id provided."}
 
         try {
@@ -853,7 +929,27 @@ export const getRoadmap = withOrganizationAuth(
                     organizationId: organization.id,
                     id: roadmapId
                 },
-                include: {
+                // include: {
+                //     nodes: {
+                //         include: {data: true},
+                //         orderBy: [{ createdAt: "desc" }]
+                //     },
+                //     milestones: {
+                //         include: {
+                //             node: true,
+                //             contacts: true,
+                //             attachments: true,
+                //             types: {include: { milestoneType: true }},
+                //             tools: {include: {tool: true}},
+                //             rfps: {include: {rfp: true}}
+                //         },
+                //         orderBy: [{ createdAt: "desc" }]
+                //     },
+                //     edges: true,
+                //     organization: true
+                // }
+                select: {
+                    ...select,
                     nodes: {
                         include: {data: true},
                         orderBy: [{ createdAt: "desc" }]
@@ -868,9 +964,7 @@ export const getRoadmap = withOrganizationAuth(
                             rfps: {include: {rfp: true}}
                         },
                         orderBy: [{ createdAt: "desc" }]
-                    },
-                    edges: true,
-                    organization: true
+                    }
                 }
             })
 
@@ -883,27 +977,45 @@ export const getRoadmap = withOrganizationAuth(
 )
 
 export const getOrganizationFromOrganizationId = withOrganizationAuth(
-    async (authOrganization: Organization) => {
+    async (
+        authOrganization: Organization,
+        select: Prisma.OrganizationSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
         try {
             let organization = await prisma.organization.findUnique({
                 where: {
                     id: authOrganization.id,
                 },
-                include: {
-                    roadmaps: true,
-                    members: {
-                        orderBy: {
-                            createdAt: 'asc'
-                        },
-                        include: {
-                            user: true
-                        }
-                    },
-                    conditions: {
-                        include: {
-                            condition: true
-                        }
-                    }
+                // include: {
+                //     roadmaps: true,
+                //     members: {
+                //         orderBy: {
+                //             createdAt: 'asc'
+                //         },
+                //         include: {
+                //             user: true
+                //         }
+                //     },
+                //     conditions: {
+                //         include: {
+                //             condition: true
+                //         }
+                //     }
+                // }
+                select: {
+                    ...select,
+                    members: select.members ? ({
+                        orderBy: {createdAt: 'asc'},
+                        include: {user: true}
+                    }) : undefined,
+                    conditions: select.conditions ? ({
+                        include: {condition: true}
+                    }) : undefined
                 }
             });
 
@@ -911,19 +1023,21 @@ export const getOrganizationFromOrganizationId = withOrganizationAuth(
                 return {success: false, error: "organization not found"};
             }
 
-            // sort members list - move org owners to the beginning of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.role === 'owner' && b.role !== 'owner') return -1
-                if (b.role === 'owner' && a.role !== 'owner') return 1
-                return 0
-            })
+            if (organization.members) {
+                // sort members list - move org owners to the beginning of the list
+                organization.members = organization.members.sort((a, b) => {
+                    if (a.role === 'owner' && b.role !== 'owner') return -1
+                    if (b.role === 'owner' && a.role !== 'owner') return 1
+                    return 0
+                })
 
-            // sort members list - move comend users to the end of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-                return 0
-            })
+                // sort members list - move comend users to the end of the list
+                organization.members = organization.members.sort((a, b) => {
+                    if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+                    if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+                    return 0
+                })
+            }
 
             return {success: true, data: organization};
         } catch (error: any) {

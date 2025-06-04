@@ -22,7 +22,12 @@ export default function ProjectMultipleSelector({
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
-            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined, {
+                id: true,
+                title: true,
+                roadmap: true,
+                
+            })
             if (milestonesResponse.success) {
                 setFetchedMilestones(milestonesResponse?.data as Milestone[])
             } else {
