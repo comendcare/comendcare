@@ -163,23 +163,22 @@ export const RFPActionsMenu = ({rfp}: {rfp: RFP}) => {
                     <DialogContent className="min-w-fit">
                         <ShareDialog
                             url={`${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}?rfp=${rfp.id}`}
-                            // organization={organization}
-                            // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
-                            // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
-                            // embeddedProjectData={{
-                            //     embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestone.roadmapId}/project/${milestone.id}`,
-                            //     projectId: milestone.id,
-                            //     projectTitle: milestone.title
-                            // }}
-                            
+                            embeddedRFPData={{
+                                embeddedRFPLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization?.subdomain}/rfp/${rfp.id}`,
+                                rfpId: rfp.id,
+                                rfpTitle: rfp.title
+                            }}  
+                            organization={organization}
+                            postMessage={`A new RFP ${rfp.title} has been added to ${organization?.name} ${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}?rfp=${rfp.id}`}
+                            postSubject={`A new RFP ${rfp.title} has been added to ${organization?.name}`}
 
-                            // trackShareEvent={{
-                            //     title: `Project Shared`,
-                            //     additonalProperties: {
-                            //         "Project ID": milestone.id,
-                            //         "Project Title": milestone.title
-                            //     }
-                            // }}
+                            trackShareEvent={{
+                                title: `RFP Shared`,
+                                additonalProperties: {
+                                    "RFP ID": rfp.id,
+                                    "RFP Title": rfp.title
+                                }
+                            }}
                         />
                     </DialogContent>
                 </div>
