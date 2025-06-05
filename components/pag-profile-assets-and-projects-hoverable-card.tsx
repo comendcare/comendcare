@@ -34,8 +34,11 @@ import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
 import { formatMoney } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
+import { useSearchParams } from "next/navigation";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }: { tools: any[], rfps: any[], isPrivate: boolean }) => {
+    const searchParams = useSearchParams()
+
     if (tools && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
@@ -52,7 +55,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }:
                                         <CarouselContent>
                                             {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
                                                 <CarouselItem key={index} className="lg:basis-1/2">
-                                                    <Dialog>
+                                                    <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
                                                         <DialogTrigger className="w-full h-full" onClick={() => {
                                                             mixpanelTrack("RFP Details Viewed", {
                                                                 "ID": rfp.id,

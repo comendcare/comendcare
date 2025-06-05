@@ -113,6 +113,7 @@ export default async function OrganizationHomePage({
             milestones: true
         }),
         getPublicRFPsForOrganization(domain, {
+            id: true,
             title: true,
             description: true,
             openTo: true,
@@ -123,7 +124,8 @@ export default async function OrganizationHomePage({
             pinned: true,
             contacts: true,
             attachments: true,
-            milestones: true
+            milestones: true,
+            organizationId: true,
         })
     ])
 

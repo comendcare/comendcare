@@ -33,7 +33,8 @@ export default async function EmbeddedRFPPage({params}: {params: {domain: string
             private: true,
             headerImage: true,
             // pinned: true,
-            milestones: true
+            milestones: true,
+            organizationId: true,
         })
     ])
 
