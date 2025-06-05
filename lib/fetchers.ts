@@ -83,6 +83,28 @@ export async function getPublicRFPsForOrganization(
     return rfps
 }
 
+export async function getPublicRFP(
+    id: string,
+    select: Prisma.RFPSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
+    const rfp = await prisma.rFP.findUnique({
+        where: {id, private: {equals: false}},
+        select: {
+            ...select,
+            milestones: select.milestones ? ({
+                where: {milestone: {private: {equals: false}}}
+            }) : undefined
+        }
+    })
+
+    return rfp
+}
+
 export async function getPublicRoadmapsForOrganization(
     domain: string,
     select: Prisma.RoadmapSelect<InternalArgs & {
