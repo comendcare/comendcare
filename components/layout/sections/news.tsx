@@ -74,13 +74,14 @@ export const BlogCard = ({ blog }: { blog: Blog }) => {
             href={`${blog.slug}`}
         >
             {blog.image ? (
-                <BlurImage
-                    src={blog.image || ""}
-                    alt={blog.title}
-                    height="800"
-                    width="800"
-                    className="h-52 object-cover object-top w-full"
-                />
+                <div className="relative w-full h-60">
+                    <Image
+                        src={blog.image || ""}
+                        alt={blog.title}
+                        fill
+                        className="object-cover object-top"
+                    />
+                </div>
             ) : (
                 <div className="h-52 flex items-center justify-center bg-blue-light dark:bg-neutral-900" />
             )}
