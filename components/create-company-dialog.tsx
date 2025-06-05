@@ -106,14 +106,14 @@ export function CreateCompanyDialog() {
             const response = await createCompany(formData)
 
             if (response.success) {
-                toast.success("Company created successfully")
+                toast.success("Service Provider created successfully")
                 form.reset()
                 setOpen(false)
             } else {
-                toast.error(response.error || "An error occurred while creating the company.")
+                toast.error(response.error || "An error occurred while creating the Service Provider.")
             }
         } catch (error) {
-            console.error("Create company error:", error)
+            console.error("Create Service Provider error:", error)
             toast.error("An unexpected error occurred.")
         } finally {
             setLoading(false)
@@ -123,13 +123,13 @@ export function CreateCompanyDialog() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Create New Company</Button>
+                <Button>Create New Service Provider</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Company</DialogTitle>
+                    <DialogTitle>Create New Service Provider</DialogTitle>
                     <DialogDescription>
-                        {`Enter the company's information. Click save when you're done.`}
+                        {`Enter the service provider's information. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -142,7 +142,7 @@ export function CreateCompanyDialog() {
                                 <FormItem>
                                     <FormLabel>Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Company Name" {...field} />
+                                        <Input placeholder="Service Provider Name" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -156,7 +156,7 @@ export function CreateCompanyDialog() {
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                        <Textarea placeholder="What does this company do?" {...field} />
+                                        <Textarea placeholder="What does this service provider do?" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
