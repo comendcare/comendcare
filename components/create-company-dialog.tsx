@@ -48,11 +48,11 @@ const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().min(1, "Description is required"),
     website: z.string().url("Enter a valid URL"),
-    yearFounded: z.string().regex(/^\d{4}$/, "Enter a valid year"),
-    headquarters: z.string(),
     type: z.string(),
-    services: z.array(optionSchema),
-    certifications: z.array(optionSchema),
+    yearFounded: z.string().regex(/^\d{4}$/, "Enter a valid year").optional(),
+    headquarters: z.string().optional(),
+    services: z.array(optionSchema).optional(),
+    certifications: z.array(optionSchema).optional(),
 })
 
 type CreateCompanyFormValues = z.infer<typeof formSchema>
@@ -86,9 +86,9 @@ export function CreateCompanyDialog() {
             formData.set("orgName", values.name)
             formData.set("description", values.description)
             formData.set("website", values.website)
-            formData.set("founded", values.yearFounded)
-            formData.set("headquarters", values.headquarters)
-            formData.set("type", values.yearFounded)
+            formData.set("founded", values.yearFounded || "")
+            formData.set("headquarters", values.headquarters || "")
+            formData.set("type", values.type || "")
 
             // Map form values into FormData
             const data = {
@@ -125,7 +125,7 @@ export function CreateCompanyDialog() {
             <DialogTrigger asChild>
                 <Button>Create New Service Provider</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Create New Service Provider</DialogTitle>
                     <DialogDescription>
