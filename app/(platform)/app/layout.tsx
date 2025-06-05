@@ -32,6 +32,9 @@ import { BookOpen, Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
 import Link from "next/link";
+import {MobileWarning} from "@/components/mobile-warning";
+import {useIsMobile} from "@/lib/hooks/use-mobile";
+import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -309,6 +312,11 @@ export default function AppLayout({children}: AppLayoutProps) {
     useEffect(() => {
         setTourName(getTourName())
     }, [pathname, roadmapId, getTourName])
+
+    const isMobile = useIsMobile()
+    if (isMobile) return <>
+        <MobileWarning />
+    </>
 
     if (status === "authenticated" && session) {
         return (
