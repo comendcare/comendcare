@@ -6,6 +6,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { getOrganizationData, getPublicRFP, getPublicRoadmapsForOrganization } from "@/lib/fetchers";
 import { formatMoney, standardizeYear } from "@/lib/utils";
 import { Building2, Calendar, HandCoins } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default async function EmbeddedRFPPage({params}: {params: {domain: string, rfpId: string}}) {
@@ -62,7 +63,9 @@ export default async function EmbeddedRFPPage({params}: {params: {domain: string
                 </BreadcrumbList>
             </Breadcrumb>
             <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
-            <RFPCard rfp={rfp}/>
+            <Link href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}?rfp=${rfp?.id}`} target="_blank">
+                <RFPCard rfp={rfp}/>
+            </Link>
         </div>
     )
 }
