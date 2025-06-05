@@ -30,7 +30,6 @@
     "@notionhq/client": "^2.2.15",
     "@prisma/client": "^5.22.0",
     "@prisma/extension-pulse": "^1.2.0",
-    "@prisma/studio": "^0.511.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -184,7 +183,6 @@
     "swr": "^2.2.4",
     "tailwind-merge": "^2.5.5",
     "tailwind-scrollbar-hide": "^1.1.7",
-    "tsx": "^4.19.3",
     "typesense": "^1.8.2",
     "unist-util-visit": "^5.0.0",
     "uploadthing": "^7.2.0",
@@ -196,6 +194,8 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.3.0",
+    "@next/bundle-analyzer": "^15.3.3",
+    "@prisma/studio": "^0.511.0",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.16",
     "@types/canvas-confetti": "^1.6.4",
@@ -220,6 +220,7 @@
     "react-email": "3.0.1",
     "tailwindcss": "^3.4.13",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.19.4",
     "typescript": "^5.2.2"
   }
 }
