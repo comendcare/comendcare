@@ -304,6 +304,7 @@ export function NavUser() {
                     id: true,
                     role: true,
                     organization: true,
+                    user: true,
                 });
 
                 if (response.success && response.data) {
@@ -398,6 +399,12 @@ export function NavUser() {
 
     const handleClose = async (memberRequest: MemberRequestWithUser) => {
         try {
+            mixpanelTrack("Membership Request Approval Acknowledged", {
+                "Member Name": memberRequest.user.name,
+                "Member Email": memberRequest.user.email,
+                "Role": memberRequest.role
+            })
+
             const response = await deleteMemberRequest(session?.user.id, memberRequest);
 
             if (response.success && response.data) {
