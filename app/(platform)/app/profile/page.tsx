@@ -139,6 +139,7 @@ export default async function ProfilePage() {
                 milestones: true
             }),
             getPublicRFPsForOrganization(organization.subdomain, {
+                id: true,
                 title: true,
                 description: true,
                 openTo: true,
@@ -149,7 +150,8 @@ export default async function ProfilePage() {
                 pinned: true,
                 contacts: true,
                 attachments: true,
-                milestones: true
+                milestones: true, 
+                organizationId: true
             })
         ])
 
