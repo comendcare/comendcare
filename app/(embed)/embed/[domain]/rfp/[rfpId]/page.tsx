@@ -8,59 +8,15 @@ import { formatMoney, standardizeYear } from "@/lib/utils";
 import { Building2, Calendar, HandCoins } from "lucide-react";
 import { notFound } from "next/navigation";
 
-export default async function EmbeddedResearchPlansPage({params}: {params: {domain: string, rfpId: string}}) {
+export default async function EmbeddedRFPPage({params}: {params: {domain: string, rfpId: string}}) {
     const [organization, rfp] = await Promise.all([
         getOrganizationData(params.domain, {
             id: true,
-            public: true,
-            verified: true,
-            published: true,
             name: true,
-            description: true,
-            contactEmail: true,
-            logo: true,
-            font: true,
             image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
             subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
             createdAt: true,
             updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
         }),
         getPublicRFP(params.rfpId, {
             id: true,
@@ -76,8 +32,7 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
             budget: true,
             private: true,
             headerImage: true,
-            pinned: true,
-            metadata: true,
+            // pinned: true,
             milestones: true
         })
     ])
