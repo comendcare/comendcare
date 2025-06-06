@@ -33,7 +33,7 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
             edges: [],
             milestones: [],
             selectedView: null,
-            selectedNodeId: null 
+            selectedNodeIds: []
         })
     }, [])
 
