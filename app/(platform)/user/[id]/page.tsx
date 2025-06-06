@@ -120,10 +120,10 @@ export default function UserProfilePage() {
                     id: true,
                     email: true,
                     role: true,
+                    organizationId: true,
                     createdAt: true,
                     updatedAt: true,
                     accepted: true,
-                    organizationId: true,
                 });
 
                 if (response.success && response.data) {
