@@ -61,7 +61,7 @@ export const columns: ColumnDef<Asset>[] = [
         ),
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">
-                {row.original.milestones.map((milestone, index) => (
+                {row.original.milestones?.map((milestone, index) => (
                     <li key={index} className="line-clamp-2">
                         {milestone.milestone?.title || undefined}
                     </li>

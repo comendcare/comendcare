@@ -18,7 +18,18 @@ export default function SavesPage() {
 
     useEffect(() => {
         async function fetchData() {
-            const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined);
+            const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined, {
+                id: true,
+                organizationId: true,
+                organization: true,
+                companyId: true,
+                company: true,
+                milestoneId: true,
+                milestone: true,
+                updatedAt: true,
+                createdAt: true,
+                metadata: true
+            });
             if (savedCompaniesResponse.success) {
                 const savedCompaniesData = savedCompaniesResponse.data as SavedCompanyData[];
                 setSavedCompanies(savedCompaniesData);

@@ -99,7 +99,10 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
 
     useEffect(() => {
         const fetchData = async () => {
-            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined, {
+                id: true,
+                title: true,
+            })
             if (milestonesResponse.success) {
                 const filteredMilestones = milestonesResponse?.data?.filter(
                     (item: any) => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private

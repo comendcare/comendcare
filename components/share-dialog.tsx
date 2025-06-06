@@ -20,6 +20,7 @@ export default function ShareDialog({
                                         embeddedResearchPlansData,
                                         embeddedResearchPlanData,
                                         embeddedProjectData,
+                                        embeddedRFPData,
                                         trackShareEvent,
                                     }: {
     url: string,
@@ -38,6 +39,11 @@ export default function ShareDialog({
         embeddedProjectLink?: string,
         projectId: string,
         projectTitle: string
+    },
+    embeddedRFPData?: {
+        embeddedRFPLink?: string,
+        rfpId: string,
+        rfpTitle: string
     }
     trackShareEvent?: {
         title: string,
@@ -319,6 +325,30 @@ export default function ShareDialog({
                                                 "Organization Name": organization.name,
                                                 "Project ID": embeddedProjectData.projectId,
                                                 "Project Title": embeddedProjectData.projectTitle,
+                                                "Copy Method": location
+                                            } : undefined),
+                                        })
+                                    }}
+                                />
+                            </AccordionContent>
+                        </AccordionItem>
+                    )}
+                    {embeddedRFPData?.embeddedRFPLink && (
+                        <AccordionItem value="item-3">
+                            <AccordionTrigger className="font-semibold text-primary">
+                                Embed RFP
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <CopyCodeBlock 
+                                    code={embedCode(embeddedRFPData.embeddedRFPLink)} 
+                                    language={"JavaScript"}
+                                    onCopyCallback={(location?: string | undefined) => {
+                                        mixpanelTrack(`RFP Embed Copied`, {
+                                            ...(organization ? {
+                                                "Organization ID": organization.id,
+                                                "Organization Name": organization.name,
+                                                "RFP ID": embeddedRFPData.rfpId,
+                                                "RFP Title": embeddedRFPData.rfpTitle,
                                                 "Copy Method": location
                                             } : undefined),
                                         })

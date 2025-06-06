@@ -56,12 +56,20 @@ export default async function OrganizationHomePage({
     const [organization, roadmaps, tools, rfps] = await Promise.all([
         getOrganizationData(domain, {
             id: true,
+            public: true,
+            verified: true,
+            published: true,
             name: true,
             description: true,
             contactEmail: true,
+            logo: true,
+            font: true,
             image: true,
             headerImage: true,
+            biopharmaConsentSettings: true,
             subdomain: true,
+            customDomain: true,
+            statedGoal: true,
             yearFounded: true,
             incorporationStatus: true,
             therapeuticsOfInterest: true,
@@ -70,8 +78,33 @@ export default async function OrganizationHomePage({
             moneyRaised: true,
             moneyDeployed: true,
             researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
             members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
             conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
         }),
         getPublicRoadmapsForOrganization(domain, {
             id: true,
@@ -92,6 +125,7 @@ export default async function OrganizationHomePage({
             milestones: true
         }),
         getPublicRFPsForOrganization(domain, {
+            id: true,
             title: true,
             description: true,
             openTo: true,
@@ -102,7 +136,8 @@ export default async function OrganizationHomePage({
             pinned: true,
             contacts: true,
             attachments: true,
-            milestones: true
+            milestones: true,
+            organizationId: true,
         })
     ])
 
@@ -218,15 +253,15 @@ export default async function OrganizationHomePage({
                             />
                         ),
                     },
-                    // ...(organization.contactEmail
-                    //     ? [
-                    //         {
-                    //             title: "Contact patient group",
-                    //             icon: <Mail/>,
-                    //             dialog: <ContactPAGDialog organization={organization}/>,
-                    //         },
-                    //     ]
-                    //     : []),
+                    ...(organization.contactEmail
+                        ? [
+                            {
+                                title: "Contact patient group",
+                                icon: <Mail/>,
+                                dialog: <ContactPAGDialog organization={organization}/>,
+                            },
+                        ]
+                        : []),
                 ]}
                 orientation="vertical"
                 desktopClassName="right-4"

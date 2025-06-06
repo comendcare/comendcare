@@ -5,7 +5,7 @@ import {useOnboardingStore} from '@/state/onboarding/onboardingStore';
 import {useSession} from 'next-auth/react';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {useEffect, useState} from "react";
-import {getInvitations, getOrganizationFromOrganizationId, getPublicOrganizationData} from "@/lib/fetchers";
+import {getInvitations, getPublicOrganizationData} from "@/lib/fetchers";
 import { Check } from 'lucide-react';
 
 type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';
@@ -87,12 +87,41 @@ export default function OnboardingSteps() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await getInvitations();
+                const response = await getInvitations({
+                    id: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    accepted: true,
+                    organizationId: true,
+                });
 
                 if (response.success && response.data) {
                     const invitationsWithDetails = await Promise.all(
                         response.data.map(async (invitation) => {
-                            const orgResponse = await getPublicOrganizationData(invitation.organizationId);
+                            const orgResponse = await getPublicOrganizationData(invitation.organizationId, {
+                                id: true,
+                                name: true,
+                                published: true,
+                                verified: true,
+                                public: true,
+                                description: true,
+                                contactEmail: true,
+                                image: true,
+                                headerImage: true,
+                                subdomain: true,
+                                yearFounded: true,
+                                incorporationStatus: true,
+                                therapeuticsOfInterest: true,
+                                therapeuticsInDevelopment: true,
+                                website: true,
+                                moneyRaised: true,
+                                moneyDeployed: true,
+                                researchBudget: true,
+                                members: true,
+                                conditions: true,
+                            });
                             return {
                                 ...invitation,
                                 organization: orgResponse.success ? orgResponse.data : null,

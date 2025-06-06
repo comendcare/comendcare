@@ -31,6 +31,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/app/mixpanel";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
@@ -39,13 +40,63 @@ const invitationFormSchema = z.object({
 
 export default function InviteUserToOrgDialog() {
     const session = useSession();
-    const router = useRouter()
-
+    const [loading, setLoading] = useState(false);
     const [organization, setOrganization] = useState<Organization | null>();
     const [isOpen, setIsOpen] = useState(false); // Control dialog state
 
     useEffect(() => {
-        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((response) => {
+        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId, {
+            id: true,
+            public: true,
+            verified: true,
+            published: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            logo: true,
+            font: true,
+            image: true,
+            headerImage: true,
+            biopharmaConsentSettings: true,
+            subdomain: true,
+            customDomain: true,
+            statedGoal: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
+            members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
+            conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
+        }).then((response) => {
             if (response.success) {
                 const organization = response.data
                 setOrganization(organization)
@@ -65,6 +116,7 @@ export default function InviteUserToOrgDialog() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+        setLoading(true)
         try {
             const response = await inviteUser(
                 organization?.id as string, // organizationId
@@ -95,6 +147,8 @@ export default function InviteUserToOrgDialog() {
             }
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -163,7 +217,9 @@ export default function InviteUserToOrgDialog() {
                             )}
                         />
 
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit">
+                            {loading ? <LoadingDots color="#808080"/> : "Submit"}
+                        </Button>
                     </form>
                 </Form>
             </DialogContent>

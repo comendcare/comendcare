@@ -33,7 +33,10 @@ export default function CROPageTabs() {
             setLoading(true)
             const pathParts = pathname.split("/")
             const id = decodeURIComponent(pathParts[pathParts.length - 1])
-            const data = await getCROData(id)
+            const data = await getCROData(id, {
+                services: true,
+                reviews: true,
+            })
             setCRO(data)
             setLoading(false)
         }

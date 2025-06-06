@@ -48,11 +48,11 @@ const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().min(1, "Description is required"),
     website: z.string().url("Enter a valid URL"),
-    yearFounded: z.string().regex(/^\d{4}$/, "Enter a valid year"),
-    headquarters: z.string(),
     type: z.string(),
-    services: z.array(optionSchema),
-    certifications: z.array(optionSchema),
+    yearFounded: z.string().regex(/^\d{4}$/, "Enter a valid year").optional(),
+    headquarters: z.string().optional(),
+    services: z.array(optionSchema).optional(),
+    certifications: z.array(optionSchema).optional(),
 })
 
 type CreateCompanyFormValues = z.infer<typeof formSchema>
@@ -86,9 +86,9 @@ export function CreateCompanyDialog() {
             formData.set("orgName", values.name)
             formData.set("description", values.description)
             formData.set("website", values.website)
-            formData.set("founded", values.yearFounded)
-            formData.set("headquarters", values.headquarters)
-            formData.set("type", values.yearFounded)
+            formData.set("founded", values.yearFounded || "")
+            formData.set("headquarters", values.headquarters || "")
+            formData.set("type", values.type || "")
 
             // Map form values into FormData
             const data = {
@@ -106,14 +106,14 @@ export function CreateCompanyDialog() {
             const response = await createCompany(formData)
 
             if (response.success) {
-                toast.success("Company created successfully")
+                toast.success("Service Provider created successfully")
                 form.reset()
                 setOpen(false)
             } else {
-                toast.error(response.error || "An error occurred while creating the company.")
+                toast.error(response.error || "An error occurred while creating the Service Provider.")
             }
         } catch (error) {
-            console.error("Create company error:", error)
+            console.error("Create Service Provider error:", error)
             toast.error("An unexpected error occurred.")
         } finally {
             setLoading(false)
@@ -123,13 +123,13 @@ export function CreateCompanyDialog() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Create New Company</Button>
+                <Button>Create New Service Provider</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Company</DialogTitle>
+                    <DialogTitle>Create New Service Provider</DialogTitle>
                     <DialogDescription>
-                        {`Enter the company's information. Click save when you're done.`}
+                        {`Enter the service provider's information. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -142,7 +142,7 @@ export function CreateCompanyDialog() {
                                 <FormItem>
                                     <FormLabel>Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Company Name" {...field} />
+                                        <Input placeholder="Service Provider Name" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -156,7 +156,7 @@ export function CreateCompanyDialog() {
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                        <Textarea placeholder="What does this company do?" {...field} />
+                                        <Textarea placeholder="What does this service provider do?" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
