@@ -22,7 +22,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {AddressType} from "@/lib/types";
 import {useEffect, useState} from "react";
 import {FileWithPreview} from "@/components/image-selector";
-import {getInvitations, getOrganizationFromOrganizationId, getPublicOrganizationData, getUser} from "@/lib/fetchers";
+import {getInvitations, getPublicOrganizationData, getUser} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { getPublicFile } from "@/lib/utils";
@@ -59,12 +59,41 @@ export default function UserOnboardingForm() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await getInvitations();
+                const response = await getInvitations({
+                    id: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    accepted: true,
+                    organizationId: true,
+                });
 
                 if (response.success && response.data) {
                     const invitationsWithDetails = await Promise.all(
                         response.data.map(async (invitation) => {
-                            const orgResponse = await getPublicOrganizationData(invitation.organizationId);
+                            const orgResponse = await getPublicOrganizationData(invitation.organizationId, {
+                                id: true,
+                                name: true,
+                                published: true,
+                                verified: true,
+                                public: true,
+                                description: true,
+                                contactEmail: true,
+                                image: true,
+                                headerImage: true,
+                                subdomain: true,
+                                yearFounded: true,
+                                incorporationStatus: true,
+                                therapeuticsOfInterest: true,
+                                therapeuticsInDevelopment: true,
+                                website: true,
+                                moneyRaised: true,
+                                moneyDeployed: true,
+                                researchBudget: true,
+                                members: true,
+                                conditions: true,
+                            });
                             return {
                                 ...invitation,
                                 organization: orgResponse.success ? orgResponse.data : null,
@@ -135,7 +164,35 @@ export default function UserOnboardingForm() {
         async function fetchUserData() {
             if (session?.user?.id) {
                 let userData
-                const response = await getUser(session.user.id);
+                const response = await getUser(session.user.id, {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    notificationSettings: true,
+                    consentSettings: true,
+                    accounts: true,
+                    comments: true,
+                    follows: true,
+                    sentInvitations: true,
+                    memberships: true,
+                    membershipRequests: true,
+                    organizations: true,
+                    posts: true,
+                    reactions: true,
+                    roadmaps: true,
+                    sessions: true,
+                    stakeholders: true,
+                    platformNotifications: true,
+                    reviews: true,
+                    replies: true,
+                    reportOnReviews: true,
+                    reportOnReplies: true,
+                    reviewFeedbacks: true,
+                    metadata: true,
+                });
                 if (response.success) {
                     userData = response.data
                 } else {

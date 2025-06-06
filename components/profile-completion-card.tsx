@@ -11,6 +11,7 @@ import {PrivateBadge} from "@/components/private-badge";
 import { Banknote, File, Globe, Image, Map } from "lucide-react";
 import { ProfileCompletionMixpanelTrack } from "./profile-completion-track";
 import {getProfileCompletionChecks} from "@/lib/utils";
+import { IncorporationStatus } from "@prisma/client";
 
 // Define the possible milestone keys explicitly
 type MilestoneKey =
@@ -82,10 +83,87 @@ export async function ProfileCompletionCard() {
     let conditions: Condition[] = [];
 
     if (session?.user.organizationId) {
-        const orgResponse = await getOrganizationFromOrganizationId(session.user.organizationId);
+        const orgResponse = await getOrganizationFromOrganizationId(session.user.organizationId, {
+            id: true,
+            public: true,
+            verified: true,
+            published: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            logo: true,
+            font: true,
+            image: true,
+            headerImage: true,
+            biopharmaConsentSettings: true,
+            subdomain: true,
+            customDomain: true,
+            statedGoal: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
+            members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
+            conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
+        });
         if (orgResponse.success) organization = orgResponse.data as unknown as Organization;
 
-        const condResponse = await getConditionsFromOrganizationId(session.user.organizationId);
+        const condResponse = await getConditionsFromOrganizationId(session.user.organizationId, {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            diseaseCategories: true,
+            prevalenceNumerator: true,
+            prevalenceDenominator: true,
+            numberOfPatientsEngaged: true,
+            nationalEstimatedPopulation: true,
+            globalEstimatedPopulation: true,
+            relevantDiseaseMechanisms: true,
+            causalGenes: true,
+            associatedGenes: true,
+            associatedSystems: true,
+            associatedSignsAndSymptoms: true,
+            existingDatabasesAndStudies: true,
+            toolsUnderDevelopment: true,
+            createdAt: true,
+            updatedAt: true,
+            gardURL: true,
+            nordURL: true,
+            summary: true,
+            prevalenceRatio: true,
+            organizations: true,
+            metadata: true,
+        });
         if (condResponse.success) conditions = (condResponse.data ?? []) as Condition[];
     }
 

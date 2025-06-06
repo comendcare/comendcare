@@ -9,6 +9,7 @@ export async function POST(req: Request) {
         const results = await prisma.milestone.findMany({
             where: {
                 id: { in: ids }, // Ensure we fetch all organizations
+                private: false
             },
             include: {
                 organization: true,

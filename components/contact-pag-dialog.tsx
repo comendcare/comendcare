@@ -2,6 +2,7 @@
 import React from "react"
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -19,7 +20,8 @@ import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {sendPAGContactEmail} from "@/lib/emails";
-import { mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelTrack, useMixpanelContext } from "@/app/mixpanel";
+import { customerIOTrack, sendCustomerIOContactEmail } from "@/lib/customer-io";
 
 // Validation schema
 const contactSchema = z.object({
@@ -38,6 +40,7 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
             message: "",
         },
     });
+    const { mixpanelContext } = useMixpanelContext()
 
     // Track event in Mixpanel
     const trackMixpanelEvent = () => {
@@ -58,12 +61,43 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
                 "Contacter Name": values.name,
                 "Contacter Email": values.email
             })
-            await sendPAGContactEmail({
-                name: values.name,
-                email: values.email,
-                message: values.message,
-                organizationEmail: organization.contactEmail
-            })
+            // await customerIOTrack({
+            //     userId: mixpanelContext?.distinctId,
+            //     event: "pag_contacted",
+            //     properties: {
+            //         org_id: organization.id,
+            //         org_name: organization.name,
+            //         org_contact_email: organization.contactEmail,
+            //         message: values.message,
+            //         contacter_name: values.name,
+            //         contacter_email: values.email,
+            //         name: organization.name,
+            //         email: organization.contactEmail
+            //     }
+            // })
+            const emailPayload = {
+                transactional_message_id: "3",
+                message_data: {
+                    body: {
+                        message: values.message,
+                        email: organization.contactEmail,
+                        name: organization.name,
+                        contacter_name: values.name,
+                        contacter_email: values.email
+                    }
+                },
+                identifiers: {
+                    id: mixpanelContext?.distinctId
+                },
+                to: organization.contactEmail,
+            }
+            sendCustomerIOContactEmail(emailPayload)
+            // await sendPAGContactEmail({
+            //     name: values.name,
+            //     email: values.email,
+            //     message: values.message,
+            //     organizationEmail: organization.contactEmail
+            // })
         } catch (error) {
             toast.error(`Failed to send message to ${organization.name}. Please try again.`);
         }
@@ -119,7 +153,9 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
                     />
 
                     <DialogFooter>
+                        <DialogClose>
                         <Button type="submit">Send Message</Button>
+                        </DialogClose>
                     </DialogFooter>
                 </form>
             </Form>

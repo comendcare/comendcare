@@ -53,7 +53,13 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
         async function fetchOrgData() {
             if (session) {
                 try {
-                    const response = await getMembers(session.user.organizationId);
+                    const response = await getMembers(session.user.organizationId, {
+                        id: true,
+                        role: true,
+                        title: true,
+                        email: true,
+                        user: true,
+                    });
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
@@ -146,7 +152,18 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
 
             if (session && response.success) {
                 // Fetch the latest memberships after leaving
-                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id);
+                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id, {
+                    id: true,
+                    role: true,
+                    title: true,
+                    email: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    invitedBy: true,
+                    organization: true,
+                    user: true,
+                    metadata: true
+                });
 
                 if (updatedMembershipsResponse.success && updatedMembershipsResponse.data) {
                     if (updatedMembershipsResponse.data.length > 0) {

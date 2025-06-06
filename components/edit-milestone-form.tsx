@@ -348,19 +348,48 @@ export function EditMilestoneForm({
                 //     setOrgIsPublished(response.data.published)
                 // }
 
-                const toolsResponse = await getAssets(session.user.organizationId)
+                const toolsResponse = await getAssets(session.user.organizationId, {
+                    id: true,
+                    title: true,
+                    description: true,
+                    contacts: true,
+                    attachments: true,
+                    private: true,
+                    pinned: true,
+                    milestones: true
+                })
                 if (toolsResponse.success && toolsResponse.data) {
                     setFetchedAssets(toolsResponse.data || [])
                 }
 
-                const rfpsResponse = await getRFPs(session.user.organizationId)
+                const rfpsResponse = await getRFPs(session.user.organizationId, {
+                    id: true,
+                    title: true,
+                    description: true,
+                    openTo: true,
+                    startDate: true,
+                    endDate: true,
+                    contacts: true,
+                    attachments: true,
+                    budget: true,
+                    private: true,
+                    headerImage: true,
+                    pinned: true,
+                    milestones: true
+                })
                 if (rfpsResponse.success && rfpsResponse.data) {
                     setFetchedRFPs(rfpsResponse.data || [])
                 }
             }
 
             // get milestone types from database
-            const response = await getMilestoneTypes()
+            const response = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
@@ -465,7 +494,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="flex flex-col gap-4 mt-2 px-1"
+                    className="flex flex-col gap-4 mt-2 px-1 pb-12"
                 >
                     <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
                         e.preventDefault()
