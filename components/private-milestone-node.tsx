@@ -49,19 +49,19 @@ export interface TaskType {
 }
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
+    selectedNodeIds: state.selectedNodeIds,
     nodes: state.nodes,
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
 })
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const {selectedNodeId} = useRoadmapStore(useShallow(selector))
+    const {selectedNodeIds} = useRoadmapStore(useShallow(selector))
 
     return (
         <Card className={cn(
             "w-[350px] text-wrap break-words",
-            selectedNodeId === props?.id ? "border-black border-2 click-project-step" : "",
+            props?.id && selectedNodeIds.includes(props?.id) ? "border-black border-2 click-project-step" : "",
             props.id === "preview" ? "opacity-50" : "",
         )}>
             <CardHeader>

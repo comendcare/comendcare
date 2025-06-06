@@ -53,8 +53,8 @@ const selector = (state: RoadmapState) => ({
     initialized: state.initialized,
     selectedView: state.selectedView,
     setSelectedView: state.setSelectedView,
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
+    selectedNodeIds: state.selectedNodeIds,
+    setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     saveState: state.saveState,
     addMilestones: state.addMilestones
@@ -73,8 +73,8 @@ export function Roadmap() {
         initialized,
         selectedView,
         setSelectedView,
-        selectedNodeId, 
-        setSelectedNodeId, 
+        selectedNodeIds, 
+        setSelectedNodeIds, 
         milestones, 
         saveState,
         addMilestones
@@ -194,7 +194,7 @@ export function Roadmap() {
                 redo() // undo updates zustand state
                 saveState() // save state to update database
 
-                if (selectedNodeId) {
+                if (selectedNodeIds[0]) {
                     // if there is a node selected, remount the milestone form
                     // to update the form data after the undo was triggered
                     setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -207,7 +207,7 @@ export function Roadmap() {
                 undo(); // undo updates zustand state
                 saveState(); // save state to update database
     
-                if (selectedNodeId) {
+                if (selectedNodeIds[0]) {
                     // Remount the milestone form and update the milestoneRemountKey
                     // using the ref to get the most recent value
                     setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
@@ -217,13 +217,13 @@ export function Roadmap() {
     
         document.addEventListener("keydown", handleUndoRedo);
         return () => document.removeEventListener("keydown", handleUndoRedo);
-    }, [selectedNodeId, milestoneRemountKey, redo, undo, saveState]);
+    }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
 
-        if (selectedNodeId) {
-            params.set("project", selectedNodeId)
+        if (selectedNodeIds[0]) {
+            params.set("project", selectedNodeIds[0])
         } else {
             params.delete("project")
         }
@@ -237,15 +237,15 @@ export function Roadmap() {
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    }, [selectedNodeId, selectedView, pathname, searchParams])
+    }, [selectedNodeIds, selectedView, pathname, searchParams])
     
     const handleMilestonePanelChange = (open: boolean) => {
-        if (!open) { setSelectedNodeId(null) }
+        if (!open) { setSelectedNodeIds([]) }
     }
 
     const handleTabChange = (value: string) => {
         setSelectedView(value)
-        setSelectedNodeId(null) // deselect any selected milestones when switching tabs
+        setSelectedNodeIds([]) // deselect any selected milestones when switching tabs
     }
 
     if (!roadmapId || !initialized) {
@@ -330,7 +330,7 @@ export function Roadmap() {
                                         undo() // undo updates zustand state
                                         saveState() // save state to update database
                         
-                                        if (selectedNodeId) {
+                                        if (selectedNodeIds[0]) {
                                             // if there is a node selected, remount the milestone form
                                             // to update the form data after the undo was triggered
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -351,7 +351,7 @@ export function Roadmap() {
                                         redo() // undo updates zustand state
                                         saveState() // save state to update database
                         
-                                        if (selectedNodeId) {
+                                        if (selectedNodeIds[0]) {
                                             // if there is a node selected, remount the milestone form
                                             // to update the form data after the undo was triggered
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -395,7 +395,7 @@ export function Roadmap() {
                     </Tabs>
                 </ResizablePanel>
 
-                {selectedNodeId != null && (
+                {selectedNodeIds[0] != null && (
                     <>
                         <ResizableHandle withHandle />
 
@@ -409,7 +409,7 @@ export function Roadmap() {
                                 remountKey={milestoneRemountKey}
                                 milestone={milestones.find(
                                     milestone =>
-                                        milestone.nodeId === selectedNodeId
+                                        milestone.nodeId === selectedNodeIds[0]
                                 )}
                                 handlePanelChange={handleMilestonePanelChange}
                                 orgIsPublished={orgIsPublished}
@@ -506,17 +506,17 @@ const MilestoneDetailsPanel = ({
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
-        selectedNodeId, 
+        selectedNodeIds, 
     } = useRoadmapStore(useShallow(selector))
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
     
     useEffect(() => {
-        if (selectedNodeId) {
+        if (selectedNodeIds) {
             // remount if the selected node has changed, this will re-initialize the form data
             // without closing the side panel since we're now editing a new node
             setMilestoneRemountKey(prevKey => prevKey + 1)
         }
-    }, [selectedNodeId, remountKey])
+    }, [selectedNodeIds, remountKey])
 
     const handleClose = () => {
         handlePanelChange(false)
@@ -539,7 +539,7 @@ const MilestoneDetailsPanel = ({
 
 const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpen: (val: boolean) => void, setTab: (val: TabType) => void}) => {
     const pathname = usePathname()
-    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
     const { startOnborda } = useOnborda()
 
     return (
@@ -562,7 +562,7 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
                 variant={"secondary"}
                 onClick={() => {
                     if (pathname.includes('app/research-plan')) {
-                        setSelectedNodeId(null)
+                        setSelectedNodeIds([])
                         setTab('projects')
                         startOnborda('research-plan-tour')
                     }
