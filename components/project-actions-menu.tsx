@@ -28,8 +28,8 @@ import {
 import { mixpanelTrack } from "@/app/mixpanel"
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
+    selectedNodeIds: state.selectedNodeIds,
+    setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
     addMilestones: state.addMilestones
@@ -43,7 +43,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
 
-    const {setSelectedNodeId, addMilestones} = useRoadmapStore(useShallow(selector))
+    const {setSelectedNodeIds, addMilestones} = useRoadmapStore(useShallow(selector))
 
     useEffect(() => {
 
@@ -122,7 +122,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
     }, [session])
 
     const handleEdit = () => {
-        setSelectedNodeId(milestone.nodeId)
+        if (milestone.nodeId) setSelectedNodeIds([milestone.nodeId])
     }
 
     const handleShare = async () => {
@@ -142,7 +142,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
             // contacts: milestone.contacts,
             ...milestone
         }], "Duplicate")
-        if (milestones && milestones.length > 0) setSelectedNodeId(milestones[0].id)
+        if (milestones && milestones.length > 0) setSelectedNodeIds([milestones[0].id])
     }
 
     const handleDelete = async () => {

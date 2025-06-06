@@ -49,7 +49,7 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
                         edges: response.data.edges,
                         milestones: response.data.milestones,
                         selectedView: urlView,
-                        selectedNodeId: urlNode 
+                        selectedNodeIds: urlNode ? [urlNode] : []
                     })
 
                     console.log(`Research Plan initialized...`)
