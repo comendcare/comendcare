@@ -1,4 +1,4 @@
-import React, {memo, useState} from "react"
+import React, {memo, useEffect, useState} from "react"
 import {
     Handle,
     Position,
@@ -53,10 +53,34 @@ const selector = (state: RoadmapState) => ({
     nodes: state.nodes,
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
+    setSelectedNodeIds: state.setSelectedNodeIds,
 })
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const {selectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {selectedNodeIds, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+        console.log(`HANDLE CLICK OUTSIDE`)
+        if (selectedNodeIds.length > 1 && !event.metaKey && props.id && selectedNodeIds.includes(props.id)) {
+            console.log(`handle click outside`, selectedNodeIds)
+            setSelectedNodeIds([])
+        }
+    }
+
+    useEffect(() => {
+        if (selectedNodeIds.length > 1) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchend', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
+        }
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
+        };
+    }), [selectedNodeIds]
 
     return (
         <Card className={cn(

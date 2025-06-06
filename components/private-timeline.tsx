@@ -212,8 +212,25 @@ const DraggableTimelineItem = ({
         touchAction: "none",
         userSelect: "none" as any,
     }
+    
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+        if (selectedNodeIds.length > 1 && !event.metaKey && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
+            console.log(`handle click outside`, selectedNodeIds)
+            setSelectedNodeIds([])
+        }
+        // if (
+        //     dropdownRef.current &&
+        //     !dropdownRef.current.contains(event.target as Node) &&
+        //     inputRef.current &&
+        //     !inputRef.current.contains(event.target as Node)
+        // ) {
+        //     setOpen(false);
+        //     inputRef.current.blur();
+        // }
+    };
 
     useEffect(() => {
+        console.log(`selected node IDs changed`, selectedNodeIds)
         // if only one project is selected, we automatically scroll to that project so it's visible in the view
         if (selectedNodeIds.length === 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
             const el = elementRef.current;
@@ -229,7 +246,20 @@ const DraggableTimelineItem = ({
             if (!isVisible) {
                 el.scrollIntoView({ behavior: "smooth", block: "center" });
             }
+        } 
+        
+        if (selectedNodeIds.length > 1) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchend', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
         }
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
+        };
     }, [selectedNodeIds])
 
     return (
@@ -243,11 +273,11 @@ const DraggableTimelineItem = ({
                 index === 0 ? "click-project-step" : ""
             )}
             onClick={(event) => {
-                console.log(`selected`, milestone.nodeId, event)
                 if (event.metaKey) {
-                    // TODO: add multiselect option here...
                     // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-                    
+                    if (milestone.nodeId && !selectedNodeIds.includes(milestone.nodeId)) {
+                        setSelectedNodeIds([...selectedNodeIds, milestone.nodeId])
+                    }
                 } else {
                     // regular click, set selected node id
                     if (milestone.nodeId) {
