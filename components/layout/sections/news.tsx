@@ -64,7 +64,7 @@ export async function News() {
     );
 }
 
-export const BlogCard = ({ blog }: { blog: Blog }) => {
+export const BlogCard = ({ blog, showFullDescription = false }: { blog: Blog, showFullDescription?: boolean }) => {
     const truncate = (text: string, length: number) => {
         return text.length > length ? text.slice(0, length) + "..." : text;
     };
@@ -102,7 +102,7 @@ export const BlogCard = ({ blog }: { blog: Blog }) => {
                     {blog.title}
                 </p>
                 <p className="text-left text-sm mt-2 text-neutral-600 dark:text-neutral-400">
-                    {truncate(blog.description, 100)}
+                    {showFullDescription ? blog.description : truncate(blog.description, 100)}
                 </p>
             </div>
         </Link>
