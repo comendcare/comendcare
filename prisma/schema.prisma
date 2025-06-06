@@ -502,8 +502,8 @@ model Organization {
   published                 Boolean                   @default(true)
   name                      String?
   description               String?                   @db.Text
-  contactEmail              String?                   @unique /// @encrypted
-  contactEmailHash          String?                   @unique /// @encryption:hash(contactEmail)
+  contactEmail              String? /// @encrypted
+  contactEmailHash          String? /// @encryption:hash(contactEmail)
   logo                      String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
   font                      String                    @default("font-cal")
   image                     String?                   @db.Text
