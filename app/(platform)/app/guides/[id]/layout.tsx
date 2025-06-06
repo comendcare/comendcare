@@ -66,11 +66,11 @@ export default async function GuideArticleLayout({
                     <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                         {title}
                     </h1>
-                    {description && (
+                    {/* {description && (
                         <p className="text-muted-foreground">
                             {description}
                         </p>
-                    )}
+                    )} */}
                 </div>
             </header>
             {children}

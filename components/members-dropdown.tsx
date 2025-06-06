@@ -195,6 +195,8 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             } else {
                 toast.error("Failed to leave organization. Please try again.");
             }
+            
+            location.reload() // force full page refresh
         } catch (error) {
             console.error("Error leaving organization:", error);
             toast.error("An error occurred. Please try again later.");

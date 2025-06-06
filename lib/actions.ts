@@ -104,7 +104,8 @@ export const createMemberRequest = withAuth(
                             id: organizationId
                         }
                     }
-                }
+                },
+                include: {user: true}
             })
 
             const organization = await prisma.organization.findUnique({
@@ -120,19 +121,13 @@ export const createMemberRequest = withAuth(
                 }
             })
 
-            const requester = await prisma.organization.findUnique({
-                where: {id: session.user.id}
-            })
-
-            console.log(`requester`, requester)
-
             if (organization) {
                 await sendMemberRequestCreatedEmail(
                     {
                         user: {
-                            name: requester?.name || session.user.name,
-                            email: requester?.contactEmail || session.user.email,
-                            image: requester?.image || session.user.image,
+                            name: memberRequest.user.name || session.user.name,
+                            email: memberRequest.user.email || session.user.email,
+                            image: memberRequest.user.image || session.user.image,
                         },
                         owners: organization.members.map(member => ({
                             name: member.user?.name,
@@ -1184,19 +1179,9 @@ export const inviteUser = withOrganizationAuth(
 )
 
 export const approveMemberRequestAndCreateMember = withOrganizationAuth(
-    async (_: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
+    async (organization: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
         if (!memberRequest) {
             throw new Error("Invalid member request");
-        }
-
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: memberRequest.organizationId,
-            },
-        });
-
-        if (!organization) {
-            return {success: false, error: "Organization not found."};
         }
 
         try {
@@ -1308,19 +1293,9 @@ export const deleteMemberRequest = withUserAuth(
 )
 
 export const denyMemberRequest = withOrganizationAuth(
-    async (_: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
+    async (organization: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
         if (!memberRequest) {
             throw new Error("Invalid member request");
-        }
-
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: memberRequest.organizationId,
-            },
-        });
-
-        if (!organization) {
-            return {success: false, error: "Organization not found."};
         }
 
         try {
@@ -1396,6 +1371,38 @@ export const deleteInvitation = withOrganizationAuth(
     ['owner']
 )
 
+export const declineAndDeleteInvitation = async (invitation: Invitation): Promise<ApiResponse<any>> => {
+    if (!invitation) {
+        throw new Error("Invalid invitation");
+    }
+
+    const session = await getSession();
+    if (session?.user.email !== invitation.email) {
+        throw new Error("Current user email doesn't match the invite email.")
+    }
+
+    try {
+        // Ensure the composite key is valid or fallback to another unique identifier like `id`
+        const deletedInvitation = await prisma.invitation.delete({
+            where: {
+                id: invitation.id
+            },
+        });
+
+        if (!deletedInvitation) {
+            return {success: false, error: "Failed to delete invitation. Request not found."};
+        }
+
+        revalidatePath("/app/settings")
+
+        return {success: true, data: deletedInvitation};
+
+    } catch (error) {
+        console.error("Error deleting invitation:", error);
+        return {success: false, error: "Failed to delete invitation."};
+    }
+}
+
 // Invite user function with updated Organization model
 export const leaveOrganization = withOrganizationAuth(
     async (organization: Organization, session: Session | null) => {
@@ -1427,7 +1434,7 @@ export const leaveOrganization = withOrganizationAuth(
 
 export const updateMember = withOrganizationAuth(
     async (
-        _: Organization,
+        organization: Organization,
         membershipId: string,
         data: Prisma.MemberUpdateInput
     ) => {

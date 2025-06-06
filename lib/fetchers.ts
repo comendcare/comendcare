@@ -1062,9 +1062,9 @@ export const getOrganizationFromOrganizationId = withOrganizationAuth(
             }
 
             return {success: true, data: organization};
-        } catch (error: any) {
-            logError("Error fetching organization data", error);
-            return {success: false, error: "Internal server error"};
+        } catch (e: any) {
+            logError("Error fetching organization data", e);
+            return {success: false, error: `Internal server error`};
         }
     }
 )
