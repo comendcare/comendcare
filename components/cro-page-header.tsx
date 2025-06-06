@@ -36,7 +36,28 @@ const companyTypeIcons: Record<string, JSX.Element> = {
 };
 
 export default async function CROPageHeader({id}: { id: string }) {
-    const cro = await getCROData(id)
+    const cro = await getCROData(id, {
+        id: true,
+        url: true,
+        scientistDotComURL: true,
+        title: true,
+        description: true,
+        yearEstablished: true,
+        website: true, 
+        headquarters: true,
+        companyType: true,
+        sites: true,
+        services: true,
+        certifications: true,
+        simplifiedCertifications: true,
+        rfis: true,
+        reviews: true,
+        tags: true,
+        avgRating: true,
+        categories: true,
+        milestoneTypes: true,
+        savedByOrganizations: true,
+    })
 
     if (!cro) {
         notFound()

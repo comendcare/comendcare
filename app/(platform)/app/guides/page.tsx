@@ -36,7 +36,7 @@ export default function FAQ() {
                     const title = page?.properties?.["Name"]?.title?.map((text: any) => text?.plain_text)?.join(" ")
                     const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")
                     const slug = `/app/guides/${page.id}`
-                    const image = page?.cover?.external?.url || ''
+                    const image = page?.cover?.external?.url || page?.cover?.file?.url || ''
                     const author = page.properties["Author"].people[0].name
                     const authorAvatar = page.properties["Author"].people[0].avatar_url
                     const publishDate = new Date(page.properties["Publication Date"].date.start)
@@ -159,6 +159,7 @@ function FAQSections({pages}: {pages: Blog[]}) {
                             <BlogCard 
                                 blog={page}
                                 key={index} 
+                                showFullDescription={true}
                             />
                         )
                 })}

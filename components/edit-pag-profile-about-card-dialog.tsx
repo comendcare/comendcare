@@ -56,10 +56,20 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         defaultValues: {
             description: organization.description || "",
             website: organization.website || "",
-            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({label: ther, value: ther})) || [],
-            otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
-            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({label: ther, value: ther})) || [],
-            otherTherapeuticsOfInterest: typeof organization.metadata == 'object'? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
+            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as {
+                [key: string]: any
+            })?.otherTherapeuticsInDevelopment : undefined,
+            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsOfInterest: typeof organization.metadata == 'object' ? (organization?.metadata as {
+                [key: string]: any
+            })?.otherTherapeuticsOfInterest : undefined,
         }
     });
 
@@ -67,18 +77,24 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         editOrgForm.reset({
             description: organization.description || "",
             website: organization.website || "",
-            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({label: ther, value: ther})) || [],
-            otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsInDevelopment : undefined,
-            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({label: ther, value: ther})) || [],
-            otherTherapeuticsOfInterest: typeof organization.metadata == 'object'? (organization?.metadata as { [key: string]: any })?.otherTherapeuticsOfInterest : undefined,
+            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsInDevelopment: typeof organization.metadata == 'object' ? (organization?.metadata as {
+                [key: string]: any
+            })?.otherTherapeuticsInDevelopment : undefined,
+            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsOfInterest: typeof organization.metadata == 'object' ? (organization?.metadata as {
+                [key: string]: any
+            })?.otherTherapeuticsOfInterest : undefined,
         });
     }, [organization, editOrgForm]);
 
     const formData = editOrgForm.watch()
-
-    useEffect(() => {
-        console.log(`form data`, formData)
-    }, [formData])
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
         if (!session?.user?.organizationId) {
@@ -125,12 +141,40 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    // Reset the form to original values when dialog closes (e.g. cancel)
+                    editOrgForm.reset({
+                        description: organization.description || "",
+                        website: organization.website || "",
+                        therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                            label: ther,
+                            value: ther
+                        })) || [],
+                        otherTherapeuticsInDevelopment:
+                            typeof organization.metadata == "object"
+                                ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
+                                : undefined,
+                        therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                            label: ther,
+                            value: ther
+                        })) || [],
+                        otherTherapeuticsOfInterest:
+                            typeof organization.metadata == "object"
+                                ? (organization.metadata as any)?.otherTherapeuticsOfInterest
+                                : undefined,
+                    });
+                }
+                setOpen(state);
+            }}
+        >
             <DialogTrigger asChild>
                 <Button
                     variant="ghost"
                 >
-                    <Pencil />
+                    <Pencil/>
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[80vh] overflow-y-auto">

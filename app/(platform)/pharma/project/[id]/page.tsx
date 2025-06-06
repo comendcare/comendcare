@@ -51,7 +51,13 @@ export default function PharmaProjectPage() {
         const fetchCRO = async () => {
             const pathParts = pathname.split("/")
             const id = decodeURIComponent(pathParts[pathParts.length - 1])
-            const data = await getPharmaProjectData(id)
+            const data = await getPharmaProjectData(id, {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                metadata: true
+            })
             setPharmaProject(data)
         }
 

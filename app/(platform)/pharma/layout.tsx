@@ -136,7 +136,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Start initialization... for org ${session.user.organizationId}`)
 
             // Init notifications
-            let notifications = await getAllNotifications()
+            let notifications = await getAllNotifications({
+                id: true,
+                type: true,
+                title: true,
+                message: true,
+                link: true,
+                createdAt: true,
+                updatedAt: true,
+                lastViewedAt: true,
+            })
             if (notifications.success && notifications.data) {
                 initializeNotificationsState({
                     notifications: notifications.data
@@ -148,7 +157,13 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Notificaions initialized...`)
 
             // init CRO Search store
-            const milestoneTypes = await getMilestoneTypes()
+            const milestoneTypes = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
             const parsedCROFilters = {
                 categories: parseQuery(queryCategories),
                 milestoneTypes: parseQuery(queryMilestoneTypes)
@@ -191,7 +206,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             // init roadmap/research plan store
 
             // init tool store
-            let toolResponse = await getAssets(session.user.organizationId)
+            let toolResponse = await getAssets(session.user.organizationId, {
+                id: true,
+                title: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                private: true,
+                pinned: true,
+                milestones: true,
+            })
             if (toolResponse.success) {
                 initializeAssetsStore(toolResponse.data || [])
                 console.log(`Tools initialized...`)
@@ -201,7 +225,22 @@ export default function AppLayout({children}: AppLayoutProps) {
             }
 
             // init rfp store
-            let rfpResponse = await getRFPs(session.user.organizationId)
+            let rfpResponse = await getRFPs(session.user.organizationId, {
+                id: true,
+                title: true,
+                description: true,
+                openTo: true,
+                startDate: true,
+                endDate: true,
+                contacts: true,
+                attachments: true,
+                budget: true,
+                private: true,
+                headerImage: true,
+                pinned: true,
+                milestones: true,
+                organizationId: true,
+            })
             if (rfpResponse.success) {
                 initializeRFPStore(rfpResponse.data || [])
                 console.log(`RFPs initialized...`)

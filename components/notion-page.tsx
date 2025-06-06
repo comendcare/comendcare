@@ -42,10 +42,12 @@ import { NotionRenderer } from 'react-notion-x'
 
 export function NotionPage({
 	recordMap,
-	rootPageId
+	rootPageId,
+	showCoverImage = true
 }: {
 	recordMap: ExtendedRecordMap
-	rootPageId?: string
+	rootPageId?: string,
+	showCoverImage?: boolean
 }) {
 	if (!recordMap) {
 		return null
@@ -53,15 +55,22 @@ export function NotionPage({
 
 	return (
 		<NotionRenderer
-			className="bg-transparent"
+			className="bg-transparent -mb-40"
 			recordMap={recordMap}
 			fullPage={true}
 			darkMode={false}
 			rootPageId={rootPageId}
 			disableHeader={true}
 			header={(<></>)}
-			pageHeader={(<></>)}
+			pageHeader={(
+				<>
+				<div className="-mt-12"></div>
+				</>
+			)}
 			pageTitle={(<></>)}
+			// pageCover={(<></>)}
+			pageCover={showCoverImage ? undefined : <></>}
+			pageFooter={(<></>)}
 		/>
 	)
 }

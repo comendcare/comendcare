@@ -127,10 +127,23 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     }
 
     return (
-        <Dialog open={open} onOpenChange={(state) => {
-            console.log("Dialog open state changed:", state);
-            setOpen(state);
-        }}>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    // Reset the form when dialog is closing (user didn't save)
+                    editOrgForm.reset({
+                        name: organization.name || "",
+                        founded: organization.yearFounded || "",
+                        incorporationStatus: organization.incorporationStatus || undefined,
+                        raised: organization.moneyRaised || 0,
+                        deployed: organization.moneyDeployed || 0,
+                        budget: organization.researchBudget || 0
+                    });
+                }
+                setOpen(state);
+            }}
+        >
             <DialogTrigger asChild>
                 <Button
                     variant="ghost"

@@ -28,13 +28,57 @@ export async function generateMetadata({
     const slug = decodeURIComponent(params.slug)
 
     const organizationData = await getOrganizationData(domain, {
-            description: true,
-            website: true,
-            therapeuticsInDevelopment: true,
-            therapeuticsOfInterest: true,
-            metadata: true,
-            members: true
-        })
+        id: true,
+        public: true,
+        verified: true,
+        published: true,
+        name: true,
+        description: true,
+        contactEmail: true,
+        logo: true,
+        font: true,
+        image: true,
+        headerImage: true,
+        biopharmaConsentSettings: true,
+        subdomain: true,
+        customDomain: true,
+        statedGoal: true,
+        yearFounded: true,
+        incorporationStatus: true,
+        therapeuticsOfInterest: true,
+        therapeuticsInDevelopment: true,
+        website: true,
+        moneyRaised: true,
+        moneyDeployed: true,
+        researchBudget: true,
+        // address1                  String?
+        // address2                  String?
+        // formattedAddress          String?
+        // city                      String?
+        // region                    String?
+        // postalCode                String?
+        // country                   String?
+        // lat                       String?
+        // lng                       String?
+        createdAt: true,
+        updatedAt: true,
+        user: true,
+        userId: true,
+        roadmaps: true,
+        members: true,
+        clients: true,
+        invitations: true,
+        membershipRequests: true,
+        conditions: true,
+        kanban: true,
+        milestones: true,
+        platformNotifications: true,
+        reviews: true,
+        savedCompanies: true,
+        tools: true,
+        rfps: true,
+        metadata: true
+    })
 
     // Fallback to avoid passing null to title or description
     const title = organizationData?.name || "Default Title" // Use a fallback title
@@ -157,29 +201,76 @@ export default async function OrganizationRoadmapPage({
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
         getOrganizationData(domain, {
+            id: true,
+            public: true,
+            verified: true,
+            published: true,
+            name: true,
             description: true,
-            website: true,
-            therapeuticsInDevelopment: true,
+            contactEmail: true,
+            logo: true,
+            font: true,
+            image: true,
+            headerImage: true,
+            biopharmaConsentSettings: true,
+            subdomain: true,
+            customDomain: true,
+            statedGoal: true,
+            yearFounded: true,
+            incorporationStatus: true,
             therapeuticsOfInterest: true,
-            metadata: true,
-            members: true
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
+            members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
+            conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
         }),
         getPublicRoadmapsForOrganization(domain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true
-            }),
+            id: true,
+            title: true,
+            description: true,
+            slug: true,
+            edges: true,
+            milestones: true,
+            nodes: true,
+            modalities: true
+        }),
     ])
+
+    console.log(`GOT HERE`)
+    console.log(`organization info`, organization)
 
     if (!organization) {
         notFound()
     }
-
+    
     return (
         <>
             {roadmaps.length > 0 ? (
@@ -219,15 +310,15 @@ export default async function OrganizationRoadmapPage({
                                         />
                                     ),
                                 },
-                                // ...(organization.contactEmail
-                                //     ? [
-                                //         {
-                                //             title: "Contact patient group",
-                                //             icon: <Mail/>,
-                                //             dialog: <ContactPAGDialog organization={organization} />,
-                                //         },
-                                //     ]
-                                //     : []),
+                                ...(organization.contactEmail
+                                    ? [
+                                        {
+                                            title: "Contact patient group",
+                                            icon: <Mail/>,
+                                            dialog: <ContactPAGDialog organization={organization} />,
+                                        },
+                                    ]
+                                    : []),
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"

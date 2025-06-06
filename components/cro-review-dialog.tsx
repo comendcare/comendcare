@@ -88,7 +88,10 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined, {
+                id: true,
+                title: true
+            })
             if (milestonesResponse.success) {
                 setFetchedMilestones(milestonesResponse?.data as Milestone[])
             } else {

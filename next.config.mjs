@@ -111,14 +111,48 @@ const nextConfig = {
                 hostname: 's3-us-west-2.amazonaws.com',
                 port: '',
                 pathname: '**'
+            }, {
+                protocol: 'https',
+                hostname: 'img.notionusercontent.com',
+                port: '',
+                pathname: '**'
+            }, {
+                protocol: 'https',
+                hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
+                port: '',
+                pathname: '**'
             }
         ]
     },
     experimental: {
         serverActions: {
-          bodySizeLimit: '5mb',
+            bodySizeLimit: '5mb',
         },
-      },
+        optimizePackageImports: [
+            'lucide-react',
+            '@tabler/icons-react',
+            '@radix-ui/react-icons',
+            '@radix-ui/react-tooltip',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-popover',
+            '@udecode/plate-basic-marks',
+            '@udecode/plate-common',
+            '@udecode/plate-core',
+            '@udecode/plate-emoji',
+            '@udecode/plate-floating',
+            '@udecode/plate-link',
+            '@udecode/plate-list',
+            '@udecode/plate-paragraph',
+            '@udecode/plate-table',
+            '@udecode/plate-heading',
+            '@udecode/plate-image',
+            '@udecode/plate-media',
+            '@udecode/plate-comments',
+            '@udecode/plate-combobox',
+            '@udecode/plate-mention',
+            '@udecode/plate-kbd'
+        ],
+    },
 }
 
 export default nextConfig
