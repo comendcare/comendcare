@@ -1,19 +1,14 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
-import {getOrganizationData, getConditionsDataFromOrgId, getRFPs, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
+import {getOrganizationData, getConditionsDataFromOrgId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapCard, RoadmapsCard} from "@/components/public-roadmap-card";
+import {RoadmapsCard} from "@/components/public-roadmap-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import {Card, CardContent} from "@/components/ui/card";
-import Image from "next/image";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
-import Link from "next/link";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
-import { PublicNoResearchPlans } from "@/components/no-research-plans";
-import { Prisma } from "@prisma/client";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -49,12 +44,20 @@ export default async function OrganizationHomePage({
     const [organization, roadmaps, tools, rfps] = await Promise.all([
         getOrganizationData(domain, {
             id: true,
+            public: true,
+            verified: true,
+            published: true,
             name: true,
             description: true,
             contactEmail: true,
+            logo: true,
+            font: true,
             image: true,
             headerImage: true,
+            biopharmaConsentSettings: true,
             subdomain: true,
+            customDomain: true,
+            statedGoal: true,
             yearFounded: true,
             incorporationStatus: true,
             therapeuticsOfInterest: true,
@@ -63,8 +66,33 @@ export default async function OrganizationHomePage({
             moneyRaised: true,
             moneyDeployed: true,
             researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
             members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
             conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
         }),
         getPublicRoadmapsForOrganization(domain, {
             id: true,
@@ -85,6 +113,7 @@ export default async function OrganizationHomePage({
             milestones: true
         }),
         getPublicRFPsForOrganization(domain, {
+            id: true,
             title: true,
             description: true,
             openTo: true,
@@ -95,11 +124,10 @@ export default async function OrganizationHomePage({
             pinned: true,
             contacts: true,
             attachments: true,
-            milestones: true
+            milestones: true,
+            organizationId: true,
         })
     ])
-
-    console.log(`organization members`, organization?.members)
 
     if (!organization) {
         notFound()

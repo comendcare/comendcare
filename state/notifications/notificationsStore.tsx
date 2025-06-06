@@ -20,7 +20,16 @@ export const useNotificationsStore = create<NotificationsState>()(
         notifications: [],
         fetchNotifications: async () => {
             console.log(`fetch notifications`)
-            const response = await getAllNotifications()
+            const response = await getAllNotifications({
+                id: true,
+                type: true,
+                title: true,
+                message: true,
+                link: true,
+                createdAt: true,
+                updatedAt: true,
+                lastViewedAt: true,
+            })
             if (response.success && response.data) {
                 set({notifications: response.data})
             } else {

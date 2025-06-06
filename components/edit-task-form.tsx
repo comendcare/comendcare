@@ -130,14 +130,23 @@ export function EditTaskForm({
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await getMembers(session?.user?.organizationId || undefined)
+            const response = await getMembers(session?.user?.organizationId || undefined, {
+                id: true,
+                role: true,
+                title: true,
+                email: true,
+                user: true,
+            })
             if (response.success) {
                 setFetchedMembers(response?.data?.map(member => member.user) as User[])
             } else {
                 console.error(response.error)
             }
 
-            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined, {
+                id: true,
+                title: true
+            })
             if (milestonesResponse.success) {
                 setFetchedMilestones(milestonesResponse?.data as Milestone[])
             } else {
@@ -178,7 +187,13 @@ export function EditTaskForm({
             private: isPrivate
         } = values;
 
-        const response = await getMembers(session?.user?.organizationId || undefined)
+        const response = await getMembers(session?.user?.organizationId || undefined, {
+            id: true,
+            role: true,
+            title: true,
+            email: true,
+            user: true,
+        })
         let fetchedMembers: any[] = []
         if (response.success && response.data) fetchedMembers = response.data
 

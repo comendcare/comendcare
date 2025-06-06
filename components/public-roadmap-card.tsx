@@ -202,7 +202,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                         </CollapsibleTableGroup>
                     )
                 })}
-                {roadmaps.filter(roadmap => roadmap.modalities.length === 0).length > 0 && (
+                {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
                     // group research plans with no type or 'other' type together in the table
                     <CollapsibleTableGroup 
                         label={'Other'}

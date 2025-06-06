@@ -88,15 +88,15 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                         />
                     ),
                 },
-                // ...(organization.contactEmail
-                //     ? [
-                //         {
-                //             title: "Contact patient group",
-                //             icon: <Mail/>,
-                //             dialog: <ContactPAGDialog organization={organization} />,
-                //         },
-                //     ]
-                //     : []),
+                ...(organization.contactEmail
+                    ? [
+                        {
+                            title: "Contact patient group",
+                            icon: <Mail/>,
+                            dialog: <ContactPAGDialog organization={organization} />,
+                        },
+                    ]
+                    : []),
             ]}
             orientation="vertical"
             desktopClassName="right-4"

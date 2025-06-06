@@ -28,7 +28,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "./ui/dialog"
-import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Import, Info, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
+import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Import, Info, Lock, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -107,13 +107,70 @@ export function Roadmap() {
     useEffect(() => {
         const init = async () => {
             // get milestone types from database
-            const response = await getMilestoneTypes()
+            const response = await getMilestoneTypes({
+                id: true,
+                label: true,
+                services: true,
+                categories: true,
+                description: true
+            })
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
 
             if (session?.user.organizationId) {
-                let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
+                let orgData = await getOrganizationFromOrganizationId(session.user.organizationId, {
+                    id: true,
+                    public: true,
+                    verified: true,
+                    published: true,
+                    name: true,
+                    description: true,
+                    contactEmail: true,
+                    logo: true,
+                    font: true,
+                    image: true,
+                    headerImage: true,
+                    biopharmaConsentSettings: true,
+                    subdomain: true,
+                    customDomain: true,
+                    statedGoal: true,
+                    yearFounded: true,
+                    incorporationStatus: true,
+                    therapeuticsOfInterest: true,
+                    therapeuticsInDevelopment: true,
+                    website: true,
+                    moneyRaised: true,
+                    moneyDeployed: true,
+                    researchBudget: true,
+                    // address1                  String?
+                    // address2                  String?
+                    // formattedAddress          String?
+                    // city                      String?
+                    // region                    String?
+                    // postalCode                String?
+                    // country                   String?
+                    // lat                       String?
+                    // lng                       String?
+                    createdAt: true,
+                    updatedAt: true,
+                    user: true,
+                    userId: true,
+                    roadmaps: true,
+                    members: true,
+                    clients: true,
+                    invitations: true,
+                    membershipRequests: true,
+                    conditions: true,
+                    kanban: true,
+                    milestones: true,
+                    platformNotifications: true,
+                    reviews: true,
+                    savedCompanies: true,
+                    tools: true,
+                    rfps: true,
+                    metadata: true
+                })
                 if (orgData.success && orgData.data) {
                     setOrganization(orgData.data)
                     setOrgSubdomain(orgData.data.subdomain || undefined)
@@ -589,7 +646,58 @@ const RoadmapHeader = ({
         async function fetchOrgData() {
             if (session?.user.organizationId) {
                 try {
-                    const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                    const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
+                        id: true,
+                        public: true,
+                        verified: true,
+                        published: true,
+                        name: true,
+                        description: true,
+                        contactEmail: true,
+                        logo: true,
+                        font: true,
+                        image: true,
+                        headerImage: true,
+                        biopharmaConsentSettings: true,
+                        subdomain: true,
+                        customDomain: true,
+                        statedGoal: true,
+                        yearFounded: true,
+                        incorporationStatus: true,
+                        therapeuticsOfInterest: true,
+                        therapeuticsInDevelopment: true,
+                        website: true,
+                        moneyRaised: true,
+                        moneyDeployed: true,
+                        researchBudget: true,
+                        // address1                  String?
+                        // address2                  String?
+                        // formattedAddress          String?
+                        // city                      String?
+                        // region                    String?
+                        // postalCode                String?
+                        // country                   String?
+                        // lat                       String?
+                        // lng                       String?
+                        createdAt: true,
+                        updatedAt: true,
+                        user: true,
+                        userId: true,
+                        roadmaps: true,
+                        members: true,
+                        clients: true,
+                        invitations: true,
+                        membershipRequests: true,
+                        conditions: true,
+                        kanban: true,
+                        milestones: true,
+                        platformNotifications: true,
+                        reviews: true,
+                        savedCompanies: true,
+                        tools: true,
+                        rfps: true,
+                        metadata: true
+                    })
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
@@ -641,8 +749,8 @@ const RoadmapHeader = ({
                 <StageOfActivityBadge milestones={milestones} />
                 {milestones.filter(milestone => !milestone.private).length <= 0 && (
                     <Tooltip>
-                        <TooltipTrigger className="px-2">
-                            <TriangleAlert className="text-orange-600"/>
+                        <TooltipTrigger className="ml-2 rounded-full border-2 border-red-600 h-8 w-8 flex justify-center items-center">
+                            <Lock className="text-red-600 h-4 w-4"/>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-80">
                             {`All of the projects in your research plan are private. This research plan will appear as 'under development' on your public profile. Change a project's visibility to public, to show it off on your public profile.`}

@@ -131,7 +131,8 @@ export default async function middleware(req: NextRequest) {
     // DON'T rewrite root application to `/home` folder
     if (
         hostname === "localhost:3000" ||
-        hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN
+        hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
+        hostname === "comendcare.com"
     ) {
         return NextResponse.rewrite(
             new URL(`${path === "/" ? "/" : path}`, req.url)

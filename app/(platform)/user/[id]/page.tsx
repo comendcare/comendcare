@@ -38,7 +38,35 @@ export default function UserProfilePage() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.id) {
-                const response = await getUser(session.user.id);
+                const response = await getUser(session.user.id, {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    notificationSettings: true,
+                    consentSettings: true,
+                    accounts: true,
+                    comments: true,
+                    follows: true,
+                    sentInvitations: true,
+                    memberships: true,
+                    membershipRequests: true,
+                    organizations: true,
+                    posts: true,
+                    reactions: true,
+                    roadmaps: true,
+                    sessions: true,
+                    stakeholders: true,
+                    platformNotifications: true,
+                    reviews: true,
+                    replies: true,
+                    reportOnReviews: true,
+                    reportOnReplies: true,
+                    reviewFeedbacks: true,
+                    metadata: true,
+                });
                 if (response.success) {
                     const userData = response.data
                     setUser(userData);
@@ -52,7 +80,18 @@ export default function UserProfilePage() {
         async function fetchOrgData() {
             if (session) {
                 try {
-                    const response = await getAllMembershipsFromUserId(session.user.id);
+                    const response = await getAllMembershipsFromUserId(session.user.id, {
+                        id: true,
+                        role: true,
+                        title: true,
+                        email: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        invitedBy: true,
+                        organization: true,
+                        user: true,
+                        metadata: true
+                    });
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
@@ -77,26 +116,19 @@ export default function UserProfilePage() {
             }
 
             try {
-                const response = await getInvitations();
+                const response = await getInvitations({
+                    id: true,
+                    email: true,
+                    role: true,
+                    organizationId: true,
+                    organization: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    accepted: true,
+                });
 
                 if (response.success && response.data) {
-                    const invitationsWithDetails = await Promise.all(
-                        response.data.map(async (invitation) => {
-                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
-                            if (orgResponse.success) {
-                                return {
-                                    ...invitation,
-                                    organization: orgResponse.data,
-                                };
-                            } else {
-                                console.error(orgResponse.error);
-                                toast.error(`Could not fetch organization details for ID ${invitation.organizationId}`);
-                                return {...invitation, organization: null};
-                            }
-                        })
-                    );
-
-                    setInvitations(invitationsWithDetails);
+                    setInvitations(response.data);
                 } else if (response.error) {
                     console.error(response.error);
                     toast.error(response.error);

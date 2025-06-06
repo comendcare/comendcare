@@ -42,7 +42,6 @@ const editResearchPlanForm = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     modalities: z.array(optionSchema)
-        .min(1, "Please select a type")
         .max(1, "You can only select one type")
         .optional(),
     otherModalities: z.string().optional()

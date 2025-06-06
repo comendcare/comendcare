@@ -64,7 +64,7 @@ export async function News() {
     );
 }
 
-export const BlogCard = ({ blog }: { blog: Blog }) => {
+export const BlogCard = ({ blog, showFullDescription = false }: { blog: Blog, showFullDescription?: boolean }) => {
     const truncate = (text: string, length: number) => {
         return text.length > length ? text.slice(0, length) + "..." : text;
     };
@@ -74,13 +74,14 @@ export const BlogCard = ({ blog }: { blog: Blog }) => {
             href={`${blog.slug}`}
         >
             {blog.image ? (
-                <BlurImage
-                    src={blog.image || ""}
-                    alt={blog.title}
-                    height="800"
-                    width="800"
-                    className="h-52 object-cover object-top w-full"
-                />
+                <div className="relative w-full h-60">
+                    <Image
+                        src={blog.image || ""}
+                        alt={blog.title}
+                        fill
+                        className="object-cover object-top"
+                    />
+                </div>
             ) : (
                 <div className="h-52 flex items-center justify-center bg-blue-light dark:bg-neutral-900" />
             )}
@@ -101,7 +102,7 @@ export const BlogCard = ({ blog }: { blog: Blog }) => {
                     {blog.title}
                 </p>
                 <p className="text-left text-sm mt-2 text-neutral-600 dark:text-neutral-400">
-                    {truncate(blog.description, 100)}
+                    {showFullDescription ? blog.description : truncate(blog.description, 100)}
                 </p>
             </div>
         </Link>

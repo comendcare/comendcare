@@ -72,3 +72,14 @@ export async function sendCustomerIOFeedbackEmail(emailPayload: any, attachments
         console.error(`Error sending email`, e)
     }
 }
+
+export async function sendCustomerIOContactEmail(emailPayload: any) {
+    const client = new APIClient(process.env.CUSTOMER_IO_API_KEY || "");
+    const request = new SendEmailRequest(emailPayload)
+
+    try {
+        client.sendEmail(request)
+    } catch (e) {
+        console.error(`Error sending email`, e)
+    }
+}

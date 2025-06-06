@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/sidebar"
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
-import {getCROData, getPharmaProjects} from "@/lib/fetchers";
+import {getPharmaProjects} from "@/lib/fetchers";
 
 const data = {
     user: {
@@ -115,7 +115,13 @@ export function PharmaSidebar({ ...props }: React.ComponentProps<typeof Sidebar>
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const result = await getPharmaProjects()
+            const result = await getPharmaProjects({
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                metadata: true
+            })
             if (result.success && result.data) {
                 // Map DB projects to match NavProjects expected format
                 const formatted = result.data.map((project: any) => ({

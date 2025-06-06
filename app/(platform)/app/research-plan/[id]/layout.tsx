@@ -2,7 +2,6 @@
 
 import { getRoadmap } from "@/lib/fetchers"
 import { initializeRoadmapState } from "@/lib/initialize-client-state"
-import { sleep } from "@/lib/utils"
 import { useSession } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import { useEffect } from "react"
@@ -19,7 +18,25 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
 
     useEffect(() => {
         const init = async () => {
-            const response = await getRoadmap(session?.user.organizationId, params.id)
+            const response = await getRoadmap(session?.user.organizationId, params.id, {
+                id: true,
+                title: true,
+                description: true,
+                content: true,
+                slug: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
+                published: true,
+                organizationId: true,
+                organization: true,
+                user: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true,
+                metadata: true
+            })
             if (response.success && response.data) {
                 if (response.success) {
                     const urlNode = searchParams.get("milestone")
