@@ -310,7 +310,8 @@ export default async function OrganizationRoadmapPage({
                                         {
                                             title: "Contact patient group",
                                             icon: <Mail/>,
-                                            dialog: <ContactPAGDialog organization={organization} />,
+                                            // dialog: <ContactPAGDialog organization={organization} />,
+                                            href: `mailto:${organization.contactEmail}`
                                         },
                                     ]
                                     : []),
