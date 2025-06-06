@@ -194,7 +194,7 @@ export function Roadmap() {
                 redo() // undo updates zustand state
                 saveState() // save state to update database
 
-                if (selectedNodeIds[0]) {
+                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                     // if there is a node selected, remount the milestone form
                     // to update the form data after the undo was triggered
                     setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -207,7 +207,7 @@ export function Roadmap() {
                 undo(); // undo updates zustand state
                 saveState(); // save state to update database
     
-                if (selectedNodeIds[0]) {
+                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                     // Remount the milestone form and update the milestoneRemountKey
                     // using the ref to get the most recent value
                     setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
@@ -222,7 +222,7 @@ export function Roadmap() {
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
 
-        if (selectedNodeIds[0]) {
+        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
             params.set("project", selectedNodeIds[0])
         } else {
             params.delete("project")
@@ -330,7 +330,7 @@ export function Roadmap() {
                                         undo() // undo updates zustand state
                                         saveState() // save state to update database
                         
-                                        if (selectedNodeIds[0]) {
+                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                                             // if there is a node selected, remount the milestone form
                                             // to update the form data after the undo was triggered
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -351,7 +351,7 @@ export function Roadmap() {
                                         redo() // undo updates zustand state
                                         saveState() // save state to update database
                         
-                                        if (selectedNodeIds[0]) {
+                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                                             // if there is a node selected, remount the milestone form
                                             // to update the form data after the undo was triggered
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -395,11 +395,12 @@ export function Roadmap() {
                     </Tabs>
                 </ResizablePanel>
 
-                {selectedNodeIds[0] != null && (
+                {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
                     <>
                         <ResizableHandle withHandle />
 
                         <ResizablePanel
+                            onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
                             defaultSize={40}
                             minSize={25}
                             className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
