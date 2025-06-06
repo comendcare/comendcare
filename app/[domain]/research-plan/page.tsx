@@ -271,9 +271,6 @@ export default async function OrganizationRoadmapPage({
         notFound()
     }
     
-    // console.log(`GOT HERE - YPDATE!!!`)
-    // console.log(`organization data`, organization)
-
     return (
         <>
             {roadmaps.length > 0 ? (
