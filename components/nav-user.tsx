@@ -210,10 +210,10 @@ export function NavUser() {
                     id: true,
                     email: true,
                     role: true,
+                    organizationId: true,
                     createdAt: true,
                     updatedAt: true,
                     accepted: true,
-                    organizationId: true,
                 });
 
                 if (response.success && response.data) {
@@ -302,8 +302,13 @@ export function NavUser() {
             try {
                 const response = await getUserMemberRequests(session?.user.id, {
                     id: true,
+                    userId: true,
+                    email: true,
                     role: true,
-                    organization: true,
+                    organizationId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    approved: true,
                     user: true,
                 });
 

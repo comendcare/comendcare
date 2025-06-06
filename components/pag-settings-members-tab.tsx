@@ -24,6 +24,7 @@ export default function PAGSettingsMembersTab() {
                 const response = await getMembers(session?.user.organizationId, {
                     id: true,
                     role: true,
+                    createdAt: true,
                     title: true,
                     email: true,
                     user: true,
