@@ -93,7 +93,8 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                         {
                             title: "Contact patient group",
                             icon: <Mail/>,
-                            dialog: <ContactPAGDialog organization={organization} />,
+                            // dialog: <ContactPAGDialog organization={organization} />,
+                            href: `mailto:${organization.contactEmail}`
                         },
                     ]
                     : []),
