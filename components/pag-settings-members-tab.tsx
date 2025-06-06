@@ -26,7 +26,14 @@ export default function PAGSettingsMembersTab() {
                     role: true,
                     title: true,
                     email: true,
-                    user: true,
+                    userId: true,
+                    invitedById: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    organizationId: true,
+                    invitedBy: true,
+                    organization: true,
+                    user: true
                 })
 
                 if (response.success) {

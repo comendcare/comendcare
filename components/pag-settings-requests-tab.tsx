@@ -27,8 +27,10 @@ export default function PAGSettingsRequestsTab() {
 
             const response = await getMemberRequestsWithUsers(session.user.organizationId, {
                 id: true,
+                userId: true,
                 email: true,
                 role: true,
+                organizationId: true,
                 createdAt: true,
                 updatedAt: true,
                 approved: true,

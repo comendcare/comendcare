@@ -159,6 +159,7 @@ function FAQSections({pages}: {pages: Blog[]}) {
                             <BlogCard 
                                 blog={page}
                                 key={index} 
+                                showFullDescription={true}
                             />
                         )
                 })}

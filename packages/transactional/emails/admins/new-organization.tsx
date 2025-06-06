@@ -36,9 +36,9 @@ export default function NewOrganizationEmail ({ user, organization }: WaitlistEm
                             A new organization {organization.name} with the subdomain {organization.subdomain} has been created.
                         </Text>
                         <Text className="text-sm">
-                            Verify their organization on the admin panel 
+                            {`Verify their organization on the admin panel `}
                             <Link
-                                href={`https:${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                href={`https://comend.io/admin`}
                                 className="text-blue-600 no-underline"
                             >
                                 admin panel
