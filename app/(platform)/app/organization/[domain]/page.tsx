@@ -129,8 +129,6 @@ export default async function OrganizationHomePage({
         })
     ])
 
-    console.log(`organization members`, organization?.members)
-
     if (!organization) {
         notFound()
     }

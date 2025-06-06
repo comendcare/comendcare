@@ -44,7 +44,7 @@ import {
     getUserMemberRequests
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {acceptInvitation, deleteInvitation, deleteMemberRequest} from "@/lib/actions";
+import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest} from "@/lib/actions";
 import {Invitation, Member, Organization} from "@prisma/client";
 import {
     Dialog,
@@ -211,80 +211,14 @@ export function NavUser() {
                     email: true,
                     role: true,
                     organizationId: true,
+                    organization: true,
                     createdAt: true,
                     updatedAt: true,
                     accepted: true,
                 });
 
                 if (response.success && response.data) {
-                    const invitationsWithDetails = await Promise.all(
-                        response.data.map(async (invitation) => {
-                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId, {
-                                id: true,
-                                public: true,
-                                verified: true,
-                                published: true,
-                                name: true,
-                                description: true,
-                                contactEmail: true,
-                                logo: true,
-                                font: true,
-                                image: true,
-                                headerImage: true,
-                                biopharmaConsentSettings: true,
-                                subdomain: true,
-                                customDomain: true,
-                                statedGoal: true,
-                                yearFounded: true,
-                                incorporationStatus: true,
-                                therapeuticsOfInterest: true,
-                                therapeuticsInDevelopment: true,
-                                website: true,
-                                moneyRaised: true,
-                                moneyDeployed: true,
-                                researchBudget: true,
-                                // address1                  String?
-                                // address2                  String?
-                                // formattedAddress          String?
-                                // city                      String?
-                                // region                    String?
-                                // postalCode                String?
-                                // country                   String?
-                                // lat                       String?
-                                // lng                       String?
-                                createdAt: true,
-                                updatedAt: true,
-                                user: true,
-                                userId: true,
-                                roadmaps: true,
-                                members: true,
-                                clients: true,
-                                invitations: true,
-                                membershipRequests: true,
-                                conditions: true,
-                                kanban: true,
-                                milestones: true,
-                                platformNotifications: true,
-                                reviews: true,
-                                savedCompanies: true,
-                                tools: true,
-                                rfps: true,
-                                metadata: true
-                            });
-                            if (orgResponse.success) {
-                                return {
-                                    ...invitation,
-                                    organization: orgResponse.data,
-                                };
-                            } else {
-                                console.error(orgResponse.error);
-                                toast.error(`Could not fetch organization details for ID ${invitation.organizationId}`);
-                                return {...invitation, organization: null};
-                            }
-                        })
-                    );
-
-                    setInvitations(invitationsWithDetails);
+                    setInvitations(response.data)
                 } else if (response.error) {
                     console.error(response.error);
                     toast.error(response.error);
@@ -385,15 +319,13 @@ export function NavUser() {
     const handleDecline = async (invitation: Invitation) => {
         try {
             // Call API to deny invitation
-            if (session?.user.organizationId) {
-                const response = await deleteInvitation(session.user.organizationId, invitation)
+            const response = await declineAndDeleteInvitation(invitation)
 
-                if (response.success) {
-                    toast.success(`Successfully deleted your invitation to ${invitations[0].organization?.name}.`)
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
+            if (response.success) {
+                toast.success(`Successfully deleted your invitation to ${invitations[0].organization?.name}.`)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
             }
         } catch (error) {
             toast.error("Failed to deny invitation.");
