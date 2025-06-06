@@ -244,7 +244,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                 });
                             } else {
                                 // Otherwise, redirect to the landing page with the anchor
-                                router.push("/#contact");
+                                router.push("/contact");
                             }
                         }}
                     >
