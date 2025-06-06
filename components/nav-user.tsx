@@ -381,10 +381,10 @@ export function NavUser() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel onClick={() => handleDecline(invitations[0])}>
-                                Decline and delete
+                                Decline
                             </AlertDialogCancel>
                             <AlertDialogAction onClick={() => handleAccept(invitations[0])}>
-                                Accept and join
+                                Accept
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
