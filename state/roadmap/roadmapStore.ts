@@ -24,7 +24,7 @@ export type RoadmapState = {
         edges: Edge[], 
         milestones: Milestone[], 
         selectedView: string | null, 
-        selectedNodeId: string | null, 
+        selectedNodeIds: string[], 
         selectedTaskId: string | null, 
         roadmapId: string
     ) => void,
@@ -36,8 +36,8 @@ export type RoadmapState = {
     setRoadmapId: (id: string | null) => void
     selectedView: string | null,
     setSelectedView: (view: string | null) => void,
-    selectedNodeId: string | null
-    setSelectedNodeId: (id: string | null) => void
+    selectedNodeIds: string[]
+    setSelectedNodeIds: (ids: string[]) => void
     milestones: Milestone[]
     setMilestone: (id: string, newProperties: Partial<Milestone>) => Promise<Milestone[] | void>
     setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
@@ -56,13 +56,13 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (details: Roadmap | undefined, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (details: Roadmap | undefined, nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeIds: string[], selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
             }))
-            set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
+            set({ details: details, initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeIds, roadmapId })
         },
         details: undefined,
         setDetails: async (details: Partial<Roadmap> | undefined) => {
@@ -109,23 +109,11 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         selectedView: null,
         setSelectedView: (view: string | null) => {
-            // setting the selected roadmap view has an effect on the URL
-            // if the url is updated more than once while the DB call is still occurring next.js treats
-            // this as a full page reload, causing the loading state to show
-            // to avoid this we don't update the roadmap view if the database is currently updating
-            // NOTE: url is updated in roadmap.tsx
-            console.log(`set selected roadmap view`)
             set({ selectedView: view })
         },
-        selectedNodeId: null,
-        setSelectedNodeId: (id: string | null) => {
-            // setting the selected node id has an effect on the URL
-            // if the url is updated more than once while the DB call is still occurring next.js treats
-            // this as a full page reload, causing the loading state to show
-            // to avoid this we don't update the node id if the database is currently updating
-            // NOTE: url is updated in roadmap.tsx
-            console.log(`set selected node id`)
-            set({ selectedNodeId: id })
+        selectedNodeIds: [],
+        setSelectedNodeIds: (ids: string[]) => {
+            set({ selectedNodeIds: ids })
         },
         milestones: [],
         setMilestone: async (nodeId: string | null, newProperties: Partial<Milestone>) => {
@@ -328,7 +316,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestones = get().milestones.filter(milestone =>
                 milestone.nodeId !== nodeId
             )
-            set({ nodes, milestones, selectedNodeId: null })
+            set({ nodes, milestones, selectedNodeIds: [] })
 
             // update DB nodes
             const response = await deleteNode(get().details?.organizationId, nodeId)
@@ -354,8 +342,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             return
         },
         partialize: (state) => {
-            const { selectedNodeId, nodes, edges, milestones, details, ...rest } = state;
-            return { selectedNodeId, nodes, edges, milestones, details };
+            const { selectedNodeIds, nodes, edges, milestones, details, ...rest } = state;
+            return { selectedNodeIds, nodes, edges, milestones, details };
         },
     })
 )
