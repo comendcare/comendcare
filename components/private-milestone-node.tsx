@@ -40,7 +40,6 @@ import { ProjectActionsMenu } from "./project-actions-menu"
 export type PrivateMilestoneNode = Node<
     Milestone & {
         contextMenuRef: React.RefObject<HTMLDivElement>, 
-        handleRightClick: (e: any) => void
     },
     "PROJECT" | "ASSET" | "RFP"
 >
@@ -100,10 +99,6 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                 props?.id && selectedNodeIds.includes(props?.id) ? "border-black border-2 click-project-step" : "",
                 props.id === "preview" ? "opacity-50" : "",
             )}
-            onContextMenu={(e) => {
-                // if this element is currently selected, allow right click events for the context menu
-                if (props.id && selectedNodeIds.includes(props.id)) props.data.handleRightClick(e)
-            }}
         >
             <CardHeader>
                 <div className="flex flex-row align-center items-center justify-end gap-4">

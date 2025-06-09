@@ -44,7 +44,7 @@ const selector = (state: RoadmapState) => ({
     setMilestones: state.setMilestones,
 })
 
-export const PrivateTimelineView = ({sortBy, contextMenuRef, handleRightClick}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>, handleRightClick: (e: any) => void}) => {
+export const PrivateTimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>}) => {
     const {
         selectedNodeIds,
         milestones,
@@ -177,7 +177,6 @@ export const PrivateTimelineView = ({sortBy, contextMenuRef, handleRightClick}: 
                                 selectedNodeIds={selectedNodeIds} 
                                 disabled={sortBy !== "custom"}
                                 contextMenuRef={contextMenuRef}
-                                handleRightClick={handleRightClick}
                             />
                         ))}
                     </SortableContext>
@@ -193,14 +192,12 @@ const DraggableTimelineItem = ({
     selectedNodeIds, 
     disabled,
     contextMenuRef,
-    handleRightClick
 }: {
     milestone: Milestone, 
     index: number, 
     selectedNodeIds: string[], 
     disabled: boolean,
     contextMenuRef: React.RefObject<HTMLDivElement>,
-    handleRightClick: (e: any) => void
 }) => {
     const {
         attributes,
@@ -270,10 +267,6 @@ const DraggableTimelineItem = ({
 
     return (
         <li 
-            onContextMenu={(e) => {
-                // if this element is currently selected, allow right click events for the context menu
-                if (milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) handleRightClick(e)
-            }}
             key={milestone.id}
             ref={setNodeRef}
             style={style}
