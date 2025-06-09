@@ -283,7 +283,7 @@ function IconContainer({
                         className="aspect-square rounded-full bg-blue-dark flex items-center justify-center relative cursor-pointer"
                     >
                         <motion.div style={{width: widthIconSpring, height: heightIconSpring}}
-                                    className="flex items-center justify-center">
+                                    className="flex items-center justify-center text-blue-light">
                             {icon}
                         </motion.div>
                         <AnimatePresence>
@@ -328,7 +328,7 @@ function IconContainer({
                 </AnimatePresence>
                 <motion.div
                     style={{width: widthIcon, height: heightIcon}}
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center text-blue-light"
                 >
                     {icon}
                 </motion.div>

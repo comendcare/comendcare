@@ -41,7 +41,7 @@ export default function DeleteRoadmapForm({
                     nodes: [],
                     edges: [],
                     milestones: [],
-                    selectedNodeId: null
+                    selectedNodeIds: []
                 })
             }
             }

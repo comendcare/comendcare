@@ -63,7 +63,7 @@ export default async function EmbeddedRFPPage({params}: {params: {domain: string
                 </BreadcrumbList>
             </Breadcrumb>
             <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
-            <Link href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}?rfp=${rfp?.id}`} target="_blank">
+            <Link href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}?rfp=${rfp?.id}`} target="_blank" className="w-full">
                 <RFPCard rfp={rfp}/>
             </Link>
         </div>

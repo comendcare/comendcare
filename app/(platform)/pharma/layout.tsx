@@ -24,7 +24,6 @@ import {
     initializeNotificationsState,
     initializeOrganizationSearch,
     initializeRFPStore,
-    initializeRoadmapState
 } from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
@@ -50,10 +49,6 @@ interface AppLayoutProps {
     children: React.ReactNode
 }
 
-const selector = (state: RoadmapState) => ({
-    setSelectedNodeId: state.setSelectedNodeId
-})
-
 const parseQuery = (str: string | null) =>
     str?.split(",").filter(Boolean).map((value) => ({label: value, value})) || []
 
@@ -64,7 +59,6 @@ export default function AppLayout({children}: AppLayoutProps) {
     const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const {startOnborda} = useOnborda()
     const pathname = usePathname()
-    const {setSelectedNodeId} = useRoadmapStore(useShallow(selector))
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
         shallow: true,
