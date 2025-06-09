@@ -37,15 +37,15 @@ import { ProjectActionsMenu } from "./project-actions-menu";
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
+    selectedNodeIds: state.selectedNodeIds,
+    setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
 })
 
 export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     const {
-        selectedNodeId,
+        selectedNodeIds,
         milestones,
         setMilestones
     } = useRoadmapStore(useShallow(selector))
@@ -173,7 +173,7 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                                 milestone={milestone} 
                                 index={index} 
                                 key={milestone.id}
-                                selectedNodeId={selectedNodeId} 
+                                selectedNodeIds={selectedNodeIds} 
                                 disabled={sortBy !== "custom"}
                             />
                         ))}
@@ -187,12 +187,12 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
 const DraggableTimelineItem = ({
     milestone, 
     index, 
-    selectedNodeId, 
+    selectedNodeIds, 
     disabled,
 }: {
     milestone: Milestone, 
     index: number, 
-    selectedNodeId: string | null, 
+    selectedNodeIds: string[], 
     disabled: boolean,
 }) => {
     const {
@@ -203,7 +203,7 @@ const DraggableTimelineItem = ({
         transition,
         isDragging
     } = useSortable({id: milestone.id})
-    const {setSelectedNodeId} = useRoadmapStore(useShallow(selector))
+    const {setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
     const elementRef = useRef<HTMLDivElement>(null);
 
     const style = {
@@ -214,23 +214,23 @@ const DraggableTimelineItem = ({
     }
 
     useEffect(() => {
-        if (selectedNodeId && selectedNodeId === milestone.nodeId) {
-            console.log(`scroll to timeline element`)
-                const el = elementRef.current;
-                if (!el) return;
+        // if only one project is selected, we automatically scroll to that project so it's visible in the view
+        if (selectedNodeIds.length === 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
+            const el = elementRef.current;
+            if (!el) return;
 
-                const rect = el.getBoundingClientRect();
-                const isVisible =
-                rect.top >= 0 &&
-                rect.left >= 0 &&
-                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+            const rect = el.getBoundingClientRect();
+            const isVisible =
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth);
 
-                if (!isVisible) {
-                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                }
+            if (!isVisible) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
         }
-    }, [selectedNodeId])
+    }, [selectedNodeIds])
 
     return (
         <li 
@@ -242,7 +242,21 @@ const DraggableTimelineItem = ({
                 isDragging ? "z-20" : "",
                 index === 0 ? "click-project-step" : ""
             )}
-            onClick={() => setSelectedNodeId(milestone.nodeId || null)}
+            onClick={(event) => {
+                console.log(`selected`, milestone.nodeId, event)
+                if (event.metaKey) {
+                    // TODO: add multiselect option here...
+                    // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
+                    
+                } else {
+                    // regular click, set selected node id
+                    if (milestone.nodeId) {
+                        setSelectedNodeIds([milestone.nodeId])
+                    } else {
+                        setSelectedNodeIds([])
+                    }
+                }
+            }}
         >
             {disabled ? (
                 <Tooltip>
@@ -284,7 +298,7 @@ const DraggableTimelineItem = ({
                 ref={elementRef}
                 className={cn(
                     "bg-card hover:bg-secondary w-full p-4 rounded-md", 
-                    selectedNodeId === milestone.nodeId ? "border-primary border-2" : ""
+                    milestone.nodeId && selectedNodeIds.includes(milestone.nodeId) ? "border-primary border-2" : ""
                 )}
             >
                 <div className="flex flex-row items-center justify-start gap-4">

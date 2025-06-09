@@ -18,7 +18,7 @@ import {
     getRFPs,
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { FeedbackSheet } from "@/components/feedback";
@@ -46,7 +46,7 @@ interface AppLayoutProps {
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
-    setSelectedNodeId: state.setSelectedNodeId
+    setSelectedNodeIds: state.setSelectedNodeIds
 })
 
 const parseQuery = (str: string | null) =>
@@ -59,7 +59,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
-    const { roadmapId, setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { roadmapId, setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
     const [tourName, setTourName] = useState(getTourName())
 
     function getTourName() {
@@ -205,46 +205,6 @@ export default function AppLayout({children}: AppLayoutProps) {
             initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
 
-            // // init roadmap/research plan store
-            // let response = await getRoadmapId(session.user.organizationId)
-            // if (response.success) {
-            //     // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
-            //     if (pathname === "/app/research-plan" && !response.data) {
-            //         console.log(`research plan doesn't exist, create it`)
-            //         const roadmap =  await createRoadmap(session.user.organizationId, {})
-            //         console.log(`roadmap`, roadmap)
-            //         response = await getRoadmapId(session.user.organizationId)
-            //     }
-        
-            //     const nodesResponse = await getNodesEdgesAndMilestones(response.data)
-            //     const urlNode = searchParams.get("project")
-            //     const urlView = searchParams.get("view")
-            //     if (nodesResponse.success) {
-            //         initializeRoadmapState({
-            //             roadmapId: response.data,
-            //             nodes: nodesResponse.data.nodes,
-            //             edges: nodesResponse.data.edges,
-            //             milestones: nodesResponse.data.milestones,
-            //             selectedView: urlView,
-            //             selectedNodeId: urlNode 
-            //         })
-            //     } else {
-            //         // init state, but research plan has not been created yet
-            //         initializeRoadmapState({
-            //             roadmapId: null,
-            //             nodes: [],
-            //             edges: [],
-            //             milestones: [],
-            //             selectedView: null,
-            //             selectedNodeId: null 
-            //         })
-            //     }
-            //     console.log(`Research Plan initialized...`)
-            // } else {
-            //     console.error(response.error)
-            //     toast.error(response.error)
-            // }
-
             // init tool store
             let toolResponse = await getAssets(session.user.organizationId, {
                 id: true,
@@ -334,7 +294,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     variant="ghost"
                                     onClick={() => {
                                         if (tourName) {
-                                            setSelectedNodeId(null)
+                                            setSelectedNodeIds([])
                                             startOnborda(tourName)
                                         }
                                     }}>

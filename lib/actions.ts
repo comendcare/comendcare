@@ -1408,7 +1408,37 @@ export const leaveOrganization = withOrganizationAuth(
     async (organization: Organization, session: Session | null) => {
         try {
             if (!session) {
-                return {success: false, error: "Session not found."};
+                return { success: false, error: "Session not found." };
+            }
+
+            // Check if the user is an owner
+            const currentMember = await prisma.member.findUnique({
+                where: {
+                    userId_organizationId: {
+                        userId: session.user.id,
+                        organizationId: organization.id,
+                    }
+                }
+            });
+
+            if (!currentMember) {
+                return { success: false, error: "Membership not found." };
+            }
+
+            if (currentMember.role === "owner") {
+                const ownerCount = await prisma.member.count({
+                    where: {
+                        organizationId: organization.id,
+                        role: "owner"
+                    }
+                });
+
+                if (ownerCount <= 1) {
+                    return {
+                        success: false,
+                        error: "You are the last owner and cannot leave the organization. Assign another owner first."
+                    };
+                }
             }
 
             const member = await prisma.member.delete({
@@ -1418,19 +1448,15 @@ export const leaveOrganization = withOrganizationAuth(
                         organizationId: organization.id,
                     }
                 }
-            })
+            });
 
-            if (!member) {
-                return {success: false, error: "Membership not found"};
-            }
-
-            return {success: true, data: member};
+            return { success: true, data: member };
         } catch (error: any) {
-            logError("Error fetching membership data", error);
-            return {success: false, error: "Internal server error"};
+            logError("Error leaving organization", error);
+            return { success: false, error: "Internal server error" };
         }
     }
-)
+);
 
 export const updateMember = withOrganizationAuth(
     async (
@@ -1438,36 +1464,58 @@ export const updateMember = withOrganizationAuth(
         membershipId: string,
         data: Prisma.MemberUpdateInput
     ) => {
-        const session = await getSession()
+        const session = await getSession();
 
         try {
             if (!session) {
-                return {success: false, error: "Session not found."};
+                return { success: false, error: "Session not found." };
             }
 
-            const member = await prisma.member.update({
-                where: {
-                    id: membershipId
-                },
-                include: {user: true},
+            const targetMember = await prisma.member.findUnique({
+                where: { id: membershipId },
+            });
+
+            if (!targetMember) {
+                return { success: false, error: "Membership not found." };
+            }
+
+            // Prevent demoting the last owner to member
+            if (
+                targetMember.role === "owner" &&
+                data.role === "member"
+            ) {
+                const ownerCount = await prisma.member.count({
+                    where: {
+                        organizationId: organization.id,
+                        role: "owner"
+                    }
+                });
+
+                if (ownerCount <= 1) {
+                    return {
+                        success: false,
+                        error: "You are the last owner. Assign another owner before changing your role."
+                    };
+                }
+            }
+
+            const updatedMember = await prisma.member.update({
+                where: { id: membershipId },
+                include: { user: true },
                 data
-            })
+            });
 
-            if (!member) {
-                return {success: false, error: "Membership not found"};
-            }
+            revalidatePath("/app/analytics");
+            revalidatePath("/app/profile");
 
-            revalidatePath("/app/analytics")
-            revalidatePath("/app/profile")
-
-            return {success: true, data: member};
+            return { success: true, data: updatedMember };
         } catch (error: any) {
-            logError("Error deleting membership", error);
-            return {success: false, error: "Internal server error"};
+            logError("Error updating membership", error);
+            return { success: false, error: "Internal server error" };
         }
     },
-    ['owner']
-)
+    ["owner"]
+);
 
 // Invite user function with updated Organization model
 export const deleteMember = withOrganizationAuth(

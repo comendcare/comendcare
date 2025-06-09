@@ -9,6 +9,15 @@ import UnverifiedOrganizationPage from "@/components/unverified-organization-pag
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
+import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
+import {DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import ShareDialog from "@/components/share-dialog";
+import {FloatingDock} from "@/components/floating-dock";
+import React from "react";
+import {Mail} from "lucide-react";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -208,6 +217,56 @@ export default async function OrganizationHomePage({
 
                 </div>
             </main>
+
+            <FloatingDock
+                items={[
+                    // {
+                    //     title: "Post on feed",
+                    //     icon: <IconShare2 />,
+                    //     href: "/app/feed",
+                    // },
+                    {
+                        title: "Share on social media",
+                        icon: <IconShare/>,
+                        dialog: <ShareDialog
+                            url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${organization.subdomain}`}
+                        />
+                    },
+                    ...(organization.contactEmail
+                        ? [
+                            {
+                                title: "Contact patient group",
+                                icon: <Mail/>,
+                                // dialog: <ContactPAGDialog organization={organization}/>,
+                                href: `mailto:${organization.contactEmail}`
+                            },
+                        ]
+                        : []),
+                    // {
+                    //     title: "Report an issue",
+                    //     icon: <IconFlag/>,
+                    //     dialog: (
+                    //         <>
+                    //             <DialogHeader>
+                    //                 <DialogTitle>Edit profile</DialogTitle>
+                    //                 <DialogDescription>
+                    //                     {`Make changes to your profile here. Click save when you're done.`}
+                    //                 </DialogDescription>
+                    //             </DialogHeader>
+                    //             <div className="grid gap-4 py-4">
+                    //                 <Label htmlFor="name">Name</Label>
+                    //                 <Input id="name" defaultValue="John Doe"/>
+                    //             </div>
+                    //             <DialogFooter>
+                    //                 <Button type="submit">Save changes</Button>
+                    //             </DialogFooter>
+                    //         </>
+                    //     ),
+                    // }
+                ]}
+                orientation="vertical"
+                desktopClassName="right-4"
+            />
 
         </div>
     )
