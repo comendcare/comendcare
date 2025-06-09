@@ -15,15 +15,17 @@ import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
+import { getMilestones, getMilestoneTypes, getOrganizationFromOrganizationId, getPublicMilestoneDetails } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn, parseCSV } from "@/lib/utils"
 import Link from "next/link"
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -51,6 +53,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -62,7 +65,9 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     saveState: state.saveState,
-    addMilestones: state.addMilestones
+    addMilestones: state.addMilestones,
+    deleteNode: state.deleteNode,
+    setMilestone: state.setMilestone
 })
 
 const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
@@ -82,7 +87,9 @@ export function Roadmap() {
         setSelectedNodeIds, 
         milestones, 
         saveState,
-        addMilestones
+        addMilestones,
+        deleteNode,
+        setMilestone
     } = useRoadmapStore(useShallow(selector))
     const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session} = useSession()
@@ -105,6 +112,8 @@ export function Roadmap() {
     const triggerRef = useRef<HTMLDivElement | null>(null)
     const [anchorPoint, setAnchorPoint] = useState<{ x: number; y: number } | null>(null)
     const [menuKey, setMenuKey] = useState(0)
+    const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const lastFocusedRef = useRef<HTMLElement | null>(null)
 
     useEffect(() => {
         if (step === ".onborda-select-a-template" && isOnbordaVisible) {
@@ -279,6 +288,14 @@ export function Roadmap() {
             el.dispatchEvent(event)
         }
     }, [menuKey])
+
+    useEffect(() => {
+        if (!deleteIsOpen) {
+            setAnchorPoint(null)
+            setMenuKey(Date.now()) // if you're using a key to force re-render
+            setSelectedNodeIds([]) // if appropriate
+        }
+    }, [deleteIsOpen])
 
     if (!roadmapId || !initialized) {
         return (
@@ -548,13 +565,68 @@ export function Roadmap() {
                 </ContextMenuTrigger>
 
                 <ContextMenuContent ref={contextMenuRef}>
-                    <ContextMenuItem onSelect={() => console.log("Delete")}>
-                        Delete
+                    {/* <ContextMenuItem 
+                        onSelect={(e) => {
+                            e.preventDefault()
+                            console.log("Delete")
+                            setDeleteIsOpen(true)
+                            // deleteNode(selectedNodeIds[0])
+                        }}
+                    >
+                        Delete Selected Projects
+                    </ContextMenuItem> */}
+                    <ContextMenuItem 
+                        onSelect={(e) => {
+                            selectedNodeIds.forEach((nodeId: string) => {
+                                setMilestone(nodeId, {private: false})
+                            })
+                        }}
+                    >
+                        {`Make selected project(s) public`}
                     </ContextMenuItem>
-                    <ContextMenuItem>More actions</ContextMenuItem>
+                    <ContextMenuItem
+                        onSelect={(e) => {
+                            selectedNodeIds.forEach((nodeId: string) => {
+                                setMilestone(nodeId, {private: true})
+                            })
+                        }}
+                    >
+                        {`Make selected project(s) private`}
+                    </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
         )}
+
+        {/* <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Are you absolutely sure?
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`This action cannot be undone. This will permanently delete your project and it's data.`}
+                    </DialogDescription>
+                    <DialogFooter>
+                        <DialogClose>
+                            <Button type="button">
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        <DialogClose>
+                            <Button
+                                type="button"
+                                variant={"destructive"}
+                                onClick={(e) => {
+                                    deleteNode(selectedNodeIds[0])
+                                }}
+                            >
+                                Delete Project
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog> */}
         </>
     )
 }
