@@ -126,8 +126,8 @@ export const authOptions: NextAuthOptions = {
 
         jwt: async ({token, user, trigger, session}) => {
             if (trigger === 'update') {
-                token.organizationId = session.organizationId;
-                token.membership = session.membership;
+                token.organizationId = session.organizationId || token.organizationId;
+                token.membership = session.membership || token.membership;
             }
             if (user) {
                 // Fetch the user's organizationId from the database

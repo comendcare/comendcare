@@ -17,7 +17,7 @@ import mixpanel from "mixpanel-browser"
 const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,
     nodes: state.nodes,
-    setSelectedNodeId: state.setSelectedNodeId,
+    setSelectedNodeIds: state.setSelectedNodeIds,
     addMilestones: state.addMilestones
 })
 
@@ -31,7 +31,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     const {
         setOnboardingActive,
         nodes,
-        setSelectedNodeId,
+        setSelectedNodeIds,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
 
@@ -78,7 +78,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         }
 
         if (step.selector === '.onborda-select-a-template' && onboardingNodeId) {
-            setSelectedNodeId(onboardingNodeId)
+            setSelectedNodeIds([onboardingNodeId])
             fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         }
         // if (step.selector === '.click-project-step') {

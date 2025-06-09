@@ -28,8 +28,8 @@ import mixpanel from "mixpanel-browser"
 const proOptions = { hideAttribution: true }
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
+    selectedNodeIds: state.selectedNodeIds,
+    setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     nodes: state.nodes,
     setNodes: state.setNodes,
@@ -46,8 +46,8 @@ export const PrivateFlowView = ({
     width: number
 }) => {
     const {
-        selectedNodeId,
-        setSelectedNodeId,
+        selectedNodeIds,
+        setSelectedNodeIds,
         milestones,
         nodes,
         setNodes: setDbNodes,
@@ -143,7 +143,8 @@ export const PrivateFlowView = ({
       }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
-        setSelectedNodeId(node.id)
+        // TODO: add multiselect option here...
+        setSelectedNodeIds([node.id])
     }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
@@ -242,19 +243,19 @@ export const PrivateFlowView = ({
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (selectedNodeId) {
-                fitView({ nodes: [{ id: selectedNodeId }], padding: 2, duration: 500 })
+            if (selectedNodeIds.length === 1) {
+                fitView({ nodes: [{ id: selectedNodeIds[0] }], padding: 2, duration: 500 })
             } else {
                 fitView({ padding: 0.4, duration: 500 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
         return () => clearTimeout(timer)
-    }, [width, selectedNodeId, fitView])
+    }, [width, selectedNodeIds, fitView])
 
     useEffect(() => {
         const startOnbordaAndRemoveToast = () => {
-            setSelectedNodeId(null)
+            setSelectedNodeIds([])
             startOnborda('research-plan-tour')
             setOnboarded('research-plan-tour')
             toast.dismiss()
@@ -288,7 +289,7 @@ export const PrivateFlowView = ({
                 )
             })
         }
-    }, [localNodes, pathname, setSelectedNodeId, startOnborda])
+    }, [localNodes, pathname, setSelectedNodeIds, startOnborda])
 
     return (
         <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>

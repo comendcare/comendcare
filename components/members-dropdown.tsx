@@ -26,7 +26,7 @@ import {MembershipWithOrganization} from "@/lib/types";
 import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
+import {mixpanelTrack} from "@/app/mixpanel";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
@@ -106,6 +106,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                     await update({
                         user: {
                             ...session.user,  // Keep all existing properties intact
+                            organizationId: session.user.organizationId, // explicitly keep it
                             membership: {
                                 ...session.user.membership, // Preserve existing membership details
                                 title: values.title,
@@ -147,6 +148,11 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     }
 
     const handleLeaveOrganization = async () => {
+        if (isLastOwner) {
+            toast.error("You are the last owner and cannot leave the organization. Please assign another owner first.");
+            return;
+        }
+
         try {
             const response = await leaveOrganization(session?.user.organizationId, session);
 
@@ -195,7 +201,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             } else {
                 toast.error("Failed to leave organization. Please try again.");
             }
-            
+
             location.reload() // force full page refresh
         } catch (error) {
             console.error("Error leaving organization:", error);
@@ -212,7 +218,20 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     if (!showDropdownTrigger) return null;
 
     return (
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+                setIsDialogOpen(open);
+
+                if (!open) {
+                    // Reset form values when dialog is closed
+                    form.reset({
+                        title: member.title || "",
+                        role: member.role as z.infer<typeof formSchema>["role"],
+                    });
+                }
+            }}
+        >
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
                     <Ellipsis/>
@@ -291,8 +310,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                             <FormDescription>
                                                 {isLastOwner
                                                     ? "You cannot change your role because you are the last owner. Every organization must have at least one owner."
-                                                    : <>Choose the role for this organization member. <strong>The user
-                                                        will be signed out and will have to sign back in.</strong></>}
+                                                    : <>Choose the role for this organization member.</>}
 
                                             </FormDescription>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}
