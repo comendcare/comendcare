@@ -144,7 +144,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
     }, [debouncedNickname, defaultOrganizationValues?.subdomain, editOrgForm])
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
-        if (organization.id) {
+        if (!organization.id) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
@@ -335,7 +335,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
     }, [organization.id, editFinancesForm]);
 
     async function onFinancesFormSubmit(values: z.infer<typeof financesFormSchema>) {
-        if (organization.id) {
+        if (!organization.id) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
@@ -373,7 +373,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
 
     useEffect(() => {
         async function fetchResearchData() {
-            if (organization.id) {
+            if (!organization.id) {
                 toast.error("You must be signed into an organization.");
                 return;
             }
@@ -437,6 +437,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
                         const defaultValues = fetchedValues[0] || {};
+                        console.log("hello", defaultValues)
 
                         setDefaultResearchValues(defaultValues);
                         editResearchForm.reset(defaultValues);
@@ -457,7 +458,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
     }, [organization.id, editResearchForm]);
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
-        if (organization.id) {
+        if (!organization.id) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
