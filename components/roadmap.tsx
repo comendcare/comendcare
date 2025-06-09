@@ -53,7 +53,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -109,11 +108,8 @@ export function Roadmap() {
     const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
     const { isOnbordaVisible } = useOnborda()
     const contextMenuRef = useRef<HTMLDivElement>(null)
-    const triggerRef = useRef<HTMLDivElement | null>(null)
-    const [anchorPoint, setAnchorPoint] = useState<{ x: number; y: number } | null>(null)
-    const [menuKey, setMenuKey] = useState(0)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
-    const lastFocusedRef = useRef<HTMLElement | null>(null)
+    const focusRef = useRef<any>(null);
 
     useEffect(() => {
         if (step === ".onborda-select-a-template" && isOnbordaVisible) {
@@ -265,120 +261,111 @@ export function Roadmap() {
         setSelectedView(value)
         setSelectedNodeIds([]) // deselect any selected milestones when switching tabs
     }
-
-    const handleRightClick = (e: React.MouseEvent) => {
-        e.preventDefault() // prevent default right click context menu
-        setAnchorPoint({ x: e.clientX, y: e.clientY })
-        setMenuKey((k) => k + 1) // force remount so ContextMenu shows in the correct location
+    
+    function closeContextMenu() {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
     }
 
-    // dispatch click event on the context menu trigger after forced remount
-    // initial remount doesn't automatically open the context menu and the open property is not exposed in redux context menu
-    // so we have to trigger the open with a click event
-    useEffect(() => {
-        if (anchorPoint && triggerRef.current) {
-            const el = triggerRef.current
-            const event = new MouseEvent("contextmenu", {
-                bubbles: true,
-                cancelable: true,
-                clientX: anchorPoint.x,
-                clientY: anchorPoint.y,
-                button: 2,
-            })
-            el.dispatchEvent(event)
-        }
-    }, [menuKey])
-
-    useEffect(() => {
-        if (!deleteIsOpen) {
-            setAnchorPoint(null)
-            setMenuKey(Date.now()) // if you're using a key to force re-render
-            setSelectedNodeIds([]) // if appropriate
-        }
-    }, [deleteIsOpen])
-
     if (!roadmapId || !initialized) {
-        return (
-            // <div className="w-full h-full flex justify-center items-center">
-            //     <p>Research plan is not intialized... please refresh the page</p>
-            // </div>
-            <Loading />
-        )
+        return <Loading />
     }
 
     return (
-        <>
-        <TooltipProvider delayDuration={0}>
-            <ResizablePanelGroup
-                direction="horizontal"
-                className="h-full items-stretch"
-            >
-                <ResizablePanel className="p-2 flex flex-col gap-2">
-                    <RoadmapHeader 
-                        researchPlanId={roadmapId}
-                        researchPlanDetails={{
-                            id: roadmapId,
-                            ...details
-                        }}
-                        setTab={setTab}
-                        setNewMilestoneIsOpen={setNewMilestoneIsOpen}
-                        addMilestones={addMilestones}
-                        milestones={milestones}
-                        milestoneTypes={milestoneTypes}
-                        setBulkImportIsOpen={setBulkImportIsOpen}
-                        orgSubdomain={orgSubdomain}
-                    />
-                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
-                        <div className="flex flex-row items-center gap-x-1 justify-start">
-                            <TabsList className="mr-auto">
-                                <TabsTrigger value="timeline">Timeline View</TabsTrigger>
-                                <TabsTrigger value="flow" className="flex gap-2">
-                                    Flow View
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="ml-auto">
-                                            <Info className="h-4 w-4"/>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                            {"An interactive whiteboard that lets you easily view and organize research plans with visual elements."}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TabsTrigger>
-                            </TabsList>
+        <ContextMenu>
+        <ContextMenuTrigger autoFocus className="h-full w-full">
+            <TooltipProvider delayDuration={0}>
+                <ResizablePanelGroup
+                    direction="horizontal"
+                    className="h-full items-stretch"
+                >
+                    <ResizablePanel className="p-2 flex flex-col gap-2">
+                        <RoadmapHeader 
+                            researchPlanId={roadmapId}
+                            researchPlanDetails={{
+                                id: roadmapId,
+                                ...details
+                            }}
+                            setTab={setTab}
+                            setNewMilestoneIsOpen={setNewMilestoneIsOpen}
+                            addMilestones={addMilestones}
+                            milestones={milestones}
+                            milestoneTypes={milestoneTypes}
+                            setBulkImportIsOpen={setBulkImportIsOpen}
+                            orgSubdomain={orgSubdomain}
+                        />
+                        <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                            <div className="flex flex-row items-center gap-x-1 justify-start">
+                                <TabsList className="mr-auto">
+                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
+                                    <TabsTrigger value="flow" className="flex gap-2">
+                                        Flow View
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="ml-auto">
+                                                <Info className="h-4 w-4"/>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                                {"An interactive whiteboard that lets you easily view and organize research plans with visual elements."}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TabsTrigger>
+                                </TabsList>
 
-                            {selectedView === "timeline" || selectedView === null && (
-                                <div className="flex flex-row gap-4 items-center">
-                                    <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
-                                        <SelectTrigger className="w-[180px]">
-                                            <SelectValue defaultValue={'custom'} placeholder={"Sort by"}>
-                                                {(() => {
-                                                    switch(sortBy) {
-                                                        case "start":
-                                                            return "Sort by: Start Date"
-                                                        case "end":
-                                                            return "Sort by: End Date"
-                                                        default:
-                                                            return "Sort by: Custom"
-                                                    }
-                                                })()}
-                                            </SelectValue>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="custom">{`Custom`}</SelectItem>
-                                            <SelectItem value="start">{`Start Date`}</SelectItem>
-                                            <SelectItem value="end">{`End Date`}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )}
+                                {selectedView === "timeline" || selectedView === null && (
+                                    <div className="flex flex-row gap-4 items-center">
+                                        <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
+                                            <SelectTrigger className="w-[180px]">
+                                                <SelectValue defaultValue={'custom'} placeholder={"Sort by"}>
+                                                    {(() => {
+                                                        switch(sortBy) {
+                                                            case "start":
+                                                                return "Sort by: Start Date"
+                                                            case "end":
+                                                                return "Sort by: End Date"
+                                                            default:
+                                                                return "Sort by: Custom"
+                                                        }
+                                                    })()}
+                                                </SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="custom">{`Custom`}</SelectItem>
+                                                <SelectItem value="start">{`Start Date`}</SelectItem>
+                                                <SelectItem value="end">{`End Date`}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button 
-                                        data-skip-outside-click
-                                        onClick={(e) => {
-                                            undo() // undo updates zustand state
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            data-skip-outside-click
+                                            onClick={(e) => {
+                                                undo() // undo updates zustand state
+                                                saveState() // save state to update database
+                                
+                                                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+                                                    // if there is a node selected, remount the milestone form
+                                                    // to update the form data after the undo was triggered
+                                                    setMilestoneRemountKey(prevKey => prevKey + 1)
+                                                }
+                                            }} size={"icon"} variant={"ghost"}
+                                        >
+                                            <Undo2 />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80">
+                                        <p>{`Undo (⌘+Z)`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button onClick={() => {
+                                            console.log("Redo action triggered")
+                                            redo() // undo updates zustand state
                                             saveState() // save state to update database
                             
                                             if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
@@ -386,221 +373,187 @@ export function Roadmap() {
                                                 // to update the form data after the undo was triggered
                                                 setMilestoneRemountKey(prevKey => prevKey + 1)
                                             }
-                                        }} size={"icon"} variant={"ghost"}
-                                    >
-                                        <Undo2 />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Undo (⌘+Z)`}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                        }} size={"icon"} variant={"ghost"}>
+                                            <Redo2 />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80">
+                                        <p>{`Redo (⌘+Shift+Z)`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button onClick={() => {
-                                        console.log("Redo action triggered")
-                                        redo() // undo updates zustand state
-                                        saveState() // save state to update database
-                        
-                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                                            // if there is a node selected, remount the milestone form
-                                            // to update the form data after the undo was triggered
-                                            setMilestoneRemountKey(prevKey => prevKey + 1)
-                                        }
-                                    }} size={"icon"} variant={"ghost"}>
-                                        <Redo2 />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Redo (⌘+Shift+Z)`}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </div>
-
-                        {/* Flow View */}
-                        <TabsContent
-                            value="flow"
-                            className="m-0 h-[calc(100vh-10rem)]"
-                        >
-                            {milestones.length > 0 ? (
-                                <PrivateFlowView
-                                    width={defaultLayout[0]}
-                                    contextMenuRef={contextMenuRef} 
-                                    handleRightClick={handleRightClick}
-                                />
-                            ): (
-                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
-                            )}
-                        </TabsContent>
-                        
-                        {/* Timeline view */}
-                        <TabsContent
-                            value="timeline"
-                            className="mt-0 h-[calc(100vh-12rem)]"
-                        >
-                            {milestones.length > 0 ? (
-                                <PrivateTimelineView 
-                                    sortBy={sortBy} 
-                                    contextMenuRef={contextMenuRef} 
-                                    handleRightClick={handleRightClick}
-                                />
-                            ): (
-                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
-                            )}
-                        </TabsContent>
-
-                    </Tabs>
-                </ResizablePanel>
-
-                {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
-                    <>
-                        <ResizableHandle withHandle />
-
-                        <ResizablePanel
-                            onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
-                            defaultSize={40}
-                            minSize={25}
-                            className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
-                        >
-                            <MilestoneDetailsPanel
-                                organization={organization}
-                                remountKey={milestoneRemountKey}
-                                milestone={milestones.find(
-                                    milestone =>
-                                        milestone.nodeId === selectedNodeIds[0]
+                            {/* Flow View */}
+                            <TabsContent
+                                value="flow"
+                                className="m-0 h-[calc(100vh-10rem)]"
+                            >
+                                {milestones.length > 0 ? (
+                                    <PrivateFlowView
+                                        width={defaultLayout[0]}
+                                        contextMenuRef={contextMenuRef} 
+                                    />
+                                ): (
+                                    <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
                                 )}
-                                handlePanelChange={handleMilestonePanelChange}
-                                orgIsPublished={orgIsPublished}
-                            />
-                        </ResizablePanel>
-                    </>
-                )}
-
-                <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
-                    setBulkImportIsOpen(open)
-                }}>
-                    <DialogContent className="flex flex-col justify-start">
-                        <DialogHeader>
-                            <DialogTitle className="text-2xl">
-                                Import projects
-                            </DialogTitle>
-                            <DialogDescription>
-                                Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <FileUploadForm 
-                            accept=".csv" 
-                            onSubmit={async (file) => {
-                                if (file && file.name.endsWith(".csv")) {
-                                    // parse CSV file
-                                    try {
-                                        const result = await parseCSV(
-                                            file,
-                                            [
-                                                {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
-                                                {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                                                {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && milestoneTypes.find(type => type.label === entry) !== undefined}
-                                            ]
-                                        )
+                            </TabsContent>
                             
-                                        if (result.errors.length > 0) {
-                                            toast('Warning!', {
+                            {/* Timeline view */}
+                            <TabsContent
+                                value="timeline"
+                                className="mt-0 h-[calc(100vh-12rem)]"
+                            >
+                                {milestones.length > 0 ? (
+                                    <PrivateTimelineView 
+                                        sortBy={sortBy} 
+                                        contextMenuRef={contextMenuRef} 
+                                    />
+                                ): (
+                                    <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
+                                )}
+                            </TabsContent>
+
+                        </Tabs>
+                    </ResizablePanel>
+
+                    {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
+                        <>
+                            <ResizableHandle withHandle />
+
+                            <ResizablePanel
+                                onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
+                                defaultSize={40}
+                                minSize={25}
+                                className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
+                            >
+                                <MilestoneDetailsPanel
+                                    organization={organization}
+                                    remountKey={milestoneRemountKey}
+                                    milestone={milestones.find(
+                                        milestone =>
+                                            milestone.nodeId === selectedNodeIds[0]
+                                    )}
+                                    handlePanelChange={handleMilestonePanelChange}
+                                    orgIsPublished={orgIsPublished}
+                                />
+                            </ResizablePanel>
+                        </>
+                    )}
+
+                    <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
+                        setBulkImportIsOpen(open)
+                    }}>
+                        <DialogContent className="flex flex-col justify-start">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl">
+                                    Import projects
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <FileUploadForm 
+                                accept=".csv" 
+                                onSubmit={async (file) => {
+                                    if (file && file.name.endsWith(".csv")) {
+                                        // parse CSV file
+                                        try {
+                                            const result = await parseCSV(
+                                                file,
+                                                [
+                                                    {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                                                    {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                                                    {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && milestoneTypes.find(type => type.label === entry) !== undefined}
+                                                ]
+                                            )
+                                
+                                            if (result.errors.length > 0) {
+                                                toast('Warning!', {
+                                                    position: "bottom-left",
+                                                    duration: 6000,
+                                                    description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
+                                                })
+                                                console.error("Error: imported projects are missing required fields", result.errors)
+                                            }
+
+                                            addMilestones(result.values.map(milestone => {
+                                                const foundType = milestoneTypes.find(type => type.label === milestone.type)
+
+                                                return {
+                                                    title: milestone.title, 
+                                                    description: milestone.description, 
+                                                    types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
+                                                    nodeType: "PROJECT"
+                                                }
+                                            }), "Import")
+                                        } catch (e) {
+                                            toast('Error!', {
                                                 position: "bottom-left",
                                                 duration: 6000,
-                                                description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
+                                                description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                                             })
-                                            console.error("Error: imported projects are missing required fields", result.errors)
+                                            console.error("Error: failed to import tools", e)
                                         }
-
-                                        addMilestones(result.values.map(milestone => {
-                                            const foundType = milestoneTypes.find(type => type.label === milestone.type)
-
-                                            return {
-                                                title: milestone.title, 
-                                                description: milestone.description, 
-                                                types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                nodeType: "PROJECT"
-                                            }
-                                        }), "Import")
-                                    } catch (e) {
-                                        toast('Error!', {
-                                            position: "bottom-left",
-                                            duration: 6000,
-                                            description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
-                                        })
-                                        console.error("Error: failed to import tools", e)
+                                    } else {
+                                        console.error("Please upload a valid CSV file.");
                                     }
-                                } else {
-                                    console.error("Please upload a valid CSV file.");
-                                }
-                            }}
-                        />
-                    </DialogContent>
-                </Dialog>
+                                }}
+                            />
+                        </DialogContent>
+                    </Dialog>
 
-                <NewMilestoneDialogForm 
-                    open={newMilestoneIsOpen}
-                    setOpen={setNewMilestoneIsOpen}
-                    tab={tab}
-                    setTab={setTab}
-                />
-            </ResizablePanelGroup>
-        </TooltipProvider>
-
-        {anchorPoint && (
-            <ContextMenu key={menuKey}>
-                <ContextMenuTrigger asChild>
-                    <div
-                        ref={triggerRef}
-                        style={{
-                            position: "fixed",
-                            top: anchorPoint.y,
-                            left: anchorPoint.x,
-                            width: 1,
-                            height: 1,
-                            backgroundColor: "transparent",
-                            zIndex: 50,
-                        }}
+                    <NewMilestoneDialogForm 
+                        open={newMilestoneIsOpen}
+                        setOpen={setNewMilestoneIsOpen}
+                        tab={tab}
+                        setTab={setTab}
                     />
-                </ContextMenuTrigger>
+                </ResizablePanelGroup>
+            </TooltipProvider>
+        </ContextMenuTrigger>
 
-                <ContextMenuContent ref={contextMenuRef}>
-                    {/* <ContextMenuItem 
-                        onSelect={(e) => {
-                            e.preventDefault()
-                            console.log("Delete")
-                            setDeleteIsOpen(true)
-                            // deleteNode(selectedNodeIds[0])
-                        }}
-                    >
-                        Delete Selected Projects
-                    </ContextMenuItem> */}
-                    <ContextMenuItem 
-                        onSelect={(e) => {
-                            selectedNodeIds.forEach((nodeId: string) => {
-                                setMilestone(nodeId, {private: false})
-                            })
-                        }}
-                    >
-                        {`Make selected project(s) public`}
-                    </ContextMenuItem>
-                    <ContextMenuItem
-                        onSelect={(e) => {
-                            selectedNodeIds.forEach((nodeId: string) => {
-                                setMilestone(nodeId, {private: true})
-                            })
-                        }}
-                    >
-                        {`Make selected project(s) private`}
-                    </ContextMenuItem>
-                </ContextMenuContent>
-            </ContextMenu>
-        )}
+        <ContextMenuContent 
+            onCloseAutoFocus={(event) => {
+                if (focusRef.current) {
+                    focusRef.current.focus();
+                    focusRef.current = null;
+                    event.preventDefault();
+                }
+            }}
+        >
+            <ContextMenuItem 
+                onSelect={(e) => {
+                    selectedNodeIds.forEach((nodeId: string) => {
+                        setMilestone(nodeId, {private: false})
+                    })
+                }}
+            >
+                {`Make selected project(s) public`}
+            </ContextMenuItem>
+            <ContextMenuItem
+                onSelect={(e) => {
+                    selectedNodeIds.forEach((nodeId: string) => {
+                        setMilestone(nodeId, {private: true})
+                    })
+                }}
+            >
+                {`Make selected project(s) private`}
+            </ContextMenuItem>
+            <ContextMenuItem onClick={(e) => {
+                e.preventDefault()
+                // we have to ensure the context menu closes properly before triggering the dialog
+                // the context menu sets aria-hidden = true on itself for accessibility reasons, and this
+                // causes the focused element to be hidden when the dialog is opened
+                closeContextMenu()
+                setTimeout(() => setDeleteIsOpen(true), 10) // let context menu close after a brief delay
+            }}>
+                Delete Selected Projects
+            </ContextMenuItem>
+        </ContextMenuContent>
 
-        {/* <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-            <DialogContent>
+        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+            <DialogContent ref={focusRef}>
                 <DialogHeader>
                     <DialogTitle>
                         Are you absolutely sure?
@@ -610,7 +563,11 @@ export function Roadmap() {
                     </DialogDescription>
                     <DialogFooter>
                         <DialogClose>
-                            <Button type="button">
+                            <Button type="button" onClick={(e) => {
+                                e.preventDefault()
+                                document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+                                setDeleteIsOpen(false)
+                            }}>
                                 Cancel
                             </Button>
                         </DialogClose>
@@ -619,7 +576,10 @@ export function Roadmap() {
                                 type="button"
                                 variant={"destructive"}
                                 onClick={(e) => {
-                                    deleteNode(selectedNodeIds[0])
+                                    e.preventDefault()
+                                    selectedNodeIds.forEach(nodeId => deleteNode(nodeId))
+                                    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+                                    setDeleteIsOpen(false)
                                 }}
                             >
                                 Delete Project
@@ -628,8 +588,8 @@ export function Roadmap() {
                     </DialogFooter>
                 </DialogHeader>
             </DialogContent>
-        </Dialog> */}
-        </>
+        </Dialog>
+        </ContextMenu>
     )
 }
 

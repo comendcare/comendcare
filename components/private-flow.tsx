@@ -43,11 +43,9 @@ const selector = (state: RoadmapState) => ({
 export const PrivateFlowView = ({
     width,
     contextMenuRef,
-    handleRightClick
 }: {
     width: number,
     contextMenuRef: React.RefObject<HTMLDivElement>,
-    handleRightClick: (e: any) => void
 }) => {
     const {
         selectedNodeIds,
@@ -248,7 +246,6 @@ export const PrivateFlowView = ({
             // last node is the onboarding node, localNodes are sorted by their creation date
             onboardingMilestone: index === 0,
             contextMenuRef,
-            handleRightClick
         },
     }))
 
