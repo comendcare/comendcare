@@ -51,6 +51,7 @@ export function DeleteMilestoneDialogContent({
 
         await setSelectedNodeIds([])
         await deleteNode(milestoneData?.nodeId)
+
         toast(
             <div className="flex justify-between items-center w-full">
                 <p className="font-semibold text-gray-900">

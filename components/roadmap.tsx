@@ -15,15 +15,17 @@ import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
+import { getMilestones, getMilestoneTypes, getOrganizationFromOrganizationId, getPublicMilestoneDetails } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn, parseCSV } from "@/lib/utils"
 import Link from "next/link"
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -45,7 +47,13 @@ import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "./ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import ShareDialog from "./share-dialog"
-import { mixpanelTrack } from "@/app/mixpanel"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -57,7 +65,9 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     saveState: state.saveState,
-    addMilestones: state.addMilestones
+    addMilestones: state.addMilestones,
+    deleteNode: state.deleteNode,
+    setMilestone: state.setMilestone
 })
 
 const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
@@ -77,7 +87,9 @@ export function Roadmap() {
         setSelectedNodeIds, 
         milestones, 
         saveState,
-        addMilestones
+        addMilestones,
+        deleteNode,
+        setMilestone
     } = useRoadmapStore(useShallow(selector))
     const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session} = useSession()
@@ -95,7 +107,13 @@ export function Roadmap() {
     const [organization, setOrganization] = useState<Organization | undefined>()
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
     const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
-    const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
+    const { isOnbordaVisible } = useOnborda()
+    const contextMenuRef = useRef<HTMLDivElement>(null)
+    const triggerRef = useRef<HTMLDivElement | null>(null)
+    const [anchorPoint, setAnchorPoint] = useState<{ x: number; y: number } | null>(null)
+    const [menuKey, setMenuKey] = useState(0)
+    const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const lastFocusedRef = useRef<HTMLElement | null>(null)
 
     useEffect(() => {
         if (step === ".onborda-select-a-template" && isOnbordaVisible) {
@@ -194,7 +212,7 @@ export function Roadmap() {
                 redo() // undo updates zustand state
                 saveState() // save state to update database
 
-                if (selectedNodeIds[0]) {
+                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                     // if there is a node selected, remount the milestone form
                     // to update the form data after the undo was triggered
                     setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -207,7 +225,7 @@ export function Roadmap() {
                 undo(); // undo updates zustand state
                 saveState(); // save state to update database
     
-                if (selectedNodeIds[0]) {
+                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                     // Remount the milestone form and update the milestoneRemountKey
                     // using the ref to get the most recent value
                     setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
@@ -222,7 +240,7 @@ export function Roadmap() {
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
 
-        if (selectedNodeIds[0]) {
+        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
             params.set("project", selectedNodeIds[0])
         } else {
             params.delete("project")
@@ -248,6 +266,37 @@ export function Roadmap() {
         setSelectedNodeIds([]) // deselect any selected milestones when switching tabs
     }
 
+    const handleRightClick = (e: React.MouseEvent) => {
+        e.preventDefault() // prevent default right click context menu
+        setAnchorPoint({ x: e.clientX, y: e.clientY })
+        setMenuKey((k) => k + 1) // force remount so ContextMenu shows in the correct location
+    }
+
+    // dispatch click event on the context menu trigger after forced remount
+    // initial remount doesn't automatically open the context menu and the open property is not exposed in redux context menu
+    // so we have to trigger the open with a click event
+    useEffect(() => {
+        if (anchorPoint && triggerRef.current) {
+            const el = triggerRef.current
+            const event = new MouseEvent("contextmenu", {
+                bubbles: true,
+                cancelable: true,
+                clientX: anchorPoint.x,
+                clientY: anchorPoint.y,
+                button: 2,
+            })
+            el.dispatchEvent(event)
+        }
+    }, [menuKey])
+
+    useEffect(() => {
+        if (!deleteIsOpen) {
+            setAnchorPoint(null)
+            setMenuKey(Date.now()) // if you're using a key to force re-render
+            setSelectedNodeIds([]) // if appropriate
+        }
+    }, [deleteIsOpen])
+
     if (!roadmapId || !initialized) {
         return (
             // <div className="w-full h-full flex justify-center items-center">
@@ -258,6 +307,7 @@ export function Roadmap() {
     }
 
     return (
+        <>
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
@@ -330,7 +380,7 @@ export function Roadmap() {
                                         undo() // undo updates zustand state
                                         saveState() // save state to update database
                         
-                                        if (selectedNodeIds[0]) {
+                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                                             // if there is a node selected, remount the milestone form
                                             // to update the form data after the undo was triggered
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -351,7 +401,7 @@ export function Roadmap() {
                                         redo() // undo updates zustand state
                                         saveState() // save state to update database
                         
-                                        if (selectedNodeIds[0]) {
+                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
                                             // if there is a node selected, remount the milestone form
                                             // to update the form data after the undo was triggered
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
@@ -374,6 +424,8 @@ export function Roadmap() {
                             {milestones.length > 0 ? (
                                 <PrivateFlowView
                                     width={defaultLayout[0]}
+                                    contextMenuRef={contextMenuRef} 
+                                    handleRightClick={handleRightClick}
                                 />
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
@@ -386,7 +438,11 @@ export function Roadmap() {
                             className="mt-0 h-[calc(100vh-12rem)]"
                         >
                             {milestones.length > 0 ? (
-                                <PrivateTimelineView sortBy={sortBy}/>
+                                <PrivateTimelineView 
+                                    sortBy={sortBy} 
+                                    contextMenuRef={contextMenuRef} 
+                                    handleRightClick={handleRightClick}
+                                />
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
                             )}
@@ -395,11 +451,12 @@ export function Roadmap() {
                     </Tabs>
                 </ResizablePanel>
 
-                {selectedNodeIds[0] != null && (
+                {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
                     <>
                         <ResizableHandle withHandle />
 
                         <ResizablePanel
+                            onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
                             defaultSize={40}
                             minSize={25}
                             className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
@@ -489,6 +546,88 @@ export function Roadmap() {
                 />
             </ResizablePanelGroup>
         </TooltipProvider>
+
+        {anchorPoint && (
+            <ContextMenu key={menuKey}>
+                <ContextMenuTrigger asChild>
+                    <div
+                        ref={triggerRef}
+                        style={{
+                            position: "fixed",
+                            top: anchorPoint.y,
+                            left: anchorPoint.x,
+                            width: 1,
+                            height: 1,
+                            backgroundColor: "transparent",
+                            zIndex: 50,
+                        }}
+                    />
+                </ContextMenuTrigger>
+
+                <ContextMenuContent ref={contextMenuRef}>
+                    {/* <ContextMenuItem 
+                        onSelect={(e) => {
+                            e.preventDefault()
+                            console.log("Delete")
+                            setDeleteIsOpen(true)
+                            // deleteNode(selectedNodeIds[0])
+                        }}
+                    >
+                        Delete Selected Projects
+                    </ContextMenuItem> */}
+                    <ContextMenuItem 
+                        onSelect={(e) => {
+                            selectedNodeIds.forEach((nodeId: string) => {
+                                setMilestone(nodeId, {private: false})
+                            })
+                        }}
+                    >
+                        {`Make selected project(s) public`}
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                        onSelect={(e) => {
+                            selectedNodeIds.forEach((nodeId: string) => {
+                                setMilestone(nodeId, {private: true})
+                            })
+                        }}
+                    >
+                        {`Make selected project(s) private`}
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        )}
+
+        {/* <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Are you absolutely sure?
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`This action cannot be undone. This will permanently delete your project and it's data.`}
+                    </DialogDescription>
+                    <DialogFooter>
+                        <DialogClose>
+                            <Button type="button">
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        <DialogClose>
+                            <Button
+                                type="button"
+                                variant={"destructive"}
+                                onClick={(e) => {
+                                    deleteNode(selectedNodeIds[0])
+                                }}
+                            >
+                                Delete Project
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog> */}
+        </>
     )
 }
 
