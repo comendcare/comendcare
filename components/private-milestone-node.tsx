@@ -1,4 +1,4 @@
-import React, {memo, useState} from "react"
+import React, {memo, useEffect, useState} from "react"
 import {
     Handle,
     Position,
@@ -38,7 +38,10 @@ import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
 
 export type PrivateMilestoneNode = Node<
-    Milestone,
+    Milestone & {
+        contextMenuRef: React.RefObject<HTMLDivElement>, 
+        handleRightClick: (e: any) => void
+    },
     "PROJECT" | "ASSET" | "RFP"
 >
 
@@ -53,17 +56,52 @@ const selector = (state: RoadmapState) => ({
     nodes: state.nodes,
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
+    setSelectedNodeIds: state.setSelectedNodeIds,
 })
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const {selectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {selectedNodeIds, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+        const target = event.target as any;
+
+        // Check if click was inside context menu
+        if (props.data.contextMenuRef.current?.contains(target)) return
+        // Skip right clicks
+        if (event instanceof MouseEvent && event.button === 2) return
+
+        if (selectedNodeIds.length > 1 && !event.metaKey && props.id && selectedNodeIds.includes(props.id)) {
+            setSelectedNodeIds([])
+        }
+    }
+
+    useEffect(() => {
+        if (selectedNodeIds.length > 1) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchend', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
+        }
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
+        };
+    }), [selectedNodeIds]
 
     return (
-        <Card className={cn(
-            "w-[350px] text-wrap break-words",
-            props?.id && selectedNodeIds.includes(props?.id) ? "border-black border-2 click-project-step" : "",
-            props.id === "preview" ? "opacity-50" : "",
-        )}>
+        <Card 
+            className={cn(
+                "w-[350px] text-wrap break-words",
+                props?.id && selectedNodeIds.includes(props?.id) ? "border-black border-2 click-project-step" : "",
+                props.id === "preview" ? "opacity-50" : "",
+            )}
+            onContextMenu={(e) => {
+                // if this element is currently selected, allow right click events for the context menu
+                if (props.id && selectedNodeIds.includes(props.id)) props.data.handleRightClick(e)
+            }}
+        >
             <CardHeader>
                 <div className="flex flex-row align-center items-center justify-end gap-4">
                     <ProjectActionsMenu milestone={props.data as Milestone}/>
