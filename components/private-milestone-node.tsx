@@ -67,6 +67,9 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
 
         // Check if click was inside context menu
         if (props.data.contextMenuRef.current?.contains(target)) return
+        if (props.data.contextMenuRef.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
+            return
+        }
         // Skip right clicks
         if (event instanceof MouseEvent && event.button === 2) return
 
