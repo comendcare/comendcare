@@ -54,17 +54,17 @@ import { DateView } from "./miletone-date-view";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
-    setSelectedNodeId: state.setSelectedNodeId
+    setSelectedNodeIds: state.setSelectedNodeIds
 })
 
 export function GanttChartView() {
-  const { milestones, setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+  const { milestones, setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const handleEditClick = (nodeId: string | null) => {
-    if (nodeId) setSelectedNodeId(nodeId)
+    if (nodeId) setSelectedNodeIds([nodeId])
   }
 
   return (
@@ -212,7 +212,7 @@ const CustomBar = (props: any) => {
     const barWidth = xAxis.scale(payload.z) - xAxis.scale(payload.x);
     const barHeight = 40;
     const {
-        setSelectedNodeId,
+        setSelectedNodeIds,
     } = useRoadmapStore(useShallow(selector))
     const router = useRouter()
     const pathname = usePathname()
@@ -231,7 +231,7 @@ const CustomBar = (props: any) => {
 
     const handleEditClick = (payload: DataPoint) => {
       const nodeId = payload.milestoneData.nodeId
-      setSelectedNodeId(nodeId)
+      setSelectedNodeIds([nodeId])
     }
   
     return (

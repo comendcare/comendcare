@@ -20,7 +20,7 @@ import { mixpanelTrack } from "@/app/mixpanel"
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,
     saveState: state.saveState,
-    setSelectedNodeId: state.setSelectedNodeId
+    setSelectedNodeIds: state.setSelectedNodeIds
 })
 
 export function DeleteMilestoneDialogContent({
@@ -28,7 +28,7 @@ export function DeleteMilestoneDialogContent({
 }: {
     milestoneData: any
 }) {
-    const { deleteNode, saveState, setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { deleteNode, saveState, setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
     const { undo } = useRoadmapStore.temporal.getState()
 
     const handleUndo = () => {
@@ -49,7 +49,7 @@ export function DeleteMilestoneDialogContent({
             "Budget": milestoneData.budget
         })
 
-        await setSelectedNodeId(null)
+        await setSelectedNodeIds([])
         await deleteNode(milestoneData?.nodeId)
         toast(
             <div className="flex justify-between items-center w-full">
