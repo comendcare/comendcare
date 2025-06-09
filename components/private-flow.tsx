@@ -42,8 +42,12 @@ const selector = (state: RoadmapState) => ({
 
 export const PrivateFlowView = ({
     width,
+    contextMenuRef,
+    handleRightClick
 }: {
-    width: number
+    width: number,
+    contextMenuRef: React.RefObject<HTMLDivElement>,
+    handleRightClick: (e: any) => void
 }) => {
     const {
         selectedNodeIds,
@@ -242,8 +246,10 @@ export const PrivateFlowView = ({
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
             // last node is the onboarding node, localNodes are sorted by their creation date
-            onboardingMilestone: index === 0
-        }
+            onboardingMilestone: index === 0,
+            contextMenuRef,
+            handleRightClick
+        },
     }))
 
     const updatedEdges = localEdges.map((edge: Edge) => ({

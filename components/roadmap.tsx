@@ -45,7 +45,12 @@ import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "./ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import ShareDialog from "./share-dialog"
-import { mixpanelTrack } from "@/app/mixpanel"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -95,7 +100,11 @@ export function Roadmap() {
     const [organization, setOrganization] = useState<Organization | undefined>()
     const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
     const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
-    const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
+    const { isOnbordaVisible } = useOnborda()
+    const contextMenuRef = useRef<HTMLDivElement>(null)
+    const triggerRef = useRef<HTMLDivElement | null>(null)
+    const [anchorPoint, setAnchorPoint] = useState<{ x: number; y: number } | null>(null)
+    const [menuKey, setMenuKey] = useState(0)
 
     useEffect(() => {
         if (step === ".onborda-select-a-template" && isOnbordaVisible) {
@@ -248,6 +257,29 @@ export function Roadmap() {
         setSelectedNodeIds([]) // deselect any selected milestones when switching tabs
     }
 
+    const handleRightClick = (e: React.MouseEvent) => {
+        e.preventDefault() // prevent default right click context menu
+        setAnchorPoint({ x: e.clientX, y: e.clientY })
+        setMenuKey((k) => k + 1) // force remount so ContextMenu shows in the correct location
+    }
+
+    // dispatch click event on the context menu trigger after forced remount
+    // initial remount doesn't automatically open the context menu and the open property is not exposed in redux context menu
+    // so we have to trigger the open with a click event
+    useEffect(() => {
+        if (anchorPoint && triggerRef.current) {
+            const el = triggerRef.current
+            const event = new MouseEvent("contextmenu", {
+                bubbles: true,
+                cancelable: true,
+                clientX: anchorPoint.x,
+                clientY: anchorPoint.y,
+                button: 2,
+            })
+            el.dispatchEvent(event)
+        }
+    }, [menuKey])
+
     if (!roadmapId || !initialized) {
         return (
             // <div className="w-full h-full flex justify-center items-center">
@@ -258,6 +290,7 @@ export function Roadmap() {
     }
 
     return (
+        <>
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
@@ -374,6 +407,8 @@ export function Roadmap() {
                             {milestones.length > 0 ? (
                                 <PrivateFlowView
                                     width={defaultLayout[0]}
+                                    contextMenuRef={contextMenuRef} 
+                                    handleRightClick={handleRightClick}
                                 />
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
@@ -386,7 +421,11 @@ export function Roadmap() {
                             className="mt-0 h-[calc(100vh-12rem)]"
                         >
                             {milestones.length > 0 ? (
-                                <PrivateTimelineView sortBy={sortBy}/>
+                                <PrivateTimelineView 
+                                    sortBy={sortBy} 
+                                    contextMenuRef={contextMenuRef} 
+                                    handleRightClick={handleRightClick}
+                                />
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
                             )}
@@ -490,6 +529,33 @@ export function Roadmap() {
                 />
             </ResizablePanelGroup>
         </TooltipProvider>
+
+        {anchorPoint && (
+            <ContextMenu key={menuKey}>
+                <ContextMenuTrigger asChild>
+                    <div
+                        ref={triggerRef}
+                        style={{
+                            position: "fixed",
+                            top: anchorPoint.y,
+                            left: anchorPoint.x,
+                            width: 1,
+                            height: 1,
+                            backgroundColor: "transparent",
+                            zIndex: 50,
+                        }}
+                    />
+                </ContextMenuTrigger>
+
+                <ContextMenuContent ref={contextMenuRef}>
+                    <ContextMenuItem onSelect={() => console.log("Delete")}>
+                        Delete
+                    </ContextMenuItem>
+                    <ContextMenuItem>More actions</ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        )}
+        </>
     )
 }
 

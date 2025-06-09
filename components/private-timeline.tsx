@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import { cn } from "@/lib/utils"
@@ -33,6 +33,7 @@ import {GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
+import { ContextMenuTrigger } from "@/components/ui/context-menu"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
@@ -43,7 +44,7 @@ const selector = (state: RoadmapState) => ({
     setMilestones: state.setMilestones,
 })
 
-export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
+export const PrivateTimelineView = ({sortBy, contextMenuRef, handleRightClick}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>, handleRightClick: (e: any) => void}) => {
     const {
         selectedNodeIds,
         milestones,
@@ -175,6 +176,8 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                                 key={milestone.id}
                                 selectedNodeIds={selectedNodeIds} 
                                 disabled={sortBy !== "custom"}
+                                contextMenuRef={contextMenuRef}
+                                handleRightClick={handleRightClick}
                             />
                         ))}
                     </SortableContext>
@@ -189,11 +192,15 @@ const DraggableTimelineItem = ({
     index, 
     selectedNodeIds, 
     disabled,
+    contextMenuRef,
+    handleRightClick
 }: {
     milestone: Milestone, 
     index: number, 
     selectedNodeIds: string[], 
     disabled: boolean,
+    contextMenuRef: React.RefObject<HTMLDivElement>,
+    handleRightClick: (e: any) => void
 }) => {
     const {
         attributes,
@@ -204,7 +211,7 @@ const DraggableTimelineItem = ({
         isDragging
     } = useSortable({id: milestone.id})
     const {setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const elementRef = useRef<HTMLDivElement>(null);
+    const elementRef = useRef<HTMLDivElement>(null)
 
     const style = {
         transition,
@@ -214,23 +221,19 @@ const DraggableTimelineItem = ({
     }
     
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+        const target = event.target as Node;
+
+        // Check if click was inside context menu
+        if (contextMenuRef.current?.contains(target)) return
+        // Skip right clicks
+        if (event instanceof MouseEvent && event.button === 2) return
+
         if (selectedNodeIds.length > 1 && !event.metaKey && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
-            console.log(`handle click outside`, selectedNodeIds)
             setSelectedNodeIds([])
         }
-        // if (
-        //     dropdownRef.current &&
-        //     !dropdownRef.current.contains(event.target as Node) &&
-        //     inputRef.current &&
-        //     !inputRef.current.contains(event.target as Node)
-        // ) {
-        //     setOpen(false);
-        //     inputRef.current.blur();
-        // }
-    };
+    }
 
     useEffect(() => {
-        console.log(`selected node IDs changed`, selectedNodeIds)
         // if only one project is selected, we automatically scroll to that project so it's visible in the view
         if (selectedNodeIds.length === 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
             const el = elementRef.current;
@@ -264,6 +267,10 @@ const DraggableTimelineItem = ({
 
     return (
         <li 
+            onContextMenu={(e) => {
+                // if this element is currently selected, allow right click events for the context menu
+                if (milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) handleRightClick(e)
+            }}
             key={milestone.id}
             ref={setNodeRef}
             style={style}
