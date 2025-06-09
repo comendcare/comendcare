@@ -221,10 +221,13 @@ const DraggableTimelineItem = ({
     }
     
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-        const target = event.target as Node;
+        const target = event.target as any;
 
         // Check if click was inside context menu
         if (contextMenuRef.current?.contains(target)) return
+        if (contextMenuRef.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
+            return
+        }
         // Skip right clicks
         if (event instanceof MouseEvent && event.button === 2) return
 

@@ -375,17 +375,19 @@ export function Roadmap() {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button onClick={() => {
-                                        console.log("Undo action triggered")
-                                        undo() // undo updates zustand state
-                                        saveState() // save state to update database
-                        
-                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                                            // if there is a node selected, remount the milestone form
-                                            // to update the form data after the undo was triggered
-                                            setMilestoneRemountKey(prevKey => prevKey + 1)
-                                        }
-                                    }} size={"icon"} variant={"ghost"}>
+                                    <Button 
+                                        data-skip-outside-click
+                                        onClick={(e) => {
+                                            undo() // undo updates zustand state
+                                            saveState() // save state to update database
+                            
+                                            if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+                                                // if there is a node selected, remount the milestone form
+                                                // to update the form data after the undo was triggered
+                                                setMilestoneRemountKey(prevKey => prevKey + 1)
+                                            }
+                                        }} size={"icon"} variant={"ghost"}
+                                    >
                                         <Undo2 />
                                     </Button>
                                 </TooltipTrigger>
