@@ -44,7 +44,7 @@ import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Miles
 import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
-import { JsonValue } from "@prisma/client/runtime/library"
+import {JsonValue} from "@prisma/client/runtime/library"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -1071,7 +1071,7 @@ export const editUser = withAuth(
 // Invite user function with updated Organization model
 export const inviteUser = withOrganizationAuth(
     async (
-        organization: Organization, 
+        organization: Organization,
         session: Session | null,
         email: string = "therealflawnsontong@gmail.com",
         role: string = "member",
@@ -1408,7 +1408,7 @@ export const leaveOrganization = withOrganizationAuth(
     async (organization: Organization, session: Session | null) => {
         try {
             if (!session) {
-                return { success: false, error: "Session not found." };
+                return {success: false, error: "Session not found."};
             }
 
             // Check if the user is an owner
@@ -1422,7 +1422,7 @@ export const leaveOrganization = withOrganizationAuth(
             });
 
             if (!currentMember) {
-                return { success: false, error: "Membership not found." };
+                return {success: false, error: "Membership not found."};
             }
 
             if (currentMember.role === "owner") {
@@ -1450,10 +1450,10 @@ export const leaveOrganization = withOrganizationAuth(
                 }
             });
 
-            return { success: true, data: member };
+            return {success: true, data: member};
         } catch (error: any) {
             logError("Error leaving organization", error);
-            return { success: false, error: "Internal server error" };
+            return {success: false, error: "Internal server error"};
         }
     }
 );
@@ -1468,15 +1468,15 @@ export const updateMember = withOrganizationAuth(
 
         try {
             if (!session) {
-                return { success: false, error: "Session not found." };
+                return {success: false, error: "Session not found."};
             }
 
             const targetMember = await prisma.member.findUnique({
-                where: { id: membershipId },
+                where: {id: membershipId},
             });
 
             if (!targetMember) {
-                return { success: false, error: "Membership not found." };
+                return {success: false, error: "Membership not found."};
             }
 
             // Prevent demoting the last owner to member
@@ -1500,18 +1500,18 @@ export const updateMember = withOrganizationAuth(
             }
 
             const updatedMember = await prisma.member.update({
-                where: { id: membershipId },
-                include: { user: true },
+                where: {id: membershipId},
+                include: {user: true},
                 data
             });
 
             revalidatePath("/app/analytics");
             revalidatePath("/app/profile");
 
-            return { success: true, data: updatedMember };
+            return {success: true, data: updatedMember};
         } catch (error: any) {
             logError("Error updating membership", error);
-            return { success: false, error: "Internal server error" };
+            return {success: false, error: "Internal server error"};
         }
     },
     ["owner"]
@@ -1747,7 +1747,10 @@ export const acceptInvitation = withAuth(
 
             // extra auth logic
             if (invitation?.email !== session.user.email) {
-                return {success: false, error: "Error accepting invitation: active user email does not match the invite email."}
+                return {
+                    success: false,
+                    error: "Error accepting invitation: active user email does not match the invite email."
+                }
             }
 
             if (!invitation || invitation.accepted) {
@@ -2117,7 +2120,7 @@ export const createRoadmap = withOrganizationAuth(
         })
 
         // maps the original node id (from the template) to the new node ID that's stored in the DB
-        const nodeIDMap: {[originalNodeId: string]: string} = {}
+        const nodeIDMap: { [originalNodeId: string]: string } = {}
 
         // if a roadmap template was provided, create the relevant nodes, milestones, and edges
         if (roadmapTemplate?.milestones) {
@@ -2203,7 +2206,7 @@ export const createRoadmap = withOrganizationAuth(
             // create any edges that are connecting nodes
             if (roadmapTemplate.edges) {
                 const edges = await Promise.all(
-                    roadmapTemplate.edges.map(async (edge: Edge, index: number)=> {
+                    roadmapTemplate.edges.map(async (edge: Edge, index: number) => {
                         const newEdge = await prisma.edge.create({
                             data: {
                                 roadmap: {connect: {id: roadmap.id}},
@@ -2258,7 +2261,11 @@ export const createRoadmap = withOrganizationAuth(
 
 /* HANDLE UPDATING FLOW NODES - roadmap nodes positions, nothing in here is needed for typesense ------------------------- */
 export const updateDBFlow = withOrganizationAuth(
-    async (organization: Organization, {roadmapId, nodes, edges}: {roadmapId: string | null, nodes: any[], edges: any[]}) => {
+    async (organization: Organization, {roadmapId, nodes, edges}: {
+        roadmapId: string | null,
+        nodes: any[],
+        edges: any[]
+    }) => {
         try {
             if (!roadmapId) throw new Error('No roadmapId provided.')
             // console.log(`nodes:`, nodes)
@@ -2955,7 +2962,11 @@ export const createKanban = withOrganizationAuth(
 
 /* HANDLE KANBAN COLUMNS - create, update, delete ------------------------------------------------------------------------ */
 export const kanbanSync = withOrganizationAuth(
-    async (_: Organization, {kanbanId, columns, tasks}: {kanbanId: string | undefined, columns: Column[], tasks: Task[]}) => {
+    async (_: Organization, {kanbanId, columns, tasks}: {
+        kanbanId: string | undefined,
+        columns: Column[],
+        tasks: Task[]
+    }) => {
         try {
             if (!kanbanId) return
 
@@ -3843,16 +3854,16 @@ export const createCompany = withAdminAuth(
                     services: parsedServices.length
                         ? {
                             connectOrCreate: parsedServices.map((name) => ({
-                                where: { name },
-                                create: { name },
+                                where: {name},
+                                create: {name},
                             })),
                         }
                         : undefined,
                     certifications: parsedCertifications.length
                         ? {
                             connectOrCreate: parsedCertifications.map((name) => ({
-                                where: { name },
-                                create: { name },
+                                where: {name},
+                                create: {name},
                             })),
                         }
                         : undefined,
@@ -3881,6 +3892,76 @@ export const createCompany = withAdminAuth(
         }
     }
 )
+
+export const updateCompany = withAdminAuth(
+        async (companyId: string, formData: FormData) => {
+            const title = formData.get("orgName") as string;
+            const description = formData.get("description") as string;
+            const yearEstablished = parseInt(formData.get("founded") as string);
+            const headquarters = formData.get("headquarters") as string;
+            const companyType = formData.get("type") as string;
+            const url = formData.get("website") as string;
+            const servicesRaw = formData.get("services") as string;
+            const certificationsRaw = formData.get("certifications") as string;
+
+            const parsedServices = servicesRaw ? servicesRaw.split(",").map((s) => s.trim()) : [];
+            const parsedCertifications = certificationsRaw ? certificationsRaw.split(",").map((c) => c.trim()) : [];
+
+            const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices);
+
+            try {
+                const company = await prisma.company.update({
+                    where: {id: companyId},
+                    data: {
+                        title,
+                        description,
+                        yearEstablished: isNaN(yearEstablished) ? null : yearEstablished,
+                        headquarters,
+                        companyType,
+                        url,
+                        simplifiedCertifications: parsedCertifications,
+                        categories,
+                        milestoneTypes,
+                        services: {
+                            set: [],
+                            connectOrCreate: parsedServices.map((name) => ({
+                                where: {name},
+                                create: {name},
+                            })),
+                        },
+                        certifications: {
+                            set: [],
+                            connectOrCreate: parsedCertifications.map((name) => ({
+                                where: {name},
+                                create: {name},
+                            })),
+                        },
+                    },
+                });
+
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    company,
+                    'companies'
+                )
+
+                await revalidateTag(`${company.id}-company-metadata`);
+                revalidatePath("/admin/companies/database")
+
+                return {success: true, data: company};
+            } catch
+                (error) {
+                console.error("Error updating company:", error);
+                return {success: false, error: "Failed to update company."};
+            }
+        }
+    )
+;
 
 export const deleteCompany = withAdminAuth(
     async (company: Company) => {

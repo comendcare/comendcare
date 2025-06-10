@@ -103,12 +103,13 @@ const FloatingDockMobile = ({
                                         <DialogContent>{item.dialog}</DialogContent>
                                     </Dialog>
                                 ) : (
-                                    <Link
+                                    <a
                                         href={item.href || ""}
+                                        target={"_blank"}
                                         className="h-10 w-10 rounded-full bg-gray-50 dark:bg-neutral-900 flex items-center justify-center"
                                     >
                                         <div className="h-4 w-4">{item.icon}</div>
-                                    </Link>
+                                    </a>
                                 )}
                             </motion.div>
                         ))}
@@ -306,7 +307,7 @@ function IconContainer({
     }
 
     return (
-        <Link href={href || ""}>
+        <a href={href || ""} target={"_blank"}>
             <motion.div
                 ref={ref}
                 style={{width, height}}
@@ -333,6 +334,6 @@ function IconContainer({
                     {icon}
                 </motion.div>
             </motion.div>
-        </Link>
+        </a>
     );
 }
