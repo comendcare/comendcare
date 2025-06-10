@@ -513,15 +513,7 @@ export function Roadmap() {
             </TooltipProvider>
         </ContextMenuTrigger>
 
-        <ContextMenuContent 
-            onCloseAutoFocus={(event) => {
-                if (focusRef.current) {
-                    focusRef.current.focus();
-                    focusRef.current = null;
-                    event.preventDefault();
-                }
-            }}
-        >
+        <ContextMenuContent ref={contextMenuRef}>
             <ContextMenuItem 
                 onSelect={(e) => {
                     selectedNodeIds.forEach((nodeId: string) => {
@@ -553,13 +545,13 @@ export function Roadmap() {
         </ContextMenuContent>
 
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-            <DialogContent ref={focusRef}>
+            <DialogContent ref={contextMenuRef}>
                 <DialogHeader>
                     <DialogTitle>
                         Are you absolutely sure?
                     </DialogTitle>
                     <DialogDescription>
-                        {`This action cannot be undone. This will permanently delete your project and it's data.`}
+                        {`This action cannot be undone. This will permanently delete the selected projects and their data.`}
                     </DialogDescription>
                     <DialogFooter>
                         <DialogClose>
@@ -575,14 +567,13 @@ export function Roadmap() {
                             <Button
                                 type="button"
                                 variant={"destructive"}
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                     e.preventDefault()
-                                    selectedNodeIds.forEach(nodeId => deleteNode(nodeId))
-                                    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+                                    await Promise.all(selectedNodeIds.map(async (nodeId: string) => await deleteNode(nodeId)))
                                     setDeleteIsOpen(false)
                                 }}
                             >
-                                Delete Project
+                                Delete Selected Projects
                             </Button>
                         </DialogClose>
                     </DialogFooter>
