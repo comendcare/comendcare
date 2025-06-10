@@ -3,7 +3,8 @@ import {cn} from "@/lib/utils"
 import {
     motion,
     useScroll,
-    useMotionValueEvent
+    useMotionValueEvent,
+    AnimatePresence
 } from "framer-motion"
 import Link from "next/link"
 import React, {useRef, useState} from "react"
@@ -12,6 +13,8 @@ import Image from "next/image"
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { X, Menu as MenuIcon } from "lucide-react"
+import {Menu, MenuItem, ProductItem} from "@/components/layout/sections/navbar-menu";
+import {buttonVariants} from "@/components/ui/button";
 
 interface NavbarItem {
     name: string
@@ -143,49 +146,49 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, externalOpen}) =>
             >
                 <Image className="w-36 inline" src={logo} alt="Comend Logo"/>
             </Link>
-            {/*<motion.div*/}
-            {/*    className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">*/}
-            {/*    {navItems.map((navItem, idx) =>*/}
-            {/*        navItem.link ? (*/}
-            {/*            <Link*/}
-            {/*                onMouseEnter={() => setHovered(idx)}*/}
-            {/*                className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"*/}
-            {/*                key={`link-${idx}`}*/}
-            {/*                href={navItem.link}*/}
-            {/*            >*/}
-            {/*                {hovered === idx && (*/}
-            {/*                    <motion.div*/}
-            {/*                        layoutId="hovered"*/}
-            {/*                        className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"*/}
-            {/*                    />*/}
-            {/*                )}*/}
-            {/*                <span className="relative z-20">*/}
-            {/*                    {navItem.name}*/}
-            {/*                </span>*/}
-            {/*            </Link>*/}
-            {/*        ) : (*/}
-            {/*            <Menu setActive={setActive} key={`menu-${idx}`}>*/}
-            {/*                <MenuItem*/}
-            {/*                    setActive={setActive}*/}
-            {/*                    active={active}*/}
-            {/*                    item="Products"*/}
-            {/*                >*/}
-            {/*                    <div className="text-sm grid grid-cols-2 gap-10 p-4">*/}
-            {/*                        {navItem.items?.map((item, idx) => (*/}
-            {/*                            <ProductItem*/}
-            {/*                                key={idx}*/}
-            {/*                                title={item.title}*/}
-            {/*                                href={item.href}*/}
-            {/*                                imgParams={item.imgParams}*/}
-            {/*                                description={item.description}*/}
-            {/*                            />*/}
-            {/*                        ))}*/}
-            {/*                    </div>*/}
-            {/*                </MenuItem>*/}
-            {/*            </Menu>*/}
-            {/*        )*/}
-            {/*    )}*/}
-            {/*</motion.div>*/}
+            <motion.div
+                className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
+                {navItems.map((navItem, idx) =>
+                    navItem.link ? (
+                        <Link
+                            onMouseEnter={() => setHovered(idx)}
+                            className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
+                            key={`link-${idx}`}
+                            href={navItem.link}
+                        >
+                            {hovered === idx && (
+                                <motion.div
+                                    layoutId="hovered"
+                                    className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
+                                />
+                            )}
+                            <span className="relative z-20">
+                                {navItem.name}
+                            </span>
+                        </Link>
+                    ) : (
+                        <Menu setActive={setActive} key={`menu-${idx}`}>
+                            <MenuItem
+                                setActive={setActive}
+                                active={active}
+                                item="Products"
+                            >
+                                <div className="text-sm grid grid-cols-2 gap-10 p-4">
+                                    {navItem.items?.map((item, idx) => (
+                                        <ProductItem
+                                            key={idx}
+                                            title={item.title}
+                                            href={item.href}
+                                            imgParams={item.imgParams}
+                                            description={item.description}
+                                        />
+                                    ))}
+                                </div>
+                            </MenuItem>
+                        </Menu>
+                    )
+                )}
+            </motion.div>
 
             {/*<div className="flex items-center gap-4">*/}
             {/*    <Link href="/signin" className={cn(buttonVariants({ variant: "secondary" }), "hidden md:block")}>*/}
@@ -258,37 +261,37 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible, externalOpen}) => 
                     )}
                 </div>
 
-                {/*<AnimatePresence>*/}
-                {/*    {open && (*/}
-                {/*        <motion.div*/}
-                {/*            initial={{opacity: 0}}*/}
-                {/*            animate={{opacity: 1}}*/}
-                {/*            exit={{opacity: 0}}*/}
-                {/*            className="flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"*/}
-                {/*        >*/}
-                {/*            {navItems.map((navItem, idx) => (*/}
-                {/*                <Link*/}
-                {/*                    key={`link-${idx}`}*/}
-                {/*                    href={navItem.link ?? "#"}*/}
-                {/*                    onClick={() => setOpen(false)}*/}
-                {/*                    className="relative text-neutral-600 dark:text-neutral-300"*/}
-                {/*                >*/}
-                {/*                    <motion.span className="block">*/}
-                {/*                        {navItem.name}*/}
-                {/*                    </motion.span>*/}
-                {/*                </Link>*/}
-                {/*            ))}*/}
+                <AnimatePresence>
+                    {open && (
+                        <motion.div
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
+                            className="flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
+                        >
+                            {navItems.map((navItem, idx) => (
+                                <Link
+                                    key={`link-${idx}`}
+                                    href={navItem.link ?? "#"}
+                                    onClick={() => setOpen(false)}
+                                    className="relative text-neutral-600 dark:text-neutral-300"
+                                >
+                                    <motion.span className="block">
+                                        {navItem.name}
+                                    </motion.span>
+                                </Link>
+                            ))}
 
-                {/*            /!*<Link*!/*/}
-                {/*            /!*    href="signin"*!/*/}
-                {/*            /!*    onClick={() => setOpen(false)}*!/*/}
-                {/*            /!*    className={cn(buttonVariants({ variant: "default" }), "block md:hidden w-full")}*!/*/}
-                {/*            /!*>*!/*/}
-                {/*            /!*    Login*!/*/}
-                {/*            /!*</Link>*!/*/}
-                {/*        </motion.div>*/}
-                {/*    )}*/}
-                {/*</AnimatePresence>*/}
+                            {/*<Link*/}
+                            {/*    href="signin"*/}
+                            {/*    onClick={() => setOpen(false)}*/}
+                            {/*    className={cn(buttonVariants({ variant: "default" }), "block md:hidden w-full")}*/}
+                            {/*>*/}
+                            {/*    Login*/}
+                            {/*</Link>*/}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </>
     )
