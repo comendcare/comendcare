@@ -42,8 +42,10 @@ const selector = (state: RoadmapState) => ({
 
 export const PrivateFlowView = ({
     width,
+    contextMenuRef,
 }: {
-    width: number
+    width: number,
+    contextMenuRef: React.RefObject<HTMLDivElement>,
 }) => {
     const {
         selectedNodeIds,
@@ -143,8 +145,19 @@ export const PrivateFlowView = ({
       }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
-        // TODO: add multiselect option here...
-        setSelectedNodeIds([node.id])
+        if (event.metaKey) {
+            // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
+            if (node.id && !selectedNodeIds.includes(node.id)) {
+                setSelectedNodeIds([...selectedNodeIds, node.id])
+            }
+        } else {
+            // regular click, set selected node id
+            if (node.id) {
+                setSelectedNodeIds([node.id])
+            } else {
+                setSelectedNodeIds([])
+            }
+        }
     }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
@@ -231,8 +244,9 @@ export const PrivateFlowView = ({
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
             // last node is the onboarding node, localNodes are sorted by their creation date
-            onboardingMilestone: index === 0
-        }
+            onboardingMilestone: index === 0,
+            contextMenuRef,
+        },
     }))
 
     const updatedEdges = localEdges.map((edge: Edge) => ({
@@ -295,6 +309,10 @@ export const PrivateFlowView = ({
         <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>
         <ReactFlow
             width={width}
+            paneClickDistance={1}
+            onPaneClick={(e) => {
+                if (selectedNodeIds.length > 1) setSelectedNodeIds([])
+            }}
             nodes={previewNode ? [...updatedNodes, previewNode] : updatedNodes}
             edges={updatedEdges}
             onNodeClick={handleEditClick}

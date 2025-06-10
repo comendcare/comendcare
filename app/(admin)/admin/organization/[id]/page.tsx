@@ -10,6 +10,7 @@ import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import { mixpanelTrack } from "@/app/mixpanel"
 import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
+import EditPAGProfileDialog from "@/components/edit-pag-profile-dialog";
 
 export default async function AdminOrganizationPage({
     params
@@ -75,6 +76,7 @@ export default async function AdminOrganizationPage({
                     <VerifyOrganizationSwitch organization={data}/>
                 </div>
                 {/* <CreateRoadmapButton /> */}
+                <EditPAGProfileDialog organization={data} />
 
                 <DeleteOrganizationAlertDialog organization={data} />
 
