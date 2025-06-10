@@ -28,13 +28,14 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { cn, sleep } from "@/lib/utils";
-import { BookOpen, Wand2 } from "lucide-react";
+import { BookOpen, Cookie, Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
 import Link from "next/link";
 import {MobileWarning} from "@/components/mobile-warning";
 import {useIsMobile} from "@/lib/hooks/use-mobile";
 import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -308,9 +309,21 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     </Button>
                                 </Link> */}
                                 <FeedbackSheet />
+                                <TooltipProvider delayDuration={50}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button variant={"ghost"} className="cky-banner-element">
+                                            <Cookie className="h-4 w-4"/>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-64">
+                                            <p>{`Adjust cookie and consent settings`}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                                 <Button
                                     variant="ghost"
-                                    className="pointer-events-none"
+                                    className="pointer-events-none p-0"
                                 >
                                     <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
                                 </Button>
