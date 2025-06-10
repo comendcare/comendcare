@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {getDates} from "@/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import { cn } from "@/lib/utils"
@@ -33,6 +33,7 @@ import {GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
+import { ContextMenuTrigger } from "@/components/ui/context-menu"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
@@ -43,7 +44,7 @@ const selector = (state: RoadmapState) => ({
     setMilestones: state.setMilestones,
 })
 
-export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
+export const PrivateTimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>}) => {
     const {
         selectedNodeIds,
         milestones,
@@ -175,6 +176,7 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                                 key={milestone.id}
                                 selectedNodeIds={selectedNodeIds} 
                                 disabled={sortBy !== "custom"}
+                                contextMenuRef={contextMenuRef}
                             />
                         ))}
                     </SortableContext>
@@ -189,11 +191,13 @@ const DraggableTimelineItem = ({
     index, 
     selectedNodeIds, 
     disabled,
+    contextMenuRef,
 }: {
     milestone: Milestone, 
     index: number, 
     selectedNodeIds: string[], 
     disabled: boolean,
+    contextMenuRef: React.RefObject<HTMLDivElement>,
 }) => {
     const {
         attributes,
@@ -204,13 +208,29 @@ const DraggableTimelineItem = ({
         isDragging
     } = useSortable({id: milestone.id})
     const {setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const elementRef = useRef<HTMLDivElement>(null);
+    const elementRef = useRef<HTMLDivElement>(null)
 
     const style = {
         transition,
         transform: transform ? `translateY(${transform.y}px)` : undefined, // Restrict X-axis
         touchAction: "none",
         userSelect: "none" as any,
+    }
+    
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+        const target = event.target as any;
+
+        // Check if click was inside context menu
+        if (contextMenuRef.current?.contains(target)) return
+        if (contextMenuRef.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
+            return
+        }
+        // Skip right clicks
+        if (event instanceof MouseEvent && event.button === 2) return
+
+        if (selectedNodeIds.length > 1 && !event.metaKey && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
+            setSelectedNodeIds([])
+        }
     }
 
     useEffect(() => {
@@ -229,7 +249,20 @@ const DraggableTimelineItem = ({
             if (!isVisible) {
                 el.scrollIntoView({ behavior: "smooth", block: "center" });
             }
+        } 
+        
+        if (selectedNodeIds.length > 1) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchend', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
         }
+        
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchend', handleClickOutside);
+        };
     }, [selectedNodeIds])
 
     return (
@@ -243,11 +276,11 @@ const DraggableTimelineItem = ({
                 index === 0 ? "click-project-step" : ""
             )}
             onClick={(event) => {
-                console.log(`selected`, milestone.nodeId, event)
                 if (event.metaKey) {
-                    // TODO: add multiselect option here...
                     // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-                    
+                    if (milestone.nodeId && !selectedNodeIds.includes(milestone.nodeId)) {
+                        setSelectedNodeIds([...selectedNodeIds, milestone.nodeId])
+                    }
                 } else {
                     // regular click, set selected node id
                     if (milestone.nodeId) {
