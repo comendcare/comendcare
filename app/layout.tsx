@@ -15,6 +15,8 @@ import { FeedbackSheet } from "@/components/feedback"
 import { Suspense } from "react"
 import Loading from "./loading";
 import { onbordaTours } from "@/state/onborda/onbordaStore";
+import Script from 'next/script';
+
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -89,6 +91,10 @@ export default function RootLayout({
         >
             <body>
                 <Suspense fallback={<Loading />}>
+                <Script 
+                    src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
+                    strategy="beforeInteractive"
+                />
                 <Providers>
                     <ThemeProvider
                         attribute="class"
