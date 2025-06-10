@@ -15,48 +15,15 @@ import {
     LucideProps,
     Rocket,
     Star,
-    Trash,
-    University
+    Pencil,
+    University,
+    Trash
 } from "lucide-react";
 import {Milestone} from "@/lib/types";
 import {PropertyBadge} from "./property-badge";
-import {
-    Cloud,
-    CreditCard,
-    Github,
-    Keyboard,
-    LifeBuoy,
-    LogOut,
-    Mail,
-    MessageSquare,
-    Plus,
-    PlusCircle,
-    Settings,
-    User,
-    UserPlus,
-    Users,
-} from "lucide-react"
-
-import {Button} from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {deleteCompany} from "@/lib/actions";
-import mixpanel from "mixpanel-browser";
-import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import { mixpanelTrack } from "@/app/mixpanel";
+import {mixpanelTrack} from "@/app/mixpanel";
+import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -108,30 +75,7 @@ export function CROCardHeaderContents({cro, milestone, location}: {
     milestone?: Milestone,
     location?: string
 }) {
-    const router = useRouter()
     const {id, title, description, companyType, avgRating} = cro;
-
-    const handleDeleteCompany = async () => {
-
-        try {
-            await deleteCompany(cro)
-                .then(async res => {
-                    if (res.success) {
-                        mixpanelTrack("Company Deleted", {
-                            "ID": res?.data?.id,
-                            "Name": res?.data?.title,
-                        })
-                        toast.success(`Successfully deleted company!`)
-                        router.refresh()
-                    } else {
-                        toast.error(res.error)
-                    }
-                })
-                .catch((err: Error) => toast.error(err.message))
-        } catch (error) {
-            toast.error("An error occurred. Please try again later.");
-        }
-    };
 
     return (
         <>
@@ -147,23 +91,7 @@ export function CROCardHeaderContents({cro, milestone, location}: {
                         {title}
                     </CardTitle>
                 </Link>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline">
-                            <Ellipsis/>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem
-                                onClick={handleDeleteCompany}
-                            >
-                                <Trash/>
-                                <span>Delete Comapny</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <AdminCROCardDropdownMenu cro={cro}/>
             </div>
             <Link
                 href={
