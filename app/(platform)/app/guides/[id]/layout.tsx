@@ -1,20 +1,27 @@
-import { ProfilePhoto } from "@/components/profile-photo"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
-import { getNotionPage } from "@/lib/notion"
-import { House } from "lucide-react"
+import {ProfilePhoto} from "@/components/profile-photo"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb"
+import {getNotionPage} from "@/lib/notion"
+import {House} from "lucide-react"
 import FAQFeedback from "../components/faq-feedback"
 
 export default async function GuideArticleLayout({
-    params,
-    children
-}: Readonly<{
-    params: {id: string},
+                                                     params,
+                                                     children
+                                                 }: Readonly<{
+    params: { id: string },
     children: React.ReactNode
 }>) {
     const page: any = await getNotionPage(params.id)
-    
+
     if (!page) throw new Error("No page found")
-    
+
     const author = page.properties["Author"].people[0]
     const publishDate = page.properties["Publication Date"].date.start
     const title = page.properties["Name"].title.map((text: any) => text.plain_text).join(" ")
@@ -31,7 +38,7 @@ export default async function GuideArticleLayout({
                                 Guides
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                        <BreadcrumbSeparator />
+                        <BreadcrumbSeparator/>
                         <BreadcrumbItem>
                             <BreadcrumbPage>{title}</BreadcrumbPage>
                         </BreadcrumbItem>
@@ -39,7 +46,7 @@ export default async function GuideArticleLayout({
                 </Breadcrumb>
 
                 <div className="inline-flex items-center mr-3 text-sm text-gray-900 gap-4">
-                    <ProfilePhoto 
+                    <ProfilePhoto
                         img={author.avatar_url}
                         name={author.name}
                         textSize={"medium"}
@@ -49,7 +56,7 @@ export default async function GuideArticleLayout({
                     <div className="flex flex-col gap-1">
                         <p className="text-base font-semibold">{author.name}</p>
                         <p className="text-base text-muted-foreground">{
-                            (publishDate 
+                            (publishDate
                                 ? new Date(publishDate)
                                 : new Date())
                                 .toLocaleDateString('en-US', {
@@ -57,7 +64,7 @@ export default async function GuideArticleLayout({
                                     month: 'long',
                                     day: 'numeric',
                                 })
-                            }
+                        }
                         </p>
                     </div>
                 </div>
@@ -74,7 +81,9 @@ export default async function GuideArticleLayout({
                 </div>
             </header>
             {children}
-            <FAQFeedback title={title} description={description}/>
+            <div className="mt-16">
+                <FAQFeedback title={title} description={description}/>
+            </div>
         </div>
     )
 }
