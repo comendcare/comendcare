@@ -92,7 +92,14 @@ export default function RootLayout({
             <head>
                 {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
                 {process.env.NODE_ENV !== "production" ? (
-                    <Script src="/localstorage-manager.js" strategy="beforeInteractive"/>
+                    // <Script src="/localstorage-manager.js" strategy="beforeInteractive"/>
+                    <script
+                        // type="text/plain"
+                        // data-cookiecategory="functional"
+                        data-cookieyes='cookieyes-functional'
+                        // src="/localstorage-manager.js"
+                        src={`https://comend.io/localstorage-manager.js`}
+                    />
                 ) : (
                     <>
                     <script
@@ -104,8 +111,9 @@ export default function RootLayout({
                         src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
                     /> */}
                     <script
-                        type="text/plain"
-                        data-cookiecategory="functional"
+                        // type="text/plain"
+                        // data-cookiecategory="functional"
+                        data-cookieyes='cookieyes-functional'
                         // src="/localstorage-manager.js"
                         src={`https://comend.io/localstorage-manager.js`}
                     />
