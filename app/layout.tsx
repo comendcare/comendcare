@@ -99,10 +99,24 @@ export default function RootLayout({
                         src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
                         strategy="beforeInteractive"
                     />
-                    <script
+                    {/* <script
                         type="text/plain"
                         data-cookiecategory="functional"
                         src="/localstorage-manager.js"
+                    /> */}
+                    <script
+                        type="text/plain"
+                        data-cookiecategory="functional"
+                        dangerouslySetInnerHTML={{
+                        __html: `
+                            console.log('Inline localstorage manager script running after consent');
+                            window.consentedLocalStorage = {
+                            set(key, value) { localStorage.setItem(key, JSON.stringify(value)); },
+                            get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
+                            remove(key) { localStorage.removeItem(key); },
+                            };
+                        `,
+                        }}
                     />
                     </>
                 )}
