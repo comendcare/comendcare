@@ -65,21 +65,10 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             }
 
             if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV) throw new Error('Mixpanel dev token not found.')
-
-            // if (!(getCookie('cookieyes-consent')?.includes('analytics:yes'))) {
-            //     // delete any existing mixpanel cookies in localStorage
-            //     localStorage.removeItem(`__mp_opt_in_out_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV}`)
-            //     localStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV}_pp`)
-            //     localStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV}_ev`)
-            //     console.warn('Mixpanel cookies have been blocked by the user. Mixpanel will not be initialized.')
-            //     return
-            // }
             
             try {
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, {
                     debug: true,
-                    // disable_cookie: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
-                    // disable_persistence: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
                     track_pageview: true,
                     persistence: "localStorage",
                     loaded: function(mixpanel) {
@@ -129,6 +118,33 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             } catch (error) {
                 console.error("Mixpanel initialization failed:", error)
             }
+
+            // if (consentedLocalStorage.hasConsent('analytics')) {
+            //     // delete any existing mixpanel cookies in localStorage
+            //     consentedLocalStorage.removeItem(`__mp_opt_in_out_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}`, 'analytics')
+            //     consentedLocalStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}_pp`, 'analytics')
+            //     consentedLocalStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}_ev`, 'analytics')
+            //     console.warn('Mixpanel cookies have been blocked by the user. Mixpanel will not be initialized.')
+            //     return
+            // }
+
+            // try {
+            //     mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
+            //         debug: false,
+            //         disable_cookie: !consentedLocalStorage.hasConsent('analytics'),
+            //         disable_persistence: !consentedLocalStorage.hasConsent('analytics'),
+            //         track_pageview: true,
+            //         persistence: "localStorage",
+            //         loaded: function(mixpanel) {
+            //             const distinctId = mixpanel.get_distinct_id()
+            //             setMixpanelContext({ distinctId })
+            //         }
+            //     })
+            //     console.log("Mixpanel initialized")
+            //     setIsMixpanelInitialized(true)
+            // } catch (error) {
+            //     console.error("Mixpanel initialization failed:", error)
+            // }
         } else {
             console.error("Error initializing mixpanel. Node environment must be 'prouction', 'preview' or 'development'")
         }
