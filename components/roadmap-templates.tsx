@@ -266,7 +266,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
                             variant={"ghost"} 
                             className="absolute top-0 right-0 hover:bg-transparent" 
                             onClick={() => {
-                                window.consentedLocalStorage?.get('isHidden')
+                                window.consentedLocalStorage?.set('isHidden', true)
                                 setIsHidden(true)
                             }}
                         >
