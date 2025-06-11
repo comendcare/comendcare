@@ -24,6 +24,7 @@
 //         try {
 //             mixpanel.init(process.env.MIXPANEL_SECRET, {
 //                 debug: false,
+//                 disable_cookie: true,
 //                 track_pageview: true,
 //                 persistence: "localStorage",
 //                 loaded: function(mixpanel) {

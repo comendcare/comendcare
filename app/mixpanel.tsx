@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react"
 import { customerIOIdentify } from "@/lib/customer-io"
 import { getOrganizationFromOrganizationId, getUser } from "@/lib/fetchers"
 import { getSessionInfo } from "@/lib/actions"
+import { getCookie } from "@/lib/utils"
 
 const MixpanelContext = createContext<any>(null)
 
@@ -64,10 +65,21 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             }
 
             if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV) throw new Error('Mixpanel dev token not found.')
+
+            // if (!(getCookie('cookieyes-consent')?.includes('analytics:yes'))) {
+            //     // delete any existing mixpanel cookies in localStorage
+            //     localStorage.removeItem(`__mp_opt_in_out_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV}`)
+            //     localStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV}_pp`)
+            //     localStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV}_ev`)
+            //     console.warn('Mixpanel cookies have been blocked by the user. Mixpanel will not be initialized.')
+            //     return
+            // }
             
             try {
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, {
                     debug: true,
+                    // disable_cookie: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
+                    // disable_persistence: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
                     track_pageview: true,
                     persistence: "localStorage",
                     loaded: function(mixpanel) {
@@ -90,9 +102,21 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             }
         } else if (process.env.NEXT_PUBLIC_NODE_ENV == "production") {
             if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) throw new Error('Mixpanel token not found.')
+
+            if (!(getCookie('cookieyes-consent')?.includes('analytics:yes'))) {
+                // delete any existing mixpanel cookies in localStorage
+                localStorage.removeItem(`__mp_opt_in_out_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}`)
+                localStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}_pp`)
+                localStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}_ev`)
+                console.warn('Mixpanel cookies have been blocked by the user. Mixpanel will not be initialized.')
+                return
+            }
+
             try {
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
                     debug: false,
+                    disable_cookie: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
+                    disable_persistence: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
                     track_pageview: true,
                     persistence: "localStorage",
                     loaded: function(mixpanel) {
@@ -215,7 +239,6 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                             console.log(`mixpanel opt-in`)
                             mixpanel.opt_in_tracking()
                         }
-            
                         if (session.user.email) customerIOIdentify(distinctId, session)
                     } else {
                         // if the user has not consented, make sure they are opted out of mixpanel tracking
