@@ -12,13 +12,15 @@ import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTe
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 import { Plus, Router, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getCookie } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@/lib/actions";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { consentedLocalStorage } from "@/lib/consent-scripts/functionalConsent";
+
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -237,13 +239,14 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
 }
 
 export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
-    const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
+    // const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
+    const [isHidden, setIsHidden] = useState(consentedLocalStorage.getItem('isHidden', 'functional') ? true : false)
 
     if (isHidden) {
         return (
             <div className="w-full flex justify-end">
                 <Button variant={"link"} onClick={() => {
-                    localStorage.removeItem("isHidden")
+                    consentedLocalStorage.removeItem('isHidden', 'functional')
                     setIsHidden(false)
                 }}>Show Research Plan Templates</Button>
             </div>
@@ -263,7 +266,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
                             variant={"ghost"} 
                             className="absolute top-0 right-0 hover:bg-transparent" 
                             onClick={() => {
-                                localStorage.setItem("isHidden", "true")
+                                if (!(getCookie('cookieyes-consent')?.includes('functional:yes'))) localStorage.setItem("isHidden", "true")
                                 setIsHidden(true)
                             }}
                         >
