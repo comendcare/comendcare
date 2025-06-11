@@ -19,7 +19,7 @@ import { createRoadmap } from "@/lib/actions";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { consentedLocalStorage } from "@/lib/consent-scripts/functionalConsent";
+// import { consentedLocalStorage } from "@/lib/consent-scripts/functionalConsent";
 
 
 const selector = (state: RoadmapState) => ({
@@ -240,13 +240,13 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
 
 export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
     // const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
-    const [isHidden, setIsHidden] = useState(consentedLocalStorage.getItem('isHidden', 'functional') ? true : false)
+    const [isHidden, setIsHidden] = useState(window.consentedLocalStorage?.get('isHidden') ? true : false)
 
     if (isHidden) {
         return (
             <div className="w-full flex justify-end">
                 <Button variant={"link"} onClick={() => {
-                    consentedLocalStorage.removeItem('isHidden', 'functional')
+                    window.consentedLocalStorage?.remove('isHidden')
                     setIsHidden(false)
                 }}>Show Research Plan Templates</Button>
             </div>
@@ -266,7 +266,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
                             variant={"ghost"} 
                             className="absolute top-0 right-0 hover:bg-transparent" 
                             onClick={() => {
-                                if (!(getCookie('cookieyes-consent')?.includes('functional:yes'))) localStorage.setItem("isHidden", "true")
+                                window.consentedLocalStorage?.get('isHidden')
                                 setIsHidden(true)
                             }}
                         >
