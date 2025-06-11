@@ -17,6 +17,12 @@ import {
 import Papa from "papaparse";
 import type { Milestone, Option } from "@/lib/types";
 
+export const getCookie = (name: string) => {
+    const cookies = document.cookie.split('; ')
+    const cookie = cookies.find(row => row.startsWith(`${name}=`))
+    return cookie ? cookie.split('=')[1] : null
+}
+
 export const getStage = (milestones: Milestone[]): {value: string, label: string, variant: string} => {
     const relevantMilestoneTypes = milestones
         .filter(milestone => milestone.status === "INPROGRESS" && !milestone.private)
