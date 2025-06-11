@@ -96,11 +96,16 @@ export default function RootLayout({
                     src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
                     strategy="beforeInteractive"
                 />
-                <Script
+                {/* <Script
                     src="/scripts/consented-storage.js"
                     strategy="afterInteractive"
                     data-cookieyes="functional"
                     type="text/javascript"
+                /> */}
+                <script
+                    type="text/plain"
+                    data-cookiecategory="functional"
+                    src="/localstorage-manager.js"
                 />
                 <Providers>
                     <ThemeProvider
