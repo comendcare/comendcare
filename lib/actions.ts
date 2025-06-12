@@ -45,6 +45,7 @@ import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
 import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
+import { organizations } from "@/data/sample-pags"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -2136,6 +2137,36 @@ export const createRoadmap = withOrganizationAuth(
             }
         })
 
+        // if a roadmap template was provided, create the relevant nodes, milestones, and edges
+        if (roadmapTemplate?.milestones) {
+            await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate)
+        }
+
+        const finalRoadmap = prisma.roadmap.findUnique({
+            where: {id: roadmap.id},
+            include: {
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: {include: {milestoneType: true}},
+                        tools: {include: {tool: true}},
+                        rfps: {include: {rfp: true}}
+                    }
+                },
+                nodes: true,
+                edges: true,
+                organization: true
+            }
+        })
+
+        return finalRoadmap
+    }
+)
+
+export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
+    async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {metadata: JsonObject}) => {
         // maps the original node id (from the template) to the new node ID that's stored in the DB
         const nodeIDMap: { [originalNodeId: string]: string } = {}
 
@@ -2151,12 +2182,12 @@ export const createRoadmap = withOrganizationAuth(
                     // create Node & associated Milestone
                     const node = await prisma.node.create({
                         data: {
-                            roadmapId: roadmap.id,
+                            roadmapId: roadmapId,
                             positionX: templateNode ? templateNode.positionX : index * 500,
                             positionY: templateNode ? templateNode.positionY : 0,
                             data: {
                                 create: {
-                                    roadmapId: roadmap.id,
+                                    roadmapId: roadmapId,
                                     organizationId: organization.id,
                                     status: milestone.status || "PLANNED",
                                     title: milestone.title,
@@ -2226,7 +2257,7 @@ export const createRoadmap = withOrganizationAuth(
                     roadmapTemplate.edges.map(async (edge: Edge, index: number) => {
                         const newEdge = await prisma.edge.create({
                             data: {
-                                roadmap: {connect: {id: roadmap.id}},
+                                roadmap: {connect: {id: roadmapId}},
                                 source: nodeIDMap[edge.source] || edge.source,
                                 target: nodeIDMap[edge.target] || edge.target,
                             }
@@ -2238,7 +2269,7 @@ export const createRoadmap = withOrganizationAuth(
                 for (let i = 0; i < nodes.length - 1; i++) {
                     await prisma.edge.create({
                         data: {
-                            roadmap: {connect: {id: roadmap.id}},
+                            roadmap: {connect: {id: roadmapId}},
                             source: nodes[i]?.id,
                             target: nodes[i + 1]?.id
                         }
@@ -2247,8 +2278,8 @@ export const createRoadmap = withOrganizationAuth(
             }
         }
 
-        const finalRoadmap = prisma.roadmap.findUnique({
-            where: {id: roadmap.id},
+        const finalRoadmap = await prisma.roadmap.findUnique({
+            where: {id: roadmapId},
             include: {
                 milestones: {
                     include: {
@@ -2266,13 +2297,7 @@ export const createRoadmap = withOrganizationAuth(
             }
         })
 
-        return finalRoadmap
-        // const finalRoadmap = await prisma.roadmap.findUnique({
-        //     where: { id: roadmap.id },
-        //     include: { milestones: true, nodes: true, edges: true }
-        // })
-
-        // return finalRoadmap
+        return {success: true, data: finalRoadmap}
     }
 )
 
