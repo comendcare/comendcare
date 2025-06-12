@@ -205,6 +205,10 @@ export const createCondition = withAuth(
         const toolsUnderDevelopment = formData.get("toolsUnderDevelopment")
             ? (formData.get("toolsUnderDevelopment") as string).split(",")
             : [];
+        const metadataValue: FormDataEntryValue | null  = formData.get("metadata")
+        const metadata: JsonObject = metadataValue
+            ? JSON.parse(metadataValue.toString()) as JsonObject
+            : {}
 
         try {
             const condition = await prisma.condition.create({
@@ -225,6 +229,7 @@ export const createCondition = withAuth(
                     associatedSignsAndSymptoms,
                     existingDatabasesAndStudies,
                     toolsUnderDevelopment,
+                    metadata
                 }
             });
 
@@ -1806,6 +1811,11 @@ export const updateCondition = withOrganizationAuth(
             // Convert FormData to a plain object
             const data: Record<string, any> = {};
             formData.forEach((value, key) => {
+                if (key === "metadata") {
+                    data[key] = JSON.parse(value.toString()) as JsonValue
+                    return;
+                }
+
                 if (!isNaN(Number(value)) && value !== "") {
                     data[key] = Number(value);
                 } else if (typeof value === "string" && value.startsWith("[")) {
