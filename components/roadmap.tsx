@@ -474,11 +474,17 @@ export function Roadmap() {
                                                 [
                                                     {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
                                                     {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                                                    {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && milestoneTypes.find(type => type.label === entry) !== undefined}
+                                                    {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && (milestoneTypes || []).find(type => type.label === entry) !== undefined}
                                                 ]
                                             )
-                                
-                                            if (result.errors.length > 0) {
+
+                                            if (milestoneTypes.length === 0) {
+                                                toast('Warning!', {
+                                                    position: "bottom-left",
+                                                    duration: 6000,
+                                                    description: `Could not find the type for one or more of your imported projects. Projects may be imported without the proper types.`
+                                                })
+                                            } else if (result.errors.length > 0) {
                                                 toast('Warning!', {
                                                     position: "bottom-left",
                                                     duration: 6000,
