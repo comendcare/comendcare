@@ -44,7 +44,7 @@ import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Miles
 import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
-import {JsonValue} from "@prisma/client/runtime/library"
+import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -319,6 +319,10 @@ export const createOrganization = withAuth(
         const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
             ? (formData.get("therapeuticsOfInterest") as string).split(",")
             : [];
+        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
+        const metadata: JsonObject = metadataValue
+            ? JSON.parse(metadataValue.toString()) as JsonObject
+            : {}
 
         try {
             const organization = await prisma.organization.upsert({
@@ -346,6 +350,7 @@ export const createOrganization = withAuth(
                     lng,
                     image,
                     verified: true,  // Default verified to true for beta testing
+                    metadata
                 },
                 create: {
                     name,
@@ -373,6 +378,7 @@ export const createOrganization = withAuth(
                         },
                     },
                     verified: true,  // Default verified to true for beta testing
+                    metadata
                 },
             });
 

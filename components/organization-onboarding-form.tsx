@@ -95,6 +95,7 @@ export const newOrgFormSchema = z.object({
     lat: z.number().optional(),
     lng: z.number().optional(),
     image: z.string().optional(),
+    metadata: z.string().optional()
 })
 
 export default function OrganizationOnboardingForm(
@@ -284,7 +285,9 @@ export default function OrganizationOnboardingForm(
 
             Object.entries(values).forEach(([key, value]) => {
                 if (key === "therapeuticsInDevelopment") return
+                if (key === "otherTherapeuticsInDevelopment") return
                 if (key === "therapeuticsOfInterest") return
+                if (key === "otherTherapeuticsOfInterest") return
 
                 if (value !== undefined) {
                     formData.append(key, value.toString());
@@ -321,12 +324,19 @@ export default function OrganizationOnboardingForm(
             const data = {
                 therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
                 therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
+                metadata: JSON.stringify({
+                    // ...(organization?.metadata ? JSON.parse(JSON.stringify(organization.metadata)) : undefined),
+                    otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
+                    otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
+                })
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (value) {
                     formData.append(key, value)
                 }
             });
+
+            console.log(`create organization with metadata`, values.metadata)
 
             createOrganization(formData).then((res: any) => {
                 if (res.error) {
