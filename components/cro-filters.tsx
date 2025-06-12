@@ -17,7 +17,7 @@ import {DoubleSliderBarChart} from "./ui/slider-double"
 import {ScrollArea} from "./ui/scroll-area"
 import {Button} from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, MILESTONE_TYPE_OPTIONS} from "@/lib/types"
+import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS} from "@/lib/types"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
@@ -49,6 +49,7 @@ const filtersFormSchema = z.object({
     milestoneTypes: z.array(optionSchema),
     types: z.array(optionSchema),
     certifications: z.array(optionSchema),
+    tags: z.array(optionSchema),
 })
 
 export function CROFilters() {
@@ -227,6 +228,33 @@ export function CROFilters() {
                                         defaultOptions={CRO_CERTIFICATIONS}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select relevant certifications..."
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="tags"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                    Tags
+                                </FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        {...field}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
+                                        defaultOptions={CRO_TAGS}
+                                        hidePlaceholderWhenSelected={true}
+                                        placeholder="Select relevant tags..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.

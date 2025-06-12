@@ -162,6 +162,18 @@ export default async function CROPageHeader({id}: { id: string }) {
                             certificationName={certification}
                         />
                     ))}
+                    {cro.tags && cro.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 w-5/6">
+                            {cro.tags.map((tag, index) => (
+                                <span
+                                    key={index}
+                                    className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
+                                >
+                {tag}
+            </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 {cro.description && cro.description.trim() && (
                     <div className="w-5/6">
