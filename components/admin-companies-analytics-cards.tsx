@@ -35,7 +35,7 @@ export function AdminCompaniesAnalyticsCards() {
                 <CardHeader className="relative">
                     <CardDescription>Total Companies</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalCompanies.toLocaleString()}
+                        {data?.totalCompanies?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
