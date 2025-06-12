@@ -36,9 +36,9 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
     const router = useRouter()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [otherModality, setOtherModality] = useState<string>("");
-    const [otherCategories, setOtherCategories] = useState<string>("");
-    const [otherSystem, setOtherSystem] = useState<string>("");
+    // const [otherModality, setOtherModality] = useState<string>("");
+    // const [otherCategories, setOtherCategories] = useState<string>("");
+    // const [otherSystem, setOtherSystem] = useState<string>("");
     const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
 
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
@@ -76,6 +76,9 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
                             national: condition.nationalEstimatedPopulation?.toString() || "",
                             global: condition.globalEstimatedPopulation?.toString() || "",
+                            otherCategories: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherCategories : undefined,
+                            otherMechanisms: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherMechanisms : undefined,
+                            otherSystems: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherSystems : undefined,
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
@@ -128,6 +131,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
                 existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
                 toolsUnderDevelopment: values.tools?.map((item) => item.label) || [],
+                metadata: JSON.stringify({
+                    otherCategories: values.otherCategories,
+                    otherMechanisms: values.otherMechanisms,
+                    otherSystems: values.otherSystems
+                })
             };
 
             // Add mapped data to FormData
@@ -146,29 +154,6 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             if (response.success) {
                 toast.success("Condition updated successfully!");
-
-                // Mixpanel tracking for "Other" fields
-                if (otherModality) {
-                    mixpanelTrack("Org has other modality", {
-                        orgName: organization?.name || "Unknown Org",
-                        looking: otherModality,
-                    });
-                }
-
-                if (otherCategories) {
-                    mixpanelTrack("Org has other category", {
-                        orgName: organization?.name || "Unknown Org",
-                        looking: otherCategories,
-                    });
-                }
-
-                if (otherSystem) {
-                    mixpanelTrack("Org has other system", {
-                        orgName: organization?.name || "Unknown Org",
-                        looking: otherSystem,
-                    });
-                }
-
                 setOpen(false)
                 router.refresh(); // Refresh the page to reflect changes
             } else {
@@ -398,20 +383,31 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                 />
                                             </FormControl>
                                             <FormMessage/>
-                                            {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER") && (
-                                                <div className="mt-2">
-                                                    <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                    <Input
-                                                        type="text"
-                                                        id="categories-other"
-                                                        value={otherCategories}
-                                                        onChange={(e) => setOtherCategories(e.target.value)}
-                                                    />
-                                                </div>
-                                            )}
                                         </FormItem>
                                     )}
                                 />
+
+                                {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="otherCategories"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="categories-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
 
                                 <FormField
                                     control={editResearchForm.control}
@@ -435,20 +431,31 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                 />
                                             </FormControl>
                                             <FormMessage/>
-                                            {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER") && (
-                                                <div className="mt-2">
-                                                    <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                    <Input
-                                                        type="text"
-                                                        id="systems-other"
-                                                        value={otherSystem}
-                                                        onChange={(e) => setOtherSystem(e.target.value)}
-                                                    />
-                                                </div>
-                                            )}
                                         </FormItem>
                                     )}
                                 />
+
+                                {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="otherSystems"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="systems-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
 
                                 <FormField
                                     control={editResearchForm.control}

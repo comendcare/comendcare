@@ -28,7 +28,7 @@ export default function OverviewStats() {
                 <CardHeader className="relative">
                     <CardDescription>Total Organizations</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalOrganizations.toLocaleString()}
+                        {data?.totalOrganizations?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
@@ -41,7 +41,7 @@ export default function OverviewStats() {
                 <CardHeader className="relative">
                     <CardDescription>Total Users</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalUsers.toLocaleString()}
+                        {data?.totalUsers?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
@@ -54,7 +54,7 @@ export default function OverviewStats() {
                 <CardHeader className="relative">
                     <CardDescription>Total Companies</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalCompanies.toLocaleString()}
+                        {data?.totalCompanies?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
@@ -67,7 +67,7 @@ export default function OverviewStats() {
                 <CardHeader className="relative">
                     <CardDescription>Total Projects</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalProjects.toLocaleString()}
+                        {data?.totalProjects?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">

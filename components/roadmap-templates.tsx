@@ -169,17 +169,17 @@ export const MilestoneTemplates = ({
 //     )
 // }
 
-export const ResearchPlanTemplates = ({ selectedMilestonesTemplate, setSelectedMilestonesTemplate, inDialog = false }: {selectedMilestonesTemplate: any, setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
+export const ResearchPlanTemplates = ({ selectedResearchPlanTemplate, setSelectedResearchPlanTemplate, inDialog = false }: {selectedResearchPlanTemplate: any, setSelectedResearchPlanTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
     const [selectedResearchPlanId, setSelectedResearchPlanId] = useState<string | undefined>(undefined)
 
     const handleSetSelectedResearchPlan = (researchPlanData: any) => {
         console.log(`handle set selected research plan`, researchPlanData)
         if (researchPlanData) {
             setSelectedResearchPlanId(researchPlanData.title)
-            setSelectedMilestonesTemplate(researchPlanData.milestones)
+            setSelectedResearchPlanTemplate(researchPlanData)
         } else {
             setSelectedResearchPlanId(undefined)
-            setSelectedMilestonesTemplate([])
+            setSelectedResearchPlanTemplate(undefined)
         }
     }
     
