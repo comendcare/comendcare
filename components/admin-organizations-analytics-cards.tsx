@@ -34,7 +34,7 @@ export function AdminOrganizationsAnalyticsCards() {
                 <CardHeader className="relative">
                     <CardDescription>Total Organizations</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalOrganizations.toLocaleString()}
+                        {data?.totalOrganizations?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
@@ -47,7 +47,7 @@ export function AdminOrganizationsAnalyticsCards() {
                 <CardHeader className="relative">
                     <CardDescription>New Organizations This Month</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.newOrganizationsThisMonth.toLocaleString()}
+                        {data?.newOrganizationsThisMonth?.toLocaleString()}
                     </CardTitle>
                     <div className="absolute right-4 top-4">
                         <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">

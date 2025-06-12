@@ -44,7 +44,8 @@ import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Miles
 import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
-import {JsonValue} from "@prisma/client/runtime/library"
+import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
+import { organizations } from "@/data/sample-pags"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -205,6 +206,10 @@ export const createCondition = withAuth(
         const toolsUnderDevelopment = formData.get("toolsUnderDevelopment")
             ? (formData.get("toolsUnderDevelopment") as string).split(",")
             : [];
+        const metadataValue: FormDataEntryValue | null  = formData.get("metadata")
+        const metadata: JsonObject = metadataValue
+            ? JSON.parse(metadataValue.toString()) as JsonObject
+            : {}
 
         try {
             const condition = await prisma.condition.create({
@@ -225,6 +230,7 @@ export const createCondition = withAuth(
                     associatedSignsAndSymptoms,
                     existingDatabasesAndStudies,
                     toolsUnderDevelopment,
+                    metadata
                 }
             });
 
@@ -319,6 +325,10 @@ export const createOrganization = withAuth(
         const therapeuticsOfInterest = formData.get("therapeuticsOfInterest")
             ? (formData.get("therapeuticsOfInterest") as string).split(",")
             : [];
+        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
+        const metadata: JsonObject = metadataValue
+            ? JSON.parse(metadataValue.toString()) as JsonObject
+            : {}
 
         try {
             const organization = await prisma.organization.upsert({
@@ -346,6 +356,7 @@ export const createOrganization = withAuth(
                     lng,
                     image,
                     verified: true,  // Default verified to true for beta testing
+                    metadata
                 },
                 create: {
                     name,
@@ -373,6 +384,7 @@ export const createOrganization = withAuth(
                         },
                     },
                     verified: true,  // Default verified to true for beta testing
+                    metadata
                 },
             });
 
@@ -1800,6 +1812,11 @@ export const updateCondition = withOrganizationAuth(
             // Convert FormData to a plain object
             const data: Record<string, any> = {};
             formData.forEach((value, key) => {
+                if (key === "metadata") {
+                    data[key] = JSON.parse(value.toString()) as JsonValue
+                    return;
+                }
+
                 if (!isNaN(Number(value)) && value !== "") {
                     data[key] = Number(value);
                 } else if (typeof value === "string" && value.startsWith("[")) {
@@ -2107,7 +2124,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
 
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export const createRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] | undefined) => {
+    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {metadata: JsonObject} | undefined) => {
         const roadmap = await prisma.roadmap.create({
             data: {
                 title: roadmapTemplate?.title,
@@ -2115,10 +2132,41 @@ export const createRoadmap = withOrganizationAuth(
                 organization: {
                     connect: {id: organization.id}
                 },
-                modalities: roadmapTemplate?.modalities
+                modalities: roadmapTemplate?.modalities,
+                ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined)
             }
         })
 
+        // if a roadmap template was provided, create the relevant nodes, milestones, and edges
+        if (roadmapTemplate?.milestones) {
+            await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate)
+        }
+
+        const finalRoadmap = prisma.roadmap.findUnique({
+            where: {id: roadmap.id},
+            include: {
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: {include: {milestoneType: true}},
+                        tools: {include: {tool: true}},
+                        rfps: {include: {rfp: true}}
+                    }
+                },
+                nodes: true,
+                edges: true,
+                organization: true
+            }
+        })
+
+        return finalRoadmap
+    }
+)
+
+export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
+    async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {metadata: JsonObject}) => {
         // maps the original node id (from the template) to the new node ID that's stored in the DB
         const nodeIDMap: { [originalNodeId: string]: string } = {}
 
@@ -2134,12 +2182,12 @@ export const createRoadmap = withOrganizationAuth(
                     // create Node & associated Milestone
                     const node = await prisma.node.create({
                         data: {
-                            roadmapId: roadmap.id,
+                            roadmapId: roadmapId,
                             positionX: templateNode ? templateNode.positionX : index * 500,
                             positionY: templateNode ? templateNode.positionY : 0,
                             data: {
                                 create: {
-                                    roadmapId: roadmap.id,
+                                    roadmapId: roadmapId,
                                     organizationId: organization.id,
                                     status: milestone.status || "PLANNED",
                                     title: milestone.title,
@@ -2209,7 +2257,7 @@ export const createRoadmap = withOrganizationAuth(
                     roadmapTemplate.edges.map(async (edge: Edge, index: number) => {
                         const newEdge = await prisma.edge.create({
                             data: {
-                                roadmap: {connect: {id: roadmap.id}},
+                                roadmap: {connect: {id: roadmapId}},
                                 source: nodeIDMap[edge.source] || edge.source,
                                 target: nodeIDMap[edge.target] || edge.target,
                             }
@@ -2221,7 +2269,7 @@ export const createRoadmap = withOrganizationAuth(
                 for (let i = 0; i < nodes.length - 1; i++) {
                     await prisma.edge.create({
                         data: {
-                            roadmap: {connect: {id: roadmap.id}},
+                            roadmap: {connect: {id: roadmapId}},
                             source: nodes[i]?.id,
                             target: nodes[i + 1]?.id
                         }
@@ -2230,8 +2278,8 @@ export const createRoadmap = withOrganizationAuth(
             }
         }
 
-        const finalRoadmap = prisma.roadmap.findUnique({
-            where: {id: roadmap.id},
+        const finalRoadmap = await prisma.roadmap.findUnique({
+            where: {id: roadmapId},
             include: {
                 milestones: {
                     include: {
@@ -2249,13 +2297,7 @@ export const createRoadmap = withOrganizationAuth(
             }
         })
 
-        return finalRoadmap
-        // const finalRoadmap = await prisma.roadmap.findUnique({
-        //     where: { id: roadmap.id },
-        //     include: { milestones: true, nodes: true, edges: true }
-        // })
-
-        // return finalRoadmap
+        return {success: true, data: finalRoadmap}
     }
 )
 
