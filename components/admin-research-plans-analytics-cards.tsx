@@ -172,7 +172,7 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                 <CardHeader className="relative">
                     <CardDescription>Total Projects</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalProjects.toLocaleString()}
+                        {data?.totalProjects?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
             </Card>

@@ -33,7 +33,7 @@ export function AdminUsersAnalyticsCards() {
                 <CardHeader className="relative">
                     <CardDescription>Total Users</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalUsers.toLocaleString()}
+                        {data?.totalUsers?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
