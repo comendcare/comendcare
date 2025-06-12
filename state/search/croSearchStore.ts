@@ -67,6 +67,11 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    tags: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // moneyDeployed: number[],
     // genes: {
     //     label: string,
@@ -80,6 +85,7 @@ export const defaultFilters = {
     milestoneTypes: [],
     types: [],
     certifications: [],
+    tags: [],
     // moneyDeployed: [0, 10000000],
     // genes: []
 }
@@ -122,6 +128,14 @@ function generateFiltersString(filters: FiltersType): string {
     if (filters?.certifications && filters.certifications.length > 0) {
         const certificationFilter = filters.certifications
             .map(cert => `simplifiedCertifications:=[${escapeValue(cert.value)}]`)
+            .join(" && ");
+        filtersList.push(`(${certificationFilter})`);
+    }
+
+    // Tags (Array Field)
+    if (filters?.tags && filters.tags.length > 0) {
+        const certificationFilter = filters.certifications
+            .map(tag => `tags:=[${escapeValue(tag.value)}]`)
             .join(" && ");
         filtersList.push(`(${certificationFilter})`);
     }
