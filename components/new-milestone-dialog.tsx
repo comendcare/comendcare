@@ -6,14 +6,16 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
-import { Plus } from "lucide-react"
+import { Info, Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { ScrollArea } from "./ui/scroll-area"
 import mixpanel from "mixpanel-browser"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const selector = (state: RoadmapState) => ({
-    addMilestones: state.addMilestones
+    addMilestones: state.addMilestones,
+    selectedView: state.selectedView
 })
 
 export type TabType = 'projects' | 'research-plans'
@@ -21,6 +23,7 @@ export type TabType = 'projects' | 'research-plans'
 export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: boolean, setOpen: (open: boolean) => void, tab: TabType, setTab: (tab: TabType) => void}) => {
     const { 
         addMilestones,
+        selectedView
     } = useRoadmapStore(useShallow(selector))
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
@@ -91,7 +94,19 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                     <Tabs value={tab} onValueChange={(newTab => setTab(newTab as TabType))} className="flex h-full flex-col">
                         <TabsList className="w-fit">
                             <TabsTrigger value="projects">Project Templates</TabsTrigger>
-                            <TabsTrigger value="research-plans">Research Plan Templates</TabsTrigger>
+                            <TabsTrigger value="research-plans" className="flex gap-2">
+                                Research Plan Templates
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className="ml-auto">
+                                        <Info className="h-4 w-4"/>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                        {"Selected Projects from the template card will be added to your current research plan."}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TabsTrigger>
                         </TabsList>
 
                         <div className="flex-1 min-h-0">
