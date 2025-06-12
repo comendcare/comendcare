@@ -855,7 +855,6 @@ const RoadmapHeader = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
-                            disabled={milestoneTypes.length === 0}
                             onClick={() => {
                                 console.log("Add an empty project triggered")
                                 addMilestones([{
@@ -879,7 +878,6 @@ const RoadmapHeader = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
-                            disabled={milestoneTypes.length === 0}
                             onClick={() => {
                                 console.log("Bulk import triggered")
                                 setBulkImportIsOpen(true)
