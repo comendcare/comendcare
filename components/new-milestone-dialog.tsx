@@ -15,7 +15,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
-    selectedView: state.selectedView
+    selectedView: state.selectedView,
+    addNodes: state.addNodes,
+    addNodesFromTemplate: state.addNodesFromTemplate
 })
 
 export type TabType = 'projects' | 'research-plans'
@@ -23,9 +25,12 @@ export type TabType = 'projects' | 'research-plans'
 export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: boolean, setOpen: (open: boolean) => void, tab: TabType, setTab: (tab: TabType) => void}) => {
     const { 
         addMilestones,
-        selectedView
+        selectedView,
+        addNodes,
+        addNodesFromTemplate
     } = useRoadmapStore(useShallow(selector))
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
+    const [selectedResearchPlanTemplate, setSelectedResearchPlanTemplate] = useState<any | undefined>(undefined)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     // const [tab, setTab] = useState<TabType>(defaultTab)
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -51,6 +56,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
 
     useEffect(() => {
         setSelectedMilestonesTemplate([])
+        setSelectedResearchPlanTemplate(undefined)
     }, [tab])
 
     return (
@@ -127,8 +133,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         <TabsContent value="research-plans" className="h-full">
                             <ScrollArea className="h-full" type="always">
                                 <ResearchPlanTemplates 
-                                    selectedMilestonesTemplate={selectedMilestonesTemplate}
-                                    setSelectedMilestonesTemplate={setSelectedMilestonesTemplate}
+                                    selectedResearchPlanTemplate={selectedResearchPlanTemplate}
+                                    setSelectedResearchPlanTemplate={setSelectedResearchPlanTemplate}
                                     inDialog={true}
                                 />
                             </ScrollArea>
@@ -145,27 +151,10 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
 
                         <DialogClose>
                             <Button
-                                disabled={selectedMilestonesTemplate.length === 0 || milestoneTypes.length === 0}
+                                disabled={(tab === 'research-plans' && !selectedResearchPlanTemplate) || (tab === 'projects' && selectedMilestonesTemplate.length === 0) || milestoneTypes.length === 0}
                                 type="button"
                                 variant={"cta"}
                                 onClick={() => {
-                                    console.log(`add milestone`, selectedMilestonesTemplate)
-                                    const newMilestones = selectedMilestonesTemplate.map((template: any) => {
-                                        return ({
-                                            nodeType: "PROJECT",
-                                            title: template?.title,
-                                            description: template?.description,
-                                            types: template?.types.map((type: string) => {
-                                                const milestoneType = milestoneTypes.find(t => t.id === type)
-                                                if (!milestoneType) return // milestone type not found, don't add it to created milestone
-                                                return ({ 
-                                                    milestoneTypeId: type,
-                                                    milestoneType
-                                                })
-                                            }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
-                                            status: template?.status,
-                                        })
-                                    })
                                     addMilestones(selectedMilestonesTemplate.map((template: any) => {
                                         return ({
                                             nodeType: "PROJECT",
@@ -181,7 +170,11 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
                                             status: template?.status,
                                         })
-                                    }), tab === "projects" ? "Project Template" : "Resarch Plan Template")
+                                    }), "Project Template")
+
+                                    if (selectedResearchPlanTemplate) {
+                                        addNodesFromTemplate(selectedResearchPlanTemplate)
+                                    }
                                 }}
                             >
                                 <Plus />

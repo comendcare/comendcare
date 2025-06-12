@@ -8,7 +8,7 @@ import {
     EdgeChange,
     Connection
 } from "@xyflow/react"
-import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@/lib/actions"
+import { createNodes, createNodesAndEdgesFromTemplate, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@/lib/actions"
 import { toast } from "sonner"
 import { nanoid } from "nanoid"
 import { Milestone, NodeType, Roadmap, StatusType } from "@/lib/types"
@@ -49,6 +49,7 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addMilestones: (milestones: Partial<Milestone>[], creationMethod?: string) => Promise<Node[] | void>
     addNodes: (node: Node[], creationMethod?: string) => Promise<Node[] | void>
+    addNodesFromTemplate: (template: any) => Promise<void>
     deleteNode: (nodeId: string) => Promise<void>
     saveState: () => void
 }
@@ -313,6 +314,20 @@ export const useRoadmapStore = create<RoadmapState>()(
             } else {
                 console.error(`Error adding nodes`, response?.error)
                 toast.error(`Error adding milestones: ${response?.error}`)
+            }
+        },
+        addNodesFromTemplate: async (template: any) => {
+            const response = await createNodesAndEdgesFromTemplate(get().details?.organizationId, get().roadmapId, template)
+            if (response.success && response.data && response.data.nodes && response.data.milestones && response.data.edges) {
+                set({
+                    nodes: (response.data.nodes.map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}}))),
+                    milestones: response.data.milestones,
+                    edges: response.data.edges
+                })
+                return response.data
+            } else {
+                console.error(`Error adding nodes`, response?.error)
+                toast.error(`Error adding projects from template: ${response?.error}`)
             }
         },
         deleteNode: async (nodeId: string | undefined) => {
