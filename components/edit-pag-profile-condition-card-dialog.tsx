@@ -154,29 +154,6 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             if (response.success) {
                 toast.success("Condition updated successfully!");
-
-                // Mixpanel tracking for "Other" fields
-                // if (otherModality) {
-                //     mixpanelTrack("Org has other modality", {
-                //         orgName: organization?.name || "Unknown Org",
-                //         looking: otherModality,
-                //     });
-                // }
-
-                // if (otherCategories) {
-                //     mixpanelTrack("Org has other category", {
-                //         orgName: organization?.name || "Unknown Org",
-                //         looking: otherCategories,
-                //     });
-                // }
-
-                // if (otherSystem) {
-                //     mixpanelTrack("Org has other system", {
-                //         orgName: organization?.name || "Unknown Org",
-                //         looking: otherSystem,
-                //     });
-                // }
-
                 setOpen(false)
                 router.refresh(); // Refresh the page to reflect changes
             } else {
