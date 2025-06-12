@@ -53,6 +53,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import { NotificationBubble } from "./notification-bubble"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -110,6 +111,14 @@ export function Roadmap() {
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const focusRef = useRef<any>(null);
+    const [newFlowProjects, setNewFlowProjects] = useState(window.consentedLocalStorage?.get("newFlowProjects"))
+
+    useEffect(() => {
+        // delay this by 1 second so the browser has time to set the localstorage flag (if the user has consented)
+        setTimeout(() => {
+            setNewFlowProjects(window.consentedLocalStorage?.get("newFlowProjects"))
+        }, 1000)
+    }, [milestones, selectedView])
 
     useEffect(() => {
         if (step === ".onborda-select-a-template" && isOnbordaVisible) {
@@ -297,11 +306,11 @@ export function Roadmap() {
                             <div className="flex flex-row items-center gap-x-1 justify-start">
                                 <TabsList className="mr-auto">
                                     <TabsTrigger value="timeline">Timeline View</TabsTrigger>
-                                    <TabsTrigger value="flow" className="flex gap-2">
+                                    <TabsTrigger value="flow" className="relative">
                                         Flow View
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <div className="ml-auto">
+                                                <div className="ml-2">
                                                 <Info className="h-4 w-4"/>
                                                 </div>
                                             </TooltipTrigger>
@@ -309,6 +318,7 @@ export function Roadmap() {
                                                 {"An interactive whiteboard that lets you easily view and organize research plans with visual elements."}
                                             </TooltipContent>
                                         </Tooltip>
+                                        {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
                                 </TabsList>
 
