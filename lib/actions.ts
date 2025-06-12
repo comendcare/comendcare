@@ -2113,7 +2113,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
 
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export const createRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] | undefined) => {
+    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {metadata: JsonObject} | undefined) => {
         const roadmap = await prisma.roadmap.create({
             data: {
                 title: roadmapTemplate?.title,
@@ -2121,7 +2121,8 @@ export const createRoadmap = withOrganizationAuth(
                 organization: {
                     connect: {id: organization.id}
                 },
-                modalities: roadmapTemplate?.modalities
+                modalities: roadmapTemplate?.modalities,
+                ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined)
             }
         })
 
