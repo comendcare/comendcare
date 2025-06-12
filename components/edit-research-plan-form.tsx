@@ -110,6 +110,10 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                 userId: null,
                 nodes: [],
                 edges: [],
+                metadata: {
+                    ...(researchPlanData?.metadata ? JSON.parse(JSON.stringify(researchPlanData.metadata)) : undefined),
+                    otherModalities: values.otherModalities
+                } as JsonObject
             })
 
             if (roadmap && roadmap.id) {
