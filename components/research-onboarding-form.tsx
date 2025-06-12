@@ -19,8 +19,6 @@ import LoadingDots from "@/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {MOLECULAR_MECHANISMS, Option} from "@/lib/types";
-import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -45,6 +43,7 @@ export const researchFormSchema = z.object({
         })
         .optional(),
     categories: z.array(optionSchema).optional(),
+    otherCategories: z.string().optional(),
     prevalenceNumerator: z.string().min(1, {
         message: "Your prevalence numerator must be at least 1",
     }).optional(),
@@ -58,10 +57,12 @@ export const researchFormSchema = z.object({
     global: z.string().optional(),
     // mechanisms: z.array(optionSchema).min(0),
     mechanisms: z.array(z.string()).optional(),
+    otherMechanisms: z.string().optional(),
     causal: z.array(optionSchema).optional(),
     genes: z.array(optionSchema).optional(),
     biomarkers: z.array(optionSchema).optional(),
     systems: z.array(optionSchema).optional(),
+    otherSystems: z.string().optional(),
     symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     tools: z.array(optionSchema).optional(),
@@ -84,8 +85,6 @@ export default function ResearchOnboardingForm(
     const router = useRouter()
     const [loading, setLoading] = useState(false);
     const [organization, setOrganization] = useState<Organization | null>();
-    const [otherCategories, setOtherCategories] = useState<string>("");
-    const [otherSystem, setOtherSystem] = useState<string>("");
 
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
@@ -114,6 +113,9 @@ export default function ResearchOnboardingForm(
                 causalGenes: values.causal?.map((gene) => gene.label).join(",") || "",
                 associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
                 associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
+                metadata: JSON.stringify({
+                    otherCategories: values.otherCategories
+                })
             };
 
             // Append data to FormData
@@ -128,21 +130,6 @@ export default function ResearchOnboardingForm(
                     if (response.success && response.data) {
                         const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
                         toast.success("Successfully created condition.")
-
-                        if (otherCategories) {
-                            mixpanelTrack("Org has other category", {
-                                orgName: organization?.name || "Unknown Org",
-                                looking: otherCategories,
-                            });
-                        }
-
-                        if (otherSystem) {
-                            mixpanelTrack("Org has other system", {
-                                orgName: organization?.name || "Unknown Org",
-                                looking: otherSystem,
-                            });
-                        }
-
                         router.push(nextLink)
                     } else {
                         console.error(response.error)
@@ -390,20 +377,31 @@ export default function ResearchOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
-                                        {form.watch("categories")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="categories-other"
-                                                    value={otherCategories}
-                                                    onChange={(e) => setOtherCategories(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
                                     </FormItem>
                                 )}
                             />
+
+                            {form.watch("categories")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                <FormField
+                                    control={form.control}
+                                    name="otherCategories"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormDescription className="flex items-center">
+                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <Input
+                                                    type="text"
+                                                    id="categories-other"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
 
                             {/*<FormField*/}
                             {/*    control={form.control}*/}
