@@ -399,12 +399,12 @@ export function formatDate(dateString: string): string {
 export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export const isOnboarded = (tutorialName: string) => {
-    const onboarded = localStorage.getItem(tutorialName)
+    const onboarded = window.functionalConsentedLocalStorage?.get(tutorialName)
     return !(onboarded === null)
 }
 
 export const setOnboarded = (tutorialName: string) => {
-    localStorage.setItem(tutorialName, "true")
+    window.functionalConsentedLocalStorage?.set(tutorialName, "true")
 }
 
 type DraggableData = ColumnDragData | TaskDragData
