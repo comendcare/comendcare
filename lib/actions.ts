@@ -433,8 +433,15 @@ export const createOrganization = withAuth(
             return {organization, membership};
         } catch (error: any) {
             if (error.code === "P2002") {
-                return {
-                    error: `This subdomain is already taken`
+                const target = error.meta?.target?.[0];
+
+                switch (target) {
+                    case "subdomain":
+                        return { error: "This subdomain is already taken" };
+                    case "customDomain":
+                        return { error: "This custom domain is already taken" };
+                    default:
+                        return { error: `Unique constraint failed on ${target}` };
                 }
             } else {
                 return {
