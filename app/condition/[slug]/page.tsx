@@ -68,7 +68,7 @@ export async function generateMetadata({
         causalGenes: true,
         associatedGenes: true,
         associatedSystems: true,
-        organizations: true
+        organizations: true,
     })
     if (response.success) {
         data = response.data
