@@ -1,18 +1,38 @@
+function getCookie(key) {
+    const cookies = document.cookie
+        .split(";")
+        .reduce(
+        (ac, cv, i) => Object.assign(ac, { [cv.split("=")[0].trim()]: cv.split("=")[1] }), {})["cookieyes-consent"]
+    const { [key]: value } = cookies
+        .split(",")
+        .reduce(
+        (obj, pair) => ((pair = pair.split(":")), (obj[pair[0]] = pair[1]), obj), {});
+    return value
+}
+
 (function () {
     // This function will only run if the script is executed by CookieYes after consent
     window.consentedLocalStorage = {
         set(key, value) {
-            localStorage.setItem(key, JSON.stringify(value));
+            if (process.env.NEXT_PUBLIC_NODE_ENV !== "production" || (getCookie("consent") == "yes" && getCookie("functional") == "yes")) {
+                localStorage.setItem(key, JSON.stringify(value))
+            }
+            return null
         },
         get(key) {
             try {
-                return JSON.parse(localStorage.getItem(key));
+                if (process.env.NEXT_PUBLIC_NODE_ENV !== "production" || (getCookie("consent") == "yes" && getCookie("functional") == "yes")) {
+                    return JSON.parse(localStorage.getItem(key));
+                }
             } catch {
-                return null;
+                return null
             }
+            return null
         },
         remove(key) {
-            localStorage.removeItem(key);
+            if (process.env.NEXT_PUBLIC_NODE_ENV !== "production" || (getCookie("consent") == "yes" && getCookie("functional") == "yes")) {
+                localStorage.removeItem(key)
+            }
         },
-    };
-})();
+    }
+})()

@@ -3945,9 +3945,11 @@ export const updateCompany = withAdminAuth(
             const url = formData.get("website") as string;
             const servicesRaw = formData.get("services") as string;
             const certificationsRaw = formData.get("certifications") as string;
+            const tagsRaw = formData.get("tags") as string;
 
-            const parsedServices = servicesRaw ? servicesRaw.split(",").map((s) => s.trim()) : [];
-            const parsedCertifications = certificationsRaw ? certificationsRaw.split(",").map((c) => c.trim()) : [];
+            const parsedCertifications = certificationsRaw ? JSON.parse(certificationsRaw) : [];
+            const parsedTags = tagsRaw ? JSON.parse(tagsRaw) : [];
+            const parsedServices = servicesRaw ? JSON.parse(servicesRaw) : [];
 
             const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices);
 
@@ -3962,18 +3964,19 @@ export const updateCompany = withAdminAuth(
                         companyType,
                         url,
                         simplifiedCertifications: parsedCertifications,
+                        tags: parsedTags,
                         categories,
                         milestoneTypes,
                         services: {
                             set: [],
-                            connectOrCreate: parsedServices.map((name) => ({
+                            connectOrCreate: parsedServices.map((name: string) => ({
                                 where: {name},
                                 create: {name},
                             })),
                         },
                         certifications: {
                             set: [],
-                            connectOrCreate: parsedCertifications.map((name) => ({
+                            connectOrCreate: parsedCertifications.map((name: string) => ({
                                 where: {name},
                                 create: {name},
                             })),
