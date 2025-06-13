@@ -366,6 +366,7 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
 
         if (roles) {
             if (!roles.includes(membership.role)) {
+                toast.error(`Not authorized: role ${membership.role} doesn't have access to this action`)
                 return {error: `Not authorized: role ${membership.role} doesn't have access to this action`}
             }
         }
