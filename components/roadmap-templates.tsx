@@ -239,14 +239,13 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
 }
 
 export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
-    // const [isHidden, setIsHidden] = useState(localStorage.getItem("isHidden") ? true : false)
-    const [isHidden, setIsHidden] = useState(window.consentedLocalStorage?.get('isHidden') ? true : false)
+    const [isHidden, setIsHidden] = useState(window.functionalConsentedLocalStorage?.get('isHidden') ? true : false)
 
     if (isHidden) {
         return (
             <div className="w-full flex justify-end">
                 <Button variant={"link"} onClick={() => {
-                    window.consentedLocalStorage?.remove('isHidden')
+                    window.functionalConsentedLocalStorage?.remove('isHidden')
                     setIsHidden(false)
                 }}>Show Research Plan Templates</Button>
             </div>
@@ -266,7 +265,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
                             variant={"ghost"} 
                             className="absolute top-0 right-0 hover:bg-transparent" 
                             onClick={() => {
-                                window.consentedLocalStorage?.set('isHidden', true)
+                                window.functionalConsentedLocalStorage?.set('isHidden', true)
                                 setIsHidden(true)
                             }}
                         >
