@@ -304,7 +304,7 @@ export async function getPublicConditionData(
             return {success: false, error: "Condition not found"};
         }
 
-        const sanitizedConditionData = omit(condition, [])
+        const sanitizedConditionData = omit(condition, ['metadata'])
 
         return {success: true, data: sanitizedConditionData};
     } catch (error: any) {
@@ -330,7 +330,7 @@ export async function getConditionsDataFromOrgId(
             select
         });
 
-        const sanitizedConditions = conditions.map(condition => omit(condition, []))
+        const sanitizedConditions = conditions.map(condition => omit(condition, ['metadata']))
 
         return {success: true, data: sanitizedConditions};
     } catch (error: any) {
