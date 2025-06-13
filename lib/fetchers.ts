@@ -12,6 +12,7 @@ import path from "path";
 import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 import { InternalArgs } from "@prisma/client/runtime/library"
+import { omit } from "lodash";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -46,7 +47,9 @@ export async function getPublicAssetsForOrganization(
         orderBy: [{createdAt: "desc"}]
     })
 
-    return tools
+    const sanitizedTools = tools.map(tool => omit(tool, []))
+
+    return sanitizedTools
 }
 
 export async function getPublicRFPsForOrganization(
@@ -80,7 +83,9 @@ export async function getPublicRFPsForOrganization(
         orderBy: [{createdAt: "desc"}]
     })
 
-    return rfps
+    const sanitizedRFPs = rfps.map(rfp => omit(rfp, []))
+
+    return sanitizedRFPs
 }
 
 export async function getPublicRFP(
@@ -102,6 +107,8 @@ export async function getPublicRFP(
         }
     })
 
+    const sanitizedRFP = omit(rfp, [])
+
     return rfp
 }
 
@@ -118,7 +125,7 @@ export async function getPublicRoadmapsForOrganization(
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
-    const roadmaps = prisma.roadmap.findMany({
+    const roadmaps = await prisma.roadmap.findMany({
         where: {
             organization: {
                 subdomain: subdomain,
@@ -265,7 +272,12 @@ export async function getPublicRoadmapsForOrganization(
         },
         orderBy: [{ createdAt: "desc" }]
     })
-    return roadmaps
+
+    const sanitizedRoadmaps = roadmaps.map(roadmap => omit(roadmap, [
+        'metadata'
+    ]))
+
+    return sanitizedRoadmaps
 }
 
 export async function getPublicConditionData(
@@ -292,7 +304,9 @@ export async function getPublicConditionData(
             return {success: false, error: "Condition not found"};
         }
 
-        return {success: true, data: condition};
+        const sanitizedConditionData = omit(condition, [])
+
+        return {success: true, data: sanitizedConditionData};
     } catch (error: any) {
         logError("Error fetching condition data", error);
         return {success: false, error: "Internal server error"};
@@ -316,7 +330,9 @@ export async function getConditionsDataFromOrgId(
             select
         });
 
-        return {success: true, data: conditions};
+        const sanitizedConditions = conditions.map(condition => omit(condition, []))
+
+        return {success: true, data: sanitizedConditions};
     } catch (error: any) {
         logError("Error fetching conditions data from organization ID", error);
         return {success: false, error: "Internal server error"};
@@ -367,7 +383,11 @@ export async function getOrganizationData(
                 })
             }
 
-            return organization
+            const sanitizedOrganization = omit(organization, [
+                'contactEmailHash'
+            ])
+
+            return sanitizedOrganization
         },
         [`${domain}-metadata`],
         {
@@ -415,7 +435,11 @@ export const getPublicOrganizationData = async (
         })
     }
 
-    return {success: true, data: organization}
+    const sanitizedOrganization = omit(organization, [
+        'contactEmailHash',
+    ])
+
+    return {success: true, data: sanitizedOrganization}
 }
 
 export async function getCROData(
@@ -427,7 +451,7 @@ export async function getCROData(
         client: {};
     }>,
 ) {
-    return prisma.company.findUnique({
+    const company = prisma.company.findUnique({
         where: {
             id: id
         },
@@ -445,6 +469,9 @@ export async function getCROData(
             }) : undefined
         }
     })
+
+    const sanitizedCompany = omit(company, [])
+    return sanitizedCompany
 }
 
 export async function getMembers(
@@ -471,9 +498,13 @@ export async function getMembers(
             return {success: false, error: "members not found"};
         }
 
+        const sanitizedMembers = fetchedMembers.map(member => omit(member, [
+            'emailHash'
+        ]))
+
         return {
             success: true,
-            data: fetchedMembers
+            data: sanitizedMembers
         };
     } catch (error: any) {
         logError("Error fetching members", error);
@@ -500,9 +531,33 @@ export async function getPublicUser(
             return {success: false, error: "user not found"};
         }
 
+        const sanitizedUser = omit(user, [
+            'address1',
+            'address1Hash',
+            'address2',
+            'address2Hash',
+            'city',
+            'cityHash',
+            'country',
+            'countryHash',
+            'formattedAddress',
+            'formattedAddressHash',
+            'postalCode',
+            'postalCodeHash',
+            'region',
+            'regionHash',
+            'lat',
+            'latHash',
+            'lng',
+            'lngHash',
+            'notificationSettings',
+            'consentSettings',
+            'sessions',
+        ])
+
         return {
             success: true,
-            data: user
+            data: sanitizedUser
         };
     } catch (error: any) {
         logError("Error fetching user", error);
@@ -520,7 +575,6 @@ export async function getMilestoneTypes(
 ) {
     try {
         const types = await prisma.milestoneType.findMany({select})
-
         return {success: true, data: types}
     } catch (error: any) {
         console.error("Database error finding milestone types:", error)
@@ -574,7 +628,9 @@ export async function getPublicMilestoneDetails(
             }
         })
 
-        return {success: true, data: milestone}
+        const sanitizedMilestone = omit(milestone, ['notes'])
+
+        return {success: true, data: sanitizedMilestone}
     } catch (error: any) {
         console.error("Database error finding milestone details:", error)
         return {success: false, error: "Database error. please try again later."}
@@ -616,7 +672,9 @@ export async function getPostComments(
             }
         })
 
-        return {success: true, data: comments}
+        const sanitizedComments = comments.map(comment => omit(comment, []))
+
+        return {success: true, data: sanitizedComments}
     } catch (error: any) {
         console.error("Database error finding comments:", error)
         return {success: false, error: "Database error. please try again later."}
@@ -639,7 +697,9 @@ export async function getPosts(
             }
         })
 
-        return {success: true, data: posts}
+        const sanitizedPosts = posts.map(post => omit(post, []))
+
+        return {success: true, data: sanitizedPosts}
     } catch (error: any) {
         console.error("Database error finding posts details:", error)
         return {success: false, error: "Database error. please try again later."}
