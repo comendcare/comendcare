@@ -181,8 +181,8 @@ export interface CompanyWithReviewsAndServices extends Company {
     services: Service[]
 }
 
-export type MembershipWithOrganization = Member & {
-    organization?: Organization | null; // Optional because the organization might be null if not fetched
+export type MembershipWithOrganization = Partial<Member> & {
+    organization?: Partial<Organization> | null; // Optional because the organization might be null if not fetched
 };
 
 export type OrganizationsWithConditions = Organization & {

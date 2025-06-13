@@ -15,7 +15,7 @@ export const PAGProfileConditionsCard = ({
     isPrivate = false
 }: { 
     conditions: Partial<Condition>[] | null, 
-    organization: Organization, 
+    organization: Partial<Organization>, 
     showEditDialog: boolean,
     isPrivate?: boolean
 }) => {
