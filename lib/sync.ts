@@ -378,6 +378,14 @@ export const syncToTypesense = async (env: {
                     optional: true
                 },
                 {
+                    name: "tags",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
                     name: "milestoneTypes",
                     type: "string[]",
                     index: true,
@@ -431,6 +439,7 @@ export const syncToTypesense = async (env: {
                 categories: true,
                 avgRating: true,
                 simplifiedCertifications: true,
+                tags: true,
                 milestoneTypes: true,
             }
         });
