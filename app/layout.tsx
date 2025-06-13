@@ -95,11 +95,11 @@ export default function RootLayout({
                     <>
                     <script
                         data-cookieyes='cookieyes-functional'
-                        src={`https://comend.io/functional-localstorage-manager.js`}
+                        src={`/functional-localstorage-manager.js`}
                     />
                     <script
                         data-cookieyes='cookieyes-analytics'
-                        src={`https://comend.io/analytics-localstorage-manager.js`}
+                        src={`/analytics-localstorage-manager.js`}
                     />
                     </>
                 ) : (
@@ -111,11 +111,11 @@ export default function RootLayout({
                     ></script>
                     <script
                         data-cookieyes='cookieyes-functional'
-                        src={`https://comend.io/functional-localstorage-manager.js`}
+                        src={`/functional-localstorage-manager.js`}
                     />
                     <script
                         data-cookieyes='cookieyes-analytics'
-                        src={`https://comend.io/analytics-localstorage-manager.js`}
+                        src={`/analytics-localstorage-manager.js`}
                     />
                     </>
                 )}
