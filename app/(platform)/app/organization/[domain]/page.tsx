@@ -229,7 +229,7 @@ export default async function OrganizationHomePage({
                         title: "Share on social media",
                         icon: <IconShare/>,
                         dialog: <ShareDialog
-                            url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${organization.subdomain}`}
+                            url={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                         />
                     },
                     ...(organization.contactEmail

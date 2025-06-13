@@ -124,16 +124,19 @@ export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedResea
                 <CheckBubble isChecked={selectedResearchPlanId === researchPlanData.title} onCheckedChanged={() => {}}/>
                 <CardHeader>
                     <CardTitle className="text-lg font-semibold">
-                        {`${researchPlanData.modalities.map((modalityOption: any)=> modalityOption.label).join(', ')}`}
+                        {`${researchPlanData.title}`}
                     </CardTitle>
                     <CardDescription>
-                        <ol className="list-decimal pl-4">
-                            {researchPlanData.milestones.map((milestone: any) => (
-                                <li>{milestone.title}</li>
-                            ))}
-                        </ol>
+                        {`${researchPlanData.description}`}
                     </CardDescription>
                 </CardHeader>
+                <CardContent>
+                    <ol className="list-decimal pl-4">
+                        {researchPlanData.milestones.map((milestone: any) => (
+                            <li>{milestone.title}</li>
+                        ))}
+                    </ol>
+                </CardContent>
             </Card>
             {/* <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
                 <CardHeader>

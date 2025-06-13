@@ -18,7 +18,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { updateCompany, deleteCompany } from "@/lib/actions";
 import { mixpanelTrack } from "@/app/mixpanel";
 import { toast } from "sonner";
@@ -30,7 +30,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import MultipleSelector from "@/components/ui/multiple-selector";
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@/lib/types";
+import React from "react";
+import {optionSchema} from "@/components/research-onboarding-form";
 
 const formSchema = z.object({
     name: z.string().min(1),
@@ -39,6 +43,9 @@ const formSchema = z.object({
     yearFounded: z.string().optional(),
     headquarters: z.string().optional(),
     type: z.string().optional(),
+    certifications: z.array(optionSchema).optional(),
+    tags: z.array(optionSchema).optional(),
+    services: z.array(optionSchema).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -54,6 +61,14 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
             yearFounded: cro.yearEstablished?.toString() || "",
             headquarters: cro.headquarters || "",
             type: cro.companyType || "",
+            certifications: cro.simplifiedCertifications.map((certification: any) => ({
+                label: certification,
+                value: certification
+            })) || [],
+            tags: cro.tags.map((tag: any) => ({
+                label: tag,
+                value: tag
+            })) || [],
         },
     });
 
@@ -84,6 +99,22 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
         formData.set("headquarters", values.headquarters || "");
         formData.set("type", values.type || "");
 
+        const mappedData: Record<string, any> = {
+            certifications: values.certifications?.map((item) => item.label) || [],
+            tags: values.tags?.map((item) => item.label) || [],
+        };
+
+        // Add mapped data to FormData
+        Object.entries(mappedData).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, value.toString());
+                }
+            }
+        });
+
         const response = await updateCompany(cro.id, formData);
 
         if (response.success) {
@@ -96,7 +127,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
 
     return (
         <Dialog>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline">
                         <Ellipsis />
@@ -118,7 +149,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <DialogContent>
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Company</DialogTitle>
                     <DialogDescription>Make changes to the company information below.</DialogDescription>
@@ -142,6 +173,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="description"
@@ -168,6 +200,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="yearFounded"
@@ -181,6 +214,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="headquarters"
@@ -194,19 +228,114 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="type"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Type</FormLabel>
+                                    <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                        Business type
+                                    </FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={field.onChange}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a business type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {BUSINESS_TYPES.map((type) => (
+                                                    <SelectItem key={type.id} value={type.value}>
+                                                        {type.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="certifications"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Certifications</FormLabel>
+                                    <FormDescription>{`The official certifications earned by this service providers. Select all that apply.`}</FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            defaultOptions={CRO_CERTIFICATIONS}
+                                            hidePlaceholderWhenSelected={true}
+                                            placeholder="Select all the certifications that belong to this service provider..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="tags"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Tags</FormLabel>
+                                    <FormDescription>{`The special "Comend verified" tags that apply to this service provider. Select all that apply.`}</FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            defaultOptions={CRO_TAGS}
+                                            hidePlaceholderWhenSelected={true}
+                                            placeholder="Select all the tags that belong to this service provider..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/*<FormField*/}
+                        {/*    control={form.control}*/}
+                        {/*    name="services"*/}
+                        {/*    render={({field}) => (*/}
+                        {/*        <FormItem>*/}
+                        {/*            <FormLabel>Services</FormLabel>*/}
+                        {/*            <FormDescription>{`The special "Comend verified" tags that apply to this service provider. Select all that apply.`}</FormDescription>*/}
+                        {/*            <FormControl>*/}
+                        {/*                <MultipleSelector*/}
+                        {/*                    {...field}*/}
+                        {/*                    defaultOptions={CRO_TAGS}*/}
+                        {/*                    hidePlaceholderWhenSelected={true}*/}
+                        {/*                    placeholder="Select all the tags that belong to this service provider..."*/}
+                        {/*                    emptyIndicator={*/}
+                        {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                        {/*                            no results found.*/}
+                        {/*                        </p>*/}
+                        {/*                    }*/}
+                        {/*                    showHoverCard={false}*/}
+                        {/*                />*/}
+                        {/*            </FormControl>*/}
+                        {/*            <FormMessage/>*/}
+                        {/*        </FormItem>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
 
                         <DialogFooter>
                             <Button type="submit">Save Changes</Button>
