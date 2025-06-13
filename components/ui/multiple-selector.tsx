@@ -560,7 +560,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                         ) : Object.entries(selectables).flatMap(value => value[1]).length > 0 ? (
                                             <>
                                                 {Object.entries(selectables).map(([key, values]) => (
-                                                    <CommandGroup className="h-full" heading={groupBy ? key : undefined}>
+                                                    <CommandGroup key={key} className="h-full" heading={groupBy ? key : undefined}>
                                                         {values.map((framework, index) => (
                                                             <HoverCard openDelay={0} closeDelay={0} key={index}>
                                                                 <HoverCardTrigger>

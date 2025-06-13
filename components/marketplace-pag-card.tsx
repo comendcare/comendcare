@@ -82,7 +82,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                                 .map(({ key, icon: Icon, label }, index) => {
                                     const count = nodeTypeCount[key];
                                     return (
-                                        <PropertyBadge icon={Icon}>
+                                        <PropertyBadge key={key} icon={Icon}>
                                             <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
                                                 <div className="text-sm">{count}</div>{label}
                                                 {count > 1 ? "s" : ""}

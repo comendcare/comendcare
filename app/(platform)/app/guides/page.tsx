@@ -127,7 +127,7 @@ function FAQSections({pages}: {pages: Blog[]}) {
                         <ThumbsUp className="min-w-8 w-8 min-h-8 h-8" />
                         <div className="flex flex-col items-start text-start">
                             <h3 className="text-lg">Organization Profile Guides</h3>
-                            <p className="mt-1 text-sm text-gray-500">How to set up your organiation's profile</p>
+                            <p className="mt-1 text-sm text-gray-500">{`How to set up your organiation's profile`}</p>
                         </div>
                     </div>
                 </ToggleGroupItem>
