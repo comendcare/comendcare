@@ -111,12 +111,12 @@ export function Roadmap() {
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const focusRef = useRef<any>(null);
-    const [newFlowProjects, setNewFlowProjects] = useState(window.consentedLocalStorage?.get("newFlowProjects"))
+    const [newFlowProjects, setNewFlowProjects] = useState(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
 
     useEffect(() => {
         // delay this by 1 second so the browser has time to set the localstorage flag (if the user has consented)
         setTimeout(() => {
-            setNewFlowProjects(window.consentedLocalStorage?.get("newFlowProjects"))
+            setNewFlowProjects(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
         }, 1000)
     }, [milestones, selectedView])
 
