@@ -102,7 +102,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }:
                                     </TableHeader>
                                     <TableBody>
                                         {tools.filter(tool => tool.pinned).map((tool) => (
-                                            <Dialog>
+                                            <Dialog key={tool.id}>
                                                 <DialogTrigger asChild onClick={() => {
                                                     mixpanelTrack("Tool Details Viewed", {
                                                         "ID": tool.id,

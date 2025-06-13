@@ -50,14 +50,14 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds
 })
 
-const parseQuery = (str: string | null) =>
-    str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
+// const parseQuery = (str: string | null) =>
+//     str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
-    const [isLoading, setIsLoading] = useState(true)
-    const searchParams = useSearchParams()
-    const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
+    // const [isLoading, setIsLoading] = useState(true)
+    // const searchParams = useSearchParams()
+    // const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
     const { roadmapId, setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
@@ -69,214 +69,217 @@ export default function AppLayout({children}: AppLayoutProps) {
         return null
     }
 
-    const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryCategories, setQueryCategories] = useQueryState("categories", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryCategories, setQueryCategories] = useQueryState("categories", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryTypes, setQueryTypes] = useQueryState("types", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryTypes, setQueryTypes] = useQueryState("types", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryTags, setQueryTags] = useQueryState("tags", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryTags, setQueryTags] = useQueryState("tags", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [querySystems, setQuerySystems] = useQueryState("systems", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
-    const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
-    const [queryModalities, setQueryModalities] = useQueryState("modalities", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [querySystems, setQuerySystems] = useQueryState("systems", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
+    // const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
+    // const [queryModalities, setQueryModalities] = useQueryState("modalities", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
     useEffect(() => {
-        // Handle loading state for the session
-        if (status === "loading") {
-            setIsLoading(true);
-        } else {
-            // setIsLoading(false);
+        // // Handle loading state for the session
+        // if (status === "loading") {
+        //     setIsLoading(true);
+        // } else {
+        //     // setIsLoading(false);
 
-            // Redirect if unauthenticated
-            if (status === "unauthenticated") {
-                redirect("/login");
-            }
+        //     // Redirect if unauthenticated
+        //     if (status === "unauthenticated") {
+        //         redirect("/login");
+        //     }
+        // }
+        if (status === "unauthenticated") {
+            redirect("/login");
         }
     }, [status])
 
-    const handleSessionUpdate = async () => {
-        console.log(`session changed`, session)
-        if (session) {
-            setIsLoading(true)
+    // const handleSessionUpdate = async () => {
+    //     console.log(`session changed`, session)
+    //     if (session) {
+    //         setIsLoading(true)
 
-            if (!session.user.organizationId) {
-                console.error("Organization id is not set in the session... session data is ", session)
-                // toast.error("Error, the organization id is not set.")
-                setIsLoading(false)
-                return
-            }
+    //         if (!session.user.organizationId) {
+    //             console.error("Organization id is not set in the session... session data is ", session)
+    //             // toast.error("Error, the organization id is not set.")
+    //             setIsLoading(false)
+    //             return
+    //         }
 
-            // Init relevant Zustand stores
-            console.log(`Start initialization... for org ${session.user.organizationId}`)
+    //         // Init relevant Zustand stores
+    //         console.log(`Start initialization... for org ${session.user.organizationId}`)
 
-            // Init notifications
-            let notifications = await getAllNotifications({
-                id: true,
-                type: true,
-                title: true,
-                message: true,
-                link: true,
-                createdAt: true,
-                updatedAt: true,
-                lastViewedAt: true,
-            })
-            if (notifications.success && notifications.data) {
-                initializeNotificationsState({
-                    notifications: notifications.data
-                })
-            } else {
-                console.error(notifications.error)
-                toast.error(notifications.error)
-            }
-            console.log(`Notificaions initialized...`)
+    //         // // Init notifications
+    //         // let notifications = await getAllNotifications({
+    //         //     id: true,
+    //         //     type: true,
+    //         //     title: true,
+    //         //     message: true,
+    //         //     link: true,
+    //         //     createdAt: true,
+    //         //     updatedAt: true,
+    //         //     lastViewedAt: true,
+    //         // })
+    //         // if (notifications.success && notifications.data) {
+    //         //     initializeNotificationsState({
+    //         //         notifications: notifications.data
+    //         //     })
+    //         // } else {
+    //         //     console.error(notifications.error)
+    //         //     toast.error(notifications.error)
+    //         // }
+    //         // console.log(`Notificaions initialized...`)
 
-            // init CRO Search store
-            const milestoneTypes = await getMilestoneTypes({
-                id: true,
-                label: true,
-                services: true,
-                categories: true,
-                description: true
-            })
-            const parsedCROFilters = {
-                categories: parseQuery(queryCategories),
-                milestoneTypes: parseQuery(queryMilestoneTypes)
-                    .map(query => {
-                        const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
-                        if (!milestoneType) return undefined
-                        return {
-                            label: milestoneType.label,
-                            value: milestoneType.id
-                        }
-                    })
-                    .filter(query => query !== undefined),
-                types: parseQuery(queryTypes),
-                certifications: parseQuery(queryCertifications),
-                tags: parseQuery(queryTags),
-            }
-            initializeCROSearch(parsedCROFilters)
-            console.log(`CRO search initialized...`)
+    //         // // init CRO Search store
+    //         // const milestoneTypes = await getMilestoneTypes({
+    //         //     id: true,
+    //         //     label: true,
+    //         //     services: true,
+    //         //     categories: true,
+    //         //     description: true
+    //         // })
+    //         // const parsedCROFilters = {
+    //         //     categories: parseQuery(queryCategories),
+    //         //     milestoneTypes: parseQuery(queryMilestoneTypes)
+    //         //         .map(query => {
+    //         //             const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
+    //         //             if (!milestoneType) return undefined
+    //         //             return {
+    //         //                 label: milestoneType.label,
+    //         //                 value: milestoneType.id
+    //         //             }
+    //         //         })
+    //         //         .filter(query => query !== undefined),
+    //         //     types: parseQuery(queryTypes),
+    //         //     certifications: parseQuery(queryCertifications),
+    //         //     tags: parseQuery(queryTags),
+    //         // }
+    //         // initializeCROSearch(parsedCROFilters)
+    //         // console.log(`CRO search initialized...`)
 
-            // init organization/PAG search store
-            const parsedPAGFilters = {
-                systems: parseQuery(querySystems).map(query => {
-                    const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
-                    if (!system) return undefined
-                    return system
-                }).filter(query => query !== undefined),
-                mechanisms: parseQuery(queryMechanisms).map(query => {
-                    const mechanism = (MOLECULAR_MECHANISMS || []).find(mechanism => mechanism.value === query.value)
-                    if (!mechanism) return undefined
-                    return mechanism
-                }).filter(query => query !== undefined),
-                modalities: parseQuery(queryModalities).map(query => {
-                    const modality = (MODALITIES || []).find(modalities => modalities.value === query.value)
-                    if (!modality) return undefined
-                    return modality
-                }).filter(query => query !== undefined),
-            }
-            initializeOrganizationSearch(parsedPAGFilters)
-            console.log(`Organization search initialized...`)
+    //         // // init organization/PAG search store
+    //         // const parsedPAGFilters = {
+    //         //     systems: parseQuery(querySystems).map(query => {
+    //         //         const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
+    //         //         if (!system) return undefined
+    //         //         return system
+    //         //     }).filter(query => query !== undefined),
+    //         //     mechanisms: parseQuery(queryMechanisms).map(query => {
+    //         //         const mechanism = (MOLECULAR_MECHANISMS || []).find(mechanism => mechanism.value === query.value)
+    //         //         if (!mechanism) return undefined
+    //         //         return mechanism
+    //         //     }).filter(query => query !== undefined),
+    //         //     modalities: parseQuery(queryModalities).map(query => {
+    //         //         const modality = (MODALITIES || []).find(modalities => modalities.value === query.value)
+    //         //         if (!modality) return undefined
+    //         //         return modality
+    //         //     }).filter(query => query !== undefined),
+    //         // }
+    //         // initializeOrganizationSearch(parsedPAGFilters)
+    //         // console.log(`Organization search initialized...`)
 
-            // init tool store
-            let toolResponse = await getAssets(session.user.organizationId, {
-                id: true,
-                title: true,
-                description: true,
-                contacts: true,
-                attachments: true,
-                private: true,
-                pinned: true,
-                milestones: true
-            })
-            if (toolResponse.success) {
-                initializeAssetsStore(toolResponse.data || [])
-                console.log(`Tools initialized...`)
-            } else {
-                console.error(toolResponse.error)
-                toast.error(toolResponse.error)
-            }
+    //         // // init tool store
+    //         // let toolResponse = await getAssets(session.user.organizationId, {
+    //         //     id: true,
+    //         //     title: true,
+    //         //     description: true,
+    //         //     contacts: true,
+    //         //     attachments: true,
+    //         //     private: true,
+    //         //     pinned: true,
+    //         //     milestones: true
+    //         // })
+    //         // if (toolResponse.success) {
+    //         //     initializeAssetsStore(toolResponse.data || [])
+    //         //     console.log(`Tools initialized...`)
+    //         // } else {
+    //         //     console.error(toolResponse.error)
+    //         //     toast.error(toolResponse.error)
+    //         // }
 
-            // init rfp store
-            let rfpResponse = await getRFPs(session.user.organizationId, {
-                id: true,
-                title: true,
-                description: true,
-                openTo: true,
-                startDate: true,
-                endDate: true,
-                contacts: true,
-                attachments: true,
-                budget: true,
-                private: true,
-                headerImage: true,
-                pinned: true,
-                milestones: true,
-                organizationId: true,
-            })
-            if (rfpResponse.success) {
-                initializeRFPStore(rfpResponse.data || [])
-                console.log(`RFPs initialized...`)
-            } else {
-                console.error(rfpResponse.error)
-                toast.error(rfpResponse.error)
-            }
+    //         // // init rfp store
+    //         // let rfpResponse = await getRFPs(session.user.organizationId, {
+    //         //     id: true,
+    //         //     title: true,
+    //         //     description: true,
+    //         //     openTo: true,
+    //         //     startDate: true,
+    //         //     endDate: true,
+    //         //     contacts: true,
+    //         //     attachments: true,
+    //         //     budget: true,
+    //         //     private: true,
+    //         //     headerImage: true,
+    //         //     pinned: true,
+    //         //     milestones: true,
+    //         //     organizationId: true,
+    //         // })
+    //         // if (rfpResponse.success) {
+    //         //     initializeRFPStore(rfpResponse.data || [])
+    //         //     console.log(`RFPs initialized...`)
+    //         // } else {
+    //         //     console.error(rfpResponse.error)
+    //         //     toast.error(rfpResponse.error)
+    //         // }
 
-            console.log(`Initialization completed successfully!`)
-            setIsLoading(false)
-        }
-    }
+    //         console.log(`Initialization completed successfully!`)
+    //         setIsLoading(false)
+    //     }
+    // }
 
-    useEffect(() => {
-        // Only run if the session data has changed or the session has not yet been set up
-        // console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
-        if (
-            // !isLoading &&
-            status !== "authenticated" || 
-            !session || 
-            JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
-        ) {
-            handleSessionUpdate()
-        }
+    // useEffect(() => {
+    //     // Only run if the session data has changed or the session has not yet been set up
+    //     // console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
+    //     if (
+    //         // !isLoading &&
+    //         status !== "authenticated" || 
+    //         !session || 
+    //         JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+    //     ) {
+    //         handleSessionUpdate()
+    //     }
 
-        // Update the ref to the latest session
-        prevSessionRef.current = session
-    }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
+    //     // Update the ref to the latest session
+    //     prevSessionRef.current = session
+    // }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
 
     useEffect(() => {
         setTourName(getTourName())
@@ -338,7 +341,8 @@ export default function AppLayout({children}: AppLayoutProps) {
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
-                        {status !== "authenticated" || !session || isLoading  ? <Loading /> : (children)}
+                        {/* {status !== "authenticated" || !session || isLoading  ? <Loading /> : (children)} */}
+                        {children}
                     </div>
                 </SidebarInset>
             </SidebarProvider>

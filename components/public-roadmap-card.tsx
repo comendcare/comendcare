@@ -111,7 +111,7 @@ export const RoadmapCard = ({
                         {roadmap.description}
                     </CardDescription>
                     <div className="flex gap-2">
-                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option) => <Badge variant={'secondary'} className="text-sm">{type.label}</Badge>)}
+                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option, index) => <Badge key={index} variant={'secondary'} className="text-sm">{type.label}</Badge>)}
                         <StageOfActivityBadge milestones={roadmap.milestones}/>
                     </div>
 
@@ -176,13 +176,14 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {RESEARCH_PLAN_TYPES.map(type => {
+                {RESEARCH_PLAN_TYPES.map((type, index) => {
                     const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(type.value) && type.value !== "OTHER")
                     if (roadmapsForModality.length <= 0) return <></>
 
                     return (
                         // add a section for each roadmap type EXCEPT the OTHER type (handled below)
-                        <CollapsibleTableGroup 
+                        <CollapsibleTableGroup
+                            key={index}
                             label={type.label}
                             colSpan={2}
                         >

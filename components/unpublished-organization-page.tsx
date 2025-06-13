@@ -2,7 +2,7 @@ import Image from "next/image"
 import {Organization} from "@prisma/client";
 
 
-export default function UnpublishedOrganizationPage({organization}: {organization: Organization}) {
+export default function UnpublishedOrganizationPage({organization}: {organization: Partial<Organization>}) {
     return (
         <div className="h-full flex flex-col mx-auto items-center justify-center py-20">
             <Image

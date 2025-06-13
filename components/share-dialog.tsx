@@ -24,7 +24,7 @@ export default function ShareDialog({
                                         trackShareEvent,
                                     }: {
     url: string,
-    organization?: Organization,
+    organization?: Partial<Organization>,
     postSubject?: string,
     postMessage?: string,
     embeddedResearchPlansData?: {
