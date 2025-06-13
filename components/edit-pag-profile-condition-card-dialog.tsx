@@ -31,7 +31,7 @@ import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {mixpanelTrack} from "@/app/mixpanel";
 
-export default function EditPAGProfileConditionCardDialog({organization}: { organization: Organization }) {
+export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session} = useSession()
     const router = useRouter()
     const [open, setOpen] = useState(false);

@@ -15,8 +15,8 @@ import { Store } from "lucide-react";
 import { getPublicMilestoneDetails } from "@/lib/fetchers";
 
 export default function MarketplaceBreadcrumb({ organization, roadmap, marketplaceDomain }: {
-    organization?: Organization,
-    roadmap?: Roadmap,
+    organization?: Partial<Organization>,
+    roadmap?: Partial<Roadmap>,
     marketplaceDomain: string
 }) {
 

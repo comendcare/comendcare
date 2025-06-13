@@ -12,7 +12,7 @@ import ContactPAGDialog from "./contact-pag-dialog"
 import { Organization } from "@prisma/client"
 import { mixpanelTrack } from "@/app/mixpanel"
 
-export function PublicRoadmapContent({organization, roadmap, subdomain, milestoneChangedCallback}: {organization: Organization, roadmap: any, subdomain: string | undefined, milestoneChangedCallback?: (milestoneId: string | undefined) => void}) {
+export function PublicRoadmapContent({organization, roadmap, subdomain, milestoneChangedCallback}: {organization: Partial<Organization>, roadmap: any, subdomain: string | undefined, milestoneChangedCallback?: (milestoneId: string | undefined) => void}) {
     const searchParams = useSearchParams()
     const pathname = usePathname()
     const [milestone, setMilestone] = useState<string | undefined>(searchParams.get("project") || undefined)
