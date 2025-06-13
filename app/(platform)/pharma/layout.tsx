@@ -84,6 +84,12 @@ export default function AppLayout({children}: AppLayoutProps) {
         clearOnDefault: true,
     })
 
+    const [queryTags, setQueryTags] = useQueryState("tags", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
     const [querySystems, setQuerySystems] = useQueryState("systems", {
         shallow: true,
         history: "replace",
@@ -172,6 +178,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                     .filter(query => query !== undefined),
                 types: parseQuery(queryTypes),
                 certifications: parseQuery(queryCertifications),
+                tags: parseQuery(queryTags),
             }
             initializeCROSearch(parsedCROFilters)
             console.log(`CRO search initialized...`)
