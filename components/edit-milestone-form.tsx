@@ -286,18 +286,6 @@ export function EditMilestoneForm({
             } as Milestone], {limit: 3})
         }
 
-        // Mixpanel tracking for "Other" field
-        // only send to mixpanel if the details explaining the 'other' type have been updated
-        // if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
-        //     const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
-
-        //     mixpanelTrack("Project has other type", {
-        //         orgName: response?.data?.name || "Unknown Org",
-        //         milestoneTitle: title,
-        //         milestoneType: otherTypeDetails,
-        //     });
-        // }
-
         // toast('Success!', {
         //     position: "bottom-left",
         //     description: 'The changes to your milestone have been successfully saved.'

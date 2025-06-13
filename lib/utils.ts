@@ -21,6 +21,21 @@ export const getCookie = (name: string) => {
     const cookies = document.cookie.split('; ')
     const cookie = cookies.find(row => row.startsWith(`${name}=`))
     return cookie ? cookie.split('=')[1] : null
+    // const cookies = document.cookie.split(';')
+    //     .reduce(
+    //     (ac, cv, i) =>
+    //         Object.assign(ac, { [cv.split("=")[0].trim()]: cv.split("=")[1] }),
+    //     {}
+    //     )["cookieyes-consent"];
+    // const { [key]: value } = cookies
+    //     .split(",")
+    //     .reduce(
+    //     (obj, pair) => (
+    //         (pair = pair.split(":")), (obj[pair[0]] = pair[1]), obj
+    //     ),
+    //     {}
+    //     );
+    // return value;
 }
 
 export const getStage = (milestones: Milestone[]): {value: string, label: string, variant: string} => {
@@ -384,12 +399,12 @@ export function formatDate(dateString: string): string {
 export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export const isOnboarded = (tutorialName: string) => {
-    const onboarded = localStorage.getItem(tutorialName)
+    const onboarded = window.functionalConsentedLocalStorage?.get(tutorialName)
     return !(onboarded === null)
 }
 
 export const setOnboarded = (tutorialName: string) => {
-    localStorage.setItem(tutorialName, "true")
+    window.functionalConsentedLocalStorage?.set(tutorialName, "true")
 }
 
 type DraggableData = ColumnDragData | TaskDragData

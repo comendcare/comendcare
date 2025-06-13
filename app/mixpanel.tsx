@@ -118,33 +118,6 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             } catch (error) {
                 console.error("Mixpanel initialization failed:", error)
             }
-
-            // if (consentedLocalStorage.hasConsent('analytics')) {
-            //     // delete any existing mixpanel cookies in localStorage
-            //     consentedLocalStorage.removeItem(`__mp_opt_in_out_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}`, 'analytics')
-            //     consentedLocalStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}_pp`, 'analytics')
-            //     consentedLocalStorage.removeItem(`__mpq_${process.env.NEXT_PUBLIC_MIXPANEL_TOKEN}_ev`, 'analytics')
-            //     console.warn('Mixpanel cookies have been blocked by the user. Mixpanel will not be initialized.')
-            //     return
-            // }
-
-            // try {
-            //     mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
-            //         debug: false,
-            //         disable_cookie: !consentedLocalStorage.hasConsent('analytics'),
-            //         disable_persistence: !consentedLocalStorage.hasConsent('analytics'),
-            //         track_pageview: true,
-            //         persistence: "localStorage",
-            //         loaded: function(mixpanel) {
-            //             const distinctId = mixpanel.get_distinct_id()
-            //             setMixpanelContext({ distinctId })
-            //         }
-            //     })
-            //     console.log("Mixpanel initialized")
-            //     setIsMixpanelInitialized(true)
-            // } catch (error) {
-            //     console.error("Mixpanel initialization failed:", error)
-            // }
         } else {
             console.error("Error initializing mixpanel. Node environment must be 'prouction', 'preview' or 'development'")
         }
@@ -251,7 +224,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
 
                         // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
                         // set the user's 'opt-in' flag
-                        if (localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || localStorage.getItem(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
+                        if (window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
                             console.log(`mixpanel opt-in`)
                             mixpanel.opt_in_tracking()
                         }

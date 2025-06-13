@@ -110,6 +110,10 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                 userId: null,
                 nodes: [],
                 edges: [],
+                metadata: {
+                    ...(researchPlanData?.metadata ? JSON.parse(JSON.stringify(researchPlanData.metadata)) : undefined),
+                    otherModalities: values.otherModalities
+                } as JsonObject
             })
 
             if (roadmap && roadmap.id) {
@@ -239,7 +243,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                                 onClick={async () => {
                                                     // delete research plan, and reroute the user back to the research plans page
                                                     if (researchPlanData?.id) {
-                                                        await deleteRoadmap(session?.user.organizationId, researchPlanData.id, null)
+                                                        const roadmap = await deleteRoadmap(session?.user.organizationId, researchPlanData)
                                                         router.push('/app/research-plan')
                                                         router.refresh()
                                                     }
