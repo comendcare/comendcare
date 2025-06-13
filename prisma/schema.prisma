@@ -472,7 +472,7 @@ model ExternalContact {
   nameHash    String? /// @encryption:hash(name)
   role        String?
   email       String /// @encrypted
-  emailHash   String? @unique /// @encryption:hash(email)
+  emailHash   String? /// @encryption:hash(email)
   affiliation String?
 
   toolId      String?
