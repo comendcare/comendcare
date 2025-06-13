@@ -70,15 +70,14 @@ export const useAssetStore = create<AssetState>()(
                 set({ tools: get().tools.filter(tool => tool.id !== deletedAsset.id) })
             },
             saveState: (orgId: string | null | undefined) => {
-                console.log(`save state`)
                 syncDBAssets(orgId, { tools: get().tools })
             }
         }),
         {
             limit: 1, // limit the stored history states to 1 since we're only using this for the undo button right now
-            onSave: (pastState, currentState) => {
-                console.log(`Saved tools state: `, currentState)
-                return
-            },
+            // onSave: (pastState, currentState) => {
+            //     console.log(`Saved tools state: `, currentState)
+            //     return
+            // },
         })
     )
