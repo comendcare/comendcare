@@ -138,15 +138,15 @@ export async function generateStaticParams() {
     return allPaths
 }
 
-async function getForms() {
-    const data = await fs.readFile(
-        path.join(process.cwd(), "data/forms.json")
-    )
-
-    const forms = JSON.parse(data.toString())
-
-    return z.array(formSchema).parse(forms)
-}
+// async function getForms() {
+//     const data = await fs.readFile(
+//         path.join(process.cwd(), "data/forms.json")
+//     )
+//
+//     const forms = JSON.parse(data.toString())
+//
+//     return z.array(formSchema).parse(forms)
+// }
 
 const posts: Post[] = [
     {
@@ -213,7 +213,7 @@ export default async function ConditionPage({
     params: { domain: string; slug: string }
 }) {
     faker.seed(14)
-    const forms = await getForms()
+    // const forms = await getForms()
     const slug = decodeURIComponent(params.slug)
 
     let data: Condition & {
