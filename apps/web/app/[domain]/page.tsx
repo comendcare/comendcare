@@ -20,7 +20,7 @@ import React from "react";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 import {Mail, Share} from "lucide-react";
-import { mixpanelTrack } from "../mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
