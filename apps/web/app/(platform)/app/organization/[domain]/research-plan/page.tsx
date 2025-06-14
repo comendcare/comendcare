@@ -4,7 +4,6 @@ import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import Image from "next/image"
-import {Post} from "@/app/condition/[slug]/page";
 import {FloatingDock} from "@/components/floating-dock";
 import ShareDialog from "@/components/share-dialog";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
@@ -142,50 +141,6 @@ export async function generateStaticParams() {
     return allPaths
 }
 
-const posts: Post[] = [
-    {
-        id: '1',
-        user: {
-            name: 'John Doe',
-            username: '@johndoe',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
-        image: '/placeholder.png',
-        likes: 120,
-        comments: 18,
-        shares: 5,
-        timestamp: '2 hours ago'
-    },
-    {
-        id: '2',
-        user: {
-            name: 'Jane Smith',
-            username: '@janesmith',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
-        image: '/placeholder.png',
-        likes: 89,
-        comments: 32,
-        shares: 12,
-        timestamp: '5 hours ago'
-    },
-    {
-        id: '3',
-        user: {
-            name: 'Bob Jackson',
-            username: '@bobby',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Hello!. 🚀 #NewBeginnings',
-        image: '/placeholder.png',
-        likes: 29,
-        comments: 32,
-        shares: 1,
-        timestamp: '5 hours ago'
-    }
-]
 
 export default async function OrganizationRoadmapPage({
                                                           params

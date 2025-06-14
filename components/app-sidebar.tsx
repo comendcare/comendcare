@@ -24,7 +24,7 @@ import {
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
-import {MemberWithOrganization} from "@/app/(platform)/app/layout";
+import {MembershipWithOrganization} from "@/lib/types";
 
 // This is sample data.
 const data = {
@@ -96,7 +96,7 @@ const data = {
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
-    const [memberships, setMemberships] = useState<MemberWithOrganization[]>([]);
+    const [memberships, setMemberships] = useState<MembershipWithOrganization[]>([]);
 
     useEffect(() => {
         const fetchOrganizations = async () => {
