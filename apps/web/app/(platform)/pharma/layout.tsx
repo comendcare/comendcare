@@ -41,10 +41,6 @@ import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types"
 import {PharmaSidebar} from "@/components/pharma-sidebar";
 import {PharmaHeader} from "@/components/pharma-header";
 
-export type MemberWithOrganization = Member & {
-    organization: Organization
-};
-
 interface AppLayoutProps {
     children: React.ReactNode
 }

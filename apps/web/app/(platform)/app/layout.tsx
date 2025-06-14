@@ -37,10 +37,6 @@ import {useIsMobile} from "@/lib/hooks/use-mobile";
 import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-export type MemberWithOrganization = Member & {
-    organization: Organization
-};
-
 interface AppLayoutProps {
     children: React.ReactNode
 }
