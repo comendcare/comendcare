@@ -34,7 +34,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import Loading from "@/app/loading";
+import Loading from "@/loading";
 import {
     getAllMembershipsFromUserId,
     getInvitations,
@@ -63,7 +63,7 @@ import UserEditForm from "@/components/user-edit-form";
 import UserSettings from "@/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
-import { mixpanelReset, mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelReset, mixpanelTrack } from "@/mixpanel";
 
 
 export function NavUser() {

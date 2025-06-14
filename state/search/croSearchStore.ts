@@ -5,7 +5,7 @@ import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
 import mixpanel from 'mixpanel-browser';
 import { getExclusiveToFirstGroup } from '@/lib/utils';
-import { mixpanelTrack } from '@/app/mixpanel';
+import { mixpanelTrack } from "@/mixpanel";
 
 export const sampleCROs: any[] = [
     {

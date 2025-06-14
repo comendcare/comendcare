@@ -2,7 +2,7 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { Asset } from '@/lib/types';
 import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@/lib/actions';
-import { mixpanelTrack } from '@/app/mixpanel';
+import { mixpanelTrack } from "@/mixpanel";
 
 export interface AssetState {
     tools: Asset[],

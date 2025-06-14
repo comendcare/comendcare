@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { updateCompany, deleteCompany } from "@/lib/actions";
-import { mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Company } from "@prisma/client";

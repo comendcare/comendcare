@@ -19,8 +19,15 @@
                 "name": "next"
             }
         ],
+        "baseUrl": ".", // This enables consistent relative paths across apps
         "paths": {
-            "@/*": ["./*"],
+            "@/lib/*": ["lib/*"],
+            "@/components/*": ["components/*"],
+            "@/state/*": ["state/*"],
+            "@/data/*": ["data/*"],
+            "@/public/*": ["public/*"],
+            "@/loading": ["loading.tsx"],
+            "@/mixpanel": ["mixpanel.tsx"]
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

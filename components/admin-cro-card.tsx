@@ -22,7 +22,7 @@ import {
 import {Milestone} from "@/lib/types";
 import {PropertyBadge} from "./property-badge";
 import {useRouter} from "next/navigation";
-import {mixpanelTrack} from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
 
 type NodeTypeCount = Record<string, number>;

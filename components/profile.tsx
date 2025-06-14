@@ -12,7 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import Loading from "@/app/loading";
+import Loading from "@/loading";
 import { getUser } from "@/lib/fetchers"
 import { ProfilePhoto } from "@/components/profile-photo"
 import { LogOut } from "lucide-react"

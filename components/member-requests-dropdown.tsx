@@ -8,7 +8,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {useSession} from "next-auth/react";
 import { Ellipsis, UserCheck, UserX } from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 
 export default async function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
     const session = useSession()
