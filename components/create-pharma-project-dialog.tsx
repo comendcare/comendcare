@@ -28,7 +28,7 @@ import {optionSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {SidebarMenuButton} from "@/components/ui/sidebar"
-import {mixpanelTrack} from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 import {Info, Plus} from "lucide-react";
 
 const newPharmaProjectSchema = z.object({

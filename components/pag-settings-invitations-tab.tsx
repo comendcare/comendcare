@@ -9,7 +9,7 @@ import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog"
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button"
 import { ProfilePhoto } from "./profile-photo"
 import InvitationsDropdown from "@/components/invitations-dropdown"
-import Loading from "@/app/loading";
+import Loading from "@/loading";
 
 export default function PAGSettingsInvitationsTab() {
     const {data: session} = useSession()

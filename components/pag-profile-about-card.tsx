@@ -14,7 +14,7 @@ import EditPagProfileAboutCardDialog from "@/components/edit-pag-profile-about-c
 import {ExternalLink} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import mixpanel from "mixpanel-browser";
-import {mixpanelTrack} from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 
 export const PagProfileAboutCard = ({organization, editable, isPrivate = false}: {
     organization: Partial<Organization> & { members: (Member & { user: User })[] } | null

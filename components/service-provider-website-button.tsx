@@ -6,7 +6,7 @@ import { ExternalLink } from "lucide-react"
 import mixpanel from "mixpanel-browser"
 import Link from "next/link"
 import { buttonVariants } from "./ui/button"
-import { mixpanelTrack } from "@/app/mixpanel"
+import { mixpanelTrack } from "@/mixpanel"
 
 export const ServiceProviderWebsiteButton = ({
     cro

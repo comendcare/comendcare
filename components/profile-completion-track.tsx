@@ -1,6 +1,6 @@
 "use client"
 
-import { mixpanelTrack } from "@/app/mixpanel"
+import { mixpanelTrack } from "@/mixpanel"
 import mixpanel from "mixpanel-browser"
 import { useEffect } from "react"
 

@@ -20,7 +20,7 @@ import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {sendPAGContactEmail} from "@/lib/emails";
-import { mixpanelTrack, useMixpanelContext } from "@/app/mixpanel";
+import { mixpanelTrack, useMixpanelContext } from "@/mixpanel";
 import { customerIOTrack, sendCustomerIOContactEmail } from "@/lib/customer-io";
 
 // Validation schema

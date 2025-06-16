@@ -27,7 +27,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { sleep } from "@/lib/utils"
 import MultipleSelector from "./ui/multiple-selector"
 import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
-import { mixpanelTrack } from "@/app/mixpanel"
+import { mixpanelTrack } from "@/mixpanel"
 import { JsonObject } from "@prisma/client/runtime/library"
 
 const editResearchPlanForm = z.object({
