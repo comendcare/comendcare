@@ -4,7 +4,7 @@ import { LogOut } from "lucide-react"
 import { signOut } from "next-auth/react"
 import {Button} from "@/components/ui/button";
 import mixpanel from "mixpanel-browser";
-import { mixpanelReset, mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelReset, mixpanelTrack } from "@/mixpanel";
 
 export default function LogoutButton() {
     return (

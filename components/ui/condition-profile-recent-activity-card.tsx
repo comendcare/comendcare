@@ -5,7 +5,21 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react'
-import {Post} from "@/app/condition/[slug]/page";
+
+type Post = {
+    id: string
+    user: {
+        name: string
+        username: string
+        avatar: string
+    }
+    content: string
+    image: string
+    likes: number
+    comments: number
+    shares: number
+    timestamp: string
+}
 
 export function ConditionProfileRecentActivityCard({ post }: { post: Post }) {
     const [liked, setLiked] = useState(false)

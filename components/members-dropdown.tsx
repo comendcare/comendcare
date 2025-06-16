@@ -26,7 +26,7 @@ import {MembershipWithOrganization} from "@/lib/types";
 import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
 import mixpanel from "mixpanel-browser";
-import {mixpanelTrack} from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null

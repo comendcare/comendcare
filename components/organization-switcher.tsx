@@ -20,37 +20,37 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar";
-import {MemberWithOrganization} from "@/app/(platform)/app/layout";
+import {MembershipWithOrganization} from "@/lib/types";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 export function OrganizationSwitcher({
                                          memberships,
                                      }: {
-    memberships: MemberWithOrganization[];
+    memberships: MembershipWithOrganization[];
 }) {
     const {isMobile} = useSidebar();
     const router = useRouter();
     const {data: session, update} = useSession();
     const pathname = usePathname()
-    const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
+    const [activeOrganization, setActiveOrganization] = React.useState<MembershipWithOrganization | null>(null);
 
     React.useEffect(() => {
         if (!memberships || memberships.length === 0) return;
 
         const matchingOrganization = memberships.find(
-            (membership) => membership.organization.id === session?.user?.organizationId
+            (membership) => membership?.organization?.id === session?.user?.organizationId
         );
         setActiveOrganization(matchingOrganization || memberships[0]);
     }, [memberships, session?.user?.organizationId]);
 
-    const handleOrganizationChange = async (membership: MemberWithOrganization) => {
+    const handleOrganizationChange = async (membership: MembershipWithOrganization) => {
         // setActiveOrganization(membership);
         // await update({
         //     ...session,
         //     organizationId: membership.organizationId,
         //     membership: membership,
         // });
-        console.log(`UPDATE ORGANIZATION: ${membership.organization.name} (${membership.organization.id})`)
+        console.log(`UPDATE ORGANIZATION: ${membership?.organization?.name} (${membership?.organization?.id})`)
         // await update({
         //     user: {
         //         ...session?.user,
@@ -91,7 +91,7 @@ export function OrganizationSwitcher({
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
-                                    {activeOrganization ? activeOrganization.organization.name : "Select an organization"}
+                                    {activeOrganization ? activeOrganization?.organization?.name : "Select an organization"}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto"/>
@@ -119,7 +119,7 @@ export function OrganizationSwitcher({
                                         className="size-4 shrink-0"
                                     />
                                 </div>
-                                {membership.organization.name}
+                                {membership?.organization?.name}
                                 {activeOrganization?.id === membership.id && (
                                     <Check className="ml-auto opacity-100"/>
                                 )}
