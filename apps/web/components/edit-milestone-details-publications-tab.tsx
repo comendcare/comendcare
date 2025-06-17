@@ -17,11 +17,11 @@ export default function EditMilestoneDetailsPublicationsTab() {
                 const response = await getTopPubMedPublications()
 
                 // Map the response to the correct structure if needed
-                if (response.success && response.data) {
+                if (response?.success && response?.data) {
                     setPublications(response?.data);
                 } else {
-                    console.error(response.error)
-                    toast.error(response.error)
+                    console.error(response?.error)
+                    toast.error(response?.error)
                 }
 
             } catch (error) {
