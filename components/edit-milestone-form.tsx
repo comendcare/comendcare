@@ -51,13 +51,13 @@ import {Calendar} from "./ui/calendar"
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { PlateEditor } from "./editor/plate-editor"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
-import { CROSearchState, Recommendation, useCROSearchStore } from "@/state/search/croSearchStore"
-import { Card, CardContent } from "./ui/card"
+import {RadioGroup, RadioGroupItem} from "./ui/radio-group"
+import {PlateEditor} from "./editor/plate-editor"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "./ui/tabs"
+import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
+import {Card, CardContent} from "./ui/card"
 import Image from "next/image"
-import { CROMarketplaceCard  } from "./marketplace-cro-card"
+import {CROMarketplaceCard} from "./marketplace-cro-card"
 import Link from "next/link"
 import {
     DropdownMenu,
@@ -65,19 +65,20 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { TypeBadge } from "./type-badge"
+import {TypeBadge} from "./type-badge"
 import Loading from "@/loading";
-import { getMilestoneTypes } from "@/lib/fetchers"
-import { NotificationBubble } from "./notification-bubble"
-import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
-import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share } from "lucide-react"
-import { toast } from "sonner"
-import { badgeVariants } from "./ui/badge"
-import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
-import { useOnborda } from "./onborda/OnbordaContext"
-import { mixpanelTrack } from "@/mixpanel"
+import {getMilestoneTypes} from "@/lib/fetchers"
+import {NotificationBubble} from "./notification-bubble"
+import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
+import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share} from "lucide-react"
+import {toast} from "sonner"
+import {badgeVariants} from "./ui/badge"
+import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
+import {useOnborda} from "./onborda/OnbordaContext"
+import {mixpanelTrack} from "@/mixpanel"
 import ShareDialog from "./share-dialog"
-import { JsonObject } from "@prisma/client/runtime/library"
+import {JsonObject} from "@prisma/client/runtime/library"
+import EditMilestoneDetailsPublicationsTab from "comend-pag-platform/components/edit-milestone-details-publications-tab";
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -135,7 +136,7 @@ const editMilestoneForm = z.object({
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
 }).refine(
-    (m) => m.startDate && m.endDate ? m.startDate?.getTime() <= m.endDate?.getTime() : true, 
+    (m) => m.startDate && m.endDate ? m.startDate?.getTime() <= m.endDate?.getTime() : true,
     {
         message: "Error: Please adjust the dates so the start date comes before the end date.",
         path: ["endDate"]
@@ -143,19 +144,24 @@ const editMilestoneForm = z.object({
 )
 
 export function EditMilestoneForm({
-    organization,
-    milestoneData,
-    orgIsPublished,
-    onClose
-}: {
+                                      organization,
+                                      milestoneData,
+                                      orgIsPublished,
+                                      onClose
+                                  }: {
     organization: Organization | undefined
     milestoneData: Milestone
     orgIsPublished: boolean
     onClose: () => void
 }) {
-    const { setMilestone } = useRoadmapStore(useShallow(selector))
-    const { recommendations, setRecommendations } = useCROSearchStore(useShallow(recommendationsSelector))
-    const { initialized: notificationsInitialized, notifications, addNotification, setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
+    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
+    const {
+        initialized: notificationsInitialized,
+        notifications,
+        addNotification,
+        setNotificationsViewed
+    } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
@@ -164,8 +170,8 @@ export function EditMilestoneForm({
     const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
-    const { step } = useOnbordaStore(useShallow(onbordaSelector))
-    const { currentTour, currentStep, isOnbordaVisible } = useOnborda()
+    const {step} = useOnbordaStore(useShallow(onbordaSelector))
+    const {currentTour, currentStep, isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -176,7 +182,9 @@ export function EditMilestoneForm({
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
-            otherTypeDetails: typeof milestoneData?.metadata === 'object' ? (milestoneData.metadata as {[key: string]: any})?.otherTypeDetails : undefined,
+            otherTypeDetails: typeof milestoneData?.metadata === 'object' ? (milestoneData.metadata as {
+                [key: string]: any
+            })?.otherTypeDetails : undefined,
             startDate: milestoneData?.startDate || undefined,
             endDate: milestoneData?.endDate || undefined,
             budget: milestoneData?.budget || undefined,
@@ -213,7 +221,7 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
-        
+
         const {
             nodeType,
             title,
@@ -244,11 +252,11 @@ export function EditMilestoneForm({
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
             types: (types || []).map((type) => {
-                return ({ 
+                return ({
                     milestoneId: milestoneData.id,
                     milestoneTypeId: type.id,
                     milestoneType: type
-                })  
+                })
             }).filter((type) => type !== undefined),
             // ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             metadata: {
@@ -273,7 +281,7 @@ export function EditMilestoneForm({
                     rfp: rfp
                 })
             }).filter((rfp) => rfp !== undefined),
-            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)} : undefined)
         }
 
         if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
@@ -301,7 +309,7 @@ export function EditMilestoneForm({
     }
 
     const handleMilestoneFormSubmitCallback = useCallback(
-        handleMilestoneFormSubmit, 
+        handleMilestoneFormSubmit,
         [milestoneData, session?.user.organizationId, setMilestone, setRecommendations, milestoneTypes]
     )
 
@@ -311,19 +319,19 @@ export function EditMilestoneForm({
     }
 
     // memo ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useMemo(() => 
-        debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500), 
+    const debounceUpdates = useMemo(() =>
+            debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
         [handleMilestoneFormSubmitCallback]
     )
 
-    const debounceMixpanelTrackBudget = useMemo(() => 
-        debounce((updatedBudget) => {
-            mixpanelTrack("Project Budget Updated", {
-                "ID": milestoneData.id,
-                "Title": formData.title,
-                "Budget": updatedBudget
-            })
-        }, 500), 
+    const debounceMixpanelTrackBudget = useMemo(() =>
+            debounce((updatedBudget) => {
+                mixpanelTrack("Project Budget Updated", {
+                    "ID": milestoneData.id,
+                    "Title": formData.title,
+                    "Budget": updatedBudget
+                })
+            }, 500),
         []
     )
 
@@ -383,7 +391,7 @@ export function EditMilestoneForm({
             }
 
             if (milestoneData) {
-                await setRecommendations([milestoneData as Milestone], { limit: 3 })
+                await setRecommendations([milestoneData as Milestone], {limit: 3})
             }
 
             // trigger a form validation, if the imported data is not valid, let the user know right away
@@ -394,8 +402,8 @@ export function EditMilestoneForm({
 
         init()
 
-    // missing dependencies disabled - we only want to run this once on initialization
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // missing dependencies disabled - we only want to run this once on initialization
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     // when switching to recommendations tab, set notifications as viewed
@@ -405,7 +413,7 @@ export function EditMilestoneForm({
                 notifications.find((notification: any) => (
                     notification.type === "NEW_RECOMMENDATION" &&
                     notification.metadata?.companyId === content.id &&
-                    notification.metadata?.milestoneId === milestone.id && 
+                    notification.metadata?.milestoneId === milestone.id &&
                     notification.lastViewed
                 ))
             )).filter(n => n !== undefined) || []
@@ -420,16 +428,16 @@ export function EditMilestoneForm({
                 // Copy the notifications to avoid mutating the original array
                 let localNotifications: Partial<PlatformNotification>[] = [...notifications]
                 for (const recommendation of (recommendations || [])) {
-                    
+
                     const exists = localNotifications
-                                    .filter((notification: any) => (
-                                        notification.type === "NEW_RECOMMENDATION" && 
-                                        notification.metadata?.milestoneId === recommendation.milestone.id && 
-                                        notification.metadata?.companyId === recommendation.content.id
-                                    )).length > 0
+                        .filter((notification: any) => (
+                            notification.type === "NEW_RECOMMENDATION" &&
+                            notification.metadata?.milestoneId === recommendation.milestone.id &&
+                            notification.metadata?.companyId === recommendation.content.id
+                        )).length > 0
 
                     console.log(`notifications exist`, exists)
-            
+
                     if (!exists) {
                         console.log(`notifications`, localNotifications);
                         console.log(
@@ -453,8 +461,8 @@ export function EditMilestoneForm({
         }
 
         setupNotifications()
-    // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [recommendations, notificationsInitialized, addNotification])
 
     // Watch form changes, don't watch while initializing
@@ -477,344 +485,382 @@ export function EditMilestoneForm({
 
     return (
         <>
-        <Form {...form}>
-            <ScrollArea className="px-8 pb-4 h-full">
-                <form
-                    onKeyDown={handleKeyDown}
-                    onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="flex flex-col gap-4 mt-2 px-1 pb-12"
-                >
-                    <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
-                        e.preventDefault()
-                        onClose()
-                    }}>
-                        <X />
-                    </Button>
+            <Form {...form}>
+                <ScrollArea className="px-8 pb-4 h-full">
+                    <form
+                        onKeyDown={handleKeyDown}
+                        onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                        className="flex flex-col gap-4 mt-2 px-1 pb-12"
+                    >
+                        <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
+                            e.preventDefault()
+                            onClose()
+                        }}>
+                            <X/>
+                        </Button>
 
-                    <EditTitle form={form}/>
+                        <EditTitle form={form}/>
 
-                    <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")} className="space-y-4 w-full h-full">
-                        <div className="flex gap-4 items-center justify-between">
-                            <TabsList>
-                                <TabsTrigger value="edit">
-                                    Edit
-                                </TabsTrigger>
-                                <TabsTrigger className="relative" value="recommendations">
-                                    Marketplace recommendations
-                                    {
-                                        notifications && 
-                                        notifications
-                                            .filter((notification: any) => (
-                                                notification.type === "NEW_RECOMMENDATION" && 
-                                                notification.metadata?.milestoneId === milestoneData.id && 
-                                                (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
-                                                !notification.lastViewedAt
-                                            )).length > 0 && 
-                                        <NotificationBubble />
-                                    }
-                                </TabsTrigger>
-                            </TabsList>
-                        </div>
-                        {isMigrating ? (
-                            <Loading />
-                        ): (
-                            <>
-                            <TabsContent value="edit" className="space-y-6 w-full h-full">
-                                <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
-                                    <FormLabel>Visibility</FormLabel>
-                                    <div className="flex gap-2 justify-between items-center">
-                                    <PrivatePublicFormField 
-                                        form={form} 
-                                        formData={formData} 
-                                        disabled={!orgIsPublished}
-                                        mixpanelTrackCallback={(updatedIsPrivate) => {
-                                            mixpanelTrack("Project Visibility Updated", {
-                                                "ID": milestoneData.id,
-                                                "Title": formData.title,
-                                                "Visibility": updatedIsPrivate ? "Private" : "Public"
-                                            })
-                                        }}
-                                    />
-                                    <Tooltip delayDuration={0}>
-                                        <TooltipTrigger asChild>
-                                            <div>
-                                                <Button
-                                                    disabled={formData.isPrivate}
-                                                    onClick={(e) => {
-                                                        if (formData.isPrivate) return
-                                                        e.preventDefault()
-                                                        handleShare()
+                        <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")}
+                              className="space-y-4 w-full h-full">
+                            <div className="flex gap-4 items-center justify-between">
+                                <TabsList>
+                                    <TabsTrigger value="edit">
+                                        Edit
+                                    </TabsTrigger>
+                                    <TabsTrigger className="relative" value="recommendations">
+                                        Marketplace recommendations
+                                        {
+                                            notifications &&
+                                            notifications
+                                                .filter((notification: any) => (
+                                                    notification.type === "NEW_RECOMMENDATION" &&
+                                                    notification.metadata?.milestoneId === milestoneData.id &&
+                                                    (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
+                                                    !notification.lastViewedAt
+                                                )).length > 0 &&
+                                            <NotificationBubble/>
+                                        }
+                                    </TabsTrigger>
+                                    <TabsTrigger className="relative" value="publications">
+                                        Publications
+                                    </TabsTrigger>
+                                </TabsList>
+                            </div>
+                            {isMigrating ? (
+                                <Loading/>
+                            ) : (
+                                <>
+                                    <TabsContent value="edit" className="space-y-6 w-full h-full">
+                                        <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
+                                            <FormLabel>Visibility</FormLabel>
+                                            <div className="flex gap-2 justify-between items-center">
+                                                <PrivatePublicFormField
+                                                    form={form}
+                                                    formData={formData}
+                                                    disabled={!orgIsPublished}
+                                                    mixpanelTrackCallback={(updatedIsPrivate) => {
+                                                        mixpanelTrack("Project Visibility Updated", {
+                                                            "ID": milestoneData.id,
+                                                            "Title": formData.title,
+                                                            "Visibility": updatedIsPrivate ? "Private" : "Public"
+                                                        })
                                                     }}
-                                                    variant={'secondary'}
-                                                >
-                                                    <Share />
-                                                    Share
-                                                </Button>
+                                                />
+                                                <Tooltip delayDuration={0}>
+                                                    <TooltipTrigger asChild>
+                                                        <div>
+                                                            <Button
+                                                                disabled={formData.isPrivate}
+                                                                onClick={(e) => {
+                                                                    if (formData.isPrivate) return
+                                                                    e.preventDefault()
+                                                                    handleShare()
+                                                                }}
+                                                                variant={'secondary'}
+                                                            >
+                                                                <Share/>
+                                                                Share
+                                                            </Button>
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    {formData.isPrivate && (
+                                                        <TooltipContent side={"top"}>
+                                                            <p>This project is private. Make it public to share.</p>
+                                                        </TooltipContent>
+                                                    )}
+                                                </Tooltip>
                                             </div>
-                                        </TooltipTrigger>
-                                        {formData.isPrivate && (
-                                            <TooltipContent side={"top"}>
-                                                <p>This project is private. Make it public to share.</p>
-                                            </TooltipContent>
-                                        )}
-                                    </Tooltip>
-                                    </div>
 
-                                    <FormField
-                                        control={form.control}
-                                        name="description"
-                                        render={({field}) => (
-                                            <>
-                                            <FormLabel >{`Description`}</FormLabel>
-                                            <div className="flex flex-col gap-2">
-                                                <FormControl>
-                                                    <Textarea
-                                                        id="description"
-                                                        placeholder={`Enter a description...`}
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
+                                            <FormField
+                                                control={form.control}
+                                                name="description"
+                                                render={({field}) => (
+                                                    <>
+                                                        <FormLabel>{`Description`}</FormLabel>
+                                                        <div className="flex flex-col gap-2">
+                                                            <FormControl>
+                                                                <Textarea
+                                                                    id="description"
+                                                                    placeholder={`Enter a description...`}
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            />
+
+                                            <div>
+                                                <FormLabel>{`Project Type`}</FormLabel>
+                                                {formData?.types?.length === 3 &&
+                                                    <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                             </div>
+                                            <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
+
+                                            <FormLabel>{`Project Status`}</FormLabel>
+                                            <StatusFormField
+                                                form={form}
+                                                mixpanelTrackCallback={(updatedStatus) => {
+                                                    mixpanelTrack("Project Status Updated", {
+                                                        "ID": milestoneData.id,
+                                                        "Title": formData.title,
+                                                        "Status": updatedStatus
+                                                    })
+                                                }}
+                                            />
+
+                                            <FormLabel>{`Budget`}</FormLabel>
+                                            <BudgetFormField
+                                                form={form}
+                                                mixpanelTrackCallback={(updatedBudget) =>
+                                                    debounceMixpanelTrackBudget(updatedBudget)
+                                                }
+                                            />
+
+                                            <TimelineFormField form={form} startLabel={"Start Date"}
+                                                               endLabel={"End Date"}/>
+
+                                            <FormLabel>Linked Tools</FormLabel>
+                                            <FormField
+                                                control={form.control}
+                                                name="tools"
+                                                render={({field}) => (
+                                                    <FormItem className="w-full">
+                                                        <FormControl>
+                                                            <MultipleSelector
+                                                                value={field.value?.map(tool => ({
+                                                                    ...tool,
+                                                                    value: tool.id,
+                                                                    label: tool.title
+                                                                } as Option))}
+                                                                onChange={field.onChange}
+                                                                defaultOptions={fetchedAssets.map(tool => ({
+                                                                    ...tool,
+                                                                    value: tool.id,
+                                                                    label: tool.title
+                                                                } as Option))}
+                                                                options={fetchedAssets.map(tool => ({
+                                                                    ...tool,
+                                                                    value: tool.id,
+                                                                    label: tool.title
+                                                                } as Option))}
+                                                                hidePlaceholderWhenSelected={true}
+                                                                showHoverCard={false}
+                                                                placeholder="Link tools"
+                                                                emptyIndicator={
+                                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                        no results found.
+                                                                    </p>
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage className="text-primary"/>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormLabel>Linked RFPs</FormLabel>
+                                            <FormField
+                                                control={form.control}
+                                                name="rfps"
+                                                render={({field}) => (
+                                                    <FormItem className="w-full">
+                                                        <FormControl>
+                                                            <MultipleSelector
+                                                                value={field.value?.map(rfp => ({
+                                                                    ...rfp,
+                                                                    value: rfp.id,
+                                                                    label: rfp.title
+                                                                } as Option))}
+                                                                onChange={field.onChange}
+                                                                defaultOptions={fetchedRFPs.map(rfp => ({
+                                                                    ...rfp,
+                                                                    value: rfp.id,
+                                                                    label: rfp.title
+                                                                } as Option))}
+                                                                options={fetchedRFPs.map(rfp => ({
+                                                                    ...rfp,
+                                                                    value: rfp.id,
+                                                                    label: rfp.title
+                                                                } as Option))}
+                                                                hidePlaceholderWhenSelected={true}
+                                                                showHoverCard={false}
+                                                                placeholder="Link RFPs"
+                                                                emptyIndicator={
+                                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                        no results found.
+                                                                    </p>
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage className="text-primary"/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+
+                                        <ContactsFormField form={form}/>
+
+                                        <AttachmentsFormField form={form}/>
+
+                                        <FormField
+                                            control={form.control}
+                                            name="notes"
+                                            render={({field}) => (
+                                                <FormItem className="w-full">
+                                                    <FormLabel className="flex gap-2 items-center">
+                                                        {`Notes`}
+                                                        <PrivateBadge className="font-normal text-gray-500"
+                                                                      iconOnly={true}/>
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <div className="w-full col-span-2" data-registry="plate">
+                                                            <PlateEditor
+                                                                value={field.value ?? []}
+                                                                onChange={field.onChange}
+                                                            />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <span className="h-8"/>
+
+                                        <span
+                                            className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button type="button" variant="destructive">
+                                                        Delete Project
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
+                                            </Dialog>
+                                            <Button
+                                                disabled={!form.formState.isValid}
+                                                variant={"cta"}
+                                                id="edit-milestone-scroll-area"
+                                                className="onborda-save-project"
+                                                onClick={() => {
+                                                    handleMilestoneFormSubmit(form.getValues())
+                                                    onClose()
+                                                }}
+                                            >
+                                                Save Changes
+                                            </Button>
+                                        </span>
+                                    </TabsContent>
+                                    <TabsContent value="recommendations" className="space-y-4 w-full">
+                                        {!recommendations && (
+                                            <Loading/>
+                                        )}
+
+                                        {(recommendations && recommendations.length === 0) && (
+                                            <Card
+                                                className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                                                <CardContent className="flex flex-col gap-4 p-4">
+                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
+                                                    <div className="flex justify-center">
+                                                        <Image
+                                                            alt="No recommendations"
+                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                            width={300}
+                                                            height={300}
+                                                            className="dark:hidden"
+                                                        />
+                                                        <Image
+                                                            alt="No recommendations"
+                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                            width={300}
+                                                            height={300}
+                                                            className="hidden dark:block"
+                                                        />
+                                                    </div>
+                                                    <p className="text-md">
+                                                        {`Please add more information to your milestone to generate some recommendations.`}
+                                                    </p>
+                                                </CardContent>
+                                            </Card>
+                                        )}
+
+                                        {recommendations && recommendations.length > 0 && (
+                                            <>
+                                                <div className={cn("w-full grid gap-4 grid-cols-1")}>
+                                                    {(recommendations || []).map((result: Recommendation, index) => (
+                                                        // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
+                                                        <CROMarketplaceCard cro={result.content} key={index}
+                                                                            milestone={milestoneData}
+                                                                            location={"Research Planner"}/>
+                                                    ))}
+                                                </div>
                                             </>
                                         )}
-                                    />
 
-                                    <div>
-                                        <FormLabel>{`Project Type`}</FormLabel>
-                                        {formData?.types?.length === 3 && <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
-                                    </div>
-                                    <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
-
-                                    <FormLabel>{`Project Status`}</FormLabel>
-                                    <StatusFormField 
-                                        form={form}
-                                        mixpanelTrackCallback={(updatedStatus) => {
-                                            mixpanelTrack("Project Status Updated", {
-                                                "ID": milestoneData.id,
-                                                "Title": formData.title,
-                                                "Status": updatedStatus
-                                            })
-                                        }}
-                                    />
-
-                                    <FormLabel>{`Budget`}</FormLabel>
-                                    <BudgetFormField 
-                                        form={form}
-                                        mixpanelTrackCallback={(updatedBudget) => 
-                                            debounceMixpanelTrackBudget(updatedBudget)
-                                        }
-                                    />
-
-                                    <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
-
-                                    <FormLabel>Linked Tools</FormLabel>
-                                    <FormField
-                                        control={form.control}
-                                        name="tools"
-                                        render={({field}) => (
-                                            <FormItem className="w-full">
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        value={field.value?.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
-                                                        onChange={field.onChange}
-                                                        defaultOptions={fetchedAssets.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
-                                                        options={fetchedAssets.map(tool => ({...tool, value: tool.id, label: tool.title} as Option))}
-                                                        hidePlaceholderWhenSelected={true}
-                                                        showHoverCard={false}
-                                                        placeholder="Link tools"
-                                                        emptyIndicator={
-                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                no results found.
-                                                            </p>
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage className="text-primary"/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormLabel>Linked RFPs</FormLabel>
-                                    <FormField
-                                        control={form.control}
-                                        name="rfps"
-                                        render={({field}) => (
-                                            <FormItem className="w-full">
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        value={field.value?.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as Option))}
-                                                        onChange={field.onChange}
-                                                        defaultOptions={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as Option))}
-                                                        options={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as Option))}
-                                                        hidePlaceholderWhenSelected={true}
-                                                        showHoverCard={false}
-                                                        placeholder="Link RFPs"
-                                                        emptyIndicator={
-                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                no results found.
-                                                            </p>
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage className="text-primary"/>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <ContactsFormField form={form}/>
-
-                                <AttachmentsFormField form={form}/>
-
-                                <FormField
-                                    control={form.control}
-                                    name="notes"
-                                    render={({field}) => (
-                                        <FormItem className="w-full">
-                                            <FormLabel className="flex gap-2 items-center">
-                                                {`Notes`}
-                                                <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
-                                            </FormLabel>
-                                            <FormDescription>
-                                                {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <div className="w-full col-span-2" data-registry="plate">
-                                                        <PlateEditor
-                                                            value={field.value ?? []}
-                                                            onChange={field.onChange}
-                                                        />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <span className="h-8" />
-
-                                <span className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button type="button" variant="destructive">
-                                                Delete Project
+                                        {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
+                                        <Link
+                                            href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
+                                                .map((t: any) => t?.value || t?.id)
+                                                .join(",")}`}
+                                        >
+                                            <Button className="pl-0" variant={"link"}>
+                                                <Store/>
+                                                Explore Marketplace
                                             </Button>
-                                        </DialogTrigger>
-                                        <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
-                                    </Dialog>
-                                    <Button
-                                        disabled={!form.formState.isValid}
-                                        variant={"cta"}
-                                        id="edit-milestone-scroll-area"
-                                        className="onborda-save-project"
-                                        onClick={() => {
-                                            handleMilestoneFormSubmit(form.getValues())
-                                            onClose()
-                                        }}
-                                    >
-                                        Save Changes
-                                    </Button>
-                                </span>
-                            </TabsContent>
-                            <TabsContent value="recommendations" className="space-y-4 w-full">
-                                {!recommendations && (
-                                    <Loading />
-                                )}
-                                
-                                {(recommendations && recommendations.length === 0) && (
-                                    <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
-                                        <CardContent className="flex flex-col gap-4 p-4">
-                                            <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
-                                            <div className="flex justify-center">
-                                                <Image
-                                                    alt="No recommendations"
-                                                    src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                    width={300}
-                                                    height={300}
-                                                    className="dark:hidden"
-                                                />
-                                                <Image
-                                                    alt="No recommendations"
-                                                    src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                    width={300}
-                                                    height={300}
-                                                    className="hidden dark:block"
-                                                />
-                                            </div>
-                                            <p className="text-md">
-                                                {`Please add more information to your milestone to generate some recommendations.`}
-                                            </p>
-                                        </CardContent>
-                                    </Card>
-                                )}
-
-                                {recommendations && recommendations.length > 0 && (
-                                    <>
-                                        <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                            {(recommendations || []).map((result: Recommendation, index) => (
-                                                // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
-                                                <CROMarketplaceCard cro={result.content} key={index} milestone={milestoneData} location={"Research Planner"}/>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
-
-                                {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
-                                <Link
-                                    href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
-                                        .map((t: any) => t?.value || t?.id)
-                                        .join(",")}`}
-                                >
-                                    <Button className="pl-0" variant={"link"}>
-                                        <Store />
-                                        Explore Marketplace
-                                    </Button>
-                                </Link>
-                            </TabsContent>
-                            </>
-                        )}
-                    </Tabs>
-                </form>
-            </ScrollArea>
-        </Form>
-        <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
-            <DialogContent className="min-w-fit">
-                { organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
-                    <ShareDialog
-                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
-                        organization={organization}
-                        postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
-                        postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
-                        embeddedProjectData={{
-                            embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
-                            projectId: milestoneData.id,
-                            projectTitle: milestoneData.title
-                        }}
-                        // trackShareEvent={(socialOption: string) => {
-                        //     mixpanelTrack(`Project Shared`, {
-                        //         "Platform": socialOption,
-                        //         ...(organization ? {
-                        //             "Organization ID": organization.id,
-                        //             "Organization Name": organization.name,
-                        //             "Project ID": milestoneData.id,
-                        //             "Project Title": milestoneData.title
-                        //         } : undefined)
-                        //     })
-                        // }}
-                        trackShareEvent={{
-                            title: `Project Shared`,
-                            additonalProperties: {
-                                "Project ID": milestoneData.id,
-                                "Project Title": milestoneData.title
-                            }
-                        }}
-                    />
-                ) : (
-                    <div className="text-sm text-muted-foreground">Loading organization...</div>
-                )}
-            </DialogContent>
-        </Dialog>
+                                        </Link>
+                                    </TabsContent>
+                                    <TabsContent value="publications" className="space-y-4 w-full">
+                                        <EditMilestoneDetailsPublicationsTab/>
+                                    </TabsContent>
+                                </>
+                            )}
+                        </Tabs>
+                    </form>
+                </ScrollArea>
+            </Form>
+            <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+                <DialogContent className="min-w-fit">
+                    {organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                        <ShareDialog
+                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
+                            organization={organization}
+                            postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
+                            postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
+                            embeddedProjectData={{
+                                embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
+                                projectId: milestoneData.id,
+                                projectTitle: milestoneData.title
+                            }}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Project Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name,
+                            //             "Project ID": milestoneData.id,
+                            //             "Project Title": milestoneData.title
+                            //         } : undefined)
+                            //     })
+                            // }}
+                            trackShareEvent={{
+                                title: `Project Shared`,
+                                additonalProperties: {
+                                    "Project ID": milestoneData.id,
+                                    "Project Title": milestoneData.title
+                                }
+                            }}
+                        />
+                    ) : (
+                        <div className="text-sm text-muted-foreground">Loading organization...</div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
@@ -881,15 +927,15 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
 }
 
 export const PrivatePublicFormField = ({
-    form, 
-    formData, 
-    disabled = false, 
-    mixpanelTrackCallback
-}: { 
-    form: any, 
-    formData: any, 
-    disabled?: boolean, 
-    mixpanelTrackCallback?: (isPrivate: boolean) => void 
+                                           form,
+                                           formData,
+                                           disabled = false,
+                                           mixpanelTrackCallback
+                                       }: {
+    form: any,
+    formData: any,
+    disabled?: boolean,
+    mixpanelTrackCallback?: (isPrivate: boolean) => void
 }) => {
     if (disabled) {
         return (
@@ -899,47 +945,47 @@ export const PrivatePublicFormField = ({
                 render={({field}) => (
                     <div className="h-full items-center flex flex-row justify-end gap-4">
                         <FormControl>
-                         <Tooltip>
-                            <TooltipTrigger>
-                                <RadioGroup
-                                    onValueChange={(value)=> {
-                                        if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
-                                        form.setValue("isPrivate", value === "PRIVATE", {shouldValidate: true})
-                                    }}
-                                    defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-                                    className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50": "")}
-                                    disabled={disabled}
-                                >
-                                    <FormItem className="flex items-center space-y-0">
-                                        <FormControl>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <RadioGroup
+                                        onValueChange={(value) => {
+                                            if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
+                                            form.setValue("isPrivate", value === "PRIVATE", {shouldValidate: true})
+                                        }}
+                                        defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                                        className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50" : "")}
+                                        disabled={disabled}
+                                    >
+                                        <FormItem className="flex items-center space-y-0">
+                                            <FormControl>
                                             <span className="flex gap-2">
-                                                <RadioGroupItem value="PRIVATE" />
+                                                <RadioGroupItem value="PRIVATE"/>
                                                     <FormLabel className="font-normal flex gap-1 items-center">
                                                         <Lock className="h-4 w-4"/>
                                                         {`Private`}
                                                     </FormLabel>
                                             </span>
-                                        </FormControl>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-y-0">
-                                        <FormControl>
+                                            </FormControl>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-y-0">
+                                            <FormControl>
                                             <span className="flex gap-2">
-                                                <RadioGroupItem value="PUBLIC" />
+                                                <RadioGroupItem value="PUBLIC"/>
                                                 <FormLabel className="font-normal flex gap-1 items-center">
                                                     <Globe className="h-4 w-4"/>
                                                     {`Public`}
                                                 </FormLabel>
                                             </span>
-                                        </FormControl>
-                                    </FormItem>
-                                </RadioGroup>
-                            </TooltipTrigger>
-                            {disabled && (
-                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                    {`Publish your organization to create public projects.`}
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
+                                            </FormControl>
+                                        </FormItem>
+                                    </RadioGroup>
+                                </TooltipTrigger>
+                                {disabled && (
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                        {`Publish your organization to create public projects.`}
+                                    </TooltipContent>
+                                )}
+                            </Tooltip>
                         </FormControl>
                         <FormMessage/>
                     </div>
@@ -950,24 +996,24 @@ export const PrivatePublicFormField = ({
 
     return (
         <FormField
-        control={form.control}
-        name="isPrivate"
-        render={({field}) => (
-            <span className="h-full items-center flex flex-row justify-end gap-4">
+            control={form.control}
+            name="isPrivate"
+            render={({field}) => (
+                <span className="h-full items-center flex flex-row justify-end gap-4">
                 <FormControl>
                         <RadioGroup
-                            onValueChange={(value)=> {
+                            onValueChange={(value) => {
                                 if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
                                 form.setValue("isPrivate", value === "PRIVATE")
                             }}
                             defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-                            className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50": "")}
+                            className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50" : "")}
                             disabled={disabled}
                         >
                             <FormItem className="flex items-center space-y-0">
                                 <FormControl>
                                     <span className="flex gap-2">
-                                        <RadioGroupItem value="PRIVATE" />
+                                        <RadioGroupItem value="PRIVATE"/>
                                         <Tooltip disableHoverableContent={disabled}>
                                             <TooltipTrigger disabled={disabled} asChild>
                                                 <FormLabel className="font-normal flex gap-1 items-center">
@@ -987,7 +1033,7 @@ export const PrivatePublicFormField = ({
                             <FormItem className="flex items-center space-y-0">
                                 <FormControl>
                                     <span className="flex gap-2">
-                                        <RadioGroupItem value="PUBLIC" />
+                                        <RadioGroupItem value="PUBLIC"/>
                                         <Tooltip disableHoverableContent={disabled}>
                                         <TooltipTrigger disabled={disabled} asChild>
                                             <FormLabel className="font-normal flex gap-1 items-center">
@@ -995,11 +1041,11 @@ export const PrivatePublicFormField = ({
                                                 {`Public`}
                                             </FormLabel>
                                         </TooltipTrigger>
-                                        {!disabled && (
-                                            <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {`Public projects are visible on your profile and discoverable in the marketplace.`}
-                                            </TooltipContent>
-                                        )}
+                                            {!disabled && (
+                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                    {`Public projects are visible on your profile and discoverable in the marketplace.`}
+                                                </TooltipContent>
+                                            )}
                                     </Tooltip>
                                     </span>
                                 </FormControl>
@@ -1008,12 +1054,15 @@ export const PrivatePublicFormField = ({
                 </FormControl>
                 <FormMessage/>
             </span>
-        )}
-    />
+            )}
+        />
     )
 }
 
-const StatusFormField = ({form, mixpanelTrackCallback}: { form: any, mixpanelTrackCallback?: (newValue: string) => void }) => {
+const StatusFormField = ({form, mixpanelTrackCallback}: {
+    form: any,
+    mixpanelTrackCallback?: (newValue: string) => void
+}) => {
     return (
         <FormField
             control={form.control}
@@ -1040,9 +1089,9 @@ const StatusFormField = ({form, mixpanelTrackCallback}: { form: any, mixpanelTra
 }
 
 export const BudgetFormField = ({
-    form,
-    mixpanelTrackCallback
-}: { 
+                                    form,
+                                    mixpanelTrackCallback
+                                }: {
     form: any,
     mixpanelTrackCallback?: (budget: number) => void
 }) => {
@@ -1057,10 +1106,10 @@ export const BudgetFormField = ({
 }
 
 export const TimelineFormField = ({
-                               form,
-                               startLabel,
-                               endLabel
-                           }: {
+                                      form,
+                                      startLabel,
+                                      endLabel
+                                  }: {
     form: any,
     startLabel?: string,
     endLabel?: string
@@ -1072,50 +1121,50 @@ export const TimelineFormField = ({
                 name="startDate"
                 render={({field}) => (
                     <>
-                    <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
-                    <div className="flex gap-2">
-                        <Select
-                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                            onValueChange={(value) => {
-                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                const monthIndex = monthsList.indexOf(value)
-                                const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
-                                form.setValue('startDate', newStartDate, { shouldValidate: true })
-                            }}
-                        >
-                            <FormControl>
-                                <SelectTrigger className="h-[32px]">
-                                    <SelectValue placeholder="Month"/>
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {monthsList.map(
-                                    (
-                                        month: string,
-                                        index: number
-                                    ) => (
-                                        <SelectItem
-                                            value={month}
-                                            key={index}
-                                        >
-                                            {month}
-                                        </SelectItem>
-                                    )
-                                )}
-                            </SelectContent>
-                        </Select>
+                        <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
+                        <div className="flex gap-2">
+                            <Select
+                                defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                onValueChange={(value) => {
+                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                    const monthIndex = monthsList.indexOf(value)
+                                    const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
+                                    form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                }}
+                            >
+                                <FormControl>
+                                    <SelectTrigger className="h-[32px]">
+                                        <SelectValue placeholder="Month"/>
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {monthsList.map(
+                                        (
+                                            month: string,
+                                            index: number
+                                        ) => (
+                                            <SelectItem
+                                                value={month}
+                                                key={index}
+                                            >
+                                                {month}
+                                            </SelectItem>
+                                        )
+                                    )}
+                                </SelectContent>
+                            </Select>
 
-                        <Input
-                            placeholder="Year"
-                            maxLength={4}
-                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                            onChange={(event) => {
-                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                form.setValue('startDate', newStartDate, { shouldValidate: true })
-                            }}
-                        />
-                    </div>
+                            <Input
+                                placeholder="Year"
+                                maxLength={4}
+                                defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                onChange={(event) => {
+                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                    const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                    form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                }}
+                            />
+                        </div>
                     </>
                 )}
             />
@@ -1125,53 +1174,53 @@ export const TimelineFormField = ({
                 name="endDate"
                 render={({field}) => (
                     <>
-                    <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
-                    <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                        <Select
-                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                            onValueChange={(value) => {
-                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                const monthIndex = monthsList.indexOf(value)
-                                const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
-                                form.setValue('endDate', newEndDate, { shouldValidate: true })
-                            }}
-                        >
-                            <FormControl>
-                                <SelectTrigger className="h-[32px]">
-                                    <SelectValue placeholder="Month"/>
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {monthsList.map(
-                                    (
-                                        month: string,
-                                        index: number
-                                    ) => (
-                                        <SelectItem
-                                            value={month}
-                                            key={index}
-                                        >
-                                            {month}
-                                        </SelectItem>
-                                    )
-                                )}
-                            </SelectContent>
-                        </Select>
+                        <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                                <Select
+                                    defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                    onValueChange={(value) => {
+                                        const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                        const monthIndex = monthsList.indexOf(value)
+                                        const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
+                                        form.setValue('endDate', newEndDate, {shouldValidate: true})
+                                    }}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger className="h-[32px]">
+                                            <SelectValue placeholder="Month"/>
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {monthsList.map(
+                                            (
+                                                month: string,
+                                                index: number
+                                            ) => (
+                                                <SelectItem
+                                                    value={month}
+                                                    key={index}
+                                                >
+                                                    {month}
+                                                </SelectItem>
+                                            )
+                                        )}
+                                    </SelectContent>
+                                </Select>
 
-                        <Input
-                            placeholder="Year"
-                            maxLength={4}
-                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                            onChange={(event) => {
-                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                form.setValue('endDate', newEndDate, { shouldValidate: true })
-                            }}
-                        />
-                    </div>
-                    <FormMessage />
-                    </div>
+                                <Input
+                                    placeholder="Year"
+                                    maxLength={4}
+                                    defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                    onChange={(event) => {
+                                        const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                        const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                        form.setValue('endDate', newEndDate, {shouldValidate: true})
+                                    }}
+                                />
+                            </div>
+                            <FormMessage/>
+                        </div>
                     </>
                 )}
             />
@@ -1219,7 +1268,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
             name="openTo"
             render={({field}) => (
                 <FormItem>
-                    <FormLabel >{`Open to`}</FormLabel>
+                    <FormLabel>{`Open to`}</FormLabel>
                     <FormDescription>{`Specify which parties you wish to source proposals from.`}</FormDescription>
                     <FormControl>
                         <ToggleGroup
@@ -1248,7 +1297,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
     )
 }
 
-export function AttachmentsFormField({form}: { form: UseFormReturn<any>}) {
+export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
     return (
         <FormField
             control={form.control}
@@ -1275,7 +1324,7 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any>}) {
                                                 ])
                                             }}
                                         >
-                                            <Plus />
+                                            <Plus/>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
@@ -1325,8 +1374,8 @@ export const ContactsFormField = ({form}: { form: any }) => {
                 <FormItem>
                     <div className="flex flex-row justify-between gap-2 items-center">
                         <div className="flex flex-col">
-                        <FormLabel>{`Contacts`}</FormLabel>
-                        <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
+                            <FormLabel>{`Contacts`}</FormLabel>
+                            <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
                         </div>
                         <Tooltip>
                             <TooltipTrigger>
@@ -1341,7 +1390,7 @@ export const ContactsFormField = ({form}: { form: any }) => {
                                         ])
                                     }}
                                 >
-                                    <Plus />
+                                    <Plus/>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-80 text-wrap text-left font-normal">
