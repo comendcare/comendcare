@@ -9,7 +9,7 @@ import { ProfilePhoto } from "./profile-photo"
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog"
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button"
 import MembersDropdown from "@/components/members-dropdown"
-import Loading from "@/app/loading";
+import Loading from "@/loading";
 
 export default function PAGSettingsMembersTab() {
     const {data: session} = useSession()

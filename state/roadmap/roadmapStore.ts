@@ -14,7 +14,7 @@ import { nanoid } from "nanoid"
 import { Milestone, NodeType, Roadmap, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
-import { mixpanelTrack } from "@/app/mixpanel"
+import {mixpanelTrack} from "@/mixpanel";
 
 export type RoadmapState = {
     initialized: boolean,

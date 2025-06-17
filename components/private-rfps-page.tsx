@@ -39,7 +39,7 @@ export const PrivateRFPsPage = () => {
             {rfps.length > 0 && (
                 <div className={"w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"}>
                     {rfps.map((rfp) => (
-                        <EditRFPDialog data={rfp} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}>
+                        <EditRFPDialog key={rfp.id} data={rfp} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}>
                             <RFPCard rfp={rfp} isPrivate={true}/>
                         </EditRFPDialog>
                     ))}

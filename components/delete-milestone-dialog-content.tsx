@@ -15,7 +15,7 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog"
 import { toast } from "sonner"
 import mixpanel from "mixpanel-browser"
-import { mixpanelTrack } from "@/app/mixpanel"
+import { mixpanelTrack } from "@/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,

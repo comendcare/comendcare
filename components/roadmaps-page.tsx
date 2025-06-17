@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Organization, Roadmap } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
 import { PrivateNoResearchPlansRow } from "./no-research-plans";
-import Loading from "@/app/loading";
+import Loading from "@/loading";;
 import { initializeRoadmapState } from "@/lib/initialize-client-state";
 import { useRouter } from "next/navigation";
 import { RoadmapsTable } from "./public-roadmap-card";
@@ -15,7 +15,7 @@ import ShareDialog from "./share-dialog";
 import { getOrganizationFromOrganizationId } from "@/lib/fetchers";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 
 export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], orgId: string}) {
     const router = useRouter()

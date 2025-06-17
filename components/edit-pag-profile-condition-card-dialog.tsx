@@ -29,9 +29,9 @@ import {researchFormSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
-import {mixpanelTrack} from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 
-export default function EditPAGProfileConditionCardDialog({organization}: { organization: Organization }) {
+export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session} = useSession()
     const router = useRouter()
     const [open, setOpen] = useState(false);

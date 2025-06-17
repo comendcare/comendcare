@@ -411,8 +411,8 @@ export function EditRFPForm({
                             <DropdownMenuContent className="w-32">
                             <DropdownMenuRadioGroup value={field.value} onValueChange={(value) => form.setValue("headerImage", value, {shouldValidate: true})}>
                                 {
-                                    HEADER_IMAGE_OPTIONS.map(({label, path}) => (
-                                        <DropdownMenuRadioItem value={path} className="flex justify-between">
+                                    HEADER_IMAGE_OPTIONS.map(({label, path}, index) => (
+                                        <DropdownMenuRadioItem key={index} value={path} className="flex justify-between">
                                             {label}
                                             <img
                                                 src={path}

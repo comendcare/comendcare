@@ -48,7 +48,7 @@ import {getMilestones} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 import {MILESTONE_TYPE_OPTIONS} from "@/lib/types";
 
 export const reviewForm = z.object({

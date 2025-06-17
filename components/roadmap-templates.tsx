@@ -142,7 +142,8 @@ export const MilestoneTemplates = ({
                     <p>{categoryData.description}</p>
                     </div>
                     {templateMilestones.filter(milestone => milestone.categories.includes(categoryData.value)).map((milestoneData, index) => (
-                        <MilestoneTemplateCardMultiSelect 
+                        <MilestoneTemplateCardMultiSelect
+                            key={index}
                             className={index === 0 ? "onborda-select-a-template": ""}
                             milestoneData={milestoneData}
                             selectedMilestones={selectedMilestonesTemplate}
@@ -188,7 +189,8 @@ export const ResearchPlanTemplates = ({ selectedResearchPlanTemplate, setSelecte
         <ScrollArea type="always" className="h-full">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                 {templateResearchPlans.map(template => (
-                    <ResearchPlanTemplateCardSelect 
+                    <ResearchPlanTemplateCardSelect
+                        key={template.id}
                         researchPlanData={template}
                         selectedResearchPlanId={selectedResearchPlanId}
                         setSelectedResearchPlanId={(id) => id === template.title ? handleSetSelectedResearchPlan(template) : handleSetSelectedResearchPlan(undefined)}
@@ -280,7 +282,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
             <CardContent className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                 <CreateEmptyResearchPlanCard setIsLoading={setIsLoading}/>
                 {templateResearchPlans.map(plan => (
-                    <CreateResearchPlanFromTemplateCard plan={plan} orgId={orgId} setIsLoading={setIsLoading}/>
+                    <CreateResearchPlanFromTemplateCard key={plan.id} plan={plan} orgId={orgId} setIsLoading={setIsLoading}/>
                 ))}
             </CardContent>
         </Card>
