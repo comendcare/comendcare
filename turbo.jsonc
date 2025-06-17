@@ -1,0 +1,22 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "dependsOn": ["^dev"],
+      "env": ["*"]  // attach all env variables from .env
+    },
+    "build": {
+      "outputs": [".next/**", "!.next/cache/**"],
+      "dependsOn": ["^build"],
+      "env": ["*"]  // attach all env variables defined in Vercel
+    },
+    "lint": {
+      "outputs": []
+    },
+    "format": {
+      "outputs": []
+    }
+  },
+  "globalDependencies": ["prisma/schema.prisma"]
+}

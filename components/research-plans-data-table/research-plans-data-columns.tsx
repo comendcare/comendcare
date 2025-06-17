@@ -49,7 +49,7 @@ export const columns: ColumnDef<Roadmap>[] = [
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">
                 {RESEARCH_PLAN_TYPES.filter(modality => row.original.modalities.includes(modality.value)).map(modality => (
-                    <li>
+                    <li key={modality.value}>
                         <Badge variant={"secondary"}>{modality.label}</Badge>
                     </li>
                 ))}

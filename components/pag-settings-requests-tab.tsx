@@ -8,7 +8,7 @@ import {useSession} from "next-auth/react"
 import { ProfilePhoto } from "./profile-photo"
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button"
 import MemberRequestsDropdown from "@/components/member-requests-dropdown"
-import Loading from "@/app/loading";
+import Loading from "@/loading";
 import {MemberRequest} from "@prisma/client";
 
 export default function PAGSettingsRequestsTab() {

@@ -14,8 +14,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
-    organization?: Organization,
-    roadmap?: Roadmap | undefined,
+    organization?: Partial<Organization>,
+    roadmap?: Partial<Roadmap> | undefined,
 }) {
 
     const searchParams = useSearchParams();

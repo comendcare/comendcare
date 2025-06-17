@@ -97,7 +97,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                         <h2 className="font-semibold text-xl">{`Requests for Proposals`}</h2>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {milestone.rfps?.map((rfp: any) => rfp.rfp)?.map((rfp: any, index: number) => (
-                                <Dialog>
+                                <Dialog key={rfp.id}>
                                     <DialogTrigger>
                                         <RFPCard rfp={rfp} />
                                     </DialogTrigger>
@@ -124,7 +124,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             </TableHeader>
                             <TableBody>
                                 {milestone.tools?.map((tool: any) => tool.tool)?.map((tool: any) => (
-                                    <Dialog>
+                                    <Dialog key={tool.id}>
                                         <DialogTrigger asChild>
                                             <TableRow key={tool.id} className="cursor-pointer">
                                                 <TableCell>

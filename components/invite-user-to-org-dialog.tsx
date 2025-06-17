@@ -30,7 +30,7 @@ import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 import LoadingDots from "@/components/icons/loading-dots";
 
 const invitationFormSchema = z.object({

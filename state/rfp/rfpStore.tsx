@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { RFP } from '@/lib/types';
 import { createOrUpdateRFP, deleteRFP, syncDBRFPs } from '@/lib/actions';
 import mixpanel from 'mixpanel-browser';
-import { mixpanelTrack } from '@/app/mixpanel';
+import { mixpanelTrack } from "@/mixpanel";
 
 export interface RFPState {
     rfps: RFP[],

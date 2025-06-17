@@ -8,7 +8,7 @@ import {
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
-import {mixpanelTrack} from "@/app/mixpanel";
+import { mixpanelTrack } from "@/mixpanel";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "./ui/accordion";
 import CopyCodeBlock from "./code-block";
 
@@ -24,7 +24,7 @@ export default function ShareDialog({
                                         trackShareEvent,
                                     }: {
     url: string,
-    organization?: Organization,
+    organization?: Partial<Organization>,
     postSubject?: string,
     postMessage?: string,
     embeddedResearchPlansData?: {

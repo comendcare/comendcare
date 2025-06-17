@@ -133,7 +133,7 @@ export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedResea
                 <CardContent>
                     <ol className="list-decimal pl-4">
                         {researchPlanData.milestones.map((milestone: any) => (
-                            <li>{milestone.title}</li>
+                            <li key={milestone.id}>{milestone.title}</li>
                         ))}
                     </ol>
                 </CardContent>

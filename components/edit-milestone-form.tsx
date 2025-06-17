@@ -66,7 +66,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { TypeBadge } from "./type-badge"
-import Loading from "@/app/loading"
+import Loading from "@/loading";
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
@@ -75,7 +75,7 @@ import { toast } from "sonner"
 import { badgeVariants } from "./ui/badge"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { useOnborda } from "./onborda/OnbordaContext"
-import { mixpanelTrack } from "@/app/mixpanel"
+import { mixpanelTrack } from "@/mixpanel"
 import ShareDialog from "./share-dialog"
 import { JsonObject } from "@prisma/client/runtime/library"
 
