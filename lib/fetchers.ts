@@ -13,6 +13,7 @@ import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
 import { InternalArgs } from "@prisma/client/runtime/library"
 import { omit } from "lodash";
+import { getPubMedSearchResultIds, getPubMedSearchResultData} from "comend-pag-platform/lib/pubmed";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -2117,5 +2118,42 @@ export async function getAllOrganizationsWithConditions(
     } catch (error: any) {
         logError("Error fetching organizations", error);
         return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getTopPubMedPublications(keyword?: string) {
+    try {
+        const session = await getSession()
+        const response = await getConditionsFromOrganizationId(session?.user.organizationId);
+
+        if (response.success) {
+            const conditions = response.data;
+
+            if (conditions && conditions.length > 0) {
+                // Default to first condition
+                const ids = await getPubMedSearchResultIds(conditions[0], 0, 10)
+                const articles = await getPubMedSearchResultData(ids)
+
+                return {
+                    success: true,
+                    data: articles.map(article => ({
+                        title: article.title,
+                        abstract: article.abstract,
+                        authors: article.authors.map((a: { name: any }) => a.name),
+                        keywords: article.keywords,
+                        date: article.formattedPublishedDate,
+                        url: `https://pubmed.ncbi.nlm.nih.gov/${article.pmid}`,
+                        meta: {
+                            publishedDate: article.publishedDate
+                        }
+                    }))
+                }
+            }
+        } else {
+            return { success: false, error: "Failed to find relevant conditions." }
+        }
+    } catch (error: any) {
+        logError?.("Error fetching PubMed publications", error)
+        return { success: false, error: "Failed to fetch publications" }
     }
 }

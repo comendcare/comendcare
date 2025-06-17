@@ -386,7 +386,9 @@ export const formatMoney = (moneyRaised: number | undefined) => {
     }
 };
 
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string | undefined | null): string {
+    if (dateString === undefined || dateString === null) return null
+
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
