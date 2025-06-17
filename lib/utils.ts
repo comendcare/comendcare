@@ -386,7 +386,7 @@ export const formatMoney = (moneyRaised: number | undefined) => {
     }
 };
 
-export function formatDate(dateString: string | undefined | null): string {
+export function formatDate(dateString: string | undefined | null): string | null {
     if (dateString === undefined || dateString === null) return null
 
     const date = new Date(dateString);
