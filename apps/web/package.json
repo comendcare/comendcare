@@ -228,5 +228,8 @@
     "tsx": "^4.19.4",
     "turbo": "^2.5.4",
     "typescript": "^5.2.2"
+  },
+  "resolutions": {
+    "canvas": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz"
   }
 }
