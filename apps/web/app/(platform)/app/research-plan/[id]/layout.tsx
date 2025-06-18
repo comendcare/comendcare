@@ -18,7 +18,6 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
 
     useEffect(() => {
         const init = async () => {
-            console.log(`init research plan for org: ${session?.user.organizationId}`)
             const response = await getRoadmap(session?.user.organizationId, params.id, {
                 id: true,
                 title: true,
@@ -39,49 +38,44 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
                 metadata: true
             })
             if (response.success && response.data) {
-                if (response.success) {
-                    const urlNode = searchParams.get("milestone")
-                    const urlView = searchParams.get("view")
+                const urlNode = searchParams.get("milestone")
+                const urlView = searchParams.get("view")
 
-                    initializeRoadmapState({
-                        roadmapId: params.id,
-                        details: response.data,
-                        nodes: response.data.nodes,
-                        edges: response.data.edges,
-                        milestones: response.data.milestones,
-                        selectedView: urlView,
-                        selectedNodeIds: urlNode ? [urlNode] : []
-                    })
+                initializeRoadmapState({
+                    roadmapId: params.id,
+                    details: response.data,
+                    nodes: response.data.nodes,
+                    edges: response.data.edges,
+                    milestones: response.data.milestones,
+                    selectedView: urlView,
+                    selectedNodeIds: urlNode ? [urlNode] : []
+                })
 
-                    console.log(`Research Plan initialized...`)
-
-
-                    // Init notifications
-                    let notifications = await getAllNotifications({
-                        id: true,
-                        type: true,
-                        title: true,
-                        message: true,
-                        link: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        lastViewedAt: true,
-                    })
-                    if (notifications.success && notifications.data) {
-                        initializeNotificationsState({
-                            notifications: notifications.data
-                        })
-                    } else {
-                        console.error(notifications.error)
-                        toast.error(notifications.error)
-                    }
-                    console.log(`Notificaions initialized...`)
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
+                console.log(`Research Plan initialized...`)
             } else {
                 console.error(`Could not initialize active roadmap with id ${params.id}. Error: ${response.error}`)
+                toast.error(response.error)
+            }
+
+            // Init notifications
+            let notifications = await getAllNotifications({
+                id: true,
+                type: true,
+                title: true,
+                message: true,
+                link: true,
+                createdAt: true,
+                updatedAt: true,
+                lastViewedAt: true,
+            })
+            if (notifications.success && notifications.data) {
+                initializeNotificationsState({
+                    notifications: notifications.data
+                })
+                console.log(`Notificaions initialized...`)
+            } else {
+                console.error(notifications.error)
+                toast.error(notifications.error)
             }
         }
 
