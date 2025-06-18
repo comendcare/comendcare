@@ -29,6 +29,11 @@ import MultipleSelector from "./ui/multiple-selector"
 import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN_TYPES } from "@/lib/types"
 import { mixpanelTrack } from "@/mixpanel"
 import { JsonObject } from "@prisma/client/runtime/library"
+import Loading from "@/loading"
+import ComendLoadingSpinner from "./comend-loading-spinner"
+import Spinner from "./ui/spinner"
+import Image from "next/image"
+import logo from "@/public/Full logo.png"
 
 const editResearchPlanForm = z.object({
     title: z
@@ -61,6 +66,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
         details,
         setDetails
     } = useRoadmapStore(useShallow(selector))
+    const [isLoading, setIsLoading] = useState(false)
 
     const form = useForm<z.infer<typeof editResearchPlanForm>>({
         mode: "onChange",
@@ -121,7 +127,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             }
         }
     }
-
+    
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
@@ -223,37 +229,47 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Are you absolutely sure?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your Resarch Plan and it's data.`}
-                                    </DialogDescription>
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <Button type="button">
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
-                                        <DialogClose>
+                                {isLoading ? (
+                                    <div className="flex flex-col space-y-8 py-8 items-center justify-center">
+                                        <Spinner className="scale-150" />
+                                        <div className="w-1/6 min-w-40">
+                                            <Image priority src={logo} alt="Comend logo" />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Are you absolutely sure?
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {`This action cannot be undone. This will permanently delete your Resarch Plan and it's data.`}
+                                        </DialogDescription>
+                                        <DialogFooter>
+                                            <DialogClose>
+                                                <Button type="button">
+                                                    Cancel
+                                                </Button>
+                                            </DialogClose>
                                             <Button
                                                 type="button"
                                                 variant={"destructive"}
                                                 onClick={async () => {
                                                     // delete research plan, and reroute the user back to the research plans page
                                                     if (researchPlanData?.id) {
-                                                        const roadmap = await deleteRoadmap(session?.user.organizationId, researchPlanData)
+                                                        setIsLoading(true)
+                                                        await deleteRoadmap(session?.user.organizationId, researchPlanData)
                                                         router.push('/app/research-plan')
-                                                        router.refresh()
+                                                        // router.refresh()
                                                     }
                                                 }}
                                             >
                                                 Delete Research Plan
                                             </Button>
-                                        </DialogClose>
-                                    </DialogFooter>
-                                </DialogHeader>
+                                        </DialogFooter>
+                                    </DialogHeader>
+                                    </>
+                                )}
                             </DialogContent>
                         </Dialog>
                     ) : (
