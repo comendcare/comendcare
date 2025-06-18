@@ -1,7 +1,5 @@
-import {getRoadmaps} from "@/lib/fetchers"
 import {getSession} from "@/lib/auth"
 import NoOrganization from "@/components/no-organization";
-import { Roadmap } from "@prisma/client";
 import RoadmapsPage from "@/components/roadmaps-page";
 
 export default async function RoadmapPage() {
@@ -12,33 +10,7 @@ export default async function RoadmapPage() {
         return <NoOrganization />
     }
 
-    let roadmaps: Roadmap[] = []
-
-    const response = await getRoadmaps(orgId, {
-        id: true,
-        title: true,
-        description: true,
-        content: true,
-        slug: true,
-        image: true,
-        createdAt: true,
-        updatedAt: true,
-        published: true,
-        organizationId: true,
-        userId: true,
-        edges: true,
-        milestones: true,
-        nodes: true,
-        organization: true,
-        user: true,
-        modalities: true,
-        metadata: true,
-    })
-    if (response.success && response.data) {
-        roadmaps = response.data
-    }
-
     return (
-        <RoadmapsPage roadmaps={roadmaps} orgId={orgId}/>
+        <RoadmapsPage orgId={orgId}/>
     )
 }

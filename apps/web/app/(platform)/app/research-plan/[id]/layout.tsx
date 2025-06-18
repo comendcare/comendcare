@@ -18,6 +18,7 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
 
     useEffect(() => {
         const init = async () => {
+            console.log(`init research plan for org: ${session?.user.organizationId}`)
             const response = await getRoadmap(session?.user.organizationId, params.id, {
                 id: true,
                 title: true,
