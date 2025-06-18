@@ -1,7 +1,7 @@
 "use client"
 
-import { getRoadmap } from "@/lib/fetchers"
-import { initializeRoadmapState } from "@/lib/initialize-client-state"
+import { getAllNotifications, getRoadmap } from "@/lib/fetchers"
+import { initializeNotificationsState, initializeRoadmapState } from "@/lib/initialize-client-state"
 import { useSession } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import { useEffect } from "react"
@@ -54,6 +54,28 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
                     })
 
                     console.log(`Research Plan initialized...`)
+
+
+                    // Init notifications
+                    let notifications = await getAllNotifications({
+                        id: true,
+                        type: true,
+                        title: true,
+                        message: true,
+                        link: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        lastViewedAt: true,
+                    })
+                    if (notifications.success && notifications.data) {
+                        initializeNotificationsState({
+                            notifications: notifications.data
+                        })
+                    } else {
+                        console.error(notifications.error)
+                        toast.error(notifications.error)
+                    }
+                    console.log(`Notificaions initialized...`)
                 } else {
                     console.error(response.error)
                     toast.error(response.error)
