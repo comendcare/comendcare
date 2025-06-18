@@ -27,6 +27,7 @@ import ShareDialog from "@/components/share-dialog";
 import {Button} from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import Loading from "@/loading";
 
 export default function PAGProfilePage() {
     const {data: session} = useSession() 
@@ -35,6 +36,7 @@ export default function PAGProfilePage() {
     const [roadmaps, setRoadmaps] = useState<any[]>([])
     const [tools, setTools] = useState<any[]>([])
     const [rfps, setRfps] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState<boolean>(true)
 
     useEffect(() => {
         const init = async () => {
@@ -175,10 +177,14 @@ export default function PAGProfilePage() {
                 setTools(tools)
                 setRfps(rfps)
             }
+
+            setIsLoading(false)
         }
 
         init()
     }, [session])
+
+    if (isLoading) return <Loading />
     
     if (organization) {
         return (
