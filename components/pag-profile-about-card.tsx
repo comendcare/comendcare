@@ -189,7 +189,8 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                 </Link>
                             }
                         </div>
-                        {organization?.members ? organization?.members.map((member, index) =>
+                        {/*Don't show member if name isn't specified*/}
+                        {organization?.members ? organization?.members.filter(member => member.user?.name).map((member, index) =>
                                 <div
                                     key={index}
                                     className="flex items-center space-x-4"
