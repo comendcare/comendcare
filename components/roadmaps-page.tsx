@@ -12,17 +12,18 @@ import { Button } from "./ui/button";
 import { Ellipsis, Share } from "lucide-react";
 import { Dialog, DialogContent } from "./ui/dialog";
 import ShareDialog from "./share-dialog";
-import { getOrganizationFromOrganizationId } from "@/lib/fetchers";
+import { getOrganizationFromOrganizationId, getRoadmaps } from "@/lib/fetchers";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { mixpanelTrack } from "@/mixpanel";
 
-export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], orgId: string}) {
+export default function RoadmapsPage({orgId}: {orgId: string}) {
     const router = useRouter()
     const {data: session, status} = useSession()
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const [organization, setOrganization] = useState<Organization | {}>({})
+    const [roadmaps, setRoadmaps] = useState<Roadmap[]>([])
 
     useEffect(() => {
         // un-initialize any active research plans
@@ -102,10 +103,35 @@ export default function RoadmapsPage({roadmaps, orgId}: {roadmaps: Roadmap[], or
                         toast.error(response.error)
                     }
 
+                    const roadmapsResponse = await getRoadmaps(session.user.organizationId, {
+                        id: true,
+                        title: true,
+                        description: true,
+                        content: true,
+                        slug: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        published: true,
+                        organizationId: true,
+                        userId: true,
+                        edges: true,
+                        milestones: true,
+                        nodes: true,
+                        organization: true,
+                        user: true,
+                        modalities: true,
+                        metadata: true,
+                    })
+                    if (roadmapsResponse.success && roadmapsResponse.data) {
+                        setRoadmaps(roadmapsResponse.data)
+                    }
+
                 } catch (error) {
                     console.error("Error fetching organizations:", error);
                     toast.error("Couldn't get organizations");
                 }
+                setIsLoading(false)
             }
         }
 

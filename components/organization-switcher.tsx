@@ -66,7 +66,10 @@ export function OrganizationSwitcher({
         });
         if (pathname === "/app/profile") {
             router.refresh(); // Stay and refresh
+            // window.location.reload()
         } else {
+            // window.location.reload()
+            // router.refresh()
             router.push("/app/profile"); // Navigate if not already there
         }
     };
