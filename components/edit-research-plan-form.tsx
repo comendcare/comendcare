@@ -80,6 +80,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
     })
 
     const handleFormSubmit = async (values: z.infer<typeof editResearchPlanForm>) => {
+        setIsLoading(true)
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
             return
@@ -127,6 +128,15 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
             }
         }
     }
+
+    if (isLoading) return (
+        <div className="h-full w-full flex flex-col space-y-8 items-center justify-center">
+            <Spinner className="scale-150" />
+            <div className="w-1/6 min-w-40">
+                <Image priority src={logo} alt="Comend logo" />
+            </div>
+        </div>
+    )
     
     return (
         <Form {...form}>
