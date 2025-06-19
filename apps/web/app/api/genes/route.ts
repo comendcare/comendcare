@@ -18,6 +18,9 @@ export async function GET(req: Request) {
                 },
             },
             take: 50, // Limit the number of results
+            select: {
+                symbol: true, // Only need symbols for this request
+            },
         });
 
         // Format the results for the MultipleSelector
