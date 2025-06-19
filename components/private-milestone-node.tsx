@@ -71,8 +71,10 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
         }
         // Skip right clicks
         if (event instanceof MouseEvent && event.button === 2) return
+        // skip if user had meta (ctrl/cmd), ctrl, or alt key held down
+        if (event.metaKey || event.ctrlKey || event.altKey) return
 
-        if (selectedNodeIds.length > 1 && !event.metaKey && props.id && selectedNodeIds.includes(props.id)) {
+        if (selectedNodeIds.length > 1 && props.id && selectedNodeIds.includes(props.id)) {
             setSelectedNodeIds([])
         }
     }

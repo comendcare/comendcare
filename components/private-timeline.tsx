@@ -227,8 +227,10 @@ const DraggableTimelineItem = ({
         }
         // Skip right clicks
         if (event instanceof MouseEvent && event.button === 2) return
+        // If the user has the meta (ctrl/cmd) key, ctrl key, or alt key held down skip
+        if (event.metaKey || event.ctrlKey || event.altKey) return
 
-        if (selectedNodeIds.length > 1 && !event.metaKey && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
+        if (selectedNodeIds.length > 1 && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
             setSelectedNodeIds([])
         }
     }
