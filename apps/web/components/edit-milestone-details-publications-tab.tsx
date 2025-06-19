@@ -1,37 +1,39 @@
 "use client"
 import React, {useEffect, useState} from "react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { MatchCard } from "~web/components/match-card"
-import { toast } from "sonner"
+import {ScrollArea} from "@/components/ui/scroll-area"
+import {Separator} from "@/components/ui/separator"
+import Spinner from "@/components/ui/spinner"
+import {MatchCard} from "~web/components/match-card"
+import {toast} from "sonner"
 import {getTopPubMedPublications} from "@/lib/fetchers";
 import {PubMedPublication} from "~web/types/types";
 
 
 export default function EditMilestoneDetailsPublicationsTab() {
     const [publications, setPublications] = useState<PubMedPublication[]>()
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function fetchPublicationsData() {
             try {
                 const response = await getTopPubMedPublications()
-
-                // Map the response to the correct structure if needed
                 if (response?.success && response?.data) {
-                    setPublications(response?.data);
+                    setPublications(response.data)
                 } else {
-                    console.error(response?.error)
-                    toast.error(response?.error)
+                    toast.error(response?.error ?? "Failed to fetch publications")
+                    setPublications([])
                 }
-
             } catch (error) {
-                console.error("Error fetching organizations:", error);
-                toast.error("Couldn't get organizations");
+                console.error("Error fetching publications:", error)
+                toast.error("Couldn't fetch publications")
+                setPublications([])
+            } finally {
+                setLoading(false)
             }
         }
 
         fetchPublicationsData()
-    }, []);
+    }, [])
 
     return (
         <ScrollArea
@@ -39,10 +41,23 @@ export default function EditMilestoneDetailsPublicationsTab() {
             type="always"
         >
             <div>
+                {loading && (
+                    <div className="w-full flex justify-center items-center py-12 text-muted-foreground">
+                        <Spinner/>
+                        <span className="ml-2">Getting the latest relevant publications...</span>
+                    </div>
+                )}
+
+                {!loading && publications?.length === 0 && (
+                    <div className="w-full text-center py-12 text-muted-foreground">
+                        No relevant publications were found for your milestone.
+                    </div>
+                )}
+
                 {publications?.map((publication: PubMedPublication) => {
                         return (
                             <React.Fragment key={publication.id}>
-                                <div className="px-4 py-2" >
+                                <div className="px-4 py-2">
                                     <MatchCard
                                         title={publication.title}
                                         authors={publication.authors}
@@ -56,7 +71,7 @@ export default function EditMilestoneDetailsPublicationsTab() {
                                         saved={false}
                                     />
                                 </div>
-                                <Separator className="my-2" />
+                                <Separator className="my-2"/>
                             </React.Fragment>
                         )
                     }
