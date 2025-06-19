@@ -14,15 +14,17 @@ import {
     Factory,
     MapPin,
     Rocket,
-    University
+    University,
+    Dna,
+    HeartHandshake,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import {companyTypeMap} from "@/components/marketplace-cro-card";
 import {buttonVariants} from "@/components/ui/button";
 import mixpanel from "mixpanel-browser";
-import { Button } from "./plate-ui/button";
-import { ServiceProviderWebsiteButton } from "./service-provider-website-button";
+import {Button} from "./plate-ui/button";
+import {ServiceProviderWebsiteButton} from "./service-provider-website-button";
 
 
 const companyTypeIcons: Record<string, JSX.Element> = {
@@ -43,7 +45,7 @@ export default async function CROPageHeader({id}: { id: string }) {
         title: true,
         description: true,
         yearEstablished: true,
-        website: true, 
+        website: true,
         headquarters: true,
         companyType: true,
         sites: true,
@@ -167,10 +169,18 @@ export default async function CROPageHeader({id}: { id: string }) {
                             {cro.tags.map((tag, index) => (
                                 <span
                                     key={index}
-                                    className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
+                                    className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 font-medium text-muted-foreground shadow-sm"
                                 >
-                {tag}
-            </span>
+                                    {tag === "Experienced in rare disease" && (
+                                        <Dna className="h-3.5 w-3.5 shrink-0"/>
+                                    )}
+                                    {tag === "PAG friendly" && (
+                                        <HeartHandshake className="h-3.5 w-3.5 shrink-0"/>
+                                    )}
+                                    <span className="truncate">
+                                            {tag}
+                                        </span>
+                                    </span>
                             ))}
                         </div>
                     )}
@@ -183,7 +193,7 @@ export default async function CROPageHeader({id}: { id: string }) {
                 )}
             </div>
             <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
-                <ServiceProviderWebsiteButton cro={cro} />
+                <ServiceProviderWebsiteButton cro={cro}/>
                 <SaveCRODialog cro={cro} type={"page"} location={"Service Provider Profile"}/>
             </div>
         </div>
