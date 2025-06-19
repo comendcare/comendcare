@@ -35,8 +35,8 @@ function parseRelationMap(schema: string): Record<string, Record<string, string>
     return relationMap;
 }
 
-// Step 2: Build recursive include up to a max depth to avoid infinite loops
-function buildIncludeRecursive(
+// Step 2: Build include, to ensure all relations are included
+function buildInclude(
   relationMap: Record<string, Record<string, string>>,
   modelName: string,
   depth = 2
@@ -47,6 +47,8 @@ function buildIncludeRecursive(
   for (const [fieldName, relatedModelName] of Object.entries(relationMap[modelName])) {
     includes[fieldName] = true
   }
+
+  console.log(includes)
 
   return includes;
 }
@@ -62,7 +64,7 @@ async function exportAllModelsToJSON() {
   );
 
   for (const modelName of modelNames) {
-    const include = buildIncludeRecursive(relationMap, modelName.toLowerCase(), 2);
+    const include = buildInclude(relationMap, modelName.toLowerCase(), 2);
     const data = await (prisma as any)[modelName].findMany({ include });
     output[modelName] = data;
   }
