@@ -227,15 +227,17 @@ const DraggableTimelineItem = ({
         }
         // Skip right clicks
         if (event instanceof MouseEvent && event.button === 2) return
+        // If the user has the meta (ctrl/cmd) key, ctrl key, or alt key held down skip
+        if (event.metaKey || event.ctrlKey || event.altKey) return
 
-        if (selectedNodeIds.length > 1 && !event.metaKey && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
+        if (selectedNodeIds.length > 1 && milestone.nodeId && selectedNodeIds.includes(milestone.nodeId)) {
             setSelectedNodeIds([])
         }
     }
 
     useEffect(() => {
         // if only one project is selected, we automatically scroll to that project so it's visible in the view
-        if (selectedNodeIds.length === 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
+        if (selectedNodeIds.length >= 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
             const el = elementRef.current;
             if (!el) return;
 

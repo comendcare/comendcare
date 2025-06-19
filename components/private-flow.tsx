@@ -145,6 +145,7 @@ export const PrivateFlowView = ({
       }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
+        if (event.ctrlKey || event.altKey) return
         if (event.metaKey) {
             // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
             if (node.id && !selectedNodeIds.includes(node.id)) {
