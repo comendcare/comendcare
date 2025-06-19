@@ -37,7 +37,7 @@ export default function EditMilestoneDetailsPublicationsTab() {
 
     return (
         <ScrollArea
-            className="w-full h-[calc(65vh)]"
+            className="w-full h-[calc(75vh)]"
             type="always"
         >
             <div>
