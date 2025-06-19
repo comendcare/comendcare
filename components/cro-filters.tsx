@@ -81,15 +81,23 @@ export function CROFilters() {
         params.delete("certifications")
         if (values.certifications && values.certifications.length > 0) params.set("certifications", stringify(values.certifications))
 
+        params.delete("tags")
+        if (values.tags && values.tags.length > 0) params.set("tags", stringify(values.tags))
+
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }
 
     useEffect(() => {
-        const subscription = form.watch(() => form.handleSubmit(handleSubmit)())
+        const subscription = form.watch((values, { name }) => {
+            if (name) {
+                handleSubmit(values as any)
+            }
+        })
+
         return () => subscription.unsubscribe()
-    }, [handleSubmit, form.watch])
+    }, [form.watch])
 
     return (
         <Form {...form}>

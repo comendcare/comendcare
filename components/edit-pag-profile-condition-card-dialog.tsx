@@ -173,13 +173,32 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
         editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
     }
 
-    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
+    const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
 
         setLoading(true);
 
         try {
             const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
             const data = await response.json();
 
             // Return the fetched options
@@ -302,7 +321,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
-                                                    onSearch={handleAsyncSearch}
+                                                    onSearch={handleGeneAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}
                                                     loadingIndicator={<p>Loading genes...</p>}
@@ -344,7 +363,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
-                                                    onSearch={handleAsyncSearch}
+                                                    onSearch={handleGeneAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}
                                                     loadingIndicator={<p>Loading genes...</p>}
