@@ -2,43 +2,73 @@ import fs from 'fs'
 import prisma from "@/lib/prisma"
 export const dynamic = 'force-dynamic'; // Prevent caching
 
-
-async function exportResearchPlan(researchPlanId: string) {
-    const researchPlan = await prisma?.roadmap.findUnique({
-        where: {id: researchPlanId},
-        include: {
-            milestones: {include: {types: true}},
-            nodes: true,
-            edges: true,
-        }
-    })
-
-    console.log(`Exporting research plan with data:`, researchPlan)
-
-    const jsonString = JSON.stringify(researchPlan, null, 4) // convert to JSON with indentation
-    const homeDir = require('os').homedir()
-    const desktopDir = `${homeDir}/Desktop` 
-
-    fs.writeFileSync(`${desktopDir}/${researchPlan?.title}-${researchPlan?.id}.json`, jsonString)
+async function getPrismaSchema() {
+    return fs.readFileSync('./prisma/schema.prisma', 'utf8');
 }
 
-async function exportFunc() {
-    var args = process.argv.slice(2)
+// Step 1: Parse relation field names and their corresponding model types
+function parseRelationMap(schema: string): Record<string, Record<string, string>> {
+    const modelRegex = /model\s+(\w+)\s+{([\s\S]*?)}/g;
+    const relationFieldRegex = /^\s+(\w+)\s+(\w+)(\[\])?(?!\s+@default|\s+@id|\s+@unique|\s+@map|\s+@updatedAt|\s+@createdAt).*$/gm;
 
-    await Promise.all(args.map(async (arg) => {
-        try {
-            if (typeof arg !== 'string') throw new Error('Invalid arg format. Ensure all args are strings representing a research plan ID in the active database.')
-            
-            await exportResearchPlan(arg)
-        } catch (e) {
-            console.error(`Error exporing research plan (${arg}): ${e}`)
+    const relationMap: Record<string, Record<string, string>> = {};
+    const modelNames = Array.from(schema.matchAll(/model\s+(\w+)/g)).map(m => m[1]);
+
+    let modelMatch;
+    while ((modelMatch = modelRegex.exec(schema)) !== null) {
+        const modelName = modelMatch[1];
+        const modelBody = modelMatch[2];
+        const fields: Record<string, string> = {};
+
+        let fieldMatch;
+        while ((fieldMatch = relationFieldRegex.exec(modelBody)) !== null) {
+        const fieldName = fieldMatch[1];
+        const fieldType = fieldMatch[2];
+        if (modelNames.includes(fieldType)) {
+            fields[fieldName] = fieldType;
         }
-    }))
+        }
+
+        relationMap[modelName.toLowerCase()] = fields;
+    }
+
+    return relationMap;
 }
 
-// odylia research plan id: cm9ud3w9v0000zzb8a7osd7r5
-// megan's test research plan: cmah493yq0004gkyodk5j6m0p
+// Step 2: Build recursive include up to a max depth to avoid infinite loops
+function buildIncludeRecursive(
+  relationMap: Record<string, Record<string, string>>,
+  modelName: string,
+  depth = 2
+): any {
+  if (depth <= 0 || !relationMap[modelName]) return true;
 
-// example usage: npx tsx ./lib/export.ts <first research plan id> <second research plan id>
-// example usage: npx tsx ./lib/export.ts cmah493yq0004gkyodk5j6m0p
-exportFunc()
+  const includes: Record<string, any> = {};
+  for (const [fieldName, relatedModelName] of Object.entries(relationMap[modelName])) {
+    includes[fieldName] = true
+  }
+
+  return includes;
+}
+
+// Step 3: Export data with dynamic includes
+async function exportAllModelsToJSON() {
+  const schema = await getPrismaSchema();
+  const relationMap = parseRelationMap(schema);
+  const output: Record<string, any[]> = {};
+
+  const modelNames = Object.keys(prisma).filter(
+    (key) => typeof (prisma as any)[key]?.findMany === 'function'
+  );
+
+  for (const modelName of modelNames) {
+    const include = buildIncludeRecursive(relationMap, modelName.toLowerCase(), 2);
+    const data = await (prisma as any)[modelName].findMany({ include });
+    output[modelName] = data;
+  }
+
+  await fs.writeFile(`${require('os').homedir()}/Desktop/export.json`, JSON.stringify(output, null, 2), () => {});
+  console.log('Exported all models with relations!');
+}
+
+exportAllModelsToJSON()
