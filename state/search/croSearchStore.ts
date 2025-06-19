@@ -134,10 +134,10 @@ function generateFiltersString(filters: FiltersType): string {
 
     // Tags (Array Field)
     if (filters?.tags && filters.tags.length > 0) {
-        const certificationFilter = filters.certifications
+        const tagsFilter = filters.tags
             .map(tag => `tags:=[${escapeValue(tag.value)}]`)
             .join(" && ");
-        filtersList.push(`(${certificationFilter})`);
+        filtersList.push(`(${tagsFilter})`);
     }
 
     // Combine all filters with `&&`
