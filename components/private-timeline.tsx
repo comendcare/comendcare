@@ -237,7 +237,7 @@ const DraggableTimelineItem = ({
 
     useEffect(() => {
         // if only one project is selected, we automatically scroll to that project so it's visible in the view
-        if (selectedNodeIds.length === 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
+        if (selectedNodeIds.length >= 1 && milestone.nodeId && selectedNodeIds[0] === milestone.nodeId) {
             const el = elementRef.current;
             if (!el) return;
 
