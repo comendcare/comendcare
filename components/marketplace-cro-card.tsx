@@ -6,7 +6,7 @@ import {Company} from "@prisma/client";
 import {Separator} from "./ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "@/components/save-cro-dialog";
-import {Briefcase, Building, Building2, Factory, FileText, LucideProps, Rocket, Star, University} from "lucide-react";
+import {Briefcase, Building, Building2, Factory, FileText, Dna, Rocket, Star, University, HeartHandshake} from "lucide-react";
 import { Milestone } from "@/lib/types";
 import { PropertyBadge } from "./property-badge";
 
@@ -156,7 +156,29 @@ export function CROCardContents({cro}: { cro: Company }) {
             }
         >
             {Object.values(categoryCounts).some(count => count > 0) && (
-                <CardContent className="flex flex-col items-start justify-center">
+                <CardContent className="flex flex-col items-start justify-center space-y-4">
+                    <div>
+                        {cro.tags && cro.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 w-5/6">
+                                {cro.tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm"
+                                    >
+                                        {tag === "Experienced in rare disease" && (
+                                            <Dna className="h-3.5 w-3.5 shrink-0" />
+                                        )}
+                                        {tag === "PAG friendly" && (
+                                            <HeartHandshake className="h-3.5 w-3.5 shrink-0" />
+                                        )}
+                                        <span className="truncate">
+                                            {tag}
+                                        </span>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                     <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2">
                         {categoryLabels
                             // .filter(({key}) => categoryCounts[key] > 0)
