@@ -1853,6 +1853,8 @@ export const updateCondition = withOrganizationAuth(
                     where: {id: conditions[0].conditionId},
                     data,
                 });
+
+                revalidatePath("app/profile/");
                 return {success: true, data: updatedCondition};
             }
 

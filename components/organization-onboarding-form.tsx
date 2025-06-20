@@ -18,7 +18,7 @@ import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
-import {AutocompleteComponent} from "@/components/autocomplete";
+import {AddressAutocompleteComponent} from "@/components/address-autocomplete-component";
 import {AddressType, MODALITIES, Option} from "@/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";

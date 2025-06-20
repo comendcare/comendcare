@@ -62,7 +62,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name || "",
+                            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
                             causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
@@ -116,7 +116,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             // Map the form values to match the Condition schema
             const mappedData: Record<string, any> = {
-                name: values.disorder || "",
+                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
                 summary: values.summary || "",
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
@@ -204,7 +204,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             // Return the fetched options
             return data;
         } catch (error) {
-            console.error("Failed to fetch genes:", error);
+            console.error("Failed to fetch conditions:", error);
             return [];
         } finally {
             setLoading(false);
@@ -246,20 +246,18 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     name="disorder"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>{`Name of condition (required)`}</FormLabel>
-                                            {/*<div className="w-full flex flex-row justify-between">*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        {`The name of your rare condition/disorder.`}*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        60 characters max.*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*</div>*/}
+                                            <FormLabel>Name of condition (required)</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    id="disorder"
+                                                <MultipleSelector
                                                     {...field}
+                                                    creatable={true}
+                                                    maxSelected={1}
+                                                    onSearch={handleConditionAsyncSearch}
+                                                    placeholder="Search for conditions..."
+                                                    hidePlaceholderWhenSelected={true}
+                                                    loadingIndicator={<p>Loading conditions...</p>}
+                                                    emptyIndicator={<p>No conditions found.</p>}
+                                                    showHoverCard={false}
                                                 />
                                             </FormControl>
                                             <FormMessage/>
@@ -321,6 +319,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
+                                                    creatable={true}
                                                     onSearch={handleGeneAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}
@@ -363,6 +362,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
+                                                    creatable={true}
                                                     onSearch={handleGeneAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}

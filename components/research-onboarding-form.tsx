@@ -27,13 +27,7 @@ export const optionSchema = z.object({
 });
 
 export const researchFormSchema = z.object({
-    disorder: z.string()
-        .min(2, {
-            message: "The name of your condition needs to be longer than 2 characters",
-        })
-        .max(60, {
-            message: "The name of your condition needs to be shorter than 60 characters",
-        }),
+    disorder: z.array(optionSchema).optional(),
     summary: z.string()
         // .min(30, {
         //     message: "The summary of your condition needs to be longer than 30 characters",
@@ -101,7 +95,7 @@ export default function ResearchOnboardingForm(
 
             // Map form values into FormData
             const data = {
-                name: values.disorder || "",
+                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
                 summary: values.summary || "",
                 diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
@@ -242,6 +236,25 @@ export default function ResearchOnboardingForm(
         fetchOrganization();
     }, [setOrganization, session?.user?.organizationId, status])
 
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <TooltipProvider>
             <div className="relative grid grid-cols-2 gap-x-8">
@@ -254,20 +267,18 @@ export default function ResearchOnboardingForm(
                                 name="disorder"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Name of condition (required)`}</FormLabel>
-                                        {/*<div className="w-full flex flex-row justify-between">*/}
-                                        {/*    <FormDescription>*/}
-                                        {/*        {`The name of your rare condition/disorder.`}*/}
-                                        {/*    </FormDescription>*/}
-                                        {/*    <FormDescription>*/}
-                                        {/*        60 characters max.*/}
-                                        {/*    </FormDescription>*/}
-                                        {/*</div>*/}
+                                        <FormLabel>Name of condition (required)</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="disorder"
+                                            <MultipleSelector
                                                 {...field}
+                                                creatable={true}
+                                                maxSelected={1}
+                                                onSearch={handleConditionAsyncSearch}
+                                                placeholder="Search for conditions..."
+                                                hidePlaceholderWhenSelected={true}
+                                                loadingIndicator={<p>Loading conditions...</p>}
+                                                emptyIndicator={<p>No conditions found.</p>}
+                                                showHoverCard={false}
                                             />
                                         </FormControl>
                                         <FormMessage/>

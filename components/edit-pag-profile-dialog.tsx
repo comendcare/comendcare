@@ -14,14 +14,14 @@ import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {FileWithPreview, ImageSelector} from "@/components/image-selector";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
 import {Button} from "@/components/ui/button";
-import {AutocompleteComponent} from "@/components/autocomplete";
+import {AddressAutocompleteComponent} from "@/components/address-autocomplete-component";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {
     checkSubdomainAvailability, getConditionsFromOrganizationId,
     getOrganizationFromOrganizationId,
 } from "@/lib/fetchers";
-import {Pen, Upload, MessageCircleQuestion} from "lucide-react";
+import {Pen, Upload, MessageCircleQuestion, Info} from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -565,6 +565,25 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
         }
     };
 
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <TooltipProvider>
             <Dialog open={open} onOpenChange={(isOpen) => {
@@ -963,20 +982,18 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="disorder"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Name of condition (required)`}</FormLabel>
-                                                {/*<div className="w-full flex flex-row justify-between">*/}
-                                                {/*    <FormDescription>*/}
-                                                {/*        {`The name of your rare condition/disorder.`}*/}
-                                                {/*    </FormDescription>*/}
-                                                {/*    <FormDescription>*/}
-                                                {/*        60 characters max.*/}
-                                                {/*    </FormDescription>*/}
-                                                {/*</div>*/}
+                                                <FormLabel>Name of condition (required)</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        type="text"
-                                                        id="disorder"
+                                                    <MultipleSelector
                                                         {...field}
+                                                        creatable={true}
+                                                        maxSelected={1}
+                                                        onSearch={handleConditionAsyncSearch}
+                                                        placeholder="Search for conditions..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading conditions...</p>}
+                                                        emptyIndicator={<p>No conditions found.</p>}
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
