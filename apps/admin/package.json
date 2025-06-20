@@ -203,9 +203,7 @@
     "use-file-picker": "^2.1.2",
     "zod": "^3.23.8",
     "zundo": "^2.2.0",
-    "zustand": "^4.5.5"
-  },
-  "devDependencies": {
+    "zustand": "^4.5.5",
     "@next/bundle-analyzer": "^15.3.3",
     "@prisma/studio": "^0.511.0",
     "@types/canvas-confetti": "^1.6.4",
@@ -231,5 +229,7 @@
     "tsx": "^4.19.4",
     "turbo": "^2.5.4",
     "typescript": "^5.2.2"
+  },
+  "devDependencies": {
   }
 }
