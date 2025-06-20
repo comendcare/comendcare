@@ -607,6 +607,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                         ))}
                                                     </CommandGroup>
                                                 ))}
+
                                             </>
                                         ) : (
                                             <CommandGroup className="h-full">
@@ -616,6 +617,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             </CommandGroup>
                                         )}
                                     </ScrollArea>
+                                    {CreatableItem()}
                                 </div>
                             )}
                         </CommandList>

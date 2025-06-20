@@ -3,19 +3,19 @@
 import AddressAutoComplete from "@/components/address-autocomplete";
 import { AddressType } from "@/lib/types";
 
-interface AutocompleteComponentProps {
+interface AddressAutocompleteComponentProps {
     address: AddressType;
     setAddress: (address: AddressType) => void;
     searchInput: string;
     setSearchInput: (input: string) => void;
 }
 
-export const AutocompleteComponent = ({
+export const AddressAutocompleteComponent = ({
                                           address,
                                           setAddress,
                                           searchInput,
                                           setSearchInput
-                                      }: AutocompleteComponentProps) => {
+                                      }: AddressAutocompleteComponentProps) => {
     return (
         <AddressAutoComplete
             address={address}
