@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
     useEffect(() => {
 
         if (session) {
-            router.push("/app/admin")
+            router.push("/admin")
         }
 
         // Check cookie manually
