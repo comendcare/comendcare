@@ -1,12 +1,12 @@
 import prisma from "@/lib/prisma";
 import fs from "fs/promises";
-import { toKebabCase } from "@/lib/utils"
+import {toKebabCase} from "@/lib/utils"
 
 async function main() {
     console.log("Starting condition seed script...");
 
     // Load the JSON data
-    const data = JSON.parse(await fs.readFile("data/conditions.json", "utf-8"));
+    const data = JSON.parse(await fs.readFile("data/orphanet-conditions.json", "utf-8"));
 
     console.log(`Total conditions to process: ${data.length}`);
 
@@ -21,9 +21,7 @@ async function main() {
                     name: condition.name,
                     slug,
                     description: condition.description || null,
-                    metadata: {
-                        synonyms: condition.synonyms || [],
-                    },
+                    synonyms: condition.synonyms || [],
                 },
             });
 
