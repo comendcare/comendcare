@@ -14,46 +14,10 @@ import { getNotionDatabaseAndContents } from "@/lib/notion"
 import { Blog, BlogCard } from "@/components/layout/sections/news"
 import Loading from "@/loading";
 import { Skeleton } from "@/components/ui/skeleton"
+import { useGuides } from "./guides-context"
 
 export default function FAQ() {
-    const [filteredPages, setFilteredPages] = useState<Blog[]>([])
-
-    useEffect(() => {
-        const init = async () => {
-            const faqDBKey = '1f3801a6fddc8010b610f8175f5cccf9'
-            const {pages} = await getNotionDatabaseAndContents(faqDBKey, {sorts: [{property: 'Order', direction: 'ascending'}]})
-
-            const filteredPages: Blog[] = pages
-                .map((page: any) => {
-                    // depending on the page Status, show or hide it
-                    if (process.env.NEXT_PUBLIC_NODE_ENV === 'production' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)')) {
-                        return null
-                    }
-
-                    // if (process.env.NEXT_PUBLIC_NODE_ENV === 'development' && !(page?.properties?.["Status"]?.status?.name === 'Published (in production)' || page?.properties?.["Status"]?.status?.name === 'Ready to Deploy (in preview)')) {
-                    //     return null
-                    // }
-
-                    const title = page?.properties?.["Name"]?.title?.map((text: any) => text?.plain_text)?.join(" ")
-                    const description = page.properties["Description"].rich_text.map((text: any) => text.plain_text).join("\n")
-                    const slug = `/app/guides/${page.id}`
-                    const image = page?.cover?.external?.url || page?.cover?.file?.url || ''
-                    const author = page.properties["Author"].people[0].name
-                    const authorAvatar = page.properties["Author"].people[0].avatar_url
-                    const publishDate = new Date(page.properties["Publication Date"].date.start)
-                    const section = page.properties.Section.select.name
-
-                    if (!title || !slug || !author || !authorAvatar || !publishDate) return null
-                    return {title, description: description || '', slug, image, author, authorAvatar, date: publishDate, section}
-                })
-                .filter((page) => page !== null)
-                .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-
-            setFilteredPages(filteredPages)
-        }
-
-        init()
-    }, [])
+    const { guides } = useGuides()
 
     return (
         <div className="mx-auto space-y-16">
@@ -72,7 +36,7 @@ export default function FAQ() {
                 </div>
             </div>
 
-            <FAQSections pages={filteredPages} />
+            <FAQSections pages={guides} />
         </div>
     )
 }
