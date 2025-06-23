@@ -11,7 +11,6 @@ import {User} from "next-auth";
 import {toast} from "sonner"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
-const NEXT_PUBLIC_ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -98,26 +97,21 @@ export const authOptions: NextAuthOptions = {
     },
     adapter: PrismaAdapter(prisma as PrismaClient),
     session: {strategy: "jwt"},
-    ...(NEXT_PUBLIC_ROOT_DOMAIN === "admin.comend.io"
-            ? {} // ❌ don't override cookies on admin.comend.io
-            : {
-                cookies: {
-                    sessionToken: {
-                        name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.session-token`,
-                        options: {
-                            httpOnly: true,
-                            sameSite: "lax",
-                            path: "/",
-                            // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
-                            domain: VERCEL_DEPLOYMENT
-                                ? `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                                : undefined,
-                            secure: VERCEL_DEPLOYMENT
-                        }
-                    }
-                },
+    cookies: {
+        sessionToken: {
+            name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
+                domain: VERCEL_DEPLOYMENT
+                    ? `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : undefined,
+                secure: VERCEL_DEPLOYMENT
             }
-    ),
+        }
+    },
 
     callbacks: {
 
