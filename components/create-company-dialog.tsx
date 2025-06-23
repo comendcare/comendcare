@@ -294,7 +294,7 @@ export function CreateCompanyDialog() {
                             name="tags"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                    <FormLabel>
                                         Tags
                                     </FormLabel>
                                     <FormControl>
