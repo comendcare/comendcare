@@ -1,9 +1,10 @@
 "use client"
 import { EditResearchPlanForm } from "@/components/edit-research-plan-form"
 import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
 import Spinner from "@/components/ui/spinner"
 import { useState } from "react"
+import Image from "next/image"
+import logo from "@/public/Full logo.png"
 
 export default function CreateResearchPlanPage() {
     const [isLoading, setIsLoading] = useState(false)
@@ -11,12 +12,13 @@ export default function CreateResearchPlanPage() {
     if (isLoading) {
         return (
             <div className="h-full w-full p-10 gap-4">
-                <Skeleton className="h-full w-full flex flex-col gap-8 items-center justify-center">
-                    <div className="flex flex-col space-y-8 items-center justify-center">
+                    <div className="h-full flex flex-col space-y-8 items-center justify-center">
                         <Spinner className="scale-150" />
+                        <div className="w-1/6 min-w-40">
+                            <Image priority src={logo} alt="Comend logo" />
+                        </div>
+                        <p>Creating your research plan</p>
                     </div>
-                    <p>Creating your research plan...</p>
-                </Skeleton>
             </div>
         )
     }
