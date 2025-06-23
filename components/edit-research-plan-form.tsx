@@ -58,7 +58,7 @@ const selector = (state: RoadmapState) => ({
     setDetails: state.setDetails
 })
 
-export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchPlanData?: Partial<Roadmap>, closeDialog?: () => void}) {
+export function EditResearchPlanForm({researchPlanData, closeDialog, setIsSubmitting}: {researchPlanData?: Partial<Roadmap>, closeDialog?: () => void, setIsSubmitting?: (submitting: boolean) => void}) {
     const router = useRouter()
     const {data: session} = useSession()
     const { 
@@ -81,6 +81,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog}: {researchP
 
     const handleFormSubmit = async (values: z.infer<typeof editResearchPlanForm>) => {
         setIsLoading(true)
+        if (setIsSubmitting) setIsSubmitting(true)
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
             return

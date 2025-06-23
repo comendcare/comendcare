@@ -53,10 +53,6 @@ export default function UserOnboardingForm() {
     const hasInvitations = invitations.length > 0;
 
     useEffect(() => {
-        console.log(`selected file`, selectedFile)
-    }, [selectedFile])
-
-    useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const response = await getInvitations({
