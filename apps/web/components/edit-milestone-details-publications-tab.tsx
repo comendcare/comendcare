@@ -7,6 +7,7 @@ import {MatchCard} from "~web/components/match-card"
 import {toast} from "sonner"
 import {getTopPubMedPublications} from "@/lib/fetchers";
 import {PubMedPublication} from "~web/types/types";
+import { Skeleton } from "@/components/ui/skeleton"
 
 
 export default function EditMilestoneDetailsPublicationsTab() {
@@ -42,9 +43,10 @@ export default function EditMilestoneDetailsPublicationsTab() {
         >
             <div>
                 {loading && (
-                    <div className="w-full flex justify-center items-center py-12 text-muted-foreground">
-                        <Spinner/>
-                        <span className="ml-2">Getting the latest relevant publications...</span>
+                    <div className="flex flex-col gap-4">
+                        <Skeleton className="w-full h-[230px]"/>
+                        <Skeleton className="w-full h-[230px]"/>
+                        <Skeleton className="w-full h-[230px]"/>
                     </div>
                 )}
 
