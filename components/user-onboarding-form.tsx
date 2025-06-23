@@ -27,6 +27,7 @@ import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { getPublicFile } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
+import { Skeleton } from "./ui/skeleton";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -51,6 +52,7 @@ export default function UserOnboardingForm() {
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [invitations, setInvitations] = useState<any[]>([]);
     const hasInvitations = invitations.length > 0;
+    const [isInitializing, setIsInitializing] = useState(true)
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -102,6 +104,7 @@ export default function UserOnboardingForm() {
             } catch (error) {
                 console.error("Failed to fetch user data:", error);
             }
+            setIsInitializing(false)
         };
 
         fetchUserData()
@@ -236,6 +239,7 @@ export default function UserOnboardingForm() {
                     form.reset(fetchedValues); // Reset form with fetched data
                 }
             }
+            setIsInitializing(false)
         }
 
         fetchUserData();
@@ -297,6 +301,18 @@ export default function UserOnboardingForm() {
         } finally {
             setLoading(false);
         }
+    }
+
+    if (isInitializing) {
+        return (
+            <div className="h-full w-full flex flex-col gap-2">
+                <Skeleton className="h-[20px] w-full"/>
+                <Skeleton className="h-[32px] w-full"/>
+                <Skeleton className="mt-4 h-[80px] w-full"/>
+                <Skeleton className="h-[80px] w-full"/>
+                <Skeleton className="mt-4 h-[40px] w-full"/>
+            </div>
+        )
     }
 
     return (
