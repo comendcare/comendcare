@@ -35,7 +35,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@/lib/types"
 import {badgeVariants} from "@/components/ui/badge";
 
 const optionSchema = z.object({
@@ -53,6 +53,7 @@ const formSchema = z.object({
     headquarters: z.string().optional(),
     services: z.array(optionSchema).optional(),
     certifications: z.array(optionSchema).optional(),
+    tags: z.array(optionSchema).optional(),
 })
 
 type CreateCompanyFormValues = z.infer<typeof formSchema>
@@ -94,6 +95,7 @@ export function CreateCompanyDialog() {
             const data = {
                 services: values.services?.map((service) => service.label).join(",") || "",
                 certifications: values.certifications?.map((cert) => cert.label).join(",") || "",
+                tags: values.tags?.map((tag) => tag.label).join(",") || "",
             };
 
             // Append data to FormData
@@ -275,6 +277,33 @@ export function CreateCompanyDialog() {
                                             defaultOptions={CRO_CERTIFICATIONS}
                                             hidePlaceholderWhenSelected={true}
                                             placeholder="Select relevant certifications..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="tags"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                        Tags
+                                    </FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            badgeClassName={badgeVariants({variant: "lightBlue"})}
+                                            defaultOptions={CRO_TAGS}
+                                            hidePlaceholderWhenSelected={true}
+                                            placeholder="Select relevant tags..."
                                             emptyIndicator={
                                                 <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                     no results found.

@@ -9,6 +9,7 @@ import ComendLoadingSpinner from "./comend-loading-spinner";
 import {CROMarketplaceCard} from "@/components/marketplace-cro-card";
 import {CROMarketplaceListElement} from "@/components/marketplace-cro-list-element";
 import { Card, CardContent } from "./ui/card";
+import { Skeleton } from "./ui/skeleton";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -56,7 +57,21 @@ export function CROSearchResults() {
         searchResults 
     } = useCROSearchStore(useShallow(selector))
 
-    if (!searchResults) return <ComendLoadingSpinner />
+    if (!searchResults) {
+        return (
+            <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+            </div>
+        )
+    }
+
     console.log(searchResults)
 
     const ResultsView = () => {

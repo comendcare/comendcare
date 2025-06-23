@@ -13,9 +13,9 @@ export default async function AdminLayout({children}: { children: ReactNode }) {
 
     // Redirect if the user is not signed in or not an admin, with a query parameter
     if (!session) {
-        redirect("/login/admin?error=unauthenticated");
+        redirect("/login?error=unauthenticated");
     } else if (!isAdmin) {
-        redirect("/login/admin?error=notAdmin");
+        redirect("/login?error=notAdmin");
     }
 
     return (

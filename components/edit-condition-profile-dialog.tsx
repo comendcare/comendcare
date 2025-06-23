@@ -487,6 +487,25 @@ export default function EditConditionProfileDialog() {
         )
     }
 
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <DialogHeader>
@@ -503,13 +522,38 @@ export default function EditConditionProfileDialog() {
                         name="disorder"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>{`Name of disorder`}</FormLabel>
-                                <FormDescription>{`The name of your rare disease/disorder.`}</FormDescription>
+                                <FormLabel>Name of condition (required)</FormLabel>
+                                <FormDescription>
+                                    {`Select all that apply.`}
+                                    <Tooltip delayDuration={0}>
+                                        {/*disabled to make the tooltip unclickable*/}
+                                        <TooltipTrigger disabled>
+                                            <Info
+                                                className="text-black inline-block align-baseline mx-1 h-4 w-4"/>
+                                        </TooltipTrigger>
+                                        <TooltipContent
+                                            side="right"
+                                            sideOffset={8}
+                                            avoidCollisions={false}
+                                            className="z-[9999] max-w-xs overflow-visible"
+                                        >
+                                            <p>
+                                                {`Causal genes are those that are known to directly cause your disorder.`}
+                                            </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </FormDescription>
                                 <FormControl>
-                                    <Input
-                                        type="text"
-                                        id="disorder"
+                                    <MultipleSelector
                                         {...field}
+                                        creatable={true}
+                                        maxSelected={1}
+                                        onSearch={handleConditionAsyncSearch}
+                                        placeholder="Search for conditions..."
+                                        hidePlaceholderWhenSelected={true}
+                                        loadingIndicator={<p>Loading conditions...</p>}
+                                        emptyIndicator={<p>No conditions found.</p>}
+                                        showHoverCard={false}
                                     />
                                 </FormControl>
                                 <FormMessage/>

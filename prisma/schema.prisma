@@ -570,6 +570,7 @@ model Condition {
   id                          String                    @id @default(cuid())
   name                        String
   slug                        String                    @unique
+  synonyms                    String[]
   description                 String?
   diseaseCategories           String[]
   prevalenceNumerator         Int?

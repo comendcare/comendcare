@@ -167,7 +167,7 @@ export interface OrganizationSearchState {
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void,
-    totalResults: number,
+    totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
 
@@ -283,7 +283,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     totalResults: total,
                 })
             },
-            totalResults: 0,
+            totalResults: undefined,
             setTotalResults: (total: number) => set({totalResults: total}),
         }),
         {

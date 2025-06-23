@@ -17,7 +17,8 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
     selectedView: state.selectedView,
     addNodes: state.addNodes,
-    addNodesFromTemplate: state.addNodesFromTemplate
+    addNodesFromTemplate: state.addNodesFromTemplate,
+    setSelectedNodeIds: state.setSelectedNodeIds
 })
 
 export type TabType = 'projects' | 'research-plans'
@@ -27,7 +28,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
         addMilestones,
         selectedView,
         addNodes,
-        addNodesFromTemplate
+        addNodesFromTemplate,
+        setSelectedNodeIds
     } = useRoadmapStore(useShallow(selector))
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [selectedResearchPlanTemplate, setSelectedResearchPlanTemplate] = useState<any | undefined>(undefined)
@@ -154,8 +156,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                 disabled={(tab === 'research-plans' && !selectedResearchPlanTemplate) || (tab === 'projects' && selectedMilestonesTemplate.length === 0) || milestoneTypes.length === 0}
                                 type="button"
                                 variant={"cta"}
-                                onClick={() => {
-                                    addMilestones(selectedMilestonesTemplate.map((template: any) => {
+                                onClick={async () => {
+                                    const newNodes = await addMilestones(selectedMilestonesTemplate.map((template: any) => {
                                         return ({
                                             nodeType: "PROJECT",
                                             title: template?.title,
@@ -171,6 +173,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             status: template?.status,
                                         })
                                     }), "Project Template")
+
+                                    if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
 
                                     if (selectedResearchPlanTemplate) {
                                         addNodesFromTemplate(selectedResearchPlanTemplate)

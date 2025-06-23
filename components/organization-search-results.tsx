@@ -10,6 +10,7 @@ import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { NoResultsView } from "./cro-search-results";
+import { Skeleton } from "./ui/skeleton";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -21,7 +22,20 @@ const selector = (state: OrganizationSearchState) => ({
 export function OrganizationSearchResults() {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useOrganizationSearchStore(useShallow(selector))
 
-    if (!searchResults) return <ComendLoadingSpinner />
+    if (!searchResults) {
+        return (
+            <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+                <Skeleton className="h-[286px] w-full"/>
+            </div>
+        )
+    }
 
     const ResultsView = () => {
         if (view === "list") {
