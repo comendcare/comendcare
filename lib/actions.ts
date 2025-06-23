@@ -3883,12 +3883,16 @@ export const createCompany = withAdminAuth(
         const url = formData.get("website") as string
         const servicesRaw = formData.get("services") as string
         const certificationsRaw = formData.get("certifications") as string
+        const tagsRaw = formData.get("tags") as string
 
         const parsedServices = servicesRaw
             ? servicesRaw.split(",").map((name) => name.trim())
             : []
         const parsedCertifications = certificationsRaw
             ? certificationsRaw.split(",").map((name) => name.trim())
+            : []
+        const parsedTags = tagsRaw
+            ? tagsRaw.split(",").map((name) => name.trim())
             : []
 
         const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices)
@@ -3919,6 +3923,7 @@ export const createCompany = withAdminAuth(
                         }
                         : undefined,
                     simplifiedCertifications: parsedCertifications,
+                    tags: parsedTags,
                     categories,
                     milestoneTypes,
                 },
