@@ -211,19 +211,32 @@ export const createCondition = withAuth(
             ? JSON.parse(metadataValue.toString()) as JsonObject
             : {}
 
-        // First check if condition already exists
-        const existingCondition = await prisma.condition.findUnique({
-            where: {slug}
-        });
-
-        if (existingCondition) {
-            return {success: true, data: existingCondition};
-        }
-
         // If it doesn't exist, create it
         try {
-            const condition = await prisma.condition.create({
-                data: {
+            const condition = await prisma.condition.upsert({
+                where: {
+                    slug,
+                },
+                update: {
+                    name,
+                    summary,
+                    slug,
+                    diseaseCategories,
+                    prevalenceNumerator,
+                    prevalenceDenominator,
+                    numberOfPatientsEngaged,
+                    nationalEstimatedPopulation,
+                    globalEstimatedPopulation,
+                    relevantDiseaseMechanisms,
+                    causalGenes,
+                    associatedGenes,
+                    associatedSystems,
+                    associatedSignsAndSymptoms,
+                    existingDatabasesAndStudies,
+                    toolsUnderDevelopment,
+                    metadata
+                },
+                create: {
                     name,
                     summary,
                     slug,
