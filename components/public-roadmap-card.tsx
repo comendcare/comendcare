@@ -1,6 +1,6 @@
 "use client"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {usePathname, useRouter} from "next/navigation";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {cn, getStage} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
 import {PublicFlowView} from "./public-flow";
@@ -88,6 +88,7 @@ export const RoadmapCard = ({
     isPublic: boolean ,
     externalLinks: boolean
 }) => {
+    const params = useSearchParams()
     if (!roadmap) {
         return <PublicNoResearchPlans />
     }
@@ -98,7 +99,7 @@ export const RoadmapCard = ({
 
     return (
         <Tabs
-            defaultValue={urlView === 'flow' ? 'flow' : 'timeline'}
+            defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'timeline'}
             className="w-full"
             onValueChange={setUrlView ? setUrlView: () => {}}
         >
