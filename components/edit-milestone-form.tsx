@@ -79,6 +79,7 @@ import {mixpanelTrack} from "@/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "comend-pag-platform/components/edit-milestone-details-publications-tab";
+import { Skeleton } from "./ui/skeleton"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -759,7 +760,11 @@ export function EditMilestoneForm({
                                     </TabsContent>
                                     <TabsContent value="recommendations" className="space-y-4 w-full">
                                         {!recommendations && (
-                                            <Loading/>
+                                            <div className="flex flex-col gap-4">
+                                                <Skeleton className="w-full h-[230px]"/>
+                                                <Skeleton className="w-full h-[230px]"/>
+                                                <Skeleton className="w-full h-[230px]"/>
+                                            </div>
                                         )}
 
                                         {(recommendations && recommendations.length === 0) && (
