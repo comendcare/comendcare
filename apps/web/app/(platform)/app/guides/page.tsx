@@ -13,6 +13,7 @@ import { Lightbulb, Save, ThumbsUp } from "lucide-react"
 import { getNotionDatabaseAndContents } from "@/lib/notion"
 import { Blog, BlogCard } from "@/components/layout/sections/news"
 import Loading from "@/loading";
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function FAQ() {
     const [filteredPages, setFilteredPages] = useState<Blog[]>([])
@@ -53,8 +54,6 @@ export default function FAQ() {
 
         init()
     }, [])
-
-    if (filteredPages.length <= 0) return <Loading />
 
     return (
         <div className="mx-auto space-y-16">
@@ -152,17 +151,25 @@ function FAQSections({pages}: {pages: Blog[]}) {
                 {filterState === "Research Planner Guides" && `Research Planner Guides`}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {pages
-                    .filter((page: any) => page.section === filterState)
-                    .map((page: any, index) => {
-                        return (
-                            <BlogCard 
-                                blog={page}
-                                key={index} 
-                                showFullDescription={true}
-                            />
-                        )
-                })}
+                {pages.length <= 0 ? (
+                    <>
+                    <Skeleton className="h-[444px] w-full rounded-3xl"/>
+                    <Skeleton className="h-[444px] w-full rounded-3xl"/>
+                    <Skeleton className="h-[444px] w-full rounded-3xl"/>
+                    </>
+                ): (
+                    pages
+                        .filter((page: any) => page.section === filterState)
+                        .map((page: any, index) => {
+                            return (
+                                <BlogCard 
+                                    blog={page}
+                                    key={index} 
+                                    showFullDescription={true}
+                                />
+                            )
+                    })
+                )}
             </div>
         </div>
     )
