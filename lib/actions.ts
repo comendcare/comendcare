@@ -45,7 +45,7 @@ import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
 import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
-import { organizations } from "@/data/sample-pags"
+import {organizations} from "@/data/sample-pags"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -206,11 +206,21 @@ export const createCondition = withAuth(
         const toolsUnderDevelopment = formData.get("toolsUnderDevelopment")
             ? (formData.get("toolsUnderDevelopment") as string).split(",")
             : [];
-        const metadataValue: FormDataEntryValue | null  = formData.get("metadata")
+        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
         const metadata: JsonObject = metadataValue
             ? JSON.parse(metadataValue.toString()) as JsonObject
             : {}
 
+        // First check if condition already exists
+        const existingCondition = await prisma.condition.findUnique({
+            where: {slug}
+        });
+
+        if (existingCondition) {
+            return {success: true, data: existingCondition};
+        }
+
+        // If it doesn't exist, create it
         try {
             const condition = await prisma.condition.create({
                 data: {
@@ -437,11 +447,11 @@ export const createOrganization = withAuth(
 
                 switch (target) {
                     case "subdomain":
-                        return { error: "This subdomain is already taken" };
+                        return {error: "This subdomain is already taken"};
                     case "customDomain":
-                        return { error: "This custom domain is already taken" };
+                        return {error: "This custom domain is already taken"};
                     default:
-                        return { error: `Unique constraint failed on ${target}` };
+                        return {error: `Unique constraint failed on ${target}`};
                 }
             } else {
                 return {
@@ -2133,7 +2143,9 @@ export const createOrUpdateRFP = withOrganizationAuth(
 
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export const createRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {metadata: JsonObject} | undefined) => {
+    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {
+        metadata: JsonObject
+    } | undefined) => {
         const roadmap = await prisma.roadmap.create({
             data: {
                 title: roadmapTemplate?.title,
@@ -2175,7 +2187,9 @@ export const createRoadmap = withOrganizationAuth(
 )
 
 export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
-    async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {metadata: JsonObject}) => {
+    async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {
+        metadata: JsonObject
+    }) => {
         // maps the original node id (from the template) to the new node ID that's stored in the DB
         const nodeIDMap: { [originalNodeId: string]: string } = {}
 
