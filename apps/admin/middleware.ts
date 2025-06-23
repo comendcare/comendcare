@@ -109,7 +109,7 @@ export default async function middleware(req: NextRequest) {
     }
 
     // DON'T do rewrites for admin pages
-    if (hostname === `admin.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
+    if (hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN) {
         const session = await getToken({ req })
 
         if (!session && path !== "/login") {
