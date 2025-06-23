@@ -14,6 +14,7 @@ import {Company} from "@prisma/client";
 import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
 import {CompanyWithReviewsAndServices} from "@/lib/types";
 import {getCROData} from "@/lib/fetchers";
+import { Skeleton } from "./ui/skeleton";
 
 export default function CROPageTabs() {
     const router = useRouter()
@@ -44,8 +45,6 @@ export default function CROPageTabs() {
         fetchCRO()
     }, [pathname])
 
-    if (loading || !cro) return <div className="text-gray-500">Loading...</div>
-
     return (
         <Tabs
             value={selectedTab}
@@ -61,7 +60,7 @@ export default function CROPageTabs() {
                 <TabsTrigger value="services" variant="outline" className="px-8">
                     <Briefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                     Services
-                    {cro.services.length !== undefined && (
+                    {cro?.services?.length !== undefined && (
                         <div
                             className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
                         >
@@ -105,7 +104,7 @@ export default function CROPageTabs() {
                 <TabsTrigger value="reviews" variant="outline" className="px-8">
                     <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                     Reviews
-                    {cro.reviews.length !== undefined && (
+                    {cro?.reviews?.length !== undefined && (
                         <div
                             className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
                         >
@@ -115,7 +114,17 @@ export default function CROPageTabs() {
                 </TabsTrigger>
             </TabsList>
             <TabsContent value="services" className="space-y-4 w-full">
-                <CROMarketplaceProfileServicesTab croServices={cro.services}/>
+                {(loading || !cro) ? (
+                    <div className="flex flex-col gap-4">
+                        <div className="flex justify-between">
+                            <Skeleton className="h-[32px] w-[250px]" />
+                            <Skeleton className="h-[32px] w-[82px]" />
+                        </div>
+                        <Skeleton className="w-full h-[200px]" />
+                    </div>
+                ): (
+                    <CROMarketplaceProfileServicesTab croServices={cro.services}/>
+                )}
             </TabsContent>
             {/*<TabsContent value="sites" className="space-y-4 w-full">*/}
             {/*    <CROMarketplaceProfileSitesTab croSites={cro.sites}/>*/}
