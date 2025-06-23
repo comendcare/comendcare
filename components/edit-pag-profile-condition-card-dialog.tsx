@@ -62,7 +62,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name || "",
+                            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
                             causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
@@ -116,7 +116,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             // Map the form values to match the Condition schema
             const mappedData: Record<string, any> = {
-                name: values.disorder || "",
+                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
                 summary: values.summary || "",
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
@@ -173,7 +173,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
         editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
     }
 
-    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
+    const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
 
         setLoading(true);
@@ -186,6 +186,25 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             return data;
         } catch (error) {
             console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error);
             return [];
         } finally {
             setLoading(false);
@@ -227,20 +246,18 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     name="disorder"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>{`Name of condition (required)`}</FormLabel>
-                                            {/*<div className="w-full flex flex-row justify-between">*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        {`The name of your rare condition/disorder.`}*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        60 characters max.*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*</div>*/}
+                                            <FormLabel>Name of condition (required)</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    id="disorder"
+                                                <MultipleSelector
                                                     {...field}
+                                                    creatable={true}
+                                                    maxSelected={1}
+                                                    onSearch={handleConditionAsyncSearch}
+                                                    placeholder="Search for conditions..."
+                                                    hidePlaceholderWhenSelected={true}
+                                                    loadingIndicator={<p>Loading conditions...</p>}
+                                                    emptyIndicator={<p>No conditions found.</p>}
+                                                    showHoverCard={false}
                                                 />
                                             </FormControl>
                                             <FormMessage/>
@@ -302,7 +319,8 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
-                                                    onSearch={handleAsyncSearch}
+                                                    creatable={true}
+                                                    onSearch={handleGeneAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}
                                                     loadingIndicator={<p>Loading genes...</p>}
@@ -344,7 +362,8 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
-                                                    onSearch={handleAsyncSearch}
+                                                    creatable={true}
+                                                    onSearch={handleGeneAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}
                                                     loadingIndicator={<p>Loading genes...</p>}

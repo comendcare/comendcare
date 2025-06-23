@@ -103,7 +103,11 @@ export default function OrganizationSearchBar() {
             </div>
 
             <div className="text-muted-foreground text-sm">
-                {totalResults} results
+                {totalResults === undefined || totalResults === null ? (
+                    `loading results...`
+                ): (
+                    `${totalResults} results`
+                )}
             </div>
         </div>
     )

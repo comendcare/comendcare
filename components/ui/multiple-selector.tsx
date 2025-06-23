@@ -509,6 +509,23 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 if (!onScrollbar) {
                                     setOpen(false);
                                 }
+
+                                const trimmedValue = inputValue.trim();
+
+                                if (
+                                    creatable &&
+                                    trimmedValue.length > 0 &&
+                                    !selected.find((s) => s.value === trimmedValue) &&
+                                    !Object.values(options).flat().some((opt) => opt.value === trimmedValue)
+                                ) {
+                                    const newOption = { value: trimmedValue, label: trimmedValue };
+                                    const newOptions = [...selected, newOption];
+
+                                    setSelected(newOptions);
+                                    onChange?.(newOptions);
+                                    setInputValue('');
+                                }
+
                                 inputProps?.onBlur?.(event);
                             }}
                             onFocus={(event) => {
@@ -607,6 +624,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                         ))}
                                                     </CommandGroup>
                                                 ))}
+
                                             </>
                                         ) : (
                                             <CommandGroup className="h-full">
@@ -616,6 +634,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             </CommandGroup>
                                         )}
                                     </ScrollArea>
+                                    {CreatableItem()}
                                 </div>
                             )}
                         </CommandList>

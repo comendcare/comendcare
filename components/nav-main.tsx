@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {useShallow} from "zustand/react/shallow"
+import Link from "next/link"
 
 type Item = {
     title: string
@@ -85,7 +86,7 @@ export function NavMain({items}: { items: Item[] }) {
                                     asChild
                                     className={isActive ? "bg-blue-light text-primary" : ""}
                                 >
-                                    <a href={item.url} className="flex">
+                                    <Link href={item.url} className="flex">
                                         <div className="relative">
                                             {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
                                             {state === "collapsed" &&
@@ -96,7 +97,7 @@ export function NavMain({items}: { items: Item[] }) {
                                         {state === "expanded" &&
                                             <NavNotificationExpandedIcon item={item}/>
                                         }
-                                    </a>
+                                    </Link>
                                 </SidebarMenuButton>
                             )}
                             {(item?.subPages || []).map((subItem) => (
@@ -106,7 +107,7 @@ export function NavMain({items}: { items: Item[] }) {
                                             asChild
                                             className={pathname === subItem.url ? "bg-blue-light text-primary" : ""}
                                         >
-                                            <a href={subItem.url} className="flex">
+                                            <Link href={subItem.url} className="flex">
                                                 <div className="relative">
                                                     {subItem.icon && <subItem.icon className="mr-2 h-4 w-4"/>}
                                                     {state === "collapsed" &&
@@ -117,7 +118,7 @@ export function NavMain({items}: { items: Item[] }) {
                                                 {state === "expanded" &&
                                                     <NavNotificationExpandedIcon item={subItem}/>
                                                 }
-                                            </a>
+                                            </Link>
                                         </SidebarMenuSubButton>
                                     </SidebarMenuSubItem>
                                 </SidebarMenuSub>

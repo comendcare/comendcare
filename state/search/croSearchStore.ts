@@ -134,10 +134,10 @@ function generateFiltersString(filters: FiltersType): string {
 
     // Tags (Array Field)
     if (filters?.tags && filters.tags.length > 0) {
-        const certificationFilter = filters.certifications
+        const tagsFilter = filters.tags
             .map(tag => `tags:=[${escapeValue(tag.value)}]`)
             .join(" && ");
-        filtersList.push(`(${certificationFilter})`);
+        filtersList.push(`(${tagsFilter})`);
     }
 
     // Combine all filters with `&&`
@@ -166,7 +166,8 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                     .filter(c => c !== undefined)
                     .map(c => ({label: c?.label, value: c?.value})),
                 types: [],
-                certifications: []
+                certifications: [],
+                tags: []
             }
             const {results: newSearchResults} = await getUpdatedSearchResults({
                 searchTerm: '',
@@ -270,7 +271,7 @@ export interface CROSearchState {
     setFilters: (updatedFilters: FiltersType) => void,
     recommendations: Recommendation[] | undefined
     setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
-    totalResults: number,
+    totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
 
@@ -298,6 +299,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                             "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
                             "Business Types": filters.types.map(filter => filter.label),
                             "Certifications": filters.certifications.map(filter => filter.label),
+                            "Tags": filters.tags.map(filter => filter.label),
                             "Categories": filters.categories.map(filter => filter.label)
                         }
                     })
@@ -349,14 +351,16 @@ export const useCROSearchStore = create<CROSearchState>()(
                     categories: getExclusiveToFirstGroup(newFilters, get().filters, 'categories'),
                     milestoneTypes: getExclusiveToFirstGroup(newFilters, get().filters, 'milestoneTypes'),
                     types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
-                    certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications')
+                    certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications'),
+                    tags: getExclusiveToFirstGroup(newFilters, get().filters, 'tags')
                 }
 
                 const recentlyRemoved = {
                     categories: getExclusiveToFirstGroup(get().filters, newFilters, 'categories'),
                     milestoneTypes: getExclusiveToFirstGroup(get().filters, newFilters, 'milestoneTypes'),
                     types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
-                    certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications')
+                    certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications'),
+                    tags: getExclusiveToFirstGroup(get().filters, newFilters, 'tags')
                 }
 
                 if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
@@ -367,19 +371,22 @@ export const useCROSearchStore = create<CROSearchState>()(
                             "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
                             "Business Types": newFilters.types.map(filter => filter.label),
                             "Certifications": newFilters.certifications.map(filter => filter.label),
+                            "Tags": newFilters.tags.map(filter => filter.label),
                             "Categories": newFilters.categories.map(filter => filter.label)
                         },
                         "Added": {
                             "Milestone Types": recentlySelected.milestoneTypes.map(filter => filter.label),
                             "Business Types": recentlySelected.types.map(filter => filter.label),
                             "Certifications": recentlySelected.certifications.map(filter => filter.label),
-                            "Categories": recentlySelected.categories.map(filter => filter.label)
+                            "Categories": recentlySelected.categories.map(filter => filter.label),
+                            "Tags": recentlySelected.tags.map(filter => filter.label)
                         },
                         "Removed": {
                             "Milestone Types": recentlyRemoved.milestoneTypes.map(filter => filter.label),
                             "Business Types": recentlyRemoved.types.map(filter => filter.label),
                             "Certifications": recentlyRemoved.certifications.map(filter => filter.label),
-                            "Categories": recentlyRemoved.categories.map(filter => filter.label)
+                            "Categories": recentlyRemoved.categories.map(filter => filter.label),
+                            "Tags": recentlyRemoved.tags.map(filter => filter.label)
                         },
                     })
                 }
@@ -412,7 +419,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                 })
                 return prunedRecommendations
             },
-            totalResults: 0,
+            totalResults: undefined,
             setTotalResults: (total: number) => set({ totalResults: total }),
         }),
         {

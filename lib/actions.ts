@@ -45,7 +45,7 @@ import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@/lib/utils"
 import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
-import { organizations } from "@/data/sample-pags"
+import {organizations} from "@/data/sample-pags"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -206,14 +206,37 @@ export const createCondition = withAuth(
         const toolsUnderDevelopment = formData.get("toolsUnderDevelopment")
             ? (formData.get("toolsUnderDevelopment") as string).split(",")
             : [];
-        const metadataValue: FormDataEntryValue | null  = formData.get("metadata")
+        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
         const metadata: JsonObject = metadataValue
             ? JSON.parse(metadataValue.toString()) as JsonObject
             : {}
 
+        // If it doesn't exist, create it
         try {
-            const condition = await prisma.condition.create({
-                data: {
+            const condition = await prisma.condition.upsert({
+                where: {
+                    slug,
+                },
+                update: {
+                    name,
+                    summary,
+                    slug,
+                    diseaseCategories,
+                    prevalenceNumerator,
+                    prevalenceDenominator,
+                    numberOfPatientsEngaged,
+                    nationalEstimatedPopulation,
+                    globalEstimatedPopulation,
+                    relevantDiseaseMechanisms,
+                    causalGenes,
+                    associatedGenes,
+                    associatedSystems,
+                    associatedSignsAndSymptoms,
+                    existingDatabasesAndStudies,
+                    toolsUnderDevelopment,
+                    metadata
+                },
+                create: {
                     name,
                     summary,
                     slug,
@@ -437,11 +460,11 @@ export const createOrganization = withAuth(
 
                 switch (target) {
                     case "subdomain":
-                        return { error: "This subdomain is already taken" };
+                        return {error: "This subdomain is already taken"};
                     case "customDomain":
-                        return { error: "This custom domain is already taken" };
+                        return {error: "This custom domain is already taken"};
                     default:
-                        return { error: `Unique constraint failed on ${target}` };
+                        return {error: `Unique constraint failed on ${target}`};
                 }
             } else {
                 return {
@@ -1853,6 +1876,8 @@ export const updateCondition = withOrganizationAuth(
                     where: {id: conditions[0].conditionId},
                     data,
                 });
+
+                revalidatePath("app/profile/");
                 return {success: true, data: updatedCondition};
             }
 
@@ -2131,7 +2156,9 @@ export const createOrUpdateRFP = withOrganizationAuth(
 
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export const createRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {metadata: JsonObject} | undefined) => {
+    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {
+        metadata: JsonObject
+    } | undefined) => {
         const roadmap = await prisma.roadmap.create({
             data: {
                 title: roadmapTemplate?.title,
@@ -2173,7 +2200,9 @@ export const createRoadmap = withOrganizationAuth(
 )
 
 export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
-    async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {metadata: JsonObject}) => {
+    async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {
+        metadata: JsonObject
+    }) => {
         // maps the original node id (from the template) to the new node ID that's stored in the DB
         const nodeIDMap: { [originalNodeId: string]: string } = {}
 
@@ -3881,12 +3910,16 @@ export const createCompany = withAdminAuth(
         const url = formData.get("website") as string
         const servicesRaw = formData.get("services") as string
         const certificationsRaw = formData.get("certifications") as string
+        const tagsRaw = formData.get("tags") as string
 
         const parsedServices = servicesRaw
             ? servicesRaw.split(",").map((name) => name.trim())
             : []
         const parsedCertifications = certificationsRaw
             ? certificationsRaw.split(",").map((name) => name.trim())
+            : []
+        const parsedTags = tagsRaw
+            ? tagsRaw.split(",").map((name) => name.trim())
             : []
 
         const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices)
@@ -3917,6 +3950,7 @@ export const createCompany = withAdminAuth(
                         }
                         : undefined,
                     simplifiedCertifications: parsedCertifications,
+                    tags: parsedTags,
                     categories,
                     milestoneTypes,
                 },
