@@ -271,7 +271,7 @@ export interface CROSearchState {
     setFilters: (updatedFilters: FiltersType) => void,
     recommendations: Recommendation[] | undefined
     setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
-    totalResults: number,
+    totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
 
@@ -419,7 +419,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                 })
                 return prunedRecommendations
             },
-            totalResults: 0,
+            totalResults: undefined,
             setTotalResults: (total: number) => set({ totalResults: total }),
         }),
         {
