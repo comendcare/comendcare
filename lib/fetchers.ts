@@ -2136,7 +2136,8 @@ export async function getTopPubMedPublications(keyword?: string) {
                     ? `${conditions[0].name} AND (${cleanedKeyword})`
                     : conditions[0].name;
 
-                const ids = await getPubMedSearchResultIds(query, 0, 10);
+                // Get only 5 for now
+                const ids = await getPubMedSearchResultIds(query, 0, 5);
                 const articles = await getPubMedSearchResultData(ids)
 
                 return {
