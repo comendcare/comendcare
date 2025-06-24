@@ -10,6 +10,7 @@ import {CROServicesDataTable} from "~web/components/cro-services-data-table/cro-
 import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@/lib/types";
+import NoOrganization from "@/components/no-organization";
 
 export default function SavesPage() {
     const router = useRouter()
@@ -38,9 +39,11 @@ export default function SavesPage() {
             }
         }
 
-        fetchData();
+        if (session?.user?.organizationId) fetchData();
     }, [session?.user?.organizationId]);
     console.log(savedCompanies);
+
+    if (!session?.user?.organizationId) return <NoOrganization />
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
