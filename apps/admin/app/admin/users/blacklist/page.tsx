@@ -2,8 +2,8 @@ import {Suspense} from "react"
 import PlaceholderCard from "@/components/placeholder-card"
 import {AdminUsersNav} from "~web/components/admin-users-nav";
 import * as React from "react"
-import {BlacklistDataTable} from "@/components/blacklist-data-table/blacklist-data-table";
-import {BlacklistDialog} from "@/components/blacklist-data-table/blacklist-dialog";
+import {BlacklistDataTable} from "~web/components/blacklist-data-table/blacklist-data-table";
+import {BlacklistDialog} from "~web/components/blacklist-data-table/blacklist-dialog";
 
 export default function AdminUserWhitelist({
                                                params
