@@ -177,7 +177,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                     if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
 
                                     if (selectedResearchPlanTemplate) {
-                                        addNodesFromTemplate(selectedResearchPlanTemplate)
+                                        const newNodes = await addNodesFromTemplate(selectedResearchPlanTemplate)
+                                        if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
                                     }
                                 }}
                             >

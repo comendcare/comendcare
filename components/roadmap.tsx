@@ -296,8 +296,6 @@ export function Roadmap() {
                             }}
                             setTab={setTab}
                             setNewMilestoneIsOpen={setNewMilestoneIsOpen}
-                            addMilestones={addMilestones}
-                            milestones={milestones}
                             milestoneTypes={milestoneTypes}
                             setBulkImportIsOpen={setBulkImportIsOpen}
                             orgSubdomain={orgSubdomain}
@@ -493,7 +491,7 @@ export function Roadmap() {
                                                 console.error("Error: imported projects are missing required fields", result.errors)
                                             }
 
-                                            addMilestones(result.values.map(milestone => {
+                                            const newNodes = await addMilestones(result.values.map(milestone => {
                                                 const foundType = milestoneTypes.find(type => type.label === milestone.type)
 
                                                 return {
@@ -503,6 +501,8 @@ export function Roadmap() {
                                                     nodeType: "PROJECT"
                                                 }
                                             }), "Import")
+
+                                            if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
                                         } catch (e) {
                                             toast('Error!', {
                                                 position: "bottom-left",
@@ -710,8 +710,6 @@ const RoadmapHeader = ({
     researchPlanDetails, 
     setTab, 
     setNewMilestoneIsOpen, 
-    addMilestones, 
-    milestones,
     milestoneTypes, 
     setBulkImportIsOpen,
     orgSubdomain
@@ -720,13 +718,12 @@ const RoadmapHeader = ({
     researchPlanDetails: Partial<RoadmapType>, 
     setTab: any, 
     setNewMilestoneIsOpen: any, 
-    addMilestones: any, 
-    milestones: any[]
     milestoneTypes: any, 
     setBulkImportIsOpen: any,
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()
+    const { milestones, setSelectedNodeIds, addMilestones } = useRoadmapStore(useShallow(selector))
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
@@ -871,12 +868,14 @@ const RoadmapHeader = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
-                            onClick={() => {
+                            onClick={async () => {
                                 console.log("Add an empty project triggered")
-                                addMilestones([{
+                                const newNodes = await addMilestones([{
                                         nodeType: "PROJECT",
                                         title: 'New Project',
                                 }], "Create Empty Button")
+
+                                if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
                             }} 
                             variant={"ghost"}
                             size={isCollapsed ? "icon" : "default"}
