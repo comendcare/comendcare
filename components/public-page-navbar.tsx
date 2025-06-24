@@ -13,7 +13,7 @@ import Image from "next/image"
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { X, Menu as MenuIcon } from "lucide-react"
-import {Menu, MenuItem, ProductItem} from "@/components/layout/sections/navbar-menu";
+import {Menu, MenuItem, ProductItem} from "../apps/web/components/landing/navbar-menu";
 import {buttonVariants} from "@/components/ui/button";
 
 interface NavbarItem {

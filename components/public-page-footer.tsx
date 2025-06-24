@@ -1,9 +1,9 @@
 "use client"
 
-import CTASection from "@/components/layout/sections/cta";
-import LandingFooter from "@/components/layout/sections/landing-footer";
+import CTASection from "../apps/web/components/landing/cta";
+import LandingFooter from "../apps/web/components/landing/landing-footer";
 import React, {useEffect, useState} from "react";
-import ContactSection from "@/components/layout/sections/contact";
+import ContactSection from "../apps/web/components/landing/contact";
 
 
 export default function PublicPageFooter() {

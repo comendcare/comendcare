@@ -1,5 +1,5 @@
 import Image from "next/image"
-import bulletin from "public/illustrations/bulletin.png"
+import bulletin from "@/public/illustrations/bulletin.png"
 
 export const BulletinSection = () => {
     return (

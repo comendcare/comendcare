@@ -1,5 +1,5 @@
 import Image from "next/image"
-import database from "public/illustrations/database.png"
+import database from "@/public/illustrations/database.png"
 
 export const DatabaseSection = () => {
     return (

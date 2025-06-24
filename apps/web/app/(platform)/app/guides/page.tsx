@@ -11,7 +11,7 @@ import type { TagType } from "@/lib/articles"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Lightbulb, Save, ThumbsUp } from "lucide-react"
 import { getNotionDatabaseAndContents } from "@/lib/notion"
-import { Blog, BlogCard } from "@/components/layout/sections/news"
+import { Blog, BlogCard } from "~web/components/landing/news"
 import Loading from "@/loading";
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGuides } from "./guides-context"

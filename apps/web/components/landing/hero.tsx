@@ -6,11 +6,11 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
-import HeroIllustration from "@/components/layout/sections/hero-illustration"
+import HeroIllustration from "~web/components/landing/hero-illustration"
 import {
     HeroHighlight,
     Highlight
-} from "@/components/layout/sections/hero-highlight"
+} from "~web/components/landing/hero-highlight"
 import { motion } from "framer-motion"
 import { LinkPreview } from "@/components/link-preview"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
