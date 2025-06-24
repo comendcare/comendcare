@@ -10,7 +10,7 @@ import {CROServicesDataTable} from "~web/components/cro-services-data-table/cro-
 import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@/lib/types";
-import NoOrganization from "@/components/no-organization";
+import NoOrganization from "~web/components/no-organization";
 
 export default function SavesPage() {
     const router = useRouter()
