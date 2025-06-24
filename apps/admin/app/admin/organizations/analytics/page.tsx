@@ -1,8 +1,8 @@
 import { Suspense } from "react"
 import PlaceholderCard from "@/components/placeholder-card"
-import {AdminOrganizationsAnalyticsCards} from "~web/components/admin-organizations-analytics-cards";
-import {AdminOrganizationsNav} from "~web/components/admin-organizations-nav";
-import {AdminOrganizationsAnalyticsChart} from "~web/components/admin-organizations-analytics-chart";
+import {AdminOrganizationsAnalyticsCards} from "~admin/components/admin-organizations-analytics-cards";
+import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
+import {AdminOrganizationsAnalyticsChart} from "~admin/components/admin-organizations-analytics-chart";
 
 export default function AllOrganizations() {
     return (
