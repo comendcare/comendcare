@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useState } from "react"
 import {
     DialogDescription,
     DialogHeader,
@@ -11,6 +11,8 @@ import {Button} from "@/components/ui/button";
 import { mixpanelTrack } from "@/mixpanel";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "./ui/accordion";
 import CopyCodeBlock from "./code-block";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 export default function ShareDialog({
                                         url,
@@ -50,6 +52,7 @@ export default function ShareDialog({
         additonalProperties?: {[key: string]: string} | undefined
     },
 }) {
+    const [view, setView] = useState('timeline')
     function embedCode(link: string) {
         return (
             `<iframe
@@ -290,9 +293,17 @@ export default function ShareDialog({
                             <AccordionTrigger className="font-semibold text-primary">
                                 Embed Research Plan
                             </AccordionTrigger>
-                            <AccordionContent>
+                            <AccordionContent className="flex flex-col gap-2">
+                                <span className="flex gap-2 items-center">
+                                    <Switch 
+                                        id="view" 
+                                        checked={view === "flow"} 
+                                        onCheckedChange={(checked: boolean) => {checked ? setView('flow') : setView('timeline')}}
+                                    />
+                                    <Label htmlFor="view">Flow view</Label>
+                                </span>
                                 <CopyCodeBlock 
-                                    code={embedCode(embeddedResearchPlanData.embeddedResearchPlanLink)} 
+                                    code={embedCode(`${embeddedResearchPlanData.embeddedResearchPlanLink}?view=${view}`)} 
                                     language={"JavaScript"}
                                     onCopyCallback={(location?: string | undefined) => {
                                         mixpanelTrack(`Research Plan Embed Copied`, {
@@ -301,7 +312,8 @@ export default function ShareDialog({
                                                 "Organization Name": organization.name,
                                                 "Research Plan ID": embeddedResearchPlanData.resarchPlanId,
                                                 "Research Plan Title": embeddedResearchPlanData.researchPlanTitle,
-                                                "Copy Method": location
+                                                "Copy Method": location,
+                                                "view": "flow"
                                             } : undefined),
                                         })
                                     }}

@@ -1,10 +1,7 @@
 import { getOrganizationData, getPublicRoadmapsForOrganization } from "@/lib/fetchers"
 import { notFound } from "next/navigation"
-import {cn, formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
-import {ProfilePhoto} from "@/components/profile-photo";
 import React from "react";
-import { Building2, Calendar, HandCoins } from "lucide-react"
 import { RoadmapCard } from "@/components/public-roadmap-card";
 import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -116,7 +113,6 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
                                     subdomain={params.domain || undefined}
                                     isPublic={true}
                                     externalLinks={true}
-                                    urlView={'flow'}
                                 />
                             </div>
                         </div>

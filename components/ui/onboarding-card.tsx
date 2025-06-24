@@ -67,11 +67,11 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         if (step.selector === '.onborda-select-a-template') {
             // if there are no nodes, we create one to use for the onboarding flow
             if (nodes.length <= 0) {
-                const newNode = await addMilestones([{
+                const newNodes = await addMilestones([{
                     title: `Basic Science`,
                     status: "PLANNED",
                 }], "Onborda Tutorial")
-                onboardingNodeId = newNode?.[0]?.id
+                onboardingNodeId = newNodes?.[0]?.id
             }
 
             if (onboardingNodeId) fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })

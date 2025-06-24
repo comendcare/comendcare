@@ -48,7 +48,7 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addMilestones: (milestones: Partial<Milestone>[], creationMethod?: string) => Promise<Node[] | void>
     addNodes: (node: Node[], creationMethod?: string) => Promise<Node[] | void>
-    addNodesFromTemplate: (template: any) => Promise<void>
+    addNodesFromTemplate: (template: any) => Promise<Node[]>
     deleteNode: (nodeId: string) => Promise<void>
     saveState: () => void
 }
@@ -318,12 +318,13 @@ export const useRoadmapStore = create<RoadmapState>()(
         addNodesFromTemplate: async (template: any) => {
             const response = await createNodesAndEdgesFromTemplate(get().details?.organizationId, get().roadmapId, template)
             if (response.success && response.data && response.data.nodes && response.data.milestones && response.data.edges) {
+                const newNodes = response.data.nodes.filter((node: any) => !get().nodes.map(n => n.id).includes(node.id))
                 set({
                     nodes: (response.data.nodes.map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}}))),
                     milestones: response.data.milestones,
                     edges: response.data.edges
                 })
-                return response.data
+                return newNodes
             } else {
                 console.error(`Error adding nodes`, response?.error)
                 toast.error(`Error adding projects from template: ${response?.error}`)
