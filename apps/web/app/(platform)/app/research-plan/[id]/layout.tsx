@@ -58,25 +58,25 @@ export default function ResearchPlanLayout({children, params}: ResearchPlanLayou
             }
 
             // Init notifications
-            let notifications = await getAllNotifications({
-                id: true,
-                type: true,
-                title: true,
-                message: true,
-                link: true,
-                createdAt: true,
-                updatedAt: true,
-                lastViewedAt: true,
-            })
-            if (notifications.success && notifications.data) {
-                initializeNotificationsState({
-                    notifications: notifications.data
-                })
-                console.log(`Notificaions initialized...`)
-            } else {
-                console.error(notifications.error)
-                toast.error(notifications.error)
-            }
+            // let notifications = await getAllNotifications({
+            //     id: true,
+            //     type: true,
+            //     title: true,
+            //     message: true,
+            //     link: true,
+            //     createdAt: true,
+            //     updatedAt: true,
+            //     lastViewedAt: true,
+            // })
+            // if (notifications.success && notifications.data) {
+            //     initializeNotificationsState({
+            //         notifications: notifications.data
+            //     })
+            //     console.log(`Notificaions initialized...`)
+            // } else {
+            //     console.error(notifications.error)
+            //     toast.error(notifications.error)
+            // }
         }
 
         init()
