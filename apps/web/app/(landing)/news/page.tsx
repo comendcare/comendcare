@@ -6,7 +6,7 @@ import Link from "next/link";
 // import {useEffect, useState} from "react";
 // import FuzzySearch from "fuzzy-search";
 import { getNotionDatabaseAndContents } from "@/lib/notion";
-import { Blog, BlurImage } from "@/components/layout/sections/news";
+import { Blog, BlurImage } from "~web/components/landing/news";
 
 export default async function NewsPage() {
     const newsDBKey = '1f7801a6fddc805297d9d10211608c11'
@@ -224,7 +224,7 @@ const blogs: Blog[] = [
         title: "CSS Grid Layout",
         description: "Learn how to create complex layouts easily with CSS Grid.",
         date: new Date("2021-03-10"),
-        slug: "css-grid-layout",
+        slug: "css-grid-landing",
         image:
             "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=3542&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         author: "Flawnson Tong",

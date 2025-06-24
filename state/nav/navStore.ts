@@ -12,7 +12,7 @@ type NavState = {
 export const useNavStore = create<NavState>(set => ({
     isCollapsed: false, // Collapsed by default
     navCollapsedSize: 4, // Set the size when nav is collapsed
-    defaultLayout: [20, 32], // Default layout sizes
+    defaultLayout: [20, 32], // Default landing sizes
     setIsCollapsed: isCollapsed => set(() => ({ isCollapsed })),
     setLayout: layout => set(() => ({ defaultLayout: layout })),
     setNavState: (layout, isCollapsed) =>
@@ -22,7 +22,7 @@ export const useNavStore = create<NavState>(set => ({
 export const useSidebarStore = create<NavState>(set => ({
     isCollapsed: false, // Collapsed by default
     navCollapsedSize: 4, // Set the size when nav is collapsed
-    defaultLayout: [32, 20], // Default layout sizes
+    defaultLayout: [32, 20], // Default landing sizes
     setIsCollapsed: isCollapsed => set(() => ({ isCollapsed })),
     setLayout: layout => set(() => ({ defaultLayout: layout })),
     setNavState: (layout, isCollapsed) =>
@@ -32,7 +32,7 @@ export const useSidebarStore = create<NavState>(set => ({
 export const useFiltersStore = create<NavState>(set => ({
     isCollapsed: false, // Collapsed by default
     navCollapsedSize: 4, // Set the size when nav is collapsed
-    defaultLayout: [80, 20], // Default layout sizes
+    defaultLayout: [80, 20], // Default landing sizes
     setIsCollapsed: isCollapsed => set(() => ({ isCollapsed })),
     setLayout: layout => set(() => ({ defaultLayout: layout })),
     setNavState: (layout, isCollapsed) =>

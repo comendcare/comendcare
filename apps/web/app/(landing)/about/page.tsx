@@ -1,7 +1,7 @@
-import { TeamSection } from "@/components/layout/sections/team-section"
-import { TimelineSection } from "@/components/layout/sections/timeilne-section"
-import { PartneredWithLogoCloud } from "@/components/layout/sections/partnered-with-logo-cloud"
-import About from "@/components/layout/sections/about";
+import { TeamSection } from "~web/components/landing/team-section"
+import { TimelineSection } from "~web/components/landing/timeilne-section"
+import { PartneredWithLogoCloud } from "~web/components/landing/partnered-with-logo-cloud"
+import About from "~web/components/landing/about";
 
 export default function AboutPage() {
     return (

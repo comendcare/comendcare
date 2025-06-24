@@ -1,7 +1,7 @@
 import React from "react"
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MilestoneSearchResults } from "@/components/milestone-search-results";
-import MilestoneSearchBar from "@/components/milestone-searchbar";
+import { MilestoneSearchResults } from "~web/components/milestone-search-results";
+import MilestoneSearchBar from "~web/components/milestone-searchbar";
 
 export default async function MilestonesPage() {
     return (

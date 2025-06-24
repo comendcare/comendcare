@@ -1,4 +1,4 @@
-import { AdminResearchPlansAnalyticsCards } from "@/components/admin-research-plans-analytics-cards";
+import { AdminResearchPlansAnalyticsCards } from "~admin/components/admin-research-plans-analytics-cards";
 
 export default function ResearchPlansAnalyticsPage() {
     return (

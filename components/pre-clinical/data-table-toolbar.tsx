@@ -9,7 +9,7 @@ import {DataTableViewOptions} from "./data-table-view-options"
 
 import {priorities, statuses} from "@/data/pharma-data/data"
 import {DataTableFacetedFilter} from "./data-table-faceted-filter"
-import PharmaProjectPreclinicalFilterDialog from "@/components/pharma-project-preclinical-filter-dialog";
+import PharmaProjectPreclinicalFilterDialog from "comend-pag-platform/components/pharma-project-preclinical-filter-dialog";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>

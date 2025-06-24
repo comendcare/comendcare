@@ -1,4 +1,4 @@
-import { AdminResearchPlansNav } from "@/components/admin-research-plans-nav";
+import { AdminResearchPlansNav } from "~admin/components/admin-research-plans-nav";
 import PlaceholderCard from "@/components/placeholder-card";
 import { ReactNode, Suspense } from "react";
 

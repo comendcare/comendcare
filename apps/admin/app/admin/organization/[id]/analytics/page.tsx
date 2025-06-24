@@ -1,10 +1,9 @@
 import { getSession } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
-import AnalyticsMockup from "@/components/analytics"
-import { AdminResearchPlansAnalyticsCards } from "@/components/admin-research-plans-analytics-cards"
-import { AdminToolsAnalyticsCards } from "@/components/admin-tools-analytics-cards"
-import { AdminRFPsAnalyticsCards } from "@/components/admin-rfps-analytics-cards"
+import { AdminResearchPlansAnalyticsCards } from "~admin/components/admin-research-plans-analytics-cards"
+import { AdminToolsAnalyticsCards } from "~admin/components/admin-tools-analytics-cards"
+import { AdminRFPsAnalyticsCards } from "~admin/components/admin-rfps-analytics-cards"
 
 export default async function OrganizationAnalytics({
     params

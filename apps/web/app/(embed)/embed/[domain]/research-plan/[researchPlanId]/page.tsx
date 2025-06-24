@@ -2,8 +2,8 @@ import { getOrganizationData, getPublicRoadmapsForOrganization } from "@/lib/fet
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import React from "react";
-import { RoadmapCard } from "@/components/public-roadmap-card";
-import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
+import { RoadmapCard } from "~web/components/public-roadmap-card";
+import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default async function EmbeddedResearchPlanPage({params}: {params: {domain: string, researchPlanId: string}}) {

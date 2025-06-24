@@ -1,21 +1,21 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
 import {getOrganizationData, getConditionsDataFromOrgId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
-import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapsCard} from "@/components/public-roadmap-card";
-import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
-import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
-import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
+import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
+import {RoadmapsCard} from "~web/components/public-roadmap-card";
+import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
+import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
+import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
+import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
+import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
+import MarketplaceBreadcrumb from "~web/components/marketplace-breadcrumb";
 import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
 import {DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import ShareDialog from "@/components/share-dialog";
-import {FloatingDock} from "@/components/floating-dock";
+import ShareDialog from "~web/components/share-dialog";
+import {FloatingDock} from "~web/components/floating-dock";
 import React from "react";
 import {Mail} from "lucide-react";
 

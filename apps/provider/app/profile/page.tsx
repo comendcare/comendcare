@@ -1,5 +1,3 @@
-import OverviewStats from "@/components/overview-stats";
-
 export default function ProviderProfilePage() {
     return (
         <div className="flex max-w-screen-xl flex-col space-y-12 p-8">

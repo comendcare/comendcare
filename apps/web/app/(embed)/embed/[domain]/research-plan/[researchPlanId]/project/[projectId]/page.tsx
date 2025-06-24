@@ -4,8 +4,8 @@ import { cn, formatMoney, standardizeYear } from "@/lib/utils"
 import { Building2, Calendar, HandCoins } from "lucide-react"
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import { PublicMilestoneDetails } from "@/components/public-milestone-details"
-import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
+import { PublicMilestoneDetails } from "~web/components/public-milestone-details"
+import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
 export default async function EmbeddedProjectPage({params}: {params: {domain: string, researchPlanId: string, projectId: string}}) {

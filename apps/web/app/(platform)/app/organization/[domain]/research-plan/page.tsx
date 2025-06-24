@@ -4,13 +4,13 @@ import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import Image from "next/image"
-import {FloatingDock} from "@/components/floating-dock";
-import ShareDialog from "@/components/share-dialog";
-import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
+import {FloatingDock} from "~web/components/floating-dock";
+import ShareDialog from "~web/components/share-dialog";
+import MarketplaceBreadcrumb from "~web/components/marketplace-breadcrumb";
 import { Mail, Share } from "lucide-react";
-import ContactPAGDialog from "@/components/contact-pag-dialog";
-import { PAGRoadmapHeader } from "@/components/pag-roadmap-header";
-import { RoadmapsCard } from "@/components/public-roadmap-card";
+import ContactPAGDialog from "~web/components/contact-pag-dialog";
+import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
+import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { mixpanelTrack } from "@/mixpanel";
 
 export async function generateMetadata({

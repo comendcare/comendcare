@@ -9,7 +9,7 @@ import {toast} from "sonner";
 import {acceptedFiletypes, cn, getPublicFile, sleep} from "@/lib/utils";
 import {Pencil, Trash2Icon, Upload} from "lucide-react";
 import {difference} from "lodash";
-import {Button} from "./ui/button";
+import {Button} from "@/components/ui/button";
 
 export const FormImageSelector = ({
                                       className = "",

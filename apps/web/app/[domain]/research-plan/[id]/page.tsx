@@ -1,10 +1,10 @@
 import {notFound} from "next/navigation"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import Image from "next/image"
-import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
+import PAGPublicRoadmapBreadcrumb from "~web/components/pag-public-roadmap-breadcrumb";
 import React from "react";
-import { PublicRoadmapContent } from "@/components/public-roadmap-content"
-import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
+import { PublicRoadmapContent } from "~web/components/public-roadmap-content"
+import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
 
 // export async function generateMetadata({
 //                                            params

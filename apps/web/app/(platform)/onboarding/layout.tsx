@@ -1,6 +1,6 @@
 import {Metadata} from "next";
 import {ReactNode} from "react";
-import OnboardingSteps, {Step} from "@/components/onboarding-steps";
+import OnboardingSteps, {Step} from "~web/components/onboarding-steps";
 import {getSession} from "@/lib/auth";
 import {redirect} from "next/navigation";
 

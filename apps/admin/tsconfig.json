@@ -22,7 +22,7 @@
     "baseUrl": ".", // makes paths relative to `apps/web`
     "paths": {
       "@/*": ["../../*"],
-      "~web/*": ["./*"]
+      "~admin/*": ["./*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
