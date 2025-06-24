@@ -19,12 +19,12 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".", // makes paths relative to `apps/web`
+    "baseUrl": ".", // makes paths relative to `apps/admin`
     "paths": {
       "@/*": ["../../*"],
       "~admin/*": ["./*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "../web", "../provider"]
 }
