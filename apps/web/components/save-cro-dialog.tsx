@@ -135,11 +135,11 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {type === "page" ? (
-                    <Button variant="secondary" className="w-fit onborda-save-service-provider">
+                    <Button variant="secondary" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
                         {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save Service Provider
                     </Button>
                 ) : (
-                    <Button variant="ghost" className="w-fit onborda-save-service-provider">
+                    <Button variant="ghost" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
                         {isSaved ? <Bookmark fill="currentColor" /> : <Bookmark />}
                     </Button>
                 )}
