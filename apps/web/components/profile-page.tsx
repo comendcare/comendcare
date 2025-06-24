@@ -13,7 +13,7 @@ import {
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
-import {PAGBannerPhoto} from "~web/components/pag-banner-photo";
+import {PAGBannerPhoto} from "@/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {BiopharmaConsentSwitch} from "~web/components/biopharma-consent-switch";
 import EditPAGProfileHeaderDialog from "~web/components/edit-pag-profile-header-dialog";

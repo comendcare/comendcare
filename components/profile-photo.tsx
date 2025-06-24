@@ -16,7 +16,7 @@ import {cn, getPublicFile} from "@/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageSelector} from "comend-pag-platform/components/form-image-selector";
+import {FormImageSelector} from "@/components/form-image-selector";
 import {FileWithPreview} from "@/components/image-selector";
 import {toast} from "sonner";
 import {handleImageDelete, handleImageUpload} from "@/lib/upload";

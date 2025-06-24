@@ -40,8 +40,8 @@ import {researchFormSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import MoneyInput from "@/components/money-input";
-import {FormImageSelector} from "comend-pag-platform/components/form-image-selector";
-import {PAGBannerPhoto} from "comend-pag-platform/components/pag-banner-photo";
+import {FormImageSelector} from "@/components/form-image-selector";
+import {PAGBannerPhoto} from "@/components/pag-banner-photo";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 const optionSchema = z.object({
