@@ -77,46 +77,6 @@ export function EmptyResearchPlanCard() {
     )
 }
 
-// export function ResearchPlanTemplateCardSelect({ researchPlanData, milestoneTypes }: {researchPlanData: any, milestoneTypes: any[]}) {
-//     const { addMilestones } = useRoadmapStore(useShallow(selector))
-
-//     return (
-//         <button onClick={() => {
-//             console.log(`add milestones`, researchPlanData.milestones)
-//             addMilestones(researchPlanData.milestones.map((template: any) => {
-//                 return ({
-//                     nodeType: "PROJECT",
-//                     title: template?.title,
-//                     description: template?.description,
-//                     types: template?.types.map((type: string) => {
-//                         const milestoneType = milestoneTypes.find(t => t.id === type)
-//                         if (!milestoneType) return // milestone type not found, don't add it to created milestone
-//                         return ({ 
-//                             milestoneTypeId: type,
-//                             milestoneType
-//                         })
-//                     }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
-//                     status: template?.status,
-//                 })
-//             }))
-//         }}>
-//             <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
-//                 <CardContent className="flex flex-col gap-2 overflow-visible">
-//                     <CardHeader>
-//                         <CardTitle>{researchPlanData.title}</CardTitle>
-//                     </CardHeader>
-
-//                     <ol className="list-decimal pl-4">
-//                         {researchPlanData.milestones.map((milestone: any) => (
-//                             <li>{milestone.title}</li>
-//                         ))}
-//                     </ol>
-//                 </CardContent>
-//             </Card>
-//         </button>
-//     )
-// }
-
 export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedResearchPlanId, setSelectedResearchPlanId }: {researchPlanData: any, selectedResearchPlanId: string | undefined, setSelectedResearchPlanId: (value: SetStateAction<string | undefined>) => void}) {
     return (
         <button onClick={() => {selectedResearchPlanId !== researchPlanData.title ? setSelectedResearchPlanId(researchPlanData.title) : setSelectedResearchPlanId(undefined)}}>
