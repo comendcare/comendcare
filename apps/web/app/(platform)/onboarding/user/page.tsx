@@ -1,4 +1,4 @@
-import UserOnboardingForm from "@/components/user-onboarding-form";
+import UserOnboardingForm from "~web/components/user-onboarding-form";
 import {Separator} from "@/components/ui/separator";
 import {Timer} from "lucide-react";
 

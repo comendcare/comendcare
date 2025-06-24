@@ -3,7 +3,7 @@
 import React from "react"
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CROSearchBar from "@/components/cro-searchbar";
-import {CROSearchResults} from "@/components/cro-search-results";
+import {CROSearchResults} from "~web/components/cro-search-results";
 
 export default function CROPage() {
     return (

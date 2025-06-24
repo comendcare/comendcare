@@ -4,7 +4,7 @@ import {getAssets, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import { initializeAssetsStore} from "@/lib/initialize-client-state"
-import NoOrganization from "@/components/no-organization";
+import NoOrganization from "~web/components/no-organization";
 import Loading from "@/loading";;
 
 export default function ToolsLayout({children}: {children: React.ReactNode}) {

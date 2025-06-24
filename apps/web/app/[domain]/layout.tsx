@@ -6,10 +6,10 @@ import {getOrganizationData} from "@/lib/fetchers"
 import {fontMapper} from "@/styles/fonts"
 import {Metadata} from "next"
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
-import PublicPageFooter from "@/components/public-page-footer"
+import PublicPageFooter from "~web/components/public-page-footer"
 import {Button} from "@/components/ui/button"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
-import {PublicPageNavbar} from "@/components/public-page-navbar";
+import {PublicPageNavbar} from "~web/components/public-page-navbar";
 
 export async function generateMetadata({
                                            params

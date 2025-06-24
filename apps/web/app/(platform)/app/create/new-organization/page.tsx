@@ -1,4 +1,4 @@
-import OrganizationOnboardingForm from "@/components/organization-onboarding-form";
+import OrganizationOnboardingForm from "~web/components/organization-onboarding-form";
 import {Separator} from "@/components/ui/separator";
 
 

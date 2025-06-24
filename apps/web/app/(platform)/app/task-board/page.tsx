@@ -1,9 +1,9 @@
 import {getSession} from "@/lib/auth";
-import {KanbanView} from "@/components/kanban";
+import {KanbanView} from "~web/components/kanban";
 import {getKanbanFromOrganizationId} from "@/lib/fetchers";
-import NewKanbanForm from "@/components/new-kanban";
+import NewKanbanForm from "~web/components/new-kanban";
 import {createKanban} from "@/lib/actions";
-import NoOrganization from "@/components/no-organization";
+import NoOrganization from "~web/components/no-organization";
 
 export default async function KanbanPage({params}: {
     params: { id: string }

@@ -22,15 +22,15 @@ import {FolderOpen, UserSearch} from "lucide-react";
 import {faker} from "@faker-js/faker";
 import {Condition, Organization} from "@prisma/client";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
-import ConditionProfilePatientGroupCard from "@/components/condition-profile-patient-group-card";
+import ConditionProfilePatientGroupCard from "~web/components/condition-profile-patient-group-card";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
-import PublicPageFooter from "@/components/public-page-footer";
+import PublicPageFooter from "~web/components/public-page-footer";
 import Link from "next/link";
-import {FloatingDock} from "@/components/floating-dock";
+import {FloatingDock} from "~web/components/floating-dock";
 import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
-import ShareDialog from "@/components/share-dialog";
+import ShareDialog from "~web/components/share-dialog";
 
 export type Post = {
     id: string

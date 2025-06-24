@@ -20,8 +20,8 @@ import {
 import {toast} from "sonner";
 import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
-import {AppSidebar} from "@/components/app-sidebar";
-import { FeedbackSheet } from "@/components/feedback";
+import {AppSidebar} from "~web/components/app-sidebar";
+import { FeedbackSheet } from "~web/components/feedback";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
@@ -32,7 +32,7 @@ import { BookOpen, Cookie, Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
 import Link from "next/link";
-import {MobileWarning} from "@/components/mobile-warning";
+import {MobileWarning} from "~web/components/mobile-warning";
 import {useIsMobile} from "@/lib/hooks/use-mobile";
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

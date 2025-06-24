@@ -1,16 +1,15 @@
 import { getSession } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
-import Roadmaps from "@/components/roadmaps"
-import CreateRoadmapButton from "@/components/create-roadmap-button"
-import {VerifyOrganizationSwitch} from "@/components/verify-organization-switch";
-import OrganizationRoadmaps from "@/components/organization-roadmaps";
+import Roadmaps from "~admin/components/roadmaps"
+import {VerifyOrganizationSwitch} from "~admin/components/verify-organization-switch";
+import OrganizationRoadmaps from "~admin/components/organization-roadmaps";
 import {deleteOrganization} from "@/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import { mixpanelTrack } from "@/mixpanel"
 import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
-import EditPAGProfileDialog from "@/components/edit-pag-profile-dialog";
+import EditPAGProfileDialog from "~admin/components/edit-pag-profile-dialog";
 
 export default async function AdminOrganizationPage({
     params
@@ -75,7 +74,7 @@ export default async function AdminOrganizationPage({
                     </a>
                     <VerifyOrganizationSwitch organization={data}/>
                 </div>
-                {/* <CreateRoadmapButton /> */}
+
                 <EditPAGProfileDialog organization={data} />
 
                 <DeleteOrganizationAlertDialog organization={data} />

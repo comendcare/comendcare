@@ -3,9 +3,6 @@ import Link from "next/link";
 import {truncate} from "@/lib/utils";
 import React, {useState} from "react";
 import {Company} from "@prisma/client";
-import {Separator} from "../../../components/ui/separator";
-import {TypeBadge} from "../../../components/type-badge";
-import SaveCRODialog from "@/components/save-cro-dialog";
 import {
     Briefcase,
     Building,
@@ -20,9 +17,7 @@ import {
     Trash
 } from "lucide-react";
 import {Milestone} from "@/lib/types";
-import {PropertyBadge} from "../../../components/property-badge";
-import {useRouter} from "next/navigation";
-import { mixpanelTrack } from "@/mixpanel";
+import {PropertyBadge} from "comend-pag-platform/components/property-badge";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
 
 type NodeTypeCount = Record<string, number>;

@@ -1,5 +1,5 @@
 import React from "react"
-import HowItWorksCard from "@/components/how-it-works-card"
+import HowItWorksCard from "~web/components/how-it-works-card"
 import { CircleArrowRight } from "lucide-react"
 
 const steps = [

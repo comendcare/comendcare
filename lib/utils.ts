@@ -1,8 +1,8 @@
 import {type ClassValue, clsx} from "clsx"
 import {twMerge} from "tailwind-merge"
 import {Active, DataRef, Over} from "@dnd-kit/core";
-import {ColumnDragData} from "@/components/board-column";
-import {TaskDragData} from "@/components/task-card";
+import {ColumnDragData} from "comend-pag-platform/components/board-column";
+import {TaskDragData} from "comend-pag-platform/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";

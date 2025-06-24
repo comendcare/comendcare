@@ -1,5 +1,5 @@
 import React from "react"
-import { BetaSignup } from "@/components/beta-signup"
+import { BetaSignup } from "~web/components/beta-signup"
 
 export default function CTASection({
     isSubscribedCallback,

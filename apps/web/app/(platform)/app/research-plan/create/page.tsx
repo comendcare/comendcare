@@ -1,5 +1,5 @@
 "use client"
-import { EditResearchPlanForm } from "@/components/edit-research-plan-form"
+import { EditResearchPlanForm } from "~web/components/edit-research-plan-form"
 import { Separator } from "@/components/ui/separator"
 import Spinner from "@/components/ui/spinner"
 import { useState } from "react"

@@ -6,7 +6,7 @@ import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/loading";;
 import Link from "next/link";
-import UserEditSettingsDialog from "@/components/user-edit-settings-dialog";
+import UserEditSettingsDialog from "~web/components/user-edit-settings-dialog";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
