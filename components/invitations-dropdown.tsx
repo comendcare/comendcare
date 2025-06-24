@@ -16,12 +16,11 @@ export default async function InvitationsDropdown({invitation}: { invitation: In
 
             if (response.success) {
                 toast.success(`Successfully deleted ${response.data.email}'s invitation.`)
+                window.location.reload() // force full page reload
             } else {
                 console.error(response.error)
                 toast.error(response.error)
             }
-
-            location.reload() // force full page refresh
         }
     }
 

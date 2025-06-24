@@ -141,6 +141,7 @@ export default function InviteUserToOrgDialog() {
                 })
                 
                 toast.success(`Invitation to ${invitation.email} sent successfully.`)
+                window.location.reload() // force page reload
             } else {
                 console.error(response.error)
                 toast.error(response.error)
