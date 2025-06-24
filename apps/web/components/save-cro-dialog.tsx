@@ -29,6 +29,7 @@ import { mixpanelTrack } from "@/mixpanel";
 import MultipleSelector from "@/components/ui/multiple-selector";
 import {MILESTONE_TYPE_OPTIONS, Option} from "@/lib/types"
 import ProjectMultipleSelector from "./project-multiple-selector";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -133,17 +134,26 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {type === "page" ? (
-                    <Button variant="secondary" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
-                        {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save Service Provider
-                    </Button>
-                ) : (
-                    <Button variant="ghost" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
-                        {isSaved ? <Bookmark fill="currentColor" /> : <Bookmark />}
-                    </Button>
-                )}
-            </DialogTrigger>
+                <Tooltip>
+                    <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                        <DialogTrigger asChild>
+                        {type === "page" ? (
+                            <Button variant="secondary" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
+                                {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save Service Provider
+                            </Button>
+                        ) : (
+                            <Button variant="ghost" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
+                                {isSaved ? <Bookmark fill="currentColor" /> : <Bookmark />}
+                            </Button>
+                        )}
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    {!session?.user?.organizationId && (
+                        <TooltipContent>
+                            <p>Please join an organization to enable Service Provider shortlisting.</p>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Save {cro.title} to shortlist</DialogTitle>
