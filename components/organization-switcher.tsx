@@ -23,11 +23,7 @@ import {
 import {MembershipWithOrganization} from "@/lib/types";
 import {ProfilePhoto} from "@/components/profile-photo";
 
-export function OrganizationSwitcher({
-                                         memberships,
-                                     }: {
-    memberships: MembershipWithOrganization[];
-}) {
+export function OrganizationSwitcher({memberships}: {memberships: MembershipWithOrganization[]}) {
     const {isMobile} = useSidebar();
     const router = useRouter();
     const {data: session, update} = useSession();
@@ -41,24 +37,9 @@ export function OrganizationSwitcher({
             (membership) => membership?.organization?.id === session?.user?.organizationId
         );
         setActiveOrganization(matchingOrganization || memberships[0]);
-    }, [memberships, session?.user?.organizationId]);
+    }, [memberships, session]);
 
     const handleOrganizationChange = async (membership: MembershipWithOrganization) => {
-        // setActiveOrganization(membership);
-        // await update({
-        //     ...session,
-        //     organizationId: membership.organizationId,
-        //     membership: membership,
-        // });
-        console.log(`UPDATE ORGANIZATION: ${membership?.organization?.name} (${membership?.organization?.id})`)
-        // await update({
-        //     user: {
-        //         ...session?.user,
-        //         organizationId: membership.organization.id, // Ensure the correct org ID is set
-        //         membership: membership, // Explicitly set membership
-        //     }
-        // });
-
         await update({
             ...session,
             organizationId: membership.organizationId,
@@ -66,10 +47,7 @@ export function OrganizationSwitcher({
         });
         if (pathname === "/app/profile") {
             router.refresh(); // Stay and refresh
-            // window.location.reload()
         } else {
-            // window.location.reload()
-            // router.refresh()
             router.push("/app/profile"); // Navigate if not already there
         }
     };

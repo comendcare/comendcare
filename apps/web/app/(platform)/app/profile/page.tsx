@@ -7,6 +7,5 @@ export default async function ProfilePage() {
     const orgId = session?.user.organizationId
 
     if (!orgId) return <NoOrganization />
-
     return <PAGProfilePage />
 }
