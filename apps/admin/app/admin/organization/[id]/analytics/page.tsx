@@ -1,7 +1,6 @@
 import { getSession } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
-import AnalyticsMockup from "@/components/analytics"
 import { AdminResearchPlansAnalyticsCards } from "~web/components/admin-research-plans-analytics-cards"
 import { AdminToolsAnalyticsCards } from "~web/components/admin-tools-analytics-cards"
 import { AdminRFPsAnalyticsCards } from "~web/components/admin-rfps-analytics-cards"
