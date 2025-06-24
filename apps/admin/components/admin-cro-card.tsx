@@ -3,8 +3,8 @@ import Link from "next/link";
 import {truncate} from "@/lib/utils";
 import React, {useState} from "react";
 import {Company} from "@prisma/client";
-import {Separator} from "./ui/separator";
-import {TypeBadge} from "./type-badge";
+import {Separator} from "../../../components/ui/separator";
+import {TypeBadge} from "../../../components/type-badge";
 import SaveCRODialog from "@/components/save-cro-dialog";
 import {
     Briefcase,
@@ -20,7 +20,7 @@ import {
     Trash
 } from "lucide-react";
 import {Milestone} from "@/lib/types";
-import {PropertyBadge} from "./property-badge";
+import {PropertyBadge} from "../../../components/property-badge";
 import {useRouter} from "next/navigation";
 import { mixpanelTrack } from "@/mixpanel";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";

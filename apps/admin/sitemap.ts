@@ -11,25 +11,10 @@ export default async function Sitemap() {
                 `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
             ) ?? "vercel.pub"
 
-    const posts = await getPublicRoadmapsForOrganization(domain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true
-            })
-
     return [
         {
-            url: `https://${domain}`,
+            url: `https://admin.${domain}`,
             lastModified: new Date()
         },
-        ...posts.map(({ slug }) => ({
-            url: `https://${domain}/${slug}`,
-            lastModified: new Date()
-        }))
     ]
 }

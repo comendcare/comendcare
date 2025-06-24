@@ -5,7 +5,7 @@ import {Suspense, useEffect} from "react";
 import logo from "@/public/logos/comend-logo.png"
 import {useSearchParams} from "next/navigation";
 import {toast} from "sonner";
-import AdminLoginForm from "@/components/admin-login-form";
+import AdminLoginForm from "@/apps/admin/components/admin-login-form";
 
 export default function AdminLoginPage() {
     const searchParams = useSearchParams();
