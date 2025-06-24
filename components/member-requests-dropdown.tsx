@@ -55,6 +55,13 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
         }
     }
 
+    const canApproveRequest = session?.data?.user?.membership?.role === "owner"
+    const canDenyRequest = session?.data?.user?.membership?.role === "owner"
+
+    const showDropdownTrigger = canApproveRequest || canDenyRequest
+
+    if (!showDropdownTrigger) return null;
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>

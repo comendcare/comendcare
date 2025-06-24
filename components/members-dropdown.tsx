@@ -2,7 +2,7 @@
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {MemberWithUser} from "@/lib/types";
-import {deleteMember, leaveOrganization, updateMember} from "@/lib/actions";
+import {deleteMember, leaveOrganization, updateMemberWithOwnerPermission, updateMemberWithMemberPermission} from "@/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
@@ -89,7 +89,9 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
 
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
         if (session?.user.organizationId) {
-            const response = await updateMember(session?.user.organizationId, member.id, values)
+            const response = session?.user?.membership?.role === "owner" 
+                ? await updateMemberWithOwnerPermission(session?.user.organizationId, member.id, values)
+                : await updateMemberWithMemberPermission(session?.user.organizationId, member.id, values)
 
             if (response.success && response.data) {
                 const isSelf = session.user.id === member.user.id;

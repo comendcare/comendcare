@@ -156,7 +156,7 @@ export default function InviteUserToOrgDialog() {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className="gap-x-2">
+                <Button className="gap-x-2" disabled={session?.data?.user?.membership?.role !== "owner"}>
                     <UserPlus />
                     Invite user
                 </Button>
