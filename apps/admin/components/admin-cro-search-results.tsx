@@ -3,13 +3,13 @@
 import React from "react"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import InfiniteScroll from "./ui/infinite-scroll";
+import InfiniteScroll from "../../../components/ui/infinite-scroll";
 import Image from "next/image";
-import ComendLoadingSpinner from "./comend-loading-spinner";
+import ComendLoadingSpinner from "../../../components/comend-loading-spinner";
 import {CROMarketplaceCard} from "@/components/marketplace-cro-card";
 import {CROMarketplaceListElement} from "@/components/marketplace-cro-list-element";
-import { Card, CardContent } from "./ui/card";
-import {AdminCROCard} from "@/components/admin-cro-card";
+import { Card, CardContent } from "../../../components/ui/card";
+import {AdminCROCard} from "~web/components/admin-cro-card";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,

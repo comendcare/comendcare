@@ -3,7 +3,7 @@ import Organizations from "@/components/organizations"
 import PlaceholderCard from "@/components/placeholder-card"
 import CreateOrganizationButton from "@/components/create-organization-button"
 import CreateOrganizationModal from "@/components/modal/create-organization"
-import {AdminOrganizationsNav} from "@/components/admin-organizations-nav";
+import {AdminOrganizationsNav} from "~web/components/admin-organizations-nav";
 
 export default function AllOrganizations() {
     return (

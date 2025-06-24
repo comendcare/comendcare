@@ -1,11 +1,11 @@
 import { Suspense } from "react"
 import PlaceholderCard from "@/components/placeholder-card"
-import {AdminCompaniesAnalyticsCards} from "@/components/admin-companies-analytics-cards";
+import {AdminCompaniesAnalyticsCards} from "~web/components/admin-companies-analytics-cards";
 import CROSearchBar from "@/components/cro-searchbar";
 import {CROSearchResults} from "@/components/cro-search-results";
 import {CreateCompanyDialog} from "@/components/create-company-dialog";
-import {AdminCompaniesNav} from "@/components/admin-companies-nav";
-import {AdminCROSearchResults} from "@/components/admin-cro-search-results";
+import {AdminCompaniesNav} from "~web/components/admin-companies-nav";
+import {AdminCROSearchResults} from "~web/components/admin-cro-search-results";
 
 export default function AdminCompaniesPage() {
     return (

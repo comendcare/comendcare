@@ -1,8 +1,8 @@
 import {Suspense} from "react"
 import PlaceholderCard from "@/components/placeholder-card"
-import {AdminUsersNav} from "@/components/admin-users-nav";
-import {AdminUsersAnalyticsCards} from "@/components/admin-users-analytics-cards";
-import {AdminUsersAnalyticsChart} from "@/components/admin-users-analytics-chart";
+import {AdminUsersNav} from "~web/components/admin-users-nav";
+import {AdminUsersAnalyticsCards} from "~web/components/admin-users-analytics-cards";
+import {AdminUsersAnalyticsChart} from "~web/components/admin-users-analytics-chart";
 
 export default function AdminUsersAnalyticsPage() {
 

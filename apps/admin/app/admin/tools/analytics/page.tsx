@@ -1,4 +1,4 @@
-import { AdminToolsAnalyticsCards } from "@/components/admin-tools-analytics-cards";
+import { AdminToolsAnalyticsCards } from "~web/components/admin-tools-analytics-cards";
 
 export default function ToolsAnalyticsPage() {
     return (

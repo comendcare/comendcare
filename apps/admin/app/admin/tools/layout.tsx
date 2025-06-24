@@ -1,4 +1,4 @@
-import { AdminToolsNav } from "@/components/admin-tools-nav";
+import { AdminToolsNav } from "~web/components/admin-tools-nav";
 import PlaceholderCard from "@/components/placeholder-card";
 import { ReactNode, Suspense } from "react";
 
