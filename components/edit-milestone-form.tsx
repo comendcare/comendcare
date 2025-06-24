@@ -96,7 +96,8 @@ export const optionSchema = z.object({
 });
 
 const selector = (state: RoadmapState) => ({
-    setMilestone: state.setMilestone
+    setMilestone: state.setMilestone,
+    selectedNodeIds: state.selectedNodeIds
 })
 
 const recommendationsSelector = (state: CROSearchState) => ({
@@ -155,13 +156,13 @@ export function EditMilestoneForm({
     orgIsPublished: boolean
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
     const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
     const {
         initialized: notificationsInitialized,
         notifications,
         addNotification,
-        setNotificationsViewed
+        setNotificationsViewed,
     } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
@@ -174,6 +175,7 @@ export function EditMilestoneForm({
     const {step} = useOnbordaStore(useShallow(onbordaSelector))
     const {currentTour, currentStep, isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
+    const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -408,63 +410,67 @@ export function EditMilestoneForm({
     }, [])
 
     // when switching to recommendations tab, set notifications as viewed
-    useEffect(() => {
-        if (tab === "recommendations") {
-            const relevantNotifications = recommendations?.map(({content, milestone}) => (
-                notifications.find((notification: any) => (
-                    notification.type === "NEW_RECOMMENDATION" &&
-                    notification.metadata?.companyId === content.id &&
-                    notification.metadata?.milestoneId === milestone.id &&
-                    notification.lastViewed
-                ))
-            )).filter(n => n !== undefined) || []
-            if (relevantNotifications.length > 0) setNotificationsViewed(relevantNotifications)
-        }
-    }, [tab, notifications, recommendations, setNotificationsViewed])
+    // useEffect(() => {
+    //     if (tab === "recommendations") {
+    //         const relevantNotifications = recommendations?.map(({content, milestone}) => (
+    //             notifications.find((notification: any) => (
+    //                 notification.type === "NEW_RECOMMENDATION" &&
+    //                 notification.metadata?.companyId === content.id &&
+    //                 notification.metadata?.milestoneId === milestone.id &&
+    //                 notification.lastViewed
+    //             ))
+    //         )).filter(n => n !== undefined) || []
+    //         if (relevantNotifications.length > 0) setNotificationsViewed(relevantNotifications)
+    //     }
+    // }, [tab, notifications, recommendations, setNotificationsViewed])
 
     useEffect(() => {
-        const setupNotifications = async () => {
-            if (!initializing.current && notificationsInitialized) {
-                // if is initialized, set up the notifications for new recommendations
-                // Copy the notifications to avoid mutating the original array
-                let localNotifications: Partial<PlatformNotification>[] = [...notifications]
-                for (const recommendation of (recommendations || [])) {
+        if (tab === "recommendations") setRecommendationsViewed(true)
+    }, [tab])
 
-                    const exists = localNotifications
-                        .filter((notification: any) => (
-                            notification.type === "NEW_RECOMMENDATION" &&
-                            notification.metadata?.milestoneId === recommendation.milestone.id &&
-                            notification.metadata?.companyId === recommendation.content.id
-                        )).length > 0
+    // useEffect(() => {
+    //     const setupNotifications = async () => {
+    //         if (!initializing.current && notificationsInitialized) {
+    //             // if is initialized, set up the notifications for new recommendations
+    //             // Copy the notifications to avoid mutating the original array
+    //             let localNotifications: Partial<PlatformNotification>[] = [...notifications]
+    //             for (const recommendation of (recommendations || [])) {
 
-                    console.log(`notifications exist`, exists)
+    //                 const exists = localNotifications
+    //                     .filter((notification: any) => (
+    //                         notification.type === "NEW_RECOMMENDATION" &&
+    //                         notification.metadata?.milestoneId === recommendation.milestone.id &&
+    //                         notification.metadata?.companyId === recommendation.content.id
+    //                     )).length > 0
 
-                    if (!exists) {
-                        console.log(`notifications`, localNotifications);
-                        console.log(
-                            `ADD NOTIFICATION`,
-                            `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
-                        );
+    //                 console.log(`notifications exist`, exists)
 
-                        const notificationData = {
-                            type: "NEW_RECOMMENDATION",
-                            title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
-                            metadata: {
-                                milestoneId: recommendation.milestone.id,
-                                companyId: recommendation.content.id,
-                            },
-                        }
-                        await addNotification(notificationData)
-                        localNotifications = localNotifications.concat([notificationData])
-                    }
-                }
-            }
-        }
+    //                 if (!exists) {
+    //                     console.log(`notifications`, localNotifications);
+    //                     console.log(
+    //                         `ADD NOTIFICATION`,
+    //                         `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
+    //                     );
 
-        setupNotifications()
-        // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [recommendations, notificationsInitialized, addNotification])
+    //                     const notificationData = {
+    //                         type: "NEW_RECOMMENDATION",
+    //                         title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
+    //                         metadata: {
+    //                             milestoneId: recommendation.milestone.id,
+    //                             companyId: recommendation.content.id,
+    //                         },
+    //                     }
+    //                     await addNotification(notificationData)
+    //                     localNotifications = localNotifications.concat([notificationData])
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     setupNotifications()
+    //     // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [selectedNodeIds, recommendations, notificationsInitialized, addNotification])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
@@ -512,14 +518,15 @@ export function EditMilestoneForm({
                                     <TabsTrigger className="relative" value="recommendations">
                                         Marketplace recommendations
                                         {
-                                            notifications &&
-                                            notifications
-                                                .filter((notification: any) => (
-                                                    notification.type === "NEW_RECOMMENDATION" &&
-                                                    notification.metadata?.milestoneId === milestoneData.id &&
-                                                    (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
-                                                    !notification.lastViewedAt
-                                                )).length > 0 &&
+                                            // notifications &&
+                                            // notifications
+                                            //     .filter((notification: any) => (
+                                            //         notification.type === "NEW_RECOMMENDATION" &&
+                                            //         notification.metadata?.milestoneId === milestoneData.id &&
+                                            //         (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
+                                            //         !notification.lastViewedAt
+                                            //     )).length > 0 &&
+                                            recommendations && recommendations.length > 0 && !recommendationsViewed &&
                                             <NotificationBubble/>
                                         }
                                     </TabsTrigger>
