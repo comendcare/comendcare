@@ -55,7 +55,7 @@ export default function RFPsLayout({children}: {children: React.ReactNode}) {
         handleSessionUpdate()
     }, [session?.user?.organizationId])
 
-    if (!isInitialized) return <Loading />
-    if (!organization) return <NoOrganization />
+    // if (!isInitialized) return <Loading />
+    // if (!organization) return <NoOrganization />
     return <>{children}</>
 }

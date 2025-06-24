@@ -94,45 +94,9 @@ const data = {
     ]
 }
 
-export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
-    const {data: session} = useSession()
-    const [memberships, setMemberships] = useState<MembershipWithOrganization[]>([]);
-    useEffect(() => {
-        const fetchOrganizations = async () => {
-            if (session) {
-                try {
-                    const response = await getAllMembershipsFromUserId(session.user.id, {
-                        id: true,
-                        role: true,
-                        title: true,
-                        email: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        invitedBy: true,
-                        organization: true,
-                        organizationId: true,
-                        user: true,
-                        metadata: true
-                    });
-                    if (response.success) {
-                        setMemberships(response.data ?? []);
-                    } else {
-                        console.error(response.error);
-                        toast.error(response.error);
-                    }
-                } catch (err) {
-                    console.error(err);
-                    toast.error("Unexpected error fetching organizations.");
-                }
-            }
-        };
-
-        fetchOrganizations(); // fire and forget, but it's now safe
-
-    }, [session]);
-
+export function AppSidebar({memberships}: {memberships: MembershipWithOrganization[]}) {
     return (
-        <Sidebar collapsible="icon" {...props}>
+        <Sidebar collapsible="icon">
             <SidebarHeader>
                 <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>

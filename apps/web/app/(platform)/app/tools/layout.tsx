@@ -13,7 +13,7 @@ export default function ToolsLayout({children}: {children: React.ReactNode}) {
     const [organization, setOrganization] = useState(undefined)
 
     const handleSessionUpdate = async () => {
-        if (session) {
+        if (session && session?.user?.organizationId) {
             // init organization
             const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {id: true})
             if (response.success) {
@@ -49,7 +49,7 @@ export default function ToolsLayout({children}: {children: React.ReactNode}) {
         handleSessionUpdate()
     }, [session?.user?.organizationId])
 
-    if (!isInitialized) return <Loading />
-    if (!organization) return <NoOrganization />
+    // if (!isInitialized) return <Loading />
+    // if (!organization) return <NoOrganization />
     return <>{children}</>
 }

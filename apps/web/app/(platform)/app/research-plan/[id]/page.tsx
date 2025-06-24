@@ -6,11 +6,6 @@ export default async function RoadmapPage({params}: {params: { id: string }}) {
     const session = await getSession()
     const orgId = session?.user.organizationId
 
-    if (!orgId) {
-        return <NoOrganization />
-    }
-
-    return (
-        <Roadmap />
-    )
+    if (!orgId) return <NoOrganization />
+    return <Roadmap />
 }
