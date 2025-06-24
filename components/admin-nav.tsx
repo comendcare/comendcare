@@ -27,6 +27,7 @@ import {ReactNode, useEffect, useMemo, useState} from "react"
 import Image from "next/image"
 import {getOrganizationFromRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
+import ComendAdminLogo from "@/public/Comend Admin Full logo.png"
 
 const externalLinks: any[] = [
     {
@@ -190,10 +191,10 @@ export default function AdminNav({children}: { children: ReactNode }) {
             >
                 <div className="grid gap-2 space-y-2">
                     <Image
-                        src="/Comend Admin Full logo.png"
+                        src={ComendAdminLogo}
                         width={100}
                         height={100}
-                        alt="Logo"
+                        alt="Comend Admin Logo"
                         className="w-full"
                     />
                     <div className="grid gap-1">
