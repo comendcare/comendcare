@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Asset } from "@/lib/types"
 import { Pin } from "lucide-react"
-import { AssetActionsMenu } from "../tool-actions-menu"
+import { AssetActionsMenu } from "../../../../components/tool-actions-menu"
 
 interface CustomColumnMeta {
     name?: string;

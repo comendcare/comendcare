@@ -8,7 +8,7 @@ import Image from "next/image";
 import ComendLoadingSpinner from "../../../components/comend-loading-spinner";
 import {CROMarketplaceListElement} from "@/components/marketplace-cro-list-element";
 import {Card, CardContent} from "@/components/ui/card";
-import {AdminCROCard} from "~web/components/admin-cro-card";
+import {AdminCROCard} from "~admin/components/admin-cro-card";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
