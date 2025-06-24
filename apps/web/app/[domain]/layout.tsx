@@ -5,7 +5,7 @@ import {notFound, redirect} from "next/navigation"
 import {getOrganizationData} from "@/lib/fetchers"
 import {fontMapper} from "@/styles/fonts"
 import {Metadata} from "next"
-import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
+import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import PublicPageFooter from "@/components/public-page-footer"
 import {Button} from "@/components/ui/button"
 import {TooltipProvider} from "@radix-ui/react-tooltip"

@@ -2,7 +2,7 @@
 import {
     HeroHighlight,
     Highlight
-} from "@/components/layout/sections/hero-highlight"
+} from "~web/components/landing/hero-highlight"
 import {motion, useMotionValue, useSpring, useTransform} from "framer-motion"
 import {Label} from "@/components/ui/label"
 import {FancyInput} from "@/components/ui/fancy-input"

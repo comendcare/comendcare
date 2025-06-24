@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { getNotionDatabaseAndContents } from '@/lib/notion' // adjust import
-import { Blog } from '@/components/layout/sections/news'
+import { Blog } from '~web/components/landing/news'
 
 const GuidesContext = createContext<{ guides: Blog[] }>({ guides: [] })
 

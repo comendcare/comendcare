@@ -14,7 +14,7 @@ import {
     Menu,
     MenuItem,
     ProductItem
-} from "@/components/layout/sections/navbar-menu"
+} from "~web/components/landing/navbar-menu"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
@@ -285,7 +285,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                 )}
             >
                 <div className="flex flex-row justify-between items-center w-full">
-                    <Link href="/">
+                    <Link href="/public">
                         <Image
                             className="w-24 inline"
                             src={logo}

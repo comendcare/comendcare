@@ -34,7 +34,7 @@ import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/type
 import Link from "next/link";
 import {MobileWarning} from "@/components/mobile-warning";
 import {useIsMobile} from "@/lib/hooks/use-mobile";
-import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
+import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AppLayoutProps {

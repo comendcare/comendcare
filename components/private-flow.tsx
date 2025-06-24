@@ -263,7 +263,7 @@ export const PrivateFlowView = ({
             } else {
                 fitView({ padding: 0.4, duration: 500 })
             }
-        }, 1) // Delay by a short time to allow layout adjustment
+        }, 1) // Delay by a short time to allow landing adjustment
 
         return () => clearTimeout(timer)
     }, [width, selectedNodeIds, fitView])
