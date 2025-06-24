@@ -1,7 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { getNotionDatabaseAndContents } from "@/lib/notion"
-import { fi } from "@faker-js/faker"
-import { filter } from "lodash"
 import Link from "next/link"
 
 export default async function FAQLayout({
