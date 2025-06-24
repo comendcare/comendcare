@@ -19,15 +19,16 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import { Asset } from "@/lib/types"
-import { EditAssetDialog } from "../edit-asset-dialog"
+import { Roadmap } from "@prisma/client"
+import { useRouter } from "next/navigation"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../../../components/ui/collapsible"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
 
-export function AssetsDataTable<TData, TValue>({
+export function ResearchPlansDataTable<TData, TValue>({
                                              columns,
                                              data,
                                          }: DataTableProps<TData, TValue>) {
@@ -38,6 +39,7 @@ export function AssetsDataTable<TData, TValue>({
         []
     )
     const [sorting, setSorting] = React.useState<SortingState>([])
+    const router = useRouter()
 
     const table = useReactTable({
         data,
@@ -87,25 +89,39 @@ export function AssetsDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <EditAssetDialog
+                                <TableRow
                                     key={row.id}
-                                    data={{...row.original} as Partial<Asset>} 
-                                    numAssetsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Asset>).pinned).length}
+                                    data-state={row.getIsSelected() && "selected"}
+                                    onClick={() => {
+                                        router.push(`/app/research-plan/${(row.original as Roadmap).id}`)
+                                    }}
+                                    className="cursor-pointer"
                                 >
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </EditAssetDialog>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                                // <Collapsible key={row.id} asChild>
+                                //     <>
+                                //     <CollapsibleTrigger asChild>
+                                //         <TableRow data-state={row.getIsSelected() && "selected"} className="!appearance-none">
+                                //         {row.getVisibleCells().map((cell) => (
+                                //             <TableCell key={cell.id}>
+                                //             {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                //             </TableCell>
+                                //         ))}
+                                //         </TableRow>
+                                //     </CollapsibleTrigger>
+                                //     <CollapsibleContent asChild>
+                                //         {/* <ExpandedContent dollars={[]} /> */}
+                                //     </CollapsibleContent>
+                                //     </>
+                                // </Collapsible>
                             ))
                         ) : (
                             <TableRow>

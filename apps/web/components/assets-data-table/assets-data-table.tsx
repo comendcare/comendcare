@@ -19,16 +19,15 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import { Roadmap } from "@prisma/client"
-import { useRouter } from "next/navigation"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
+import { Asset } from "@/lib/types"
+import { EditAssetDialog } from "../../../../components/edit-asset-dialog"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
 
-export function ResearchPlansDataTable<TData, TValue>({
+export function AssetsDataTable<TData, TValue>({
                                              columns,
                                              data,
                                          }: DataTableProps<TData, TValue>) {
@@ -39,7 +38,6 @@ export function ResearchPlansDataTable<TData, TValue>({
         []
     )
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const router = useRouter()
 
     const table = useReactTable({
         data,
@@ -89,39 +87,25 @@ export function ResearchPlansDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
+                                <EditAssetDialog
                                     key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    onClick={() => {
-                                        router.push(`/app/research-plan/${(row.original as Roadmap).id}`)
-                                    }}
-                                    className="cursor-pointer"
+                                    data={{...row.original} as Partial<Asset>} 
+                                    numAssetsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Asset>).pinned).length}
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                                // <Collapsible key={row.id} asChild>
-                                //     <>
-                                //     <CollapsibleTrigger asChild>
-                                //         <TableRow data-state={row.getIsSelected() && "selected"} className="!appearance-none">
-                                //         {row.getVisibleCells().map((cell) => (
-                                //             <TableCell key={cell.id}>
-                                //             {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                //             </TableCell>
-                                //         ))}
-                                //         </TableRow>
-                                //     </CollapsibleTrigger>
-                                //     <CollapsibleContent asChild>
-                                //         {/* <ExpandedContent dollars={[]} /> */}
-                                //     </CollapsibleContent>
-                                //     </>
-                                // </Collapsible>
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && "selected"}
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                </EditAssetDialog>
                             ))
                         ) : (
                             <TableRow>

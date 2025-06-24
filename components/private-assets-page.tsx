@@ -5,8 +5,8 @@ import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import { NewAssetDialog } from "./edit-asset-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
-import { columns } from "@/components/assets-data-table/assets-data-columns";
-import { AssetsDataTable } from "./assets-data-table/assets-data-table"
+import { columns } from "../apps/web/components/assets-data-table/assets-data-columns";
+import { AssetsDataTable } from "../apps/web/components/assets-data-table/assets-data-table"
 
 const toolSelector = (state: AssetState) => ({
     tools: state.tools

@@ -35,7 +35,7 @@ import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
-import ProjectMultipleSelector from "../project-multiple-selector";
+import ProjectMultipleSelector from "../../../../components/project-multiple-selector";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
