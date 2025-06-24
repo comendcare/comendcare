@@ -460,7 +460,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     }}
                 >
                     <div className="relative flex flex-wrap gap-1">
-                        {selected.map((option) => {
+                        {selected && selected.map((option) => {
                             return (
                                 <Badge
                                     key={option.value}

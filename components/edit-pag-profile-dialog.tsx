@@ -423,7 +423,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
 
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name || "",
+                            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories?.map((cat: any) => ({
                                 label: cat,
@@ -443,9 +443,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
                             national: condition.nationalEstimatedPopulation?.toString() || "",
                             global: condition.globalEstimatedPopulation?.toString() || "",
-                            otherCategories: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherCategories : undefined,
-                            otherMechanisms: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherMechanisms : undefined,
-                            otherSystems: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherSystems : undefined,
+                            otherCategories: typeof condition.metadata == 'object' ? (condition.metadata as { [key: string]: any })?.otherCategories : undefined,
+                            otherMechanisms: typeof condition.metadata == 'object' ? (condition.metadata as { [key: string]: any })?.otherMechanisms : undefined,
+                            otherSystems: typeof condition.metadata == 'object' ? (condition.metadata as { [key: string]: any })?.otherSystems : undefined,
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
@@ -484,7 +484,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
 
             // Map the form values to match the Condition schema
             const mappedData: Record<string, any> = {
-                name: values.disorder || "",
+                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
                 summary: values.summary || "",
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
@@ -972,7 +972,6 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                         </TabsContent>
 
                         <TabsContent value="research">
-
                             <Form {...editResearchForm}>
                                 <form onSubmit={editResearchForm.handleSubmit(onResearchFormSubmit)}
                                       className="space-y-8">

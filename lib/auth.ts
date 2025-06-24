@@ -277,7 +277,7 @@ export function withAdminAuth(action: any) {
     ) => {
         const session = await getSession()
         if (!session) {
-            toast.error("Not authenticated: could not find session data")
+            // toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -285,11 +285,11 @@ export function withAdminAuth(action: any) {
             where: {id: session.user.id}
         })
         if (!user) {
-            toast.error(`Not authenticated: could not find user data in the database for user ${session.user.id}`)
+            // toast.error(`Not authenticated: could not find user data in the database for user ${session.user.id}`)
             return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
         }
         if (!user.email) {
-            toast.error(`Not authenticated: could not find email address in the database for user ${session.user.id}`)
+            // toast.error(`Not authenticated: could not find email address in the database for user ${session.user.id}`)
             return {error: `Not authenticated: could not find email address in the database for user ${session.user.id}`}
         }
 
@@ -314,7 +314,7 @@ export function withAuth(action: any) {
     ) => {
         const session = await getSession()
         if (!session || !session?.user?.id) {
-            toast.error("Not authenticated: could not find session data")
+            // toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -343,7 +343,7 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
     ) => {
         const session = await getSession()
         if (!session) {
-            toast.error("Not authenticated: could not find session data")
+            // toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -356,17 +356,17 @@ export function withOrganizationAuth(action: any, roles?: string[]) {
         const membership = organization?.members.find(member => member.userId === session.user.id)
 
         if (!organization) {
-            toast.error("Not authorized: organization doesn't exist")
+            // toast.error("Not authorized: organization doesn't exist")
             return {error: "Not authorized: organization doesn't exist"}
         }
         if (!membership) {
-            toast.error("Not authorized: user is not a member of this organziation")
+            // toast.error("Not authorized: user is not a member of this organziation")
             return {error: "Not authorized: user is not a member of this organziation"}
         }
 
         if (roles) {
             if (!roles.includes(membership.role)) {
-                toast.error(`Not authorized: role ${membership.role} doesn't have access to this action`)
+                // toast.error(`Not authorized: role ${membership.role} doesn't have access to this action`)
                 return {error: `Not authorized: role ${membership.role} doesn't have access to this action`}
             }
         }
@@ -382,7 +382,7 @@ export function withUserAuth(action: any) {
     ) => {
         const session = await getSession()
         if (!session) {
-            toast.error("Not authenticated: could not find session data")
+            // toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -393,7 +393,7 @@ export function withUserAuth(action: any) {
             where: {id: userId}
         })
         if (!user) {
-            toast.error("Not authorized: user doesn't exist")
+            // toast.error("Not authorized: user doesn't exist")
             return {error: "Not authorized: user doesn't exist"}
         }
 
