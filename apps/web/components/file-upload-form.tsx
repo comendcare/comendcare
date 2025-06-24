@@ -15,7 +15,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import Papa from "papaparse"
-import { DialogClose } from "../../../components/ui/dialog"
+import { DialogClose } from "@/components/ui/dialog"
 import { toast } from "sonner"
 
 const formSchema = z.object({

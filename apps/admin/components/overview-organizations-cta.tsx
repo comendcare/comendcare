@@ -1,7 +1,7 @@
 import {getSession} from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import CreateOrganizationButton from "~admin/components/create-organization-button";
-import CreateOrganizationModal from "../../../components/modal/create-organization";
+import CreateOrganizationModal from "@/components/modal/create-organization";
 import Link from "next/link";
 
 export default async function OverviewOrganizationsCTA() {

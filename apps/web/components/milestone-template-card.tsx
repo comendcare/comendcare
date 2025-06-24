@@ -7,7 +7,7 @@ import {
     CardDescription,
     CardHeader,
     CardTitle
-} from "../../../components/ui/card"
+} from "@/components/ui/card"
 import { CheckBubble } from "./check-bubble"
 import { cn } from "@/lib/utils";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";

@@ -42,7 +42,7 @@ import {Organization} from "@prisma/client";
 import MoneyInput from "@/components/money-input";
 import {FormImageSelector} from "comend-pag-platform/components/form-image-selector";
 import {PAGBannerPhoto} from "comend-pag-platform/components/pag-banner-photo";
-import {ProfilePhoto} from "../../../components/profile-photo";
+import {ProfilePhoto} from "@/components/profile-photo";
 
 const optionSchema = z.object({
     label: z.string(),

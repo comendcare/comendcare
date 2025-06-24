@@ -9,10 +9,10 @@ import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import { mixpanelTrack } from "@/mixpanel";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../../../components/ui/accordion";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import CopyCodeBlock from "./code-block";
-import { Switch } from "../../../components/ui/switch";
-import { Label } from "../../../components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function ShareDialog({
                                         url,

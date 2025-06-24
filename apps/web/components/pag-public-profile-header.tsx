@@ -1,6 +1,6 @@
 import {formatMoney, standardizeYear} from "@/lib/utils";
 import {Organization} from "@prisma/client";
-import {ProfilePhoto} from "../../../components/profile-photo";
+import {ProfilePhoto} from "@/components/profile-photo";
 import {BackButton} from "./back-button";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import { Building2, Calendar, HandCoins } from "lucide-react";

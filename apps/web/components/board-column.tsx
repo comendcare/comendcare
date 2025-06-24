@@ -5,9 +5,9 @@ import { useMemo } from "react"
 import { Task, TaskCard } from "~web/components/task-card"
 import { cva } from "class-variance-authority"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "../../../components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Ellipsis, GripVertical, Trash } from "lucide-react"
-import { ScrollArea } from "../../../components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import {Column} from "@prisma/client";
 import NewKanbanTaskButton from "~web/components/new-kanban-task-button";

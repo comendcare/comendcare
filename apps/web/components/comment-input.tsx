@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input, InputProps } from "@/components/ui/input";
 import { Send } from "lucide-react";
-import Spinner from "../../../components/ui/spinner";
+import Spinner from "@/components/ui/spinner";
 
 interface CommentInputProps extends InputProps {
     onSubmit: () => void;

@@ -4,8 +4,8 @@ import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
-import { Button } from "../../../components/ui/button"
-import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "../../../components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "@/components/ui/dialog"
 
 const toolSelector = (state: AssetState) => ({
     createAsset: state.createAsset,

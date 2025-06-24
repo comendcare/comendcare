@@ -14,7 +14,7 @@ import {Company} from "@prisma/client";
 import CROMarketplaceProfileReviewsTab from "~web/components/cro-marketplace-profile-reviews-tab";
 import {CompanyWithReviewsAndServices} from "@/lib/types";
 import {getCROData} from "@/lib/fetchers";
-import { Skeleton } from "../../../components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CROPageTabs() {
     const router = useRouter()

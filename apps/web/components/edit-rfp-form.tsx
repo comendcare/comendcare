@@ -12,11 +12,11 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "../../../components/ui/form"
-import {Input} from "../../../components/ui/input"
-import {Textarea} from "../../../components/ui/textarea"
-import {Button} from "../../../components/ui/button"
-import {ScrollArea, ScrollBar} from "../../../components/ui/scroll-area"
+} from "@/components/ui/form"
+import {Input} from "@/components/ui/input"
+import {Textarea} from "@/components/ui/textarea"
+import {Button} from "@/components/ui/button"
+import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
@@ -26,16 +26,16 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "../../../components/ui/dialog"
+} from "@/components/ui/dialog"
 import {RFP} from "@/lib/types"
 import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import {useSession} from "next-auth/react"
-import {Popover, PopoverContent, PopoverTrigger} from "../../../components/ui/popover"
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
 import {cn} from "@/lib/utils"
 import {format} from "date-fns"
-import {Calendar} from "../../../components/ui/calendar"
-import MultipleSelector from "../../../components/ui/multiple-selector"
+import {Calendar} from "@/components/ui/calendar"
+import MultipleSelector from "@/components/ui/multiple-selector"
 import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -48,10 +48,10 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { useShallow } from "zustand/react/shallow"
-import MoneyInput from "../../../components/money-input"
+import MoneyInput from "@/components/money-input"
 import ProjectMultipleSelector from "./project-multiple-selector"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>

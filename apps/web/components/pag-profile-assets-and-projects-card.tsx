@@ -12,7 +12,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
 import { ChevronRight, ExternalLink, Info, Paperclip, Pencil } from "lucide-react";
 

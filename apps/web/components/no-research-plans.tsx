@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react"
 import Image from "next/image"
-import { Button, buttonVariants } from "../../../components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 

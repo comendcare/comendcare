@@ -27,12 +27,12 @@ import {useShallow} from "zustand/react/shallow"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {useSession} from "next-auth/react"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../../components/ui/select"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Column} from "@/lib/actions"
 import NewColumnDialog from "./new-column-dialog"
-import { ScrollArea, ScrollBar } from "../../../components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button } from "../../../components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Redo2, Undo2 } from "lucide-react"
 
 export type ColumnId = string

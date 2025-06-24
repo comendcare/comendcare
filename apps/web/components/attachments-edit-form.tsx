@@ -1,13 +1,13 @@
 import { Prisma } from "@prisma/client"
 import { ExternalAttachmentField } from "./external-attachment-field"
-import { Button } from "../../../components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
     FormControl,
     FormField,
     FormLabel,
     FormItem,
     FormMessage,
-} from "../../../components/ui/form"
+} from "@/components/ui/form"
 import { UseFormReturn } from "react-hook-form"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{

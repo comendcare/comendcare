@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react"
 import { MilestoneTemplates, ResearchPlanTemplates } from "./roadmap-templates"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog"
-import { Button } from "../../../components/ui/button"
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 import { Info, Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
-import { ScrollArea } from "../../../components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import mixpanel from "mixpanel-browser"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,

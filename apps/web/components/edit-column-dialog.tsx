@@ -26,7 +26,7 @@ import {Input} from "@/components/ui/input"
 import {getNewColumnFormSchema} from "@/lib/schemas";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
-import { DropdownMenuItem } from "../../../components/ui/dropdown-menu"
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Column } from "@prisma/client"
 import { Pencil } from "lucide-react"
 import { useSession } from "next-auth/react"

@@ -1,5 +1,5 @@
 import { Organization } from "@prisma/client";
-import { ProfilePhoto } from "../../../components/profile-photo";
+import { ProfilePhoto } from "@/components/profile-photo";
 import { Building2, Calendar, HandCoins } from "lucide-react";
 import { formatMoney, standardizeYear } from "@/lib/utils";
 

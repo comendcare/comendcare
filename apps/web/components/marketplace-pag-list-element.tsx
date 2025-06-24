@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { Badge } from "../../../components/ui/badge";
-import { ProfilePhoto } from "../../../components/profile-photo";
+import { Badge } from "@/components/ui/badge";
+import { ProfilePhoto } from "@/components/profile-photo";
 import { Building2, HandCoins, Calendar } from "lucide-react";
 
 export function OrganizationMarketplaceListElement({ organization }: { organization: any }) {

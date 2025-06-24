@@ -3,7 +3,7 @@
 import React from "react"
 import {CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {useShallow} from "zustand/react/shallow";
-import InfiniteScroll from "../../../components/ui/infinite-scroll";
+import InfiniteScroll from "@/components/ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "comend-pag-platform/components/comend-loading-spinner";
 import {CROMarketplaceListElement} from "@/components/marketplace-cro-list-element";
