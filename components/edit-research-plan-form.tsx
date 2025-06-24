@@ -235,7 +235,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog, setIsSubmit
                     {researchPlanData?.id ? (
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button type="button" variant="destructive">
+                                <Button type="button" variant="destructive" disabled={session?.user?.membership?.role !== "owner" }>
                                     Delete Research Plan
                                 </Button>
                             </DialogTrigger>
@@ -265,6 +265,7 @@ export function EditResearchPlanForm({researchPlanData, closeDialog, setIsSubmit
                                             <Button
                                                 type="button"
                                                 variant={"destructive"}
+                                                disabled={session?.user?.membership?.role !== "owner"}
                                                 onClick={async () => {
                                                     // delete research plan, and reroute the user back to the research plans page
                                                     if (researchPlanData?.id) {

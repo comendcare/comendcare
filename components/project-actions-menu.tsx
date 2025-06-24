@@ -131,7 +131,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
     }
 
     const handleDuplicate = async () => {
-        const milestones = await addMilestones([{
+        const newNodes = await addMilestones([{
             // nodeType: milestone.nodeType || milestone.nodeType,
             // title: milestone.title,
             // description: milestone.description,
@@ -142,7 +142,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
             // contacts: milestone.contacts,
             ...milestone
         }], "Duplicate")
-        if (milestones && milestones.length > 0) setSelectedNodeIds([milestones[0].id])
+        if (newNodes && newNodes.length > 0) setSelectedNodeIds([newNodes[0].id])
     }
 
     const handleDelete = async () => {

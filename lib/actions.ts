@@ -1346,6 +1346,9 @@ export const denyMemberRequest = withOrganizationAuth(
                 where: {
                     id: memberRequest.id
                 },
+                include: {
+                    user: true
+                }
             });
 
             if (!deletedMemberRequest) {
@@ -1500,7 +1503,47 @@ export const leaveOrganization = withOrganizationAuth(
     }
 );
 
-export const updateMember = withOrganizationAuth(
+export const updateMemberWithMemberPermission = withOrganizationAuth(
+    async (
+        organization: Organization, 
+        membershipId: string,
+        data: Prisma.MemberUpdateInput
+    ) => {
+        const session = await getSession();
+
+        try {
+            if (!session) {
+                return {success: false, error: "Session not found."};
+            }
+
+            const targetMember = await prisma.member.findUnique({
+                where: {id: membershipId},
+            });
+
+            if (!targetMember) {
+                return {success: false, error: "Membership not found."};
+            }
+
+            const updatedMember = await prisma.member.update({
+                where: {id: membershipId},
+                include: {user: true},
+                data: {
+                    title: data.title // members can only update the title
+                }
+            });
+
+            revalidatePath("/app/analytics");
+            revalidatePath("/app/profile");
+
+            return {success: true, data: updatedMember};
+        } catch (error: any) {
+            logError("Error updating membership", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const updateMemberWithOwnerPermission = withOrganizationAuth(
     async (
         organization: Organization,
         membershipId: string,
