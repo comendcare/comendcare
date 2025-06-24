@@ -1,6 +1,6 @@
 import {getSession} from "@/lib/auth"
-import NoOrganization from "@/components/no-organization";
-import RoadmapsPage from "@/components/roadmaps-page";
+import NoOrganization from "~web/components/no-organization";
+import RoadmapsPage from "~web/components/roadmaps-page";
 
 export default async function RoadmapPage() {
     const session = await getSession();

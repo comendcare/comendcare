@@ -1,8 +1,8 @@
 import {Suspense} from "react"
 import PlaceholderCard from "@/components/placeholder-card"
-import {AdminCompaniesNav} from "@/components/admin-companies-nav";
-import {AdminCompaniesAnalyticsCards} from "@/components/admin-companies-analytics-cards";
-import {AdminCompaniesAnalyticsChart} from "@/components/admin-companies-analytics-chart";
+import {AdminCompaniesNav} from "~admin/components/admin-companies-nav";
+import {AdminCompaniesAnalyticsCards} from "~admin/components/admin-companies-analytics-cards";
+import {AdminCompaniesAnalyticsChart} from "~admin/components/admin-companies-analytics-chart";
 
 export default function AdminCompaniesPage() {
 

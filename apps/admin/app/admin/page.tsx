@@ -1,10 +1,10 @@
 import {Suspense} from "react";
-import Organizations from "@/components/organizations";
-import OverviewStats from "@/components/overview-stats";
-import Roadmaps from "@/components/roadmaps";
+import Organizations from "~admin/components/organizations";
+import OverviewStats from "~admin/components/overview-stats";
+import Roadmaps from "~admin/components/roadmaps";
 import Link from "next/link";
 import PlaceholderCard from "@/components/placeholder-card";
-import OverviewOrganizationsCTA from "@/components/overview-organizations-cta";
+import OverviewOrganizationsCTA from "~admin/components/overview-organizations-cta";
 
 export default function Overview() {
     return (

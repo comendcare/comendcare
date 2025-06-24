@@ -1,4 +1,4 @@
-import { FAQsWithGrid } from "@/components/layout/sections/faq"
+import { FAQsWithGrid } from "~web/components/landing/faq"
 
 const FAQs = [
     // {

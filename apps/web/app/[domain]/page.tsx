@@ -8,17 +8,17 @@ import {
     getPublicAssetsForOrganization,
     getPublicRoadmapsForOrganization
 } from "@/lib/fetchers"
-import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapsCard} from "@/components/public-roadmap-card";
-import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
-import {FloatingDock} from "@/components/floating-dock";
-import ShareDialog from "@/components/share-dialog";
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
+import {RoadmapsCard} from "~web/components/public-roadmap-card";
+import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
+import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
+import {FloatingDock} from "~web/components/floating-dock";
+import ShareDialog from "~web/components/share-dialog";
+import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
+import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
 import React from "react";
-import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
-import ContactPAGDialog from "@/components/contact-pag-dialog";
+import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
+import ContactPAGDialog from "~web/components/contact-pag-dialog";
 import {Mail, Share} from "lucide-react";
 import { mixpanelTrack } from "@/mixpanel";
 

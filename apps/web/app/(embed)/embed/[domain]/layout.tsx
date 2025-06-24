@@ -3,8 +3,8 @@ import {notFound} from "next/navigation"
 import {getOrganizationData} from "@/lib/fetchers"
 import {fontMapper} from "@/styles/fonts"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
-import {PublicPageNavbar} from "@/components/public-page-navbar";
-import { ComendEmbedBanner } from "@/components/comend-embed-banner"
+import {PublicPageNavbar} from "~web/components/public-page-navbar";
+import { ComendEmbedBanner } from "~web/components/comend-embed-banner"
 
 export default async function EmbedLayout({
     params,

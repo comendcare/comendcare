@@ -4,19 +4,19 @@ import prisma from "@/lib/prisma"
 import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
-import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
+import PAGPublicRoadmapBreadcrumb from "~web/components/pag-public-roadmap-breadcrumb";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import {FloatingDock} from "@/components/floating-dock";
+import {FloatingDock} from "~web/components/floating-dock";
 import {IconFlag, IconShare} from "@tabler/icons-react";
-import ShareDialog from "@/components/share-dialog";
+import ShareDialog from "~web/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
-import FeedbackForm from "@/components/feedback-form";
+import FeedbackForm from "~web/components/feedback-form";
 import React from "react";
 import { Mail, Share } from "lucide-react"
-import ContactPAGDialog from "@/components/contact-pag-dialog";
-import { RoadmapsCard } from "@/components/public-roadmap-card"
-import { PAGRoadmapHeader } from "@/components/pag-roadmap-header"
+import ContactPAGDialog from "~web/components/contact-pag-dialog";
+import { RoadmapsCard } from "~web/components/public-roadmap-card"
+import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
 import { mixpanelTrack } from "@/mixpanel"
 
 export async function generateMetadata({

@@ -1,9 +1,9 @@
 import {Suspense} from "react"
 import PlaceholderCard from "@/components/placeholder-card"
-import {AdminUsersNav} from "@/components/admin-users-nav";
+import {AdminUsersNav} from "~admin/components/admin-users-nav";
 import * as React from "react"
-import {WhitelistDialog} from "@/components/whitelist-data-table/whitelist-dialog";
-import { WhitelistDataTable } from "@/components/whitelist-data-table/whitelist-data-table"
+import {WhitelistDialog} from "~admin/components/whitelist-data-table/whitelist-dialog";
+import { WhitelistDataTable } from "~admin/components/whitelist-data-table/whitelist-data-table"
 
 export default function AdminUserWhitelist({
                                                params

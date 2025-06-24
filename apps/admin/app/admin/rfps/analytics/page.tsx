@@ -1,4 +1,4 @@
-import { AdminRFPsAnalyticsCards } from "@/components/admin-rfps-analytics-cards";
+import { AdminRFPsAnalyticsCards } from "~admin/components/admin-rfps-analytics-cards";
 
 export default function ToolsAnalyticsPage() {
     return (

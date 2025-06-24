@@ -6,10 +6,11 @@ import Image from "next/image"
 import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";
 import {getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
-import {CROServicesDataTable} from "@/components/cro-services-data-table/cro-services-data-table";
-import {columns} from "@/components/saved-cro-data-table/saved-cros-data-columns";
-import {SavedCROsDataTable} from "@/components/saved-cro-data-table/saved-cros-data-table";
+import {CROServicesDataTable} from "~web/components/cro-services-data-table/cro-services-data-table";
+import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
+import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@/lib/types";
+import NoOrganization from "~web/components/no-organization";
 
 export default function SavesPage() {
     const router = useRouter()
@@ -38,9 +39,11 @@ export default function SavesPage() {
             }
         }
 
-        fetchData();
+        if (session?.user?.organizationId) fetchData();
     }, [session?.user?.organizationId]);
     console.log(savedCompanies);
+
+    if (!session?.user?.organizationId) return <NoOrganization />
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">

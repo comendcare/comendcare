@@ -1,4 +1,4 @@
-import { AdminRFPsNav } from "@/components/admin-rfps-nav";
+import { AdminRFPsNav } from "~admin/components/admin-rfps-nav";
 import PlaceholderCard from "@/components/placeholder-card";
 import { ReactNode, Suspense } from "react";
 

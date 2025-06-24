@@ -1,4 +1,4 @@
-import { mechanisms } from '@/components/edit-condition-profile-dialog';
+import { mechanisms } from 'comend-pag-platform/components/edit-condition-profile-dialog';
 import {typesense} from '@/lib/typesense';
 import { Filter } from 'customerio-node/dist/lib/types';
 import mixpanel from 'mixpanel-browser';

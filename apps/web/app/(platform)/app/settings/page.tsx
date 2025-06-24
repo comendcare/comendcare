@@ -1,10 +1,10 @@
 import React from "react";
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
+import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {getSession} from "@/lib/auth";
-import NoOrganization from "@/components/no-organization";
+import NoOrganization from "~web/components/no-organization";
 import {TooltipProvider} from "@/components/ui/tooltip";
-import OrganizationSettingsTabs from "@/components/organization-settings-tabs";
+import OrganizationSettingsTabs from "~web/components/organization-settings-tabs";
 
 export default async function SettingsPage() {
     const session = await getSession()

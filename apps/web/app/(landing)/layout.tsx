@@ -1,5 +1,5 @@
-import { LandingNavbar } from "@/components/layout/sections/landing-navbar"
-import LandingFooter from "@/components/layout/sections/landing-footer"
+import { LandingNavbar } from "~web/components/landing/landing-navbar"
+import LandingFooter from "~web/components/landing/landing-footer"
 
 interface AppLayoutProps {
     children: React.ReactNode
