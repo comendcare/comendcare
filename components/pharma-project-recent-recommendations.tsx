@@ -13,7 +13,7 @@ import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {OrganizationsWithConditions} from "@/lib/types";
 
-export async function PharmaProjectRecentRecommendations() {
+export function PharmaProjectRecentRecommendations() {
     const [organizations, setOrganizations] = useState<OrganizationsWithConditions[]>([]);
 
     useEffect(() => {

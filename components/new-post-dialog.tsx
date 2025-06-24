@@ -45,7 +45,7 @@ const formSchema = z.object({
 })
 
 
-export default async function NewPostDialog() {
+export default function NewPostDialog() {
     const router = useRouter()
     const {data: session} = useSession()
 

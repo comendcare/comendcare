@@ -92,7 +92,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('touchend', handleClickOutside);
         };
-    }), [selectedNodeIds]
+    }, [selectedNodeIds])
 
     return (
         <Card 

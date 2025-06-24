@@ -480,7 +480,7 @@ export function EditMilestoneForm({
 
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
-        if (initializing.current === false) form.trigger()
+        if (!initializing.current) form.trigger()
     }, [formData.startDate, formData.endDate])
 
     // handle onborda steps

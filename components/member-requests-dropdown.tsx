@@ -10,7 +10,7 @@ import { Ellipsis, UserCheck, UserX } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 
-export default async function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
+export default function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
     const session = useSession()
 
     async function approveMemberRequestClick(memberRequest: MemberRequestWithUser) {

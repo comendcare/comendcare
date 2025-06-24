@@ -97,35 +97,39 @@ const data = {
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
     const [memberships, setMemberships] = useState<MembershipWithOrganization[]>([]);
-
     useEffect(() => {
         const fetchOrganizations = async () => {
             if (session) {
-                const response = await getAllMembershipsFromUserId(session.user.id, {
-                    id: true,
-                    role: true,
-                    title: true,
-                    email: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    invitedBy: true,
-                    organization: true,
-                    organizationId: true,
-                    user: true,
-                    metadata: true
-                });
-                if (response.success) {
-                    const orgs = response.data ?? []
-                    setMemberships(orgs)
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
+                try {
+                    const response = await getAllMembershipsFromUserId(session.user.id, {
+                        id: true,
+                        role: true,
+                        title: true,
+                        email: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        invitedBy: true,
+                        organization: true,
+                        organizationId: true,
+                        user: true,
+                        metadata: true
+                    });
+                    if (response.success) {
+                        setMemberships(response.data ?? []);
+                    } else {
+                        console.error(response.error);
+                        toast.error(response.error);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    toast.error("Unexpected error fetching organizations.");
                 }
             }
         };
-        
-        fetchOrganizations()
-    }, [session])
+
+        fetchOrganizations(); // fire and forget, but it's now safe
+
+    }, [session]);
 
     return (
         <Sidebar collapsible="icon" {...props}>
