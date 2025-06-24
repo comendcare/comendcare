@@ -1,21 +1,13 @@
 import "~web/globals.css"
-import { ThemeProvider } from "~web/theme-provider"
-import type { Metadata, ResolvingMetadata } from "next"
-import { Analytics } from '@vercel/analytics/next';
+import {ThemeProvider} from "~web/theme-provider"
+import type {Metadata, ResolvingMetadata} from "next"
+import {Analytics} from '@vercel/analytics/next';
 
 // Import Montserrat Display and Source Sans Pro
-import { Poppins, Source_Sans_3 } from "next/font/google"
-import { Providers } from "~web/providers"
-import Onborda from "@/components/onborda/Onborda"
-import OnboardingCard from "@/components/ui/onboarding-card"
-import { Tour } from "@/components/onborda/types"
-import gif1 from "@/public/onboarding-gif-1.gif"
-import Image from "next/image"
-import { FeedbackSheet } from "@/components/feedback"
-import { Suspense } from "react"
+import {Poppins, Source_Sans_3} from "next/font/google"
+import {Providers} from "~web/providers"
+import {Suspense} from "react"
 import Loading from "@/loading";
-import { onbordaTours } from "@/state/onborda/onbordaStore";
-import Script from 'next/script';
 
 
 // Set up Playfair Display and Source Sans 3 fonts
@@ -55,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
             "Researchers"
         ],
         authors: [
-            { name: "Flawnson", url: "http://flawnson.com/" },
+            {name: "Flawnson", url: "http://flawnson.com/"},
             {
                 name: "Albert",
                 url: "https://www.linkedin.com/in/albert-yq-wang/"
@@ -79,8 +71,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({
-    children
-}: {
+                                       children
+                                   }: {
     children: React.ReactNode
 }) {
     return (
@@ -89,10 +81,10 @@ export default function RootLayout({
             suppressHydrationWarning
             className={`${poppins.variable} ${sourceSans3.variable}`}
         >
-            <head>
-                {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
-                {process.env.NODE_ENV !== "production" ? (
-                    <>
+        <head>
+            {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
+            {process.env.NODE_ENV !== "production" ? (
+                <>
                     <script
                         data-cookieyes='cookieyes-functional'
                         src={`/functional-localstorage-manager.js`}
@@ -101,9 +93,9 @@ export default function RootLayout({
                         data-cookieyes='cookieyes-analytics'
                         src={`/analytics-localstorage-manager.js`}
                     />
-                    </>
-                ) : (
-                    <>
+                </>
+            ) : (
+                <>
                     <script
                         id="cookieyes"
                         type="text/javascript"
@@ -117,27 +109,25 @@ export default function RootLayout({
                         data-cookieyes='cookieyes-analytics'
                         src={`/analytics-localstorage-manager.js`}
                     />
-                    </>
-                )}
-            </head>
-            <body>
-                <Suspense fallback={<Loading />}>
-                <Providers>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="light"
-                        enableSystem={false}
-                        disableTransitionOnChange
-                    >
-                        <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
-                            {children}
-                            {/* <FeedbackForm /> */}
-                            <Analytics />
-                        </Onborda>
-                    </ThemeProvider>
-                </Providers>
-                </Suspense>
-            </body>
+                </>
+            )}
+        </head>
+        <body>
+        <Suspense fallback={<Loading/>}>
+            <Providers>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="light"
+                    enableSystem={false}
+                    disableTransitionOnChange
+                >
+                    {children}
+                    {/* <FeedbackForm /> */}
+                    <Analytics/>
+                </ThemeProvider>
+            </Providers>
+        </Suspense>
+        </body>
         </html>
     )
 }
