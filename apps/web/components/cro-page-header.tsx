@@ -23,7 +23,7 @@ import React from "react";
 import {companyTypeMap} from "~web/components/marketplace-cro-card";
 import {buttonVariants} from "@/components/ui/button";
 import mixpanel from "mixpanel-browser";
-import {Button} from "../../../components/plate-ui/button";
+import {Button} from "@/components/plate-ui/button";
 import {ServiceProviderWebsiteButton} from "./service-provider-website-button";
 
 

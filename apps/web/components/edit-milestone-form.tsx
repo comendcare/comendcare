@@ -12,11 +12,11 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "../../../components/ui/form"
-import {Input} from "../../../components/ui/input"
-import {AutosizeTextarea, Textarea} from "../../../components/ui/textarea"
-import {Button} from "../../../components/ui/button"
-import {ScrollArea} from "../../../components/ui/scroll-area"
+} from "@/components/ui/form"
+import {Input} from "@/components/ui/input"
+import {AutosizeTextarea, Textarea} from "@/components/ui/textarea"
+import {Button} from "@/components/ui/button"
+import {ScrollArea} from "@/components/ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
@@ -26,12 +26,12 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "../../../components/ui/select"
+} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
     DialogTrigger
-} from "../../../components/ui/dialog"
+} from "@/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
@@ -41,21 +41,21 @@ import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma
 import {getAssets, getRFPs} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
-import {ToggleGroup, ToggleGroupItem} from "../../../components/ui/toggle-group"
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
 import {ExternalAttachmentField} from "./external-attachment-field"
-import {Popover, PopoverContent, PopoverTrigger} from "../../../components/ui/popover"
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
 import {cn, sleep} from "@/lib/utils"
 import {format} from "date-fns"
-import {Calendar} from "../../../components/ui/calendar"
-import {Tooltip, TooltipContent, TooltipTrigger} from "../../../components/ui/tooltip";
+import {Calendar} from "@/components/ui/calendar"
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import MoneyInput from "@/components/money-input";
-import MultipleSelector from "../../../components/ui/multiple-selector"
-import {RadioGroup, RadioGroupItem} from "../../../components/ui/radio-group"
-import {PlateEditor} from "../../../components/editor/plate-editor"
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "../../../components/ui/tabs"
+import MultipleSelector from "@/components/ui/multiple-selector"
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
+import {PlateEditor} from "@/components/editor/plate-editor"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
-import {Card, CardContent} from "../../../components/ui/card"
+import {Card, CardContent} from "@/components/ui/card"
 import Image from "next/image"
 import {CROMarketplaceCard} from "./marketplace-cro-card"
 import Link from "next/link"
@@ -72,14 +72,14 @@ import {NotificationBubble} from "./notification-bubble"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share} from "lucide-react"
 import {toast} from "sonner"
-import {badgeVariants} from "../../../components/ui/badge"
+import {badgeVariants} from "@/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
-import {useOnborda} from "../../../components/onborda/OnbordaContext"
+import {useOnborda} from "@/components/onborda/OnbordaContext"
 import {mixpanelTrack} from "@/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
-import { Skeleton } from "../../../components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>

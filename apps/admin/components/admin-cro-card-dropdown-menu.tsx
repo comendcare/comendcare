@@ -18,7 +18,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "../../../components/ui/select"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
 import { updateCompany, deleteCompany } from "@/lib/actions";
 import { mixpanelTrack } from "@/mixpanel";
 import { toast } from "sonner";

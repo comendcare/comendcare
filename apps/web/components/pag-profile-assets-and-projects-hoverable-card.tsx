@@ -22,12 +22,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
 import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
-import { ScrollArea } from "../../../components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
 import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
 import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";

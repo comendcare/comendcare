@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/../components/ui/card"
 import patients from "@/public/illustrations/patients.svg"
 import advocates from "@/public/illustrations/advocates.svg"
 import researchers from "@/public/illustrations/researchers.svg"

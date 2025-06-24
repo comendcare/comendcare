@@ -7,14 +7,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover"
-import { Button } from "../../../components/ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import { Asset } from "@/lib/types"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import { useSession } from "next-auth/react"
-import { Dialog, DialogPortal } from "../../../components/ui/dialog"
+import { Dialog, DialogPortal } from "@/components/ui/dialog"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 
 const toolSelector = (state: AssetState) => ({

@@ -26,7 +26,7 @@ import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
-import MultipleSelector from "../../../components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {MILESTONE_TYPE_OPTIONS, Option} from "@/lib/types"
 import ProjectMultipleSelector from "./project-multiple-selector";
 

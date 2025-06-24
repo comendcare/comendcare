@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { EditAssetForm } from "~web/components/edit-asset-form";
 import { ReactNode, useState } from "react";
 import { Asset } from "@/lib/types";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: boolean, numAssetsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)

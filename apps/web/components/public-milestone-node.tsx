@@ -7,7 +7,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle
-} from "../../../components/ui/card"
+} from "@/components/ui/card"
 import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { StatusType } from "@/lib/types"

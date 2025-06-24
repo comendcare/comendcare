@@ -2,7 +2,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {CardContent, CardFooter} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
-import { ProfilePhoto } from "../../../components/profile-photo";
+import { ProfilePhoto } from "@/components/profile-photo";
 import { Send } from "lucide-react";
 
 interface FeedCardSocialSectionProps {

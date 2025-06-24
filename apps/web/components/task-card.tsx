@@ -11,13 +11,13 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "../../../components/ui/dialog"
+} from "@/components/ui/dialog"
 import {EditTaskForm} from "./edit-task-form"
 import {useEffect, useState} from "react"
 import { Milestone } from "@prisma/client"
-import { ProfilePhoto } from "../../../components/profile-photo"
+import { ProfilePhoto } from "@/components/profile-photo"
 import { truncate } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { PriorityType, StatusType } from "@/lib/types"
 
 export interface Task {

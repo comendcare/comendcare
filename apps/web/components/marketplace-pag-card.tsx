@@ -1,8 +1,8 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
 import {formatMoney, truncate} from "@/lib/utils";
-import {Badge} from "../../../components/ui/badge";
-import {ProfilePhoto} from "../../../components/profile-photo";
+import {Badge} from "@/components/ui/badge";
+import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {FileText, HandCoins, Megaphone, Star, Users} from "lucide-react";
 import React from "react";

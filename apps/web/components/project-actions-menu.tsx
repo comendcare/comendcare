@@ -6,13 +6,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {Popover, PopoverContent, PopoverTrigger} from "../../../components/ui/popover"
-import {Button} from "../../../components/ui/button"
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
+import {Button} from "@/components/ui/button"
 import {useEffect, useRef, useState} from "react"
 import {Milestone} from "@/lib/types"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {Dialog, DialogContent, DialogPortal} from "../../../components/ui/dialog"
+import {Dialog, DialogContent, DialogPortal} from "@/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import ShareDialog from "~web/components/share-dialog";
 import {toast} from "sonner";

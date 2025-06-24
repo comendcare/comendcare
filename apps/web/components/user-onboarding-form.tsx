@@ -27,7 +27,7 @@ import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { getPublicFile } from "@/lib/utils";
 import mixpanel from "mixpanel-browser";
-import { Skeleton } from "../../../components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),

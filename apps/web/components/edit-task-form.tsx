@@ -11,19 +11,19 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-} from "../../../components/ui/form"
-import {Input} from "../../../components/ui/input"
-import {Button} from "../../../components/ui/button"
-import {ScrollArea, ScrollBar} from "../../../components/ui/scroll-area"
+} from "@/components/ui/form"
+import {Input} from "@/components/ui/input"
+import {Button} from "@/components/ui/button"
+import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
     DialogTrigger
-} from "../../../components/ui/dialog"
+} from "@/components/ui/dialog"
 import {DeleteTaskDialogContent} from "./delete-task-dialog-content"
 import {useShallow} from "zustand/react/shallow"
 import {nanoid} from "nanoid"
-import {Checkbox} from "../../../components/ui/checkbox"
+import {Checkbox} from "@/components/ui/checkbox"
 import {
     arrayMove,
     SortableContext,
@@ -49,15 +49,15 @@ import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { getMembers, getMilestones } from "@/lib/fetchers"
-import MultipleSelector from "../../../components/ui/multiple-selector"
+import MultipleSelector from "@/components/ui/multiple-selector"
 import { Milestone, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "../../../components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { Calendar } from "../../../components/ui/calendar"
-import {Separator} from "../../../components/ui/separator"
+import { Calendar } from "@/components/ui/calendar"
+import {Separator} from "@/components/ui/separator"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import { StatusType } from "@/lib/types"
 

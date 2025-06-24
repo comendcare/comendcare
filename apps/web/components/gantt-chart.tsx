@@ -30,8 +30,8 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { Task } from "./task-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Button } from "../../../components/ui/button";
-import { ScrollArea, ScrollBar } from "../../../components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import StatusButton from "./milestone-status-button";
 import { truncate } from "@/lib/utils";
 import { DateView } from "./miletone-date-view";

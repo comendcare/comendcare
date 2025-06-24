@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Button } from "../../../components/ui/button"
+import { Button } from "@/components/ui/button"
 import { useShallow } from "zustand/react/shallow"
 import {
     DialogContent,
@@ -8,7 +8,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "../../../components/ui/dialog"
+} from "@/components/ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useSession } from "next-auth/react"

@@ -26,7 +26,7 @@ import {useState} from "react";
 import {toast} from "sonner";
 import PostActionBar from "~web/components/post-action-bar";
 import { Ellipsis, Trash } from "lucide-react";
-import Spinner from "../../../components/ui/spinner";
+import Spinner from "@/components/ui/spinner";
 
 export function PostDialog(
     {

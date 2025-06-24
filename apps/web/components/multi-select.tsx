@@ -1,13 +1,13 @@
 import * as React from "react"
 import { X } from "lucide-react"
-import { Badge } from "../../../components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import {
     Command,
     CommandEmpty,
     CommandGroup,
     CommandItem,
     CommandList
-} from "../../../components/ui/command"
+} from "@/components/ui/command"
 import { Command as CommandPrimitive } from "cmdk"
 import { useController, UseControllerProps } from "react-hook-form"
 

@@ -11,7 +11,7 @@ import {
 import {Separator} from "@/components/ui/separator"
 import {Input} from "@/components/ui/input";
 import {UserFeedCardSocialSection} from "~web/components/user-feed-card-social-section";
-import { ProfilePhoto } from "../../../components/profile-photo"
+import { ProfilePhoto } from "@/components/profile-photo"
 
 interface UserFeedTextCardProps {
     content: string

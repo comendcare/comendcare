@@ -26,7 +26,7 @@ import {useRouter} from "next/navigation";
 import {PostDialog} from "~web/components/post-dialog";
 import PostActionBar from "~web/components/post-action-bar";
 import { Ellipsis, Trash } from "lucide-react";
-import Spinner from "../../../components/ui/spinner";
+import Spinner from "@/components/ui/spinner";
 
 interface PostProps {
     data: PostWithAuthorAndComments;

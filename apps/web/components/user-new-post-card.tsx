@@ -8,7 +8,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import * as z from "zod";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
-import { ProfilePhoto } from "../../../components/profile-photo";
+import { ProfilePhoto } from "@/components/profile-photo";
 import { Send } from "lucide-react";
 
 const newPostSchema = z.object({

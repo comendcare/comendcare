@@ -9,14 +9,14 @@ import {
     FormLabel,
     FormMessage
 } from "@/components/ui/form"
-import { ToggleGroup, ToggleGroupItem } from "../../../components/ui/toggle-group"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useForm } from "react-hook-form"
-import { ScrollArea } from "../../../components/ui/scroll-area"
-import { Button } from "../../../components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
 import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
-import MultipleSelector from "../../../components/ui/multiple-selector"
-import {Tooltip, TooltipContent, TooltipTrigger} from "../../../components/ui/tooltip";
+import MultipleSelector from "@/components/ui/multiple-selector"
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
 

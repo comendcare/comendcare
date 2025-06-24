@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { getMilestones, getMilestoneTypes, getOrganizationFromOrganizationId, getPublicMilestoneDetails } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
-import { Button, buttonVariants } from "../../../components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn, parseCSV } from "@/lib/utils"
 import Link from "next/link"
 import {
@@ -29,23 +29,23 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "../../../components/ui/dialog"
+} from "@/components/ui/dialog"
 import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Import, Info, Lock, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import { toast } from "sonner"
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Milestone } from "@/lib/types"
 import Loading from "@/loading";
 import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { useOnborda } from "../../../components/onborda/OnbordaContext"
+import { useOnborda } from "@/components/onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
-import { Separator } from "../../../components/ui/separator"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import ShareDialog from "./share-dialog"
 import {
   ContextMenu,

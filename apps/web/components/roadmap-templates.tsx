@@ -2,23 +2,23 @@
 
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
-import { ScrollArea} from "../../../components/ui/scroll-area";
+import { ScrollArea} from "@/components/ui/scroll-area";
 import { SetStateAction, useState } from "react";
 import { templateMilestones, templateResearchPlans } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
-import { DialogClose } from "../../../components/ui/dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DialogClose } from "@/components/ui/dialog";
 import { Plus, Router, X } from "lucide-react";
 import { cn, getCookie } from "@/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@/lib/types";
 import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@/lib/actions";
 import Link from "next/link";
-import { Badge } from "../../../components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 // import { consentedLocalStorage } from "@/lib/consent-scripts/functionalConsent";
 
 
