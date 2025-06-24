@@ -7,12 +7,12 @@ import {motion, useMotionValue, useSpring, useTransform} from "framer-motion"
 import {Label} from "@/components/ui/label"
 import {FancyInput} from "@/components/ui/fancy-input"
 import React, {useEffect, useRef, useState} from "react"
-import {LabelInputContainer} from "@/components/contact-form"
-import {LinkPreview} from "@/components/link-preview"
+import {LabelInputContainer} from "~web/components/contact-form"
+import {LinkPreview} from "~web/components/link-preview"
 import Image from "next/image"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
-import {BetaSignup} from "@/components/beta-signup"
+import {BetaSignup} from "~web/components/beta-signup"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
 

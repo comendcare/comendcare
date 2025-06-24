@@ -11,7 +11,7 @@ import OnboardingCard from "@/components/ui/onboarding-card"
 import { Tour } from "@/components/onborda/types"
 import gif1 from "@/public/onboarding-gif-1.gif"
 import Image from "next/image"
-import { FeedbackSheet } from "@/components/feedback"
+import { FeedbackSheet } from "~web/components/feedback"
 import { Suspense } from "react"
 import Loading from "@/loading";
 import { onbordaTours } from "@/state/onborda/onbordaStore";

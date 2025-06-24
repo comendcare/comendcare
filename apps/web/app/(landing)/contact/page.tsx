@@ -1,6 +1,6 @@
 "use client"
 
-import {ContactForm} from "@/components/contact-form"
+import {ContactForm} from "~web/components/contact-form"
 
 export default function ContactPage() {
 

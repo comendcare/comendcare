@@ -3,7 +3,7 @@ import { ReactFlow, useNodesState, useEdgesState, addEdge } from "@xyflow/react"
 
 import "@xyflow/react/dist/base.css"
 
-import CustomNode from "@/components/custom-node"
+import CustomNode from "~web/components/custom-node"
 
 const nodeTypes = {
     custom: CustomNode

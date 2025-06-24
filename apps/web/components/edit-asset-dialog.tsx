@@ -1,0 +1,78 @@
+"use client"
+
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import { EditAssetForm } from "~web/components/edit-asset-form";
+import { ReactNode, useState } from "react";
+import { Asset } from "@/lib/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
+
+export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: boolean, numAssetsPinned: number}) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const closeDialog = () => {
+        setIsOpen(false)
+    }
+    
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {iconOnly ? (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"cta"} size={"icon"} onClick={() => setIsOpen(true)}>
+                            <Plus />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Create a tool
+                    </TooltipContent>
+                </Tooltip>
+            ) : (
+                <Button variant={"cta"} onClick={() => setIsOpen(true)}>
+                    <Plus />
+                    {`Create a tool`}
+                </Button>
+            )}
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Create a Tool
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Create your Tool here. Click save when you're done.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <EditAssetForm toolData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+export const EditAssetDialog = ({children, data, numAssetsPinned}: {children: ReactNode, data: Partial<Asset>, numAssetsPinned: number}) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const closeDialog = () => {
+        setIsOpen(false)
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild className="cursor-pointer">
+                {children}
+            </DialogTrigger>
+
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Edit a Tool
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Edit your Tool here. Click save when you're done.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <EditAssetForm toolData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+            </DialogContent>
+        </Dialog>
+    )
+}

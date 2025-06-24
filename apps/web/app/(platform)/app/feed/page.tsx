@@ -1,10 +1,10 @@
-import NewPostDialog from "@/components/new-post-dialog";
+import NewPostDialog from "~web/components/new-post-dialog";
 import {getSession} from "@/lib/auth";
 import {getOrganizationFromOrganizationId, getPosts} from "@/lib/fetchers";
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import NoOrganization from "@/components/no-organization";
+import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
+import NoOrganization from "~web/components/no-organization";
 import Image from "next/image";
-import {PostList} from "@/components/post-list";
+import {PostList} from "~web/components/post-list";
 
 export default async function FeedPage() {
     const session = await getSession()

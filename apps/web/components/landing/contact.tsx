@@ -1,6 +1,6 @@
 import React from "react"
-import { BetaSignup } from "@/components/beta-signup"
-import {SimpleContactForm} from "@/components/simple-contact-form";
+import { BetaSignup } from "~web/components/beta-signup"
+import {SimpleContactForm} from "~web/components/simple-contact-form";
 
 export default function ContactSection() {
     return (

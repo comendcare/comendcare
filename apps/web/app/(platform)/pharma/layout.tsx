@@ -26,9 +26,9 @@ import {
     initializeRFPStore,
 } from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
-import {AppSidebar} from "@/components/app-sidebar";
+import {AppSidebar} from "~web/components/app-sidebar";
 import {createKanban, createRoadmap} from "@/lib/actions";
-import {FeedbackSheet} from "@/components/feedback";
+import {FeedbackSheet} from "~web/components/feedback";
 import {useOnborda} from "@/components/onborda/OnbordaContext";
 import {Button} from "@/components/ui/button";
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
@@ -38,8 +38,8 @@ import {cn, sleep} from "@/lib/utils";
 import {Wand2} from "lucide-react";
 import {useQueryState} from "nuqs"
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
-import {PharmaSidebar} from "@/components/pharma-sidebar";
-import {PharmaHeader} from "@/components/pharma-header";
+import {PharmaSidebar} from "~web/components/pharma-sidebar";
+import {PharmaHeader} from "~web/components/pharma-header";
 
 interface AppLayoutProps {
     children: React.ReactNode

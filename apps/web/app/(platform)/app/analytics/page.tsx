@@ -4,11 +4,11 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
-import PAGDashboardAnalyticsTab from "@/components/pag-dashboard-analytics-tab";
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
+import PAGDashboardAnalyticsTab from "~web/components/pag-dashboard-analytics-tab";
+import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {getSession} from "@/lib/auth";
-import NoOrganization from "@/components/no-organization";
+import NoOrganization from "~web/components/no-organization";
 import React from "react";
 import { IncorporationStatus } from "@prisma/client";
 

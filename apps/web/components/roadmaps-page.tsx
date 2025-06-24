@@ -1,0 +1,211 @@
+"use client"
+import { useEffect, useState } from "react";
+import { Organization, Roadmap } from "@prisma/client";
+import { ResearchPlanTemplatesCard } from "./roadmap-templates";
+import { PrivateNoResearchPlansRow } from "./no-research-plans";
+import Loading from "@/loading";
+import { initializeRoadmapState } from "@/lib/initialize-client-state";
+import { useRouter } from "next/navigation";
+import { RoadmapsTable } from "./public-roadmap-card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
+import { Button } from "../../../components/ui/button";
+import { Ellipsis, Share } from "lucide-react";
+import { Dialog, DialogContent } from "../../../components/ui/dialog";
+import ShareDialog from "./share-dialog";
+import { getOrganizationFromOrganizationId, getRoadmaps } from "@/lib/fetchers";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { mixpanelTrack } from "@/mixpanel";
+
+export default function RoadmapsPage({orgId}: {orgId: string}) {
+    const router = useRouter()
+    const {data: session, status} = useSession()
+    const [isLoading, setIsLoading] = useState(true)
+    const [shareIsOpen, setShareIsOpen] = useState(false)
+    const [organization, setOrganization] = useState<Organization | {}>({})
+    const [roadmaps, setRoadmaps] = useState<Roadmap[]>([])
+
+    useEffect(() => {
+        // un-initialize any active research plans
+        initializeRoadmapState({
+            roadmapId: undefined,
+            details: undefined,
+            nodes: [],
+            edges: [],
+            milestones: [],
+            selectedView: null,
+            selectedNodeIds: []
+        })
+    }, [])
+
+    useEffect(() => {
+        async function fetchOrgData() {
+            if (session?.user.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
+                        id: true,
+                        public: true,
+                        verified: true,
+                        published: true,
+                        name: true,
+                        description: true,
+                        contactEmail: true,
+                        logo: true,
+                        font: true,
+                        image: true,
+                        headerImage: true,
+                        biopharmaConsentSettings: true,
+                        subdomain: true,
+                        customDomain: true,
+                        statedGoal: true,
+                        yearFounded: true,
+                        incorporationStatus: true,
+                        therapeuticsOfInterest: true,
+                        therapeuticsInDevelopment: true,
+                        website: true,
+                        moneyRaised: true,
+                        moneyDeployed: true,
+                        researchBudget: true,
+                        // address1                  String?
+                        // address2                  String?
+                        // formattedAddress          String?
+                        // city                      String?
+                        // region                    String?
+                        // postalCode                String?
+                        // country                   String?
+                        // lat                       String?
+                        // lng                       String?
+                        createdAt: true,
+                        updatedAt: true,
+                        user: true,
+                        userId: true,
+                        roadmaps: true,
+                        members: true,
+                        clients: true,
+                        invitations: true,
+                        membershipRequests: true,
+                        conditions: true,
+                        kanban: true,
+                        milestones: true,
+                        platformNotifications: true,
+                        reviews: true,
+                        savedCompanies: true,
+                        tools: true,
+                        rfps: true,
+                        metadata: true
+                    })
+
+                    // Map the response to the correct structure if needed
+                    if (response.success && response.data) {
+                        setOrganization(response.data);
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+
+                    const roadmapsResponse = await getRoadmaps(session.user.organizationId, {
+                        id: true,
+                        title: true,
+                        description: true,
+                        content: true,
+                        slug: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        published: true,
+                        organizationId: true,
+                        userId: true,
+                        edges: true,
+                        milestones: true,
+                        nodes: true,
+                        organization: true,
+                        user: true,
+                        modalities: true,
+                        metadata: true,
+                    })
+                    if (roadmapsResponse.success && roadmapsResponse.data) {
+                        setRoadmaps(roadmapsResponse.data)
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching organizations:", error);
+                    toast.error("Couldn't get organizations");
+                }
+                setIsLoading(false)
+            }
+        }
+
+        fetchOrgData()
+    }, [session])
+
+    const handleShare = async () => {
+        // override default delete behaviour with our custom dialog
+        setShareIsOpen(true)
+    }
+
+    if (isLoading) return <Loading />
+
+    return (
+        <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
+            <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
+            <div className="p-6 w-full onborda-existing-research-plans-section">
+                <div className="w-full flex justify-between items-center gap-4">
+                    <h2 className="col-span-full font-semibold text-2xl">Research Plans</h2>
+                        <Button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleShare()
+                            }}
+                            variant={'secondary'}
+                            className="onborda-share-research-plan"
+                        >
+                            <Share />
+                            Share
+                        </Button>
+                </div>
+                {/* {roadmaps.length > 0 && ( */}
+                    <RoadmapsTable 
+                        roadmaps={roadmaps} 
+                        rowClickCallback={(roadmap) => {
+                            setIsLoading(true)
+                            router.push(`/app/research-plan/${roadmap.id}`)
+                        }}
+                    />
+                {/* )} */}
+                {/* {roadmaps.length === 0 && (
+                    <PrivateNoResearchPlansRow />
+                )} */}
+            </div>
+            
+            <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+                <DialogContent className="min-w-fit">
+                    { "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                        <ShareDialog
+                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
+                            organization={organization}
+                            // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
+                            // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
+                            embeddedResearchPlansData={{
+                                embeddedResearchPlansLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`,
+                            }}
+                            // trackShareEvent={(socialOption: string) => {
+                            //     mixpanelTrack(`Research Plans Table Shared`, {
+                            //         "Platform": socialOption,
+                            //         ...(organization ? {
+                            //             "Organization ID": organization.id,
+                            //             "Organization Name": organization.name
+                            //         } : undefined)
+                            //     })
+                            // }}
+                            trackShareEvent={{
+                                title: `Research Plans Table Shared`
+                            }}
+                        />
+                    ) : (
+                        <div className="text-sm text-muted-foreground">Loading organization...</div>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </main>
+    )
+}

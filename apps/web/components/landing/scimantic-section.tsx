@@ -1,8 +1,8 @@
 "use client"
 
-import { PlaceholdersAndVanishInput } from "@/components/placeholders-and-vanish-input"
-import { PlaceholdersAndVanishTextarea } from "@/components/placeholders-and-vanish-text-area"
-import { LinkPreview } from "@/components/link-preview"
+import { PlaceholdersAndVanishInput } from "~web/components/placeholders-and-vanish-input"
+import { PlaceholdersAndVanishTextarea } from "~web/components/placeholders-and-vanish-text-area"
+import { LinkPreview } from "~web/components/link-preview"
 import React from "react"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
 import Image from "next/image"

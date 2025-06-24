@@ -12,11 +12,11 @@ import {
     Highlight
 } from "~web/components/landing/hero-highlight"
 import { motion } from "framer-motion"
-import { LinkPreview } from "@/components/link-preview"
+import { LinkPreview } from "~web/components/link-preview"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
 import React from "react"
-import { BetaSignup } from "@/components/beta-signup"
+import { BetaSignup } from "~web/components/beta-signup"
 
 export const HeroSection = () => {
     return (

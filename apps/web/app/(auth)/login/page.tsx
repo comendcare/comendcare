@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import LoginForm from "@/components/login-form";
+import LoginForm from "~web/components/login-form";
 import {Suspense, useEffect, useState, useRef} from "react";
 import fullLogo from "@/public/logos/affiliations/comend-full-logo.svg"
 import {useSession} from "next-auth/react";

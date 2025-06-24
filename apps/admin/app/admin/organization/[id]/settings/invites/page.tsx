@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma"
-import InvitationForm from "@/components/invitation-form"
+import InvitationForm from "~admin/components/invitation-form"
 
 export default async function SiteSettingsAppearance({
     params

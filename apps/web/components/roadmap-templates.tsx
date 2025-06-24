@@ -1,0 +1,352 @@
+"use client"
+
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import { ScrollArea} from "../../../components/ui/scroll-area";
+import { SetStateAction, useState } from "react";
+import { templateMilestones, templateResearchPlans } from '@/lib/templates'
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useShallow } from "zustand/react/shallow";
+import ComendLoadingSpinner from "./comend-loading-spinner";
+import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
+import { DialogClose } from "../../../components/ui/dialog";
+import { Plus, Router, X } from "lucide-react";
+import { cn, getCookie } from "@/lib/utils";
+import { ASSOCIATED_CATEGORIES } from "@/lib/types";
+import { MilestoneType } from "@prisma/client";
+import { createRoadmap } from "@/lib/actions";
+import Link from "next/link";
+import { Badge } from "../../../components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../../components/ui/tooltip";
+// import { consentedLocalStorage } from "@/lib/consent-scripts/functionalConsent";
+
+
+const selector = (state: RoadmapState) => ({
+    milestones: state.milestones,
+    addNodes: state.addNodes,
+})
+
+export default function RoadmapTemplates() {
+    const router = useRouter()
+    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState(false)
+
+    const {
+        milestones,
+        addNodes,
+    } = useRoadmapStore(useShallow(selector))
+
+    if (isLoading) {
+        return (
+            <ComendLoadingSpinner />
+        )
+    }
+
+    return (
+        <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
+            <span className="flex flex-col gap-2">
+                <h1 className="text-3xl font-bold text-primary">
+                    {`Browse our milestone library`}
+                </h1>
+                <p className="text-muted-foreground">
+                    {`Projects are the pieces that make up your research plan. Add a template to your plan to see more information on projects like recommended steps.`}
+                </p>
+            </span>
+
+            <MilestoneTemplateTabs 
+                selectedMilestones={selectedMilestones}
+                setSelectedMilestones={setSelectedMilestones}
+                createEmpty={async () => {
+                    setIsLoading(true)
+                    // await addMilestones([{name: 'New Milestone'}])
+                    router.push('/app/research-plan')
+                    router.refresh()
+                }}
+            />
+
+            <span className="flex flex-col justify-end sm:flex-row gap-4">
+                <div className="flex flex-row space-x-2">
+                    <Button
+                        disabled={selectedMilestones.length === 0}
+                        onClick={async () => {
+                            setIsLoading(true)
+                            // await addMilestones(selectedMilestones)
+                            router.push('/app/research-plan')
+                            router.refresh()
+                        }}
+                    >
+                        Add selected projects
+                    </Button>
+                </div>
+            </span>
+        </div>
+    )
+}
+
+export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestones, createEmpty, inDialog = false }: {selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void, createEmpty: () => void, inDialog?: boolean}) => {
+    return (
+        <div className="min-h-0 h-full flex flex-col">
+            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                    <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
+                    {templateMilestones.map((milestoneData, index) => (
+                        <MilestoneTemplateCardMultiSelect
+                            key={index} 
+                            milestoneData={milestoneData}
+                            selectedMilestones={selectedMilestones}
+                            setSelectedMilestones={setSelectedMilestones}
+                        />
+                    ))}
+                </div>
+            </ScrollArea>
+        </div>
+    )
+}
+
+export const MilestoneTemplates = ({ 
+    selectedMilestonesTemplate, 
+    setSelectedMilestonesTemplate, 
+    createEmpty, 
+    inDialog = false, 
+    className 
+}: {
+    selectedMilestonesTemplate: any, 
+    setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, 
+    createEmpty: () => void, 
+    inDialog?: boolean,
+    className?: string
+}) => {
+    const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
+    
+    return(
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-5 pt-2", className)}>
+            {/* {allCategories.map((category, index) => (
+                <>
+                    <h3 key={`category-title-${index}`} className="col-span-full text-2xl font-semibold">{String(category).charAt(0).toUpperCase() + String(category).slice(1)}</h3>
+                    {ASSOCIATED_CATEGORIES.find(c => c.label === category) && <p>{ASSOCIATED_CATEGORIES.find(c => c.label === category)?.description}</p>}
+                    {templateMilestones.filter(milestone => milestone.categories.includes(category)).map((milestoneData, index) => (
+                        <MilestoneTemplateCardMultiSelect 
+                            className={index === 0 ? "onborda-select-a-template": ""}
+                            milestoneData={milestoneData}
+                            selectedMilestones={selectedMilestonesTemplate}
+                            setSelectedMilestones={setSelectedMilestonesTemplate}
+                        />
+                    ))}
+                </>
+            ))} */}
+            {ASSOCIATED_CATEGORIES.map((categoryData, index) => (
+                <>
+                    <div className={cn("col-span-full", index !== 0 ? "mt-8" : "")}>
+                    <h3 key={`category-title-${index}`} className="text-2xl font-semibold">{categoryData.label}</h3>
+                    <p>{categoryData.description}</p>
+                    </div>
+                    {templateMilestones.filter(milestone => milestone.categories.includes(categoryData.value)).map((milestoneData, index) => (
+                        <MilestoneTemplateCardMultiSelect
+                            key={index}
+                            className={index === 0 ? "onborda-select-a-template": ""}
+                            milestoneData={milestoneData}
+                            selectedMilestones={selectedMilestonesTemplate}
+                            setSelectedMilestones={setSelectedMilestonesTemplate}
+                        />
+                    ))}
+                </>
+            ))}
+        </div>
+    )
+}
+
+// export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
+//     return(
+//         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+//             <EmptyResearchPlanCard />
+//             {templateResearchPlans.map(template => (
+//                 <ResearchPlanTemplateCardSelect
+//                     milestoneTypes={milestoneTypes} 
+//                     researchPlanData={template}
+//                 />
+//             ))}
+//         </div>
+//     )
+// }
+
+export const ResearchPlanTemplates = ({ selectedResearchPlanTemplate, setSelectedResearchPlanTemplate, inDialog = false }: {selectedResearchPlanTemplate: any, setSelectedResearchPlanTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
+    const [selectedResearchPlanId, setSelectedResearchPlanId] = useState<string | undefined>(undefined)
+
+    const handleSetSelectedResearchPlan = (researchPlanData: any) => {
+        console.log(`handle set selected research plan`, researchPlanData)
+        if (researchPlanData) {
+            setSelectedResearchPlanId(researchPlanData.title)
+            setSelectedResearchPlanTemplate(researchPlanData)
+        } else {
+            setSelectedResearchPlanId(undefined)
+            setSelectedResearchPlanTemplate(undefined)
+        }
+    }
+    
+    return(
+        <div className="h-[50vh] max-h-[50vh]">
+        <ScrollArea type="always" className="h-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                {templateResearchPlans.map(template => (
+                    <ResearchPlanTemplateCardSelect
+                        key={template.id}
+                        researchPlanData={template}
+                        selectedResearchPlanId={selectedResearchPlanId}
+                        setSelectedResearchPlanId={(id) => id === template.title ? handleSetSelectedResearchPlan(template) : handleSetSelectedResearchPlan(undefined)}
+                    />
+                ))}
+            </div>
+        </ScrollArea>
+        </div>
+    )
+}
+
+const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) => void, inDialog: boolean}) => {
+    if (inDialog) {
+        return (
+            <DialogClose className="p-0 m-0">
+                <Button 
+                    variant="secondary"
+                    onClick={handleClick}
+                    asChild
+                    className="hover:cursor-pointer"
+                >
+                    <Card className="h-full w-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
+                        <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                            <CardTitle>{`Create an empty milestone`}</CardTitle>
+                            <Plus />
+                        </CardContent>
+                    </Card>
+                </Button>
+            </DialogClose>
+        )
+    }
+
+    return (
+        <Button 
+            variant="secondary"
+            onClick={handleClick}
+            asChild
+            className="hover:cursor-pointer"
+        >
+            <Card className="h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
+                <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                    <CardTitle>{`Create an empty milestone`}</CardTitle>
+                    <Plus />
+                </CardContent>
+            </Card>
+        </Button>
+    )
+}
+
+export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
+    const [isHidden, setIsHidden] = useState(window.functionalConsentedLocalStorage?.get('isHidden') ? true : false)
+
+    if (isHidden) {
+        return (
+            <div className="w-full flex justify-end">
+                <Button variant={"link"} onClick={() => {
+                    window.functionalConsentedLocalStorage?.remove('isHidden')
+                    setIsHidden(false)
+                }}>Show Research Plan Templates</Button>
+            </div>
+        )
+    }
+
+    return (
+        <Card className="w-full bg-gray-50 onborda-research-plan-templates-section">
+            <CardHeader className="relative">
+                <CardTitle>
+                    Research Plan Templates
+                </CardTitle>
+                <CardDescription>Create a research plan from one of our curated templates.</CardDescription>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            variant={"ghost"} 
+                            className="absolute top-0 right-0 hover:bg-transparent" 
+                            onClick={() => {
+                                window.functionalConsentedLocalStorage?.set('isHidden', true)
+                                setIsHidden(true)
+                            }}
+                        >
+                            <X />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{`Hide Research Plan Templates`}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </CardHeader>
+            <CardContent className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                <CreateEmptyResearchPlanCard setIsLoading={setIsLoading}/>
+                {templateResearchPlans.map(plan => (
+                    <CreateResearchPlanFromTemplateCard key={plan.id} plan={plan} orgId={orgId} setIsLoading={setIsLoading}/>
+                ))}
+            </CardContent>
+        </Card>
+    )
+}
+
+export const CreateEmptyResearchPlanCard = ({setIsLoading}: {setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
+    const router = useRouter()
+
+    return (
+        <button
+            onClick={() => {
+                if (setIsLoading) setIsLoading(true)
+                router.push(`/app/research-plan/create`)
+            }}
+            className="hover:cursor-pointer"
+        >
+            <Card className="h-full hover:border-black">
+                <CardContent className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                    <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
+                    <Plus />
+                </CardContent>
+            </Card>
+        </button>
+    )
+}
+
+export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: {plan: typeof templateResearchPlans[0], orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
+    const router = useRouter()
+
+    return (
+        <button
+            onClick={async () => {
+                if (setIsLoading) setIsLoading(true)
+                const roadmap =  await createRoadmap(orgId, plan)
+                if (roadmap && roadmap.id) {
+                    router.push(`/app/research-plan/${roadmap.id}`)
+                }
+            }}
+            className="hover:cursor-pointer"
+        >
+            <Card className="text-left h-full hover:border-black">
+                <CardHeader>
+                    <CardTitle className="text-xl font-normal">{plan.title}</CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                </CardHeader>
+                {/* <CardContent className="flex flex-wrap gap-2 items-center">
+                    {plan.milestones.slice(0, 3).map(milestone => (
+                        <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
+                    ))}
+                    <Tooltip>
+                        <TooltipTrigger>
+                            {plan.milestones.slice(3, plan.milestones.length).length > 0 && (
+                                <p>{`+ ${plan.milestones.slice(3, plan.milestones.length).length} more`}</p>
+                            )}
+                        </TooltipTrigger>
+                        <TooltipContent className="flex flex-wrap gap-2 max-w-80 p-4">
+                            {plan.milestones.slice(3, plan.milestones.length).map(milestone => (
+                                <Badge variant={"blue"} className="text-sm">{milestone.title}</Badge>
+                            ))}
+                        </TooltipContent>
+                    </Tooltip>
+                </CardContent> */}
+            </Card>
+        </button>
+    )
+}

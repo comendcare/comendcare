@@ -1,4 +1,4 @@
-import { BetaSignup } from "@/components/beta-signup"
+import { BetaSignup } from "~web/components/beta-signup"
 import { motion } from "framer-motion"
 
 export default function JoinWaitlistSection({

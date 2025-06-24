@@ -1,8 +1,8 @@
 import React from "react"
-import NoOrganization from "@/components/no-organization"
+import NoOrganization from "~web/components/no-organization"
 import {getSession} from "@/lib/auth"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
-import { PrivateRFPsPage } from "@/components/private-rfps-page"
+import { PrivateRFPsPage } from "~web/components/private-rfps-page"
 
 export default async function RFPsPage() {
     const session = await getSession()
