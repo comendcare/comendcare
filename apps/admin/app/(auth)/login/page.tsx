@@ -5,7 +5,7 @@ import {Suspense, useEffect, useRef, useState} from "react";
 import logo from "@/public/logos/comend-logo.png"
 import {useRouter, useSearchParams} from "next/navigation";
 import {toast} from "sonner";
-import AdminLoginForm from "~web/components/admin-login-form";
+import AdminLoginForm from "~admin/components/admin-login-form";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSession} from "next-auth/react";
 

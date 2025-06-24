@@ -1,11 +1,11 @@
-import "~web/globals.css"
-import {ThemeProvider} from "~web/theme-provider"
+import "~admin/globals.css"
+import {ThemeProvider} from "~admin/theme-provider"
 import type {Metadata, ResolvingMetadata} from "next"
 import {Analytics} from '@vercel/analytics/next';
 
 // Import Montserrat Display and Source Sans Pro
 import {Poppins, Source_Sans_3} from "next/font/google"
-import {Providers} from "~web/providers"
+import {Providers} from "~admin/providers"
 import {Suspense} from "react"
 import Loading from "@/loading";
 

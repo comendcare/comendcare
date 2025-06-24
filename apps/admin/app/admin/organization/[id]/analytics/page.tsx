@@ -1,9 +1,9 @@
 import { getSession } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
-import { AdminResearchPlansAnalyticsCards } from "~web/components/admin-research-plans-analytics-cards"
-import { AdminToolsAnalyticsCards } from "~web/components/admin-tools-analytics-cards"
-import { AdminRFPsAnalyticsCards } from "~web/components/admin-rfps-analytics-cards"
+import { AdminResearchPlansAnalyticsCards } from "~admin/components/admin-research-plans-analytics-cards"
+import { AdminToolsAnalyticsCards } from "~admin/components/admin-tools-analytics-cards"
+import { AdminRFPsAnalyticsCards } from "~admin/components/admin-rfps-analytics-cards"
 
 export default async function OrganizationAnalytics({
     params
