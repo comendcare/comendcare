@@ -137,7 +137,7 @@ export function EditAssetForm({
         const updateData: Partial<Asset> = {
             ...toolData,
             title,
-            pinned: (isPrivate === false && isPinned) || false, // only save pinned if tool is public
+            pinned: (!isPrivate && isPinned) || false, // only save pinned if tool is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({

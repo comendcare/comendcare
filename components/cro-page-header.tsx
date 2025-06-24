@@ -27,7 +27,7 @@ import {Button} from "./plate-ui/button";
 import {ServiceProviderWebsiteButton} from "./service-provider-website-button";
 
 
-const companyTypeIcons: Record<string, JSX.Element> = {
+const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
     "Small Business (1-10M TTM Revenue)": <Building className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
     "Academic Core Facility": <University className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,

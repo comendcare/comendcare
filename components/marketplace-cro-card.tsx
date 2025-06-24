@@ -32,7 +32,7 @@ export const companyTypeMap: Record<string, string> = {
     "Consultant (<5 employees)": "Consultant",
 };
 
-const companyTypeIcons: Record<string, JSX.Element> = {
+const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="size-4 text-gray-500 dark:text-gray-400"/>,
     "Small Business (1-10M TTM Revenue)": <Building className="size-4 text-gray-500 dark:text-gray-400"/>,
     "Academic Core Facility": <University className="size-4 text-gray-500 dark:text-gray-400"/>,

@@ -49,7 +49,7 @@ interface Condition {
     globalEstimatedPopulation: number | null;
 }
 
-const milestoneMessages: Record<MilestoneKey, { message: string; icon: JSX.Element }> = {
+const milestoneMessages: Record<MilestoneKey, { message: string; icon: React.ReactElement | null }> = {
     "Add website and description": {
         message: "Add your organization's website and description to improve visibility.",
         icon: <Globe className="size-4" />,

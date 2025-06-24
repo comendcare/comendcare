@@ -215,7 +215,7 @@ export function EditRFPForm({
             ...rfpData,
             headerImage,
             title,
-            pinned: (isPrivate === false && isPinned) || false, // only save pinned if rfp is public
+            pinned: (!isPrivate && isPinned) || false, // only save pinned if rfp is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
@@ -382,7 +382,7 @@ export function EditRFPForm({
 
     useEffect(() => {
         // Forces re-validation whenever startDate or endDate changes
-        if (initializing.current === false) form.trigger()
+        if (!initializing.current) form.trigger()
     }, [formData.startDate, formData.endDate])
 
     return (

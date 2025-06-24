@@ -7,7 +7,7 @@ import {useSession} from "next-auth/react";
 import {Invitation} from "@prisma/client";
 import { Ellipsis, UserX } from "lucide-react";
 
-export default async function InvitationsDropdown({invitation}: { invitation: Invitation }) {
+export default function InvitationsDropdown({invitation}: { invitation: Invitation }) {
     const session = useSession()
 
     async function revokeInvite(invitation: Invitation) {
