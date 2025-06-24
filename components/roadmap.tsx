@@ -585,8 +585,8 @@ export function Roadmap() {
                                 variant={"destructive"}
                                 onClick={async (e) => {
                                     e.preventDefault()
-                                    await Promise.all(selectedNodeIds.map(async (nodeId: string) => await deleteNode(nodeId)))
                                     setDeleteIsOpen(false)
+                                    await Promise.all(selectedNodeIds.map(async (nodeId: string) => await deleteNode(nodeId)))
                                 }}
                             >
                                 Delete Selected Projects
