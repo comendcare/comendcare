@@ -26,12 +26,11 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
                 })
                 
                 toast.success(`Successfully approved member request and added ${response.data.user.name} as a member.`)
+                window.location.reload() // force full page reload
             } else {
                 console.error(response.error)
                 toast.error(response.error)
             }
-
-            location.reload() // force full page refresh
         }
     }
 
@@ -48,12 +47,11 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
                 })
 
                 toast.success(`Successfully deleted ${response.data.user.name}'s member request`)
+                window.location.reload() // force full page reload
             } else {
                 console.error(response.error)
                 toast.error(response.error)
             }
-
-            location.reload() // force full page refresh
         }
     }
 

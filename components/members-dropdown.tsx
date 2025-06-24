@@ -117,8 +117,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 }
 
                 setIsDialogOpen(false)
-                // router.refresh()
-                location.reload() // force full page refresh
+                window.location.reload() // force full page refresh
             } else {
                 console.error(response.error)
                 toast.error(response.error)
@@ -143,7 +142,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 toast.error(response.error)
             }
 
-            location.reload() // force full page refresh
+            window.location.reload() // force full page refresh
         }
     }
 
@@ -202,7 +201,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 toast.error("Failed to leave organization. Please try again.");
             }
 
-            location.reload() // force full page refresh
+            window.location.reload() // force full page refresh
         } catch (error) {
             console.error("Error leaving organization:", error);
             toast.error("An error occurred. Please try again later.");

@@ -1346,6 +1346,9 @@ export const denyMemberRequest = withOrganizationAuth(
                 where: {
                     id: memberRequest.id
                 },
+                include: {
+                    user: true
+                }
             });
 
             if (!deletedMemberRequest) {
