@@ -9,9 +9,9 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {z} from "zod";
 import {toast} from "sonner";
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganization} from "@comend/lib/actions";
 import {useEffect, useState} from "react";
-import {getConditionsDataFromOrgId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import Link from "next/link"
 import {useForm} from "react-hook-form";
@@ -23,7 +23,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import React from "react";
 import LoadingDots from "@/components/icons/loading-dots";
 import {researchFormSchema} from "@/components/research-onboarding-form";
-import { Option } from "@/lib/types";
+import { Option } from "@comend/lib/types";
 import { Info } from "lucide-react";
 
 export const optionSchema = z.object({

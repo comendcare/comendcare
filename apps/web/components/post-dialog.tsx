@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import {PostWithAuthorAndComments} from "@/lib/types";
+import {PostWithAuthorAndComments} from "@comend/lib/types";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {
     Popover,
@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/popover";
 import {useSession} from "next-auth/react";
 import Link from "next/link";
-import {formatDates} from "@/lib/utils";
-import {createComment, deletePost} from "@/lib/actions";
+import {formatDates} from "@comend/lib/utils";
+import {createComment, deletePost} from "@comend/lib/actions";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image"
 import {useState} from "react";

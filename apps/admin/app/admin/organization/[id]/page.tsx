@@ -1,14 +1,14 @@
-import { getSession } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getSession } from "@comend/lib/auth"
+import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import Roadmaps from "~admin/components/roadmaps"
 import {VerifyOrganizationSwitch} from "~admin/components/verify-organization-switch";
 import OrganizationRoadmaps from "~admin/components/organization-roadmaps";
-import {deleteOrganization} from "@/lib/actions";
+import {deleteOrganization} from "@comend/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import { mixpanelTrack } from "@/mixpanel"
-import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
+import {DeleteOrganizationAlertDialog} from "@comend/components/delete-organization-alert-dialog";
 import EditPAGProfileDialog from "~admin/components/edit-pag-profile-dialog";
 
 export default async function AdminOrganizationPage({

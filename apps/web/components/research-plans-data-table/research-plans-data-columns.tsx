@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { RESEARCH_PLAN_TYPES } from "@/lib/types"
+import { RESEARCH_PLAN_TYPES } from "@comend/lib/types"
 import { Roadmap } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
 

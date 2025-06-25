@@ -4,8 +4,8 @@ import PAGAnalyticsLineChart from "~web/components/pag-analytics-line-chart";
 import {DonutChartCard} from "~web/components/donut-chart-card";
 import {Eye, UserPlus, Users, Workflow} from "lucide-react";
 import {MagnifyingGlassIcon} from "@radix-ui/react-icons";
-import prisma from "@/lib/prisma"
-import {getSession} from "@/lib/auth";
+import prisma from "@comend/lib/prisma"
+import {getSession} from "@comend/lib/auth";
 import Image from "next/image";
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button";
 

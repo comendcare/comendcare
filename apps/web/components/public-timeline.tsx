@@ -1,9 +1,9 @@
 "use client"
 
 import React, {ReactNode, useEffect, useRef, useState} from "react"
-import {getDates} from "@/lib/utils";
+import {getDates} from "@comend/lib/utils";
 import {PrivateBadge} from "./private-badge"
-import {cn} from "@/lib/utils"
+import {cn} from "@comend/lib/utils"
 import {Card, CardContent} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {usePathname} from "next/navigation"

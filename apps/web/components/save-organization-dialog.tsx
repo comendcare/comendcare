@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { getSavedOrganizationsFromOrganizationId } from "@/lib/fetchers";
+import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
 import { useSession } from "next-auth/react";
 import {Form} from "@/components/ui/form";
 import va from "@vercel/analytics"
-import {saveOrganization} from "@/lib/actions";
+import {saveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark } from "lucide-react";
 import { mixpanelTrack } from "@/mixpanel";

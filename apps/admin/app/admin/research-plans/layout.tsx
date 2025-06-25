@@ -1,5 +1,5 @@
 import { AdminResearchPlansNav } from "~admin/components/admin-research-plans-nav";
-import PlaceholderCard from "@/components/placeholder-card";
+import PlaceholderCard from "@comend/components/placeholder-card";
 import { ReactNode, Suspense } from "react";
 
 export default function ResearchPlansAnalyticsLayout({children}: {children: ReactNode}) {

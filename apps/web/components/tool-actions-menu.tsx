@@ -10,7 +10,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from "react"
-import { Asset } from "@/lib/types"
+import { Asset } from "@comend/lib/types"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import { useSession } from "next-auth/react"

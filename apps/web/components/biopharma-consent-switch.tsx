@@ -14,7 +14,7 @@ import {
     FormLabel,
 } from "@/components/ui/form"
 import {Switch} from "@/components/ui/switch"
-import {toggleBiopharmaConsentSettings} from "@/lib/actions"
+import {toggleBiopharmaConsentSettings} from "@comend/lib/actions"
 import {Organization} from "@prisma/client";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import React from "react";

@@ -1,5 +1,5 @@
 import {Suspense} from "react"
-import PlaceholderCard from "@/components/placeholder-card"
+import PlaceholderCard from "@comend/components/placeholder-card"
 import {AdminCompaniesNav} from "~admin/components/admin-companies-nav";
 import {AdminCompaniesAnalyticsCards} from "~admin/components/admin-companies-analytics-cards";
 import {AdminCompaniesAnalyticsChart} from "~admin/components/admin-companies-analytics-chart";

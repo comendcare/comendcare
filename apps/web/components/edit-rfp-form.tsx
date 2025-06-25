@@ -27,19 +27,19 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog"
-import {RFP} from "@/lib/types"
+import {RFP} from "@comend/lib/types"
 import {Prisma} from "@prisma/client"
-import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
+import {getMilestones, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
-import {cn} from "@/lib/utils"
+import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@/components/ui/calendar"
 import MultipleSelector from "@/components/ui/multiple-selector"
 import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { Option } from "@/lib/types"
+import { Option } from "@comend/lib/types"
 import { AttachmentsFormField, BudgetFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import {
     DropdownMenu,

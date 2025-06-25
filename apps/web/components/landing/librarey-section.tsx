@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import AnimatedMarquee from "~web/components/animated-marquee"
 import React, { useEffect, useState } from "react"
 import Link from "next/link"

@@ -1,5 +1,5 @@
 import { AdminToolsNav } from "~admin/components/admin-tools-nav";
-import PlaceholderCard from "@/components/placeholder-card";
+import PlaceholderCard from "@comend/components/placeholder-card";
 import { ReactNode, Suspense } from "react";
 
 export default function ToolsAnalyticsLayout({children}: {children: ReactNode}) {

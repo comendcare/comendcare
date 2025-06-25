@@ -6,7 +6,7 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPreview, ImageSelector} from "@/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {toast} from "sonner";
-import {acceptedFiletypes, cn, getPublicFile, sleep} from "@/lib/utils";
+import {acceptedFiletypes, cn, getPublicFile, sleep} from "@comend/lib/utils";
 import {Pencil, Trash2Icon, Upload} from "lucide-react";
 import {difference} from "lodash";
 import {Button} from "@/components/ui/button";

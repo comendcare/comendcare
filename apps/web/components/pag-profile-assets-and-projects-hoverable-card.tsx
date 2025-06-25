@@ -31,7 +31,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
 import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
 import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
-import { formatMoney } from "@/lib/utils";
+import { formatMoney } from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 import { useSearchParams } from "next/navigation";

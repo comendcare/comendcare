@@ -1,7 +1,7 @@
 import {DataTable} from "@/components/clinical/data-table";
 import {columns} from "@/components/clinical/columns"
 import {useEffect, useState} from "react";
-import {getClinicalData} from "@/lib/fetchers";
+import {getClinicalData} from "@comend/lib/fetchers";
 
 
 export default function PharmaProjectClinicalTab() {

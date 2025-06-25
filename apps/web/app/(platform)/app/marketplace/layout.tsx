@@ -7,14 +7,14 @@ import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
-import {getMilestoneTypes, getPublicOrganizationData} from "@/lib/fetchers";
+import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import Image from "next/image"
 import {CROFilters} from "~web/components/cro-filters";
 import { useQueryState } from "nuqs"
-import { initializeCROSearch, initializeOrganizationSearch } from "@/lib/initialize-client-state"
-import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
+import { initializeCROSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
 
 // export const metadata: Metadata = {
 //     title: "Comend",

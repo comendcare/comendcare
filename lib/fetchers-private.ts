@@ -1,12 +1,12 @@
 "use server"
 
 import {unstable_cache} from "next/cache"
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
-import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
-import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
-import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
-import {getSession} from "@/lib/auth";
+import {replaceExamples, replaceTweets} from "@comend/lib/remark-plugins"
+import {ApiResponse, CustomOrganization, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
+import {getSession} from "@comend/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition, Prisma} from "@prisma/client";
 import {promises as fs} from "fs";

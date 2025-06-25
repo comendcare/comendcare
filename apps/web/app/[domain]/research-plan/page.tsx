@@ -1,8 +1,8 @@
 "use server"
 import {notFound} from "next/navigation"
-import prisma from "@/lib/prisma"
-import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
-import {formatMoney, standardizeYear} from "@/lib/utils"
+import prisma from "@comend/lib/prisma"
+import {getOrganizationData, getPublicRoadmapsForOrganization} from "@comend/lib/fetchers"
+import {formatMoney, standardizeYear} from "@comend/lib/utils"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "~web/components/pag-public-roadmap-breadcrumb";
 import {ProfilePhoto} from "@/components/profile-photo";

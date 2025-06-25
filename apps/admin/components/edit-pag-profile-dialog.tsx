@@ -1,25 +1,25 @@
 "use client"
 
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {updateOrganization, updateCondition} from "@/lib/actions";
-import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {FileWithPreview, ImageSelector} from "@/components/image-selector";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
-import {Button} from "@/components/ui/button";
+import {updateOrganization, updateCondition} from "@comend/lib/actions";
+import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
+import {FileWithPreview, ImageSelector} from "@comend/components/image-selector";
+import MultipleSelector, {Option} from "@comend/components/ui/multiple-selector";
+import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {
     checkSubdomainAvailability, getConditionsFromOrganizationId,
     getOrganizationFromOrganizationId,
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {Pen, Upload, MessageCircleQuestion, Info} from "lucide-react";
 import {
     Dialog,
@@ -28,21 +28,21 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
-import {handleImageUpload} from "@/lib/upload";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Slider} from "@/components/ui/slider";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {financesFormSchema} from "@/components/finances-onboarding-form";
-import {researchFormSchema} from "@/components/research-onboarding-form";
+} from "@comend/components/ui/dialog";
+import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, years} from "@comend/lib/utils";
+import {handleImageUpload} from "@comend/lib/upload";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {Slider} from "@comend/components/ui/slider";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
+import {financesFormSchema} from "@comend/components/finances-onboarding-form";
+import {researchFormSchema} from "@comend/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
-import MoneyInput from "@/components/money-input";
-import {FormImageSelector} from "@/components/form-image-selector";
-import {PAGBannerPhoto} from "@/components/pag-banner-photo";
-import {ProfilePhoto} from "@/components/profile-photo";
+import MoneyInput from "@comend/components/money-input";
+import {FormImageSelector} from "@comend/components/form-image-selector";
+import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
+import {ProfilePhoto} from "@comend/components/profile-photo";
 
 const optionSchema = z.object({
     label: z.string(),

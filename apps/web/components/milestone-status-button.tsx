@@ -2,8 +2,8 @@
 
 import React, { memo, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { StatusType } from "@/lib/types"
-import { cn } from "@/lib/utils"
+import { StatusType } from "@comend/lib/types"
+import { cn } from "@comend/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 export default function StatusButton({

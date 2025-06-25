@@ -21,14 +21,14 @@ import {
 } from "@dnd-kit/core"
 import {SortableContext, arrayMove} from "@dnd-kit/sortable"
 import {type Task, TaskCard} from "~web/components/task-card"
-import {hasDraggableData} from "@/lib/utils"
-import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
+import {hasDraggableData} from "@comend/lib/utils"
+import {coordinateGetter} from "@comend/lib/multiple-containers-keyboard-preset"
 import {useShallow} from "zustand/react/shallow"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {useSession} from "next-auth/react"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {Column} from "@/lib/actions"
+import {Column} from "@comend/lib/actions"
 import NewColumnDialog from "./new-column-dialog"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";

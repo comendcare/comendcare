@@ -27,11 +27,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {deleteUser, leaveOrganization} from "@/lib/actions";
+import {deleteUser, leaveOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {revalidatePath} from "next/cache";
 import { signOut } from "next-auth/react"
-import {getAllMembershipsFromUserId} from "@/lib/fetchers";
+import {getAllMembershipsFromUserId} from "@comend/lib/fetchers";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 

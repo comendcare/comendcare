@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import {
     Roadmap,
     Organization,
@@ -16,8 +16,8 @@ import {
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAdminAuth, withAuth, withOrganizationAuth, withUserAuth} from "./auth"
-import {getSession} from "@/lib/auth"
-import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
+import {getSession} from "@comend/lib/auth"
+import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@comend/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {
@@ -28,8 +28,8 @@ import {
     sleep,
     toKebabCase,
     updateTypeSenseDocument
-} from "@/lib/utils";
-import {validateEmailDomain} from "@/lib/server-utils";
+} from "@comend/lib/utils";
+import {validateEmailDomain} from "@comend/lib/server-utils";
 import {Session} from "next-auth";
 import {
     sendInviteEmail,
@@ -38,12 +38,12 @@ import {
     sendNewOrganizationEmail,
     sendMemberRequestDeniedEmail,
     sendMemberDeletedEmail,
-} from "@/lib/emails";
+} from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@comend/lib/types";
 import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
-import {getCategoriesAndMilestones} from "@/lib/utils"
+import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import {organizations} from "@/data/sample-pags"
 

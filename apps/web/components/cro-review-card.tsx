@@ -40,17 +40,17 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {StarRatingSelector} from "~web/components/star-rating-selector";
 import {useSession} from "next-auth/react";
-import {editReview, deleteReview, submitFeedback} from "@/lib/actions";
+import {editReview, deleteReview, submitFeedback} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
 import va from "@vercel/analytics"
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {getMilestones} from "@/lib/fetchers";
+import {getMilestones} from "@comend/lib/fetchers";
 import { reviewForm } from "./cro-review-dialog";
 import {Button} from "@/components/ui/button";
-import {ReviewWithAuthor} from "@/lib/types";
+import {ReviewWithAuthor} from "@comend/lib/types";
 import { EllipsisVertical, Flag, Link2Off, Pencil, Trash } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 

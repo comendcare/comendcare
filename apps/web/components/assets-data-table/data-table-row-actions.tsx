@@ -18,7 +18,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {Asset} from "@/lib/types";
+import {Asset} from "@comend/lib/types";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>

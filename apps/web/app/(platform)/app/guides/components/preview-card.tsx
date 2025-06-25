@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
-import type { ArticleType } from "@/lib/articles"
+import type { ArticleType } from "@comend/lib/articles"
 
 interface PreviewCardPropsType {
     index: number

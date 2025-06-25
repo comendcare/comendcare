@@ -9,15 +9,15 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
-import {useDebounce} from "@/lib/hooks/use-debounce";
-import {mapsFetcher} from "@/lib/utils";
+import {useDebounce} from "@comend/lib/hooks/use-debounce";
+import {mapsFetcher} from "@comend/lib/utils";
 import { Delete, Loader2, Pencil } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import useSWR from "swr";
 import AddressDialog from "./address-dialog";
 
 import { Command as CommandPrimitive } from "cmdk";
-import {AddressType} from "@/lib/types";
+import {AddressType} from "@comend/lib/types";
 
 interface AddressAutoCompleteProps {
     address: AddressType;

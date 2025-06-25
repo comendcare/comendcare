@@ -1,4 +1,4 @@
-import {mockAddresses} from "@/lib/mock";
+import {mockAddresses} from "@comend/lib/mock";
 import { NextResponse } from "next/server";
 
 export async function GET() {

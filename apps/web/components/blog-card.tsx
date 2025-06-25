@@ -2,7 +2,7 @@ import Link from "next/link"
 import BlurImage from "@/components/blur-image"
 
 import type { Roadmap } from "@prisma/client"
-import { placeholderBlurhash, toDateString } from "@/lib/utils"
+import { placeholderBlurhash, toDateString } from "@comend/lib/utils"
 
 interface BlogCardProps {
     data: Pick<

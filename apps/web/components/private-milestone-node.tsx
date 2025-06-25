@@ -19,11 +19,11 @@ import {
     CardTitle
 } from "@/components/ui/card"
 import StatusButton from "./milestone-status-button"
-import {truncate, cn, formatMoney} from "@/lib/utils"
+import {truncate, cn, formatMoney} from "@comend/lib/utils"
 import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
 import {badgeVariants} from "@/components/ui/badge"
-import {Milestone, StatusType} from "@/lib/types"
+import {Milestone, StatusType} from "@comend/lib/types"
 import {PopoverClose, PopoverContent, PopoverTrigger} from "@radix-ui/react-popover"
 import {Popover} from "@/components/plate-ui/popover"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"

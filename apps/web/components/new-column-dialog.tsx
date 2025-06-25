@@ -23,7 +23,7 @@ import {useForm} from "react-hook-form"
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Input} from "@/components/ui/input"
-import {getNewColumnFormSchema} from "@/lib/schemas";
+import {getNewColumnFormSchema} from "@comend/lib/schemas";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import { Plus } from "lucide-react"

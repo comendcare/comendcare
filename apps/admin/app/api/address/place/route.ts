@@ -1,4 +1,4 @@
-import {AddressType} from "@/lib/types";
+import {AddressType} from "@comend/lib/types";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

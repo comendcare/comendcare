@@ -6,7 +6,7 @@ import Image from "next/image"
 import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";
 import NoOrganization from "~web/components/no-organization";
-import { getSavedOrganizationsFromOrganizationId } from "@/lib/fetchers";
+import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
 import { SavedOrganization } from "@prisma/client";
 import { SavedOrganizationsDataTable } from "~web/components/saved-organization-data-table/saved-cros-data-table";
 import { columns } from "~web/components/saved-organization-data-table/saved-cros-data-columns";

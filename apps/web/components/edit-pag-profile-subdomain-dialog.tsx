@@ -14,14 +14,14 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Member, Organization, User} from "@prisma/client";
 import {useEffect, useState} from "react";
 import {useDebounce} from "use-debounce";
-import {checkSubdomainAvailability, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {checkSubdomainAvailability, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import { Pencil } from "lucide-react";
 
 const editSubdomainFormSchema = z.object({

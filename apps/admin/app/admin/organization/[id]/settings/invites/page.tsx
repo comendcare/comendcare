@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import InvitationForm from "~admin/components/invitation-form"
 
 export default async function SiteSettingsAppearance({

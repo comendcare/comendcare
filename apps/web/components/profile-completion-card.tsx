@@ -10,7 +10,7 @@ import {
 import {PrivateBadge} from "~web/components/private-badge";
 import { Banknote, File, Globe, Image, Map } from "lucide-react";
 import { ProfileCompletionMixpanelTrack } from "./profile-completion-track";
-import {getProfileCompletionChecks} from "@/lib/utils";
+import {getProfileCompletionChecks} from "@comend/lib/utils";
 
 // Define the possible milestone keys explicitly
 type MilestoneKey =

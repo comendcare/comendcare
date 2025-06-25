@@ -7,7 +7,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {connectOrganizationToCondition, createCondition} from "@/lib/actions";
+import {connectOrganizationToCondition, createCondition} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import MultipleSelector from "@/components/ui/multiple-selector";
@@ -16,9 +16,9 @@ import {Info} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {faker} from "@faker-js/faker";
 import LoadingDots from "@/components/icons/loading-dots";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {Organization} from "@prisma/client";
-import {MOLECULAR_MECHANISMS, Option} from "@/lib/types";
+import {MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
 
 export const optionSchema = z.object({
     label: z.string(),

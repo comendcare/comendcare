@@ -3,8 +3,8 @@
 import {format} from "date-fns";
 import * as React from "react";
 import Link from "next/link";
-import {formatDates} from "@/lib/utils";
-import {CommentWithUser} from "@/lib/types";
+import {formatDates} from "@comend/lib/utils";
+import {CommentWithUser} from "@comend/lib/types";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 interface CommentItemProps {

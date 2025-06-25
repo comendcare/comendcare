@@ -1,7 +1,7 @@
 "use client"
 import React, {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {isOnboarded, nameToInitials, setOnboarded} from "@/lib/utils";
+import {isOnboarded, nameToInitials, setOnboarded} from "@comend/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";

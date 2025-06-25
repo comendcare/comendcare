@@ -9,14 +9,14 @@ import {
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
 import {Button} from "@/components/ui/button"
 import {useEffect, useRef, useState} from "react"
-import {Milestone} from "@/lib/types"
+import {Milestone} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {Dialog, DialogContent, DialogPortal} from "@/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import ShareDialog from "~web/components/share-dialog";
 import {toast} from "sonner";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import {

@@ -2,7 +2,7 @@
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import {Organization, User, Invitation} from "@prisma/client";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/loading";;
 import Link from "next/link";
@@ -15,13 +15,13 @@ import {
     getInvitations,
     getOrganizationFromOrganizationId,
     getUser
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Button} from "@/components/ui/button"
-import {acceptInvitation} from "@/lib/actions";
+import {acceptInvitation} from "@comend/lib/actions";
 import Image from "next/image"
 import {useRouter} from "next/navigation";
-import {MembershipWithOrganization} from "@/lib/types";
+import {MembershipWithOrganization} from "@comend/lib/types";
 import { ArrowLeft } from "lucide-react";
 
 type InvitationWithOrganization = Invitation & {

@@ -20,7 +20,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar";
-import {MembershipWithOrganization} from "@/lib/types";
+import {MembershipWithOrganization} from "@comend/lib/types";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 export function OrganizationSwitcher({memberships}: {memberships: MembershipWithOrganization[]}) {

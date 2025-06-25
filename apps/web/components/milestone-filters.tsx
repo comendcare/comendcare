@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
-import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
+import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@comend/lib/types"
 import MultipleSelector from "@/components/ui/multiple-selector"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import { useEffect } from "react"

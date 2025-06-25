@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { getMemberRequestsWithUsers } from "@/lib/fetchers"
+import { getMemberRequestsWithUsers } from "@comend/lib/fetchers"
 import { toast } from "sonner"
 import {useSession} from "next-auth/react"
 import { ProfilePhoto } from "@/components/profile-photo"

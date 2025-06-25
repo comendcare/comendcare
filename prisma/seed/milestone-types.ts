@@ -1,6 +1,6 @@
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 
-import {MILESTONE_TYPE_OPTIONS} from "@/lib/types";
+import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 
 async function main() {
     console.log('Starting seed script...');

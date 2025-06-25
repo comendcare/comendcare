@@ -1,4 +1,4 @@
-import { getOrganizationData } from "@/lib/fetchers"
+import { getOrganizationData } from "@comend/lib/fetchers"
 import { headers } from "next/headers"
 import Image from "next/image"
 
