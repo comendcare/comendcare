@@ -27,7 +27,9 @@
             "@/data/*": ["data/*"],
             "@/public/*": ["public/*"],
             "@/loading": ["loading.tsx"],
-            "@/mixpanel": ["mixpanel.tsx"]
+            "@/mixpanel": ["mixpanel.tsx"],
+            "@comend/lib/*": ["packages/lib/*"],
+            "@comend/components/*": ["packages/components/*"]
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
