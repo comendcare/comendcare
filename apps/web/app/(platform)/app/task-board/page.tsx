@@ -33,7 +33,7 @@ export default async function KanbanPage({params}: {
     if (response.success && response.data) {
         return (
             <main className="flex flex-col w-full h-full">
-                <KanbanView />
+                {/*<KanbanView />*/}
             </main>
         )
     }
