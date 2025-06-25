@@ -20,7 +20,7 @@ import {
     pointerWithin
 } from "@dnd-kit/core"
 import {SortableContext, arrayMove} from "@dnd-kit/sortable"
-import {type Task, TaskCard} from "~web/components/task-card"
+import {TaskCard} from "~web/components/task-card"
 import {hasDraggableData} from "@comend/lib/utils"
 import {coordinateGetter} from "@comend/lib/multiple-containers-keyboard-preset"
 import {useShallow} from "zustand/react/shallow"
@@ -34,6 +34,7 @@ import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Button } from "@comend/components/ui/button"
 import { Redo2, Undo2 } from "lucide-react"
+import {Task} from "@/packages/lib/types";
 
 export type ColumnId = string
 

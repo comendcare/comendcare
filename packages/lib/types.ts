@@ -1,5 +1,5 @@
 import {
-    Tool as DBAsset,
+    Column,
     Comment,
     Company,
     ConditionToOrganization,
@@ -14,9 +14,12 @@ import {
     RFP as DBRFP,
     SavedCompany,
     Service,
+    Tool as DBAsset,
     User
 } from "@prisma/client";
 import {z} from "zod";
+import {ColumnType} from "comend-pag-platform/components/board-column";
+import {TaskType} from "comend-pag-platform/components/task-card";
 
 export type MilestoneKey =
     | "Add website and description"
@@ -1159,4 +1162,29 @@ export type SERVICE_CATEGORY_MAP = {
     'Clinical Trial Feasibility': 'clinical study',
     'Phase 1-3 Studies': 'clinical study',
     'Post-Marketing (Phase 4) Studies': 'clinical study'
+}
+
+export interface Task {
+    columnId: string;
+    id: string
+    status: StatusType
+    name: string
+    description?: string
+    checklist?: any[],
+    orderPosition: number,
+    kanbanPosition: number,
+    stakeholders?: any[],
+    endDate: Date,
+    priority: PriorityType
+    milestone: DBMilestone
+}
+
+export interface ColumnDragData {
+    type: ColumnType
+    column: Column
+}
+
+export interface TaskDragData {
+    type: TaskType
+    task: Task
 }

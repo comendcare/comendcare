@@ -5,35 +5,13 @@ import {Button} from "@comend/components/ui/button"
 import {cva} from "class-variance-authority"
 import {Calendar, CornerLeftUp, GripVertical, SquareCheck} from "lucide-react"
 import {Badge} from "@comend/components/ui/badge"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@comend/components/ui/dialog"
+import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@comend/components/ui/dialog"
 import {EditTaskForm} from "./edit-task-form"
 import {useEffect, useState} from "react"
-import { Milestone } from "@prisma/client"
-import { ProfilePhoto } from "@comend/components/profile-photo"
-import { truncate } from "@comend/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip"
-import { PriorityType, StatusType } from "@comend/lib/types"
-
-export interface Task {
-    columnId: string;
-    id: string
-    status: StatusType
-    name: string
-    description?: string
-    checklist?: any[],
-    orderPosition: number,
-    kanbanPosition: number,
-    stakeholders?: any[],
-    endDate: Date,
-    priority: PriorityType
-    milestone: Milestone
-}
+import {ProfilePhoto} from "@comend/components/profile-photo"
+import {truncate} from "@comend/lib/utils"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip"
+import {PriorityType, Task} from "@comend/lib/types"
 
 interface TaskCardProps {
     task: Task
@@ -42,11 +20,6 @@ interface TaskCardProps {
 }
 
 export type TaskType = "Task"
-
-export interface TaskDragData {
-    type: TaskType
-    task: Task
-}
 
 export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {
     const {

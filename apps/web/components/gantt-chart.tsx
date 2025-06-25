@@ -28,13 +28,13 @@ import {
 } from "@comend/components/ui/chart";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import { Task } from "./task-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@comend/components/ui/button";
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 import StatusButton from "./milestone-status-button";
 import { truncate } from "@comend/lib/utils";
 import { DateView } from "./miletone-date-view";
+import {Task} from "@/packages/lib/types";
 
   const chartConfig: ChartConfig = {
     item: {
