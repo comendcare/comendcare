@@ -1352,6 +1352,37 @@ export const getSavedCompaniesFromOrganizationId = withOrganizationAuth(
     }
 )
 
+export const getSavedOrganizationsFromOrganizationId = withOrganizationAuth(
+    async (
+        organization: Organization,
+        select: Prisma.SavedOrganizationSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const savedOrganizations = await prisma?.savedOrganization.findMany({
+                where: {organizationId: organization.id},
+                select
+            })
+
+            if (!savedOrganizations) {
+                return {success: false, error: "Saved organizations not found"};
+            }
+
+            return {
+                success: true,
+                data: savedOrganizations
+            };
+        } catch (error: any) {
+            logError("Error fetching saved organizations", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 /* USER FETCHERS - only the active user has access to these functions, usually fetching their own user data in some capacity */
 export const getUser = withUserAuth(
     async (
