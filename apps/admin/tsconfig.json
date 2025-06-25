@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -21,7 +22,6 @@
     ],
     "baseUrl": ".", // makes paths relative to `apps/admin`
     "paths": {
-      "@/*": ["../../*"],
       "~admin/*": ["./*"]
     }
   },
