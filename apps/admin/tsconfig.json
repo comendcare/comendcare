@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".", // makes paths relative to `apps/admin`
     "paths": {
-      "~admin/*": ["./*"]
+      "~admin/*": ["./*"],
+      "@/lib/*": ["@comend/lib/*"],
+      "@/components/*": ["@comend/components/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
