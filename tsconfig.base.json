@@ -22,7 +22,7 @@
         "baseUrl": ".", // This enables consistent relative paths across apps
         "paths": {
             "@/lib/*": ["lib/*"],
-            "@/components/*": ["components/*"],
+            "@/components/*": ["packages/components/*"],
             "@/state/*": ["state/*"],
             "@/data/*": ["data/*"],
             "@/public/*": ["public/*"],
