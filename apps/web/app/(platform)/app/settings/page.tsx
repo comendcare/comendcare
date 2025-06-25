@@ -3,7 +3,7 @@ import UnverifiedOrganizationPage from "~web/components/unverified-organization-
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {getSession} from "@comend/lib/auth";
 import NoOrganization from "~web/components/no-organization";
-import {TooltipProvider} from "@/components/ui/tooltip";
+import {TooltipProvider} from "@comend/components/ui/tooltip";
 import OrganizationSettingsTabs from "~web/components/organization-settings-tabs";
 
 export default async function SettingsPage() {

@@ -4,7 +4,7 @@ import {
     Avatar,
     AvatarFallback,
     AvatarImage,
-} from "@/components/ui/avatar"
+} from "@comend/components/ui/avatar"
 import {Users} from "lucide-react"
 import prisma from "@comend/lib/prisma"
 import {useEffect, useState} from "react";

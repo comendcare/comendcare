@@ -1,5 +1,5 @@
-import {DataTable} from "@/components/clinical/data-table";
-import {columns} from "@/components/clinical/columns"
+import {DataTable} from "@comend/components/clinical/data-table";
+import {columns} from "@comend/components/clinical/columns"
 import {useEffect, useState} from "react";
 import {getClinicalData} from "@comend/lib/fetchers";
 

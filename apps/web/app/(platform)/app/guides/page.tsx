@@ -1,15 +1,15 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@comend/components/ui/button"
 import { cn } from "@comend/lib/utils"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { ToggleGroup, ToggleGroupItem } from "@comend/components/ui/toggle-group"
 import type { TagType } from "@comend/lib/articles"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Lightbulb, Save, ThumbsUp } from "lucide-react"
 import { getNotionDatabaseAndContents } from "@comend/lib/notion"
 import { Blog, BlogCard } from "~web/components/landing/news"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@comend/components/ui/skeleton"
 
 export default function FAQ() {
     const [guides, setGuides] = useState<Blog[]>([])

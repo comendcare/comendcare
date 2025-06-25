@@ -1,10 +1,10 @@
 "use client"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
 import hero from "@/public/illustrations/hero.png"
 import Image from "next/image"
 import Link from "next/link"
 import { cn } from "@comend/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@comend/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import HeroIllustration from "~web/components/landing/hero-illustration"
 import {

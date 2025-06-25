@@ -5,12 +5,12 @@ import { OrganizationMarketplaceCard } from "~web/components/marketplace-pag-car
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
-import InfiniteScroll from "@/components/ui/infinite-scroll";
+import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { NoResultsView } from "./cro-search-results";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@comend/components/ui/skeleton";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,

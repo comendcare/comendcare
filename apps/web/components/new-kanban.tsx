@@ -1,6 +1,6 @@
 "use client"
 
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import {useSession} from "next-auth/react"
 import {useRouter} from "next/navigation";
 import { createKanban } from "@comend/lib/actions";

@@ -1,5 +1,5 @@
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Separator } from "@comend/components/ui/separator"
+import { SidebarTrigger } from "@comend/components/ui/sidebar"
 
 export function PharmaHeader() {
     return (

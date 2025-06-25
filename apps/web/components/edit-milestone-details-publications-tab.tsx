@@ -1,13 +1,13 @@
 "use client"
 import React, {useEffect, useState} from "react"
-import {ScrollArea} from "@/components/ui/scroll-area"
-import {Separator} from "@/components/ui/separator"
-import Spinner from "@/components/ui/spinner"
+import {ScrollArea} from "@comend/components/ui/scroll-area"
+import {Separator} from "@comend/components/ui/separator"
+import Spinner from "@comend/components/ui/spinner"
 import {MatchCard} from "~web/components/match-card"
 import {toast} from "sonner"
 import {getTopPubMedPublications} from "@comend/lib/fetchers";
 import {PubMedPublication} from "~web/types/types";
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@comend/components/ui/skeleton"
 
 
 export default function EditMilestoneDetailsPublicationsTab() {

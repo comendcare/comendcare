@@ -8,8 +8,8 @@ import {
     CardContent,
     CardDescription,
     CardFooter
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+} from "@comend/components/ui/card"
+import { Button } from "@comend/components/ui/button"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import {
@@ -20,16 +20,16 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Input } from "@/components/ui/input"
+import { Input } from "@comend/components/ui/input"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger
-} from "@/components/ui/tooltip"
-import { Textarea } from "@/components/ui/textarea"
+} from "@comend/components/ui/tooltip"
+import { Textarea } from "@comend/components/ui/textarea"
 import { feedbackTypeLabels, FeedbackTypes } from "./faq-feedback-radio-buttons"
 import { Info } from "lucide-react"
 

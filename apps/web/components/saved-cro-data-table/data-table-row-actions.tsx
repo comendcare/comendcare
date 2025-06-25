@@ -8,27 +8,27 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {SavedCompany} from "@prisma/client";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {Label} from "@/components/ui/label";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+} from "@comend/components/ui/dialog";
+import {Button} from "@comend/components/ui/button";
+import {Label} from "@comend/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {toast} from "sonner";
 import {getMilestones, getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {signOut, useSession} from "next-auth/react";
-import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
+import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@comend/components/ui/form";
 import va from "@vercel/analytics"
 import {editSavedCRO, unsaveCRO} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";

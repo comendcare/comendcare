@@ -1,10 +1,10 @@
 "use client"
 
 import React, { memo, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@comend/components/ui/button"
 import { StatusType } from "@comend/lib/types"
 import { cn } from "@comend/lib/utils"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
 
 export default function StatusButton({
     status = "PLANNED",

@@ -2,9 +2,9 @@ import {promises as fs} from "fs"
 import path from "path"
 import {z} from "zod"
 
-import {DataTable} from "@/components/biorepo/data-table";
+import {DataTable} from "@comend/components/biorepo/data-table";
 import {biosampleSchema} from "@/data/pharma-data/schema";
-import {columns} from "@/components/biorepo/columns"
+import {columns} from "@comend/components/biorepo/columns"
 
 export default async function PharmaBiorepoPage() {
     // async function getBiosamples() {

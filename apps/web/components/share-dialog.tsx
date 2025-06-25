@@ -4,15 +4,15 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import { mixpanelTrack } from "@/mixpanel";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@comend/components/ui/accordion";
 import CopyCodeBlock from "./code-block";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@comend/components/ui/switch";
+import { Label } from "@comend/components/ui/label";
 
 export default function ShareDialog({
                                         url,

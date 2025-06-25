@@ -1,9 +1,9 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
 import {truncate} from "@comend/lib/utils";
 import React, { ReactNode } from "react";
 import {Company} from "@prisma/client";
-import {Separator} from "@/components/ui/separator";
+import {Separator} from "@comend/components/ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "~web/components/save-cro-dialog";
 import {Briefcase, Building, Building2, Factory, FileText, Dna, Rocket, Star, University, HeartHandshake} from "lucide-react";

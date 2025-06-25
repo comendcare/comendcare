@@ -1,8 +1,8 @@
 "use client"
-import { Label } from "@/components/ui/label"
-import { FancyInput } from "@/components/ui/fancy-input"
+import { Label } from "@comend/components/ui/label"
+import { FancyInput } from "@comend/components/ui/fancy-input"
 import { LabelInputContainer } from "~web/components/contact-form"
-import { RainbowSubscribeButton } from "@/components/ui/rainbow-subscribe-button"
+import { RainbowSubscribeButton } from "@comend/components/ui/rainbow-subscribe-button"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -11,7 +11,7 @@ import {
     FormField,
     FormItem,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import { useForm } from "react-hook-form"
 import { sendBetaSignupEmail } from "@comend/lib/emails"
 import mixpanel from "mixpanel-browser"

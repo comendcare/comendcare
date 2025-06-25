@@ -6,7 +6,7 @@ import {
     CardContent,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
+} from "@comend/components/ui/card";
 import {PrivateBadge} from "~web/components/private-badge";
 import { Banknote, File, Globe, Image, Map } from "lucide-react";
 import { ProfileCompletionMixpanelTrack } from "./profile-completion-track";

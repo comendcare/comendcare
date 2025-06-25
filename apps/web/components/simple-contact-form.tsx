@@ -1,9 +1,9 @@
 "use client"
 import React from "react"
-import { Label } from "@/components/ui/label"
-import { FancyInput } from "@/components/ui/fancy-input"
+import { Label } from "@comend/components/ui/label"
+import { FancyInput } from "@comend/components/ui/fancy-input"
 import { cn } from "@comend/lib/utils"
-import { FancyTextarea } from "@/components/ui/fancy-textarea"
+import { FancyTextarea } from "@comend/components/ui/fancy-textarea"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -14,7 +14,7 @@ import {
     FormField,
     FormItem,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import { sendContactEmail } from "@comend/lib/emails"
 import { useRouter } from "next/navigation"
 

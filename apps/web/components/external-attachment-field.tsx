@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@comend/components/ui/button"
+import { Input } from "@comend/components/ui/input"
 import { Prisma } from "@prisma/client"
 import { Trash } from "lucide-react"
 

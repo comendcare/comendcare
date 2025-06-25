@@ -4,7 +4,7 @@ import { useTransition } from "react"
 import { createRoadmap } from "@comend/lib/actions"
 import { cn } from "@comend/lib/utils"
 import { useParams, useRouter } from "next/navigation"
-import LoadingDots from "@/components/icons/loading-dots"
+import LoadingDots from "@comend/components/icons/loading-dots"
 import va from "@vercel/analytics"
 
 export default function CreateRoadmapButton() {

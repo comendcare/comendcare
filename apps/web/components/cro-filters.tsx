@@ -11,20 +11,20 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import {useForm} from "react-hook-form"
-import {DoubleSliderBarChart} from "@/components/ui/slider-double"
-import {ScrollArea} from "@/components/ui/scroll-area"
-import {Button} from "@/components/ui/button"
-import MultipleSelector from "@/components/ui/multiple-selector"
+import {DoubleSliderBarChart} from "@comend/components/ui/slider-double"
+import {ScrollArea} from "@comend/components/ui/scroll-area"
+import {Button} from "@comend/components/ui/button"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
-import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group"
+import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {useEffect} from "react"
 import {Info} from "lucide-react"
 import {useQueryState} from "nuqs"
-import { badgeVariants } from "@/components/ui/badge"
+import { badgeVariants } from "@comend/components/ui/badge"
 import { usePathname, useSearchParams } from "next/navigation"
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({

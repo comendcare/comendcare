@@ -4,7 +4,7 @@ import {
     SidebarFooter,
     SidebarGroup,
     SidebarHeader,
-  } from "@/components/ui/sidebar"
+  } from "@comend/components/ui/sidebar"
    
   export function PAGMarketplaceSidebar() {
     return (

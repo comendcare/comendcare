@@ -5,31 +5,31 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Company, Prisma, SavedCompany } from "@prisma/client";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@comend/components/ui/radio-group";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+} from "@comend/components/ui/dialog";
+import { Button } from "@comend/components/ui/button";
+import { Label } from "@comend/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select";
 import { toast } from "sonner";
 import { getSavedCompaniesFromOrganizationId } from "@comend/lib/fetchers";
 import { useSession } from "next-auth/react";
-import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
+import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@comend/components/ui/form";
 import va from "@vercel/analytics"
 import {saveCRO} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
-import MultipleSelector from "@/components/ui/multiple-selector";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MILESTONE_TYPE_OPTIONS, Option} from "@comend/lib/types"
 import ProjectMultipleSelector from "./project-multiple-selector";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 

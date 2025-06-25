@@ -1,17 +1,17 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar"
 import Link from "next/link"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription, CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import {Separator} from "@/components/ui/separator"
-import {Input} from "@/components/ui/input";
+} from "@comend/components/ui/card"
+import {Separator} from "@comend/components/ui/separator"
+import {Input} from "@comend/components/ui/input";
 import {UserFeedCardSocialSection} from "~web/components/user-feed-card-social-section";
-import { ProfilePhoto } from "@/components/profile-photo"
+import { ProfilePhoto } from "@comend/components/profile-photo"
 
 interface UserFeedTextCardProps {
     content: string

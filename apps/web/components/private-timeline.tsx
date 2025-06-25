@@ -6,8 +6,8 @@ import {PrivateBadge} from "./private-badge"
 import { cn } from "@comend/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@comend/components/ui/button"
+import { ScrollArea } from "@comend/components/ui/scroll-area"
 import { TypeBadge } from "./type-badge"
 import { Milestone, StatusType } from "@comend/lib/types"
 import StatusButton from "./milestone-status-button"
@@ -30,10 +30,10 @@ import {
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
 import {GripVertical, Megaphone, Star, User} from "lucide-react"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
-import { ContextMenuTrigger } from "@/components/ui/context-menu"
+import { ContextMenuTrigger } from "@comend/components/ui/context-menu"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 

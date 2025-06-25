@@ -1,8 +1,8 @@
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
-import { ProfilePhoto } from "@/components/profile-photo";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { RFPCard } from "~web/components/rfp-card";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
 import { getOrganizationData, getPublicRFP, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
 import { formatMoney, standardizeYear } from "@comend/lib/utils";
 import { Building2, Calendar, HandCoins } from "lucide-react";

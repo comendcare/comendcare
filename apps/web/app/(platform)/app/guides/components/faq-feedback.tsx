@@ -2,7 +2,7 @@
 "use client"
 import React, { useState } from "react"
 import { usePathname } from "next/navigation"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@comend/components/ui/card"
 import { articles } from "@comend/lib/articles"
 import FAQFeedbackRadioButtons, {
     FeedbackTypes

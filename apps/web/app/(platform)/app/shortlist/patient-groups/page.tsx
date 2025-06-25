@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { PulsatingButton } from "@/components/ui/pulsating-button"
+import { PulsatingButton } from "@comend/components/ui/pulsating-button"
 import Image from "next/image"
 import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";

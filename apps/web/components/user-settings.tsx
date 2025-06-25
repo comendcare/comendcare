@@ -13,9 +13,9 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
+} from "@comend/components/ui/form";
+import {Button} from "@comend/components/ui/button";
+import {Input} from "@comend/components/ui/input";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -26,7 +26,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@comend/components/ui/alert-dialog";
 import {deleteUser, leaveOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {revalidatePath} from "next/cache";

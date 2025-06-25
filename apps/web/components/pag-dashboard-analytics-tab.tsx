@@ -1,4 +1,4 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import PAGAnalyticsBarChart from "~web/components/pag-analytics-bar-chart";
 import PAGAnalyticsLineChart from "~web/components/pag-analytics-line-chart";
 import {DonutChartCard} from "~web/components/donut-chart-card";

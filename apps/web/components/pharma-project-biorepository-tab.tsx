@@ -1,5 +1,5 @@
-import {DataTable} from "@/components/biorepo/data-table";
-import {columns} from "@/components/biorepo/columns"
+import {DataTable} from "@comend/components/biorepo/data-table";
+import {columns} from "@comend/components/biorepo/columns"
 import {useEffect, useState} from "react";
 import {getBiosampleData} from "@comend/lib/fetchers";
 

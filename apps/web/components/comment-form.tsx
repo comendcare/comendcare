@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {ProfilePhoto} from "@/components/profile-photo"
+import {ProfilePhoto} from "@comend/components/profile-photo"
 
 import {CommentInput} from "~web/components/comment-input";
 import {useState} from "react";

@@ -1,6 +1,6 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
 import {cn} from "@comend/lib/utils";
 import {faker} from "@faker-js/faker";
@@ -11,8 +11,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+} from "@comend/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@comend/lib/types";
 import { ChevronRight, ExternalLink, Info, Paperclip, Pencil } from "lucide-react";
 

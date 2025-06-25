@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
 import researchersHero from "@/public/illustrations/researchers-hero.svg"
 import Image from "next/image"
 

@@ -5,13 +5,13 @@
 import Link from "next/link"
 import { LucideIcon } from "lucide-react"
 import { cn } from "@comend/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@comend/components/ui/button"
 import {
     Tooltip,
     TooltipTrigger,
     TooltipContent,
     TooltipProvider
-} from "@/components/ui/tooltip"
+} from "@comend/components/ui/tooltip"
 import { usePathname } from "next/navigation"
 import {ReactNode} from "react";
 

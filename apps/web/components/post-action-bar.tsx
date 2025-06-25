@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import {AnimatePresence, motion} from "framer-motion";
-import {Button} from "@/components/ui/button";
-import {Separator} from "@/components/ui/separator";
+import {Button} from "@comend/components/ui/button";
+import {Separator} from "@comend/components/ui/separator";
 import {cn, formatDates} from "@comend/lib/utils";
 import {CommentForm} from "~web/components/comment-form";
 import {setTransition} from "@comend/lib/transition";

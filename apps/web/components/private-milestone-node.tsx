@@ -9,7 +9,7 @@ import {
     getOutgoers,
     getConnectedEdges
 } from "@xyflow/react"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Card,
     CardContent,
@@ -17,15 +17,15 @@ import {
     CardFooter,
     CardHeader,
     CardTitle
-} from "@/components/ui/card"
+} from "@comend/components/ui/card"
 import StatusButton from "./milestone-status-button"
 import {truncate, cn, formatMoney} from "@comend/lib/utils"
 import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
-import {badgeVariants} from "@/components/ui/badge"
+import {badgeVariants} from "@comend/components/ui/badge"
 import {Milestone, StatusType} from "@comend/lib/types"
 import {PopoverClose, PopoverContent, PopoverTrigger} from "@radix-ui/react-popover"
-import {Popover} from "@/components/plate-ui/popover"
+import {Popover} from "@comend/components/plate-ui/popover"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {PublicMilestoneNode} from "./public-milestone-node"

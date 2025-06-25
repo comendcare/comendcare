@@ -1,5 +1,5 @@
 import Link from "next/link"
-import BlurImage from "@/components/blur-image"
+import BlurImage from "@comend/components/blur-image"
 
 import type { Roadmap } from "@prisma/client"
 import { placeholderBlurhash, toDateString } from "@comend/lib/utils"

@@ -1,18 +1,18 @@
 "use client"
 import React, {useEffect} from "react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {isOnboarded, nameToInitials, setOnboarded} from "@comend/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {toast} from "sonner";
-import {useOnborda} from "@/components/onborda/OnbordaContext";
+import {useOnborda} from "@comend/components/onborda/OnbordaContext";
 import {usePathname} from "next/navigation";
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import EditPagProfileAboutCardDialog from "~web/components/edit-pag-profile-about-card-dialog";
 import {ExternalLink} from "lucide-react";
-import {Badge} from "@/components/ui/badge";
+import {Badge} from "@comend/components/ui/badge";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 

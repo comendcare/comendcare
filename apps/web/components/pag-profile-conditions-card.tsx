@@ -1,9 +1,9 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Condition, Organization} from "@prisma/client";
-import {Badge} from "@/components/ui/badge";
+import {Badge} from "@comend/components/ui/badge";
 import {concat} from "lodash";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
 import EditPAGProfileConditionCardDialog from "~web/components/edit-pag-profile-condition-card-dialog";
 import { Info } from "lucide-react";

@@ -1,5 +1,5 @@
 "use client"
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -7,7 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
+} from "@comend/components/ui/dialog";
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import { Settings } from "lucide-react";

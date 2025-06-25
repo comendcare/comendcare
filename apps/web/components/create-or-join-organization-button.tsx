@@ -1,7 +1,7 @@
 "use client"
 
 import {useRouter} from "next/navigation";
-import {PulsatingButton} from "@/components/ui/pulsating-button";
+import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 
 export default function CreateOrJoinOrganizationButton() {
     const router = useRouter();

@@ -1,7 +1,7 @@
 "use client"
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
-import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import {Card, CardContent, CardHeader} from "@comend/components/ui/card";
 import Link from "next/link";
 import {
     getConditionsDataFromOrgId,
@@ -12,8 +12,8 @@ import {
 } from "@comend/lib/fetchers";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
-import {ProfilePhoto} from "@/components/profile-photo";
-import {PAGBannerPhoto} from "@/components/pag-banner-photo";
+import {ProfilePhoto} from "@comend/components/profile-photo";
+import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {BiopharmaConsentSwitch} from "~web/components/biopharma-consent-switch";
 import EditPAGProfileHeaderDialog from "~web/components/edit-pag-profile-header-dialog";
@@ -21,10 +21,10 @@ import {ProfileCompletionCard} from "~web/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "~web/components/edit-pag-profile-subdomain-dialog";
 import EditPAGContactEmailDialog from "~web/components/edit-pag-contact-email-dialog";
 import {Building2, Calendar, ExternalLink, HandCoins} from "lucide-react";
-import {ScrollArea} from "@/components/ui/scroll-area";
-import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
+import {ScrollArea} from "@comend/components/ui/scroll-area";
+import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
 import ShareDialog from "~web/components/share-dialog";
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Loading from "@/loading";

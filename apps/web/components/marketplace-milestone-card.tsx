@@ -1,10 +1,10 @@
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
 import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@comend/lib/types";
 import React from "react";
 import {cn, formatMoney, truncate} from "@comend/lib/utils";
-import {ProfilePhoto} from "@/components/profile-photo";
-import {Separator} from "@/components/ui/separator";
+import {ProfilePhoto} from "@comend/components/profile-photo";
+import {Separator} from "@comend/components/ui/separator";
 import {Banknote, ExternalLink} from "lucide-react";
 import {CardContents} from "~web/components/private-milestone-node";
 import { PublicMilestoneNode } from "./public-milestone-node";

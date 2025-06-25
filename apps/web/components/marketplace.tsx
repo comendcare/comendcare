@@ -5,10 +5,10 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
     ResizableHandle
-} from "@/components/ui/resizable"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
-import { TooltipProvider } from "@/components/ui/tooltip"
+} from "@comend/components/ui/resizable"
+import { Separator } from "@comend/components/ui/separator"
+import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/tabs"
+import { TooltipProvider } from "@comend/components/ui/tooltip"
 import Browse from "~web/components/browse"
 import { useNavStore } from "@/state/nav/navStore"
 

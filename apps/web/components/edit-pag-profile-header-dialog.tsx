@@ -7,8 +7,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+} from "@comend/components/ui/dialog";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {
     Form,
     FormControl,
@@ -16,27 +16,27 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form";
+} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Input} from "@/components/ui/input";
+import {Input} from "@comend/components/ui/input";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "@/components/ui/select";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/select";
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
+import {Button} from "@comend/components/ui/button";
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
-import MoneyInput from "@/components/money-input";
+import MoneyInput from "@comend/components/money-input";
 import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
 

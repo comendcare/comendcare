@@ -1,13 +1,13 @@
 import {TrendingUpIcon} from "lucide-react"
 
-import {Badge} from "@/components/ui/badge"
+import {Badge} from "@comend/components/ui/badge"
 import {
     Card,
     CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@comend/components/ui/card"
 
 export function PharmaDashboardSectionCards() {
     return (

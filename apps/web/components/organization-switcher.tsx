@@ -13,15 +13,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuShortcut,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from "@/components/ui/sidebar";
+} from "@comend/components/ui/sidebar";
 import {MembershipWithOrganization} from "@comend/lib/types";
-import {ProfilePhoto} from "@/components/profile-photo";
+import {ProfilePhoto} from "@comend/components/profile-photo";
 
 export function OrganizationSwitcher({memberships}: {memberships: MembershipWithOrganization[]}) {
     const {isMobile} = useSidebar();

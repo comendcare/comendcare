@@ -8,9 +8,9 @@ import {
     CardContent,
     CardDescription,
     CardFooter
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+} from "@comend/components/ui/card"
+import { Button } from "@comend/components/ui/button"
+import { RadioGroup, RadioGroupItem } from "@comend/components/ui/radio-group"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import {
@@ -20,7 +20,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 export type FeedbackTypes =

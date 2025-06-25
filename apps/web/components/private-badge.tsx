@@ -1,5 +1,5 @@
 import { cn } from "@comend/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Lock } from "lucide-react";
 
 export function PrivateBadge({ iconOnly = false, className = "" }: { iconOnly?: boolean, className?: string }) {

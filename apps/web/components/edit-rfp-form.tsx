@@ -12,11 +12,11 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {Textarea} from "@/components/ui/textarea"
-import {Button} from "@/components/ui/button"
-import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
+} from "@comend/components/ui/form"
+import {Input} from "@comend/components/ui/input"
+import {Textarea} from "@comend/components/ui/textarea"
+import {Button} from "@comend/components/ui/button"
+import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
@@ -26,16 +26,16 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {RFP} from "@comend/lib/types"
 import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
+import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/popover"
 import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
-import {Calendar} from "@/components/ui/calendar"
-import MultipleSelector from "@/components/ui/multiple-selector"
+import {Calendar} from "@comend/components/ui/calendar"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -47,11 +47,11 @@ import {
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+  } from "@comend/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { useShallow } from "zustand/react/shallow"
-import MoneyInput from "@/components/money-input"
+import MoneyInput from "@comend/components/money-input"
 import ProjectMultipleSelector from "./project-multiple-selector"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>

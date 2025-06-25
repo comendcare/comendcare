@@ -3,7 +3,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@comend/components/ui/tabs"
 import PAGDashboardAnalyticsTab from "~web/components/pag-dashboard-analytics-tab";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";

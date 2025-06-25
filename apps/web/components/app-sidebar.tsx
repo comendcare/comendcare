@@ -17,7 +17,7 @@ import {
     SidebarFooter,
     SidebarHeader,
     SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@comend/components/ui/sidebar"
 import {
     getAllMembershipsFromUserId,
 } from "@comend/lib/fetchers";

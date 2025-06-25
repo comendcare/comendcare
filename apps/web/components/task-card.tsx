@@ -1,23 +1,23 @@
 import {useSortable} from "@dnd-kit/sortable"
 import {CSS} from "@dnd-kit/utilities"
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
-import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card"
+import {Button} from "@comend/components/ui/button"
 import {cva} from "class-variance-authority"
 import {Calendar, CornerLeftUp, GripVertical, SquareCheck} from "lucide-react"
-import {Badge} from "@/components/ui/badge"
+import {Badge} from "@comend/components/ui/badge"
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {EditTaskForm} from "./edit-task-form"
 import {useEffect, useState} from "react"
 import { Milestone } from "@prisma/client"
-import { ProfilePhoto } from "@/components/profile-photo"
+import { ProfilePhoto } from "@comend/components/profile-photo"
 import { truncate } from "@comend/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PriorityType, StatusType } from "@comend/lib/types"
 
 export interface Task {

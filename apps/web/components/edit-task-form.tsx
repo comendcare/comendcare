@@ -11,19 +11,19 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-} from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {Button} from "@/components/ui/button"
-import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
+} from "@comend/components/ui/form"
+import {Input} from "@comend/components/ui/input"
+import {Button} from "@comend/components/ui/button"
+import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
     DialogTrigger
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {DeleteTaskDialogContent} from "./delete-task-dialog-content"
 import {useShallow} from "zustand/react/shallow"
 import {nanoid} from "nanoid"
-import {Checkbox} from "@/components/ui/checkbox"
+import {Checkbox} from "@comend/components/ui/checkbox"
 import {
     arrayMove,
     SortableContext,
@@ -45,20 +45,20 @@ import {
 import {CSS} from "@dnd-kit/utilities"
 import {cva} from "class-variance-authority"
 import {debounce} from "lodash"
-import {SettingsProvider} from "@/components/editor/settings";
-import {PlateEditor} from "@/components/editor/plate-editor";
+import {SettingsProvider} from "@comend/components/editor/settings";
+import {PlateEditor} from "@comend/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { getMembers, getMilestones } from "@comend/lib/fetchers"
-import MultipleSelector from "@/components/ui/multiple-selector"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { Milestone, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@comend/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@comend/components/ui/popover"
 import { format } from "date-fns"
 import { cn } from "@comend/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {Separator} from "@/components/ui/separator"
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import { Calendar } from "@comend/components/ui/calendar"
+import {Separator} from "@comend/components/ui/separator"
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { StatusType } from "@comend/lib/types"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])

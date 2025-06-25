@@ -7,15 +7,15 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog"
-import {Button} from "@/components/ui/button"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form"
+} from "@comend/components/ui/dialog"
+import {Button} from "@comend/components/ui/button"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form"
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {z} from "zod"
-import {Input} from "@/components/ui/input"
-import MultipleSelector from "@/components/ui/multiple-selector"
-import {Slider} from "@/components/ui/slider"
+import {Input} from "@comend/components/ui/input"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
+import {Slider} from "@comend/components/ui/slider"
 import {useState} from "react"
 import {Filter} from "lucide-react"
 

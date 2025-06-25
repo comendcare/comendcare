@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { cn } from "@comend/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input, InputProps } from "@/components/ui/input";
+import { Button } from "@comend/components/ui/button";
+import { Input, InputProps } from "@comend/components/ui/input";
 import { Send } from "lucide-react";
-import Spinner from "@/components/ui/spinner";
+import Spinner from "@comend/components/ui/spinner";
 
 interface CommentInputProps extends InputProps {
     onSubmit: () => void;

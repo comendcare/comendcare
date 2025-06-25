@@ -2,8 +2,8 @@ import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuItem,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dropdown-menu";
+import {Button} from "@comend/components/ui/button";
 import { Ellipsis, Globe } from "lucide-react";
 
 export default function PublicProfileDropdown({ website }: { website: string | null }) {
