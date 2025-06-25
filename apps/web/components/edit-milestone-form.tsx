@@ -530,9 +530,9 @@ export function EditMilestoneForm({
                                             <NotificationBubble/>
                                         }
                                     </TabsTrigger>
-                                    <TabsTrigger className="relative" value="publications">
+                                    {/* <TabsTrigger className="relative" value="publications">
                                         Publications
-                                    </TabsTrigger>
+                                    </TabsTrigger> */}
                                 </TabsList>
                             </div>
                             {isMigrating ? (
@@ -827,9 +827,9 @@ export function EditMilestoneForm({
                                             </Button>
                                         </Link>
                                     </TabsContent>
-                                    <TabsContent value="publications" className="space-y-4 w-full">
+                                    {/* <TabsContent value="publications" className="space-y-4 w-full">
                                         <EditMilestoneDetailsPublicationsTab/>
-                                    </TabsContent>
+                                    </TabsContent> */}
                                 </>
                             )}
                         </Tabs>
