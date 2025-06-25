@@ -1,8 +1,7 @@
 import {type ClassValue, clsx} from "clsx"
 import {twMerge} from "tailwind-merge"
 import {Active, DataRef, Over} from "@dnd-kit/core";
-// import {ColumnDragData} from "comend-pag-platform/components/board-column";
-// import {TaskDragData} from "comend-pag-platform/components/task-card";
+import {ColumnDragData, TaskDragData} from "./types";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
@@ -16,6 +15,8 @@ import {
 } from "@comend/lib/types";
 import Papa from "papaparse";
 import type { Milestone, Option } from "@comend/lib/types";
+import {Column} from "@prisma/client";
+import {Task} from "./types";
 
 export const getCookie = (name: string) => {
     const cookies = document.cookie.split('; ')
@@ -409,25 +410,25 @@ export const setOnboarded = (tutorialName: string) => {
     window.functionalConsentedLocalStorage?.set(tutorialName, "true")
 }
 
-// type DraggableData = ColumnDragData | TaskDragData
-//
-// export function hasDraggableData<T extends Active | Over>(
-//     entry: T | null | undefined
-// ): entry is T & {
-//     data: DataRef<DraggableData>
-// } {
-//     if (!entry) {
-//         return false
-//     }
-//
-//     const data = entry.data.current
-//
-//     if (data?.type === "Column" || data?.type === "Task") {
-//         return true
-//     }
-//
-//     return false
-// }
+type DraggableData = ColumnDragData | TaskDragData
+
+export function hasDraggableData<T extends Active | Over>(
+    entry: T | null | undefined
+): entry is T & {
+    data: DataRef<DraggableData>
+} {
+    if (!entry) {
+        return false
+    }
+
+    const data = entry.data.current
+
+    if (data?.type === "Column" || data?.type === "Task") {
+        return true
+    }
+
+    return false
+}
 
 export const getIp = async (): Promise<string> => {
     const res = await fetch('https://api.ipify.org?format=json');
