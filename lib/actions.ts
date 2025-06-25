@@ -3756,6 +3756,43 @@ export const saveCRO = withOrganizationAuth(
     }
 )
 
+export const saveOrganization = withOrganizationAuth(
+    async (organization: Organization, savedOrganizationId: string) => {
+        try {
+            const response = await prisma.savedOrganization.create({
+                include: {
+                    savedOrganization: true,
+                    organization: true,
+                },
+                data: {
+                    savedOrganization: {
+                        connect: {
+                            id: savedOrganizationId
+                        }
+                    },
+                    organization: {
+                        connect: {
+                            id: organization.id
+                        }
+                    },
+                }
+            });
+
+            if (!response) {
+                console.error("Error saving organization.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            console.log(`response`, response)
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error saving organization:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
+
 export const editSavedCRO = withOrganizationAuth(
     async (_: Organization, savedCROId: string, milestoneId: string) => {
         try {

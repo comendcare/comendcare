@@ -7,6 +7,7 @@ import {Separator} from "@/components/ui/separator";
 import {FileText, HandCoins, Megaphone, Star, Users} from "lucide-react";
 import React from "react";
 import { PropertyBadge } from "./property-badge";
+import SaveOrganizationDialog from "./save-organization-dialog";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -48,10 +49,21 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
                 <CardHeader className="gap-2">
-                    <CardTitle className="text-xl flex flex-row gap-2 items-center">
-                        <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
-                        {name}
-                    </CardTitle>
+                    <div className="flex justify-between">
+                        <Link
+                            href={
+                                process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                                    : `http://localhost:3000/app/organization/${subdomain}`
+                            }
+                        >
+                            <CardTitle className="text-xl flex flex-row gap-2 items-center">
+                                <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
+                                {name}
+                            </CardTitle>
+                        </Link>
+                        <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>
+                    </div>
                     {(moneyDeployed || numberOfPatientsEngaged) && (
                         <div className="w-full grid gap-2 grid-cols-2">
                             {moneyDeployed !== null && moneyDeployed > 0 && (
