@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".", // makes paths relative to `apps/admin`
     "paths": {
+      "@/*": ["../../*"],
       "~admin/*": ["./*"]
     }
   },
