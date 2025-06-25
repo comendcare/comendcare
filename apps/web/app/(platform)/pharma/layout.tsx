@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {useNavStore} from "@/state/nav/navStore"; // Zustand store
-import {ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
+import {ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable";
 import {useSession} from "next-auth/react";
 import {useEffect, useRef} from "react";
 import Image from "next/image"
@@ -25,12 +25,12 @@ import {
     initializeOrganizationSearch,
     initializeRFPStore,
 } from "@comend/lib/initialize-client-state";
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
 import {AppSidebar} from "~web/components/app-sidebar";
 import {createKanban, createRoadmap} from "@comend/lib/actions";
 import {FeedbackSheet} from "~web/components/feedback";
-import {useOnborda} from "@/components/onborda/OnbordaContext";
-import {Button} from "@/components/ui/button";
+import {useOnborda} from "@comend/components/onborda/OnbordaContext";
+import {Button} from "@comend/components/ui/button";
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore";

@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@comend/components/ui/checkbox"
 import { Organization, Prisma, SavedOrganization } from "@prisma/client"
 
 interface CustomColumnMeta {

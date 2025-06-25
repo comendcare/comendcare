@@ -5,8 +5,8 @@ import {Table} from "@tanstack/react-table"
 
 import {DataTableViewOptions} from "~web/components/cro-services-data-table/data-table-view-options";
 
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>

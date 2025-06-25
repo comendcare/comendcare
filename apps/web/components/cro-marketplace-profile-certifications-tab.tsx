@@ -9,9 +9,9 @@ import {
     TableHead,
     TableHeader,
     TableRow
-} from "@/components/ui/table";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
+} from "@comend/components/ui/table";
+import { Collapsible, CollapsibleContent } from "@comend/components/ui/collapsible";
+import { Button } from "@comend/components/ui/button";
 import { Download } from "lucide-react";
 
 interface Certification {

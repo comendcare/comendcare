@@ -1,4 +1,4 @@
-import {ProfilePhoto} from "@/components/profile-photo"
+import {ProfilePhoto} from "@comend/components/profile-photo"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -6,7 +6,7 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator
-} from "@/components/ui/breadcrumb"
+} from "@comend/components/ui/breadcrumb"
 import {getNotionPage} from "@comend/lib/notion"
 import {House} from "lucide-react"
 import FAQFeedback from "../components/faq-feedback"

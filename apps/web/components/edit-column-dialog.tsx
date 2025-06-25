@@ -8,7 +8,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import {
     Dialog,
     DialogContent,
@@ -17,16 +17,16 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogFooter
-} from "@/components/ui/dialog"
-import {Button} from "@/components/ui/button"
+} from "@comend/components/ui/dialog"
+import {Button} from "@comend/components/ui/button"
 import {useForm} from "react-hook-form"
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Input} from "@/components/ui/input"
+import {Input} from "@comend/components/ui/input"
 import {getNewColumnFormSchema} from "@comend/lib/schemas";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { DropdownMenuItem } from "@comend/components/ui/dropdown-menu"
 import { Column } from "@prisma/client"
 import { Pencil } from "lucide-react"
 import { useSession } from "next-auth/react"

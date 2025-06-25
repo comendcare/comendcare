@@ -8,9 +8,9 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -18,10 +18,10 @@ import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {editUser} from "@comend/lib/actions";
-import {Checkbox} from "@/components/ui/checkbox";
+import {Checkbox} from "@comend/components/ui/checkbox";
 import {AddressType} from "@comend/lib/types";
 import {useCallback, useEffect, useState} from "react";
-import {FileWithPreview} from "@/components/image-selector";
+import {FileWithPreview} from "@comend/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@comend/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@comend/lib/utils";

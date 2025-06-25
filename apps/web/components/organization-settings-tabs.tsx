@@ -6,7 +6,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@comend/components/ui/tabs"
 import PAGSettingsMembersTab from "~web/components/pag-settings-members-tab"
 import PAGSettingsInvitationsTab from "~web/components/pag-settings-invitations-tab"
 import PAGSettingsRequestsTab from "~web/components/pag-settings-requests-tab"

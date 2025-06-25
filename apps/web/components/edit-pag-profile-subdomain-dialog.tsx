@@ -7,13 +7,13 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
+} from "@comend/components/ui/dialog";
+import {Form, FormControl, FormField, FormItem, FormMessage} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";

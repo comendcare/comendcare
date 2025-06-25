@@ -8,7 +8,7 @@ import {
     Avatar,
     AvatarFallback,
     AvatarImage,
-} from "@/components/ui/avatar";
+} from "@comend/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,13 +17,13 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from "@/components/ui/sidebar";
+} from "@comend/components/ui/sidebar";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -33,7 +33,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@comend/components/ui/alert-dialog";
 import Loading from "@/loading";
 import {
     getAllMembershipsFromUserId,
@@ -53,12 +53,12 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {ProfilePhoto} from "@/components/profile-photo";
+} from "@comend/components/ui/dialog";
+import {Button} from "@comend/components/ui/button";
+import {ProfilePhoto} from "@comend/components/profile-photo";
 import UserEditSettingsDialog from "~web/components/user-edit-settings-dialog";
 import {cn} from "@comend/lib/utils";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";

@@ -1,5 +1,5 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {faker} from "@faker-js/faker";
 
 // Define types for statuses and environments

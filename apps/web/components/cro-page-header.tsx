@@ -1,6 +1,6 @@
 import {getCROData} from "@comend/lib/fetchers";
 import {notFound} from "next/navigation";
-// import {Star} from "@/components/cro-rating-section";
+// import {Star} from "@comend/components/cro-rating-section";
 import {CertificationBadge} from "~web/components/certification-badge";
 import {cn} from "@comend/lib/utils";
 import SaveCRODialog from "~web/components/save-cro-dialog";
@@ -21,9 +21,9 @@ import {
 import Link from "next/link";
 import React from "react";
 import {companyTypeMap} from "~web/components/marketplace-cro-card";
-import {buttonVariants} from "@/components/ui/button";
+import {buttonVariants} from "@comend/components/ui/button";
 import mixpanel from "mixpanel-browser";
-import {Button} from "@/components/plate-ui/button";
+import {Button} from "@comend/components/plate-ui/button";
 import {ServiceProviderWebsiteButton} from "./service-provider-website-button";
 
 

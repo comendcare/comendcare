@@ -8,17 +8,17 @@ import {
     CardDescription,
     CardHeader,
     CardTitle
-} from "@/components/ui/card"
+} from "@comend/components/ui/card"
 import {NODE_TYPE_OPTIONS} from "@comend/lib/types"
 import {DateView} from "./miletone-date-view"
 import {BudgetView} from "./milestone-budget-view"
-import {Separator} from "@/components/ui/separator"
+import {Separator} from "@comend/components/ui/separator"
 import Link from "next/link"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import { TypeBadge } from "./type-badge"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import { ExternalLink } from "lucide-react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { RFPCard } from "./rfp-card"
 import {
     Table,
@@ -27,7 +27,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@comend/components/ui/table"
 import { PrivateBadge } from "./private-badge"
 import { AssetDetails, RFPDetails } from "./pag-profile-assets-and-projects-hoverable-card"
 

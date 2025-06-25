@@ -1,6 +1,6 @@
 "use client"
 
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -8,30 +8,30 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@comend/components/ui/dropdown-menu"
 import {
     Form,
     FormControl,
     FormField,
     FormItem,
     FormMessage,
-} from "@/components/ui/form"
-import {Card, CardContent, CardHeader} from "@/components/ui/card";
+} from "@comend/components/ui/form"
+import {Card, CardContent, CardHeader} from "@comend/components/ui/card";
 import {EmojiPicker} from "~web/components/emoji-picker"
-import {Textarea} from "@/components/ui/textarea";
+import {Textarea} from "@comend/components/ui/textarea";
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import Link from "next/link";
-import {Separator} from "@/components/ui/separator";
-import {ProfilePhoto} from "@/components/profile-photo"
+import {Separator} from "@comend/components/ui/separator";
+import {ProfilePhoto} from "@comend/components/profile-photo"
 import {createPost} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";

@@ -8,8 +8,8 @@ import {
     CardDescription,
     CardHeader,
     CardTitle
-} from "@/components/ui/card"
-import {Badge} from "@/components/ui/badge"
+} from "@comend/components/ui/card"
+import {Badge} from "@comend/components/ui/badge"
 import {formatDate} from "@comend/lib/utils";
 import React from "react"
 import {fixPlatformName} from "~web/lib/utils";

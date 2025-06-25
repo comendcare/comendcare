@@ -8,16 +8,16 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
     ResizableHandle
-} from "@/components/ui/resizable"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
+} from "@comend/components/ui/resizable"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/tabs"
 import { PrivateFlowView } from "~web/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { getMilestones, getMilestoneTypes, getOrganizationFromOrganizationId, getPublicMilestoneDetails } from "@comend/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@comend/components/ui/button"
 import { cn, parseCSV } from "@comend/lib/utils"
 import Link from "next/link"
 import {
@@ -29,30 +29,30 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Import, Info, Lock, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import { toast } from "sonner"
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
 import { Milestone } from "@comend/lib/types"
 import Loading from "@/loading";
 import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { useOnborda } from "@/components/onborda/OnbordaContext"
+import { useOnborda } from "@comend/components/onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
-import { Separator } from "@/components/ui/separator"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Separator } from "@comend/components/ui/separator"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 import ShareDialog from "./share-dialog"
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu"
+} from "@comend/components/ui/context-menu"
 import { NotificationBubble } from "./notification-bubble"
 
 const selector = (state: RoadmapState) => ({

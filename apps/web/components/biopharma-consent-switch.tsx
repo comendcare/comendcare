@@ -4,7 +4,7 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {toast} from "sonner"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Form,
     FormControl,
@@ -12,11 +12,11 @@ import {
     FormField,
     FormItem,
     FormLabel,
-} from "@/components/ui/form"
-import {Switch} from "@/components/ui/switch"
+} from "@comend/components/ui/form"
+import {Switch} from "@comend/components/ui/switch"
 import {toggleBiopharmaConsentSettings} from "@comend/lib/actions"
 import {Organization} from "@prisma/client";
-import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
 import { Info } from "lucide-react"
 

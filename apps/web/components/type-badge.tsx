@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
 import { cn } from "@comend/lib/utils"
 import { FileText, Megaphone, Star } from "lucide-react"
 

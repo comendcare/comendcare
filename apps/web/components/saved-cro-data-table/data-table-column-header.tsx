@@ -12,9 +12,9 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import {DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu";
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 
 interface DataTableColumnHeaderProps<TData, TValue>
     extends React.HTMLAttributes<HTMLDivElement> {

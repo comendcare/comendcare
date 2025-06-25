@@ -6,7 +6,7 @@ import {
     TableHeader,
     TableHead,
     TableRow
-} from "@/components/ui/table";
+} from "@comend/components/ui/table";
 
 const sites = [
     { name: "HGNC", url: "https://www.genenames.org/" },

@@ -1,6 +1,6 @@
 // import React from "react"
 // import { BlockMapType } from "react-notion";
-// import { NotionPage } from "@/components/notion-page";
+// import { NotionPage } from "@comend/components/notion-page";
 
 // export default async function NotionFAQPage({params}: {params: {id: string}}) {
 //     const pageId = params.id;

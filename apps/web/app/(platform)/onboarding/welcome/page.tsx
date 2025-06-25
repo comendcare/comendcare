@@ -1,7 +1,7 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import { Separator } from "@comend/components/ui/separator";
+import { Button } from "@comend/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Loading from "@/loading";;

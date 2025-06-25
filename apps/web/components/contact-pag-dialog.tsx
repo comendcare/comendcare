@@ -8,11 +8,11 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dialog"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";

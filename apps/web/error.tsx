@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import Link from "next/link"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@comend/components/ui/button"
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
     useEffect(() => {

@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -17,8 +17,8 @@ import {Prisma, SavedCompany} from "@prisma/client";
 import {
     Dialog,
     DialogContent,
-} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dialog";
+import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";

@@ -1,7 +1,7 @@
 "use client"
 import { encode } from "qss"
 import React, { useEffect, useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import marketplace from "@/public/screenshots/marketplace.png"

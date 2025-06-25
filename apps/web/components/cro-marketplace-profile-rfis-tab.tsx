@@ -7,7 +7,7 @@ import {
     TableHead,
     TableHeader,
     TableRow
-} from "@/components/ui/table";
+} from "@comend/components/ui/table";
 
 export default function CROMarketplaceProfileRFIsTab({ croRFIs }: { croRFIs: RFI[] }) {
     return (

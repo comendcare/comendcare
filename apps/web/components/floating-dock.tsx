@@ -21,12 +21,12 @@ import {
     Dialog,
     DialogContent,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {
     Sheet,
     SheetTrigger,
     SheetContent,
-} from "@/components/ui/sheet"
+} from "@comend/components/ui/sheet"
 
 export const FloatingDock = ({
                                  items,

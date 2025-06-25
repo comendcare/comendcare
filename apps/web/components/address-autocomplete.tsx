@@ -1,14 +1,14 @@
 "use client";
 
 import { FormMessages } from "~web/components/form-messages";
-import { Button } from "@/components/ui/button";
+import { Button } from "@comend/components/ui/button";
 import {
     Command,
     CommandEmpty,
     CommandGroup,
     CommandList,
-} from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
+} from "@comend/components/ui/command";
+import { Input } from "@comend/components/ui/input";
 import {useDebounce} from "@comend/lib/hooks/use-debounce";
 import {mapsFetcher} from "@comend/lib/utils";
 import { Delete, Loader2, Pencil } from "lucide-react";

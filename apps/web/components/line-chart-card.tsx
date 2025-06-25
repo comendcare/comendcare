@@ -1,6 +1,6 @@
 'use client'
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer } from "recharts"
-import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
+import {Card, CardHeader, CardTitle, CardContent} from "@comend/components/ui/card";
 import {cn} from "@comend/lib/utils";
 
 const data = [

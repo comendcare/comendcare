@@ -4,10 +4,10 @@ import { CSS } from "@dnd-kit/utilities"
 import { useMemo } from "react"
 import { Task, TaskCard } from "~web/components/task-card"
 import { cva } from "class-variance-authority"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card"
+import { Button } from "@comend/components/ui/button"
 import { Ellipsis, GripVertical, Trash } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@comend/components/ui/scroll-area"
 import { cn } from "@comend/lib/utils"
 import {Column} from "@prisma/client";
 import NewKanbanTaskButton from "~web/components/new-kanban-task-button";
@@ -16,7 +16,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@comend/components/ui/dropdown-menu"
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import EditColumnDialog from "./edit-column-dialog"
@@ -31,7 +31,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@comend/components/ui/alert-dialog";
 
 export type ColumnType = "Column"
 

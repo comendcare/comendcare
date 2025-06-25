@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {ScrollArea} from "@/components/ui/scroll-area";
+import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {AnimatePresence, motion} from "framer-motion"
 import {cn} from "@comend/lib/utils"
 import {CommentItem} from "./comment-item";

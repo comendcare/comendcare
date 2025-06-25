@@ -2,7 +2,7 @@
 
 import { Prisma } from "@prisma/client"
 import { Option } from "@comend/lib/types"
-import MultipleSelector from "@/components/ui/multiple-selector"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { useEffect, useState } from "react"
 import { getMilestones } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"

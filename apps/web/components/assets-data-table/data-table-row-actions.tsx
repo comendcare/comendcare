@@ -7,7 +7,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import {useState} from "react";
 import {
     Dialog,
@@ -16,8 +16,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dialog";
+import {Button} from "@comend/components/ui/button";
 import {Asset} from "@comend/lib/types";
 
 interface DataTableRowActionsProps<TData> {

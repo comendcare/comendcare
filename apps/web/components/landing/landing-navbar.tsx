@@ -15,11 +15,11 @@ import {
     MenuItem,
     ProductItem
 } from "~web/components/landing/navbar-menu"
-import {PulsatingButton} from "@/components/ui/pulsating-button";
+import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { X, Menu as MenuIcon } from "lucide-react"
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 
 interface NavbarItem {
     name: string

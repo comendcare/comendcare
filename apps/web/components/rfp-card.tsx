@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { PrivateBadge } from "~web/components/private-badge";
 import { DateView } from "~web/components/miletone-date-view";
 import { Calendar, CircleDollarSign, DollarSign, Pin, User } from "lucide-react";

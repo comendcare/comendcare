@@ -8,15 +8,15 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+} from "@comend/components/ui/form"
+import { ToggleGroup, ToggleGroupItem } from "@comend/components/ui/toggle-group"
 import { useForm } from "react-hook-form"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@comend/components/ui/scroll-area"
+import { Button } from "@comend/components/ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
 import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@comend/lib/types"
-import MultipleSelector from "@/components/ui/multiple-selector"
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import MultipleSelector from "@comend/components/ui/multiple-selector"
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
 

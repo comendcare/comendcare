@@ -2,7 +2,7 @@
 
 import {deleteInvitation} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@comend/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
 import {Invitation} from "@prisma/client";
 import { Ellipsis, UserX } from "lucide-react";

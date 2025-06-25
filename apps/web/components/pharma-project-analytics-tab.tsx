@@ -11,7 +11,7 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@comend/components/ui/card"
 import {PharmaProjectAnalyticsChart} from "~web/components/pharma-project-analytics-chart"
 import {PharmaProjectRecentRecommendations} from "~web/components/pharma-project-recent-recommendations"
 

@@ -1,5 +1,5 @@
-import {Separator} from "@/components/ui/separator";
-import ResearchOnboardingForm from "@/components/research-onboarding-form";
+import {Separator} from "@comend/components/ui/separator";
+import ResearchOnboardingForm from "@comend/components/research-onboarding-form";
 
 
 export default function CreateOrganizationResearchPage() {

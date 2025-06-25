@@ -1,8 +1,8 @@
-import ResearchOnboardingForm from "@/components/research-onboarding-form";
+import ResearchOnboardingForm from "@comend/components/research-onboarding-form";
 import {Timer} from "lucide-react";
-import {Separator} from "@/components/ui/separator";
+import {Separator} from "@comend/components/ui/separator";
 import { Info } from "lucide-react";
-import {TooltipProvider} from "@/components/ui/tooltip";
+import {TooltipProvider} from "@comend/components/ui/tooltip";
 
 
 export default function OrganizationOnboardingResearchPage() {

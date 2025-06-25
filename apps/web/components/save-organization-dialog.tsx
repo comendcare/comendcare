@@ -11,18 +11,18 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@comend/components/ui/dialog";
+import { Button } from "@comend/components/ui/button";
 import { toast } from "sonner";
 import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
 import { useSession } from "next-auth/react";
-import {Form} from "@/components/ui/form";
+import {Form} from "@comend/components/ui/form";
 import va from "@vercel/analytics"
 import {saveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark } from "lucide-react";
 import { mixpanelTrack } from "@/mixpanel";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 

@@ -13,7 +13,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@comend/components/ui/dropdown-menu"
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -22,7 +22,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from "@/components/ui/sidebar"
+} from "@comend/components/ui/sidebar"
 import CreatePharmaProjectDialog from "~web/components/create-pharma-project-dialog";
 import {usePathname, useRouter} from "next/navigation"
 import {deletePharmaProject, removeEmailFromWhitelist} from "@comend/lib/actions";

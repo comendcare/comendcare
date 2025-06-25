@@ -9,13 +9,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
+} from "@comend/components/ui/form"
 import { useForm } from "react-hook-form"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Button } from "@/components/ui/button"
-import MultipleSelector from "@/components/ui/multiple-selector"
+import { ScrollArea } from "@comend/components/ui/scroll-area"
+import { Button } from "@comend/components/ui/button"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
 import {useQueryState} from "nuqs";

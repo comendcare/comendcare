@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { cn } from "@comend/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@comend/components/ui/button"
 
 export default function Page() {
     return (

@@ -2,7 +2,7 @@
 import {MarketplaceNav} from "~web/components/marketplace-nav"
 import {MilestoneFilters} from "~web/components/milestone-filters"
 import {PAGFilters} from "~web/components/pag-filters"
-import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable"
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable"
 import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";

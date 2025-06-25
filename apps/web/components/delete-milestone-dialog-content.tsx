@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@comend/components/ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
@@ -11,7 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { toast } from "sonner"
 import mixpanel from "mixpanel-browser"
