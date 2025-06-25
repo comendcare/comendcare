@@ -545,12 +545,29 @@ model Organization {
   milestones                Milestone[]
   platformNotifications     PlatformNotification[]
   reviews                   Review[]
-  savedCompanies            SavedCompany[]
+  savedCompanies            SavedCompany[]            @relation("cro_save_organization")
+  savedOrganizations        SavedOrganization[]       @relation("org_save_organization")
+  savedByOrganizations      SavedOrganization[]       @relation("org_save_savedOrganization")
   tools                     Tool[]
   rfps                      RFP[]
   metadata                  Json?
 
   @@index([userId])
+}
+
+model SavedOrganization {
+  id                  String @id @default(uuid())
+  organizationId      String
+  savedOrganizationId String
+
+  organization      Organization @relation("org_save_organization", fields: [organizationId], references: [id], onDelete: Cascade)
+  savedOrganization Organization @relation("org_save_savedOrganization", fields: [savedOrganizationId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  metadata  Json?
+
+  @@unique([organizationId, savedOrganizationId]) // Ensures an organization can't save the same organization more than once
 }
 
 model Follow {
@@ -761,7 +778,7 @@ model Company {
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
   categories               String[]
   milestoneTypes           String[]
-  savedByOrganizations     SavedCompany[]
+  savedByOrganizations     SavedCompany[]  @relation("cro_save_savedCompany")
   createdAt                DateTime        @default(now())
   updatedAt                DateTime        @default(now()) @updatedAt
   metadata                 Json?
@@ -774,8 +791,8 @@ model SavedCompany {
   milestoneId    String
   // engagement     OrganizationToCompanyEngagement
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organization Organization @relation("cro_save_organization", fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company      @relation("cro_save_savedCompany", fields: [companyId], references: [id], onDelete: Cascade)
   milestone    Milestone    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
 
   updatedAt DateTime @updatedAt
