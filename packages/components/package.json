@@ -1,0 +1,14 @@
+{
+  "name": "@comend/components",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "types": "./index.ts"
+    }
+  },
+  "files": ["**/*"],
+  "private": true
+}
