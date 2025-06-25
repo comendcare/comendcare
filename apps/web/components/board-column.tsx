@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Ellipsis, GripVertical, Trash } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import {Column} from "@prisma/client";
 import NewKanbanTaskButton from "~web/components/new-kanban-task-button";
 import {

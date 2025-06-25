@@ -26,13 +26,13 @@ import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {toast} from "sonner";
-import {getMilestones, getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
+import {getMilestones, getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {signOut, useSession} from "next-auth/react";
 import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
 import va from "@vercel/analytics"
-import {editSavedCRO, unsaveCRO} from "@/lib/actions";
+import {editSavedCRO, unsaveCRO} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
-import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@/lib/types";
+import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@comend/lib/types";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 import ProjectMultipleSelector from "../project-multiple-selector";

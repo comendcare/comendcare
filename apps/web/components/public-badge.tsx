@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@comend/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Globe } from "lucide-react";
 

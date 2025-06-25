@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { getNotionDatabaseAndContents } from "@/lib/notion";
+import { cn } from "@comend/lib/utils";
+import { getNotionDatabaseAndContents } from "@comend/lib/notion";
 
 export async function News() {
     const newsDBKey = '1f7801a6fddc805297d9d10211608c11'

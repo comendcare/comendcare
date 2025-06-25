@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createMemberRequest, createOrganization} from "@/lib/actions";
+import {createMemberRequest, createOrganization} from "@comend/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -19,14 +19,14 @@ import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {AddressAutocompleteComponent} from "~web/components/address-autocomplete-component";
-import {AddressType, MODALITIES, Option} from "@/lib/types";
+import {AddressType, MODALITIES, Option} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Bold, Info, Italic} from "lucide-react";
 import {FileWithPreview} from "@/components/image-selector";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@/lib/utils";
+import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@comend/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -34,8 +34,8 @@ import {
     checkSubdomainAvailability,
     getAllNonMemberOrganizations,
     getOrganizationFromOrganizationId
-} from "@/lib/fetchers";
-import {handleImageUpload} from "@/lib/upload";
+} from "@comend/lib/fetchers";
+import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
 import {Member, Organization} from "@prisma/client";

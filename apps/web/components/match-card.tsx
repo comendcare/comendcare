@@ -10,7 +10,7 @@ import {
     CardTitle
 } from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
-import {formatDate} from "@/lib/utils";
+import {formatDate} from "@comend/lib/utils";
 import React from "react"
 import {fixPlatformName} from "~web/lib/utils";
 import {PubMedPublication} from "~web/types/types";

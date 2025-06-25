@@ -3,7 +3,7 @@
 import * as React from "react";
 import {AnimatePresence} from "framer-motion";
 import {Post} from "~web/components/post";
-import {PostWithAuthorAndComments} from "@/lib/types";
+import {PostWithAuthorAndComments} from "@comend/lib/types";
 import Image from "next/image";
 
 export function PostList({posts}: { posts: PostWithAuthorAndComments[] }) {

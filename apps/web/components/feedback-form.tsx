@@ -26,10 +26,10 @@ import { Input } from "@/components/ui/input"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useMixpanelContext} from "@/mixpanel";
-import {createFeedbackTicket} from "@/lib/notion";
+import {createFeedbackTicket} from "@comend/lib/notion";
 import {toast} from "sonner";
 import {z} from "zod";
-import {uploadFeedbackImg} from "@/lib/g-cloud";
+import {uploadFeedbackImg} from "@comend/lib/g-cloud";
 import { Info } from "lucide-react"
 
 async function getBase64(file: File) {

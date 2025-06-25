@@ -2,7 +2,7 @@
 
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import Image from "next/image"

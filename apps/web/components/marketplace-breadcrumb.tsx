@@ -12,7 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Store } from "lucide-react";
-import { getPublicMilestoneDetails } from "@/lib/fetchers";
+import { getPublicMilestoneDetails } from "@comend/lib/fetchers";
 
 export default function MarketplaceBreadcrumb({ organization, roadmap, marketplaceDomain }: {
     organization?: Partial<Organization>,

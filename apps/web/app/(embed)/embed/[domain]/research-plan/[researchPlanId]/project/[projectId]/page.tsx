@@ -1,6 +1,6 @@
 import { ProfilePhoto } from "@/components/profile-photo"
-import { getOrganizationData, getPublicRoadmapsForOrganization } from "@/lib/fetchers"
-import { cn, formatMoney, standardizeYear } from "@/lib/utils"
+import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
+import { cn, formatMoney, standardizeYear } from "@comend/lib/utils"
 import { Building2, Calendar, HandCoins } from "lucide-react"
 import { notFound } from "next/navigation"
 import Image from "next/image"

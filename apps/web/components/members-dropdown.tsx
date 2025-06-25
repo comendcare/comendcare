@@ -1,8 +1,8 @@
 "use client"
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {MemberWithUser} from "@/lib/types";
-import {deleteMember, leaveOrganization, updateMemberWithOwnerPermission, updateMemberWithMemberPermission} from "@/lib/actions";
+import {MemberWithUser} from "@comend/lib/types";
+import {deleteMember, leaveOrganization, updateMemberWithOwnerPermission, updateMemberWithMemberPermission} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
@@ -21,8 +21,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useEffect, useState} from "react";
-import {getAllMembershipsFromUserId, getMembers} from "@/lib/fetchers";
-import {MembershipWithOrganization} from "@/lib/types";
+import {getAllMembershipsFromUserId, getMembers} from "@comend/lib/fetchers";
+import {MembershipWithOrganization} from "@comend/lib/types";
 import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
 import mixpanel from "mixpanel-browser";

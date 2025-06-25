@@ -12,15 +12,15 @@ import {
     DialogClose,
 } from "@/components/ui/dialog";
 import {Form} from "@/components/ui/form";
-import {cn, getPublicFile} from "@/lib/utils";
+import {cn, getPublicFile} from "@comend/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {FormImageSelector} from "@/components/form-image-selector";
 import {FileWithPreview} from "@/components/image-selector";
 import {toast} from "sonner";
-import {handleImageDelete, handleImageUpload} from "@/lib/upload";
-import {updateOrganization} from "@/lib/actions";
+import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
+import {updateOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";

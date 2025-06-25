@@ -3,16 +3,16 @@
 import React, { useState } from "react"
 import { usePathname } from "next/navigation"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { articles } from "@/lib/articles"
+import { articles } from "@comend/lib/articles"
 import FAQFeedbackRadioButtons, {
     FeedbackTypes
 } from "./faq-feedback-radio-buttons"
 import FAQFeedbackThumbs from "./faq-feedback-thumbs"
 import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
-import { customerIOTrack } from "@/lib/customer-io"
+import { customerIOTrack } from "@comend/lib/customer-io"
 import { mixpanelTrack, useMixpanelContext } from "@/mixpanel"
-import { createGuidesFeedbackTicket } from "@/lib/notion"
+import { createGuidesFeedbackTicket } from "@comend/lib/notion"
 
 interface FAQFeedbackType {
     helpful?: boolean

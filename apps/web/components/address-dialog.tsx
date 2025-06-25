@@ -14,7 +14,7 @@ import {Label} from "@/components/ui/label";
 import type React from "react";
 import {type FormEvent, useEffect, useState} from "react";
 import {type ZodError, z} from "zod";
-import type {AddressType} from "@/lib/types";
+import type {AddressType} from "@comend/lib/types";
 import {FormMessages} from "~web/components/form-messages";
 import {Loader2} from "lucide-react";
 

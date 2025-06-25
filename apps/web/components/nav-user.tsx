@@ -42,9 +42,9 @@ import {
     getPublicOrganizationData,
     getUser,
     getUserMemberRequests
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest} from "@/lib/actions";
+import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest} from "@comend/lib/actions";
 import {Invitation, Member, Organization} from "@prisma/client";
 import {
     Dialog,
@@ -57,11 +57,11 @@ import {
 import {Button} from "@/components/ui/button";
 import {ProfilePhoto} from "@/components/profile-photo";
 import UserEditSettingsDialog from "~web/components/user-edit-settings-dialog";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
-import {MemberRequestWithUser, MembershipWithOrganization} from "@/lib/types";
+import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
 import mixpanel from "mixpanel-browser";
 import { mixpanelReset, mixpanelTrack } from "@/mixpanel";
 

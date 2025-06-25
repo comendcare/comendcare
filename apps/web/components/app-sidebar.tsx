@@ -20,11 +20,11 @@ import {
 } from "@/components/ui/sidebar"
 import {
     getAllMembershipsFromUserId,
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
-import {MembershipWithOrganization} from "@/lib/types";
+import {MembershipWithOrganization} from "@comend/lib/types";
 
 // This is sample data.
 const data = {

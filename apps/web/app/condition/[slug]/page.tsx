@@ -1,7 +1,7 @@
 import {notFound} from "next/navigation"
-import prisma from "@/lib/prisma"
-import {getPublicConditionData} from "@/lib/fetchers"
-import {cn, toDateString} from "@/lib/utils"
+import prisma from "@comend/lib/prisma"
+import {getPublicConditionData} from "@comend/lib/fetchers"
+import {cn, toDateString} from "@comend/lib/utils"
 import {
     DialogDescription,
     DialogFooter,
@@ -13,7 +13,7 @@ import {Button} from "@/components/ui/button";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {formSchema} from "@/lib/schemas";
+import {formSchema} from "@comend/lib/schemas";
 import React from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";

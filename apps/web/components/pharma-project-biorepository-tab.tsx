@@ -1,7 +1,7 @@
 import {DataTable} from "@/components/biorepo/data-table";
 import {columns} from "@/components/biorepo/columns"
 import {useEffect, useState} from "react";
-import {getBiosampleData} from "@/lib/fetchers";
+import {getBiosampleData} from "@comend/lib/fetchers";
 
 
 export default function PharmaProjectBiorepositoryTab() {

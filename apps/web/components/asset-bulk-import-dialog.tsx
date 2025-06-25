@@ -10,9 +10,9 @@ import Papa from "papaparse";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createOrUpdateAsset } from "@/lib/actions";
+import { createOrUpdateAsset } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { parseCSV, validateImport } from "@/lib/utils";
+import { parseCSV, validateImport } from "@comend/lib/utils";
 
 export function AssetBulkImportDialog() {
     const router = useRouter()

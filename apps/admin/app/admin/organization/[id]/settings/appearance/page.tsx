@@ -1,6 +1,6 @@
-import prisma from "@/lib/prisma"
-import Form from "@/components/form"
-import { adminUpdateOrganizationAttribute } from "@/lib/actions"
+import prisma from "@comend/lib/prisma"
+import Form from "@comend/components/form"
+import { adminUpdateOrganizationAttribute } from "@comend/lib/actions"
 
 export default async function SiteSettingsAppearance({
     params

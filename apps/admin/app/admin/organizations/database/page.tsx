@@ -1,8 +1,8 @@
 import { Suspense } from "react"
 import Organizations from "~admin/components/organizations"
-import PlaceholderCard from "@/components/placeholder-card"
+import PlaceholderCard from "@comend/components/placeholder-card"
 import CreateOrganizationButton from "~admin/components/create-organization-button"
-import CreateOrganizationModal from "@/components/modal/create-organization"
+import CreateOrganizationModal from "@comend/components/modal/create-organization"
 import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
 
 export default function AllOrganizations() {

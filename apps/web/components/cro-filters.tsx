@@ -17,7 +17,7 @@ import {DoubleSliderBarChart} from "@/components/ui/slider-double"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {Button} from "@/components/ui/button"
 import MultipleSelector from "@/components/ui/multiple-selector"
-import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS} from "@/lib/types"
+import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";

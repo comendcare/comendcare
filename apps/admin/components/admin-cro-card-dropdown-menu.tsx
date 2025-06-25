@@ -8,33 +8,33 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@comend/components/ui/dialog";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@comend/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
-import { updateCompany, deleteCompany } from "@/lib/actions";
+} from "@comend/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@comend/components/ui/select"
+import { updateCompany, deleteCompany } from "@comend/lib/actions";
 import { mixpanelTrack } from "@/mixpanel";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Company } from "@prisma/client";
 import { Ellipsis, Pencil, Trash } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@comend/components/ui/input";
+import { Textarea } from "@comend/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@/lib/types";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types";
 import React from "react";
-import {optionSchema} from "@/components/research-onboarding-form";
+import {optionSchema} from "@comend/components/research-onboarding-form";
 
 const formSchema = z.object({
     name: z.string().min(1),

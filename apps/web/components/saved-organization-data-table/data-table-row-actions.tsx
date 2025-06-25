@@ -20,11 +20,11 @@ import {
 } from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
-import {getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
+import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {unsaveOrganization} from "@/lib/actions";
+import {unsaveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
-import {Milestone, MILESTONE_TYPE_OPTIONS} from "@/lib/types";
+import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 import { mixpanelTrack } from "@/mixpanel";
 
 const formSchema = z.object({

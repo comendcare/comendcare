@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {getToolsAnalytics} from "@/lib/fetchers";
+import { Card, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
+import {getToolsAnalytics} from "@comend/lib/fetchers";
 
 interface AnalyticsData {
     totalTools: number,

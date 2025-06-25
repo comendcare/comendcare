@@ -1,7 +1,7 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
-import prisma from "@/lib/prisma"
-import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@/lib/utils";
-import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS} from '@/lib/types';
+import prisma from "@comend/lib/prisma"
+import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@comend/lib/utils";
+import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS} from '@comend/lib/types';
 
 
 async function main() {

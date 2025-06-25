@@ -1,5 +1,5 @@
 import {Suspense} from "react"
-import PlaceholderCard from "@/components/placeholder-card"
+import PlaceholderCard from "@comend/components/placeholder-card"
 import {AdminUsersNav} from "~admin/components/admin-users-nav";
 import * as React from "react"
 import {WhitelistDialog} from "~admin/components/whitelist-data-table/whitelist-dialog";

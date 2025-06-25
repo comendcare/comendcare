@@ -1,8 +1,8 @@
-import {getCROData} from "@/lib/fetchers";
+import {getCROData} from "@comend/lib/fetchers";
 import {notFound} from "next/navigation";
 // import {Star} from "@/components/cro-rating-section";
 import {CertificationBadge} from "~web/components/certification-badge";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import SaveCRODialog from "~web/components/save-cro-dialog";
 import {
     BriefcaseBusiness,

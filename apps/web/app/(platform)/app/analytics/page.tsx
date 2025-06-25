@@ -6,8 +6,8 @@ import {
 } from "@/components/ui/tabs"
 import PAGDashboardAnalyticsTab from "~web/components/pag-dashboard-analytics-tab";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {getSession} from "@/lib/auth";
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import React from "react";
 import { IncorporationStatus } from "@prisma/client";

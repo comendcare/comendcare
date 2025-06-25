@@ -1,10 +1,10 @@
-import { typesense } from '@/lib/typesense';
+import { typesense } from '@comend/lib/typesense';
 import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
-import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
+import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
 import mixpanel from 'mixpanel-browser';
-import { getExclusiveToFirstGroup } from '@/lib/utils';
+import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@/mixpanel";
 
 export const sampleCROs: any[] = [

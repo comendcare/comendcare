@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 
 
 const sendTypeSenseRequest = async (

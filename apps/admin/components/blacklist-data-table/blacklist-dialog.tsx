@@ -1,7 +1,7 @@
 "use client"
 
 import {useState} from "react"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -10,11 +10,11 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
+} from "@comend/components/ui/dialog"
+import {Input} from "@comend/components/ui/input"
+import {Label} from "@comend/components/ui/label"
 import {toast} from "sonner";
-import {addEmailToBlacklist} from "@/lib/actions";
+import {addEmailToBlacklist} from "@comend/lib/actions";
 
 export function BlacklistDialog() {
     const [email, setEmail] = useState("")

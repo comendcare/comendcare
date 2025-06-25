@@ -1,6 +1,6 @@
 "use client"
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
-import {formatMoney, standardizeYear} from "@/lib/utils";
+import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import Link from "next/link";
 import {
@@ -9,7 +9,7 @@ import {
     getPublicAssetsForOrganization,
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";

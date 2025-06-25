@@ -3,7 +3,7 @@
 import {Button} from "@/components/ui/button";
 import {useSession} from "next-auth/react"
 import {useRouter} from "next/navigation";
-import { createKanban } from "@/lib/actions";
+import { createKanban } from "@comend/lib/actions";
 
 export default function NewKanbanForm() {
     const {data: session} = useSession()

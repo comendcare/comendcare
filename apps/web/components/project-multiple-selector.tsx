@@ -1,10 +1,10 @@
 "use client"
 
 import { Prisma } from "@prisma/client"
-import { Option } from "@/lib/types"
+import { Option } from "@comend/lib/types"
 import MultipleSelector from "@/components/ui/multiple-selector"
 import { useEffect, useState } from "react"
-import { getMilestones } from "@/lib/fetchers"
+import { getMilestones } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>

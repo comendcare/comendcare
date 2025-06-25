@@ -30,14 +30,14 @@ import {
 } from "@/components/ui/select";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Button} from "@/components/ui/button";
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import MoneyInput from "@/components/money-input";
-import {years} from "@/lib/utils";
+import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
 
 const editOrgFormSchema = z.object({

@@ -12,8 +12,8 @@ import { Briefcase, Users } from "lucide-react";
 import CROMarketplaceProfileServicesTab from "~web/components/cro-marketplace-profile-services-tab";
 import {Company} from "@prisma/client";
 import CROMarketplaceProfileReviewsTab from "~web/components/cro-marketplace-profile-reviews-tab";
-import {CompanyWithReviewsAndServices} from "@/lib/types";
-import {getCROData} from "@/lib/fetchers";
+import {CompanyWithReviewsAndServices} from "@comend/lib/types";
+import {getCROData} from "@comend/lib/fetchers";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CROPageTabs() {

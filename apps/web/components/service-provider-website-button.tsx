@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import { Company } from "@prisma/client"
 import { ExternalLink } from "lucide-react"
 import mixpanel from "mixpanel-browser"

@@ -1,10 +1,10 @@
 "use server"
 
 import {unstable_cache} from "next/cache"
-import prisma from "@/lib/prisma"
-import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@/lib/types";
-import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@/lib/utils";
-import {getSession, withAdminAuth, withOrganizationAuth, withUserAuth} from "@/lib/auth";
+import prisma from "@comend/lib/prisma"
+import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
+import {getSession, withAdminAuth, withOrganizationAuth, withUserAuth} from "@comend/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Condition, Organization, Prisma, User} from "@prisma/client";
 import {promises as fs} from "fs";

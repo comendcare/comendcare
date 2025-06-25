@@ -1,4 +1,4 @@
-import { getOrganizationData, getPublicRoadmapsForOrganization } from "@/lib/fetchers"
+import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import React from "react";

@@ -5,7 +5,7 @@ import {useOnboardingStore} from '@/state/onboarding/onboardingStore';
 import {useSession} from 'next-auth/react';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {useEffect, useState} from "react";
-import {getInvitations, getPublicOrganizationData} from "@/lib/fetchers";
+import {getInvitations, getPublicOrganizationData} from "@comend/lib/fetchers";
 import { Check } from 'lucide-react';
 
 type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';

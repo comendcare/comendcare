@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import MultipleSelector from "@/components/ui/multiple-selector"
-import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"

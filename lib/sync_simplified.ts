@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { withPulse } from '@prisma/extension-pulse/node';
-import { typesense } from '@/lib/typesense';
+import { typesense } from '@comend/lib/typesense';
 
 process.on('SIGINT', () => {
     process.exit(0)

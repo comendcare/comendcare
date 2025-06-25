@@ -16,7 +16,7 @@ import {
     getAssets,
     getMilestoneTypes,
     getRFPs,
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {
     initializeAssetsStore,
@@ -24,20 +24,20 @@ import {
     initializeNotificationsState,
     initializeOrganizationSearch,
     initializeRFPStore,
-} from "@/lib/initialize-client-state";
+} from "@comend/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "~web/components/app-sidebar";
-import {createKanban, createRoadmap} from "@/lib/actions";
+import {createKanban, createRoadmap} from "@comend/lib/actions";
 import {FeedbackSheet} from "~web/components/feedback";
 import {useOnborda} from "@/components/onborda/OnbordaContext";
 import {Button} from "@/components/ui/button";
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore";
-import {cn, sleep} from "@/lib/utils";
+import {cn, sleep} from "@comend/lib/utils";
 import {Wand2} from "lucide-react";
 import {useQueryState} from "nuqs"
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import {PharmaSidebar} from "~web/components/pharma-sidebar";
 import {PharmaHeader} from "~web/components/pharma-header";
 

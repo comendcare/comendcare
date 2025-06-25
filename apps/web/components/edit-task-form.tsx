@@ -48,18 +48,18 @@ import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
-import { getMembers, getMilestones } from "@/lib/fetchers"
+import { getMembers, getMilestones } from "@comend/lib/fetchers"
 import MultipleSelector from "@/components/ui/multiple-selector"
 import { Milestone, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import {Separator} from "@/components/ui/separator"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import { StatusType } from "@/lib/types"
+import { StatusType } from "@comend/lib/types"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"

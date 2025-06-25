@@ -21,7 +21,7 @@ import {
 
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Image, Pencil, Trash2Icon, Upload } from "lucide-react"
-import {acceptedFiletypes, cn, getPublicFile, sleep} from "@/lib/utils";
+import {acceptedFiletypes, cn, getPublicFile, sleep} from "@comend/lib/utils";
 import { toast } from "sonner"
 import {FileWithPath, useDropzone} from "react-dropzone";
 

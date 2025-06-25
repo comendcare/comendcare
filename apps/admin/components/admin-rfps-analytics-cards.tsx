@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {getRFPsAnalytics} from "@/lib/fetchers";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
+import {getRFPsAnalytics} from "@comend/lib/fetchers";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@comend/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 interface AnalyticsData {

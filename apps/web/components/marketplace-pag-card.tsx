@@ -1,6 +1,6 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {formatMoney, truncate} from "@/lib/utils";
+import {formatMoney, truncate} from "@comend/lib/utils";
 import {Badge} from "@/components/ui/badge";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";

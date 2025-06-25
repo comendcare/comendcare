@@ -20,7 +20,7 @@ import {GroupAvatar} from "@/components/ui/group-avatar";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {getPharmaProjectData} from "@/lib/fetchers";
+import {getPharmaProjectData} from "@comend/lib/fetchers";
 import PharmaProjectBiorepositoryTab from "~web/components/pharma-project-biorepository-tab";
 import Loading from "@/loading";;
 import {

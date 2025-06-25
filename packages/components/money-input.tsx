@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import {Input} from "@/components/ui/input"; // ShadCN UI Input
 import {UseFormReturn} from "react-hook-form";
-import {cn, formatMoney} from "@/lib/utils";
+import {cn, formatMoney} from "@comend/lib/utils";
 
 
 type TextInputProps = {

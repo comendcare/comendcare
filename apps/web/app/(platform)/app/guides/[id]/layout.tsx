@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb"
-import {getNotionPage} from "@/lib/notion"
+import {getNotionPage} from "@comend/lib/notion"
 import {House} from "lucide-react"
 import FAQFeedback from "../components/faq-feedback"
 

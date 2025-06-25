@@ -35,17 +35,17 @@ import {
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
-import {monthsList} from "@/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
+import {monthsList} from "@comend/lib/data";
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@comend/lib/types"
 import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
-import {getAssets, getRFPs} from "@/lib/fetchers"
+import {getAssets, getRFPs} from "@comend/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
 import {ExternalAttachmentField} from "./external-attachment-field"
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
-import {cn, sleep} from "@/lib/utils"
+import {cn, sleep} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@/components/ui/calendar"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
@@ -67,7 +67,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {TypeBadge} from "./type-badge"
 import Loading from "@/loading";
-import {getMilestoneTypes} from "@/lib/fetchers"
+import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationBubble} from "./notification-bubble"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share} from "lucide-react"

@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import { getPublicMilestoneDetails } from "@/lib/fetchers";
+import { getPublicMilestoneDetails } from "@comend/lib/fetchers";
 import { Organization, Roadmap } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

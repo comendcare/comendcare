@@ -9,10 +9,10 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card";
-import {PostWithAuthorAndComments} from "@/lib/types";
+import {PostWithAuthorAndComments} from "@comend/lib/types";
 import {Button} from "@/components/ui/button";
-import {cn, formatDates} from "@/lib/utils";
-import {useLike} from "@/lib/hooks/use-like";
+import {cn, formatDates} from "@comend/lib/utils";
+import {useLike} from "@comend/lib/hooks/use-like";
 import {
     Popover,
     PopoverContent,
@@ -21,7 +21,7 @@ import {
 import useMeasure from "react-use-measure";
 import {ProfilePhoto} from "@/components/profile-photo"
 import {useSession} from "next-auth/react";
-import {deletePost} from "@/lib/actions";
+import {deletePost} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {PostDialog} from "~web/components/post-dialog";
 import PostActionBar from "~web/components/post-action-bar";

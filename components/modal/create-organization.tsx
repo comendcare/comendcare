@@ -1,10 +1,10 @@
 "use client"
 
 import { toast } from "sonner"
-import { createOrganization } from "@/lib/actions"
+import { createOrganization } from "@comend/lib/actions"
 import { useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import LoadingDots from "@/components/icons/loading-dots"
 import { useModal } from "./provider"
 import va from "@vercel/analytics"

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@comend/lib/utils";
 import { CheckCircle2, XCircle } from "lucide-react";
 import * as React from "react";
 

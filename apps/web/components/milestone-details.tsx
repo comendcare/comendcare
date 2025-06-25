@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
-import {NODE_TYPE_OPTIONS} from "@/lib/types"
+import {NODE_TYPE_OPTIONS} from "@comend/lib/types"
 import {DateView} from "./miletone-date-view"
 import {BudgetView} from "./milestone-budget-view"
 import {Separator} from "@/components/ui/separator"

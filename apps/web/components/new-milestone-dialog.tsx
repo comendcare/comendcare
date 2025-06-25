@@ -4,7 +4,7 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { Button } from "@/components/ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { getMilestoneTypes } from "@/lib/fetchers"
+import { getMilestoneTypes } from "@comend/lib/fetchers"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 import { Info, Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"

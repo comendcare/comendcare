@@ -13,9 +13,9 @@ import {
     MILESTONE_TYPE_OPTIONS,
     milestoneCategories,
     MilestoneKey
-} from "@/lib/types";
+} from "@comend/lib/types";
 import Papa from "papaparse";
-import type { Milestone, Option } from "@/lib/types";
+import type { Milestone, Option } from "@comend/lib/types";
 
 export const getCookie = (name: string) => {
     const cookies = document.cookie.split('; ')

@@ -1,5 +1,5 @@
 import { AdminRFPsNav } from "~admin/components/admin-rfps-nav";
-import PlaceholderCard from "@/components/placeholder-card";
+import PlaceholderCard from "@comend/components/placeholder-card";
 import { ReactNode, Suspense } from "react";
 
 export default function RFPsAnalyticsLayout({children}: {children: ReactNode}) {

@@ -2,7 +2,7 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {faker} from "@faker-js/faker";
 import {
     Dialog,
@@ -13,7 +13,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { NODE_TYPE_OPTIONS } from "@/lib/types";
+import { NODE_TYPE_OPTIONS } from "@comend/lib/types";
 import { ChevronRight, ExternalLink, Info, Paperclip, Pencil } from "lucide-react";
 
 // Define types for statuses and environments

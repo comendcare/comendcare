@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@comend/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -13,12 +13,12 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@comend/components/ui/dialog"
+import { Input } from "@comend/components/ui/input"
+import { Label } from "@comend/components/ui/label"
+import { Textarea } from "@comend/components/ui/textarea"
 import { toast } from "sonner"
-import { createCompany } from "@/lib/actions"
+import { createCompany } from "@comend/lib/actions"
 import {
     Form,
     FormControl,
@@ -26,17 +26,17 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import MultipleSelector from "@/components/ui/multiple-selector"
+} from "@comend/components/ui/form"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@/lib/types"
-import {badgeVariants} from "@/components/ui/badge";
+} from "@comend/components/ui/select"
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types"
+import {badgeVariants} from "@comend/components/ui/badge";
 
 const optionSchema = z.object({
     label: z.string(),

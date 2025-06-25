@@ -8,11 +8,11 @@ import {
     EdgeChange,
     Connection
 } from "@xyflow/react"
-import { createNodes, createNodesAndEdgesFromTemplate, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@/lib/actions"
+import { createNodes, createNodesAndEdgesFromTemplate, deleteNode, updateDBFlow, updateEdges, updateMilestones, updateRoadmap} from "@comend/lib/actions"
 import { toast } from "sonner"
 import { nanoid } from "nanoid"
-import { Milestone, NodeType, Roadmap, StatusType } from "@/lib/types"
-import { getMilestoneTypes } from "@/lib/fetchers"
+import { Milestone, NodeType, Roadmap, StatusType } from "@comend/lib/types"
+import { getMilestoneTypes } from "@comend/lib/fetchers"
 import {mixpanelTrack} from "@/mixpanel";
 
 export type RoadmapState = {

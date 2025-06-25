@@ -9,10 +9,10 @@ import { FileUploadForm } from "~web/components/file-upload-form";
 import Papa from "papaparse";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { parseCSV } from "@/lib/utils";
+import { parseCSV } from "@comend/lib/utils";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { createOrUpdateRFP } from "@/lib/actions";
+import { createOrUpdateRFP } from "@comend/lib/actions";
 
 export function RFPBulkImportDialog() {
     const router = useRouter()

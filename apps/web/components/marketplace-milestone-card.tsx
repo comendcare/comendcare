@@ -1,8 +1,8 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
+import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@comend/lib/types";
 import React from "react";
-import {cn, formatMoney, truncate} from "@/lib/utils";
+import {cn, formatMoney, truncate} from "@comend/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {Banknote, ExternalLink} from "lucide-react";

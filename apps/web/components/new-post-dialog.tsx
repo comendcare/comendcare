@@ -32,7 +32,7 @@ import {useSession} from "next-auth/react";
 import Link from "next/link";
 import {Separator} from "@/components/ui/separator";
 import {ProfilePhoto} from "@/components/profile-photo"
-import {createPost} from "@/lib/actions";
+import {createPost} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import { Globe } from "lucide-react"

@@ -1,6 +1,6 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {truncate} from "@/lib/utils";
+import {truncate} from "@comend/lib/utils";
 import React, {useState} from "react";
 import {Company} from "@prisma/client";
 import {
@@ -16,7 +16,7 @@ import {
     University,
     Trash
 } from "lucide-react";
-import {Milestone} from "@/lib/types";
+import {Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "comend-pag-platform/components/property-badge";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
 

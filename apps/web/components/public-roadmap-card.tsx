@@ -1,7 +1,7 @@
 "use client"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {cn, getStage} from "@/lib/utils";
+import {cn, getStage} from "@comend/lib/utils";
 import "@xyflow/react/dist/base.css"
 import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
@@ -12,14 +12,14 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/plate-ui/button";
 import { ChevronsUpDown, Pencil, Plus, Variable } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@/lib/types";
+import { Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@comend/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Organization } from "@prisma/client";
 import { PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans } from "./no-research-plans";
 import { NoProjects } from "./no-projects";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FunctionComponent, ReactElement, useState } from "react";
-import { labels } from "@/lib/data";
+import { labels } from "@comend/lib/data";
 
 export const RoadmapsCard = ({
     roadmaps,

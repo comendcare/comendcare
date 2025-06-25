@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { EditRFPForm } from "./edit-rfp-form";
-import { RFP } from "@/lib/types";
+import { RFP } from "@comend/lib/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const NewRFPDialog = ({iconOnly = false, numRFPsPinned}: {iconOnly?: boolean, numRFPsPinned: number}) => {

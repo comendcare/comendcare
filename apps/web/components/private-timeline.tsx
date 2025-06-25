@@ -1,15 +1,15 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
-import {getDates} from "@/lib/utils";
+import {getDates} from "@comend/lib/utils";
 import {PrivateBadge} from "./private-badge"
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TypeBadge } from "./type-badge"
-import { Milestone, StatusType } from "@/lib/types"
+import { Milestone, StatusType } from "@comend/lib/types"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import {

@@ -11,10 +11,10 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+} from "@comend/components/ui/dropdown-menu";
 import Loading from "@/loading";
-import { getUser } from "@/lib/fetchers"
-import { ProfilePhoto } from "@/components/profile-photo"
+import { getUser } from "@comend/lib/fetchers"
+import { ProfilePhoto } from "@comend/components/profile-photo"
 import { LogOut } from "lucide-react"
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {

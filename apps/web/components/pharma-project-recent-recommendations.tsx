@@ -6,12 +6,12 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar"
 import {Users} from "lucide-react"
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import {useEffect, useState} from "react";
-import {getAllOrganizationsWithConditions} from "@/lib/fetchers";
+import {getAllOrganizationsWithConditions} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
-import {OrganizationsWithConditions} from "@/lib/types";
+import {OrganizationsWithConditions} from "@comend/lib/types";
 
 export function PharmaProjectRecentRecommendations() {
     const [organizations, setOrganizations] = useState<OrganizationsWithConditions[]>([]);

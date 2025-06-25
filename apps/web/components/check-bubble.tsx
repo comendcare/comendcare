@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@comend/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Check, Plus } from "lucide-react";
 

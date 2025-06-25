@@ -5,7 +5,7 @@ import {Separator} from "@/components/ui/separator"
 import Spinner from "@/components/ui/spinner"
 import {MatchCard} from "~web/components/match-card"
 import {toast} from "sonner"
-import {getTopPubMedPublications} from "@/lib/fetchers";
+import {getTopPubMedPublications} from "@comend/lib/fetchers";
 import {PubMedPublication} from "~web/types/types";
 import { Skeleton } from "@/components/ui/skeleton"
 
