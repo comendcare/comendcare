@@ -79,7 +79,7 @@ export default function SaveOrganizationDialog({ savedOrganization, type }: { sa
                     "Saved Organization Id": response.data.savedOrganization.name,
                 })
                 router.refresh();
-                toast.success("Successfully saved organization!");
+                toast.success("Successfully saved patient group!");
                 setOpen(false)
             } else {
                 toast.error(response.error);
@@ -88,7 +88,7 @@ export default function SaveOrganizationDialog({ savedOrganization, type }: { sa
             toast.error(
                 "An unexpected error occurred. Please try again later."
             );
-            console.error("Error saving organization:", error);
+            console.error("Error saving patient group:", error);
         } finally {
             setIsSubmitting(false);
         }
@@ -101,7 +101,7 @@ export default function SaveOrganizationDialog({ savedOrganization, type }: { sa
                     <DialogTrigger asChild>
                     {type === "page" ? (
                         <Button variant="secondary" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>
-                            {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save Organization
+                            {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save Patient Group
                         </Button>
                     ) : (
                         <Button variant="ghost" className="w-fit onborda-save-service-provider" disabled={!session?.user?.organizationId}>

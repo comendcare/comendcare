@@ -38,7 +38,7 @@ const data = {
                 title: "Shortlist",
                 icon: Bookmark,
                 variant: "ghost",
-                url: "/app/shortlist"
+                url: "/app/shortlist/service-providers"
             }]
         },
         {
