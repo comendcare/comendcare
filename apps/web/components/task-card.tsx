@@ -19,8 +19,6 @@ interface TaskCardProps {
     mountKey: number
 }
 
-export type TaskType = "Task"
-
 export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {
     const {
         setNodeRef,
