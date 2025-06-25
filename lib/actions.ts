@@ -3851,6 +3851,30 @@ export const unsaveCRO = withOrganizationAuth(
     }
 )
 
+export const unsaveOrganization = withOrganizationAuth(
+    async (_: Organization, savedOrganizationId: string) => {
+        try {
+            const response = await prisma.savedOrganization.delete({
+                where: {id: savedOrganizationId},
+                include: {
+                    organization: true,
+                    savedOrganization: true
+                },
+            });
+
+            if (!response) {
+                console.error("Error unsaving organization.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error unsaving organization:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
+
 export const submitFeedback = withAuth(
     async (reviewId: string, userId: string, isHelpful: boolean) => {
         try {
