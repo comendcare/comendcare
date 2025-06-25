@@ -19,7 +19,6 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 import {ColumnType} from "comend-pag-platform/components/board-column";
-import {TaskType} from "comend-pag-platform/components/task-card";
 
 export type MilestoneKey =
     | "Add website and description"
@@ -1183,6 +1182,8 @@ export interface ColumnDragData {
     type: ColumnType
     column: Column
 }
+
+export type TaskType = "Task"
 
 export interface TaskDragData {
     type: TaskType
