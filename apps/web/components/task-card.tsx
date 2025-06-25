@@ -11,7 +11,7 @@ import {useEffect, useState} from "react"
 import {ProfilePhoto} from "@comend/components/profile-photo"
 import {truncate} from "@comend/lib/utils"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip"
-import {PriorityType, Task} from "@comend/lib/types"
+import {PriorityType, Task, TaskDragData} from "@comend/lib/types"
 
 interface TaskCardProps {
     task: Task
