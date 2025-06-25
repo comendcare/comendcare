@@ -70,7 +70,6 @@ export default function SaveOrganizationDialog({ savedOrganization, type }: { sa
             const response = await saveOrganization(session?.user?.organizationId, savedOrganization.id)
 
             if (response.success && response.data) {
-                va.track("Shortlisted Organization");
                 mixpanelTrack("Organization Saved", {
                     "Location": location,
                     "Saver Organization Name": response.data.organization.title,

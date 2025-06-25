@@ -26,7 +26,7 @@ export default function ProjectMultipleSelector({
                 id: true,
                 title: true,
                 roadmap: true,
-                
+                organizationId: true
             })
             if (milestonesResponse.success) {
                 setFetchedMilestones(milestonesResponse?.data as Milestone[])
