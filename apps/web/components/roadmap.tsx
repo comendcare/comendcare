@@ -429,7 +429,7 @@ export function Roadmap() {
                             <ResizableHandle withHandle />
 
                             <ResizablePanel
-                                onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
+                                // onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
                                 defaultSize={40}
                                 minSize={25}
                                 className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"

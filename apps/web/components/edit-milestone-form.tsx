@@ -530,9 +530,9 @@ export function EditMilestoneForm({
                                             <NotificationBubble/>
                                         }
                                     </TabsTrigger>
-                                    {/* <TabsTrigger className="relative" value="publications">
+                                    <TabsTrigger className="relative" value="publications">
                                         Publications
-                                    </TabsTrigger> */}
+                                    </TabsTrigger>
                                 </TabsList>
                             </div>
                             {isMigrating ? (
@@ -778,7 +778,7 @@ export function EditMilestoneForm({
                                             <Card
                                                 className="w-full flex flex-col mx-auto justify-center items-center align-center">
                                                 <CardContent className="flex flex-col gap-4 p-4">
-                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
+                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this project`}</h2>
                                                     <div className="flex justify-center">
                                                         <Image
                                                             alt="No recommendations"
@@ -796,7 +796,7 @@ export function EditMilestoneForm({
                                                         />
                                                     </div>
                                                     <p className="text-md">
-                                                        {`Please add more information to your milestone to generate some recommendations.`}
+                                                        {`Please add more information to your project to generate some recommendations.`}
                                                     </p>
                                                 </CardContent>
                                             </Card>
@@ -827,9 +827,9 @@ export function EditMilestoneForm({
                                             </Button>
                                         </Link>
                                     </TabsContent>
-                                    {/* <TabsContent value="publications" className="space-y-4 w-full">
+                                    <TabsContent value="publications" className="space-y-4 w-full">
                                         <EditMilestoneDetailsPublicationsTab/>
-                                    </TabsContent> */}
+                                    </TabsContent>
                                 </>
                             )}
                         </Tabs>
