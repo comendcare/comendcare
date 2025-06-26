@@ -26,7 +26,7 @@ import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@comend/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@comend/lib/utils";
 import { handleImageDelete, handleImageUpload } from "@comend/lib/upload";
-import { FormImageSelector } from "../../../components/form-image-selector";
+import { FormImageSelector } from "@comend/components/form-image-selector";
 import mixpanel from "mixpanel-browser";
 
 const userFormSchema = z.object({

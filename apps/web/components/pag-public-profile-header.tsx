@@ -4,7 +4,7 @@ import {ProfilePhoto} from "@comend/components/profile-photo";
 import {BackButton} from "./back-button";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
 import { Building2, Calendar, HandCoins } from "lucide-react";
-import { PAGBannerPhoto } from "../../../components/pag-banner-photo";
+import { PAGBannerPhoto } from "@comend/components/pag-banner-photo";
 
 export default function PAGPublicProfileHeader({organization, showBackButton}: {
     organization: Partial<Organization>,
