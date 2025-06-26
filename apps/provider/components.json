@@ -11,7 +11,7 @@
   "registries": {
     "plate": {
       "aliases": {
-        "ui": "@/components/plate-ui"
+        "ui": "@comend/components/plate-ui"
       },
       "url": "https://platejs.org/r"
     }
