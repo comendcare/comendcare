@@ -1,18 +1,18 @@
 "use client"
-import {Card, CardContent} from "@/components/ui/card";
+import {Card, CardContent} from "@comend/components/ui/card";
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@comend/components/ui/tabs"
 import {
     Carousel,
     CarouselContent,
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-  } from "@/components/ui/carousel"
+  } from "@comend/components/ui/carousel"
 import { RFPCard } from "./rfp-card";
 import {
     Table,
@@ -21,17 +21,17 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+} from "@comend/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
 import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@comend/components/ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
 import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
 import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
-import { formatMoney } from "@/lib/utils";
+import { formatMoney } from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 import { useSearchParams } from "next/navigation";

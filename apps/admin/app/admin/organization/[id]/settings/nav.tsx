@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import Link from "next/link"
 import { useParams, useSelectedLayoutSegment } from "next/navigation"
 

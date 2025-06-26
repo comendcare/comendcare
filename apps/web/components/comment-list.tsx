@@ -1,18 +1,18 @@
 "use client";
 
 import * as React from "react";
-import {ScrollArea} from "@/components/ui/scroll-area";
+import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {AnimatePresence, motion} from "framer-motion"
-import {cn} from "@/lib/utils"
+import {cn} from "@comend/lib/utils"
 import {CommentItem} from "./comment-item";
-import {setTransition} from "@/lib/transition";
+import {setTransition} from "@comend/lib/transition";
 import {useEffect, useState} from "react";
-import {getPostComments} from "@/lib/fetchers";
+import {getPostComments} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react"
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
 import {Comment} from "@prisma/client";
-import {CommentWithUser} from "@/lib/types";
+import {CommentWithUser} from "@comend/lib/types";
 
 
 interface PostCommentProps {

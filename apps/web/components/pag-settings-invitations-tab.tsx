@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import {useSession} from "next-auth/react"
-import { getInvitees } from "@/lib/fetchers"
+import { getInvitees } from "@comend/lib/fetchers"
 import { toast } from "sonner"
 import InviteUserToOrgDialog from "~web/components/invite-user-to-org-dialog"
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
-import { ProfilePhoto } from "@/components/profile-photo"
+import { ProfilePhoto } from "@comend/components/profile-photo"
 import InvitationsDropdown from "~web/components/invitations-dropdown"
 import Loading from "@/loading";
 

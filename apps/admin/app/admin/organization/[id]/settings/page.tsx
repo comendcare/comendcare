@@ -1,7 +1,7 @@
-import prisma from "@/lib/prisma"
-import Form from "@/components/form"
-import { adminUpdateOrganizationAttribute } from "@/lib/actions"
-import DeleteOrganizationForm from "@/components/form/delete-organization-form"
+import prisma from "@comend/lib/prisma"
+import Form from "@comend/components/form"
+import { adminUpdateOrganizationAttribute } from "@comend/lib/actions"
+import DeleteOrganizationForm from "@comend/components/form/delete-organization-form"
 
 export default async function SiteSettingsIndex({
     params

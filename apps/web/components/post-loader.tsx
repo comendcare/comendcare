@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@comend/components/ui/card";
+import { Skeleton } from "@comend/components/ui/skeleton";
 
 export function PostLoader() {
     return (

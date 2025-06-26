@@ -10,11 +10,11 @@ import {
     FormField,
     FormItem,
     FormLabel,
-} from "@/components/ui/form"
-import {Switch} from "@/components/ui/switch"
-import {toggleOrganizationPublished} from "@/lib/actions"
+} from "@comend/components/ui/form"
+import {Switch} from "@comend/components/ui/switch"
+import {toggleOrganizationPublished} from "@comend/lib/actions"
 import {Organization} from "@prisma/client";
-import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
 import { Info } from "lucide-react"
 

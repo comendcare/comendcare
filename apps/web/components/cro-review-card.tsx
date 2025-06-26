@@ -3,7 +3,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Milestone, Company} from "@prisma/client";
 import {StarRatingIndicator} from "~web/components/star-rating-indicator";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {
     Form,
     FormControl,
@@ -11,14 +11,14 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-} from "@/components/ui/form";
+} from "@comend/components/ui/form";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@comend/components/ui/dropdown-menu"
 import {
     Select,
     SelectContent,
@@ -27,7 +27,7 @@ import {
     SelectTrigger,
     SelectValue,
     SelectItem
-} from "@/components/ui/select"
+} from "@comend/components/ui/select"
 import {
     Dialog,
     DialogContent,
@@ -35,22 +35,22 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
+} from "@comend/components/ui/dialog";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
 import {StarRatingSelector} from "~web/components/star-rating-selector";
 import {useSession} from "next-auth/react";
-import {editReview, deleteReview, submitFeedback} from "@/lib/actions";
+import {editReview, deleteReview, submitFeedback} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
 import va from "@vercel/analytics"
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {getMilestones} from "@/lib/fetchers";
+import {getMilestones} from "@comend/lib/fetchers";
 import { reviewForm } from "./cro-review-dialog";
-import {Button} from "@/components/ui/button";
-import {ReviewWithAuthor} from "@/lib/types";
+import {Button} from "@comend/components/ui/button";
+import {ReviewWithAuthor} from "@comend/lib/types";
 import { EllipsisVertical, Flag, Link2Off, Pencil, Trash } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 

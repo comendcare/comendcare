@@ -7,24 +7,24 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+} from "@comend/components/ui/dialog";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Button} from "@/components/ui/button";
-import {updateOrganization} from "@/lib/actions";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
+import {Button} from "@comend/components/ui/button";
+import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Member, Organization, User} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import {Info, Pencil} from "lucide-react";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import {MODALITIES} from "@/lib/types";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
+import {MODALITIES} from "@comend/lib/types";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -170,13 +170,23 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                 setOpen(state);
             }}
         >
-            <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                >
-                    <Pencil/>
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            disabled={session?.user?.membership?.role !== "owner"}
+                        >
+                            <Pencil/>
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>

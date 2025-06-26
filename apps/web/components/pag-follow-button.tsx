@@ -1,10 +1,10 @@
 "use client"
 
 import {useEffect, useState} from "react";
-import {Button} from "@/components/ui/button";
-import {createFollow} from "@/lib/actions";
+import {Button} from "@comend/components/ui/button";
+import {createFollow} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {isUserFollowing} from "@/lib/fetchers";
+import {isUserFollowing} from "@comend/lib/fetchers";
 import { Check, Plus } from "lucide-react";
 
 export default function PAGFollowButton({organizationId}: { organizationId: string }) {

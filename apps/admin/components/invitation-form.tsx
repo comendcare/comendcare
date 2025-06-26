@@ -1,14 +1,14 @@
 "use client"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {inviteUser} from "@/lib/actions";
+import {inviteUser} from "@comend/lib/actions";
 import {useParams} from "next/navigation";
-import {getIp} from "@/lib/utils";
+import {getIp} from "@comend/lib/utils";
 import {toast} from "sonner";
 
 const invitationFormSchema = z.object({

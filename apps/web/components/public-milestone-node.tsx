@@ -7,10 +7,10 @@ import {
     CardFooter,
     CardHeader,
     CardTitle
-} from "@/components/ui/card"
-import { truncate, cn } from "@/lib/utils"
+} from "@comend/components/ui/card"
+import { truncate, cn } from "@comend/lib/utils"
 import { PrivateBadge } from "./private-badge"
-import { StatusType } from "@/lib/types"
+import { StatusType } from "@comend/lib/types"
 import { CardContents } from "./private-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"

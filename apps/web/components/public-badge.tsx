@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@comend/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Globe } from "lucide-react";
 
 export function PublicBadge({ className = "", iconOnly = false }: { className?: string, iconOnly?: boolean }) {

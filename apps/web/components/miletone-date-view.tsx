@@ -1,5 +1,5 @@
 import React from "react"
-import {monthsList} from "@/lib/data";
+import {monthsList} from "@comend/lib/data";
 import { Calendar } from "lucide-react";
 
 export function DateView({

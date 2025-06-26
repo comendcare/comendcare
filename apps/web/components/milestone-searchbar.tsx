@@ -1,9 +1,9 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import {Input} from "@/components/ui/input";
+import {Input} from "@comend/components/ui/input";
 import {useShallow} from "zustand/react/shallow"
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {MilestoneSearchState, useMilestoneSearchStore, ViewType} from "@/state/search/milestoneSearchStore";
 
 const selector = (state: MilestoneSearchState) => ({

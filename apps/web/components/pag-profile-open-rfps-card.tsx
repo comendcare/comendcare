@@ -1,7 +1,7 @@
 "use client"
 
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn} from "@/lib/utils";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {cn} from "@comend/lib/utils";
 import {
     Dialog,
     DialogContent,
@@ -9,7 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
+} from "@comend/components/ui/dialog";
 import { ChevronRight, Paperclip } from "lucide-react";
 
 // Define types for statuses and environments

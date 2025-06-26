@@ -1,10 +1,10 @@
 "use client"
 
 
-import {MemberRequestWithUser} from "@/lib/types";
-import {approveMemberRequestAndCreateMember, denyMemberRequest} from "@/lib/actions";
+import {MemberRequestWithUser} from "@comend/lib/types";
+import {approveMemberRequestAndCreateMember, denyMemberRequest} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@comend/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
 import { Ellipsis, UserCheck, UserX } from "lucide-react";
 import mixpanel from "mixpanel-browser";

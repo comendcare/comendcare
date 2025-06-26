@@ -3,31 +3,31 @@
 import * as React from "react"
 import {Area, AreaChart, CartesianGrid, XAxis} from "recharts"
 
-import {useIsMobile} from "@/lib/hooks/use-mobile"
+import {useIsMobile} from "@comend/lib/hooks/use-mobile"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@comend/components/ui/card"
 import {
     ChartConfig,
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@comend/components/ui/chart"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@comend/components/ui/select"
 import {
     ToggleGroup,
     ToggleGroupItem,
-} from "@/components/ui/toggle-group"
+} from "@comend/components/ui/toggle-group"
 
 const chartData = [
     {date: "2024-04-01", desktop: 222, mobile: 150},

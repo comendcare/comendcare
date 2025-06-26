@@ -1,7 +1,7 @@
 import { Suspense } from "react"
-import PlaceholderCard from "@/components/placeholder-card"
+import PlaceholderCard from "@comend/components/placeholder-card"
 import {AdminCompaniesAnalyticsCards} from "~admin/components/admin-companies-analytics-cards";
-import CROSearchBar from "@/components/cro-searchbar";
+import CROSearchBar from "@comend/components/cro-searchbar";
 import {CreateCompanyDialog} from "~admin/components/create-company-dialog";
 import {AdminCompaniesNav} from "~admin/components/admin-companies-nav";
 import {AdminCROSearchResults} from "~admin/components/admin-cro-search-results";

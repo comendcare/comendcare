@@ -1,8 +1,8 @@
 "use server"
 import React from "react";
 import {notFound} from "next/navigation"
-import prisma from "@/lib/prisma"
-import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
+import prisma from "@comend/lib/prisma"
+import {getOrganizationData, getPublicRoadmapsForOrganization} from "@comend/lib/fetchers"
 import Image from "next/image"
 import {FloatingDock} from "~web/components/floating-dock";
 import ShareDialog from "~web/components/share-dialog";

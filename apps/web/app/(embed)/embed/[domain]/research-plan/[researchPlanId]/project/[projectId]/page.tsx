@@ -1,12 +1,12 @@
-import { ProfilePhoto } from "@/components/profile-photo"
-import { getOrganizationData, getPublicRoadmapsForOrganization } from "@/lib/fetchers"
-import { cn, formatMoney, standardizeYear } from "@/lib/utils"
+import { ProfilePhoto } from "@comend/components/profile-photo"
+import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
+import { cn, formatMoney, standardizeYear } from "@comend/lib/utils"
 import { Building2, Calendar, HandCoins } from "lucide-react"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { PublicMilestoneDetails } from "~web/components/public-milestone-details"
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb"
 
 export default async function EmbeddedProjectPage({params}: {params: {domain: string, researchPlanId: string, projectId: string}}) {
     const [organization, roadmaps] = await Promise.all([

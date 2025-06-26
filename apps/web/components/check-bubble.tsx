@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@comend/lib/utils";
+import { Button } from "@comend/components/ui/button";
 import { Check, Plus } from "lucide-react";
 
 export function CheckBubble({ isChecked, onCheckedChanged }: { isChecked: boolean, onCheckedChanged: MouseEventHandler<HTMLButtonElement> }) {    

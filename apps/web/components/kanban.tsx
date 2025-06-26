@@ -20,20 +20,21 @@ import {
     pointerWithin
 } from "@dnd-kit/core"
 import {SortableContext, arrayMove} from "@dnd-kit/sortable"
-import {type Task, TaskCard} from "~web/components/task-card"
-import {hasDraggableData} from "@/lib/utils"
-import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
+import {TaskCard} from "~web/components/task-card"
+import {hasDraggableData} from "@comend/lib/utils"
+import {coordinateGetter} from "@comend/lib/multiple-containers-keyboard-preset"
 import {useShallow} from "zustand/react/shallow"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {useSession} from "next-auth/react"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {Column} from "@/lib/actions"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select"
+import {Column} from "@comend/lib/actions"
 import NewColumnDialog from "./new-column-dialog"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button"
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { Button } from "@comend/components/ui/button"
 import { Redo2, Undo2 } from "lucide-react"
+import {Task} from "@/packages/lib/types";
 
 export type ColumnId = string
 

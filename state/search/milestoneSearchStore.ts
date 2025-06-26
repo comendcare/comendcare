@@ -1,4 +1,4 @@
-import {typesense} from '@/lib/typesense';
+import {typesense} from '@comend/lib/typesense';
 import {temporal} from 'zundo';
 import {create} from 'zustand';
 

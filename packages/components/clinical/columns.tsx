@@ -1,7 +1,7 @@
 "use client"
 
 import {ColumnDef} from "@tanstack/react-table"
-import {Checkbox} from "@/components/ui/checkbox"
+import {Checkbox} from "@comend/components/ui/checkbox"
 import {DataTableColumnHeader} from "./data-table-column-header"
 
 export const columns: ColumnDef<any>[] = [

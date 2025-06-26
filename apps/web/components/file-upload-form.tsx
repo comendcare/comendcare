@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@comend/components/ui/button"
 import {
     Form,
     FormControl,
@@ -9,13 +9,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@comend/components/ui/form"
+import { Input } from "@comend/components/ui/input"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import Papa from "papaparse"
-import { DialogClose } from "@/components/ui/dialog"
+import { DialogClose } from "@comend/components/ui/dialog"
 import { toast } from "sonner"
 
 const formSchema = z.object({

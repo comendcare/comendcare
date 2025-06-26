@@ -6,13 +6,13 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
+} from "@comend/components/ui/breadcrumb";
 import { Organization, Roadmap } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Store } from "lucide-react";
-import { getPublicMilestoneDetails } from "@/lib/fetchers";
+import { getPublicMilestoneDetails } from "@comend/lib/fetchers";
 
 export default function MarketplaceBreadcrumb({ organization, roadmap, marketplaceDomain }: {
     organization?: Partial<Organization>,

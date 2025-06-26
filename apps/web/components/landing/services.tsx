@@ -1,10 +1,10 @@
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
 import {
     Card,
     CardDescription,
     CardHeader,
     CardTitle
-} from "@/components/ui/card"
+} from "@comend/components/ui/card"
 
 enum ProService {
     YES = 1,

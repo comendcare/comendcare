@@ -32,7 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './tooltip';
-import {AIChatEditor} from "@/components/plate-ui/ai-chat-editor";
+import {AIChatEditor} from "@comend/components/plate-ui/ai-chat-editor";
 
 export interface DraggableProps extends PlateElementProps {
   /**

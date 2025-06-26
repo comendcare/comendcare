@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import {useRouter, useSearchParams} from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@comend/components/ui/button'
 import {toast} from "sonner";
 
 export default function SignOutPage() {

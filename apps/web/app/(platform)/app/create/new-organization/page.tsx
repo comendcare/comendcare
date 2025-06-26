@@ -1,5 +1,5 @@
 import OrganizationOnboardingForm from "~web/components/organization-onboarding-form";
-import {Separator} from "@/components/ui/separator";
+import {Separator} from "@comend/components/ui/separator";
 
 
 export default function CreateOrganizationPage() {

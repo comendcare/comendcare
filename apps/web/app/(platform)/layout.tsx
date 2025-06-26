@@ -1,6 +1,6 @@
-import {getSession} from "@/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {redirect} from "next/navigation";
-import prisma from "@/lib/prisma";
+import prisma from "@comend/lib/prisma";
 
 interface PlatformLayoutProps {
     children: React.ReactNode

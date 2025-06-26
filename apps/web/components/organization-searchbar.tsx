@@ -1,10 +1,10 @@
 "use client"
 
 import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {Input} from "@/components/ui/input";
+import {Input} from "@comend/components/ui/input";
 import {OrganizationSearchState, useOrganizationSearchStore, ViewType} from "@/state/search/organizationSearchStore";
 import {useShallow} from "zustand/react/shallow"
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import { debounce } from "lodash";
 
 const selector = (state: OrganizationSearchState) => ({

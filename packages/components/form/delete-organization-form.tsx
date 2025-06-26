@@ -1,13 +1,13 @@
 "use client";
 
-import LoadingDots from "@/components/icons/loading-dots";
-import { cn } from "@/lib/utils";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import { cn } from "@comend/lib/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 import va from "@vercel/analytics";
 import { useSession } from "next-auth/react";
-import { deleteOrganization } from "@/lib/actions";
+import { deleteOrganization } from "@comend/lib/actions";
 import {Organization} from "@prisma/client";
 
 export default function DeleteOrganizationForm({

@@ -2,26 +2,26 @@
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import {Organization, User, Invitation} from "@prisma/client";
-import {cn} from "@/lib/utils";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {cn} from "@comend/lib/utils";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import Loading from "@/loading";;
 import Link from "next/link";
 import UserEditSettingsDialog from "~web/components/user-edit-settings-dialog";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {toast} from "sonner";
 import {
     getAllMembershipsFromUserId,
     getInvitations,
     getOrganizationFromOrganizationId,
     getUser
-} from "@/lib/fetchers";
-import {ProfilePhoto} from "@/components/profile-photo";
-import {Button} from "@/components/ui/button"
-import {acceptInvitation} from "@/lib/actions";
+} from "@comend/lib/fetchers";
+import {ProfilePhoto} from "@comend/components/profile-photo";
+import {Button} from "@comend/components/ui/button"
+import {acceptInvitation} from "@comend/lib/actions";
 import Image from "next/image"
 import {useRouter} from "next/navigation";
-import {MembershipWithOrganization} from "@/lib/types";
+import {MembershipWithOrganization} from "@comend/lib/types";
 import { ArrowLeft } from "lucide-react";
 
 type InvitationWithOrganization = Invitation & {

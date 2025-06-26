@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { TrendingDownIcon, TrendingUp, TrendingUpIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {getOrganizationAnalytics, getResearchPlansAnalytics} from "@/lib/fetchers";
+import { Badge } from "@comend/components/ui/badge";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card";
+import {getOrganizationAnalytics, getResearchPlansAnalytics} from "@comend/lib/fetchers";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@comend/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 interface AnalyticsData {

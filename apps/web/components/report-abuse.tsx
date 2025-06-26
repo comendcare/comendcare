@@ -1,11 +1,11 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@comend/lib/utils"
 import { AlertTriangle } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { useFormStatus } from "react-dom"
-import LoadingDots from "@/components/icons/loading-dots"
+import LoadingDots from "@comend/components/icons/loading-dots"
 import va from "@vercel/analytics"
 import { toast } from "sonner"
 

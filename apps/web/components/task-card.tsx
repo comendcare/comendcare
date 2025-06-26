@@ -1,51 +1,22 @@
 import {useSortable} from "@dnd-kit/sortable"
 import {CSS} from "@dnd-kit/utilities"
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
-import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card"
+import {Button} from "@comend/components/ui/button"
 import {cva} from "class-variance-authority"
 import {Calendar, CornerLeftUp, GripVertical, SquareCheck} from "lucide-react"
-import {Badge} from "@/components/ui/badge"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+import {Badge} from "@comend/components/ui/badge"
+import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@comend/components/ui/dialog"
 import {EditTaskForm} from "./edit-task-form"
 import {useEffect, useState} from "react"
-import { Milestone } from "@prisma/client"
-import { ProfilePhoto } from "@/components/profile-photo"
-import { truncate } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { PriorityType, StatusType } from "@/lib/types"
-
-export interface Task {
-    columnId: string;
-    id: string
-    status: StatusType
-    name: string
-    description?: string
-    checklist?: any[],
-    orderPosition: number,
-    kanbanPosition: number,
-    stakeholders?: any[],
-    endDate: Date,
-    priority: PriorityType
-    milestone: Milestone
-}
+import {ProfilePhoto} from "@comend/components/profile-photo"
+import {truncate} from "@comend/lib/utils"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip"
+import {PriorityType, Task, TaskDragData} from "@comend/lib/types"
 
 interface TaskCardProps {
     task: Task
     isOverlay?: boolean,
     mountKey: number
-}
-
-export type TaskType = "Task"
-
-export interface TaskDragData {
-    type: TaskType
-    task: Task
 }
 
 export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {

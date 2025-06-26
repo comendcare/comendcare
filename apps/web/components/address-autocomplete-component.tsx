@@ -1,7 +1,7 @@
 "use client";
 
 import AddressAutoComplete from "~web/components/address-autocomplete";
-import { AddressType } from "@/lib/types";
+import { AddressType } from "@comend/lib/types";
 
 interface AddressAutocompleteComponentProps {
     address: AddressType;

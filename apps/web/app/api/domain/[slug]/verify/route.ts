@@ -2,8 +2,8 @@ import {
     getConfigResponse,
     getDomainResponse,
     verifyDomain
-} from "@/lib/domains"
-import { DomainVerificationStatusProps } from "@/lib/types"
+} from "@comend/lib/domains"
+import { DomainVerificationStatusProps } from "@comend/lib/types"
 import { NextResponse } from "next/server"
 
 export async function GET(

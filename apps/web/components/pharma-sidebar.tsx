@@ -31,10 +31,10 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@comend/components/ui/sidebar"
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
-import {getPharmaProjects} from "@/lib/fetchers";
+import {getPharmaProjects} from "@comend/lib/fetchers";
 
 const data = {
     user: {

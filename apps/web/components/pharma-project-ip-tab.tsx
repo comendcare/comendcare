@@ -1,7 +1,7 @@
-import {DataTable} from "@/components/ip/data-table";
-import {columns} from "@/components/ip/columns"
+import {DataTable} from "@comend/components/ip/data-table";
+import {columns} from "@comend/components/ip/columns"
 import {useEffect, useState} from "react";
-import {getIPData} from "@/lib/fetchers";
+import {getIPData} from "@comend/lib/fetchers";
 
 
 export default function PharmaProjectIPTab() {

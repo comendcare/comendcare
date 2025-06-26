@@ -1,13 +1,13 @@
 "use client"
 
-import LoadingDots from "@/components/icons/loading-dots"
-import { cn } from "@/lib/utils"
+import LoadingDots from "@comend/components/icons/loading-dots"
+import { cn } from "@comend/lib/utils"
 import { useParams, useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
 import { toast } from "sonner"
-import { deleteRoadmap } from "@/lib/actions"
+import { deleteRoadmap } from "@comend/lib/actions"
 import va from "@vercel/analytics"
-import { initializeRoadmapState } from "@/lib/initialize-client-state"
+import { initializeRoadmapState } from "@comend/lib/initialize-client-state"
 import { useSession } from "next-auth/react"
 
 export default function DeleteRoadmapForm({

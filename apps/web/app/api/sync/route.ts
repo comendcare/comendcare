@@ -1,6 +1,6 @@
-// import { syncToTypesense } from '@/lib/sync';
+// import { syncToTypesense } from '@comend/lib/sync';
 import { NextResponse } from 'next/server';
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 
 const sendTypeSenseRequest = async (
     url: string,

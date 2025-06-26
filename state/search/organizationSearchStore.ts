@@ -1,11 +1,11 @@
 import { mechanisms } from 'comend-pag-platform/components/edit-condition-profile-dialog';
-import {typesense} from '@/lib/typesense';
+import {typesense} from '@comend/lib/typesense';
 import { Filter } from 'customerio-node/dist/lib/types';
 import mixpanel from 'mixpanel-browser';
 import {temporal} from 'zundo';
 import {create} from 'zustand';
-import type { Option } from '@/lib/types';
-import { getExclusiveToFirstGroup } from '@/lib/utils';
+import type { Option } from '@comend/lib/types';
+import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@/mixpanel";
 
 export type ViewType = 'grid' | 'list'

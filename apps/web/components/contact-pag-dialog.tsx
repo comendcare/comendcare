@@ -8,20 +8,20 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dialog"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
-import {sendPAGContactEmail} from "@/lib/emails";
+import {sendPAGContactEmail} from "@comend/lib/emails";
 import { mixpanelTrack, useMixpanelContext } from "@/mixpanel";
-import { customerIOTrack, sendCustomerIOContactEmail } from "@/lib/customer-io";
+import { customerIOTrack, sendCustomerIOContactEmail } from "@comend/lib/customer-io";
 
 // Validation schema
 const contactSchema = z.object({

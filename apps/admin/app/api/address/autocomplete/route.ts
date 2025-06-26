@@ -1,4 +1,4 @@
-import {getGeolocation} from "@/lib/get-geolocation";
+import {getGeolocation} from "@comend/lib/get-geolocation";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

@@ -1,8 +1,8 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {UserNewPostCard} from "~web/components/user-new-post-card";
 import {UserFeedTextCard} from "~web/components/user-feed-text-card";
 import { ExternalLink } from "lucide-react";

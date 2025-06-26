@@ -3,12 +3,12 @@
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Card, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Card, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import * as z from "zod";
-import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
-import { ProfilePhoto } from "@/components/profile-photo";
+import {Form, FormControl, FormField, FormItem, FormMessage} from "@comend/components/ui/form";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Send } from "lucide-react";
 
 const newPostSchema = z.object({

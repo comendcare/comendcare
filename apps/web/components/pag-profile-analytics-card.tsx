@@ -1,6 +1,6 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn} from "@/lib/utils";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {cn} from "@comend/lib/utils";
 import {PrivateBadge} from "./private-badge";
 import PAGAnalyticsLineChart from "~web/components/pag-analytics-line-chart";
 

@@ -1,6 +1,6 @@
 import {ReactNode} from "react"
 import {notFound} from "next/navigation"
-import {getOrganizationData} from "@/lib/fetchers"
+import {getOrganizationData} from "@comend/lib/fetchers"
 import {fontMapper} from "@/styles/fonts"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
 import {PublicPageNavbar} from "~web/components/public-page-navbar";

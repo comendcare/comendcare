@@ -8,14 +8,14 @@ import {
     SidebarMenuSub,
     SidebarMenuSubButton,
     SidebarMenuSubItem, useSidebar,
-} from "@/components/ui/sidebar"
+} from "@comend/components/ui/sidebar"
 import {usePathname} from "next/navigation"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@comend/components/ui/tooltip"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {useShallow} from "zustand/react/shallow"
 import Link from "next/link"

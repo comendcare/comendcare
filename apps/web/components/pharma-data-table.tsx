@@ -54,16 +54,16 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { useIsMobile } from "@/lib/hooks/use-mobile"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@comend/lib/hooks/use-mobile"
+import { Badge } from "@comend/components/ui/badge"
+import { Button } from "@comend/components/ui/button"
 import {
     ChartConfig,
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@comend/components/ui/chart"
+import { Checkbox } from "@comend/components/ui/checkbox"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -71,17 +71,17 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@comend/components/ui/dropdown-menu"
+import { Input } from "@comend/components/ui/input"
+import { Label } from "@comend/components/ui/label"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+} from "@comend/components/ui/select"
+import { Separator } from "@comend/components/ui/separator"
 import {
     Sheet,
     SheetClose,
@@ -91,7 +91,7 @@ import {
     SheetHeader,
     SheetTitle,
     SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@comend/components/ui/sheet"
 import {
     Table,
     TableBody,
@@ -99,13 +99,13 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@comend/components/ui/table"
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@comend/components/ui/tabs"
 
 export const schema = z.object({
     id: z.number(),

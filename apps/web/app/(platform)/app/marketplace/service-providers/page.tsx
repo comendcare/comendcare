@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react"
-import { ScrollArea } from "@/components/ui/scroll-area";
-import CROSearchBar from "@/components/cro-searchbar";
+import { ScrollArea } from "@comend/components/ui/scroll-area";
+import CROSearchBar from "@comend/components/cro-searchbar";
 import {CROSearchResults} from "~web/components/cro-search-results";
 
 export default function CROPage() {

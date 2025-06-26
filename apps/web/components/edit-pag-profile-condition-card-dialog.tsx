@@ -1,20 +1,20 @@
 "use client"
 
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
-import {updateCondition} from "@/lib/actions";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import {Button} from "@/components/ui/button";
+import {updateCondition} from "@comend/lib/actions";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
+import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {getConditionsFromOrganizationId} from "@/lib/fetchers";
+import {getConditionsFromOrganizationId} from "@comend/lib/fetchers";
 import {
     Dialog,
     DialogContent,
@@ -22,10 +22,10 @@ import {
     DialogHeader, DialogPortal,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {formatNumberWithCommas} from "@/lib/utils";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {researchFormSchema} from "@/components/research-onboarding-form";
+} from "@comend/components/ui/dialog";
+import {formatNumberWithCommas} from "@comend/lib/utils";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {researchFormSchema} from "@comend/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
@@ -218,14 +218,24 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 onCloseForm();
             }
         }}>
-            <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    className="gap-x-2"
-                >
-                    <Pencil/>
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="gap-x-2"
+                            disabled={session?.user?.membership?.role !== "owner"}
+                        >
+                            <Pencil/>
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Condition editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogPortal>
                 <DialogContent className="max-h-[80vh] overflow-y-auto overflow-x-visible">
                     <TooltipProvider>

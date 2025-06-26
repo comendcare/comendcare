@@ -12,11 +12,11 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {AutosizeTextarea, Textarea} from "@/components/ui/textarea"
-import {Button} from "@/components/ui/button"
-import {ScrollArea} from "@/components/ui/scroll-area"
+} from "@comend/components/ui/form"
+import {Input} from "@comend/components/ui/input"
+import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
+import {Button} from "@comend/components/ui/button"
+import {ScrollArea} from "@comend/components/ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
@@ -26,36 +26,36 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "@/components/ui/select"
+} from "@comend/components/ui/select"
 import {
     Dialog,
     DialogContent,
     DialogTrigger
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
-import {monthsList} from "@/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
+import {monthsList} from "@comend/lib/data";
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@comend/lib/types"
 import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
-import {getAssets, getRFPs} from "@/lib/fetchers"
+import {getAssets, getRFPs} from "@comend/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
-import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group"
+import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
 import {ExternalAttachmentField} from "./external-attachment-field"
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
-import {cn, sleep} from "@/lib/utils"
+import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/popover"
+import {cn, sleep} from "@comend/lib/utils"
 import {format} from "date-fns"
-import {Calendar} from "@/components/ui/calendar"
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import MoneyInput from "@/components/money-input";
-import MultipleSelector from "@/components/ui/multiple-selector"
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
-import {PlateEditor} from "@/components/editor/plate-editor"
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import {Calendar} from "@comend/components/ui/calendar"
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import MoneyInput from "@comend/components/money-input";
+import MultipleSelector from "@comend/components/ui/multiple-selector"
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
+import {PlateEditor} from "@comend/components/editor/plate-editor"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
-import {Card, CardContent} from "@/components/ui/card"
+import {Card, CardContent} from "@comend/components/ui/card"
 import Image from "next/image"
 import {CROMarketplaceCard} from "./marketplace-cro-card"
 import Link from "next/link"
@@ -64,22 +64,23 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@comend/components/ui/dropdown-menu"
 import {TypeBadge} from "./type-badge"
 import Loading from "@/loading";
-import {getMilestoneTypes} from "@/lib/fetchers"
+import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationBubble} from "./notification-bubble"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share} from "lucide-react"
 import {toast} from "sonner"
-import {badgeVariants} from "@/components/ui/badge"
+import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
-import {useOnborda} from "@/components/onborda/OnbordaContext"
+import {useOnborda} from "@comend/components/onborda/OnbordaContext"
 import {mixpanelTrack} from "@/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@comend/components/ui/skeleton"
+import EditMilestoneDetailsProjectsTab from "./edit-milestone-details-projects-tab"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -511,7 +512,7 @@ export function EditMilestoneForm({
                         <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")}
                               className="space-y-4 w-full h-full">
                             <div className="flex gap-4 items-center justify-between">
-                                <TabsList>
+                                <TabsList className="flex flex-wrap h-fit">
                                     <TabsTrigger value="edit">
                                         Edit
                                     </TabsTrigger>
@@ -530,9 +531,12 @@ export function EditMilestoneForm({
                                             <NotificationBubble/>
                                         }
                                     </TabsTrigger>
-                                    {/* <TabsTrigger className="relative" value="publications">
+                                    <TabsTrigger className="relative" value="publications">
                                         Publications
-                                    </TabsTrigger> */}
+                                    </TabsTrigger>
+                                    <TabsTrigger className="relative" value="projects">
+                                        Similar projects
+                                    </TabsTrigger>
                                 </TabsList>
                             </div>
                             {isMigrating ? (
@@ -778,7 +782,7 @@ export function EditMilestoneForm({
                                             <Card
                                                 className="w-full flex flex-col mx-auto justify-center items-center align-center">
                                                 <CardContent className="flex flex-col gap-4 p-4">
-                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
+                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this project`}</h2>
                                                     <div className="flex justify-center">
                                                         <Image
                                                             alt="No recommendations"
@@ -796,7 +800,7 @@ export function EditMilestoneForm({
                                                         />
                                                     </div>
                                                     <p className="text-md">
-                                                        {`Please add more information to your milestone to generate some recommendations.`}
+                                                        {`Please add more information to your project to generate some recommendations.`}
                                                     </p>
                                                 </CardContent>
                                             </Card>
@@ -827,9 +831,12 @@ export function EditMilestoneForm({
                                             </Button>
                                         </Link>
                                     </TabsContent>
-                                    {/* <TabsContent value="publications" className="space-y-4 w-full">
+                                    <TabsContent value="publications" className="space-y-4 w-full">
                                         <EditMilestoneDetailsPublicationsTab/>
-                                    </TabsContent> */}
+                                    </TabsContent>
+                                    <TabsContent value="projects" className="space-y-4 w-full">
+                                        <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
+                                    </TabsContent>
                                 </>
                             )}
                         </Tabs>

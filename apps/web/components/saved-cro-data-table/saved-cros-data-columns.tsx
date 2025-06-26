@@ -3,10 +3,10 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { toTitleCase } from "@/lib/utils"
-import { SavedCompanyData } from "@/lib/types"
+import { Checkbox } from "@comend/components/ui/checkbox"
+import { Badge } from "@comend/components/ui/badge"
+import { toTitleCase } from "@comend/lib/utils"
+import { SavedCompanyData } from "@comend/lib/types"
 
 interface CustomColumnMeta {
     name?: string;

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@comend/components/ui/collapsible";
 
 export const CRODescription = ({ text }: { text: string }) => {
     const [isExpanded, setIsExpanded] = useState(false);

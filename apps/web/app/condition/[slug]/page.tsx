@@ -1,35 +1,35 @@
 import {notFound} from "next/navigation"
-import prisma from "@/lib/prisma"
-import {getPublicConditionData} from "@/lib/fetchers"
-import {cn, toDateString} from "@/lib/utils"
+import prisma from "@comend/lib/prisma"
+import {getPublicConditionData} from "@comend/lib/fetchers"
+import {cn, toDateString} from "@comend/lib/utils"
 import {
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog"
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dialog"
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
+import {Button} from "@comend/components/ui/button";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {formSchema} from "@/lib/schemas";
+import {formSchema} from "@comend/lib/schemas";
 import React from "react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Badge} from "@/components/ui/badge";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {Badge} from "@comend/components/ui/badge";
 import {FolderOpen, UserSearch} from "lucide-react";
 import {faker} from "@faker-js/faker";
 import {Condition, Organization} from "@prisma/client";
-import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
+import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@comend/components/ui/carousel";
 import ConditionProfilePatientGroupCard from "~web/components/condition-profile-patient-group-card";
-import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
+import {ConditionProfileRecentActivityCard} from "@comend/components/ui/condition-profile-recent-activity-card";
 import PublicPageFooter from "~web/components/public-page-footer";
 import Link from "next/link";
 import {FloatingDock} from "~web/components/floating-dock";
 import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
+import {Input} from "@comend/components/ui/input";
+import {Label} from "@comend/components/ui/label";
 import ShareDialog from "~web/components/share-dialog";
 
 export type Post = {

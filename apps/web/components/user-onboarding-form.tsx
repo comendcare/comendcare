@@ -8,26 +8,26 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser} from "@/lib/actions";
-import {Checkbox} from "@/components/ui/checkbox";
-import {AddressType} from "@/lib/types";
+import {editUser} from "@comend/lib/actions";
+import {Checkbox} from "@comend/components/ui/checkbox";
+import {AddressType} from "@comend/lib/types";
 import {useEffect, useState} from "react";
-import {FileWithPreview} from "@/components/image-selector";
-import {getInvitations, getPublicOrganizationData, getUser} from "@/lib/fetchers";
-import {handleImageUpload} from "@/lib/upload";
-import LoadingDots from "@/components/icons/loading-dots";
-import { getPublicFile } from "@/lib/utils";
+import {FileWithPreview} from "@comend/components/image-selector";
+import {getInvitations, getPublicOrganizationData, getUser} from "@comend/lib/fetchers";
+import {handleImageUpload} from "@comend/lib/upload";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import { getPublicFile } from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@comend/components/ui/skeleton";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),

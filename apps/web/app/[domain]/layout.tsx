@@ -2,12 +2,12 @@ import Image from "next/image"
 import Link from "next/link"
 import {ReactNode} from "react"
 import {notFound, redirect} from "next/navigation"
-import {getOrganizationData} from "@/lib/fetchers"
+import {getOrganizationData} from "@comend/lib/fetchers"
 import {fontMapper} from "@/styles/fonts"
 import {Metadata} from "next"
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import PublicPageFooter from "~web/components/public-page-footer"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
 import {PublicPageNavbar} from "~web/components/public-page-navbar";
 

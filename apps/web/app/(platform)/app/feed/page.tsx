@@ -1,6 +1,6 @@
 import NewPostDialog from "~web/components/new-post-dialog";
-import {getSession} from "@/lib/auth";
-import {getOrganizationFromOrganizationId, getPosts} from "@/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
+import {getOrganizationFromOrganizationId, getPosts} from "@comend/lib/fetchers";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import NoOrganization from "~web/components/no-organization";
 import Image from "next/image";

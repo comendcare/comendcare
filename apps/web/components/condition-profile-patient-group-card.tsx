@@ -1,10 +1,10 @@
 "use client";
 
 import React, { forwardRef, ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { faker } from "@faker-js/faker";
 import { motion } from "framer-motion";
-import { createDicebearAvatar } from "@/lib/utils";
+import { createDicebearAvatar } from "@comend/lib/utils";
 import {Organization} from "@prisma/client";
 
 interface CardProps {

@@ -1,14 +1,14 @@
-import "~web/globals.css"
-import { ThemeProvider } from "~web/theme-provider"
+import "~provider/globals.css"
+import { ThemeProvider } from "~provider/theme-provider"
 import type { Metadata, ResolvingMetadata } from "next"
 import { Analytics } from '@vercel/analytics/next';
 
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
-import { Providers } from "~web/providers"
-import Onborda from "@/components/onborda/Onborda"
-import OnboardingCard from "@/components/ui/onboarding-card"
-import { Tour } from "@/components/onborda/types"
+import { Providers } from "~provider/providers"
+import Onborda from "@comend/components/onborda/Onborda"
+import OnboardingCard from "@comend/components/ui/onboarding-card"
+import { Tour } from "@comend/components/onborda/types"
 import gif1 from "@/public/onboarding-gif-1.gif"
 import Image from "next/image"
 import { FeedbackSheet } from "@/apps/web/components/feedback"

@@ -5,7 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import { MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { MilestoneMarketplaceListElement } from "./marketplace-milestone-list-element";
 import { MilestoneMarketplaceCard } from "./marketplace-milestone-card";
-import InfiniteScroll from "@/components/ui/infinite-scroll";
+import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 

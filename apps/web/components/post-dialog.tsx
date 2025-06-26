@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -8,25 +8,25 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import {PostWithAuthorAndComments} from "@/lib/types";
-import {ProfilePhoto} from "@/components/profile-photo";
+} from "@comend/components/ui/dialog"
+import {PostWithAuthorAndComments} from "@comend/lib/types";
+import {ProfilePhoto} from "@comend/components/profile-photo";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@comend/components/ui/popover";
 import {useSession} from "next-auth/react";
 import Link from "next/link";
-import {formatDates} from "@/lib/utils";
-import {createComment, deletePost} from "@/lib/actions";
+import {formatDates} from "@comend/lib/utils";
+import {createComment, deletePost} from "@comend/lib/actions";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image"
 import {useState} from "react";
 import {toast} from "sonner";
 import PostActionBar from "~web/components/post-action-bar";
 import { Ellipsis, Trash } from "lucide-react";
-import Spinner from "@/components/ui/spinner";
+import Spinner from "@comend/components/ui/spinner";
 
 export function PostDialog(
     {

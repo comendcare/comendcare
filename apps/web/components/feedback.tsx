@@ -7,8 +7,8 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-} from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
+} from "@comend/components/ui/sheet"
+import { Button } from "@comend/components/ui/button"
 import FeedbackForm from "~web/components/feedback-form";
 import { MessageCircle } from "lucide-react"
 

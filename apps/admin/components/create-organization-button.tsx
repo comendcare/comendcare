@@ -1,6 +1,6 @@
 "use client"
 
-import { useModal } from "@/components/modal/provider"
+import { useModal } from "@comend/components/modal/provider"
 import { ReactNode } from "react"
 
 export default function CreateOrganizationButton({

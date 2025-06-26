@@ -1,7 +1,7 @@
 "use client"
 
-import { getAllNotifications, getRoadmap } from "@/lib/fetchers"
-import { initializeNotificationsState, initializeRoadmapState } from "@/lib/initialize-client-state"
+import { getAllNotifications, getRoadmap } from "@comend/lib/fetchers"
+import { initializeNotificationsState, initializeRoadmapState } from "@comend/lib/initialize-client-state"
 import { useSession } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import { useEffect } from "react"

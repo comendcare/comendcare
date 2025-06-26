@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@comend/components/ui/scroll-area"
 import StatusButton from "./milestone-status-button"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@comend/components/ui/label"
+import { Checkbox } from "@comend/components/ui/checkbox"
 
 export function TaskDetails({ taskData }: { taskData: any }) {
     return (

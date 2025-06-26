@@ -20,21 +20,21 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@comend/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-} from "@/components/ui/chart";
+} from "@comend/components/ui/chart";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import { Task } from "./task-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Button } from "@comend/components/ui/button";
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 import StatusButton from "./milestone-status-button";
-import { truncate } from "@/lib/utils";
+import { truncate } from "@comend/lib/utils";
 import { DateView } from "./miletone-date-view";
+import {Task} from "@/packages/lib/types";
 
   const chartConfig: ChartConfig = {
     item: {

@@ -8,25 +8,25 @@ import {
     CardContent,
     CardFooter,
     CardHeader,
-} from "@/components/ui/card";
-import {PostWithAuthorAndComments} from "@/lib/types";
-import {Button} from "@/components/ui/button";
-import {cn, formatDates} from "@/lib/utils";
-import {useLike} from "@/lib/hooks/use-like";
+} from "@comend/components/ui/card";
+import {PostWithAuthorAndComments} from "@comend/lib/types";
+import {Button} from "@comend/components/ui/button";
+import {cn, formatDates} from "@comend/lib/utils";
+import {useLike} from "@comend/lib/hooks/use-like";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@comend/components/ui/popover";
 import useMeasure from "react-use-measure";
-import {ProfilePhoto} from "@/components/profile-photo"
+import {ProfilePhoto} from "@comend/components/profile-photo"
 import {useSession} from "next-auth/react";
-import {deletePost} from "@/lib/actions";
+import {deletePost} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {PostDialog} from "~web/components/post-dialog";
 import PostActionBar from "~web/components/post-action-bar";
 import { Ellipsis, Trash } from "lucide-react";
-import Spinner from "@/components/ui/spinner";
+import Spinner from "@comend/components/ui/spinner";
 
 interface PostProps {
     data: PostWithAuthorAndComments;

@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {Input} from "@/components/ui/input";
+import {Input} from "@comend/components/ui/input";
 import {useShallow} from "zustand/react/shallow"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
 import {CROSearchState, useCROSearchStore, ViewType} from "@/state/search/croSearchStore";

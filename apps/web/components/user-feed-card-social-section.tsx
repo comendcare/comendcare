@@ -1,8 +1,8 @@
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {CardContent, CardFooter} from "@/components/ui/card";
-import {Separator} from "@/components/ui/separator";
-import { ProfilePhoto } from "@/components/profile-photo";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
+import {CardContent, CardFooter} from "@comend/components/ui/card";
+import {Separator} from "@comend/components/ui/separator";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Send } from "lucide-react";
 
 interface FeedCardSocialSectionProps {

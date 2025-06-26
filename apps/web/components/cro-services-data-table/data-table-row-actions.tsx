@@ -9,8 +9,8 @@ import {
     DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem,
     DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dropdown-menu";
+import {Button} from "@comend/components/ui/button";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>

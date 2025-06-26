@@ -32,7 +32,7 @@ import {
 import {
   getBlockType,
   setBlockType,
-} from '@/components/editor/transforms';
+} from '@comend/components/editor/transforms';
 
 import {
   DropdownMenu,
