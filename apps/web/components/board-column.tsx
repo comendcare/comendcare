@@ -34,7 +34,7 @@ import {
 } from "@comend/components/ui/alert-dialog";
 import {ColumnType, Task} from "@/packages/lib/types";
 
-export interface ColumnDragData {
+interface ColumnDragData {
     type: ColumnType
     column: Column
 }
