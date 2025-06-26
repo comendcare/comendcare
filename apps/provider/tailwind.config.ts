@@ -12,7 +12,8 @@ const config: Config = {
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
-        "../../components/**/*.{ts,tsx}"
+        "../../components/**/*.{ts,tsx}",
+        '../../packages/components/**/*.{js,ts,jsx,tsx}', // shared components
         // "./node_modules/onborda/dist/**/*.{js,ts,jsx,tsx}"
     ],
     theme: {
