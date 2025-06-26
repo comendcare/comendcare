@@ -18,7 +18,6 @@ import {
     User
 } from "@prisma/client";
 import {z} from "zod";
-import {ColumnType} from "comend-pag-platform/components/board-column";
 
 export type MilestoneKey =
     | "Add website and description"
@@ -1177,6 +1176,8 @@ export interface Task {
     priority: PriorityType
     milestone: DBMilestone
 }
+
+export type ColumnType = "Column"
 
 export interface ColumnDragData {
     type: ColumnType
