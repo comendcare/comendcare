@@ -1190,3 +1190,13 @@ export interface TaskDragData {
     type: TaskType
     task: Task
 }
+
+export const companyTypeMap: Record<string, string> = {
+    "Mid-Sized Business (10-100M TTM Revenue)": "Mid-Sized Business",
+    "Small Business (1-10M TTM Revenue)": "Small Business",
+    "Academic Core Facility": "Academic Core Facility",
+    "New Startup (0-1M TTM Revenue)": "New Startup",
+    "Consultant (5 or more employees)": "Consultant",
+    "Large Business (>100M TTM Revenue)": "Large Business",
+    "Consultant (<5 employees)": "Consultant",
+};

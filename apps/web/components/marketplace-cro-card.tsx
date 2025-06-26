@@ -1,7 +1,7 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
 import {truncate} from "@comend/lib/utils";
-import React, {ReactNode} from "react";
+import React from "react";
 import {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
 import {TypeBadge} from "./type-badge";
@@ -10,15 +10,15 @@ import {
     Briefcase,
     Building,
     Building2,
+    Dna,
     Factory,
     FileText,
-    Dna,
+    HeartHandshake,
     Rocket,
     Star,
-    University,
-    HeartHandshake
+    University
 } from "lucide-react";
-import {Milestone} from "@comend/lib/types";
+import {companyTypeMap, Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "./property-badge";
 
 type NodeTypeCount = Record<string, number>;
@@ -32,16 +32,6 @@ function countCategories(cro: any): NodeTypeCount {
         reviews: cro.reviews?.length || 0
     };
 }
-
-export const companyTypeMap: Record<string, string> = {
-    "Mid-Sized Business (10-100M TTM Revenue)": "Mid-Sized Business",
-    "Small Business (1-10M TTM Revenue)": "Small Business",
-    "Academic Core Facility": "Academic Core Facility",
-    "New Startup (0-1M TTM Revenue)": "New Startup",
-    "Consultant (5 or more employees)": "Consultant",
-    "Large Business (>100M TTM Revenue)": "Large Business",
-    "Consultant (<5 employees)": "Consultant",
-};
 
 const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="size-4 text-gray-500 dark:text-gray-400"/>,
