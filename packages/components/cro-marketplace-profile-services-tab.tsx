@@ -1,6 +1,6 @@
 import {Company, Service} from "@prisma/client";
-import {CROServicesDataTable} from "./cro-services-data-table/cro-services-data-table";
-import {columns} from "./cro-services-data-table/cro-services-data-columns";
+import {CROServicesDataTable} from "comend-pag-platform/components/cro-services-data-table/cro-services-data-table";
+import {columns} from "comend-pag-platform/components/cro-services-data-table/cro-services-data-columns";
 
 
 export default function CROMarketplaceProfileServicesTab({croServices}: {croServices: Service[]}) {

@@ -8,11 +8,8 @@ declare module "next-auth" {
         user: {
             id: string
             bio?: string | null | undefined
-            organizationId?: string | null | undefined
-            membership?: any
         } & DefaultSession["user"]
         terminate?: boolean
-        roleChanged?: boolean
     }
     interface User {
         id: string
