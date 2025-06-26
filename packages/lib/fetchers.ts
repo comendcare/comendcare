@@ -707,6 +707,62 @@ export async function getPosts(
     }
 }
 
+type SanitizeSelect<T extends Prisma.MilestoneSelect, K> = K extends keyof T ? never : T;
+export async function getProjectRecommendations<
+    TSelect extends Prisma.MilestoneSelect
+>(
+    projectId: string,
+    select: SanitizeSelect<TSelect, 'notes'> // exclude private field notes from select param
+): Promise<
+    { success: boolean; data?: Array<Prisma.MilestoneGetPayload<{ select: SanitizeSelect<TSelect, 'notes'> }>>; error?: string }
+> {
+    try {
+        const currentProject = await prisma.milestone.findUnique({
+            where: {id: projectId},
+            include: {
+                types: {
+                    select: {
+                        milestoneTypeId: true
+                    }
+                }
+            }
+        })
+
+        if (!currentProject) {
+            logError(`Error fetching milestone`, new Error(`Could not find milestone with id ${projectId}`))
+            return {success: false, error: "Internal server error"}
+        }
+
+        const typeIds = currentProject.types.map(t => t.milestoneTypeId)
+        if (typeIds.length === 0) {
+            return { success: true, data: [] } // no types to match on
+        }
+
+        // Find all other milestones that share at least one of the same milestone types
+        const sharedTypeProjects = await prisma.milestone.findMany({
+            where: {
+                id: {
+                    not: projectId // Exclude the current project
+                },
+                private: false, // Only include public projects
+                types: {
+                    some: {
+                        milestoneTypeId: {
+                            in: typeIds
+                        }
+                    }
+                }
+            },
+            select
+        })
+
+        return {success: true, data: sharedTypeProjects}
+    } catch (e) {
+        logError("Error fetching organizations", e)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 /* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
 export const getAssets = withOrganizationAuth(
     async (
@@ -2097,16 +2153,15 @@ export async function getIPData() {
     }
 }
 
-export async function getPharmaProjectData(
+export async function getPharmaProjectData<
+    TSelect extends Prisma.PharmaProjectSelect
+>(
     id: string,
-    select: Prisma.PharmaProjectSelect<InternalArgs & {
-        result: {};
-        model: {};
-        query: {};
-        client: {};
-    }>
-) {
-    return prisma.pharmaProject.findUnique({
+    select: TSelect
+): Promise<
+    Prisma.PharmaProjectGetPayload<{ select: TSelect }> | null
+> {
+    return await prisma.pharmaProject.findUnique({
         where: {
             id: id
         },
@@ -2114,32 +2169,17 @@ export async function getPharmaProjectData(
     })
 }
 
-export async function getAllOrganizationsWithConditions(
-    select: Prisma.OrganizationSelect<InternalArgs & {
-        result: {};
-        model: {};
-        query: {};
-        client: {};
-    }>
-) {
+export async function getAllOrganizations<
+    TSelect extends Prisma.OrganizationSelect
+>(
+    select: TSelect
+): Promise<
+    {success: boolean; data?: Array<Prisma.OrganizationGetPayload<{ select: TSelect }>>; error?: string}
+> {
     try {
         const organizations = await prisma.organization.findMany({
-            orderBy: {
-                createdAt: "desc",
-            },
-            // include: {
-            //     conditions: {
-            //         include: {
-            //             condition: true
-            //         }
-            //     },
-            // },
-            select: {
-                ...select,
-                conditions: select.conditions ? ({
-                    include: {condition: true}
-                }) : undefined
-            }
+            orderBy: {createdAt: "desc"},
+            select
         })
 
         return {
@@ -2149,62 +2189,6 @@ export async function getAllOrganizationsWithConditions(
     } catch (error: any) {
         logError("Error fetching organizations", error);
         return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function getProjectRecommendations<
-    TSelect extends Prisma.MilestoneSelect
->(
-    projectId: string,
-    select: TSelect
-): Promise<
-    | { success: true; data: Array<Prisma.MilestoneGetPayload<{ select: TSelect }>>; error: null }
-    | { success: false; data: null, error: string }
-> {
-    try {
-        const currentProject = await prisma.milestone.findUnique({
-            where: {id: projectId},
-            include: {
-                types: {
-                    select: {
-                        milestoneTypeId: true
-                    }
-                }
-            }
-        })
-
-        if (!currentProject) {
-            logError(`Error fetching milestone`, new Error(`Could not find milestone with id ${projectId}`))
-            return {success: false, error: "Internal server error", data: null}
-        }
-
-        const typeIds = currentProject.types.map(t => t.milestoneTypeId)
-        if (typeIds.length === 0) {
-            return { success: true, data: [], error: null } // no types to match on
-        }
-
-        // Find all other milestones that share at least one of the same milestone types
-        const sharedTypeProjects = await prisma.milestone.findMany({
-            where: {
-                id: {
-                    not: projectId // Exclude the current project
-                },
-                private: false, // Only include public projects
-                types: {
-                    some: {
-                        milestoneTypeId: {
-                            in: typeIds
-                        }
-                    }
-                }
-            },
-            select
-        })
-
-        return {success: true, data: sharedTypeProjects, error: null}
-    } catch (e) {
-        logError("Error fetching organizations", e)
-        return {success: false, error: "Internal server error", data: null}
     }
 }
 
