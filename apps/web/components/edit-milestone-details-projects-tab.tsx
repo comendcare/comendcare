@@ -1,41 +1,42 @@
 "use client"
 import React, {useEffect, useState} from "react"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
-import {Separator} from "@comend/components/ui/separator"
 import {toast} from "sonner"
-import {PubMedPublication} from "~web/types/types";
 import { Skeleton } from "@comend/components/ui/skeleton"
-import { getProjectRecommendations, getTopPubMedPublications } from "@comend/lib/fetchers"
+import { getProjectRecommendations } from "@comend/lib/fetchers"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
 import Image from "next/image"
 import { ProfilePhoto } from "@/packages/components/profile-photo"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
-import { MilestoneTypeOnMilestone, Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client"
+
+// shape of the milestone objects that are returned from our call to getProjectRecommendations
+const MILESTONE_SELECT = {
+    id: true,
+    title: true,
+    description: true,
+    organization: {select: {name: true, image: true, subdomain: true}},
+    types: {select: {milestoneType: {select: {id: true, label: true}}}},
+    roadmapId: true,
+}
 
 export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId: string}) {
-    const [projects, setProjects] = useState<any[]>([])
+    const [projects, setProjects] = useState<Prisma.MilestoneGetPayload<{ select: typeof MILESTONE_SELECT }>[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function fetchProjectsData() {
             try {
-                const response = await getProjectRecommendations(projectId, {
-                    id: true,
-                    title: true,
-                    description: true,
-                    organization: true,
-                    types: {include: {milestoneType: true}},
-                    roadmapId: true,
-                })
+                const response = await getProjectRecommendations(projectId, MILESTONE_SELECT)
                 if (response?.success && response?.data) {
                     setProjects(response.data)
                 } else {
-                    toast.error(response?.error ?? "Failed to fetch publications")
+                    toast.error(response?.error ?? "Failed to fetch projects")
                     setProjects([])
                 }
             } catch (error) {
-                console.error("Error fetching publications:", error)
-                toast.error("Couldn't fetch publications")
+                console.error("Error fetching projects:", error)
+                toast.error("Couldn't fetch projects")
                 setProjects([])
             } finally {
                 setLoading(false)
@@ -46,10 +47,7 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
     }, [])
 
     return (
-        <ScrollArea
-            className="w-full h-[calc(75vh)]"
-            type="always"
-        >
+        <ScrollArea className="w-full h-[calc(75vh)]">
             <div>
                 {loading && (
                     <div className="flex flex-col gap-4">
@@ -87,11 +85,15 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
                     </Card>
                 )}
 
-                {projects?.map((project: any) => {
+                {projects?.map((project) => {
                         return (
                             <div className="px-4 py-2">
                                 <a
-                                    href={`https://${project.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${project.roadmapId}?project=${project.id}`}
+                                    href={
+                                        process.env.NEXT_PUBLIC_ROOT_DOMAIN 
+                                            ? `http://${project.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${project.roadmapId}?project=${project.id}`
+                                            : `https://${project.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${project.roadmapId}?project=${project.id}`
+                                    }
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -110,7 +112,7 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
                                                 {project.organization.name}
                                             </span>
                                             <span className="flex gap-2 flex-wrap text-sm">
-                                                {(project.types || []).map((type: Prisma.MilestoneTypeOnMilestoneGetPayload<{include: {milestoneType: true}}>, index: number) => (
+                                                {(project.types || []).map((type, index) => (
                                                     <MilestoneTypeBadge label={type.milestoneType.label} key={index}/>
                                                 ))}
                                             </span>

@@ -2152,15 +2152,15 @@ export async function getAllOrganizationsWithConditions(
     }
 }
 
-export async function getProjectRecommendations(
+export async function getProjectRecommendations<
+    TSelect extends Prisma.MilestoneSelect
+>(
     projectId: string,
-    select: Prisma.MilestoneSelect<InternalArgs & {
-        result: {};
-        model: {};
-        query: {};
-        client: {};
-    }>
-) {
+    select: TSelect
+): Promise<
+    | { success: true; data: Array<Prisma.MilestoneGetPayload<{ select: TSelect }>>; error: null }
+    | { success: false; data: null, error: string }
+> {
     try {
         const currentProject = await prisma.milestone.findUnique({
             where: {id: projectId},
@@ -2175,12 +2175,12 @@ export async function getProjectRecommendations(
 
         if (!currentProject) {
             logError(`Error fetching milestone`, new Error(`Could not find milestone with id ${projectId}`))
-            return {success: false, error: "Internal server error"}
+            return {success: false, error: "Internal server error", data: null}
         }
 
         const typeIds = currentProject.types.map(t => t.milestoneTypeId)
         if (typeIds.length === 0) {
-            return { success: true, projects: [] } // no types to match on
+            return { success: true, data: [], error: null } // no types to match on
         }
 
         // Find all other milestones that share at least one of the same milestone types
@@ -2201,10 +2201,10 @@ export async function getProjectRecommendations(
             select
         })
 
-        return {success: true, data: sharedTypeProjects}
+        return {success: true, data: sharedTypeProjects, error: null}
     } catch (e) {
         logError("Error fetching organizations", e)
-        return {success: false, error: "Internal server error"}
+        return {success: false, error: "Internal server error", data: null}
     }
 }
 
