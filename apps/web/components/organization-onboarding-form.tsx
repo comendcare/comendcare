@@ -1,46 +1,46 @@
 "use client"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createMemberRequest, createOrganization} from "@/lib/actions";
-import {Textarea} from "@/components/ui/textarea";
+import {createMemberRequest, createOrganization} from "@comend/lib/actions";
+import {Textarea} from "@comend/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {usePathname, useRouter} from "next/navigation";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import MultipleSelector from "@/components/ui/multiple-selector";
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
 import React, {useCallback, useEffect, useState} from "react";
-import {Label} from "@/components/ui/label";
-import {Switch} from "@/components/ui/switch";
-import {Separator} from "@/components/ui/separator";
+import {Label} from "@comend/components/ui/label";
+import {Switch} from "@comend/components/ui/switch";
+import {Separator} from "@comend/components/ui/separator";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {AddressAutocompleteComponent} from "~web/components/address-autocomplete-component";
-import {AddressType, MODALITIES, Option} from "@/lib/types";
+import {AddressType, MODALITIES, Option} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
-import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
+import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
 import {Bold, Info, Italic} from "lucide-react";
-import {FileWithPreview} from "@/components/image-selector";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar";
+import {FileWithPreview} from "@comend/components/image-selector";
+import {Avatar, AvatarFallback} from "@comend/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@/lib/utils";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Skeleton} from "@/components/ui/skeleton";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@comend/lib/utils";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {
     checkSubdomainAvailability,
     getAllNonMemberOrganizations,
     getOrganizationFromOrganizationId
-} from "@/lib/fetchers";
-import {handleImageUpload} from "@/lib/upload";
-import LoadingDots from "@/components/icons/loading-dots";
+} from "@comend/lib/fetchers";
+import {handleImageUpload} from "@comend/lib/upload";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
 import {Member, Organization} from "@prisma/client";
 import {Calendar, Building2} from "lucide-react";
-import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { mixpanelTrack } from "@/mixpanel";
 
 const optionSchema = z.object({

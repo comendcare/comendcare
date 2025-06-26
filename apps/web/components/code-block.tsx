@@ -1,5 +1,5 @@
 import { CodeBlock } from "react-code-block"
-import { Button } from "@/components/ui/button"
+import { Button } from "@comend/components/ui/button"
 
 export default function CopyCodeBlock({ code, language, onCopyCallback }: { code: string; language: string, onCopyCallback?: (location?: string) => void }) {
     const copyCode = () => {

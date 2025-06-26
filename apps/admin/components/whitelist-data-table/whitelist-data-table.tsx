@@ -13,8 +13,8 @@ import {
     SortingState,
     VisibilityState, Row,
 } from "@tanstack/react-table"
-import {Button} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
+import {Button} from "@comend/components/ui/button"
+import {Input} from "@comend/components/ui/input"
 import {
     Table,
     TableBody,
@@ -22,7 +22,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@comend/components/ui/table"
 import {ChevronDown, Trash} from "lucide-react"
 import {
     DropdownMenu,
@@ -30,8 +30,8 @@ import {
     DropdownMenuContent, 
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {getUserWhitelist} from "@/lib/fetchers"
+} from "@comend/components/ui/dropdown-menu"
+import {getUserWhitelist} from "@comend/lib/fetchers"
 import {toast} from 'sonner';
 import {
     ChevronLeft,
@@ -45,10 +45,10 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import {removeEmailFromWhitelist} from "@/lib/actions";
+import {removeEmailFromWhitelist} from "@comend/lib/actions";
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>

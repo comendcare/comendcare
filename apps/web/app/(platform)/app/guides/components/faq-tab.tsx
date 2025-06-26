@@ -1,4 +1,4 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@comend/components/ui/accordion"
 import ReactMarkdown from "react-markdown"
 
 export default function FAQTab(props: { faq: { question: string; answer: string } }) {

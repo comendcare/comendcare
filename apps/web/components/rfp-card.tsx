@@ -1,10 +1,10 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { PrivateBadge } from "~web/components/private-badge";
 import { DateView } from "~web/components/miletone-date-view";
 import { Calendar, CircleDollarSign, DollarSign, Pin, User } from "lucide-react";
 import { PropertyBadge } from "./property-badge";
-import { formatMoney } from "@/lib/utils";
+import { formatMoney } from "@comend/lib/utils";
 import { RFPActionsMenu } from "./rfp-actions-menu";
 
 export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean}) => {

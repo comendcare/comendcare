@@ -1,9 +1,9 @@
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {formatMoney, truncate} from "@/lib/utils";
-import {Badge} from "@/components/ui/badge";
-import {ProfilePhoto} from "@/components/profile-photo";
-import {Separator} from "@/components/ui/separator";
+import {formatMoney, truncate} from "@comend/lib/utils";
+import {Badge} from "@comend/components/ui/badge";
+import {ProfilePhoto} from "@comend/components/profile-photo";
+import {Separator} from "@comend/components/ui/separator";
 import {FileText, HandCoins, Megaphone, Star, Users} from "lucide-react";
 import React from "react";
 import { PropertyBadge } from "./property-badge";

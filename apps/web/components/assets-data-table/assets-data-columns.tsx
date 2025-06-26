@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { Asset } from "@/lib/types"
+import { Asset } from "@comend/lib/types"
 import { Pin } from "lucide-react"
 import { AssetActionsMenu } from "../tool-actions-menu"
 

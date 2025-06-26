@@ -4,7 +4,7 @@
 import * as React from 'react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@comend/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 import { ChartConfig, ChartContainer, ChartTooltip } from './chart';
 import { Bar, BarChart, CartesianGrid, Cell, XAxis } from 'recharts';

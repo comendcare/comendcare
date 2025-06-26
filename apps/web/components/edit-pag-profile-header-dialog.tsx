@@ -7,8 +7,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+} from "@comend/components/ui/dialog";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {
     Form,
     FormControl,
@@ -16,29 +16,31 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form";
+} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Input} from "@/components/ui/input";
+import {Input} from "@comend/components/ui/input";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "@/components/ui/select";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {Button} from "@/components/ui/button";
-import {updateOrganization} from "@/lib/actions";
+} from "@comend/components/ui/select";
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
+import {Button} from "@comend/components/ui/button";
+import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
-import MoneyInput from "@/components/money-input";
-import {years} from "@/lib/utils";
+import MoneyInput from "@comend/components/money-input";
+import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
+import { Tooltip } from "@/packages/components/plate-ui/tooltip";
+import { TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
@@ -144,15 +146,25 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                 setOpen(state);
             }}
         >
-            <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    className="organization-profile-tour-step3"
-                    onClick={() => console.log("DialogTrigger clicked")}
-                >
-                    <Pencil/>
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="organization-profile-tour-step3"
+                            onClick={() => console.log("DialogTrigger clicked")}
+                            disabled={session?.user?.membership?.role !== "owner"}
+                        >
+                            <Pencil/>
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>

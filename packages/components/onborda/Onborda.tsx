@@ -9,7 +9,7 @@ import { Portal } from "@radix-ui/react-portal";
 import { OnbordaProps } from "./types";
 import { ResearchPlanOnbordaState, Selector, useOnbordaStore } from "@/state/onborda/onbordaStore";
 import { useShallow } from "zustand/react/shallow";
-import { sleep } from "@/lib/utils";
+import { sleep } from "@comend/lib/utils";
 import { init } from "mixpanel-browser";
 
 const selector = (state: ResearchPlanOnbordaState) => ({

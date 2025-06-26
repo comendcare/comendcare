@@ -8,20 +8,21 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogDescription,
-} from "@/components/ui/dialog";
-import {Form} from "@/components/ui/form";
+} from "@comend/components/ui/dialog";
+import {Form} from "@comend/components/ui/form";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageSelector} from "@/components/form-image-selector";
-import {FileWithPreview} from "@/components/image-selector";
+import {FormImageSelector} from "@comend/components/form-image-selector";
+import {FileWithPreview} from "@comend/components/image-selector";
 import {toast} from "sonner";
-import {handleImageDelete, handleImageUpload} from "@/lib/upload";
-import {updateOrganization} from "@/lib/actions";
+import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
+import {updateOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import { Pencil } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -109,15 +110,25 @@ export function PAGBannerPhoto({
             {/* Edit Button (Only if Editable) */}
             {editable && (
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
-                        >
-                            <Pencil className="w-4 h-4"/>
-                        </Button>
-                    </DialogTrigger>
+                    <Tooltip>
+                        <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                            <DialogTrigger asChild>
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
+                                    disabled={session?.user?.membership?.role !== "owner"}
+                                >
+                                    <Pencil className="w-4 h-4"/>
+                                </Button>
+                            </DialogTrigger>
+                        </TooltipTrigger>
+                        {session?.user?.membership?.role !== "owner" && (
+                            <TooltipContent className="max-w-80">
+                                <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
                     <DialogContent className="max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Edit organization banner image</DialogTitle>

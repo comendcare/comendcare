@@ -4,10 +4,10 @@ import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
-import { customerIOIdentify } from "@/lib/customer-io"
-import { getOrganizationFromOrganizationId, getUser } from "@/lib/fetchers"
-import { getSessionInfo } from "@/lib/actions"
-import { getCookie } from "@/lib/utils"
+import { customerIOIdentify } from "@comend/lib/customer-io"
+import { getOrganizationFromOrganizationId, getUser } from "@comend/lib/fetchers"
+import { getSessionInfo } from "@comend/lib/actions"
+import { getCookie } from "@comend/lib/utils"
 
 const MixpanelContext = createContext<any>(null)
 

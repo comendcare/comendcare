@@ -1,7 +1,7 @@
 import { Organization } from "@prisma/client";
-import { ProfilePhoto } from "@/components/profile-photo";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Building2, Calendar, HandCoins } from "lucide-react";
-import { formatMoney, standardizeYear } from "@/lib/utils";
+import { formatMoney, standardizeYear } from "@comend/lib/utils";
 
 export function PAGRoadmapHeader({
     organization, 

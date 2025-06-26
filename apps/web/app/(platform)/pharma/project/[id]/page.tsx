@@ -16,11 +16,11 @@ import {
     Workflow,
     Share2
 } from "lucide-react";
-import {GroupAvatar} from "@/components/ui/group-avatar";
-import {Button} from "@/components/ui/button";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {GroupAvatar} from "@comend/components/ui/group-avatar";
+import {Button} from "@comend/components/ui/button";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {getPharmaProjectData} from "@/lib/fetchers";
+import {getPharmaProjectData} from "@comend/lib/fetchers";
 import PharmaProjectBiorepositoryTab from "~web/components/pharma-project-biorepository-tab";
 import Loading from "@/loading";;
 import {
@@ -28,7 +28,7 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@comend/components/ui/tooltip"
 import PharmaProjectAnalyticsTab from "~web/components/pharma-project-analytics-tab";
 import PharmaProjectClinicalTab from "~web/components/pharma-project-clinical-tab";
 import PharmaProjectPreclinicalTab from "~web/components/pharma-project-preclinical-tab";

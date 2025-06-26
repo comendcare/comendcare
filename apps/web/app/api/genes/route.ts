@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import path from "path";
 import fs from "fs";
 

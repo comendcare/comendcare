@@ -1,15 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { PulsatingButton } from "@/components/ui/pulsating-button"
+import { PulsatingButton } from "@comend/components/ui/pulsating-button"
 import Image from "next/image"
 import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";
-import {getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
+import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {CROServicesDataTable} from "~web/components/cro-services-data-table/cro-services-data-table";
 import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
-import {SavedCompanyData} from "@/lib/types";
+import {SavedCompanyData} from "@comend/lib/types";
 import NoOrganization from "~web/components/no-organization";
 
 export default function ServiceProviderSavesPage() {

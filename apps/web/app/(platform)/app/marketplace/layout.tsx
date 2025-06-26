@@ -2,19 +2,19 @@
 import {MarketplaceNav} from "~web/components/marketplace-nav"
 import {MilestoneFilters} from "~web/components/milestone-filters"
 import {PAGFilters} from "~web/components/pag-filters"
-import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable"
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable"
 import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
-import {getMilestoneTypes, getPublicOrganizationData} from "@/lib/fetchers";
+import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import Image from "next/image"
 import {CROFilters} from "~web/components/cro-filters";
 import { useQueryState } from "nuqs"
-import { initializeCROSearch, initializeOrganizationSearch } from "@/lib/initialize-client-state"
-import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
+import { initializeCROSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
 
 // export const metadata: Metadata = {
 //     title: "Comend",

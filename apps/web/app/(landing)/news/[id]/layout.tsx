@@ -1,5 +1,5 @@
-import {ProfilePhoto} from "@/components/profile-photo"
-import {getNotionPage} from "@/lib/notion"
+import {ProfilePhoto} from "@comend/components/profile-photo"
+import {getNotionPage} from "@comend/lib/notion"
 
 export default async function NewsArticleLayout({
                                                     params,

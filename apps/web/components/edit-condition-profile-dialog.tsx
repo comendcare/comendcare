@@ -3,27 +3,27 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog"
-import {Button, buttonVariants} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
+} from "@comend/components/ui/dialog"
+import {Button, buttonVariants} from "@comend/components/ui/button";
+import {Input} from "@comend/components/ui/input";
+import {Label} from "@comend/components/ui/label";
 import {z} from "zod";
 import {toast} from "sonner";
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganization} from "@comend/lib/actions";
 import {useEffect, useState} from "react";
-import {getConditionsDataFromOrgId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import Link from "next/link"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
+import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
-import LoadingDots from "@/components/icons/loading-dots";
-import {researchFormSchema} from "@/components/research-onboarding-form";
-import { Option } from "@/lib/types";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import {researchFormSchema} from "@comend/components/research-onboarding-form";
+import { Option } from "@comend/lib/types";
 import { Info } from "lucide-react";
 
 export const optionSchema = z.object({

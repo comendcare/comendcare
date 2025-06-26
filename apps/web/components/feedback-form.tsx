@@ -4,15 +4,15 @@ import React from "react"
 import {
     SheetFooter,
     SheetClose
-} from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+} from "@comend/components/ui/sheet"
+import { Button } from "@comend/components/ui/button"
+import { Textarea } from "@comend/components/ui/textarea"
 import {
     TooltipProvider,
     Tooltip,
     TooltipTrigger,
     TooltipContent
-} from "@/components/ui/tooltip"
+} from "@comend/components/ui/tooltip"
 import {
     Form,
     FormControl,
@@ -21,15 +21,15 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@comend/components/ui/form"
+import { Input } from "@comend/components/ui/input"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useMixpanelContext} from "@/mixpanel";
-import {createFeedbackTicket} from "@/lib/notion";
+import {createFeedbackTicket} from "@comend/lib/notion";
 import {toast} from "sonner";
 import {z} from "zod";
-import {uploadFeedbackImg} from "@/lib/g-cloud";
+import {uploadFeedbackImg} from "@comend/lib/g-cloud";
 import { Info } from "lucide-react"
 
 async function getBase64(file: File) {

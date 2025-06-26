@@ -1,12 +1,12 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@comend/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { EditAssetForm } from "~web/components/edit-asset-form";
 import { ReactNode, useState } from "react";
-import { Asset } from "@/lib/types";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Asset } from "@comend/lib/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 export const NewAssetDialog = ({iconOnly = false, numAssetsPinned}: {iconOnly?: boolean, numAssetsPinned: number}) => {
     const [isOpen, setIsOpen] = useState(false)

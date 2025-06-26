@@ -4,7 +4,7 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {toast} from "sonner"
-import {Button} from "@/components/ui/button"
+import {Button} from "@comend/components/ui/button"
 import {
     Form,
     FormControl,
@@ -12,9 +12,9 @@ import {
     FormField,
     FormItem,
     FormLabel,
-} from "@/components/ui/form"
-import {Switch} from "@/components/ui/switch"
-import {toggleOrganizationVerified} from "@/lib/actions"
+} from "@comend/components/ui/form"
+import {Switch} from "@comend/components/ui/switch"
+import {toggleOrganizationVerified} from "@comend/lib/actions"
 import {Organization} from "@prisma/client";
 
 const FormSchema = z.object({

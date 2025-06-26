@@ -7,20 +7,21 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+} from "@comend/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@comend/components/ui/form";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { updateOrganization } from "@/lib/actions";
+import { Input } from "@comend/components/ui/input";
+import { Button } from "@comend/components/ui/button";
+import { updateOrganization } from "@comend/lib/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Organization } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 
 // Schema for validating the contact email
 const editContactEmailSchema = z.object({
@@ -79,11 +80,20 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
                 setOpen(state);
             }}
         >
-            <DialogTrigger asChild>
-                <Button variant="ghost">
-                    <Pencil />
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" disabled={session?.user?.membership?.role !== "owner"}>
+                            <Pencil />
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit Contact Email</DialogTitle>

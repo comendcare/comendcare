@@ -1,5 +1,5 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { getNotionDatabaseAndContents } from "@/lib/notion"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@comend/components/ui/accordion"
+import { getNotionDatabaseAndContents } from "@comend/lib/notion"
 import Link from "next/link"
 
 export default async function FAQLayout({

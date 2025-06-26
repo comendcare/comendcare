@@ -1,10 +1,10 @@
-import { getOrganizationData, getPublicRoadmapsForOrganization } from "@/lib/fetchers"
+import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import React from "react";
 import { RoadmapCard } from "~web/components/public-roadmap-card";
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
 
 export default async function EmbeddedResearchPlanPage({params}: {params: {domain: string, researchPlanId: string}}) {
     const [organization, roadmaps] = await Promise.all([

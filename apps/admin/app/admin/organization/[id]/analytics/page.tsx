@@ -1,5 +1,5 @@
-import { getSession } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getSession } from "@comend/lib/auth"
+import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import { AdminResearchPlansAnalyticsCards } from "~admin/components/admin-research-plans-analytics-cards"
 import { AdminToolsAnalyticsCards } from "~admin/components/admin-tools-analytics-cards"

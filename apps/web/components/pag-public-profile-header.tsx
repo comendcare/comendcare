@@ -1,10 +1,10 @@
-import {formatMoney, standardizeYear} from "@/lib/utils";
+import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Organization} from "@prisma/client";
-import {ProfilePhoto} from "@/components/profile-photo";
+import {ProfilePhoto} from "@comend/components/profile-photo";
 import {BackButton} from "./back-button";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
 import { Building2, Calendar, HandCoins } from "lucide-react";
-import { PAGBannerPhoto } from "../../../components/pag-banner-photo";
+import { PAGBannerPhoto } from "@comend/components/pag-banner-photo";
 
 export default function PAGPublicProfileHeader({organization, showBackButton}: {
     organization: Partial<Organization>,

@@ -1,7 +1,7 @@
 import { temporal } from 'zundo';
 import { create } from 'zustand';
-import { RFP } from '@/lib/types';
-import { createOrUpdateRFP, deleteRFP, syncDBRFPs } from '@/lib/actions';
+import { RFP } from '@comend/lib/types';
+import { createOrUpdateRFP, deleteRFP, syncDBRFPs } from '@comend/lib/actions';
 import mixpanel from 'mixpanel-browser';
 import { mixpanelTrack } from "@/mixpanel";
 

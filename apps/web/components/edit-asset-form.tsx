@@ -12,11 +12,11 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {Textarea} from "@/components/ui/textarea"
-import {Button} from "@/components/ui/button"
-import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
+} from "@comend/components/ui/form"
+import {Input} from "@comend/components/ui/input"
+import {Textarea} from "@comend/components/ui/textarea"
+import {Button} from "@comend/components/ui/button"
+import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
@@ -26,19 +26,19 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog"
-import {Asset} from "@/lib/types"
+} from "@comend/components/ui/dialog"
+import {Asset} from "@comend/lib/types"
 import {Prisma} from "@prisma/client"
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
-import {cn} from "@/lib/utils"
-import MultipleSelector from "@/components/ui/multiple-selector"
+import {cn} from "@comend/lib/utils"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { Option } from "@/lib/types"
+import { Option } from "@comend/lib/types"
 import { Delete, Pin } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
 import mixpanel from "mixpanel-browser"

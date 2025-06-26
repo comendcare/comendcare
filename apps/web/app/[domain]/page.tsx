@@ -1,5 +1,5 @@
 "use server"
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import {notFound} from "next/navigation"
 import {
     getOrganizationData,
@@ -7,7 +7,7 @@ import {
     getPublicRFPsForOrganization,
     getPublicAssetsForOrganization,
     getPublicRoadmapsForOrganization
-} from "@/lib/fetchers"
+} from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";

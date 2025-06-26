@@ -1,23 +1,23 @@
 "use client"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@comend/components/ui/select"
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {inviteUser} from "@/lib/actions";
-import {getIp} from "@/lib/utils";
+import {inviteUser} from "@comend/lib/actions";
+import {getIp} from "@comend/lib/utils";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -25,13 +25,13 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "@/components/ui/dialog";
+} from "@comend/components/ui/dialog";
 import {toast} from "sonner";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
-import LoadingDots from "@/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),

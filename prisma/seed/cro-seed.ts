@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import fs from 'fs/promises';
 
 async function main() {

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {useNavStore} from "@/state/nav/navStore"; // Zustand store
-import {ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
+import {ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable";
 import {useSession} from "next-auth/react";
 import {useEffect, useRef} from "react";
 import Image from "next/image"
@@ -17,26 +17,26 @@ import {
     getAssets,
     getMilestoneTypes,
     getRFPs,
-} from "@/lib/fetchers";
+} from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore} from "@/lib/initialize-client-state";
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
+import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore} from "@comend/lib/initialize-client-state";
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
 import {AppSidebar} from "~web/components/app-sidebar";
 import { FeedbackSheet } from "~web/components/feedback";
-import { useOnborda } from "@/components/onborda/OnbordaContext";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { useOnborda } from "@comend/components/onborda/OnbordaContext";
+import { Button, buttonVariants } from "@comend/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
-import { cn, sleep } from "@/lib/utils";
+import { cn, sleep } from "@comend/lib/utils";
 import { BookOpen, Cookie, Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
-import { ASSOCIATED_SYSTEMS, MembershipWithOrganization, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
+import { ASSOCIATED_SYSTEMS, MembershipWithOrganization, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types";
 import Link from "next/link";
 import {MobileWarning} from "~web/components/mobile-warning";
-import {useIsMobile} from "@/lib/hooks/use-mobile";
+import {useIsMobile} from "@comend/lib/hooks/use-mobile";
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 interface AppLayoutProps {
     children: React.ReactNode

@@ -1,9 +1,9 @@
 "use client"
 import React, {useEffect, useState} from "react";
-import {getAssets, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getAssets, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
-import { initializeAssetsStore} from "@/lib/initialize-client-state"
+import { initializeAssetsStore} from "@comend/lib/initialize-client-state"
 import NoOrganization from "~web/components/no-organization";
 import Loading from "@/loading";;
 

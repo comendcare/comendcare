@@ -1,4 +1,4 @@
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import {Column} from "@prisma/client";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore";
 import { useShallow } from "zustand/react/shallow";

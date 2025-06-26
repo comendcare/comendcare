@@ -1,8 +1,8 @@
-import {getSession} from "@/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {KanbanView} from "~web/components/kanban";
-import {getKanbanFromOrganizationId} from "@/lib/fetchers";
+import {getKanbanFromOrganizationId} from "@comend/lib/fetchers";
 import NewKanbanForm from "~web/components/new-kanban";
-import {createKanban} from "@/lib/actions";
+import {createKanban} from "@comend/lib/actions";
 import NoOrganization from "~web/components/no-organization";
 
 export default async function KanbanPage({params}: {
@@ -33,7 +33,7 @@ export default async function KanbanPage({params}: {
     if (response.success && response.data) {
         return (
             <main className="flex flex-col w-full h-full">
-                <KanbanView />
+                {/*<KanbanView />*/}
             </main>
         )
     }

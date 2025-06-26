@@ -2,7 +2,7 @@
 
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
-import {DeleteOrganizationAlertDialog} from "@/components/delete-organization-alert-dialog";
+import {DeleteOrganizationAlertDialog} from "@comend/components/delete-organization-alert-dialog";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session} = useSession()

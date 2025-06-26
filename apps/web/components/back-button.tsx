@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@comend/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 

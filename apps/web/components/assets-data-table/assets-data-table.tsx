@@ -18,8 +18,8 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import { Asset } from "@/lib/types"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
+import { Asset } from "@comend/lib/types"
 import { EditAssetDialog } from "../edit-asset-dialog"
 
 interface DataTableProps<TData, TValue> {

@@ -1,6 +1,6 @@
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import {notFound} from "next/navigation"
-import {getOrganizationData, getConditionsDataFromOrgId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
+import {getOrganizationData, getConditionsDataFromOrgId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
@@ -10,10 +10,10 @@ import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "~web/components/marketplace-breadcrumb";
 import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
-import {DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@comend/components/ui/dialog";
+import {Label} from "@comend/components/ui/label";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import ShareDialog from "~web/components/share-dialog";
 import {FloatingDock} from "~web/components/floating-dock";
 import React from "react";

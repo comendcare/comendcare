@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {ProfilePhoto} from "@/components/profile-photo"
+import {ProfilePhoto} from "@comend/components/profile-photo"
 
 import {CommentInput} from "~web/components/comment-input";
 import {useState} from "react";
 import {useSession} from "next-auth/react";
-import {createComment} from "@/lib/actions";
+import {createComment} from "@comend/lib/actions";
 import {toast} from "sonner";
 
 interface CommentFormProps {

@@ -1,6 +1,6 @@
-import prisma from "@/lib/prisma";
+import prisma from "@comend/lib/prisma";
 import fs from "fs/promises";
-import {toKebabCase} from "@/lib/utils"
+import {toKebabCase} from "@comend/lib/utils"
 
 async function main() {
     console.log("Starting condition seed script...");

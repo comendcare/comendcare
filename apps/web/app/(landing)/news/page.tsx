@@ -1,11 +1,11 @@
 // "use client";
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {format} from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 // import {useEffect, useState} from "react";
 // import FuzzySearch from "fuzzy-search";
-import { getNotionDatabaseAndContents } from "@/lib/notion";
+import { getNotionDatabaseAndContents } from "@comend/lib/notion";
 import { Blog, BlurImage } from "~web/components/landing/news";
 
 export default async function NewsPage() {

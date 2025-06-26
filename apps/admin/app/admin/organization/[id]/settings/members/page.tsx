@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"
+import prisma from "@comend/lib/prisma"
 
 export default async function SiteSettingsDomains({
     params

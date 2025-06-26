@@ -1,5 +1,5 @@
 import React from "react"
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@comend/components/ui/scroll-area";
 import { MilestoneSearchResults } from "~web/components/milestone-search-results";
 import MilestoneSearchBar from "~web/components/milestone-searchbar";
 

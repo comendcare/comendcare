@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { getMemberRequestsWithUsers } from "@/lib/fetchers"
+import { getMemberRequestsWithUsers } from "@comend/lib/fetchers"
 import { toast } from "sonner"
 import {useSession} from "next-auth/react"
-import { ProfilePhoto } from "@/components/profile-photo"
+import { ProfilePhoto } from "@comend/components/profile-photo"
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
 import MemberRequestsDropdown from "~web/components/member-requests-dropdown"
 import Loading from "@/loading";

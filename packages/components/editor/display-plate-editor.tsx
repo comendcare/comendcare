@@ -6,9 +6,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { ParagraphPlugin, Plate, PlateEditor, useEditorState, usePlateEditor } from '@udecode/plate-common/react';
 
-import { useCreateEditor } from '@/components/editor/use-create-editor';
-import { SettingsDialog } from '@/components/editor/settings';
-import { Editor, EditorContainer } from '@/components/plate-ui/editor';
+import { useCreateEditor } from '@comend/components/editor/use-create-editor';
+import { SettingsDialog } from '@comend/components/editor/settings';
+import { Editor, EditorContainer } from '@comend/components/plate-ui/editor';
 import { JsonObject } from '@prisma/client/runtime/library';
 import {
   BoldPlugin,
@@ -81,44 +81,44 @@ import {
 } from '@udecode/plate-table/react';
 import { TogglePlugin } from '@udecode/plate-toggle/react';
 
-import { copilotPlugins } from '@/components/editor/plugins/copilot-plugins';
-import { editorPlugins } from '@/components/editor/plugins/editor-plugins';
-import { AILeaf } from '@/components/plate-ui/ai-leaf';
-import { BlockquoteElement } from '@/components/plate-ui/blockquote-element';
-import { CodeBlockElement } from '@/components/plate-ui/code-block-element';
-import { CodeLeaf } from '@/components/plate-ui/code-leaf';
-import { CodeLineElement } from '@/components/plate-ui/code-line-element';
-import { CodeSyntaxLeaf } from '@/components/plate-ui/code-syntax-leaf';
-import { ColumnElement } from '@/components/plate-ui/column-element';
-import { ColumnGroupElement } from '@/components/plate-ui/column-group-element';
-import { CommentLeaf } from '@/components/plate-ui/comment-leaf';
-import { DateElement } from '@/components/plate-ui/date-element';
-import { EmojiInputElement } from '@/components/plate-ui/emoji-input-element';
-import { ExcalidrawElement } from '@/components/plate-ui/excalidraw-element';
-import { HeadingElement } from '@/components/plate-ui/heading-element';
-import { HighlightLeaf } from '@/components/plate-ui/highlight-leaf';
-import { HrElement } from '@/components/plate-ui/hr-element';
-import { ImageElement } from '@/components/plate-ui/image-element';
-import { KbdLeaf } from '@/components/plate-ui/kbd-leaf';
-import { LinkElement } from '@/components/plate-ui/link-element';
-import { MediaAudioElement } from '@/components/plate-ui/media-audio-element';
-import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
-import { MediaFileElement } from '@/components/plate-ui/media-file-element';
-import { MediaVideoElement } from '@/components/plate-ui/media-video-element';
-import { MentionElement } from '@/components/plate-ui/mention-element';
-import { MentionInputElement } from '@/components/plate-ui/mention-input-element';
-import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
-import { withPlaceholders } from '@/components/plate-ui/placeholder';
-import { SlashInputElement } from '@/components/plate-ui/slash-input-element';
+import { copilotPlugins } from '@comend/components/editor/plugins/copilot-plugins';
+import { editorPlugins } from '@comend/components/editor/plugins/editor-plugins';
+import { AILeaf } from '@comend/components/plate-ui/ai-leaf';
+import { BlockquoteElement } from '@comend/components/plate-ui/blockquote-element';
+import { CodeBlockElement } from '@comend/components/plate-ui/code-block-element';
+import { CodeLeaf } from '@comend/components/plate-ui/code-leaf';
+import { CodeLineElement } from '@comend/components/plate-ui/code-line-element';
+import { CodeSyntaxLeaf } from '@comend/components/plate-ui/code-syntax-leaf';
+import { ColumnElement } from '@comend/components/plate-ui/column-element';
+import { ColumnGroupElement } from '@comend/components/plate-ui/column-group-element';
+import { CommentLeaf } from '@comend/components/plate-ui/comment-leaf';
+import { DateElement } from '@comend/components/plate-ui/date-element';
+import { EmojiInputElement } from '@comend/components/plate-ui/emoji-input-element';
+import { ExcalidrawElement } from '@comend/components/plate-ui/excalidraw-element';
+import { HeadingElement } from '@comend/components/plate-ui/heading-element';
+import { HighlightLeaf } from '@comend/components/plate-ui/highlight-leaf';
+import { HrElement } from '@comend/components/plate-ui/hr-element';
+import { ImageElement } from '@comend/components/plate-ui/image-element';
+import { KbdLeaf } from '@comend/components/plate-ui/kbd-leaf';
+import { LinkElement } from '@comend/components/plate-ui/link-element';
+import { MediaAudioElement } from '@comend/components/plate-ui/media-audio-element';
+import { MediaEmbedElement } from '@comend/components/plate-ui/media-embed-element';
+import { MediaFileElement } from '@comend/components/plate-ui/media-file-element';
+import { MediaVideoElement } from '@comend/components/plate-ui/media-video-element';
+import { MentionElement } from '@comend/components/plate-ui/mention-element';
+import { MentionInputElement } from '@comend/components/plate-ui/mention-input-element';
+import { ParagraphElement } from '@comend/components/plate-ui/paragraph-element';
+import { withPlaceholders } from '@comend/components/plate-ui/placeholder';
+import { SlashInputElement } from '@comend/components/plate-ui/slash-input-element';
 import {
   TableCellElement,
   TableCellHeaderElement,
-} from '@/components/plate-ui/table-cell-element';
-import { TableElement } from '@/components/plate-ui/table-element';
-import { TableRowElement } from '@/components/plate-ui/table-row-element';
-import { TocElement } from '@/components/plate-ui/toc-element';
-import { ToggleElement } from '@/components/plate-ui/toggle-element';
-import { withDraggables } from '@/components/plate-ui/with-draggables';
+} from '@comend/components/plate-ui/table-cell-element';
+import { TableElement } from '@comend/components/plate-ui/table-element';
+import { TableRowElement } from '@comend/components/plate-ui/table-row-element';
+import { TocElement } from '@comend/components/plate-ui/toc-element';
+import { ToggleElement } from '@comend/components/plate-ui/toggle-element';
+import { withDraggables } from '@comend/components/plate-ui/with-draggables';
 
 export function DisplayPlateEditor({ value }: { value: any[] }) {
   // this Plate Editor is basically the same as the useCreateEditor, except

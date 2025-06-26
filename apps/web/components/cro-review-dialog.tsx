@@ -12,8 +12,8 @@ import {
     DialogTitle,
     DialogFooter,
     DialogDescription
-} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
+} from "@comend/components/ui/dialog";
+import {Button} from "@comend/components/ui/button";
 import {
     Select,
     SelectContent,
@@ -22,12 +22,12 @@ import {
     SelectTrigger,
     SelectValue,
     SelectItem
-} from "@/components/ui/select"
+} from "@comend/components/ui/select"
 import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
-} from "@/components/ui/hover-card"
+} from "@comend/components/ui/hover-card"
 import {
     Form,
     FormControl,
@@ -35,21 +35,21 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {createReview} from "@/lib/actions";
+} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Textarea} from "@comend/components/ui/textarea";
+import {createReview} from "@comend/lib/actions";
 import {Company, Milestone} from "@prisma/client";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {StarRatingSelector} from "~web/components/star-rating-selector";
-import {getMilestones} from "@/lib/fetchers";
+import {getMilestones} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
-import {MILESTONE_TYPE_OPTIONS} from "@/lib/types";
+import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 
 export const reviewForm = z.object({
     title: z

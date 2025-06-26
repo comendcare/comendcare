@@ -5,7 +5,7 @@
  * Mobile navbar is better positioned at bottom right.
  **/
 
-import {cn} from "@/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {IconLayoutNavbarCollapse} from "@tabler/icons-react";
 import {
     AnimatePresence,
@@ -21,12 +21,12 @@ import {
     Dialog,
     DialogContent,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 import {
     Sheet,
     SheetTrigger,
     SheetContent,
-} from "@/components/ui/sheet"
+} from "@comend/components/ui/sheet"
 
 export const FloatingDock = ({
                                  items,

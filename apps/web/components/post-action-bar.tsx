@@ -2,16 +2,16 @@
 
 import * as React from "react";
 import {AnimatePresence, motion} from "framer-motion";
-import {Button} from "@/components/ui/button";
-import {Separator} from "@/components/ui/separator";
-import {cn, formatDates} from "@/lib/utils";
+import {Button} from "@comend/components/ui/button";
+import {Separator} from "@comend/components/ui/separator";
+import {cn, formatDates} from "@comend/lib/utils";
 import {CommentForm} from "~web/components/comment-form";
-import {setTransition} from "@/lib/transition";
+import {setTransition} from "@comend/lib/transition";
 import {IconShare, IconThumbUp, IconThumbUpFilled} from "@tabler/icons-react";
 import {CommentList} from "~web/components/comment-list";
-import {useLike} from "@/lib/hooks/use-like";
+import {useLike} from "@comend/lib/hooks/use-like";
 import useMeasure from "react-use-measure";
-import {PostWithAuthorAndComments} from "@/lib/types";
+import {PostWithAuthorAndComments} from "@comend/lib/types";
 import {MessageCircle} from "lucide-react"
 
 export default function PostActionBar({data}: {data: PostWithAuthorAndComments}) {

@@ -1,5 +1,5 @@
-import { createNotification, createNotifications, notificationsViewed } from "@/lib/actions"
-import { getAllNotifications } from "@/lib/fetchers"
+import { createNotification, createNotifications, notificationsViewed } from "@comend/lib/actions"
+import { getAllNotifications } from "@comend/lib/fetchers"
 import { PlatformNotification } from "@prisma/client"
 import { toast } from "sonner"
 import {create} from "zustand"
