@@ -2152,6 +2152,62 @@ export async function getAllOrganizationsWithConditions(
     }
 }
 
+export async function getProjectRecommendations(
+    projectId: string,
+    select: Prisma.MilestoneSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
+    try {
+        const currentProject = await prisma.milestone.findUnique({
+            where: {id: projectId},
+            include: {
+                types: {
+                    select: {
+                        milestoneTypeId: true
+                    }
+                }
+            }
+        })
+
+        if (!currentProject) {
+            logError(`Error fetching milestone`, new Error(`Could not find milestone with id ${projectId}`))
+            return {success: false, error: "Internal server error"}
+        }
+
+        const typeIds = currentProject.types.map(t => t.milestoneTypeId)
+        if (typeIds.length === 0) {
+            return { success: true, projects: [] } // no types to match on
+        }
+
+        // Find all other milestones that share at least one of the same milestone types
+        const sharedTypeProjects = await prisma.milestone.findMany({
+            where: {
+                id: {
+                    not: projectId // Exclude the current project
+                },
+                private: false, // Only include public projects
+                types: {
+                    some: {
+                        milestoneTypeId: {
+                            in: typeIds
+                        }
+                    }
+                }
+            },
+            select
+        })
+
+        return {success: true, data: sharedTypeProjects}
+    } catch (e) {
+        logError("Error fetching organizations", e)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function getTopPubMedPublications(keyword?: string) {
     try {
         const session = await getSession()
