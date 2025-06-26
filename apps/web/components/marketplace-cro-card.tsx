@@ -1,14 +1,25 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
 import {truncate} from "@comend/lib/utils";
-import React, { ReactNode } from "react";
+import React, {ReactNode} from "react";
 import {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "~web/components/save-cro-dialog";
-import {Briefcase, Building, Building2, Factory, FileText, Dna, Rocket, Star, University, HeartHandshake} from "lucide-react";
-import { Milestone } from "@comend/lib/types";
-import { PropertyBadge } from "./property-badge";
+import {
+    Briefcase,
+    Building,
+    Building2,
+    Factory,
+    FileText,
+    Dna,
+    Rocket,
+    Star,
+    University,
+    HeartHandshake
+} from "lucide-react";
+import {Milestone} from "@comend/lib/types";
+import {PropertyBadge} from "./property-badge";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -71,7 +82,11 @@ export function CRORecommendationCard({cro, milestone, location}: { cro: Company
     );
 }
 
-export function CROMarketplaceCard({cro, milestone, location}: { cro: Company, milestone?: Milestone, location?: string }) {
+export function CROMarketplaceCard({cro, milestone, location}: {
+    cro: Company,
+    milestone?: Milestone,
+    location?: string
+}) {
     const {id} = cro;
 
     return (
@@ -84,7 +99,11 @@ export function CROMarketplaceCard({cro, milestone, location}: { cro: Company, m
     )
 }
 
-export function CROCardHeaderContents({cro, milestone, location}: { cro: Company, milestone?: Milestone, location?: string}) {
+export function CROCardHeaderContents({cro, milestone, location}: {
+    cro: Company,
+    milestone?: Milestone,
+    location?: string
+}) {
     const {id, title, description, companyType, avgRating} = cro;
 
     return (
@@ -166,10 +185,10 @@ export function CROCardContents({cro}: { cro: Company }) {
                                         className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm"
                                     >
                                         {tag === "Experienced in rare disease" && (
-                                            <Dna className="h-3.5 w-3.5 shrink-0" />
+                                            <Dna className="h-3.5 w-3.5 shrink-0"/>
                                         )}
                                         {tag === "PAG friendly" && (
-                                            <HeartHandshake className="h-3.5 w-3.5 shrink-0" />
+                                            <HeartHandshake className="h-3.5 w-3.5 shrink-0"/>
                                         )}
                                         <span className="truncate">
                                             {tag}

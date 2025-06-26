@@ -1,4 +1,5 @@
 import type {Config} from "tailwindcss"
+import path from 'path'
 
 const svgToDataUri = require("mini-svg-data-uri")
 const {
@@ -13,7 +14,10 @@ const config: Config = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
         "../../components/**/*.{ts,tsx}",
-        '../../packages/components/**/*.{js,ts,jsx,tsx}', // shared components
+        path.join(
+            path.dirname(require.resolve('@comend/components/package.json')),
+            '**/*.{js,ts,jsx,tsx}'
+        ),
         // "./node_modules/onborda/dist/**/*.{js,ts,jsx,tsx}"
     ],
     theme: {
