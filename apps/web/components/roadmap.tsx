@@ -833,16 +833,31 @@ const RoadmapHeader = ({
 
     return (
         <>
-        <div ref={parentRef} className="flex p-x-2 justify-between items-start">
-            <span className="flex flex-row items-center gap-x-1">
-                <h1 className="h-full my-auto text-2xl font-semibold text-wrap line-clamp-2">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+        <div ref={parentRef} className="flex justify-between items-center">
+            <span className="flex flex-row items-center">
+                <h1 className="h-full text-2xl font-semibold text-wrap line-clamp-2 pr-1">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+                <div className="p-[6px] h-[40px]">
+                    <StageOfActivityBadge milestones={milestones} />
+                </div>
+                {milestones.filter(milestone => !milestone.private).length <= 0 && (
+                    <Tooltip>
+                        <div className="p-[6px] h-[40px] w-[40px] min-w-[40px]">
+                            <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center bg-red-100">
+                                <Lock className="text-red-600 h-4 w-4"/>
+                            </TooltipTrigger>
+                        </div>
+                        <TooltipContent className="max-w-80">
+                            {`All of the projects in your research plan are private. This research plan will appear as 'under development' on your public profile. Change a project's visibility to public, to show it off on your public profile.`}
+                        </TooltipContent>
+                    </Tooltip>
+                )}
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
                             onClick={() => setEditResearchPlanIsOpen(true)} 
-                            variant={"ghost"}
-                            size={isCollapsed ? "icon" : "default"}
-                            // className="w-16"
+                            variant="ghost"
+                            size={"icon"}
+                            className="min-w-[40px]"
                         >
                             <Pencil />
                         </Button>
@@ -851,20 +866,9 @@ const RoadmapHeader = ({
                         <p>{`Edit the details of your research plan, like the title and description.`}</p>
                     </TooltipContent>
                 </Tooltip>
-                <StageOfActivityBadge milestones={milestones} />
-                {milestones.filter(milestone => !milestone.private).length <= 0 && (
-                    <Tooltip>
-                        <TooltipTrigger className="ml-2 rounded-full border-2 border-red-600 h-8 w-8 flex justify-center items-center">
-                            <Lock className="text-red-600 h-4 w-4"/>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-80">
-                            {`All of the projects in your research plan are private. This research plan will appear as 'under development' on your public profile. Change a project's visibility to public, to show it off on your public profile.`}
-                        </TooltipContent>
-                    </Tooltip>
-                )}
             </span>
 
-            <span className="onborda-create-a-project flex flex-row items-center gap-x-1 justify-end">
+            <span className="onborda-create-a-project flex flex-row items-center justify-end">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
@@ -928,7 +932,7 @@ const RoadmapHeader = ({
                                 e.stopPropagation()
                             }}
                             variant="ghost"
-                            className="p-2 justify-end h-full"
+                            size={"icon"}
                         >
                             <Ellipsis/>
                         </Button>
