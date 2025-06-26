@@ -21,6 +21,7 @@ import { useSession } from "next-auth/react";
 import { Organization } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 
 // Schema for validating the contact email
 const editContactEmailSchema = z.object({
@@ -79,11 +80,20 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
                 setOpen(state);
             }}
         >
-            <DialogTrigger asChild>
-                <Button variant="ghost">
-                    <Pencil />
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" disabled={session?.user?.membership?.role !== "owner"}>
+                            <Pencil />
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit Contact Email</DialogTitle>

@@ -23,6 +23,7 @@ import {useEffect, useState} from "react";
 import {useDebounce} from "use-debounce";
 import {checkSubdomainAvailability, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import { Pencil } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 
 const editSubdomainFormSchema = z.object({
     subdomain: z.string().min(2, {
@@ -192,13 +193,23 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
                 setOpen(state);
             }}
         >
-            <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                >
-                    <Pencil />
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            disabled={session?.user?.membership?.role !== "owner"}
+                        >
+                            <Pencil />
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Organization Abbreviation (required)</DialogTitle>

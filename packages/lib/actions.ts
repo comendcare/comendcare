@@ -716,7 +716,8 @@ export const updateOrganization = withOrganizationAuth(
             console.error("Error updating organization:", error.message);
             throw new Error(error.message || "Failed to update organization.");
         }
-    }
+    },
+    ['owner']
 );
 
 export const adminUpdateOrganizationAttribute = withAdminAuth(

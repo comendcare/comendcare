@@ -218,14 +218,24 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 onCloseForm();
             }
         }}>
-            <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    className="gap-x-2"
-                >
-                    <Pencil/>
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="gap-x-2"
+                            disabled={session?.user?.membership?.role !== "owner"}
+                        >
+                            <Pencil/>
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Condition editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogPortal>
                 <DialogContent className="max-h-[80vh] overflow-y-auto overflow-x-visible">
                     <TooltipProvider>
