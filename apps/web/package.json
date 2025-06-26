@@ -18,11 +18,11 @@
     "seed": "tsx prisma/seed/seed.ts"
   },
   "dependencies": {
-    "@comend/components": "*",
-    "@comend/lib": "*",
     "@ai-sdk/openai": "^1.0.7",
     "@ariakit/react": "^0.4.15",
     "@babel/runtime": "^7.26.0",
+    "@comend/components": "*",
+    "@comend/lib": "*",
     "@customerio/cdp-analytics-node": "^0.2.3",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
@@ -187,6 +187,7 @@
     "react-tweet": "^3.2.1",
     "react-use-measure": "^2.1.1",
     "recharts": "^2.12.7",
+    "rehype-slug": "^6.0.0",
     "remark": "^14.0.3",
     "sharp": "^0.32.6",
     "sonner": "^1.7.1",
