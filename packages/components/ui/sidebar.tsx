@@ -7,17 +7,17 @@ import {PanelLeft, PanelLeftOpen, PanelRightOpen} from "lucide-react"
 
 import {useIsMobile} from "@comend/lib/hooks/use-mobile";
 import {cn} from "@comend/lib/utils";
-import {Button} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
-import {Separator} from "@/components/ui/separator"
-import {Sheet, SheetContent} from "@/components/ui/sheet"
-import {Skeleton} from "@/components/ui/skeleton"
+import {Button} from "@comend/components/ui/button"
+import {Input} from "@comend/components/ui/input"
+import {Separator} from "@comend/components/ui/separator"
+import {Sheet, SheetContent} from "@comend/components/ui/sheet"
+import {Skeleton} from "@comend/components/ui/skeleton"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@comend/components/ui/tooltip"
 
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"

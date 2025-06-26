@@ -5,10 +5,10 @@ import {X} from 'lucide-react';
 import * as React from 'react';
 import {forwardRef, useEffect} from 'react';
 
-import {Badge} from '@/components/ui/badge';
-import {Command, CommandGroup, CommandItem, CommandList} from '@/components/ui/command';
+import {Badge} from '@comend/components/ui/badge';
+import {Command, CommandGroup, CommandItem, CommandList} from '@comend/components/ui/command';
 import {cn, sleep} from '@comend/lib/utils';
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
 import {ScrollArea} from './scroll-area';
 import { keyBy, remove } from 'lodash';
 

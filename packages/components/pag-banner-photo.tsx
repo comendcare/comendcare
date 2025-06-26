@@ -8,19 +8,19 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogDescription,
-} from "@/components/ui/dialog";
-import {Form} from "@/components/ui/form";
+} from "@comend/components/ui/dialog";
+import {Form} from "@comend/components/ui/form";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageSelector} from "@/components/form-image-selector";
-import {FileWithPreview} from "@/components/image-selector";
+import {FormImageSelector} from "@comend/components/form-image-selector";
+import {FileWithPreview} from "@comend/components/image-selector";
 import {toast} from "sonner";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import {updateOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {Button} from "@/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import { Pencil } from "lucide-react";
 
 const editOrgProfileImageSchema = z.object({

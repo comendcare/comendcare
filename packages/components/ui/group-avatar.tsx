@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@comend/components/ui/avatar';
 import { cn } from '@comend/lib/utils';
 import React from 'react';
 

@@ -3,7 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".", // makes paths relative to `apps/web`
     "paths": {
-      "@comend/*": ["../../*"],
       "@/*": ["../../*"],
       "~web/*": ["./*"]
     }

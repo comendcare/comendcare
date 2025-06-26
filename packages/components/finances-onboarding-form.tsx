@@ -1,6 +1,6 @@
 "use client"
-import {Form} from "@/components/ui/form";
-import {Button} from "@/components/ui/button";
+import {Form} from "@comend/components/ui/form";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
-import MoneyInput from "@/components/money-input";
+import MoneyInput from "@comend/components/money-input";
 import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@/mixpanel";
 
