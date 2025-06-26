@@ -22,6 +22,7 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import { Pencil } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -109,15 +110,25 @@ export function PAGBannerPhoto({
             {/* Edit Button (Only if Editable) */}
             {editable && (
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
-                        >
-                            <Pencil className="w-4 h-4"/>
-                        </Button>
-                    </DialogTrigger>
+                    <Tooltip>
+                        <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                            <DialogTrigger asChild>
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
+                                    disabled={session?.user?.membership?.role !== "owner"}
+                                >
+                                    <Pencil className="w-4 h-4"/>
+                                </Button>
+                            </DialogTrigger>
+                        </TooltipTrigger>
+                        {session?.user?.membership?.role !== "owner" && (
+                            <TooltipContent className="max-w-80">
+                                <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
                     <DialogContent className="max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Edit organization banner image</DialogTitle>
