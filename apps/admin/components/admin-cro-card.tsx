@@ -6,15 +6,14 @@ import {Company} from "@prisma/client";
 import {
     Briefcase,
     Building,
-    Building2, Ellipsis,
+    Building2,
     Factory,
     FileText,
-    LucideProps,
+    Dna,
     Rocket,
     Star,
-    Pencil,
     University,
-    Trash
+    HeartHandshake
 } from "lucide-react";
 import {Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "comend-pag-platform/components/property-badge";
@@ -142,6 +141,28 @@ export function CROCardContents({cro}: { cro: Company }) {
         >
             {Object.values(categoryCounts).some(count => count > 0) && (
                 <CardContent className="flex flex-col items-start justify-center">
+                    <div>
+                        {cro.tags && cro.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 w-5/6">
+                                {cro.tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm"
+                                    >
+                                        {tag === "Experienced in rare disease" && (
+                                            <Dna className="h-3.5 w-3.5 shrink-0"/>
+                                        )}
+                                        {tag === "PAG friendly" && (
+                                            <HeartHandshake className="h-3.5 w-3.5 shrink-0"/>
+                                        )}
+                                        <span className="truncate">
+                                            {tag}
+                                        </span>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                     <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2">
                         {categoryLabels
                             // .filter(({key}) => categoryCounts[key] > 0)
