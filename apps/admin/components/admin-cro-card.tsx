@@ -2,7 +2,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend
 import Link from "next/link";
 import {truncate} from "@comend/lib/utils";
 import React, {useState} from "react";
-import {Company} from "@prisma/client";
+import { CompanyWithReviewsAndServices } from "@comend/lib/types";
 import {
     Briefcase,
     Building,
@@ -51,7 +51,7 @@ const companyTypeIcons: Record<string, JSX.Element> = {
     "Consultant (<5 employees)": <Briefcase className="size-4 text-gray-500 dark:text-gray-400"/>,
 };
 
-export function AdminCROCard({cro, milestone, location}: { cro: Company, milestone?: Milestone, location?: string }) {
+export function AdminCROCard({cro, milestone, location}: { cro: CompanyWithReviewsAndServices, milestone?: Milestone, location?: string }) {
     const {id} = cro;
 
     return (
@@ -65,7 +65,7 @@ export function AdminCROCard({cro, milestone, location}: { cro: Company, milesto
 }
 
 export function CROCardHeaderContents({cro, milestone, location}: {
-    cro: Company,
+    cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
     location?: string
 }) {
@@ -120,7 +120,7 @@ export function CROCardHeaderContents({cro, milestone, location}: {
     )
 }
 
-export function CROCardContents({cro}: { cro: Company }) {
+export function CROCardContents({cro}: { cro: CompanyWithReviewsAndServices }) {
     const categoryCounts = countCategories(cro);
 
     const categoryLabels = [
