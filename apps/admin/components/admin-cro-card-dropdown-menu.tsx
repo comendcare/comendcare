@@ -23,7 +23,7 @@ import { updateCompany, deleteCompany } from "@comend/lib/actions";
 import { mixpanelTrack } from "@/mixpanel";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Company } from "@prisma/client";
+import { CompanyWithReviewsAndServices } from "@comend/lib/types";
 import { Ellipsis, Pencil, Trash } from "lucide-react";
 import { Input } from "@comend/components/ui/input";
 import { Textarea } from "@comend/components/ui/textarea";
@@ -50,7 +50,14 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
+const handleAsyncSearch = async (query: string) => {
+    const res = await fetch(`/api/services?search=${encodeURIComponent(query || "")}`);
+    const services = await res.json();
+
+    return services
+};
+
+export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithReviewsAndServices }) {
     const router = useRouter();
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -66,6 +73,10 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                 value: certification
             })) || [],
             tags: cro.tags.map((tag: any) => ({
+                label: tag,
+                value: tag
+            })) || [],
+            services: cro.services.map((tag: any) => ({
                 label: tag,
                 value: tag
             })) || [],
@@ -234,7 +245,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                             name="type"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                    <FormLabel>
                                         Business type
                                     </FormLabel>
                                     <FormControl>
@@ -311,31 +322,35 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: Company }) {
                             )}
                         />
 
-                        {/*<FormField*/}
-                        {/*    control={form.control}*/}
-                        {/*    name="services"*/}
-                        {/*    render={({field}) => (*/}
-                        {/*        <FormItem>*/}
-                        {/*            <FormLabel>Services</FormLabel>*/}
-                        {/*            <FormDescription>{`The special "Comend verified" tags that apply to this service provider. Select all that apply.`}</FormDescription>*/}
-                        {/*            <FormControl>*/}
-                        {/*                <MultipleSelector*/}
-                        {/*                    {...field}*/}
-                        {/*                    defaultOptions={CRO_TAGS}*/}
-                        {/*                    hidePlaceholderWhenSelected={true}*/}
-                        {/*                    placeholder="Select all the tags that belong to this service provider..."*/}
-                        {/*                    emptyIndicator={*/}
-                        {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
-                        {/*                            no results found.*/}
-                        {/*                        </p>*/}
-                        {/*                    }*/}
-                        {/*                    showHoverCard={false}*/}
-                        {/*                />*/}
-                        {/*            </FormControl>*/}
-                        {/*            <FormMessage/>*/}
-                        {/*        </FormItem>*/}
-                        {/*    )}*/}
-                        {/*/>*/}
+                        <FormField
+                            control={form.control}
+                            name="services"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Services
+                                    </FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            onSearch={handleAsyncSearch}
+                                            placeholder="Search for services..."
+                                            triggerSearchOnFocus={true}
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={
+                                                <p
+                                                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                >
+                                                    Loading services...
+                                                </p>}
+                                            emptyIndicator={<p>No services found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
                         <DialogFooter>
                             <Button type="submit">Save Changes</Button>
