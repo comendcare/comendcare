@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: "Comend",
-        short_name: "Comend",
-        description: "Software for rare disease patient groups",
+        name: "Comend Provider Portal",
+        short_name: "Comend Provider Portal",
+        description: "Comend's Provider Portal for service providers and CROs.",
         start_url: "/",
         display: "standalone",
         background_color: "#fff",
