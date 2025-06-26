@@ -80,6 +80,7 @@ import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
 import { Skeleton } from "@comend/components/ui/skeleton"
+import EditMilestoneDetailsProjectsTab from "./edit-milestone-details-projects-tab"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -533,6 +534,9 @@ export function EditMilestoneForm({
                                     <TabsTrigger className="relative" value="publications">
                                         Publications
                                     </TabsTrigger>
+                                    <TabsTrigger className="relative" value="projects">
+                                        Similar projects
+                                    </TabsTrigger>
                                 </TabsList>
                             </div>
                             {isMigrating ? (
@@ -829,6 +833,9 @@ export function EditMilestoneForm({
                                     </TabsContent>
                                     <TabsContent value="publications" className="space-y-4 w-full">
                                         <EditMilestoneDetailsPublicationsTab/>
+                                    </TabsContent>
+                                    <TabsContent value="projects" className="space-y-4 w-full">
+                                        <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
                                     </TabsContent>
                                 </>
                             )}
