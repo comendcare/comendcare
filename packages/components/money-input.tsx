@@ -7,8 +7,8 @@ import {
     FormLabel,
     FormDescription,
     FormMessage
-} from "@/components/ui/form";
-import {Input} from "@/components/ui/input"; // ShadCN UI Input
+} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input"; // ShadCN UI Input
 import {UseFormReturn} from "react-hook-form";
 import {cn, formatMoney} from "@comend/lib/utils";
 

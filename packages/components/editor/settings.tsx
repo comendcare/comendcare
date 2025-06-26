@@ -15,7 +15,7 @@ import {
   Wand2Icon,
 } from 'lucide-react';
 
-import { Button } from '@/components/plate-ui/button';
+import { Button } from '@comend/components/plate-ui/button';
 import {
   Command,
   CommandEmpty,
@@ -23,7 +23,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/plate-ui/command';
+} from '@comend/components/plate-ui/command';
 import {
   Dialog,
   DialogContent,
@@ -31,13 +31,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/plate-ui/dialog';
-import { Input } from '@/components/plate-ui/input';
+} from '@comend/components/plate-ui/dialog';
+import { Input } from '@comend/components/plate-ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/plate-ui/popover';
+} from '@comend/components/plate-ui/popover';
 
 interface Model {
   label: string;

@@ -9,15 +9,15 @@ import ReactCrop, {
     type PixelCrop,
 } from "react-image-crop"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar"
+import { Button } from "@comend/components/ui/button"
 import {
     Dialog,
     DialogClose,
     DialogContent,
     DialogFooter,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@comend/components/ui/dialog"
 
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Image, Pencil, Trash2Icon, Upload } from "lucide-react"

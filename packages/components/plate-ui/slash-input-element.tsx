@@ -34,7 +34,7 @@ import {
 import {
   insertBlock,
   insertInlineElement,
-} from '@/components/editor/transforms';
+} from '@comend/components/editor/transforms';
 
 import {
   InlineCombobox,

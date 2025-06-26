@@ -1,8 +1,8 @@
 "use client"
 
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -10,12 +10,12 @@ import {useSession} from "next-auth/react"
 import {connectOrganizationToCondition, createCondition} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {Info} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {faker} from "@faker-js/faker";
-import LoadingDots from "@/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";

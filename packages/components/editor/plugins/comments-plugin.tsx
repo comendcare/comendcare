@@ -2,7 +2,7 @@
 
 import { CommentsPlugin } from '@udecode/plate-comments/react';
 
-import { CommentsPopover } from '@/components/plate-ui/comments-popover';
+import { CommentsPopover } from '@comend/components/plate-ui/comments-popover';
 
 export const commentsPlugin = CommentsPlugin.configure({
   options: {

@@ -1,6 +1,6 @@
 "use client";
 
-import LoadingDots from "@/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import { cn } from "@comend/lib/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
