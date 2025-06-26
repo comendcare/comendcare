@@ -29,13 +29,14 @@ export const MatchCard: React.FC<Partial<PubMedPublication>> = ({
             <CardHeader className="items-start gap-4 space-y-0 p-2">
                 <div className="space-y-1">
                     <CardTitle className="text-lg font-semibold leading-none tracking-tight">
-                        <Link
+                        <a
                             href={url ?? ""}
                             className="hover:underline"
                             target="_blank"
+                            rel="noopener noreferrer"
                         >
                             {title}
-                        </Link>
+                        </a>
                     </CardTitle>
                     <CardDescription className="">
                         {authors?.join(", ")}
@@ -82,15 +83,17 @@ export const MatchCard: React.FC<Partial<PubMedPublication>> = ({
 
             <CardContent className="p-2">
                 <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-baseline">
-                        <CircleIcon className="mr-1 h-3 w-3 fill-sky-400 text-sky-400"/>
-                        {fixPlatformName(platform ?? "")}
-                    </div>
+                    {platform && (
+                        <div className="flex items-baseline">
+                            <CircleIcon className="mr-1 h-3 w-3 fill-sky-400 text-sky-400"/>
+                            {fixPlatformName(platform ?? "")}
+                        </div>
+                    )}
                     {/*<div className="flex items-center">*/}
                     {/*    <StarIcon className="mr-1 h-3 w-3"/>*/}
                     {/*    {annotations}*/}
                     {/*</div>*/}
-                    <div>{formatDate(date)}</div>
+                    {date && (<div>{formatDate(date)}</div>)}
                     <div className="flex flex-wrap gap-2">
                         {keywords?.map((keyword: string, index: number) => (
                             <Badge
