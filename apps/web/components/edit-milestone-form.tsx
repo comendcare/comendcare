@@ -512,7 +512,7 @@ export function EditMilestoneForm({
                         <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")}
                               className="space-y-4 w-full h-full">
                             <div className="flex gap-4 items-center justify-between">
-                                <TabsList>
+                                <TabsList className="flex flex-wrap h-fit">
                                     <TabsTrigger value="edit">
                                         Edit
                                     </TabsTrigger>
