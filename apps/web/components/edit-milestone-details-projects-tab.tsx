@@ -89,38 +89,35 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
 
                 {projects?.map((project: any) => {
                         return (
-                            <React.Fragment key={project.id}>
-                                <div className="px-4 py-2">
-                                    <a
-                                        href={`https://${project.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${project.roadmapId}?project=${project.id}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <Card>
-                                            <CardHeader>
-                                                <CardTitle className="hover:underline">
-                                                    {project.title}
-                                                </CardTitle>
-                                                <CardDescription>
-                                                    {project.description}
-                                                </CardDescription>
-                                            </CardHeader>
-                                            <CardContent className="flex flex-col gap-4">
-                                                <span className="flex gap-2 items-center">
-                                                    <ProfilePhoto img={project.organization.image} name={project.organization.name} className="h-8 w-8"/>
-                                                    {project.organization.name}
-                                                </span>
-                                                <span className="flex gap-2 flex-wrap text-sm">
-                                                    {(project.types || []).map((type: Prisma.MilestoneTypeOnMilestoneGetPayload<{include: {milestoneType: true}}>, index: number) => (
-                                                        <MilestoneTypeBadge label={type.milestoneType.label} key={index}/>
-                                                    ))}
-                                                </span>
-                                            </CardContent>
-                                        </Card>
-                                    </a>
-                                </div>
-                                <Separator className="my-2"/>
-                            </React.Fragment>
+                            <div className="px-4 py-2">
+                                <a
+                                    href={`https://${project.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${project.roadmapId}?project=${project.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle className="hover:underline">
+                                                {project.title}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {project.description}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col gap-4">
+                                            <span className="flex gap-2 items-center">
+                                                <ProfilePhoto img={project.organization.image} name={project.organization.name} className="h-8 w-8"/>
+                                                {project.organization.name}
+                                            </span>
+                                            <span className="flex gap-2 flex-wrap text-sm">
+                                                {(project.types || []).map((type: Prisma.MilestoneTypeOnMilestoneGetPayload<{include: {milestoneType: true}}>, index: number) => (
+                                                    <MilestoneTypeBadge label={type.milestoneType.label} key={index}/>
+                                                ))}
+                                            </span>
+                                        </CardContent>
+                                    </Card>
+                                </a>
+                            </div>
                         )
                     }
                 )}
