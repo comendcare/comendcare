@@ -19,7 +19,6 @@ import {
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@comend/components/ui/select"
-import { updateCompany, deleteCompany } from "@comend/lib/actions";
 import { mixpanelTrack } from "@/mixpanel";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -35,6 +34,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types";
 import React from "react";
 import {optionSchema} from "@comend/components/research-onboarding-form";
+import { deleteCompany, updateCompany } from "~admin/lib/actions";
 
 const formSchema = z.object({
     name: z.string().min(1),

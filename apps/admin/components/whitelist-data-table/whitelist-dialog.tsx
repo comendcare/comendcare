@@ -14,7 +14,7 @@ import {
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {toast} from "sonner";
-import {addEmailToWhitelist} from "@comend/lib/actions";
+import { addEmailToWhitelist } from "~admin/lib/actions"
 
 export function WhitelistDialog() {
     const [email, setEmail] = useState("")

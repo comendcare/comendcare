@@ -48,7 +48,7 @@ import {
 } from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import {removeEmailFromBlacklist} from "@comend/lib/actions";
+import { removeEmailFromBlacklist } from "~admin/lib/actions"
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
