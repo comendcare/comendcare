@@ -1,4 +1,4 @@
-import { authOptions } from "@comend/lib/auth"
+import { authOptions } from "~provider/lib/auth"
 import NextAuth from "next-auth"
 
 const handler = NextAuth(authOptions)
