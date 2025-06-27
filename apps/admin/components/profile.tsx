@@ -13,9 +13,9 @@ import {
     DropdownMenuTrigger
 } from "@comend/components/ui/dropdown-menu";
 import Loading from "@/loading";
-import { getUser } from "@comend/lib/fetchers"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import { LogOut } from "lucide-react"
+import { getUser } from "@/packages/lib/fetchers"
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()

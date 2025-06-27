@@ -4,7 +4,7 @@ import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
 import { useIsMobile } from "@comend/lib/hooks/use-mobile"
-import {getUserChartAnalytics} from "@comend/lib/fetchers";
+import {getUserChartAnalytics} from "~admin/lib/fetchers"
 import {
     Card,
     CardContent,

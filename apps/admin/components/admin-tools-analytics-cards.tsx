@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getToolsAnalytics} from "@comend/lib/fetchers";
+import {getToolsAnalytics} from "~admin/lib/fetchers"
 
 interface AnalyticsData {
     totalTools: number,

@@ -16,10 +16,6 @@ import MultipleSelector, {Option} from "@comend/components/ui/multiple-selector"
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {
-    checkSubdomainAvailability, getConditionsFromOrganizationId,
-    getOrganizationFromOrganizationId,
-} from "@comend/lib/fetchers";
 import {Pen, Upload, MessageCircleQuestion, Info} from "lucide-react";
 import {
     Dialog,
@@ -43,6 +39,7 @@ import MoneyInput from "@comend/components/money-input";
 import {FormImageSelector} from "@comend/components/form-image-selector";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {ProfilePhoto} from "@comend/components/profile-photo";
+import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";
 
 const optionSchema = z.object({
     label: z.string(),
