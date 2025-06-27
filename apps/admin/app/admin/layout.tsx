@@ -2,8 +2,8 @@ import {ReactNode, Suspense} from "react";
 import Profile from "~admin/components/profile";
 import AdminNav from "~admin/components/admin-nav";
 import {redirect} from "next/navigation";
-import {getSession} from "@comend/lib/auth";
 import { getIsAdmin } from "~admin/lib/utils";
+import { getSession } from "~admin/lib/auth";
 
 export default async function AdminLayout({children}: { children: ReactNode }) {
     const session = await getSession()
