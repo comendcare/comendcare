@@ -18,6 +18,7 @@ const MILESTONE_SELECT = {
     organization: {select: {name: true, image: true, subdomain: true}},
     types: {select: {milestoneType: {select: {id: true, label: true}}}},
     roadmapId: true,
+    // notes: true // for example, this will error out, because we exclude the private field 'notes' from the Milestone select
 }
 
 export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId: string}) {
