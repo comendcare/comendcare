@@ -46,8 +46,8 @@ export default function AdminLoginPage() {
     function handleExpired() {
         setIsVerified(false);
     }
-    useEffect(() => {
 
+    useEffect(() => {
         if (session && getIsAdmin(session)) {
             router.push("/admin")
         }
@@ -90,6 +90,17 @@ export default function AdminLoginPage() {
             <h1 className="mt-6 text-center font-cal text-3xl dark:text-white">
                 Comend Admin
             </h1>
+
+            <div className="mx-auto w-11/12 max-w-xs sm:w-full">
+                {requireCaptcha &&
+                    <ReCAPTCHA
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                        ref={recaptchaRef}
+                        onChange={handleChange}
+                        onExpired={handleExpired}
+                    />
+                }
+            </div>
 
             <div className="mx-auto mt-4 w-11/12 max-w-xs sm:w-full">
                 <Suspense
