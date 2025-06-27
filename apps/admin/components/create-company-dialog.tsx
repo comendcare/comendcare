@@ -18,7 +18,6 @@ import { Input } from "@comend/components/ui/input"
 import { Label } from "@comend/components/ui/label"
 import { Textarea } from "@comend/components/ui/textarea"
 import { toast } from "sonner"
-import { createCompany } from "@comend/lib/actions"
 import {
     Form,
     FormControl,
@@ -37,6 +36,7 @@ import {
 } from "@comend/components/ui/select"
 import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge";
+import { createCompany } from "~admin/lib/actions"
 
 const optionSchema = z.object({
     label: z.string(),

@@ -25,7 +25,7 @@ import {
 } from "@comend/components/ui/sidebar"
 import CreatePharmaProjectDialog from "~web/components/create-pharma-project-dialog";
 import {usePathname, useRouter} from "next/navigation"
-import {deletePharmaProject, removeEmailFromWhitelist} from "@comend/lib/actions";
+import {deletePharmaProject} from "@comend/lib/actions";
 import {toast} from "sonner";
 
 export function NavProjects({
