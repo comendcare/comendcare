@@ -25,9 +25,9 @@ import {
 } from "next/navigation"
 import {ReactNode, useEffect, useMemo, useState} from "react"
 import Image from "next/image"
-import {getOrganizationFromRoadmapId} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import ComendAdminLogo from "@/public/Comend Admin Full logo.png"
+import { getOrganizationFromRoadmapId } from "~admin/lib/fetchers"
 
 const externalLinks: any[] = [
     {

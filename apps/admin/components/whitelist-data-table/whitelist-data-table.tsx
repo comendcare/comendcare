@@ -31,7 +31,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
-import {getUserWhitelist} from "@comend/lib/fetchers"
 import {toast} from 'sonner';
 import {
     ChevronLeft,
@@ -49,6 +48,7 @@ import {
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
 import { removeEmailFromWhitelist } from "~admin/lib/actions"
+import { getUserWhitelist } from "~admin/lib/fetchers"
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>

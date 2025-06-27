@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Badge } from "@comend/components/ui/badge";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getUserAnalytics} from "@comend/lib/fetchers";
+import {getUserAnalytics} from "~admin/lib/fetchers"
 
 interface AnalyticsData {
     totalUsers: number;

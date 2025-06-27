@@ -4,7 +4,6 @@ import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
 import { useIsMobile } from "@comend/lib/hooks/use-mobile"
-import {getCompanyChartAnalytics} from "@comend/lib/fetchers";
 import {
     Card,
     CardContent,
@@ -29,6 +28,7 @@ import {
     ToggleGroup,
     ToggleGroupItem,
 } from "@comend/components/ui/toggle-group"
+import { getCompanyChartAnalytics } from "~admin/lib/fetchers"
 
 const chartConfig = {
     companies: {
