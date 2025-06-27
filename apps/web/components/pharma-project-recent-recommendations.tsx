@@ -6,11 +6,9 @@ import {
     AvatarImage,
 } from "@comend/components/ui/avatar"
 import {Users} from "lucide-react"
-import prisma from "@comend/lib/prisma"
 import {useEffect, useState} from "react";
-import {getAllOrganizationsWithConditions} from "@comend/lib/fetchers";
+import {getAllOrganizations} from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {Organization} from "@prisma/client";
 import {OrganizationsWithConditions} from "@comend/lib/types";
 
 export function PharmaProjectRecentRecommendations() {
@@ -19,7 +17,7 @@ export function PharmaProjectRecentRecommendations() {
     useEffect(() => {
         async function fetchOrgData() {
             try {
-                const response = await getAllOrganizationsWithConditions({
+                const response = await getAllOrganizations({
                     id: true,
                     public: true,
                     verified: true,
