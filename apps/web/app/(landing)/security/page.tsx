@@ -9,6 +9,27 @@ import {IconMenu} from "@tabler/icons-react";
 import Flawnson from "@/public/profiles/Flawnson2.jpeg"
 import rehypeSlug from "rehype-slug";
 
+type Blog = {
+    title: string;
+    summary?: string;
+    date: string;
+    author: string;
+    authorImage: string;
+    thumbnail: string;
+    content: string;
+};
+const blog: Blog = {
+    title: " 🔐 Security & Compliance Commitment",
+    summary:
+        "Artificial Intelligence (AI) has been rapidly evolving, transforming various aspects of our lives. From voice assistants to autonomous vehicles, AI is becoming increasingly integrated into our daily routines.",
+    date: "2025-06-26",
+    author: "Flawnson Tong",
+    authorImage: Flawnson.src,
+    thumbnail:
+        "https://images.unsplash.com/photo-1713869782573-3a6eee95c834?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    content: dummyContentMarkdown,
+};
+
 export default function BlogContentWithToc() {
     return (
         <div
@@ -217,24 +238,3 @@ Security is not a one-time effort — it’s a continuous process. We’re commi
 
 Have questions? Contact us at **hello@comendcare.com**
 `;
-
-type Blog = {
-    title: string;
-    summary?: string;
-    date: string;
-    author: string;
-    authorImage: string;
-    thumbnail: string;
-    content: string;
-};
-const blog: Blog = {
-    title: " 🔐 Security & Compliance Commitment",
-    summary:
-        "Artificial Intelligence (AI) has been rapidly evolving, transforming various aspects of our lives. From voice assistants to autonomous vehicles, AI is becoming increasingly integrated into our daily routines.",
-    date: "2025-06-26",
-    author: "Flawnson Tong",
-    authorImage: Flawnson.src,
-    thumbnail:
-        "https://images.unsplash.com/photo-1713869782573-3a6eee95c834?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    content: dummyContentMarkdown,
-};
