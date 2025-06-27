@@ -3,10 +3,10 @@
 import prisma from "@comend/lib/prisma"
 import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import {withAdminAuth} from "@comend/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
 import {Prisma} from "@prisma/client";
 import { InternalArgs } from "@prisma/client/runtime/library"
+import { withAdminAuth } from "./auth";
 
 /* ADMIN PANEL FETCHERS - require admin priviledges to access these functions */
 export const getOrganizationFromRoadmapId = withAdminAuth(

@@ -1,14 +1,8 @@
 import {getServerSession, type NextAuthOptions} from "next-auth"
-// import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
-// import FacebookProvider from "next-auth/providers/facebook"
-// import LinkedInProvider from "next-auth/providers/linkedin"
-// import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
-import {Member, Organization, PrismaClient} from "@prisma/client";
-// import {User} from "next-auth";
-// import {toast} from "sonner"
+import {Member, PrismaClient} from "@prisma/client";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
@@ -216,7 +210,6 @@ export function withAdminAuth(action: any) {
     ) => {
         const session = await getSession()
         if (!session) {
-            // toast.error("Not authenticated: could not find session data")
             return {error: "Not authenticated: could not find session data"}
         }
 
@@ -224,11 +217,9 @@ export function withAdminAuth(action: any) {
             where: {id: session.user.id}
         })
         if (!user) {
-            // toast.error(`Not authenticated: could not find user data in the database for user ${session.user.id}`)
             return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
         }
         if (!user.email) {
-            // toast.error(`Not authenticated: could not find email address in the database for user ${session.user.id}`)
             return {error: `Not authenticated: could not find email address in the database for user ${session.user.id}`}
         }
 
@@ -238,104 +229,3 @@ export function withAdminAuth(action: any) {
         return action(...args)
     }
 }
-
-// /*
-//     This is the most basic auth wrapper - for actions that are available to ALL users on the platform, no matter which organization
-//     they're a part of. It just ensures the user is logged in & has an account on the platform
-
-//     Auth wrapper - only allows the given action function to execute if the active user satisfies the following criteria:
-//     1. The user is signed in
-//     2. The user exists in the database
-//  */
-// export function withAuth(action: any) {
-//     return async (
-//         ...args: any
-//     ) => {
-//         const session = await getSession()
-//         if (!session || !session?.user?.id) {
-//             // toast.error("Not authenticated: could not find session data")
-//             return {error: "Not authenticated: could not find session data"}
-//         }
-
-//         const user = await prisma.user.findUnique({
-//             where: {id: session.user.id}
-//         })
-//         if (!user) return {error: `Not authenticated: could not find user data in the database for user ${session.user.id}`}
-
-//         return action(...args)
-//     }
-// }
-
-// /*
-//     Auth wrapper - only allows the given action function to execute if the active user satisfies the following criteria:
-//     1. User is logged in - i.e. the active user's data is included in the session
-//     2. The user is a member of the given organization
-//     3. The user's membership role matches one of the provided roles. If no roles are provided, it is assumed that the action
-//         is accessible to EVERY org member
-// */
-// export function withOrganizationAuth(action: any, roles?: string[]) {
-//     return async (
-//         // formData: FormData | null,
-//         organizationId: string | null | undefined,
-//         ...args: any
-//         // roles?: string[]
-//     ) => {
-//         const session = await getSession()
-//         if (!session) {
-//             // toast.error("Not authenticated: could not find session data")
-//             return {error: "Not authenticated: could not find session data"}
-//         }
-
-//         if (!organizationId) return {error: "Not authorized: organizationId not provided"}
-
-//         const organization = await prisma.organization.findUnique({
-//             where: {id: organizationId},
-//             include: {members: true}
-//         })
-//         const membership = organization?.members.find(member => member.userId === session.user.id)
-
-//         if (!organization) {
-//             // toast.error("Not authorized: organization doesn't exist")
-//             return {error: "Not authorized: organization doesn't exist"}
-//         }
-//         if (!membership) {
-//             // toast.error("Not authorized: user is not a member of this organziation")
-//             return {error: "Not authorized: user is not a member of this organziation"}
-//         }
-
-//         if (roles) {
-//             if (!roles.includes(membership.role)) {
-//                 // toast.error(`Not authorized: role ${membership.role} doesn't have access to this action`)
-//                 return {error: `Not authorized: role ${membership.role} doesn't have access to this action`}
-//             }
-//         }
-
-//         return action(organization, ...args)
-//     }
-// }
-
-// export function withUserAuth(action: any) {
-//     return async (
-//         userId: string | null | undefined,
-//         ...args: any
-//     ) => {
-//         const session = await getSession()
-//         if (!session) {
-//             // toast.error("Not authenticated: could not find session data")
-//             return {error: "Not authenticated: could not find session data"}
-//         }
-
-//         if (!userId) return {error: "Not authorized: userId not provided"}
-//         if (userId !== session.user.id) return {error: "Not authorized: provided userId does not match userId in session"}
-
-//         const user = await prisma.user.findUnique({
-//             where: {id: userId}
-//         })
-//         if (!user) {
-//             // toast.error("Not authorized: user doesn't exist")
-//             return {error: "Not authorized: user doesn't exist"}
-//         }
-
-//         return action(user, ...args)
-//     }
-// }
