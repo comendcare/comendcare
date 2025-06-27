@@ -3,13 +3,11 @@ import Profile from "~admin/components/profile";
 import AdminNav from "~admin/components/admin-nav";
 import {redirect} from "next/navigation";
 import {getSession} from "@comend/lib/auth";
+import { getIsAdmin } from "~admin/lib/utils";
 
 export default async function AdminLayout({children}: { children: ReactNode }) {
     const session = await getSession()
-
-    // Determine if the user is an admin
-    const isAdmin = session?.user?.email?.endsWith("@comendcare.com") ||
-        (process.env.ADMIN_WHITELIST?.split(",").includes(session?.user?.email || ""));
+    const isAdmin = getIsAdmin(session)
 
     // Redirect if the user is not signed in or not an admin, with a query parameter
     if (!session) {

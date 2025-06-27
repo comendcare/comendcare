@@ -8,6 +8,7 @@ import {toast} from "sonner";
 import AdminLoginForm from "~admin/components/admin-login-form";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSession} from "next-auth/react";
+import { getIsAdmin } from "~admin/lib/utils";
 
 export default function AdminLoginPage() {
     const {data: session} = useSession()
@@ -47,7 +48,7 @@ export default function AdminLoginPage() {
     }
     useEffect(() => {
 
-        if (session) {
+        if (session && getIsAdmin(session)) {
             router.push("/admin")
         }
 
