@@ -46,7 +46,33 @@ export const authOptions: NextAuthOptions = {
                     : undefined,
                 secure: VERCEL_DEPLOYMENT
             }
-        }
+        },
+        callbackUrl: {
+            name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.callback-url-${process.env.NEXT_PUBLIC_APP_ID}`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
+                domain: VERCEL_DEPLOYMENT
+                    ? `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : undefined,
+                secure: VERCEL_DEPLOYMENT
+            },
+        },
+        csrfToken: {
+            name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.csrf-token-${process.env.NEXT_PUBLIC_APP_ID}`,
+            options: {
+                httpOnly: false,
+                sameSite: 'lax',
+                path: '/',
+                // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
+                domain: VERCEL_DEPLOYMENT
+                    ? `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : undefined,
+                secure: VERCEL_DEPLOYMENT
+            },
+        },
     },
 
     callbacks: {

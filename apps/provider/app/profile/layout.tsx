@@ -1,6 +1,6 @@
 import {ReactNode, Suspense} from "react";
 import Profile from "@/apps/admin/components/profile";
-import AdminNav from "@/apps/admin/components/admin-nav";
+// import AdminNav from "@/apps/admin/components/admin-nav";
 import {redirect} from "next/navigation";
 import {getSession} from "@comend/lib/auth";
 
@@ -14,11 +14,11 @@ export default async function ProviderLayout({children}: { children: ReactNode }
 
     return (
         <div>
-            <AdminNav>
+            {/* <AdminNav> */}
                 <Suspense fallback={<div>Loading...</div>}>
                     <Profile/>
                 </Suspense>
-            </AdminNav>
+            {/* </AdminNav> */}
             <div className="min-h-screen dark:bg-black sm:pl-60">{children}</div>
         </div>
     );

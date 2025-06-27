@@ -126,7 +126,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                     name={userData?.data?.name}
                     className="h-8 w-8 rounded-full"
                 />
-                <span className="truncate text-sm font-medium">
+                <span className="truncate text-sm font-medium pl-2">
                     {session?.user?.name}
                 </span>
             </div>
