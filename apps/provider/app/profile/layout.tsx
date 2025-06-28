@@ -1,8 +1,9 @@
 import {ReactNode, Suspense} from "react";
 import Profile from "@/apps/admin/components/profile";
-// import AdminNav from "@/apps/admin/components/admin-nav";
 import {redirect} from "next/navigation";
 import { getSession } from "~provider/lib/auth";
+import {ProviderNavbarMenu} from "~provider/components/provider-navbar-menu";
+import {ProviderNavbar} from "~provider/components/provider-navbar";
 
 export default async function ProviderLayout({children}: { children: ReactNode }) {
     const session = await getSession()
@@ -16,7 +17,7 @@ export default async function ProviderLayout({children}: { children: ReactNode }
         <div>
             {/* <AdminNav> */}
                 <Suspense fallback={<div>Loading...</div>}>
-                    <Profile/>
+                    <ProviderNavbar />
                 </Suspense>
             {/* </AdminNav> */}
             <div className="min-h-screen dark:bg-black sm:pl-60">{children}</div>
