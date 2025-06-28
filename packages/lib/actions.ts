@@ -1783,7 +1783,11 @@ export const updateCondition = withOrganizationAuth(
             } else {
                 // ✅ Create new condition and link to organization
                 const newCondition = await prisma.condition.create({
-                    data,
+                    data: {
+                        ...data,
+                        slug: toKebabCase(data.name),
+                        name: data.name,
+                    },
                 });
 
                 await prisma.conditionToOrganization.create({
