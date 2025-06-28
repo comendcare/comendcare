@@ -76,6 +76,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     callbacks: {
+
         async signIn({user, account, profile, email, credentials}) {
             const isAllowedToSignIn = true
             if (isAllowedToSignIn) {
@@ -84,123 +85,28 @@ export const authOptions: NextAuthOptions = {
                 return false
             }
         },
+
         jwt: async ({token, user, trigger, session}) => {
-            if (trigger === 'update') {
-                token.organizationId = session.organizationId || token.organizationId;
-                token.membership = session.membership || token.membership;
-            }
             if (user) {
-                // Fetch the user's organizationId from the database
-                const dbUser = await prisma.user.findUnique({
-                    where: {id: user.id},
-                    include: {memberships: true},
-                });
-
-                // Extract organization IDs from the user's memberships
-                const organizationIds: string[] = dbUser?.memberships
-                    .map((membership) => membership.organizationId)
-                    .filter((id): id is string => !!id) || []
-
-                const membership = dbUser?.memberships[0]
-
-                token.user = user;
-                token.organizationId = organizationIds[0] || null; // Default to the first ID, if any
-                token.membership = membership || null;
-            }
-            return token
-        },
-        session: async ({session, token}) => {
-            // Check if the user still exists in the database
-            const dbUser = await prisma.user.findUnique({
-                where: {id: token.sub},
-                include: {memberships: true}, // Ensure we get latest memberships
-            });
-
-            const organizationIds = dbUser?.memberships.map((m) => m.organizationId);
-
-            // Storing both the current organizationId AND the membership object is redundant
-            // The membership object has the organizationId
-            // Prefer the token's organizationId if the user still has access to it
-            let membership: Member | null = null;
-            let activeOrganizationId: string | null = null;
-
-            if (dbUser?.memberships.length) {
-                const validOrgIds = dbUser.memberships.map(m => m.organizationId);
-
-                if (typeof token.organizationId === "string" && validOrgIds.includes(token.organizationId)) {
-                    activeOrganizationId = token.organizationId;
-                    membership = dbUser.memberships.find(m => m.organizationId === token.organizationId) || null;
-                } else {
-                    // fallback to first available membership
-                    membership = dbUser.memberships[0];
-                    activeOrganizationId = membership.organizationId;
-                }
-            }
-
-            if (organizationIds) {
-                // If activeOrganizationId is null but the user has memberships, use the first membership
-                if (!activeOrganizationId && organizationIds.length > 0) {
-                    activeOrganizationId = organizationIds[0];
-                }
-
-                // If activeOrganizationId is set but not in the user's memberships, reset to null
-                if (activeOrganizationId && !organizationIds.includes(activeOrganizationId)) {
-                    activeOrganizationId = null;
-                }
-            }
-
-            if (dbUser) {
-                if (!membership && dbUser.memberships.length > 0) {
-                    // Assign the first membership if none exists
-                    membership = dbUser.memberships[0];
-                } else if (
-                    membership &&
-                    !dbUser.memberships.some((m) => m.id === membership?.id)
-                ) {
-                    // If membership exists but isn't in the user's memberships, reset it
-                    membership = null;
-                } else if (membership) {
-                    const matchingMembership = dbUser.memberships.find((m) => m.id === membership?.id);
-
-                    if (matchingMembership && matchingMembership.role !== membership.role) {
-                        // Role has changed — terminate the session such that user must log back in
-                        session.roleChanged = true;
-                    }
-                }
-            }
-
-            if (!dbUser) {
-                // Continue with your existing session logic
-                session.user = {
-                    ...session.user,
-                    // @ts-expect-error
-                    id: token.sub,
-                    // @ts-expect-error
-                    username: token?.user?.username || token?.user?.gh_username,
-                    organizationId: token.organizationId as string | null, // Ensure type matches
-                    membership: token.membership as any
+                token.user = {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    image: user.image,
                 };
-
-                // If user cannot be found, assume they've been deleted and forcibly sign them out in the frontend.
-                session.terminate = true
-                session.expires = new Date().toDateString()
-
-                return session
             }
+            return token;
+        },
 
-            // Continue with your existing session logic
-            session.user = {
-                ...session.user,
-                // @ts-expect-error
-                id: token.sub,
-                // @ts-expect-error
-                username: token?.user?.username || token?.user?.gh_username,
-                organizationId: activeOrganizationId,
-                membership: membership
+        async session({session, token}) {
+            session.user = token.user as {
+                id: string;
+                name: string;
+                email: string;
+                image: string;
             };
-
             return session;
-        }
+        },
     },
 
     debug: process.env.VERCEL_URL === "development",
