@@ -1,5 +1,80 @@
 "use client";
 import {format} from "date-fns";
+
+const dummyContentMarkdown = `
+
+At Comend, the security and privacy of your data is our highest priority. We take a proactive, multi-layered approach to ensure your information remains safe, your experience is smooth, and our systems remain resilient. Here's how we protect your data:
+
+---
+
+## 🔄 Data Protection & Encryption
+
+- **Encryption in Transit & at Rest**  
+  Sensitive and identifying data such as emails, names, and location information is encrypted using industry-standard protocols both when it’s stored and while it's being transmitted.
+
+- **Cloud Infrastructure**  
+  We host on **Google Cloud**, and maintain a signed **Business Associate Agreement (BAA)** to support compliance with applicable data protection regulations. This includes HIPAA, although we currently do not hold any PHI. It's just another way we're trying to be prepared!
+
+---
+
+## 🛡️ Access Control & Authentication
+
+- **OAuth Sign-In Options**  
+  Secure login via **Google, Facebook**, and **LinkedIn** using OAuth 2.0.
+
+- **Role-Based Access Permissions**  
+  Users are granted only the access required for their role, following the principle of **least privilege**.
+
+- **App Isolation**  
+  Each of our applications enforces **separate logins** to maintain contextual access boundaries and minimize attack surfaces.
+
+---
+
+## ⚙️ API & Infrastructure Security
+
+- **Protected API Endpoints**  
+  All backend services are guarded by authentication and strict access policies.
+
+- **Rate Limiting & Bot Detection**  
+  Automated systems prevent abuse and ensure fair usage through **rate limiting** and **advanced bot detection**.
+
+- **Cookie Management**  
+  Our cookies are secure, and we provide **user-friendly controls** so you can manage your privacy preferences easily. We use CookieYes as our cookie consent management solution.
+
+---
+
+## 🔍 Compliance & Monitoring
+
+- **Auditing & Logging**  
+  Regular **scheduled audits** ensure that our systems remain compliant and secure.
+
+- **Key Management**  
+  We implement **secret key rotation** policies to prevent long-term exposure of credentials.
+
+- **Security Incident Response**  
+  In the unlikely event of a breach, we have a formal **reporting process** and **incident response plan** in place to act swiftly and transparently.
+
+---
+
+## 👨‍💻 Developer Security Practices
+
+- **Least Privilege Development**  
+  Developer access is tightly scoped to what’s needed for each task.
+
+- **Breach Monitoring & Reporting**  
+  All activity is monitored and logged, and our team is trained to handle **breach identification and escalation** effectively.
+
+- **Secure Deployment Pipelines**  
+  Our CI/CD processes are designed with security gates and regular reviews.
+
+---
+
+## ✅ Our Ongoing Commitment
+
+Security is not a one-time effort — it’s a continuous process. We’re committed to ongoing improvements, transparent communication, and aligning with best practices in cybersecurity.
+
+Have questions? Contact us at **hello@comendcare.com**
+`;
 import Image from "next/image";
 import Link from "next/link";
 import React, {useState} from "react";
@@ -163,78 +238,3 @@ const Toc = () => {
         </>
     );
 };
-
-const dummyContentMarkdown = `
-
-At Comend, the security and privacy of your data is our highest priority. We take a proactive, multi-layered approach to ensure your information remains safe, your experience is smooth, and our systems remain resilient. Here's how we protect your data:
-
----
-
-## 🔄 Data Protection & Encryption
-
-- **Encryption in Transit & at Rest**  
-  Sensitive and identifying data such as emails, names, and location information is encrypted using industry-standard protocols both when it’s stored and while it's being transmitted.
-
-- **Cloud Infrastructure**  
-  We host on **Google Cloud**, and maintain a signed **Business Associate Agreement (BAA)** to support compliance with applicable data protection regulations. This includes HIPAA, although we currently do not hold any PHI. It's just another way we're trying to be prepared!
-
----
-
-## 🛡️ Access Control & Authentication
-
-- **OAuth Sign-In Options**  
-  Secure login via **Google, Facebook**, and **LinkedIn** using OAuth 2.0.
-
-- **Role-Based Access Permissions**  
-  Users are granted only the access required for their role, following the principle of **least privilege**.
-
-- **App Isolation**  
-  Each of our applications enforces **separate logins** to maintain contextual access boundaries and minimize attack surfaces.
-
----
-
-## ⚙️ API & Infrastructure Security
-
-- **Protected API Endpoints**  
-  All backend services are guarded by authentication and strict access policies.
-
-- **Rate Limiting & Bot Detection**  
-  Automated systems prevent abuse and ensure fair usage through **rate limiting** and **advanced bot detection**.
-
-- **Cookie Management**  
-  Our cookies are secure, and we provide **user-friendly controls** so you can manage your privacy preferences easily. We use CookieYes as our cookie consent management solution.
-
----
-
-## 🔍 Compliance & Monitoring
-
-- **Auditing & Logging**  
-  Regular **scheduled audits** ensure that our systems remain compliant and secure.
-
-- **Key Management**  
-  We implement **secret key rotation** policies to prevent long-term exposure of credentials.
-
-- **Security Incident Response**  
-  In the unlikely event of a breach, we have a formal **reporting process** and **incident response plan** in place to act swiftly and transparently.
-
----
-
-## 👨‍💻 Developer Security Practices
-
-- **Least Privilege Development**  
-  Developer access is tightly scoped to what’s needed for each task.
-
-- **Breach Monitoring & Reporting**  
-  All activity is monitored and logged, and our team is trained to handle **breach identification and escalation** effectively.
-
-- **Secure Deployment Pipelines**  
-  Our CI/CD processes are designed with security gates and regular reviews.
-
----
-
-## ✅ Our Ongoing Commitment
-
-Security is not a one-time effort — it’s a continuous process. We’re committed to ongoing improvements, transparent communication, and aligning with best practices in cybersecurity.
-
-Have questions? Contact us at **hello@comendcare.com**
-`;
