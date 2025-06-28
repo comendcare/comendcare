@@ -5,8 +5,12 @@ import {
     Cog,
     Store, User, Workflow,
     Bookmark,
+    HardDriveDownload,
+    LayoutDashboard,
+    Search,
+    Settings,
     Star,
-    Megaphone
+    Megaphone, TestTubeDiagonal
 } from "lucide-react"
 import {NavMain} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -78,6 +82,38 @@ const data = {
             subPages: []
         },
         {
+            title: "Toolkit",
+            icon: TestTubeDiagonal,
+            variant: "ghost",
+            url: "/app/tools",
+            subPages: [
+                {
+                    title: "Toolkit Dashboard",
+                    icon: LayoutDashboard,
+                    variant: "ghost",
+                    url: "/"
+                },
+                {
+                    title: "Specimen Browser",
+                    icon: Search,
+                    variant: "ghost",
+                    url: "/"
+                },
+                {
+                    title: "Sample Requests",
+                    icon: HardDriveDownload,
+                    variant: "ghost",
+                    url: "/"
+                },
+                {
+                    title: "Toolkit Settings",
+                    icon: Settings,
+                    variant: "ghost",
+                    url: "/"
+                },
+            ]
+        },
+        {
             title: "Organization Profile",
             icon: User,
             variant: "ghost",
@@ -94,7 +130,7 @@ const data = {
     ]
 }
 
-export function AppSidebar({memberships}: {memberships: MembershipWithOrganization[]}) {
+export function AppSidebar({memberships}: { memberships: MembershipWithOrganization[] }) {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
