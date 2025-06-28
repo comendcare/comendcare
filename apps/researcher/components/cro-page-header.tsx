@@ -1,0 +1,188 @@
+import {getCROData} from "@comend/lib/fetchers";
+import {notFound} from "next/navigation";
+import {CertificationBadge} from "@comend/components/certification-badge";
+import {
+    BriefcaseBusiness,
+    Building,
+    Star,
+    Building2,
+    Calendar,
+    ExternalLink,
+    Factory,
+    MapPin,
+    Rocket,
+    University,
+    Dna,
+    HeartHandshake,
+} from "lucide-react";
+import Link from "next/link";
+import React from "react";
+import {companyTypeMap} from "@comend/lib/types";
+
+
+const companyTypeIcons: Record<string, React.ReactElement | null> = {
+    "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Small Business (1-10M TTM Revenue)": <Building className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Academic Core Facility": <University className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "New Startup (0-1M TTM Revenue)": <Rocket className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Consultant (5 or more employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Large Business (>100M TTM Revenue)": <Building2 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Consultant (<5 employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+};
+
+export default async function CROPageHeader({id}: { id: string }) {
+    const cro = await getCROData(id, {
+        id: true,
+        url: true,
+        scientistDotComURL: true,
+        title: true,
+        description: true,
+        yearEstablished: true,
+        website: true,
+        headquarters: true,
+        companyType: true,
+        sites: true,
+        services: true,
+        certifications: true,
+        simplifiedCertifications: true,
+        rfis: true,
+        reviews: true,
+        tags: true,
+        avgRating: true,
+        categories: true,
+        milestoneTypes: true,
+        savedByOrganizations: true,
+    })
+
+    if (!cro) {
+        notFound()
+    }
+
+    const allowedCertifications = new Set([
+        "Good Clinical Practice (GCP)",
+        "Good Laboratory Practice (GLP)",
+        "Good Manufacturing Practice (GMP)",
+        "Clinical Laboratory Improvement Amendments (CLIA)",
+        "Good Clinical Laboratory Practice (GCLP)",
+        "College of American Pathologists (CAP)",
+        "American Society for Clinical Pathology (ASCP)",
+        "Diplomate of the American Board of Toxicology (DABT)",
+        "Assessment and Accreditation of Laboratory Animal Care (AAALAC)",
+        "Institutional animal care and use committee (IACUC)",
+        "Office of Laboratory Animal Welfare (OLAW)",
+        "United States Department of Agriculture (USDA)",
+        "Eco-Friendly Business",
+        "Woman-Owned Business",
+    ]);
+
+    const filteredCertifications = cro.simplifiedCertifications.filter(certification =>
+        allowedCertifications.has(certification)
+    );
+
+    return (
+        <div className="col-span-4 flex flex-col space-y-4">
+            <div className="min-w-0 flex-1 text-wrap text-3xl font-bold text-gray-900">
+                <h1 className="leading-normal">
+                    {cro.title}
+                </h1>
+            </div>
+            {/*<Link*/}
+            {/*    href={"?tab=reviews"}*/}
+            {/*    className="flex items-center mb-2"*/}
+            {/*>*/}
+            {/*    {[...Array(5)].map((_, index) => (*/}
+            {/*        <Star*/}
+            {/*            key={index}*/}
+            {/*            filled={cro.avgRating ? index < Math.round(cro.avgRating) : false}*/}
+            {/*        />*/}
+            {/*    ))}*/}
+            {/*    <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">*/}
+            {/*        {cro.reviews.length > 0 && typeof cro.avgRating === "number"*/}
+            {/*            ? Number.isInteger(cro.avgRating)*/}
+            {/*                ? `${cro.avgRating} out of 5`*/}
+            {/*                : `${cro.avgRating.toFixed(2)} out of 5`*/}
+            {/*            : "No reviews yet"}*/}
+            {/*    </p>*/}
+            {/*</Link>*/}
+            <div
+                className="flex flex-col sm:flex-row sm:flex-wrap items-baseline sm:space-x-6">
+                {cro.headquarters &&
+                    <div className="flex items-center text-gray-500">
+                        <MapPin
+                            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                            aria-hidden="true"
+                        />
+                        Headquartered in {cro.headquarters}
+                    </div>
+                }
+                {cro.yearEstablished && (
+                    <div className="flex items-center text-gray-500">
+                        <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                  aria-hidden="true"
+                        />
+                        Founded in {cro.yearEstablished}
+                    </div>
+                )}
+                {cro.companyType && (
+                    <div className="flex items-center text-gray-500">
+                        {companyTypeIcons[cro.companyType] ||
+                            <Building className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                      aria-hidden="true"/>}
+                        {companyTypeMap[cro.companyType] || cro.companyType}
+                    </div>
+                )}
+                <Link
+                    href={"?tab=reviews"}
+                    className="flex items-center mb-2 hover:cursor-pointer"
+                >
+                    <div className="flex items-center text-gray-500">
+                        <Star className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                              aria-hidden="true"
+                        />
+                        <div className="flex items-center text-gray-500">
+                            {cro.reviews.length > 0 && typeof cro.avgRating === "number"
+                                ? Number.isInteger(cro.avgRating)
+                                    ? `${cro.avgRating} out of 5`
+                                    : `${cro.avgRating.toFixed(2)} out of 5`
+                                : "No reviews yet"}
+                        </div>
+                    </div>
+                </Link>
+            </div>
+            <div className="flex flex-wrap gap-2 w-5/6">
+                {filteredCertifications.map((certification, index) => (
+                    <CertificationBadge
+                        key={index}
+                        certificationName={certification}
+                    />
+                ))}
+                {cro.tags && cro.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 w-5/6">
+                        {cro.tags.map((tag, index) => (
+                            <span
+                                key={index}
+                                className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 font-medium text-muted-foreground shadow-sm"
+                            >
+                                    {tag === "Experienced in rare disease" && (
+                                        <Dna className="h-3.5 w-3.5 shrink-0"/>
+                                    )}
+                                {tag === "PAG friendly" && (
+                                    <HeartHandshake className="h-3.5 w-3.5 shrink-0"/>
+                                )}
+                                <span className="truncate">
+                                            {tag}
+                                        </span>
+                                    </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+            {cro.description && cro.description.trim() && (
+                <div className="w-5/6">
+                    {/*<CRODescription text={cro.description}/>*/}
+                    {cro.description}
+                </div>
+            )}
+        </div>
+    )
+}

@@ -14,7 +14,5 @@ declare module "next-auth" {
     interface User {
         id: string
         bio?: string | null | undefined
-        organizationId?: string | null | undefined
-        membership?: any
     }
 }
