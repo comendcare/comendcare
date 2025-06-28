@@ -1746,11 +1746,10 @@ export const acceptInvitation = withAuth(
 export const updateCondition = withOrganizationAuth(
     async (organization: Organization, formData: FormData) => {
         try {
-            // Convert FormData to a plain object
             const data: Record<string, any> = {};
             formData.forEach((value, key) => {
                 if (key === "metadata") {
-                    data[key] = JSON.parse(value.toString()) as JsonValue
+                    data[key] = JSON.parse(value.toString()) as JsonValue;
                     return;
                 }
 
@@ -1767,35 +1766,42 @@ export const updateCondition = withOrganizationAuth(
                 }
             });
 
-            // Find the first condition associated with the organization
             const conditions = await prisma.conditionToOrganization.findMany({
-                where: {organizationId: organization.id},
-                include: {condition: true},
+                where: { organizationId: organization.id },
+                include: { condition: true },
             });
 
-            if (!conditions || conditions.length === 0) {
-                throw new Error("No associated condition found for the organization.");
-            }
-
-            // Update the condition in Prisma
-            if (conditions[0].conditionId) {
+            if (conditions.length > 0 && conditions[0].conditionId) {
+                // ✅ Update existing condition
                 const updatedCondition = await prisma.condition.update({
-                    where: {id: conditions[0].conditionId},
+                    where: { id: conditions[0].conditionId },
                     data,
                 });
 
                 revalidatePath("app/profile/");
-                return {success: true, data: updatedCondition};
+                return { success: true, data: updatedCondition };
+            } else {
+                // ✅ Create new condition and link to organization
+                const newCondition = await prisma.condition.create({
+                    data,
+                });
+
+                await prisma.conditionToOrganization.create({
+                    data: {
+                        conditionId: newCondition.id,
+                        organizationId: organization.id,
+                    },
+                });
+
+                revalidatePath("app/profile/");
+                return { success: true, data: newCondition };
             }
-
-            return {success: false, error: "No condition id found"};
-
         } catch (error: any) {
-            console.error("Error updating condition:", error);
-            return {success: false, error: error.message || "Failed to update condition."};
+            console.error("Error in updateCondition:", error);
+            return { success: false, error: error.message || "Failed to update or create condition." };
         }
     }
-)
+);
 
 export const deleteAsset = withOrganizationAuth(
     async (_: Organization, toolId: string) => {

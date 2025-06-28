@@ -13,7 +13,7 @@ export default async function Sitemap() {
 
     return [
         {
-            url: `https://provider.${domain}`,
+            url: `https://researcher.${domain}`,
             lastModified: new Date()
         },
     ]
