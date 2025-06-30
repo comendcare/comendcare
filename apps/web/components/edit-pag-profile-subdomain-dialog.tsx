@@ -60,7 +60,6 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
                     description: true,
                     contactEmail: true,
                     logo: true,
-                    font: true,
                     image: true,
                     headerImage: true,
                     biopharmaConsentSettings: true,

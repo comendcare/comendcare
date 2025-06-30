@@ -255,7 +255,6 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                     headerImage: organization.headerImage || "",
                     name: organization.name || "",
                     logo: organization.logo || "",
-                    font: organization.font || "",
                     imageBlurhash: organization.imageBlurhash || "",
                     statedGoal: organization.statedGoal || null,
                     incorporationStatus: organization.incorporationStatus || undefined,

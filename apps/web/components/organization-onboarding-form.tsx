@@ -378,7 +378,6 @@ export default function OrganizationOnboardingForm(
                     description: true,
                     contactEmail: true,
                     logo: true,
-                    font: true,
                     image: true,
                     headerImage: true,
                     biopharmaConsentSettings: true,
@@ -470,7 +469,6 @@ export default function OrganizationOnboardingForm(
                         image: organizationData.image || "",
                         name: organizationData.name || "",
                         logo: organizationData.logo || "",
-                        font: organizationData.font || "",
                         imageBlurhash: organizationData.imageBlurhash || "",
                         statedGoal: organizationData.statedGoal || null,
                         incorporationStatus: organizationData.incorporationStatus || undefined
