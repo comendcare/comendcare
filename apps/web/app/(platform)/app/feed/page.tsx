@@ -20,7 +20,6 @@ export default async function FeedPage() {
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,
