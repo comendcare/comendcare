@@ -2,11 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
-      }
-    }
+    // "compilerOptions": {
+    //   "baseUrl": ".",
+    //   "paths": {
+    //   }
+    // }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules", "dist"]
