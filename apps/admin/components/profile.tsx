@@ -3,7 +3,6 @@
 import {signOut, useSession} from "next-auth/react"
 import {useEffect, useState} from "react"
 import {useRouter} from "next/navigation"
-import Link from "next/link"
 import LogoutButton from "comend-pag-platform/components/logout-button"
 import {
     DropdownMenu,
@@ -13,9 +12,9 @@ import {
     DropdownMenuTrigger
 } from "@comend/components/ui/dropdown-menu";
 import Loading from "@/loading";
-import { ProfilePhoto } from "@comend/components/profile-photo"
 import { LogOut } from "lucide-react"
 import { getUser } from "@/packages/lib/fetchers"
+import { ProfilePhoto } from "./admin-profile-photo"
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()
@@ -88,6 +87,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                         className="h-8 w-8 rounded-full"
                     /> */}
                     <ProfilePhoto
+                        orgId={userData?.data?.organizationId}
                         img={userData?.data?.image}
                         name={userData?.data?.name}
                         className="h-8 w-8 rounded-full"
@@ -122,6 +122,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                     className="h-6 w-6 rounded-full"
                 /> */}
                 <ProfilePhoto
+                    orgId={userData?.data?.organizationId}
                     img={userData?.data?.image}
                     name={userData?.data?.name}
                     className="h-8 w-8 rounded-full"

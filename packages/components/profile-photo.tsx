@@ -12,7 +12,7 @@ import {
     DialogClose,
 } from "@comend/components/ui/dialog";
 import {Form} from "@comend/components/ui/form";
-import {cn, getPublicFile} from "@comend/lib/utils";
+import {cn} from "@comend/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -25,9 +25,8 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-const editOrgProfileImageSchema = z.object({
+export const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
     headerImage: z.string().nullable().optional(),
 });
@@ -38,22 +37,23 @@ export function ProfilePhoto({
                                  textSize,
                                  className,
                                  editable,
+                                 submitCallback
                              }: {
     img: string | null | undefined;
     name: string | null | undefined;
     textSize?: "small" | "medium" | "large";
     className?: string | null | undefined;
     editable?: boolean;
+    submitCallback?: (values: z.infer<typeof editOrgProfileImageSchema>, selectedFileProfile: FileWithPreview | null) => Promise<void>
 }) {
-    const {data: session} = useSession();
-    const router = useRouter();
+    // const {data: session} = useSession();
+    // const router = useRouter();
     const [open, setOpen] = useState(false);
     const [selectedFileProfile, setSelectedFileProfile] = useState<FileWithPreview | null>(null);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
     const [isCropping, setIsCropping] = useState(false)
-
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
@@ -62,47 +62,55 @@ export function ProfilePhoto({
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
-        if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.");
-            return;
+        if (submitCallback) {
+            submitCallback(values, selectedFileProfile)
+            return
         }
 
-        const formData = new FormData();
+        setIsCropping(false)
+        setOpen(false);
 
-        if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
-            try {
-                const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
-                if (imgUrl) {
-                    formData.set("image", imgUrl);
-                }
-            } catch (error) {
-                console.error("Failed to upload image:", error);
-                toast.error("Image upload failed.");
-                return;
-            }
-        }
+        // if (!session?.user?.organizationId) {
+        //     toast.error("You're not signed into an organization right now.");
+        //     return;
+        // }
 
-        if (!selectedFileProfile) {
-            // no file selected, set profile image to null, allow deleting profile photo
-            formData.set("image", "")
-        }
+        // const formData = new FormData();
 
-        if (values.image !== img && img) {
-            // if the image is being changed, delete the old image in our google cloud storage bucket
-            await handleImageDelete(img)
-        }
+        // if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
+        //     try {
+        //         const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
+        //         if (imgUrl) {
+        //             formData.set("image", imgUrl);
+        //         }
+        //     } catch (error) {
+        //         console.error("Failed to upload image:", error);
+        //         toast.error("Image upload failed.");
+        //         return;
+        //     }
+        // }
 
-        try {
-            await updateOrganization(session.user.organizationId, formData);
-            toast.success("Organization profile updated successfully!");
-            // setHasCropped(false);
-            setIsCropping(false)
-            setOpen(false);
-            router.refresh();
-        } catch (error) {
-            console.error("Error updating organization:", error);
-            toast.error("Failed to update organization profile.");
-        }
+        // if (!selectedFileProfile) {
+        //     // no file selected, set profile image to null, allow deleting profile photo
+        //     formData.set("image", "")
+        // }
+
+        // if (values.image !== img && img) {
+        //     // if the image is being changed, delete the old image in our google cloud storage bucket
+        //     await handleImageDelete(img)
+        // }
+
+        // try {
+        //     await updateOrganization(session.user.organizationId, formData);
+        //     toast.success("Organization profile updated successfully!");
+        //     // setHasCropped(false);
+        //     setIsCropping(false)
+        //     setOpen(false);
+        //     router.refresh();
+        // } catch (error) {
+        //     console.error("Error updating organization:", error);
+        //     toast.error("Failed to update organization profile.");
+        // }
     }
 
     return (
@@ -125,25 +133,15 @@ export function ProfilePhoto({
             {/* Edit Button (Only If Editable) */}
             {editable && (
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <Tooltip>
-                        <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                            <DialogTrigger asChild>
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="absolute bottom-0 right-0 p-0.5 bg-white shadow-md rounded-full"
-                                    disabled={session?.user?.membership?.role !== "owner"}
-                                >
-                                    <Pencil className="w-1 h-1"/>
-                                </Button>
-                            </DialogTrigger>
-                        </TooltipTrigger>
-                        {session?.user?.membership?.role !== "owner" && (
-                            <TooltipContent className="max-w-80">
-                                <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
-                            </TooltipContent>
-                        )}
-                    </Tooltip>
+                    <DialogTrigger asChild>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className="absolute bottom-0 right-0 p-0.5 bg-white shadow-md rounded-full"
+                        >
+                            <Pencil className="w-1 h-1"/>
+                        </Button>
+                    </DialogTrigger>
                     <DialogContent className="max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Edit organization profile picture</DialogTitle>

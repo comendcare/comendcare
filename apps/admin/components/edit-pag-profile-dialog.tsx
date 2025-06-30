@@ -38,8 +38,8 @@ import {Organization} from "@prisma/client";
 import MoneyInput from "@comend/components/money-input";
 import {FormImageSelector} from "@comend/components/form-image-selector";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
-import {ProfilePhoto} from "@comend/components/profile-photo";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";
+import { ProfilePhoto } from "./admin-profile-photo";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -803,6 +803,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                     />
 
                                     <ProfilePhoto
+                                        orgId={organization.id}
                                         img={organization.image}
                                         name={organization.name}
                                         className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
