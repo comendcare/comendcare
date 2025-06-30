@@ -6,7 +6,7 @@ import {temporal} from 'zundo';
 import {create} from 'zustand';
 import type { Option } from '@comend/lib/types';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export type ViewType = 'grid' | 'list'
 

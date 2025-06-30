@@ -25,7 +25,7 @@ import {saveCRO} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MILESTONE_TYPE_OPTIONS, Option} from "@comend/lib/types"
 import ProjectMultipleSelector from "./project-multiple-selector";

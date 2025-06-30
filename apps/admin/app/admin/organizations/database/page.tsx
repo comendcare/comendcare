@@ -27,9 +27,7 @@ export default function AllOrganizations() {
                         </div>
                     }
                 >
-                    <Organizations
-                        // organizationId={decodeURIComponent(params.id)}
-                    />
+                    <Organizations />
                 </Suspense>
             </div>
         </div>

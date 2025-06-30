@@ -41,7 +41,7 @@ import mixpanel from "mixpanel-browser";
 import {Member, Organization} from "@prisma/client";
 import {Calendar, Building2} from "lucide-react";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),

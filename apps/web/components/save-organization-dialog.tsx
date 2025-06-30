@@ -21,7 +21,7 @@ import va from "@vercel/analytics"
 import {saveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark } from "lucide-react";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>

@@ -27,7 +27,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { sleep } from "@comend/lib/utils"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN_TYPES } from "@comend/lib/types"
-import { mixpanelTrack } from "@/mixpanel"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { JsonObject } from "@prisma/client/runtime/library"
 import Loading from "@/loading"
 import ComendLoadingSpinner from "./comend-loading-spinner"
