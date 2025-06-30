@@ -11,7 +11,7 @@ import {useRouter} from "next/navigation";
 import {useState} from "react";
 import MoneyInput from "@comend/components/money-input";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export const financesFormSchema = z.object({
     // raising: z.enum(["yes", "no-but", "no"]).optional(),

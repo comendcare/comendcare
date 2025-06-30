@@ -11,7 +11,7 @@ import FAQFeedbackThumbs from "./faq-feedback-thumbs"
 import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
 import { customerIOTrack } from "@comend/lib/customer-io"
-import { mixpanelTrack, useMixpanelContext } from "@/mixpanel"
+import { mixpanelTrack, useMixpanelContext } from "@comend/lib/mixpanel"
 import { createGuidesFeedbackTicket } from "@comend/lib/notion"
 
 interface FAQFeedbackType {

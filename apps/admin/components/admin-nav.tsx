@@ -78,12 +78,12 @@ export default function AdminNav({children}: { children: ReactNode }) {
                     isActive: segments.includes("analytics"),
                     icon: <BarChart3 width={18}/>
                 },
-                {
-                    name: "Settings",
-                    href: `/admin/organization/${id}/settings`,
-                    isActive: segments.includes("settings"),
-                    icon: <Settings width={18}/>
-                }
+                // {
+                //     name: "Settings",
+                //     href: `/admin/organization/${id}/settings`,
+                //     isActive: segments.includes("settings"),
+                //     icon: <Settings width={18}/>
+                // }
             ]
         } else if (segments[0] === "roadmap" && id) {
             return [

@@ -19,7 +19,7 @@ import {
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@comend/components/ui/select"
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { CompanyWithReviewsAndServices } from "@comend/lib/types";

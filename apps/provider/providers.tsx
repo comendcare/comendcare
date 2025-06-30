@@ -5,7 +5,7 @@ import {Toaster} from "sonner"
 import {ModalProvider} from "@comend/components/modal/provider"
 import {OnbordaProvider} from "@comend/components/onborda/OnbordaContext"
 import {ReactFlowProvider} from "@xyflow/react"
-import {MixpanelProvider} from "@/mixpanel"
+import {MixpanelProvider} from "@comend/lib/mixpanel"
 import { SettingsProvider } from "@comend/components/editor/settings"
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 

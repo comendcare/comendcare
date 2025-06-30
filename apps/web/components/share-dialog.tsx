@@ -8,7 +8,7 @@ import {
 import {toast} from "sonner";
 import {Organization} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@comend/components/ui/accordion";
 import CopyCodeBlock from "./code-block";
 import { Switch } from "@comend/components/ui/switch";
