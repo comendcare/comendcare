@@ -17,7 +17,7 @@ import { Mail, Share } from "lucide-react"
 import ContactPAGDialog from "~web/components/contact-pag-dialog";
 import { RoadmapsCard } from "~web/components/public-roadmap-card"
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
-import { mixpanelTrack } from "@/mixpanel"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 export async function generateMetadata({
                                            params

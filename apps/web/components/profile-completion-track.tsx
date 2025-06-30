@@ -1,6 +1,6 @@
 "use client"
 
-import { mixpanelTrack } from "@/mixpanel"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 import mixpanel from "mixpanel-browser"
 import { useEffect } from "react"
 

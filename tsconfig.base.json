@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        // "typeRoots": ["./node_modules/@types", "../../packages/types"],
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
         "skipLibCheck": true,
@@ -27,7 +28,6 @@
             "@/data/*": ["data/*"],
             "@/public/*": ["public/*"],
             "@/loading": ["loading.tsx"],
-            "@/mixpanel": ["mixpanel.tsx"],
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

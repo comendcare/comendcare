@@ -13,7 +13,7 @@ import { toast } from "sonner"
 import { nanoid } from "nanoid"
 import { Milestone, NodeType, Roadmap, StatusType } from "@comend/lib/types"
 import { getMilestoneTypes } from "@comend/lib/fetchers"
-import {mixpanelTrack} from "@/mixpanel";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 
 export type RoadmapState = {
     initialized: boolean,

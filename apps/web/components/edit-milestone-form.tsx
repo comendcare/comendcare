@@ -75,7 +75,7 @@ import {toast} from "sonner"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {useOnborda} from "@comend/components/onborda/OnbordaContext"
-import {mixpanelTrack} from "@/mixpanel"
+import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
