@@ -516,8 +516,8 @@ export function EditMilestoneForm({
                                     <TabsTrigger value="edit">
                                         Edit
                                     </TabsTrigger>
-                                    <TabsTrigger 
-                                        className="relative" 
+                                    <TabsTrigger
+                                        className="relative"
                                         value="recommendations"
                                         style={
                                             (recommendations && recommendations.length > 0 && !recommendationsViewed ? (
@@ -530,7 +530,7 @@ export function EditMilestoneForm({
                                         }
                                     >
                                         <div className="relative z-10 flex gap-2 items-center">
-                                            Marketplace recommendations
+                                            Relevant vendors
                                         </div>
                                         <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit")} />
                                         {/* {
