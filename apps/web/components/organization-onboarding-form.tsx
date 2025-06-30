@@ -41,7 +41,7 @@ import mixpanel from "mixpanel-browser";
 import {Member, Organization} from "@prisma/client";
 import {Calendar, Building2} from "lucide-react";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -378,7 +378,6 @@ export default function OrganizationOnboardingForm(
                     description: true,
                     contactEmail: true,
                     logo: true,
-                    font: true,
                     image: true,
                     headerImage: true,
                     biopharmaConsentSettings: true,
@@ -470,7 +469,6 @@ export default function OrganizationOnboardingForm(
                         image: organizationData.image || "",
                         name: organizationData.name || "",
                         logo: organizationData.logo || "",
-                        font: organizationData.font || "",
                         imageBlurhash: organizationData.imageBlurhash || "",
                         statedGoal: organizationData.statedGoal || null,
                         incorporationStatus: organizationData.incorporationStatus || undefined

@@ -20,7 +20,7 @@ import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import ContactPAGDialog from "~web/components/contact-pag-dialog";
 import {Mail, Share} from "lucide-react";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -63,7 +63,6 @@ export default async function OrganizationHomePage({
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,

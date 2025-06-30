@@ -25,7 +25,7 @@ import {useSession} from "next-auth/react";
 import {unsaveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {

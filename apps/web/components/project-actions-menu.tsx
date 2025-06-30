@@ -25,7 +25,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
-import { mixpanelTrack } from "@/mixpanel"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
@@ -59,7 +59,6 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                         description: true,
                         contactEmail: true,
                         logo: true,
-                        font: true,
                         image: true,
                         headerImage: true,
                         biopharmaConsentSettings: true,

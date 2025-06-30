@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import Loading from "@/loading";;
 import { useEffect } from "react";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export default function OnboardingWelcomePage() {
     const { data: session, status } = useSession();

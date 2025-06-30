@@ -12,7 +12,7 @@ import {TimelineCardContents} from "./private-timeline"
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {ExternalLink} from "lucide-react"
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,

@@ -1,7 +1,6 @@
 import {ReactNode} from "react"
 import {notFound} from "next/navigation"
 import {getOrganizationData} from "@comend/lib/fetchers"
-import {fontMapper} from "@/styles/fonts"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
 import {PublicPageNavbar} from "~web/components/public-page-navbar";
 import { ComendEmbedBanner } from "~web/components/comend-embed-banner"
@@ -23,7 +22,6 @@ export default async function EmbedLayout({
         description: true,
         contactEmail: true,
         logo: true,
-        font: true,
         image: true,
         headerImage: true,
         biopharmaConsentSettings: true,
@@ -72,7 +70,7 @@ export default async function EmbedLayout({
     }
 
     return (
-        <div className={fontMapper[data.font]}>
+        <div>
             <TooltipProvider>
                 <PublicPageNavbar/>
                 <div>

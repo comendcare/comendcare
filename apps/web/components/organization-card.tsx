@@ -1,11 +1,20 @@
 import BlurImage from "@comend/components/blur-image"
 import { placeholderBlurhash, random } from "@comend/lib/utils"
+import Placeholder from "@/public/placeholder.png"
 import { Organization } from "@prisma/client"
-import { BarChart, ExternalLink } from "lucide-react"
+import {FolderKanban} from "lucide-react"
 import Link from "next/link"
+import prisma from "@/packages/lib/prisma";
 
-export default function OrganizationCard({ data }: { data: Organization }) {
+export default async function OrganizationCard({ data }: { data: Organization }) {
     const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+
+    const projectCount = await prisma.milestone.count({
+        where: {
+            organizationId: data.id, // replace with the actual org ID
+        },
+    })
+
     return (
         <div className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
             <Link
@@ -17,7 +26,7 @@ export default function OrganizationCard({ data }: { data: Organization }) {
                     width={500}
                     height={400}
                     className="h-44 object-cover"
-                    src={data.image ?? "/placeholder.png"}
+                    src={data.image ?? Placeholder.src}
                     placeholder="blur"
                     blurDataURL={data.imageBlurhash ?? placeholderBlurhash}
                 />
@@ -47,8 +56,8 @@ export default function OrganizationCard({ data }: { data: Organization }) {
                     href={`/admin/organization/${data.id}/analytics`}
                     className="flex items-center rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-600 transition-colors hover:bg-green-200 dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400 dark:hover:bg-green-800 dark:hover:bg-opacity-50"
                 >
-                    <BarChart height={16} />
-                    <p>{random(10, 40)}%</p>
+                    <FolderKanban height={16} />
+                    <p>{projectCount}</p>
                 </Link>
             </div>
         </div>

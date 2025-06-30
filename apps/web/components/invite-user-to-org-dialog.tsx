@@ -30,7 +30,7 @@ import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 import LoadingDots from "@comend/components/icons/loading-dots";
 
 const invitationFormSchema = z.object({
@@ -54,7 +54,6 @@ export default function InviteUserToOrgDialog() {
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,

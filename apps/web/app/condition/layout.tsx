@@ -3,7 +3,6 @@ import Link from "next/link"
 import { ReactNode } from "react"
 import { notFound, redirect } from "next/navigation"
 import { getOrganizationData } from "@comend/lib/fetchers"
-import { fontMapper } from "@/styles/fonts"
 import { Metadata } from "next"
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
 
@@ -22,7 +21,6 @@ export async function generateMetadata({
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,
