@@ -1,4 +1,4 @@
-import "~provider/globals.css"
+import "@/globals.css"
 import { ThemeProvider } from "~provider/theme-provider"
 import type { Metadata, ResolvingMetadata } from "next"
 import { Analytics } from '@vercel/analytics/next';

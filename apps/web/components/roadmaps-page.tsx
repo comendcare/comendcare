@@ -51,7 +51,6 @@ export default function RoadmapsPage({orgId}: {orgId: string}) {
                         description: true,
                         contactEmail: true,
                         logo: true,
-                        font: true,
                         image: true,
                         headerImage: true,
                         biopharmaConsentSettings: true,

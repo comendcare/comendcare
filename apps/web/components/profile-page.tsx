@@ -51,7 +51,6 @@ export default function PAGProfilePage() {
                     description: true,
                     contactEmail: true,
                     logo: true,
-                    font: true,
                     image: true,
                     headerImage: true,
                     biopharmaConsentSettings: true,

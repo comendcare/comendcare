@@ -3,7 +3,6 @@ import Link from "next/link"
 import {ReactNode} from "react"
 import {notFound, redirect} from "next/navigation"
 import {getOrganizationData} from "@comend/lib/fetchers"
-import {fontMapper} from "@/styles/fonts"
 import {Metadata} from "next"
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import PublicPageFooter from "~web/components/public-page-footer"
@@ -26,7 +25,6 @@ export async function generateMetadata({
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,
@@ -128,7 +126,6 @@ export default async function SiteLayout({
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,
@@ -186,7 +183,7 @@ export default async function SiteLayout({
     }
 
     return (
-        <div className={fontMapper[data.font]}>
+        <div>
             <TooltipProvider>
                 <PublicPageNavbar/>
                 <div>
