@@ -25,7 +25,7 @@ import {
 import { Input } from "@comend/components/ui/input"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useMixpanelContext} from "@/mixpanel";
+import {useMixpanelContext} from "@comend/lib/mixpanel";
 import {createFeedbackTicket} from "@comend/lib/notion";
 import {toast} from "sonner";
 import {z} from "zod";

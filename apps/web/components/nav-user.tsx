@@ -63,7 +63,7 @@ import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
 import mixpanel from "mixpanel-browser";
-import { mixpanelReset, mixpanelTrack } from "@/mixpanel";
+import { mixpanelReset, mixpanelTrack } from "@comend/lib/mixpanel";
 
 
 export function NavUser() {

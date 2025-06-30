@@ -14,7 +14,7 @@ import {
 import {useSession} from "next-auth/react";
 import {useState} from "react";
 import {deleteOrganization} from "@comend/lib/actions";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {toast} from "sonner";
 import {Button} from "@comend/components/ui/button";
 import {Organization} from "@prisma/client";

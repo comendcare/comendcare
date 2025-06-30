@@ -15,7 +15,7 @@ import ShareDialog from "./share-dialog";
 import { getOrganizationFromOrganizationId, getRoadmaps } from "@comend/lib/fetchers";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export default function RoadmapsPage({orgId}: {orgId: string}) {
     const router = useRouter()

@@ -7,7 +7,7 @@ import OrganizationRoadmaps from "~admin/components/organization-roadmaps";
 import {deleteOrganization} from "@comend/lib/actions";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
-import { mixpanelTrack } from "@/mixpanel"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 import {DeleteOrganizationAlertDialog} from "@comend/components/delete-organization-alert-dialog";
 import EditPAGProfileDialog from "~admin/components/edit-pag-profile-dialog";
 

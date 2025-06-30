@@ -25,7 +25,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
-import { mixpanelTrack } from "@/mixpanel"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,

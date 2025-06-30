@@ -33,7 +33,7 @@ import {revalidatePath} from "next/cache";
 import { signOut } from "next-auth/react"
 import {getAllMembershipsFromUserId} from "@comend/lib/fetchers";
 import mixpanel from "mixpanel-browser";
-import { mixpanelTrack } from "@/mixpanel";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export default function UserSettings() {
     const {data: session, update} = useSession()
