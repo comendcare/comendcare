@@ -9,6 +9,7 @@ import Image from "next/image"
 import { ProfilePhoto } from "@/packages/components/profile-photo"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import { Prisma } from "@prisma/client"
+import StatusButton from "./milestone-status-button"
 
 // shape of the milestone objects that are returned from our call to getProjectRecommendations
 const MILESTONE_SELECT = {
@@ -18,6 +19,7 @@ const MILESTONE_SELECT = {
     organization: {select: {name: true, image: true, subdomain: true}},
     types: {select: {milestoneType: {select: {id: true, label: true}}}},
     roadmapId: true,
+    status: true,
     // notes: true // for example, this will error out, because we exclude the private field 'notes' from the Milestone select
 }
 
@@ -113,6 +115,9 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
                                                 {project.organization.name}
                                             </span>
                                             <span className="flex gap-2 flex-wrap text-sm">
+                                                {project.status && (
+                                                    <StatusButton status={project.status as any} disabled={true} onStatusChange={() => {}}/>
+                                                )}
                                                 {(project.types || []).map((type, index) => (
                                                     <MilestoneTypeBadge label={type.milestoneType.label} key={index}/>
                                                 ))}
