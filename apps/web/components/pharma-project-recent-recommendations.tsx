@@ -26,7 +26,6 @@ export function PharmaProjectRecentRecommendations() {
                     description: true,
                     contactEmail: true,
                     logo: true,
-                    font: true,
                     image: true,
                     headerImage: true,
                     biopharmaConsentSettings: true,

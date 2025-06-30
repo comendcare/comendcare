@@ -159,7 +159,6 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                             description: true,
                             contactEmail: true,
                             logo: true,
-                            font: true,
                             image: true,
                             headerImage: true,
                             biopharmaConsentSettings: true,

@@ -18,7 +18,6 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,

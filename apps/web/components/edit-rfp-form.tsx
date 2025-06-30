@@ -320,7 +320,6 @@ export function EditRFPForm({
                     description: true,
                     contactEmail: true,
                     logo: true,
-                    font: true,
                     image: true,
                     headerImage: true,
                     biopharmaConsentSettings: true,

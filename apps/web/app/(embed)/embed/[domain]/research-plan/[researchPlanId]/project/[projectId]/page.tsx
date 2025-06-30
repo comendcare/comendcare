@@ -19,7 +19,6 @@ export default async function EmbeddedProjectPage({params}: {params: {domain: st
             description: true,
             contactEmail: true,
             logo: true,
-            font: true,
             image: true,
             headerImage: true,
             biopharmaConsentSettings: true,
