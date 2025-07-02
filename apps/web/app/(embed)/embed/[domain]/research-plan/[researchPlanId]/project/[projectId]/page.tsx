@@ -1,4 +1,3 @@
-import { ProfilePhoto } from "@comend/components/profile-photo"
 import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
 import { cn, formatMoney, standardizeYear } from "@comend/lib/utils"
 import { Building2, Calendar, HandCoins } from "lucide-react"

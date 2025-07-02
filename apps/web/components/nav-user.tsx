@@ -55,7 +55,6 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog";
 import {Button} from "@comend/components/ui/button";
-import {ProfilePhoto} from "@comend/components/profile-photo";
 import UserEditSettingsDialog from "~web/components/user-edit-settings-dialog";
 import {cn} from "@comend/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";

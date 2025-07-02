@@ -45,7 +45,6 @@ import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
 import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
-import {organizations} from "@/data/sample-pags"
 
 export const getSessionInfo = async () => {
     const session = await getSession()

@@ -5,7 +5,6 @@ import {getOrganizationData, getPublicRoadmapsForOrganization} from "@comend/lib
 import {formatMoney, standardizeYear} from "@comend/lib/utils"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "~web/components/pag-public-roadmap-breadcrumb";
-import {ProfilePhoto} from "@comend/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
 import {FloatingDock} from "~web/components/floating-dock";
 import {IconFlag, IconShare} from "@tabler/icons-react";
