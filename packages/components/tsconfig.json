@@ -8,6 +8,6 @@
     //   }
     // }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/cro-searchbar.tsx"],
   "exclude": ["node_modules", "dist"]
 }
