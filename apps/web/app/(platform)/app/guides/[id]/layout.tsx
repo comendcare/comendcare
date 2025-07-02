@@ -50,7 +50,6 @@ export default async function GuideArticleLayout({
                         img={author.avatar_url}
                         name={author.name}
                         textSize={"medium"}
-                        editable={false}
                         className="h-16 w-16"
                     />
                     <div className="flex flex-col gap-1">

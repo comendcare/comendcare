@@ -19,7 +19,6 @@ export function PAGRoadmapHeader({
                 name={organization.name}
                 className="h-16 w-16 rounded-full"
                 textSize="small"
-                editable={editable}
             />
             <div className="flex flex-col">
                 <div className="flex gap-4 justify-between">

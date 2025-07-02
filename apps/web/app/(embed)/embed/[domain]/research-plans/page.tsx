@@ -1,5 +1,4 @@
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
-import { ProfilePhoto } from "@comend/components/profile-photo";
 import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
 import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
