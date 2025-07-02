@@ -3,7 +3,7 @@
 import {SessionProvider} from "next-auth/react"
 import {Toaster} from "sonner"
 import {ModalProvider} from "@comend/components/modal/provider"
-import {OnbordaProvider} from "@comend/components/onborda/OnbordaContext"
+// import {OnbordaProvider} from "@comend/components/onborda/OnbordaContext"
 import {ReactFlowProvider} from "@xyflow/react"
 import {MixpanelProvider} from "@comend/lib/mixpanel"
 import { SettingsProvider } from "@comend/components/editor/settings"
@@ -26,11 +26,11 @@ export function Providers({children}: { children: React.ReactNode }) {
                 <NuqsAdapter>
                     <ReactFlowProvider>
                         <MixpanelProvider>
-                            <OnbordaProvider>
+                            {/* <OnbordaProvider> */}
                                 <SettingsProvider>
                                     {children}
                                 </SettingsProvider>
-                            </OnbordaProvider>
+                            {/* </OnbordaProvider> */}
                         </MixpanelProvider>
                     </ReactFlowProvider>
                 </NuqsAdapter>

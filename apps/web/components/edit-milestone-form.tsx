@@ -74,13 +74,13 @@ import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Stor
 import {toast} from "sonner"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
-import {useOnborda} from "@comend/components/onborda/OnbordaContext"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
 import { Skeleton } from "@comend/components/ui/skeleton"
 import EditMilestoneDetailsProjectsTab from "./edit-milestone-details-projects-tab"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>

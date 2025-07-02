@@ -23,7 +23,6 @@ import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
 import {AppSidebar} from "~web/components/app-sidebar";
 import { FeedbackSheet } from "~web/components/feedback";
-import { useOnborda } from "@comend/components/onborda/OnbordaContext";
 import { Button, buttonVariants } from "@comend/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
@@ -37,6 +36,7 @@ import {MobileWarning} from "~web/components/mobile-warning";
 import {useIsMobile} from "@comend/lib/hooks/use-mobile";
 import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { useOnborda } from "~web/components/onborda/OnbordaContext";
 
 interface AppLayoutProps {
     children: React.ReactNode
