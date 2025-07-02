@@ -29,7 +29,6 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/
 import {AppSidebar} from "~web/components/app-sidebar";
 import {createKanban, createRoadmap} from "@comend/lib/actions";
 import {FeedbackSheet} from "~web/components/feedback";
-import {useOnborda} from "@comend/components/onborda/OnbordaContext";
 import {Button} from "@comend/components/ui/button";
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
@@ -53,7 +52,6 @@ export default function AppLayout({children}: AppLayoutProps) {
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
     const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
-    const {startOnborda} = useOnborda()
     const pathname = usePathname()
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
