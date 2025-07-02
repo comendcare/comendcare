@@ -20,12 +20,12 @@ import {FormImageSelector} from "@comend/components/form-image-selector";
 import {FileWithPreview} from "@comend/components/image-selector";
 import {toast} from "sonner";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
-import {updateOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
 import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { updateOrganization } from "~admin/lib/actions";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
