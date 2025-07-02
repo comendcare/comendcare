@@ -2129,7 +2129,7 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
             const nodes = await Promise.all(
                 milestones.map(async (milestone: any, index: number) => {
                     // find the node associated with the milestone, used to fetch position information
-                    const templateNode = roadmapTemplate.nodes.find(n => n.id === milestone.nodeId)
+                    const templateNode = roadmapTemplate.nodes.find((n: any) => n.id === milestone.nodeId)
 
                     // create Node & associated Milestone
                     const node = await prisma.node.create({
