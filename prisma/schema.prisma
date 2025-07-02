@@ -939,3 +939,44 @@ model PharmaProject {
   updatedAt DateTime @updatedAt
   metadata  Json?
 }
+
+model Institution {
+  id           String   @id @default(uuid())
+  rorId        String   @unique
+  name         String
+  established  Int?
+  types        String[]
+  aliases      String[]
+  acronyms     String[]
+  status       String
+  wikipediaUrl String?
+  website      String?
+  city         String?
+  countryName  String?
+  countryCode  String?
+
+  fundrefAll       String[]
+  fundrefPreferred String?
+  gridAll          String
+  gridPreferred    String?
+  isniAll          String[]
+  wikidataAll      String[]
+
+  relationships InstitutionRelationship[] @relation("InstitutionRelationships")
+  relatedTo     InstitutionRelationship[] @relation("InstitutionRelatedTo")
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+}
+
+model InstitutionRelationship {
+  id            String @id @default(uuid())
+  type          String
+  label         String
+  institutionId String
+  relatedId     String
+
+  institution Institution @relation("InstitutionRelationships", fields: [institutionId], references: [id])
+  related     Institution @relation("InstitutionRelatedTo", fields: [relatedId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
