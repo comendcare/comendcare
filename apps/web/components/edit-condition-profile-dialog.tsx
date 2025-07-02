@@ -22,9 +22,9 @@ import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import {researchFormSchema} from "@comend/components/research-onboarding-form";
 import { Option } from "@comend/lib/types";
 import { Info } from "lucide-react";
+import { researchFormSchema } from "./research-onboarding-form";
 
 export const optionSchema = z.object({
     label: z.string(),
