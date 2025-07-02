@@ -36,10 +36,9 @@ import {researchFormSchema} from "@comend/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import MoneyInput from "@comend/components/money-input";
-import {FormImageSelector} from "@comend/components/form-image-selector";
-import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";
 import { EditableProfilePhoto } from "./editable-profile-photo";
+import { EditablePAGBannerPhoto } from "./editable-pag-banner-photo";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -809,11 +808,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         textSize="large"
                                     />
 
-                                    <PAGBannerPhoto
+                                    <EditablePAGBannerPhoto
+                                        orgId={organization.id}
                                         img={organization.headerImage}
-                                        name={organization.headerImage}
-                                        className="rounded-full ring-4 ring-white w-full"
-                                        editable={true}
                                     />
 
                                     {/*<FormField*/}
