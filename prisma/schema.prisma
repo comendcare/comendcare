@@ -28,7 +28,6 @@ model User {
   name                  String? /// @encrypted
   nameHash              String? /// @encryption:hash(name)
   username              String?
-  gh_username           String?
   email                 String?                @unique /// @encrypted
   emailHash             String?                @unique /// @encryption:hash(email)
   emailVerified         DateTime?
@@ -964,8 +963,10 @@ model Institution {
 
   relationships InstitutionRelationship[] @relation("InstitutionRelationships")
   relatedTo     InstitutionRelationship[] @relation("InstitutionRelatedTo")
+  affiliation   Affiliation[]
   createdAt     DateTime                  @default(now())
   updatedAt     DateTime                  @updatedAt
+  metadata      Json?
 }
 
 model InstitutionRelationship {
@@ -979,4 +980,37 @@ model InstitutionRelationship {
   related     Institution @relation("InstitutionRelatedTo", fields: [relatedId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  metadata    Json?
+}
+
+model Affiliation {
+  id            String    @id @default(uuid())
+  researcherId  String
+  institutionId String
+  startDate     DateTime?
+  endDate       DateTime?
+
+  researcher  Researcher  @relation(fields: [researcherId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([researcherId, institutionId])
+}
+
+model Researcher {
+  id                   String        @id @default(uuid())
+  orcid                String        @unique
+  email                String?       @unique /// @encrypted
+  emailHash            String?       @unique /// @encryption:hash(email)
+  title                String?
+  name                 String
+  researchInterests    String[]
+  conditionsOfInterest String[]
+  genesOfInterest      String[]
+  affiliation          Affiliation[]
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  metadata             Json?
 }
