@@ -1,0 +1,533 @@
+"use client";
+
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useSession} from "next-auth/react";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
+import {editUser} from "@comend/lib/actions";
+import {Checkbox} from "@comend/components/ui/checkbox";
+import {AddressType, Option} from "@comend/lib/types";
+import React, {useEffect, useState} from "react";
+import {FileWithPreview} from "@comend/components/image-selector";
+import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@comend/lib/fetchers";
+import {handleImageUpload} from "@comend/lib/upload";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import {getPublicFile} from "@comend/lib/utils";
+import mixpanel from "mixpanel-browser";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import MultipleSelector from "@/packages/components/ui/multiple-selector";
+import {optionSchema} from "@/packages/components/research-onboarding-form";
+import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
+import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
+import { badgeVariants } from "@comend/components/ui/badge"
+
+export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
+    ...option,
+    value: option.id,
+}));
+
+const userFormSchema = z.object({
+    name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
+    title: z.string().min(2, {message: "Your title must be at least 2 characters."}),
+    affiliations: z.array(optionSchema).optional(),
+    researchInterests: z.array(optionSchema).optional(),
+    genesOfInterest: z.array(optionSchema).optional(),
+    conditionsOfInterest: z.array(optionSchema).optional(),
+    notificationSettings: z.boolean().default(false),
+    consentSettings: z.boolean().default(false),
+    image: z.string().optional(),
+});
+
+export default function ResearcherOnboardingForm() {
+    const router = useRouter();
+    const {data: session} = useSession();
+    const [loading, setLoading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [invitations, setInvitations] = useState<any[]>([]);
+    const hasInvitations = invitations.length > 0;
+    const [isInitializing, setIsInitializing] = useState(true)
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await getInvitations({
+                    id: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    accepted: true,
+                    organizationId: true,
+                });
+
+                if (response.success && response.data) {
+                    const invitationsWithDetails = await Promise.all(
+                        response.data.map(async (invitation) => {
+                            const orgResponse = await getPublicOrganizationData(invitation.organizationId, {
+                                id: true,
+                                name: true,
+                                published: true,
+                                verified: true,
+                                public: true,
+                                description: true,
+                                contactEmail: true,
+                                image: true,
+                                headerImage: true,
+                                subdomain: true,
+                                yearFounded: true,
+                                incorporationStatus: true,
+                                therapeuticsOfInterest: true,
+                                therapeuticsInDevelopment: true,
+                                website: true,
+                                moneyRaised: true,
+                                moneyDeployed: true,
+                                researchBudget: true,
+                                members: true,
+                                conditions: true,
+                            });
+                            return {
+                                ...invitation,
+                                organization: orgResponse.success ? orgResponse.data : null,
+                            };
+                        })
+                    );
+
+                    setInvitations(invitationsWithDetails);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+            setIsInitializing(false)
+        };
+
+        fetchUserData()
+    }, [session, router]);
+
+
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof userFormSchema> | undefined>(undefined);
+
+    const form = useForm<z.infer<typeof userFormSchema>>({
+        mode: "onChange",
+        resolver: zodResolver(userFormSchema),
+        defaultValues,
+    });
+
+    useEffect(() => {
+        async function fetchUserData() {
+            if (session?.user?.id) {
+                let userData
+                const response = await getResearcher(session.user.id, {
+                    id: true,
+                    orcid: true,
+                    email: true,
+                    emailHash: true,
+                    title: true,
+                    name: true,
+                    researchInterests: true,
+                    conditionsOfInterest: true,
+                    genesOfInterest: true,
+                    affiliations: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    metadata: true
+                });
+                if (response.success) {
+                    userData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
+                if (userData) {
+                    const fetchedValues = {
+                        name: userData.name || "",
+                        title: userData.name || "",
+                        affiliations: userData.affiliations.map((affiliation: any) => ({
+                            label: affiliation,
+                            value: affiliation
+                        })) || [],
+                        researchInterests: userData.researchInterests.map((interests: any) => ({
+                            label: interests,
+                            value: interests
+                        })) || [],
+                        conditionsOfInterest: userData.conditionsOfInterest.map((condition: any) => ({
+                            label: condition,
+                            value: condition
+                        })) || [],
+                        genesOfInterest: userData.genesOfInterest.map((gene: any) => ({
+                            label: gene,
+                            value: gene
+                        })) || [],
+                        notificationSettings: userData.notificationSettings ?? true,
+                        consentSettings: userData.consentSettings ?? true,
+                        image: userData.image || "",
+                    };
+
+                    if (userData.image) {
+                        try {
+                            const userPhoto: File = await getPublicFile(userData.image)
+                            if (userPhoto) {
+                                const fileWithPreview = Object.assign(userPhoto, {
+                                    preview: URL.createObjectURL(userPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
+                    setDefaultValues(fetchedValues);
+                    form.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+            setIsInitializing(false)
+        }
+
+        fetchUserData();
+    }, [session, form]);
+
+    async function onSubmit(values: z.infer<typeof userFormSchema>) {
+        setLoading(true);
+
+        try {
+            // handle mixpanel opt-in/opt-out
+            if (values.consentSettings) {
+                console.log(`mixpanel opt-in`)
+                if (session?.user?.id && session?.user?.email) {
+                    // identify the user if we can, to ensure we have the proper distinct ID
+                    if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
+                    else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+                }
+                mixpanel.opt_in_tracking()
+            } else if (!values.consentSettings) {
+                console.log(`mixpanel opt-out`)
+                mixpanel.opt_out_tracking()
+            }
+
+            // handle image upload, only upload if the current image is not the same as the previous image
+            if (selectedFile && values.image && values.image !== defaultValues?.image) {
+                console.log(`selectedFile`, selectedFile)
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                values.image = imgUrl || undefined
+            }
+
+            for (const [key, value] of Object.entries(values)) {
+                const res: any = await editUser(session?.user?.id as string, {[key]: value});
+                if (res?.error) {
+                    toast.error(res.error);
+                    return;
+                }
+            }
+
+            toast.success("Successfully updated researcher profile!");
+            if (hasInvitations) {
+                router.push("/app/profile");
+            } else {
+                router.push("/onboarding/organization");
+            }
+        } catch (error) {
+            toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (isInitializing) {
+        return (
+            <div className="h-full w-full flex flex-col gap-2">
+                <Skeleton className="h-[20px] w-full"/>
+                <Skeleton className="h-[32px] w-full"/>
+                <Skeleton className="mt-4 h-[80px] w-full"/>
+                <Skeleton className="h-[80px] w-full"/>
+                <Skeleton className="mt-4 h-[40px] w-full"/>
+            </div>
+        )
+    }
+
+    return (
+        <div className="grid grid-cols-2 gap-x-8">
+            <div className="col-span-1">
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(
+                            onSubmit,
+                            (errors) => {
+                                console.log("Validation errors:", errors);
+                                if (Object.keys(errors).length > 0) {
+                                    toast.error("Please correct the highlighted errors.");
+                                }
+                            }
+                        )}
+                        className="space-y-8"
+                    >
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Your Full Name (required)</FormLabel>
+                                    {/*<FormDescription>This is your public display name.</FormDescription>*/}
+                                    <FormControl>
+                                        <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Your role</FormLabel>
+                                    <FormDescription>Your primary title or role.</FormDescription>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger
+                                                aria-label="Select title or role"
+                                            >
+                                                <SelectValue placeholder="Role"/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent className="rounded-xl">
+                                            <SelectItem value="researcher">Researcher</SelectItem>
+                                            <SelectItem value="pm">Project Manager</SelectItem>
+                                            <SelectItem value="pi">Principal Investigator</SelectItem>
+                                            <SelectItem value="student">Student</SelectItem>
+                                            <SelectItem value="other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="affiliations"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Affiliations</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={true}
+                                            maxSelected={5}
+                                            onSearch={handleInstitutionAsyncSearch}
+                                            placeholder="Search for institutions..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading institutions...</p>}
+                                            emptyIndicator={<p>No institutions found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="researchInterests"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Research interests</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            badgeClassName={badgeVariants({variant: "lightBlue"})}
+                                            defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                            hidePlaceholderWhenSelected={true}
+                                            placeholder="Select associated project types..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="conditionsOfInterest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Conditions of interest</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={true}
+                                            maxSelected={5}
+                                            onSearch={handleConditionAsyncSearch}
+                                            placeholder="Search for conditions..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading conditions...</p>}
+                                            emptyIndicator={<p>No conditions found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="genesOfInterest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Genes of interest</FormLabel>
+                                    <FormDescription>
+                                        Select all that apply.
+                                    </FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            onSearch={handleGeneAsyncSearch}
+                                            placeholder="Search for genes..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading genes...</p>}
+                                            emptyIndicator={<p>No genes found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="notificationSettings"
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                {`Allow us to contact you regarding platform changes and notifications.`}
+                                            </FormLabel>
+                                            <FormDescription>
+                                                {`You can manage your notifications in your user settings page.`}
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="consentSettings"
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                {`I consent for Comend to collect data to help improve the platform.`}
+                                            </FormLabel>
+                                            <FormDescription>
+                                                {`You can change these settings in your user settings page.`}
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <Button type="submit" disabled={loading}>
+                            {loading ? <LoadingDots color="#808080"/> : "Next"}
+                        </Button>
+                    </form>
+                </Form>
+            </div>
+
+        </div>
+    )
+}

@@ -6,11 +6,11 @@ import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
 import {getSession, withOrganizationAuth, withUserAuth} from "@comend/lib/auth";
 import { subMonths, startOfMonth } from "date-fns";
-import {Condition, Organization, Prisma, User} from "@prisma/client";
+import {Condition, Organization, Prisma, Researcher, User} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "@/data/pharma-data/schema";
+import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "../../data/pharma-data/schema";
 import { InternalArgs } from "@prisma/client/runtime/library"
 import { omit } from "lodash";
 import { getPubMedSearchResultIds, getPubMedSearchResultData} from "comend-pag-platform/lib/pubmed";
@@ -529,7 +529,7 @@ export async function getPublicUser(
         })
 
         if (!user) {
-            return {success: false, error: "user not found"};
+            return {success: false, error: "User not found"};
         }
 
         const sanitizedUser = omit(user, [
@@ -962,7 +962,7 @@ export const getUserMemberRequests = withUserAuth(
             })
 
             if (!fetchedMemberRequests) {
-                return {success: false, error: "user not found"};
+                return {success: false, error: "User not found"};
             }
 
             return {
@@ -998,7 +998,7 @@ export const getMemberRequestsWithUsers = withOrganizationAuth(
             // return {fetchedMemberRequests}
 
             if (!fetchedMemberRequests) {
-                return {success: false, error: "user not found"};
+                return {success: false, error: "User not found"};
             }
 
             return {
@@ -1458,7 +1458,7 @@ export const getUser = withUserAuth(
             })
 
             if (!fetchedUser) {
-                return {success: false, error: "user not found"};
+                return {success: false, error: "User not found"};
             }
 
             return {
@@ -1702,3 +1702,35 @@ export async function getTopPubMedPublications(keyword?: string) {
         return { success: false, error: "Failed to fetch publications" }
     }
 }
+
+export const getResearcher = withUserAuth(
+    async (
+        researcher: Researcher,
+        select: Prisma.ResearcherSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: {id: researcher.id},
+                // include: {organizations: true},
+                select
+            })
+
+            if (!fetchedResearcher) {
+                return {success: false, error: "Researcher not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedResearcher
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
