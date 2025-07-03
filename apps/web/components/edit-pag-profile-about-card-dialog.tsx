@@ -23,14 +23,8 @@ import {Member, Organization, User} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
-import {MODALITIES} from "@comend/lib/types";
+import {MODALITIES, optionSchema} from "@comend/lib/types";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {

@@ -44,13 +44,6 @@ import { DeleteAssetDialog } from "./delete-asset-dialog"
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    description: z.string().optional()
-    // disable: z.boolean().optional(),
-});
-
 const editAssetForm = z.object({
     title: z
         .string({

@@ -7,7 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {updateOrganization, updateCondition} from "@comend/lib/actions";
-import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
+import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, optionSchema} from "@comend/lib/types";
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
@@ -35,12 +35,6 @@ import MoneyInput from "@comend/components/money-input";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";
 import { EditableProfilePhoto } from "./editable-profile-photo";
 import { EditablePAGBannerPhoto } from "./editable-pag-banner-photo";
-
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 export const financesFormSchema = z.object({
     // raising: z.enum(["yes", "no-but", "no"]).optional(),
