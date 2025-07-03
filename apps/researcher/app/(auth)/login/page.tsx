@@ -8,7 +8,7 @@ import {toast} from "sonner";
 import AdminLoginForm from "@/apps/admin/components/admin-login-form";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSession} from "next-auth/react";
-import ProviderLoginForm from "~provider/components/login-form";
+import ResearcherLoginForm from "~provider/components/login-form";
 
 export default function LoginPage() {
     const {data: session} = useSession()
@@ -121,7 +121,7 @@ export default function LoginPage() {
                                 className="my-2 h-10 w-full rounded-md border border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-800"/>
                         }
                     >
-                        <ProviderLoginForm
+                        <ResearcherLoginForm
                             callback="/onboarding/"
                             isCaptchaVerified={isVerified}
                         />
