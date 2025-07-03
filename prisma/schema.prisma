@@ -1009,7 +1009,7 @@ model Researcher {
   researchInterests    String[]
   conditionsOfInterest String[]
   genesOfInterest      String[]
-  affiliation          Affiliation[]
+  affiliations         Affiliation[]
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   metadata             Json?

@@ -19,18 +19,33 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {editUser} from "@comend/lib/actions";
 import {Checkbox} from "@comend/components/ui/checkbox";
-import {AddressType} from "@comend/lib/types";
-import {useEffect, useState} from "react";
+import {AddressType, Option} from "@comend/lib/types";
+import React, {useEffect, useState} from "react";
 import {FileWithPreview} from "@comend/components/image-selector";
-import {getInvitations, getPublicOrganizationData, getUser} from "@comend/lib/fetchers";
+import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import { getPublicFile } from "@comend/lib/utils";
+import {getPublicFile} from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
-import { Skeleton } from "@comend/components/ui/skeleton";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import MultipleSelector from "@/packages/components/ui/multiple-selector";
+import {optionSchema} from "@/packages/components/research-onboarding-form";
+import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
+import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
+import { badgeVariants } from "@comend/components/ui/badge"
+
+export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
+    ...option,
+    value: option.id,
+}));
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
+    title: z.string().min(2, {message: "Your title must be at least 2 characters."}),
+    affiliations: z.array(optionSchema).optional(),
+    researchInterests: z.array(optionSchema).optional(),
+    genesOfInterest: z.array(optionSchema).optional(),
+    conditionsOfInterest: z.array(optionSchema).optional(),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     image: z.string().optional(),
@@ -114,34 +129,20 @@ export default function ResearcherOnboardingForm() {
         async function fetchUserData() {
             if (session?.user?.id) {
                 let userData
-                const response = await getUser(session.user.id, {
+                const response = await getResearcher(session.user.id, {
                     id: true,
-                    name: true,
+                    orcid: true,
                     email: true,
-                    image: true,
+                    emailHash: true,
+                    title: true,
+                    name: true,
+                    researchInterests: true,
+                    conditionsOfInterest: true,
+                    genesOfInterest: true,
+                    affiliations: true,
                     createdAt: true,
                     updatedAt: true,
-                    notificationSettings: true,
-                    consentSettings: true,
-                    accounts: true,
-                    comments: true,
-                    follows: true,
-                    sentInvitations: true,
-                    memberships: true,
-                    membershipRequests: true,
-                    organizations: true,
-                    posts: true,
-                    reactions: true,
-                    roadmaps: true,
-                    sessions: true,
-                    stakeholders: true,
-                    platformNotifications: true,
-                    reviews: true,
-                    replies: true,
-                    reportOnReviews: true,
-                    reportOnReplies: true,
-                    reviewFeedbacks: true,
-                    metadata: true,
+                    metadata: true
                 });
                 if (response.success) {
                     userData = response.data
@@ -153,17 +154,25 @@ export default function ResearcherOnboardingForm() {
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",
+                        title: userData.name || "",
+                        affiliations: userData.affiliations.map((affiliation: any) => ({
+                            label: affiliation,
+                            value: affiliation
+                        })) || [],
+                        researchInterests: userData.researchInterests.map((interests: any) => ({
+                            label: interests,
+                            value: interests
+                        })) || [],
+                        conditionsOfInterest: userData.conditionsOfInterest.map((condition: any) => ({
+                            label: condition,
+                            value: condition
+                        })) || [],
+                        genesOfInterest: userData.genesOfInterest.map((gene: any) => ({
+                            label: gene,
+                            value: gene
+                        })) || [],
                         notificationSettings: userData.notificationSettings ?? true,
                         consentSettings: userData.consentSettings ?? true,
-                        address1: userData.address1 || "",
-                        address2: userData.address2 || "",
-                        formattedAddress: userData.formattedAddress || "",
-                        city: userData.city || "",
-                        region: userData.region || "",
-                        postalCode: userData.postalCode || "",
-                        country: userData.country || "",
-                        lat: userData.lat?.toString() || "0",
-                        lng: userData.lng?.toString() || "0",
                         image: userData.image || "",
                     };
 
@@ -224,7 +233,7 @@ export default function ResearcherOnboardingForm() {
                 }
             }
 
-            toast.success("Successfully updated user profile!");
+            toast.success("Successfully updated researcher profile!");
             if (hasInvitations) {
                 router.push("/app/profile");
             } else {
@@ -236,6 +245,62 @@ export default function ResearcherOnboardingForm() {
             setLoading(false);
         }
     }
+
+    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (isInitializing) {
         return (
@@ -274,6 +339,132 @@ export default function ResearcherOnboardingForm() {
                                     {/*<FormDescription>This is your public display name.</FormDescription>*/}
                                     <FormControl>
                                         <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Your role</FormLabel>
+                                    <FormDescription>Your primary title or role.</FormDescription>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger
+                                                aria-label="Select title or role"
+                                            >
+                                                <SelectValue placeholder="Role"/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent className="rounded-xl">
+                                            <SelectItem value="researcher">Researcher</SelectItem>
+                                            <SelectItem value="pm">Project Manager</SelectItem>
+                                            <SelectItem value="pi">Principal Investigator</SelectItem>
+                                            <SelectItem value="student">Student</SelectItem>
+                                            <SelectItem value="other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="affiliations"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Affiliations</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={true}
+                                            maxSelected={5}
+                                            onSearch={handleInstitutionAsyncSearch}
+                                            placeholder="Search for institutions..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading institutions...</p>}
+                                            emptyIndicator={<p>No institutions found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="researchInterests"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Research interests</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            badgeClassName={badgeVariants({variant: "lightBlue"})}
+                                            defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                            hidePlaceholderWhenSelected={true}
+                                            placeholder="Select associated project types..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="conditionsOfInterest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Conditions of interest</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={true}
+                                            maxSelected={5}
+                                            onSearch={handleConditionAsyncSearch}
+                                            placeholder="Search for conditions..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading conditions...</p>}
+                                            emptyIndicator={<p>No conditions found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="genesOfInterest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Genes of interest</FormLabel>
+                                    <FormDescription>
+                                        Select all that apply.
+                                    </FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            onSearch={handleGeneAsyncSearch}
+                                            placeholder="Search for genes..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading genes...</p>}
+                                            emptyIndicator={<p>No genes found.</p>}
+                                            showHoverCard={false}
+                                        />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -337,69 +528,6 @@ export default function ResearcherOnboardingForm() {
                 </Form>
             </div>
 
-            {/*<div className="col-span-1 space-y-4 border-1 rounded-lg">*/}
-            {/*    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">*/}
-            {/*        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">*/}
-            {/*            User profile preview*/}
-            {/*        </h1>*/}
-
-            {/*        <div className="grid grid-cols-6 w-full space-y-8 my-8">*/}
-            {/*            <div className="col-span-2">*/}
-            {/*                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">*/}
-            {/*                    <div className="flex">*/}
-            {/*                        {selectedFile?.preview ?*/}
-            {/*                            <img className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"*/}
-            {/*                            src={selectedFile?.preview}*/}
-            {/*                                 alt=""/>*/}
-            {/*                            :*/}
-            {/*                            <p*/}
-            {/*                                className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}*/}
-            {/*                            >*/}
-            {/*                                {nameToInitials(form.watch("name"))}*/}
-            {/*                            </p>*/}
-            {/*                        }*/}
-            {/*                    </div>*/}
-
-            {/*                    <div*/}
-            {/*                        className="mt-4 min-w-0 flex-1 truncate text-xl font-bold text-gray-900 sm:hidden md:block">*/}
-            {/*                        {form.watch("name") || <Skeleton className="h-4 w-full"/>}*/}
-            {/*                    </div>*/}
-
-            {/*                    <div>*/}
-            {/*                        {form.watch("title") || <Skeleton className="h-4 w-full"/>}*/}
-            {/*                    </div>*/}
-
-            {/*                    <div*/}
-            {/*                        className="mt-4 min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:hidden md:block">*/}
-            {/*                        Organizations*/}
-            {/*                    </div>*/}
-            {/*                    <Skeleton className="h-4 w-full"/>*/}
-
-            {/*                    <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">*/}
-            {/*                        <h1 className="truncate text-2xl font-bold text-gray-900">*/}
-            {/*                            {form.watch("name")}*/}
-            {/*                        </h1>*/}
-            {/*                    </div>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-
-            {/*            <div className="col-span-4 flex flex-col space-y-4">*/}
-            {/*                <Card>*/}
-            {/*                    <CardHeader className="flex flex-row items-center justify-between space-y-0">*/}
-            {/*                        <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>*/}
-            {/*                            Activity*/}
-            {/*                        </CardTitle>*/}
-            {/*                    </CardHeader>*/}
-            {/*                    <CardContent className="space-y-4">*/}
-            {/*                        <Skeleton className="h-4 w-full"/>*/}
-            {/*                        <Skeleton className="h-4 w-[200px]"/>*/}
-            {/*                        <Skeleton className="h-4 w-[200px]"/>*/}
-            {/*                    </CardContent>*/}
-            {/*                </Card>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
         </div>
     )
 }
