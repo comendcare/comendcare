@@ -27,6 +27,7 @@ export default function ToolsLayout({children}: {children: React.ReactNode}) {
                 id: true,
                 title: true,
                 description: true,
+                types: true,
                 contacts: true,
                 attachments: true,
                 private: true,

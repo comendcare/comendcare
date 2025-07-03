@@ -29,6 +29,13 @@ async function main() {
         skipDuplicates: true
     })
 
+    // seed tool types
+    await prisma.toolType.deleteMany()
+    const toolTypes = await prisma.toolType.createMany({
+        data: MILESTONE_TYPE_OPTIONS.map(({id, label}) => ({id, label})),
+        skipDuplicates: true
+    })
+
     const flawnson = await prisma.user.upsert({
         where: {email: 'flawnsontong1@gmail.com'},
         update: {},

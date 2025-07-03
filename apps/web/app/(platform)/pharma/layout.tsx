@@ -192,6 +192,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 id: true,
                 title: true,
                 description: true,
+                types: true,
                 contacts: true,
                 attachments: true,
                 private: true,
