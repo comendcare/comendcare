@@ -293,10 +293,20 @@ model Tool {
   private     Boolean              @default(true)
   pinned      Boolean              @default(false)
   metadata    Json?
+  types       String[] // values (ToolType ids)
 
   organizationId String?
   organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     ToolToMilestone[]
+}
+
+model ToolType {
+  id          String   @id // value
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  label       String
+  description String?
+  metadata    Json?
 }
 
 model ToolToMilestone {
