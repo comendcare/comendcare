@@ -16,7 +16,7 @@ export const PrivateAssetsPage = () => {
     const { tools } = useAssetStore(useShallow(toolSelector))
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
+        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
         <div className="flex gap-2 w-full justify-end">
             <NewAssetDialog iconOnly={true} numAssetsPinned={tools.filter(tool => tool.pinned).length}/>
             <AssetBulkImportDialog />
