@@ -6,7 +6,9 @@ import {
     Store, User, Workflow,
     Bookmark,
     Star,
-    Megaphone
+    Megaphone,
+    TestTube,
+    Book
 } from "lucide-react"
 import {NavMain} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -61,8 +63,23 @@ const data = {
             title: "Tools",
             icon: Star,
             variant: "ghost",
-            url: `/app/tools`,
-            subPages: []
+            url: `/app/tools/biosample`,
+            subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
+                {
+                    title: "Biosample Requests",
+                    icon: TestTube,
+                    variant: "ghost",
+                    url: `/app/requests/biosample`,
+                    subPages: []
+                },
+                {
+                    title: "Data Requests",
+                    icon: Book,
+                    variant: "ghost",
+                    url: `/app/requests/data`,
+                    subPages: []
+                }
+            ] : []
         },
         {
             title: "RFPs",
