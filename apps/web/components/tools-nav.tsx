@@ -10,12 +10,12 @@ const links = [
     {
         name: "Biosample Tools",
         href: "/biosample",
-        comingSoon: false
+        comingSoon: false,
     },
     {
         name: "Data Tools",
         href: "/data",
-        comingSoon: false
+        comingSoon: false,
     },
 ]
 
