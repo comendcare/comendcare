@@ -96,7 +96,7 @@ export default function LoginPage() {
                         quality={100}
                     /> */}
                     <h1 className="text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
-                        {`Comend Provider Portal`}
+                        {`Comend Researcher Hub`}
                     </h1>
                     <h2 className="text-center text-xl font-bold leading-9 tracking-tight text-gray-900">
                         {`Sign in or create account`}
@@ -122,7 +122,7 @@ export default function LoginPage() {
                         }
                     >
                         <ProviderLoginForm
-                            callback="/profile"
+                            callback="/onboarding/"
                             isCaptchaVerified={isVerified}
                         />
                     </Suspense>
