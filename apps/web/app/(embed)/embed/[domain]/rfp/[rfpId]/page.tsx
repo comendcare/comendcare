@@ -49,7 +49,7 @@ export default async function EmbeddedRFPPage({params}: {params: {domain: string
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
+                        <BreadcrumbLink href={`https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
                             {organization.name}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
