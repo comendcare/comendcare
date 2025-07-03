@@ -30,6 +30,7 @@ const data = {
             icon: Store,
             variant: "ghost",
             url: "/app/marketplace/service-providers",
+            match: (path: string) => path.startsWith('/app/marketplace'),
             subPages: [{
                 title: "Shortlist",
                 icon: Bookmark,
@@ -42,6 +43,7 @@ const data = {
             icon: Workflow,
             variant: "ghost",
             url: `/app/research-plan`,
+            match: (path: string) => path.startsWith('/app/research-plan'),
             subPages: [
                 // {
                 //     title: "Assets",
@@ -64,6 +66,7 @@ const data = {
             icon: Star,
             variant: "ghost",
             url: `/app/tools/biosample`,
+            match: (path: string) => path.startsWith('/app/tools'),
             subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
                 {
                     title: "Biosample Requests",
