@@ -59,16 +59,10 @@ import { cn } from "@comend/lib/utils"
 import { Calendar } from "@comend/components/ui/calendar"
 import {Separator} from "@comend/components/ui/separator"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import { StatusType } from "@comend/lib/types"
+import { optionSchema, StatusType } from "@comend/lib/types"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-})
 
 const editTaskForm = z.object({
     name: z
