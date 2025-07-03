@@ -2,27 +2,15 @@
 
 import Link from "next/link"
 import {usePathname} from "next/navigation"
-
 import {cn} from "@comend/lib/utils"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 
-const links = [
-    {
-        name: "Biosample Requests",
-        href: "/biosample",
-        comingSoon: false
-    },
-    {
-        name: "Data Requests",
-        href: "/data",
-        comingSoon: false
-    },
-]
-
-export function RequestsNav({
+export function TabNav({
     className,
+    baseLink,
+    links,
     ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string, links: {name: string, href: string, comingSoon: boolean}[]})) {
     const pathname = usePathname()
 
     return (
@@ -46,7 +34,7 @@ export function RequestsNav({
                         </Tooltip>
                         :
                         <Link
-                            href={"/app/requests/" + link.href}
+                            href={baseLink + link.href}
                             key={link.href}
                             className={cn(
                                 "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
