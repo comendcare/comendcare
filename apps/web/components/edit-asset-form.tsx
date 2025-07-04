@@ -124,7 +124,7 @@ export function EditAssetForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
-        console.log(`handle form submit`, values)
+        // console.log(`handle form submit`, values)
         const {
             title,
             description,
@@ -136,8 +136,6 @@ export function EditAssetForm({
             contacts,
             milestones,
         } = values;
-
-        console.log(`save`, values)
 
         const updateData: Partial<Asset> = {
             ...toolData,
@@ -159,8 +157,6 @@ export function EditAssetForm({
             ...(attachments ? {attachments} : undefined),
             ...(contacts ? {contacts} : undefined),
         }
-
-        console.log(`updateData`, updateData)
 
         if (!session?.user?.organizationId) {
             toast.error(
@@ -277,8 +273,6 @@ export function EditAssetForm({
     }, [])
 
     useEffect(() => {
-        console.log(`tool types`, toolTypes)
-        console.log(`tool data types`, toolData.types)
         form.setValue("types", toolTypes.filter(toolType => (toolData?.types || []).includes(toolType.id)).map(toolType => ({value: toolType.id, label: toolType.label}) as Option))
     }, [toolTypes])
 
