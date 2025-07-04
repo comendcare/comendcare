@@ -6,12 +6,12 @@ import { useShallow } from "zustand/react/shallow"
 import { NewAssetDialog } from "./edit-asset-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { columns } from "./assets-data-table/assets-data-columns";
-import { columns as DataToolColumns, PAGDataToolDataTable } from "./pag-data-tool-data-table/pag-data-tool-data-table"
-import { columns as BiosampleToolColumns } from "./pag-biosample-tool-data-table/pag-biosample-tool-data-table"
+import { columns as DataToolColumns, DataToolDataTable } from "./data-tool-data-table/data-tool-data-table"
+import { columns as BiosampleToolColumns } from "./biosample-tool-data-table/biosample-tool-data-table"
 import { AssetsDataTable } from "./assets-data-table/assets-data-table"
 import { useEffect, useState } from "react"
 import { Asset } from "@/packages/lib/types"
-import { PAGBiosampleToolDataTable } from "./pag-biosample-tool-data-table/pag-biosample-tool-data-table"
+import { BiosampleToolDataTable } from "./biosample-tool-data-table/biosample-tool-data-table"
 
 const toolSelector = (state: AssetState) => ({
     tools: state.tools,
@@ -58,10 +58,10 @@ export const PrivateAssetsPage = ({type}: {type: 'biosample' | 'data'}) => {
             </div>
         )}
         {filteredTools.length > 0 && type === 'biosample' && (
-            <PAGBiosampleToolDataTable data={filteredTools} columns={BiosampleToolColumns} />
+            <BiosampleToolDataTable data={filteredTools} columns={BiosampleToolColumns} />
         )}
         {filteredTools.length > 0 && type === 'data' && (
-            <PAGDataToolDataTable data={filteredTools} columns={DataToolColumns} />
+            <DataToolDataTable data={filteredTools} columns={DataToolColumns} />
         )}
         {/* <AssetsDataTable data={filteredTools} columns={columns} type={type}/> */}
         </main>

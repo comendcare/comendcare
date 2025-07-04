@@ -151,7 +151,7 @@ export const columns: ColumnDef<Asset>[] = [
     },
 ]
 
-export function PAGBiosampleToolDataTable<TData, TValue>({
+export function DataRequestDataTable<TData, TValue>({
                                              columns,
                                              data,
                                          }: DataTableProps<TData, TValue>) {
@@ -215,7 +215,7 @@ export function PAGBiosampleToolDataTable<TData, TValue>({
                                     key={row.id}
                                     data={{...row.original} as Partial<Asset>} 
                                     numAssetsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Asset>).pinned).length}
-                                    type={'biosample'}
+                                    type={'data'}
                                 >
                                     <TableRow
                                         key={row.id}

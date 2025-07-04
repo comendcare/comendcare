@@ -151,7 +151,7 @@ export const columns: ColumnDef<Asset>[] = [
     },
 ]
 
-export function PAGDataToolDataTable<TData, TValue>({
+export function DataToolDataTable<TData, TValue>({
                                              columns,
                                              data,
                                          }: DataTableProps<TData, TValue>) {
