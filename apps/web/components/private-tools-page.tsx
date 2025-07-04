@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { AssetState, useAssetStore } from "@/state/asset/assetStore"
+import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import { NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
@@ -13,13 +13,13 @@ import { useEffect, useState } from "react"
 import { Asset } from "@/packages/lib/types"
 import { BiosampleToolDataTable } from "./biosample-tool-data-table/biosample-tool-data-table"
 
-const toolSelector = (state: AssetState) => ({
+const toolSelector = (state: ToolState) => ({
     tools: state.tools,
     toolTypes: state.toolTypes
 })
 
 export const PrivateToolsPage = ({type}: {type: 'biosample' | 'data'}) => {
-    const { tools, toolTypes } = useAssetStore(useShallow(toolSelector))
+    const { tools, toolTypes } = useToolStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
 
     useEffect(() => {

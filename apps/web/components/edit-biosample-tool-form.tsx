@@ -35,7 +35,7 @@ import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from 
 import { toast } from "sonner"
 import { Delete, Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
-import { AssetState, useAssetStore } from "@/state/asset/assetStore"
+import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
@@ -70,10 +70,10 @@ const editAssetForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional()
 })
 
-const toolSelector = (state: AssetState) => ({
+const toolSelector = (state: ToolState) => ({
     toolTypes: state.toolTypes,
-    createAsset: state.createAsset,
-    updateAsset: state.updateAsset
+    createTool: state.createTool,
+    updateTool: state.updateTool
 })
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
@@ -90,7 +90,7 @@ export function EditBiosampleToolForm({
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { toolTypes, createAsset, updateAsset } = useAssetStore(useShallow(toolSelector))
+    const { toolTypes, createTool, updateTool } = useToolStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editAssetForm>>({
@@ -172,13 +172,13 @@ export function EditBiosampleToolForm({
 
         try {
             if (toolData.id) {
-                await updateAsset(updateData, session.user.organizationId)
+                await updateTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
             } else {
-                await createAsset(updateData, session.user.organizationId)
+                await createTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}

@@ -9,7 +9,7 @@ import { useOrganizationSearchStore } from "@/state/search/organizationSearchSto
 import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
 import { Asset, RFP, Roadmap } from '@comend/lib/types';
-import { useAssetStore } from "@/state/asset/assetStore";
+import { useToolStore } from "@/state/tool/toolStore";
 import { useRFPStore } from "@/state/rfp/rfpStore";
 
 export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
@@ -82,7 +82,7 @@ export function initializeNotificationsState(initData: {
 
 export function initializeAssetsStore(tools: Asset[], toolTypes: ToolType[]) {
     if (typeof window !== "undefined") {
-        const initAssetState = useAssetStore.getState().initState;
+        const initAssetState = useToolStore.getState().initState;
 
         // Call Zustand's initState directly
         initAssetState(tools, toolTypes)
