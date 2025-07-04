@@ -37,7 +37,9 @@ import {
 import Loading from "@/loading";
 import {
     getAllMembershipsFromUserId,
+    getAllNotifications,
     getInvitations,
+    getMembershipRemovedNotifications,
     getOrganizationFromOrganizationId,
     getPublicOrganizationData,
     getUser,
@@ -45,7 +47,7 @@ import {
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest} from "@comend/lib/actions";
-import {Invitation, Member, Organization} from "@prisma/client";
+import {Invitation, Member, Organization, PlatformNotification} from "@prisma/client";
 import {
     Dialog,
     DialogContent,
@@ -72,6 +74,7 @@ export function NavUser() {
     const [invitations, setInvitations] = useState<any[]>([]);
     const [memberRequests, setMemberRequests] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [membershipRemovedNotifications, setMembershipRemovedNotifications] = useState<Partial<PlatformNotification>[]>([])
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -258,10 +261,39 @@ export function NavUser() {
             }
         }
 
+        async function fetchMemberRemovedNotifications() {
+            try {
+                const response = await getMembershipRemovedNotifications({
+                    id: true,
+                    type: true,
+                    title: true,
+                    message: true,
+                    lastViewedAt: true,
+                });
+
+                console.log(`fetch member removed notifications`, response)
+
+                if (response.success && response.data) {
+                    const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
+                    setMembershipRemovedNotifications(filteredNotifications)
+                } else if (response.error) {
+                    console.error(response.error);
+                    toast.error(response.error);
+                } else {
+                    console.error("Unexpected response structure:", response);
+                    toast.error("Couldn't fetch notifications. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+                toast.error("An unexpected error occurred while fetching notifications.");
+            }
+        }
+
         fetchUserData()
         fetchOrgData()
         fetchInvitationData()
         fetchMemberRequestData()
+        fetchMemberRemovedNotifications()
     }, [status, session, router]);
 
     async function handleAcceptInvitation(invitationId: string) {
@@ -365,6 +397,22 @@ export function NavUser() {
 
     return (
         <>
+            {membershipRemovedNotifications && membershipRemovedNotifications.length > 0 && (
+                <AlertDialog>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>{membershipRemovedNotifications[0].title}</AlertDialogTitle>
+                            <AlertDialogDescription>{membershipRemovedNotifications[0].message}</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => {}}>
+                                Close
+                            </AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+
             {isDialogOpen && invitations.length > 0 && (
                 <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <AlertDialogContent>

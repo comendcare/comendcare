@@ -7,6 +7,7 @@ import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
+import { createNotification } from "actions"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
@@ -173,6 +174,28 @@ export const authOptions: NextAuthOptions = {
                     // fallback to first available membership
                     membership = dbUser.memberships[0];
                     activeOrganizationId = membership.organizationId;
+
+                    // const userKickedNotification = await createNotification({
+                    //     type: "REMOVED_FROM_ORG",
+                    //     title: `You have been removed from ${}`
+                    // })
+                    if (typeof token.organizationId === "string") {
+                        const kickedOrganization = await prisma.organization.findUnique({
+                            where: {id: token.organizationId}
+                        })
+
+                        if (kickedOrganization) {
+                            const notification = await prisma.platformNotification.create({
+                                data: {
+                                    type: "REMOVED_FROM_ORG",
+                                    title: `You've been removed from ${kickedOrganization.name}`,
+                                    message: `Your membership from ${kickedOrganization.name} had been removed. If you think this is a mistake, please contact the organization administrator.`,
+                                    user: {connect: {id: session?.user.id}},
+                                    organization: {connect: {id: membership.organizationId}},
+                                }
+                            })
+                        }
+                    }
                 }
             }
 

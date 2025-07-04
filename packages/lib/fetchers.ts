@@ -1523,6 +1523,34 @@ export const getAllNotifications = async (
     }
 }
 
+export const getMembershipRemovedNotifications = async (
+    select: Prisma.PlatformNotificationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) => {
+    try {
+        const session = await getSession()
+        if (!session?.user.id) throw new Error("User ID or Organization ID not in session")
+        
+        const notifications = await prisma.platformNotification.findMany({
+            where: {
+                userId: session.user.id,
+                type: "REMOVED_FROM_ORG"
+                // organizationId: session.user.organizationId
+            },
+            select
+        })
+
+        return {success: true, data: notifications}
+    } catch (error: any) {
+        logError("Error fetching notifications data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 /* PHARMA PROTOTYPE FETCHERS - tbd how we want to use auth on these */
 export async function getPharmaProjects(
     select: Prisma.PharmaProjectSelect<InternalArgs & {

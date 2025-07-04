@@ -79,7 +79,7 @@ model User {
 
 model PlatformNotification {
   id             String       @id @default(uuid())
-  type           String // Stores the notification type (e.g. "NEW_TASK", "NEW_RECOMMENDATION")
+  type           String // Stores the notification type (e.g. "NEW_TASK", "NEW_RECOMMENDATION", "REMOVED_FROM_ORG")
   title          String
   message        String?
   link           String?

@@ -217,7 +217,7 @@ export type PostWithAuthorAndComments = Post & {
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
-export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
+export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION' | 'REMOVED_FROM_ORG'
 
 export type NodeType = 'ASSET' | 'PROJECT' | 'RFP'
 
