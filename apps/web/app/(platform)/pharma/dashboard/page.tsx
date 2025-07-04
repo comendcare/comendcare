@@ -2,7 +2,7 @@ import {PharmaChartAreaInteractive} from "~web/components/pharma-chart-area-inte
 import {PharmaDataTable} from "~web/components/pharma-data-table"
 import {PharmaDashboardSectionCards} from "~web/components/pharma-dashboard-section-cards"
 
-import data from "@/data/pharma-data.json"
+// import data from "@/data/pharma-data.json"
 
 export default function PharmaDashboardPage() {
     return (
