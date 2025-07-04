@@ -13,7 +13,7 @@ import {z} from "zod";
 import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "../../data/pharma-data/schema";
 import { InternalArgs } from "@prisma/client/runtime/library"
 import { omit } from "lodash";
-import { getPubMedSearchResultIds, getPubMedSearchResultData} from "comend-pag-platform/lib/pubmed";
+import { getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
