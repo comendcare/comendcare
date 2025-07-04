@@ -7,7 +7,7 @@ import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
-import ComendLoadingSpinner from "./comend-loading-spinner";
+import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
 import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { NoResultsView } from "./cro-search-results";
 import { Skeleton } from "@comend/components/ui/skeleton";

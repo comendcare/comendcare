@@ -7,7 +7,7 @@ import { SetStateAction, useState } from "react";
 import { templateMilestones, templateResearchPlans } from '@comend/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import ComendLoadingSpinner from "./comend-loading-spinner";
+import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { DialogClose } from "@comend/components/ui/dialog";
