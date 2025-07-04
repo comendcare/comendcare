@@ -8,5 +8,5 @@ export default async function AssetsPage() {
     const orgId = session?.user.organizationId
 
     if (!orgId) return <NoOrganization />
-    return <PrivateAssetsPage />
+    return <PrivateAssetsPage type={'data'}/>
 }

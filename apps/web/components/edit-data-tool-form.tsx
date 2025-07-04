@@ -29,7 +29,7 @@ import {
 } from "@comend/components/ui/dialog"
 import {Asset, optionSchema} from "@comend/lib/types"
 import {MilestoneType, Prisma, ToolType} from "@prisma/client"
-import {getOrganizationFromOrganizationId, getToolTypes} from "@comend/lib/fetchers"
+import {getDataToolTypes, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
@@ -77,7 +77,7 @@ const toolSelector = (state: AssetState) => ({
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
-export function EditAssetForm({
+export function EditDataToolForm({
     toolData,
     numAssetsPinned,
     closeDialog
@@ -251,7 +251,7 @@ export function EditAssetForm({
             }
 
             // get tool types from database
-            const response = await getToolTypes({
+            const response = await getDataToolTypes({
                 id: true,
                 label: true,
                 description: true
