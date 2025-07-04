@@ -1,23 +1,23 @@
 "use client"
 
-import { AssetState, useAssetStore } from "@/state/asset/assetStore"
+import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "@comend/components/ui/dialog"
 
-const toolSelector = (state: AssetState) => ({
-    createAsset: state.createAsset,
-    updateAsset: state.updateAsset,
-    deleteAsset: state.deleteAsset,
+const toolSelector = (state: ToolState) => ({
+    createTool: state.createTool,
+    updateTool: state.updateTool,
+    deleteTool: state.deleteTool,
     saveState: state.saveState
 })
 
 export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undefined, closeDialog?: () => void}) => {
     const {data: session} = useSession()
-    const { deleteAsset, saveState } = useAssetStore(useShallow(toolSelector))
-    const { undo } = useAssetStore.temporal.getState()
+    const { deleteTool, saveState } = useToolStore(useShallow(toolSelector))
+    const { undo } = useToolStore.temporal.getState()
 
     const handleUndo = () => {
         undo()
@@ -43,7 +43,7 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
         }
 
         try {
-            await deleteAsset(toolId, session.user.organizationId)
+            await deleteTool(toolId, session.user.organizationId)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">

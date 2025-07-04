@@ -5,18 +5,18 @@ import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@comend/lib/acti
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { ToolType } from '@prisma/client';
 
-export interface AssetState {
+export interface ToolState {
     tools: Asset[],
     toolTypes: ToolType[],
     initialized: boolean,
     initState: (tools: Asset[], toolTypes: ToolType[]) => void,
-    createAsset: (tool: Partial<Asset>, orgId: string) => Promise<void>,
-    updateAsset: (tool: Partial<Asset>, orgId: string) => Promise<void>,
-    deleteAsset: (toolId: string, orgId: string) => Promise<void>,
+    createTool: (tool: Partial<Asset>, orgId: string) => Promise<void>,
+    updateTool: (tool: Partial<Asset>, orgId: string) => Promise<void>,
+    deleteTool: (toolId: string, orgId: string) => Promise<void>,
     saveState: (orgId: string | null | undefined) => void,
 }
 
-export const useAssetStore = create<AssetState>()(
+export const useToolStore = create<ToolState>()(
     temporal((set, get) => ({
             tools: [],
             toolTypes: [],
@@ -24,7 +24,7 @@ export const useAssetStore = create<AssetState>()(
             initState: (tools: Asset[], toolTypes: ToolType[]) => {
                 set({tools, toolTypes, initialized: true})
             },
-            createAsset: async (tool: Partial<Asset>, orgId: string) => {
+            createTool: async (tool: Partial<Asset>, orgId: string) => {
                 const newAsset = await createOrUpdateAsset(orgId, tool)
 
                 mixpanelTrack("Tool Created", {
@@ -41,7 +41,7 @@ export const useAssetStore = create<AssetState>()(
                 // new Tool first, because Tools are displayed in decending order by creation date
                 set({ tools: [newAsset, ...get().tools]})
             },
-            updateAsset: async (tool: Partial<Asset>, orgId: string) => {
+            updateTool: async (tool: Partial<Asset>, orgId: string) => {
                 const updatedAsset = await createOrUpdateAsset(orgId, tool)
                 console.log(`updated tool`, updatedAsset)
 
@@ -57,7 +57,7 @@ export const useAssetStore = create<AssetState>()(
                 })
                 set({ tools: get().tools.map(tool => tool.id === updatedAsset.id ? updatedAsset : tool) })
             },
-            deleteAsset: async (toolId: string, orgId: string) => {
+            deleteTool: async (toolId: string, orgId: string) => {
                 const deletedAsset = await deleteAsset(orgId, toolId)
 
                 mixpanelTrack("Tool Deleted", {
