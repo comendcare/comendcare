@@ -8,39 +8,31 @@ import {OAuthConfig} from "next-auth/providers/oauth";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
-const OrcidProvider = (): OAuthConfig<any> => ({
-    id: "orcid",
-    name: "ORCID",
-    type: "oauth",
-    clientId: process.env.ORCID_CLIENT_ID!,
-    clientSecret: process.env.ORCID_CLIENT_SECRET!,
+const OrcidProvider = (): OAuthConfig<any> => (    {
+    id: 'orcid',
+    name: 'ORCID',
+    type: 'oauth',
+    version: '2.0',
+    wellKnown: 'https://orcid.org/.well-known/openid-configuration',
+    clientId: process.env.ORCID_CLIENT_ID,
+    clientSecret: process.env.ORCID_CLIENT_SECRET,
     authorization: {
-        url: "https://orcid.org/oauth/authorize",
+        url: 'https://orcid.org/oauth/authorize',
         params: {
-            scope: "/authenticate",
-            response_type: "code",
-            // redirect_uri: process.env.NEXTAUTH_URL + "/api/auth/callback/orcid",
+            scope: 'openid profile',
+            response_type: 'code',
         },
     },
-    token: "https://orcid.org/oauth/token",
-    userinfo: {
-        url: "https://pub.orcid.org/v3.0/[ORCID]",
-        async request({tokens, client, provider}) {
-            const id = tokens.orcid || tokens.id_token || tokens.sub || tokens.providerAccountId;
-            const res = await fetch(`https://pub.orcid.org/v3.0/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${tokens.access_token}`,
-                    Accept: "application/json",
-                },
-            });
-            return await res.json();
-        }
-    },
+    token: 'https://orcid.org/oauth/token',
+    userinfo: 'https://orcid.org/oauth/userinfo',
+    checks: ['pkce', 'state'],
     profile(profile) {
+        const given = profile.given_name ?? '';
+        const family = profile.family_name ?? '';
         return {
-            id: profile["orcid-identifier"]?.path,
-            // name: `${profile?.person?.name?.["given-names"]?.value ?? ""} ${profile?.person?.name?.["family-name"]?.value ?? ""}`.trim(),
-            // email: profile?.person?.emails?.email?.[0]?.email ?? null,
+            id: profile.sub,
+            type: 'Person',
+            label: `${given} ${family}`.trim(),
         };
     },
 });
