@@ -33,7 +33,7 @@ import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@co
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import { badgeVariants } from "@comend/components/ui/badge"
 
-export const optionSchema = z.object({
+const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
     disable: z.boolean().optional(),
