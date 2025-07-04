@@ -29,10 +29,13 @@ const OrcidProvider = (): OAuthConfig<any> => (    {
     profile(profile) {
         const given = profile.given_name ?? '';
         const family = profile.family_name ?? '';
+        const fallbackEmail = `orcid-${profile.sub}@orcid.org`; // fallback to synthetic email
+
         return {
             id: profile.sub,
-            type: 'Person',
-            label: `${given} ${family}`.trim(),
+            name: `${given} ${family}`.trim(),
+            email: profile.email ?? fallbackEmail, // ORCID doesn’t return real email
+            image: undefined, // ORCID usually doesn’t return profile image
         };
     },
 });
