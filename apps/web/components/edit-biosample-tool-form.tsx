@@ -29,7 +29,7 @@ import {
 } from "@comend/components/ui/dialog"
 import {Asset, optionSchema} from "@comend/lib/types"
 import {MilestoneType, Prisma, ToolType} from "@prisma/client"
-import {getBiosampleToolTypes, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
@@ -71,6 +71,7 @@ const editAssetForm = z.object({
 })
 
 const toolSelector = (state: AssetState) => ({
+    toolTypes: state.toolTypes,
     createAsset: state.createAsset,
     updateAsset: state.updateAsset
 })
@@ -89,9 +90,8 @@ export function EditBiosampleToolForm({
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { createAsset, updateAsset } = useAssetStore(useShallow(toolSelector))
+    const { toolTypes, createAsset, updateAsset } = useAssetStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
-    const [toolTypes, setToolTypes] = useState<ToolType[]>([])
 
     const form = useForm<z.infer<typeof editAssetForm>>({
         mode: "onChange",
@@ -99,7 +99,11 @@ export function EditBiosampleToolForm({
         defaultValues: {
             title: toolData?.title || "",
             description: toolData?.description || "",
-            types: toolTypes.filter(toolType => (toolData?.types || []).includes(toolType.id)).map(toolType => ({value: toolType.id, label: toolType.label}) as Option),
+            types: toolTypes
+                        .filter(type => type.type === 'biosample')
+                        .filter(toolType => (toolData?.types || [])
+                        .includes(toolType.id))
+                        .map(toolType => ({value: toolType.id, label: toolType.label}) as Option),
             otherTypeDetails: typeof toolData?.metadata === 'object' ? (toolData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -250,16 +254,6 @@ export function EditBiosampleToolForm({
                 }
             }
 
-            // get tool types from database
-            const response = await getBiosampleToolTypes({
-                id: true,
-                label: true,
-                description: true
-            })
-            if (response.success && response.data) {
-                setToolTypes(response.data || [])
-            }
-
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
             if (Object.keys(toolData).length > 0) form.trigger()
 
@@ -271,10 +265,6 @@ export function EditBiosampleToolForm({
     // missing dependencies disabled - we only want to run this once on initialization
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    useEffect(() => {
-        form.setValue("types", toolTypes.filter(toolType => (toolData?.types || []).includes(toolType.id)).map(toolType => ({value: toolType.id, label: toolType.label}) as Option))
-    }, [toolTypes])
 
     return (
         <Form {...form}>
@@ -330,7 +320,11 @@ export function EditBiosampleToolForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
-                                        options={toolTypes.map(toolType => ({value: toolType.id, label: toolType.label})) as Option[]}
+                                        options={
+                                            toolTypes
+                                                .filter(type => type.type === 'biosample')
+                                                .map(toolType => ({value: toolType.id, label: toolType.label})) as Option[]
+                                        }
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
                                         placeholder="Select a type..."

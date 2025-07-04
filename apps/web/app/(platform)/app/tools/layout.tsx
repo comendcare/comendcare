@@ -1,6 +1,6 @@
 "use client"
 import React, {useEffect, useState} from "react";
-import {getAssets, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
+import {getAssets, getOrganizationFromOrganizationId, getToolTypes} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import { initializeAssetsStore} from "@comend/lib/initialize-client-state"
@@ -34,8 +34,15 @@ export default function ToolsLayout({children}: {children: React.ReactNode}) {
                 pinned: true,
                 milestones: true
             })
-            if (toolResponse.success) {
-                initializeAssetsStore(toolResponse.data || [])
+            let toolTypesResponse = await getToolTypes({
+                id: true,
+                label: true,
+                type: true,
+                description: true,
+                metadata: true
+            })
+            if (toolResponse.success && toolTypesResponse.success && toolTypesResponse.data) {
+                initializeAssetsStore(toolResponse.data || [], toolTypesResponse.data)
                 console.log(`Tools initialized...`)
             } else {
                 console.error(toolResponse.error)
