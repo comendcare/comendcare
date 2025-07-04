@@ -3,6 +3,8 @@ import {PrismaAdapter} from "@next-auth/prisma-adapter";
 import type {Adapter, AdapterAccount} from "next-auth/adapters";
 import type {PrismaClient} from "@prisma/client";
 
+const MAX_INT_32 = 2_147_483_647;
+
 export function CustomPrismaAdapter(prisma: PrismaClient): Adapter {
     const base = PrismaAdapter(prisma);
 
@@ -38,7 +40,9 @@ export function CustomPrismaAdapter(prisma: PrismaClient): Adapter {
                     refresh_token: refresh_token as string | null | undefined,
                     refresh_token_expires_in: refresh_token_expires_in as number | null | undefined,
                     access_token: access_token as string | null | undefined,
-                    expires_at: expires_at as number | null | undefined,
+                    expires_at: expires_at && Number(expires_at) > MAX_INT_32
+                        ? MAX_INT_32
+                        : Number(expires_at) ?? null,
                     token_type: token_type as string | null | undefined,
                     scope: scope as string | null | undefined,
                     id_token: id_token as string | null | undefined,
