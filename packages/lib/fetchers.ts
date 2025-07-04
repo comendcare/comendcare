@@ -565,8 +565,8 @@ export async function getPublicUser(
     }
 }
 
-export async function getToolTypes(
-    select: Prisma.MilestoneTypeSelect<InternalArgs & {
+export async function getBiosampleToolTypes(
+    select: Prisma.ToolTypeSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
@@ -574,7 +574,30 @@ export async function getToolTypes(
     }>,
 ) {
     try {
-        const types = await prisma.toolType.findMany({select})
+        const types = await prisma.toolType.findMany({
+            where: {type: 'biosample'},
+            select
+        })
+        return {success: true, data: types}
+    } catch (error: any) {
+        console.error("Database error finding tool types:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getDataToolTypes(
+    select: Prisma.ToolTypeSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
+    try {
+        const types = await prisma.toolType.findMany({
+            where: {type: 'data'},
+            select
+        })
         return {success: true, data: types}
     } catch (error: any) {
         console.error("Database error finding tool types:", error)

@@ -30,10 +30,12 @@ async function main() {
     })
 
     // seed tool types
+    const biosampleTypeIds: string[] = ['BIOMARKER', 'OUTCOMEMEASURE', 'BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL', 'TARGETVALIDATION', 'ASSAYDEVELOPMENT', 'DRUGSCREEN', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY', 'GENETHERAPYPRODUCTION', 'GPMANUFACTURING', 'INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'SITESELECTION', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'FDAAPPROVAL', 'PHASE4']
+    const dataTypeIds: string[] = ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'PATIENTRECRUITMENT']
     await prisma.toolType.deleteMany()
     const toolTypes = await prisma.toolType.createMany({
-        data: MILESTONE_TYPE_OPTIONS.map(({id, label}) => ({id, label})),
-        skipDuplicates: true
+        data: MILESTONE_TYPE_OPTIONS.map(({id, label}) => ({id, label, type: biosampleTypeIds.includes(id) ? 'biosample': 'data'})),
+        skipDuplicates: true,
     })
 
     const flawnson = await prisma.user.upsert({

@@ -24,12 +24,14 @@ import { EditAssetDialog } from "../edit-asset-dialog"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    data: TData[],
+    type: 'biosample' | 'data'
 }
 
 export function AssetsDataTable<TData, TValue>({
                                              columns,
                                              data,
+                                             type
                                          }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] =
@@ -91,6 +93,7 @@ export function AssetsDataTable<TData, TValue>({
                                     key={row.id}
                                     data={{...row.original} as Partial<Asset>} 
                                     numAssetsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Asset>).pinned).length}
+                                    type={type}
                                 >
                                     <TableRow
                                         key={row.id}
