@@ -27,6 +27,7 @@ const OrcidProvider = (): OAuthConfig<any> => (    {
     token: 'https://orcid.org/oauth/token',
     userinfo: 'https://orcid.org/oauth/userinfo',
     checks: ['pkce', 'state'],
+    allowDangerousEmailAccountLinking: true,
     profile(profile) {
         const given = profile.given_name ?? '';
         const family = profile.family_name ?? '';
