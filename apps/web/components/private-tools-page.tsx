@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { AssetState, useAssetStore } from "@/state/asset/assetStore"
 import { useShallow } from "zustand/react/shallow"
-import { NewAssetDialog } from "./edit-asset-dialog"
+import { NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { columns } from "./assets-data-table/assets-data-columns";
 import { columns as DataToolColumns, DataToolDataTable } from "./data-tool-data-table/data-tool-data-table"
@@ -18,7 +18,7 @@ const toolSelector = (state: AssetState) => ({
     toolTypes: state.toolTypes
 })
 
-export const PrivateAssetsPage = ({type}: {type: 'biosample' | 'data'}) => {
+export const PrivateToolsPage = ({type}: {type: 'biosample' | 'data'}) => {
     const { tools, toolTypes } = useAssetStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
 
@@ -38,7 +38,7 @@ export const PrivateAssetsPage = ({type}: {type: 'biosample' | 'data'}) => {
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
         <div className="flex gap-2 w-full justify-end">
-            <NewAssetDialog iconOnly={true} numAssetsPinned={filteredTools.filter(tool => tool.pinned).length} type={type}/>
+            <NewToolDialog iconOnly={true} numAssetsPinned={filteredTools.filter(tool => tool.pinned).length} type={type}/>
             <AssetBulkImportDialog />
         </div>
 
@@ -52,9 +52,9 @@ export const PrivateAssetsPage = ({type}: {type: 'biosample' | 'data'}) => {
                     height={300}
                 />
                 <p className="text-lg text-stone-500">
-                    A tool is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                    A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                 </p>
-                <NewAssetDialog numAssetsPinned={tools.filter(tool => tool.pinned).length} type={type}/>
+                <NewToolDialog numAssetsPinned={tools.filter(tool => tool.pinned).length} type={type}/>
             </div>
         )}
         {filteredTools.length > 0 && type === 'biosample' && (

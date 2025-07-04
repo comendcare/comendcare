@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/t
 import { EditBiosampleToolForm } from "./edit-biosample-tool-form";
 import { EditDataToolForm } from "./edit-data-tool-form";
 
-export const NewAssetDialog = ({iconOnly = false, numAssetsPinned, type}: {iconOnly?: boolean, numAssetsPinned: number, type: 'biosample' | 'data'}) => {
+export const NewToolDialog = ({iconOnly = false, numAssetsPinned, type}: {iconOnly?: boolean, numAssetsPinned: number, type: 'biosample' | 'data'}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
