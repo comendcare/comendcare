@@ -39,7 +39,7 @@ const optionSchema = z.object({
     disable: z.boolean().optional(),
 });
 
-export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
+const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
     value: option.id,
 }));
