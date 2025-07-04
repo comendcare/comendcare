@@ -29,10 +29,15 @@ import {getPublicFile} from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import MultipleSelector from "@/packages/components/ui/multiple-selector";
-import {optionSchema} from "@/packages/components/research-onboarding-form";
 import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import { badgeVariants } from "@comend/components/ui/badge"
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+});
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,

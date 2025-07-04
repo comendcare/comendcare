@@ -30,7 +30,7 @@ import { ADDITIONAL_RESEARCH_PLAN_TYPES, MODALITIES, optionSchema, RESEARCH_PLAN
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { JsonObject } from "@prisma/client/runtime/library"
 import Loading from "@/loading"
-import ComendLoadingSpinner from "./comend-loading-spinner"
+import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner"
 import Spinner from "@comend/components/ui/spinner"
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
