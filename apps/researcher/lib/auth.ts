@@ -5,6 +5,7 @@ import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
 import {PrismaClient} from "@prisma/client";
 import {OAuthConfig} from "next-auth/providers/oauth";
+import {CustomPrismaAdapter} from "~provider/lib/custom-prisma-adapter";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
@@ -77,7 +78,8 @@ export const researcherAuthOptions: NextAuthOptions = {
         error: "/error", // Error code passed in query string as ?error=
         newUser: "/onboarding/welcome"
     },
-    adapter: PrismaAdapter(prisma as PrismaClient),
+    // adapter: PrismaAdapter(prisma as PrismaClient),
+    adapter: CustomPrismaAdapter(prisma as PrismaClient),
     session: {strategy: "jwt"},
     cookies: {
         sessionToken: {
