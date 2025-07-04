@@ -153,7 +153,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             if (response.success) {
                 toast.success("Condition updated successfully!");
                 setOpen(false)
-                router.refresh(); // Refresh the page to reflect changes
+                window.location.reload()
             } else {
                 console.error(response.error);
                 toast.error(response.error || "Failed to update condition.");

@@ -93,7 +93,7 @@ export function EditableProfilePhoto({
             // setHasCropped(false);
             setIsCropping(false)
             setOpen(false);
-            router.refresh();
+            window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");
