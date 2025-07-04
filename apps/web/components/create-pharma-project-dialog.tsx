@@ -24,12 +24,17 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas} from "@comend/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {optionSchema} from "@comend/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {SidebarMenuButton} from "@comend/components/ui/sidebar"
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {Info, Plus} from "lucide-react";
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+});
 
 const newPharmaProjectSchema = z.object({
     name: z.string()
