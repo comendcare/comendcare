@@ -14,6 +14,7 @@ declare module "next-auth" {
         };
         accessToken?: string;
         terminate?: boolean;
+        roleChanged?: boolean
     }
 
     interface User extends DefaultUser {
