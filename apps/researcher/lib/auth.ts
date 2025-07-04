@@ -19,21 +19,22 @@ const OrcidProvider = (): OAuthConfig<any> => ({
         params: {
             scope: "/authenticate",
             response_type: "code",
-            redirect_uri: process.env.NEXTAUTH_URL + "/api/auth/callback/orcid",
+            // redirect_uri: process.env.NEXTAUTH_URL + "/api/auth/callback/orcid",
         },
     },
     token: "https://orcid.org/oauth/token",
     userinfo: {
         url: "https://pub.orcid.org/v3.0/[ORCID]",
-        async request({ tokens }) {
-            const res = await fetch(`https://pub.orcid.org/v3.0/${tokens.orcid}`, {
+        async request({tokens, client, provider}) {
+            const id = tokens.orcid || tokens.id_token || tokens.sub || tokens.providerAccountId;
+            const res = await fetch(`https://pub.orcid.org/v3.0/${id}`, {
                 headers: {
                     Authorization: `Bearer ${tokens.access_token}`,
                     Accept: "application/json",
                 },
             });
             return await res.json();
-        },
+        }
     },
     profile(profile) {
         return {
@@ -42,7 +43,7 @@ const OrcidProvider = (): OAuthConfig<any> => ({
                 profile?.person?.name?.["given-names"]?.value +
                 " " +
                 profile?.person?.name?.["family-name"]?.value,
-            email: profile?.person?.emails?.email?.[0]?.email,
+            email: profile?.person?.emails?.email?.[0]?.email ?? null,
         };
     },
 });
@@ -129,7 +130,7 @@ export const researcherAuthOptions: NextAuthOptions = {
     },
 
     callbacks: {
-        jwt: async ({ token, user, account }) => {
+        jwt: async ({token, user, account}) => {
             if (user) {
                 token.user = user;
             }
@@ -139,7 +140,7 @@ export const researcherAuthOptions: NextAuthOptions = {
             }
             return token;
         },
-        session: async ({ session, token }) => {
+        session: async ({session, token}) => {
             session.user = {
                 ...session.user,
                 // @ts-expect-error
