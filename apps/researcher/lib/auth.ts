@@ -77,7 +77,7 @@ export const researcherAuthOptions: NextAuthOptions = {
         signIn: `/login`,
         verifyRequest: `/login/verify-request`,
         error: "/error", // Error code passed in query string as ?error=
-        newUser: "/onboarding/welcome"
+        newUser: "/onboarding"
     },
     // adapter: PrismaAdapter(prisma as PrismaClient),
     adapter: CustomPrismaAdapter(prisma as PrismaClient),
