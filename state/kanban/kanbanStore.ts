@@ -1,12 +1,9 @@
 import {create} from "zustand"
 import {temporal} from 'zundo'
 import { Column, createColumn, createTask, deleteColumn, deleteTask, kanbanSync, Task, updateColumns, updateTasks } from "@comend/lib/actions";
-import { nanoid } from "nanoid";
 import { toast } from "sonner";
-import { string } from "zod";
 // import { PlatformNotification } from "@prisma/client";
 import { NotificationsState, useNotificationsStore } from "../notifications/notificationsStore";
-import { useShallow } from "zustand/react/shallow";
 
 export type KanbanState = {
     kanbanId: string | undefined,

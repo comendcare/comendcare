@@ -1,9 +1,5 @@
 "use client"
 
-import { mixpanelTrack } from "@comend/lib/mixpanel"
-import mixpanel from "mixpanel-browser"
-import { useEffect } from "react"
-
 export const ProfileCompletionMixpanelTrack = ({
     completionPercentage
 }: {

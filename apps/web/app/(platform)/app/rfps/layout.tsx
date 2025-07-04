@@ -4,8 +4,6 @@ import {getOrganizationFromOrganizationId, getRFPs} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import {initializeRFPStore} from "@comend/lib/initialize-client-state"
-import Loading from "@/loading";;
-import NoOrganization from "~web/components/no-organization";
 
 export default function RFPsLayout({children}: {children: React.ReactNode}) {
     const {data: session} = useSession()

@@ -1,8 +1,6 @@
 import {ReactNode, Suspense} from "react";
-import Profile from "@/apps/admin/components/profile";
 import {redirect} from "next/navigation";
 import { getSession } from "~provider/lib/auth";
-import {ProviderNavbarMenu} from "~provider/components/provider-navbar-menu";
 import {ProviderNavbar} from "~provider/components/provider-navbar";
 
 export default async function ProviderLayout({children}: { children: ReactNode }) {

@@ -1,7 +1,6 @@
 "use client"
 
 import { Copy, Ellipsis, Share, Trash } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@comend/components/ui/popover"
 import { Button } from "@comend/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import { RFP } from "@comend/lib/types"
@@ -15,7 +14,6 @@ import ShareDialog from "./share-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 import { getOrganizationData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
 import { Organization, Prisma } from "@prisma/client"
-import { organizations } from "@/data/sample-pags"
 
 const rfpSelector = (state: RFPState) => ({
     createRFP: state.createRFP,

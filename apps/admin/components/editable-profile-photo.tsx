@@ -1,7 +1,6 @@
 "use client";
 
 import React, {useState} from "react";
-import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {
     Dialog,
     DialogContent,
@@ -12,7 +11,6 @@ import {
     DialogClose,
 } from "@comend/components/ui/dialog";
 import {Form} from "@comend/components/ui/form";
-import {cn, getPublicFile} from "@comend/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -20,7 +18,6 @@ import {FormImageSelector} from "@comend/components/form-image-selector";
 import {FileWithPreview} from "@comend/components/image-selector";
 import {toast} from "sonner";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
-import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";

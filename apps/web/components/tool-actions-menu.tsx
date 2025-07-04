@@ -7,7 +7,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@comend/components/ui/popover"
 import { Button } from "@comend/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import { Asset } from "@comend/lib/types"

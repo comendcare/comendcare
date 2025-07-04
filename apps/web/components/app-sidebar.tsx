@@ -18,12 +18,6 @@ import {
     SidebarHeader,
     SidebarRail,
 } from "@comend/components/ui/sidebar"
-import {
-    getAllMembershipsFromUserId,
-} from "@comend/lib/fetchers";
-import {toast} from "sonner";
-import {useEffect, useState} from "react";
-import {useSession} from "next-auth/react";
 import {MembershipWithOrganization} from "@comend/lib/types";
 
 // This is sample data.

@@ -2,7 +2,6 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { RFP } from '@comend/lib/types';
 import { createOrUpdateRFP, deleteRFP, syncDBRFPs } from '@comend/lib/actions';
-import mixpanel from 'mixpanel-browser';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export interface RFPState {

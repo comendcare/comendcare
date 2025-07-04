@@ -7,8 +7,6 @@ import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
-import {User} from "next-auth";
-import {toast} from "sonner"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 

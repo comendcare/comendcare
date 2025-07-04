@@ -17,7 +17,6 @@ import { toast } from "sonner";
 import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
 import { useSession } from "next-auth/react";
 import {Form} from "@comend/components/ui/form";
-import va from "@vercel/analytics"
 import {saveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark } from "lucide-react";

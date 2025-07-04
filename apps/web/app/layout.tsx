@@ -6,13 +6,9 @@ import { Analytics } from '@vercel/analytics/next';
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
 import { Providers } from "~web/providers"
-import gif1 from "@/public/onboarding-gif-1.gif"
-import Image from "next/image"
-import { FeedbackSheet } from "~web/components/feedback"
 import { Suspense } from "react"
 import Loading from "@/loading";
 import { onbordaTours } from "@/state/onborda/onbordaStore";
-import Script from 'next/script';
 import Onborda from "~web/components/onborda/Onborda";
 import OnboardingCard from "~web/components/onboarding-card";
 

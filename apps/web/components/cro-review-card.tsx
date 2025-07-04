@@ -52,7 +52,6 @@ import { reviewForm } from "./cro-review-dialog";
 import {Button} from "@comend/components/ui/button";
 import {ReviewWithAuthor} from "@comend/lib/types";
 import { EllipsisVertical, Flag, Link2Off, Pencil, Trash } from "lucide-react";
-import mixpanel from "mixpanel-browser";
 
 
 export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Company }) => {

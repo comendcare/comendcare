@@ -32,7 +32,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@comend/components/ui/sidebar"
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {getPharmaProjects} from "@comend/lib/fetchers";
 

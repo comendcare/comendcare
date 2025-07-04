@@ -10,7 +10,6 @@ import { OnbordaProps } from "./types";
 import { ResearchPlanOnbordaState, Selector, useOnbordaStore } from "@/state/onborda/onbordaStore";
 import { useShallow } from "zustand/react/shallow";
 import { sleep } from "@comend/lib/utils";
-import { init } from "mixpanel-browser";
 
 const selector = (state: ResearchPlanOnbordaState) => ({
     activeTour: state.activeTour,

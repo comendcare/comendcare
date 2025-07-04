@@ -1,5 +1,4 @@
 import {getSession} from "@comend/lib/auth";
-import {KanbanView} from "~web/components/kanban";
 import {getKanbanFromOrganizationId} from "@comend/lib/fetchers";
 import NewKanbanForm from "~web/components/new-kanban";
 import {createKanban} from "@comend/lib/actions";

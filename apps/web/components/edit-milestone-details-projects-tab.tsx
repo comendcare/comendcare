@@ -88,9 +88,9 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
                     </Card>
                 )}
 
-                {projects?.map((project) => {
+                {projects?.map((project, index) => {
                         return (
-                            <div className="px-4 py-2">
+                            <div key={index} className="px-4 py-2">
                                 <a
                                     href={
                                         process.env.NEXT_PUBLIC_ROOT_DOMAIN 

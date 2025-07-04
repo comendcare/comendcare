@@ -32,7 +32,6 @@ import { PropertyBadge } from "./property-badge";
 import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
 import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
 import { formatMoney } from "@comend/lib/utils";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { useSearchParams } from "next/navigation";
 

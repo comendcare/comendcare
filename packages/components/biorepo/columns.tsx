@@ -2,13 +2,10 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 
-import { Badge } from "@comend/components/ui/badge"
 import { Checkbox } from "@comend/components/ui/checkbox"
 
-import { labels, priorities, statuses } from "@/data/pharma-data/data"
 import { Biosample } from "@/data/pharma-data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
 
 export const columns: ColumnDef<Biosample>[] = [
   {

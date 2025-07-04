@@ -10,7 +10,6 @@ import {Command, CommandGroup, CommandItem, CommandList} from '@comend/component
 import {cn, sleep} from '@comend/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
 import {ScrollArea} from './scroll-area';
-import { keyBy, remove } from 'lodash';
 
 export interface Option {
     value: string;

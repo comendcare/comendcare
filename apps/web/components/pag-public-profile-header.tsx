@@ -1,8 +1,6 @@
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@comend/components/profile-photo";
-import {BackButton} from "./back-button";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@comend/components/ui/hover-card";
 import { Building2, Calendar, HandCoins } from "lucide-react";
 import { PAGBannerPhoto } from "@comend/components/pag-banner-photo";
 

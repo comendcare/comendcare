@@ -1,6 +1,4 @@
 import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
-import { cn, formatMoney, standardizeYear } from "@comend/lib/utils"
-import { Building2, Calendar, HandCoins } from "lucide-react"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { PublicMilestoneDetails } from "~web/components/public-milestone-details"
