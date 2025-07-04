@@ -61,7 +61,7 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Contact email updated successfully!");
             setOpen(false);
-            router.refresh();
+            window.location.reload()
         } catch (error) {
             console.error("Error updating contact email:", error);
             toast.error("Failed to update contact email.");
