@@ -9,44 +9,14 @@ import { columns } from "./assets-data-table/assets-data-columns";
 import { AssetsDataTable } from "./assets-data-table/assets-data-table"
 import { useEffect, useState } from "react"
 import { Asset } from "@/packages/lib/types"
-import { getBiosampleToolTypes, getDataToolTypes } from "@/packages/lib/fetchers"
 
 const toolSelector = (state: AssetState) => ({
-    tools: state.tools
+    tools: state.tools,
+    toolTypes: state.toolTypes
 })
 
-// const biosampleTypeIds: string[] = ['BIOMARKER', 'OUTCOMEMEASURE', 'BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL', 'TARGETVALIDATION', 'ASSAYDEVELOPMENT', 'DRUGSCREEN', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY', 'GENETHERAPYPRODUCTION', 'GPMANUFACTURING', 'INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'SITESELECTION', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'FDAAPPROVAL', 'PHASE4']
-// const dataTypeIds: string[] = ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'PATIENTRECRUITMENT']
-
-async function filterTools(tools: Asset[], type: 'biosample' | 'data') {
-    switch (type) {
-        case 'biosample':
-            const biosampleTypes = await getBiosampleToolTypes({
-                id: true, 
-                type: true
-            }) 
-            if (biosampleTypes.success && biosampleTypes.data) {
-                return tools.filter(tool => biosampleTypes.data.some(t => tool.types.includes(t.id)))
-            }
-            break;
-        case 'data':
-            const dataTypes = await getDataToolTypes({
-                id: true, 
-                type: true
-            }) 
-            if (dataTypes.success && dataTypes.data) {
-                return tools.filter(tool => dataTypes.data.some(t => tool.types.includes(t.id)))
-            }
-            break;
-        default:
-            return tools
-    }
-
-    return []
-}
-
 export const PrivateAssetsPage = ({type}: {type: 'biosample' | 'data'}) => {
-    const { tools } = useAssetStore(useShallow(toolSelector))
+    const { tools, toolTypes } = useAssetStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
 
     useEffect(() => {
@@ -56,6 +26,11 @@ export const PrivateAssetsPage = ({type}: {type: 'biosample' | 'data'}) => {
         }
         init()
     }, [tools])
+
+    async function filterTools(tools: Asset[], type: 'biosample' | 'data') {
+        const filteredTypes = toolTypes.filter(t => t.type === type)
+        return tools.filter(tool => filteredTypes.some(t => tool.types.includes(t.id)))
+    }
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
