@@ -1,16 +1,14 @@
 "use client"
 
 import * as React from "react";
-import {useNavStore} from "@/state/nav/navStore"; // Zustand store
-import {ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable";
+// Zustand store
 import {useSession} from "next-auth/react";
 import {useEffect, useRef} from "react";
 import Image from "next/image"
 import logo from "@/public/logo-square.png"
 import {useState} from "react";
-import {Member, Organization} from "@prisma/client";
 import {redirect, usePathname, useSearchParams} from "next/navigation";
-import Loading from "@/loading";;
+import Loading from "@/loading";
 import {
     getAllMembershipsFromUserId,
     getAllNotifications,
@@ -19,22 +17,18 @@ import {
     getRFPs,
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {initializeAssetsStore, initializeCROSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRFPStore} from "@comend/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
 import {AppSidebar} from "~web/components/app-sidebar";
 import { FeedbackSheet } from "~web/components/feedback";
 import { Button, buttonVariants } from "@comend/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { cn, sleep } from "@comend/lib/utils";
 import { BookOpen, Cookie, Wand2 } from "lucide-react";
-import {useQueryState} from "nuqs"
 import { ASSOCIATED_SYSTEMS, MembershipWithOrganization, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types";
 import Link from "next/link";
 import {MobileWarning} from "~web/components/mobile-warning";
 import {useIsMobile} from "@comend/lib/hooks/use-mobile";
-import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { useOnborda } from "~web/components/onborda/OnbordaContext";
 

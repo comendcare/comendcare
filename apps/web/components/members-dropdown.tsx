@@ -25,7 +25,6 @@ import {getAllMembershipsFromUserId, getMembers} from "@comend/lib/fetchers";
 import {MembershipWithOrganization} from "@comend/lib/types";
 import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const formSchema = z.object({

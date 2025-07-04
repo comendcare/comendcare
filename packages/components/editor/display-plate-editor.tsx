@@ -1,40 +1,17 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { ParagraphPlugin, Plate, PlateEditor, useEditorState, usePlateEditor } from '@udecode/plate-common/react';
 
-import { useCreateEditor } from '@comend/components/editor/use-create-editor';
-import { SettingsDialog } from '@comend/components/editor/settings';
 import { Editor, EditorContainer } from '@comend/components/plate-ui/editor';
-import { JsonObject } from '@prisma/client/runtime/library';
 import {
   BoldPlugin,
   ItalicPlugin,
   UnderlinePlugin,
 } from '@udecode/plate-basic-marks/react';
-import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { Value } from '@udecode/slate';
-import { SlashPlugin } from '@udecode/plate-slash-command/react';
-import { autoformatPlugin } from './plugins/autoformat-plugin';
-import { cursorOverlayPlugin } from './plugins/cursor-overlay-plugin';
-import { EmojiPlugin } from '@udecode/plate-emoji/react';
-import { exitBreakPlugin } from './plugins/exit-break-plugin';
-import { resetBlockTypePlugin } from './plugins/reset-block-type-plugin';
-import { softBreakPlugin } from './plugins/soft-break-plugin';
-import { DocxPlugin } from '@udecode/plate-docx';
-import { MarkdownPlugin } from '@udecode/plate-markdown';
-import { JuicePlugin } from '@udecode/plate-juice';
-import { viewPlugins } from './plugins/editor-plugins';
-import { blockMenuPlugins } from './plugins/block-menu-plugins';
-import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
-import { FixedToolbarPlugin } from './plugins/fixed-toolbar-plugin';
-import { FloatingToolbarPlugin } from './plugins/floating-toolbar-plugin';
 import { withProps } from '@udecode/cn';
-import { AIPlugin } from '@udecode/plate-ai/react';
 import {
   CodePlugin,
   StrikethroughPlugin,
@@ -81,9 +58,7 @@ import {
 } from '@udecode/plate-table/react';
 import { TogglePlugin } from '@udecode/plate-toggle/react';
 
-import { copilotPlugins } from '@comend/components/editor/plugins/copilot-plugins';
 import { editorPlugins } from '@comend/components/editor/plugins/editor-plugins';
-import { AILeaf } from '@comend/components/plate-ui/ai-leaf';
 import { BlockquoteElement } from '@comend/components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '@comend/components/plate-ui/code-block-element';
 import { CodeLeaf } from '@comend/components/plate-ui/code-leaf';
@@ -118,7 +93,6 @@ import { TableElement } from '@comend/components/plate-ui/table-element';
 import { TableRowElement } from '@comend/components/plate-ui/table-row-element';
 import { TocElement } from '@comend/components/plate-ui/toc-element';
 import { ToggleElement } from '@comend/components/plate-ui/toggle-element';
-import { withDraggables } from '@comend/components/plate-ui/with-draggables';
 
 export function DisplayPlateEditor({ value }: { value: any[] }) {
   // this Plate Editor is basically the same as the useCreateEditor, except

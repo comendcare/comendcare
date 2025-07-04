@@ -25,10 +25,8 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas} from "@comend/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { researchFormSchema } from "./research-onboarding-form";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {

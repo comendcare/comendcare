@@ -19,9 +19,6 @@ import { CloudHeroSection } from "~web/components/landing/cloud-hero"
 // import {PartneredWithLogoCloud} from "@comend/components/landing/sections/partnered-with-logo-cloud";
 // import {ClientsLogoCloud} from "@comend/components/landing/sections/clients-logo-cloud";
 import ContactSection from "~web/components/landing/contact";
-import FeatureResearchMarketplace from "~web/components/landing/feature-research-marketplace";
-import FeaturePublicPages from "~web/components/landing/feature-public-pages";
-import FeatureResearchPlan from "~web/components/landing/feature-research-plan";
 import {News} from "~web/components/landing/news";
 
 export default function App() {

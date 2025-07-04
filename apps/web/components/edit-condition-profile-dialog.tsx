@@ -6,7 +6,6 @@ import {
 } from "@comend/components/ui/dialog"
 import {Button, buttonVariants} from "@comend/components/ui/button";
 import {Input} from "@comend/components/ui/input";
-import {Label} from "@comend/components/ui/label";
 import {z} from "zod";
 import {toast} from "sonner";
 import {updateOrganization} from "@comend/lib/actions";

@@ -22,7 +22,6 @@ import { toast } from "sonner"
 import { isOnboarded, setOnboarded} from "@comend/lib/utils"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
-import mixpanel from "mixpanel-browser"
 import { useOnborda } from "./onborda/OnbordaContext"
 
 const proOptions = { hideAttribution: true }

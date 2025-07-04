@@ -14,7 +14,6 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {SavedCompany} from "@prisma/client";
-import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
 import {
     Dialog,
     DialogContent,
@@ -23,8 +22,6 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog";
 import {Button} from "@comend/components/ui/button";
-import {Label} from "@comend/components/ui/label";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {toast} from "sonner";
 import {getMilestones, getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {signOut, useSession} from "next-auth/react";
@@ -33,7 +30,6 @@ import va from "@vercel/analytics"
 import {editSavedCRO, unsaveCRO} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@comend/lib/types";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import ProjectMultipleSelector from "../project-multiple-selector";
 

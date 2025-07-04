@@ -2,8 +2,6 @@ import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
 import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
 import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
-import { formatMoney, standardizeYear } from "@comend/lib/utils";
-import { Building2, Calendar, HandCoins } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export default async function EmbeddedResearchPlansPage({params}: {params: {domain: string}}) {

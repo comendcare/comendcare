@@ -1,9 +1,7 @@
 import Image from 'next/image';
-import gif1 from "@/public/onboarding-gif-1.gif"
 import gif2 from "@/public/Screen Recording 2025-05-22 at 3.33.16 PM.gif"
 import { temporal } from 'zundo';
 import { create } from 'zustand';
-import { Step } from 'comend-pag-platform/components/onboarding-steps';
 
 export const onbordaTours: any[] = [
     {

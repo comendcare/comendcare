@@ -6,7 +6,6 @@ import Image from "next/image"
 import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";
 import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
-import {CROServicesDataTable} from "~web/components/cro-services-data-table/cro-services-data-table";
 import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@comend/lib/types";

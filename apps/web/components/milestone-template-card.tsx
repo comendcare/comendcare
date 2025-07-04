@@ -11,13 +11,8 @@ import {
 import { CheckBubble } from "./check-bubble"
 import { cn } from "@comend/lib/utils";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
-import { useShallow } from "zustand/react/shallow";
-import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import mixpanel from "mixpanel-browser";
-
-import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones

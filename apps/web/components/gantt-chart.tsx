@@ -34,9 +34,8 @@ import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 import StatusButton from "./milestone-status-button";
 import { truncate } from "@comend/lib/utils";
 import { DateView } from "./miletone-date-view";
-import {Task} from "@/packages/lib/types";
 
-  const chartConfig: ChartConfig = {
+const chartConfig: ChartConfig = {
     item: {
       label: "Item",
       color: "hsl(var(--chart-3))",

@@ -14,10 +14,7 @@ import { DialogClose } from "@comend/components/ui/dialog";
 import { Plus, Router, X } from "lucide-react";
 import { cn, getCookie } from "@comend/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@comend/lib/types";
-import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@comend/lib/actions";
-import Link from "next/link";
-import { Badge } from "@comend/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 // import { consentedLocalStorage } from "@comend/lib/consent-scripts/functionalConsent";
 

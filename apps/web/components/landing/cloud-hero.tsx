@@ -4,15 +4,10 @@ import {
     Highlight
 } from "~web/components/landing/hero-highlight"
 import {motion, useMotionValue, useSpring, useTransform} from "framer-motion"
-import {Label} from "@comend/components/ui/label"
-import {FancyInput} from "@comend/components/ui/fancy-input"
 import React, {useEffect, useRef, useState} from "react"
-import {LabelInputContainer} from "~web/components/contact-form"
 import {LinkPreview} from "~web/components/link-preview"
 import Image from "next/image"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
-import scimanticLogo from "@/public/logos/scimantic-logo.png"
-import {BetaSignup} from "~web/components/beta-signup"
 import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
 

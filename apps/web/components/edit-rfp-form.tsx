@@ -35,11 +35,9 @@ import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/pop
 import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@comend/components/ui/calendar"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { Option } from "@comend/lib/types"
 import { AttachmentsFormField, BudgetFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import {
     DropdownMenu,

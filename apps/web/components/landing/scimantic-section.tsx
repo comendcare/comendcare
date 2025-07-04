@@ -1,6 +1,5 @@
 "use client"
 
-import { PlaceholdersAndVanishInput } from "~web/components/placeholders-and-vanish-input"
 import { PlaceholdersAndVanishTextarea } from "~web/components/placeholders-and-vanish-text-area"
 import { LinkPreview } from "~web/components/link-preview"
 import React from "react"

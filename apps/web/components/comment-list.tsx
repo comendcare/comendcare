@@ -11,7 +11,6 @@ import {getPostComments} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react"
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
-import {Comment} from "@prisma/client";
 import {CommentWithUser} from "@comend/lib/types";
 
 

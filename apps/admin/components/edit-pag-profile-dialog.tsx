@@ -29,9 +29,7 @@ import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, yea
 import {handleImageUpload} from "@comend/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Slider} from "@comend/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
-import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import MoneyInput from "@comend/components/money-input";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";

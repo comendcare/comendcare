@@ -21,7 +21,6 @@ import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
 import { Roadmap } from "@prisma/client"
 import { useRouter } from "next/navigation"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@comend/components/ui/collapsible"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

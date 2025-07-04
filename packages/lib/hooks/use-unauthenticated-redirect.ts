@@ -3,7 +3,7 @@ import { signOut, useSession } from "next-auth/react"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { toast } from "sonner"
-import { Session } from "next-auth" // Import the Session type
+// Import the Session type
 
 export const useUnauthenticatedRedirect = () => {
     const { data: session, status } = useSession()

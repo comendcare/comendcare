@@ -39,7 +39,6 @@ import {monthsList} from "@comend/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@comend/lib/types"
 import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
 import {getAssets, getRFPs} from "@comend/lib/fetchers"
-import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
@@ -59,19 +58,10 @@ import {Card, CardContent} from "@comend/components/ui/card"
 import Image from "next/image"
 import {CROMarketplaceCard} from "./marketplace-cro-card"
 import Link from "next/link"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@comend/components/ui/dropdown-menu"
-import {TypeBadge} from "./type-badge"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
-import {NotificationBubble} from "./notification-bubble"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share} from "lucide-react"
-import {toast} from "sonner"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"

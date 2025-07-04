@@ -6,13 +6,9 @@ import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
-import {toast} from "sonner";
-import {usePathname} from "next/navigation";
-import {Button} from "@comend/components/ui/button";
 import EditPagProfileAboutCardDialog from "~web/components/edit-pag-profile-about-card-dialog";
 import {ExternalLink} from "lucide-react";
 import {Badge} from "@comend/components/ui/badge";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export const PagProfileAboutCard = ({organization, editable, isPrivate = false}: {

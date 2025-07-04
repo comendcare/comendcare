@@ -2,7 +2,6 @@
 import React, {useEffect, useState} from "react"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
 import {Separator} from "@comend/components/ui/separator"
-import Spinner from "@comend/components/ui/spinner"
 import {MatchCard} from "~web/components/match-card"
 import {toast} from "sonner"
 import {PubMedPublication} from "~web/types/types";

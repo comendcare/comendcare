@@ -15,7 +15,6 @@ import {
 } from "@comend/lib/types";
 import Papa from "papaparse";
 import type { Milestone, Option } from "@comend/lib/types";
-import {Column} from "@prisma/client";
 import {Task} from "./types";
 
 export const getCookie = (name: string) => {

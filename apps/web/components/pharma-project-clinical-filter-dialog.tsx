@@ -13,10 +13,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@c
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {z} from "zod"
-import {Input} from "@comend/components/ui/input"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {Slider} from "@comend/components/ui/slider"
-import {useState} from "react"
 import {Filter} from "lucide-react"
 
 const biosampleFilterSchema = z.object({

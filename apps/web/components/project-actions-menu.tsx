@@ -6,7 +6,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
-import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/popover"
 import {Button} from "@comend/components/ui/button"
 import {useEffect, useRef, useState} from "react"
 import {Milestone} from "@comend/lib/types"
@@ -25,7 +24,6 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
-import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
