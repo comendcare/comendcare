@@ -38,7 +38,7 @@ const OrcidProvider = (): OAuthConfig<any> => ({
     },
     profile(profile) {
         return {
-            // id: profile["orcid-identifier"]?.path,
+            id: profile["orcid-identifier"]?.path,
             // name: `${profile?.person?.name?.["given-names"]?.value ?? ""} ${profile?.person?.name?.["family-name"]?.value ?? ""}`.trim(),
             // email: profile?.person?.emails?.email?.[0]?.email ?? null,
         };
