@@ -159,7 +159,6 @@ export const researcherAuthOptions: NextAuthOptions = {
 
 export function getSession() {
     return getServerSession(researcherAuthOptions) as Promise<{
-        roleChanged: boolean;
         terminate: boolean;
         user: {
             id: string
