@@ -156,7 +156,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 toast.error(response.error)
             }
 
-            // window.location.reload() // force full page refresh
+            window.location.reload() // force full page refresh
         }
     }
 

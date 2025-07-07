@@ -1,9 +1,9 @@
 "use client";
 
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {signOut, useSession} from "next-auth/react";
-import {useRouter, useSearchParams} from "next/navigation";
-import {ChevronsUpDown, LogOut, User} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {LogOut, User} from "lucide-react";
 import {
     Avatar,
     AvatarFallback,
@@ -14,7 +14,6 @@ import {
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu";
@@ -37,21 +36,19 @@ import {
 import Loading from "@/loading";
 import {
     getAllMembershipsFromUserId,
-    getAllNotifications,
     getInvitations,
     getMembershipRemovedNotifications,
-    getOrganizationFromOrganizationId,
     getPublicOrganizationData,
     getUser,
     getUserMemberRequests
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest, notificationsViewed} from "@comend/lib/actions";
-import {Invitation, Member, Organization, PlatformNotification} from "@prisma/client";
+import {acceptInvitation, declineAndDeleteInvitation, deleteMemberRequest, notificationsViewed} from "@comend/lib/actions";
+import {Invitation, PlatformNotification} from "@prisma/client";
 import {
     Dialog,
     DialogContent,
-    DialogDescription, DialogFooter,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -64,7 +61,6 @@ import UserSettings from "~web/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
 import { mixpanelReset, mixpanelTrack } from "@comend/lib/mixpanel";
 
-
 export function NavUser() {
     const {data: session, update, status} = useSession();
     const router = useRouter();
@@ -75,7 +71,6 @@ export function NavUser() {
     const [memberRequests, setMemberRequests] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [membershipRemovedNotifications, setMembershipRemovedNotifications] = useState<Partial<PlatformNotification>[]>([])
-    const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     
     useEffect(() => {
         const fetchUserData = async () => {
@@ -272,11 +267,8 @@ export function NavUser() {
                     lastViewedAt: true,
                 });
 
-                console.log(`fetch member removed notifications`, response)
-
                 if (response.success && response.data) {
                     const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
-                    console.log(`filtered notifications`, filteredNotifications)
                     setMembershipRemovedNotifications(filteredNotifications)
                 } else if (response.error) {
                     console.error(response.error);
@@ -291,59 +283,12 @@ export function NavUser() {
             }
         }
 
-        // async function fetchKickedData() {
-        //     const memberships = await getAllMembershipsFromUserId(session?.user?.id, {
-        //         id: true,
-        //         organizationId: true,
-        //     })
-
-        //     console.log(`prev session ref`, prevSessionRef?.current)
-
-        //     if (
-        //         // !isLoading &&
-        //         // status !== "authenticated" || 
-        //         // !session || 
-        //         // JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
-        //         prevSessionRef?.current &&
-        //         prevSessionRef?.current?.user?.organizationId && 
-        //         !(memberships.data || []).map((membership: any) => membership.organizationId).includes(prevSessionRef?.current?.user?.organizationId)
-        //     ) {
-        //         // handleSessionUpdate()
-        //         setMembershipRemovedNotifications([{title: "you've been removed from an organization", message: "If you believe this was a mistake, please contact the owners of your organization."}])
-        //         router.refresh()
-        //     }
-
-        //     // Update the ref to the latest session
-        //     prevSessionRef.current = session
-        // }
-
         fetchUserData()
         fetchOrgData()
         fetchInvitationData()
         fetchMemberRequestData()
         fetchMemberRemovedNotifications()
-        // fetchKickedData()
     }, [status, session, router]);
-
-    //     useEffect(() => {
-    //     // Only run if the session data has changed or the session has not yet been set up
-    //     console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
-    //     if (
-    //         // !isLoading &&
-    //         // status !== "authenticated" ||
-    //         // !session ||
-    //         prevSessionRef?.current &&
-    //         JSON.stringify(prevSessionRef?.current.user.organizationId) != JSON.stringify(session?.user.organizationId)
-    //     ) {
-    //         // handleSessionUpdate()
-    //         console.log(`session changed!`)
-    //         console.log(`old session`, prevSessionRef?.current)
-    //         console.log(`new session`, session)
-    //     }
-
-    //             // Update the ref to the latest session
-    //     prevSessionRef.current = session
-    // }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
 
     async function handleAcceptInvitation(invitationId: string) {
         try {
@@ -449,9 +394,7 @@ export function NavUser() {
             {membershipRemovedNotifications && membershipRemovedNotifications.length > 0 && (
                 <AlertDialog open={membershipRemovedNotifications.length > 0} onOpenChange={async (open) => {
                     if (!open) {
-                        console.log(`notification`, [membershipRemovedNotifications[0] as PlatformNotification])
                         const notification = await notificationsViewed({notifications: [membershipRemovedNotifications[0] as PlatformNotification]})
-                        console.log(`notification`, notification)
                         setMembershipRemovedNotifications(membershipRemovedNotifications.splice(1))
                     }
                 }}>
