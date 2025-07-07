@@ -1,0 +1,146 @@
+import { addDays, endOfDay, startOfDay } from "date-fns";
+import { Prisma } from "@prisma/client";
+import type { ExtendedColumnFilter, JoinOperator } from "@comend/components/types/data-table";
+
+/**
+ * Construct Prisma conditions based on the provided filters for a specific table.
+ *
+ * This function takes a table and an array of filters, and returns a Prisma
+ * query object that represents the logical combination of these conditions. The conditions
+ * are combined using the specified join operator (either 'AND' or 'OR'), which is determined
+ * by the first filter's joinOperator property.
+ *
+ * Each filter can specify various operators (e.g., equality, inequality,
+ * comparison for numbers and dates, etc.) and the function will generate the appropriate
+ * Prisma query objects based on the filter's type and value.
+ *
+ * @param filters - An array of filters to be applied to the table.
+ * @param joinOperator - The join operator to use for combining the filters.
+ * @returns A Prisma query object representing the combined filters, or undefined if no valid
+ * filters are found.
+ */
+export function filterColumns({
+                                filters,
+                                joinOperator,
+                              }: {
+  filters: ExtendedColumnFilter<any>[];
+  joinOperator: JoinOperator;
+}): Prisma.PrismaClientKnownRequestError | undefined {
+  const joinFn = joinOperator === "and" ? "AND" : "OR";
+
+  const conditions = filters.map((filter) => {
+    const column = filter.id;
+
+    switch (filter.operator) {
+      case "eq":
+        if (Array.isArray(filter.value)) {
+          return { [column]: { in: filter.value } };
+        } else if (filter.type === "boolean" && typeof filter.value === "string") {
+          return { [column]: filter.value === "true" };
+        } else if (filter.type === "date") {
+          const date = new Date(filter.value);
+          const start = startOfDay(date);
+          const end = endOfDay(date);
+          return { [column]: { gte: start, lte: end } };
+        } else {
+          return { [column]: filter.value };
+        }
+      case "ne":
+        if (Array.isArray(filter.value)) {
+          return { [column]: { notIn: filter.value } };
+        } else if (filter.type === "boolean") {
+          return { [column]: { not: filter.value === "true" } };
+        } else if (filter.type === "date") {
+          const date = new Date(filter.value);
+          const start = startOfDay(date);
+          const end = endOfDay(date);
+          return { OR: [{ [column]: { lt: start } }, { [column]: { gt: end } }] };
+        } else {
+          return { [column]: { not: filter.value } };
+        }
+      case "iLike":
+        return filter.type === "text" && typeof filter.value === "string"
+            ? { [column]: { contains: filter.value, mode: "insensitive" } }
+            : undefined;
+      case "notILike":
+        return filter.type === "text" && typeof filter.value === "string"
+            ? { [column]: { not: { contains: filter.value, mode: "insensitive" } } }
+            : undefined;
+      case "lt":
+        return filter.type === "number"
+            ? { [column]: { lt: filter.value } }
+            : filter.type === "date" && typeof filter.value === "string"
+                ? { [column]: { lt: endOfDay(new Date(filter.value)) } }
+                : undefined;
+      case "lte":
+        return filter.type === "number"
+            ? { [column]: { lte: filter.value } }
+            : filter.type === "date" && typeof filter.value === "string"
+                ? { [column]: { lte: endOfDay(new Date(filter.value)) } }
+                : undefined;
+      case "gt":
+        return filter.type === "number"
+            ? { [column]: { gt: filter.value } }
+            : filter.type === "date" && typeof filter.value === "string"
+                ? { [column]: { gt: startOfDay(new Date(filter.value)) } }
+                : undefined;
+      case "gte":
+        return filter.type === "number"
+            ? { [column]: { gte: filter.value } }
+            : filter.type === "date" && typeof filter.value === "string"
+                ? { [column]: { gte: startOfDay(new Date(filter.value)) } }
+                : undefined;
+      case "isBetween":
+        return filter.type === "date" &&
+        Array.isArray(filter.value) &&
+        filter.value.length === 2
+            ? {
+              AND: [
+                filter.value[0] ? { [column]: { gte: startOfDay(new Date(filter.value[0])) } } : undefined,
+                filter.value[1] ? { [column]: { lte: endOfDay(new Date(filter.value[1])) } } : undefined,
+              ].filter(Boolean),
+            }
+            : undefined;
+      case "isRelativeToToday":
+        if (filter.type === "date" && typeof filter.value === "string") {
+          const today = new Date();
+          const [amount, unit] = filter.value.split(" ") ?? [];
+          let startDate: Date;
+          let endDate: Date;
+
+          if (!amount || !unit) return undefined;
+
+          switch (unit) {
+            case "days":
+              startDate = startOfDay(addDays(today, parseInt(amount)));
+              endDate = endOfDay(startDate);
+              break;
+            case "weeks":
+              startDate = startOfDay(addDays(today, parseInt(amount) * 7));
+              endDate = endOfDay(addDays(startDate, 6));
+              break;
+            case "months":
+              startDate = startOfDay(addDays(today, parseInt(amount) * 30));
+              endDate = endOfDay(addDays(startDate, 29));
+              break;
+            default:
+              return undefined;
+          }
+
+          return { AND: [{ [column]: { gte: startDate } }, { [column]: { lte: endDate } }] };
+        }
+        return undefined;
+      case "isEmpty":
+        return { [column]: null };
+      case "isNotEmpty":
+        return { NOT: { [column]: null } };
+      default:
+        throw new Error(`Unsupported operator: ${filter.operator}`);
+    }
+  });
+
+  const validConditions = conditions.filter((condition) => condition !== undefined);
+
+  //@ts-ignore
+  return validConditions.length > 0 ? { [joinFn]: validConditions } : undefined;
+}
