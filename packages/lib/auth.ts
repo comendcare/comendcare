@@ -6,8 +6,7 @@ import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
-import {Member, Organization, PrismaClient} from "@prisma/client";
-import { createNotification } from "actions"
+import {Member, PrismaClient} from "@prisma/client";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
