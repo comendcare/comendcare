@@ -46,7 +46,7 @@ import {
     getUserMemberRequests
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest} from "@comend/lib/actions";
+import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest, notificationsViewed} from "@comend/lib/actions";
 import {Invitation, Member, Organization, PlatformNotification} from "@prisma/client";
 import {
     Dialog,
@@ -275,6 +275,7 @@ export function NavUser() {
 
                 if (response.success && response.data) {
                     const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
+                    console.log(`filtered notifications`, filteredNotifications)
                     setMembershipRemovedNotifications(filteredNotifications)
                 } else if (response.error) {
                     console.error(response.error);
@@ -398,7 +399,12 @@ export function NavUser() {
     return (
         <>
             {membershipRemovedNotifications && membershipRemovedNotifications.length > 0 && (
-                <AlertDialog>
+                <AlertDialog open={membershipRemovedNotifications.length > 0} onOpenChange={async (open) => {
+                    if (!open) {
+                        await notificationsViewed([membershipRemovedNotifications[0].id])
+                        setMembershipRemovedNotifications(membershipRemovedNotifications.splice(1))
+                    }
+                }}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>{membershipRemovedNotifications[0].title}</AlertDialogTitle>

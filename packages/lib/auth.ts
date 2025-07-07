@@ -174,28 +174,6 @@ export const authOptions: NextAuthOptions = {
                     // fallback to first available membership
                     membership = dbUser.memberships[0];
                     activeOrganizationId = membership.organizationId;
-
-                    // const userKickedNotification = await createNotification({
-                    //     type: "REMOVED_FROM_ORG",
-                    //     title: `You have been removed from ${}`
-                    // })
-                    if (typeof token.organizationId === "string") {
-                        const kickedOrganization = await prisma.organization.findUnique({
-                            where: {id: token.organizationId}
-                        })
-
-                        if (kickedOrganization) {
-                            const notification = await prisma.platformNotification.create({
-                                data: {
-                                    type: "REMOVED_FROM_ORG",
-                                    title: `You've been removed from ${kickedOrganization.name}`,
-                                    message: `Your membership from ${kickedOrganization.name} had been removed. If you think this is a mistake, please contact the organization administrator.`,
-                                    user: {connect: {id: session?.user.id}},
-                                    organization: {connect: {id: membership.organizationId}},
-                                }
-                            })
-                        }
-                    }
                 }
             }
 
@@ -248,6 +226,37 @@ export const authOptions: NextAuthOptions = {
                 session.expires = new Date().toDateString()
 
                 return session
+            }
+
+            // if the user has been removed from an organization (i.e. active org id != the org is from the JWT token)
+            // check if an unviewed notification exists. If one does not exist, create one.
+            if (
+                activeOrganizationId !== token.organizationId && 
+                typeof token.organizationId === 'string' &&
+                !dbUser.memberships.map(membership => membership.organizationId).includes(token.organizationId)
+            ) {
+                const kickedOrganization = await prisma.organization.findUnique({
+                    where: {id: token.organizationId}
+                })
+
+                const matchingNotifications = await prisma.platformNotification.findMany({
+                    where: {
+                        userId: session?.user?.id || token?.user?.id,
+                        type: "REMOVED_FROM_ORG",
+                        lastViewedAt: null
+                    }
+                })
+
+                if (matchingNotifications.length === 0 && kickedOrganization) {
+                    const notification = await prisma.platformNotification.create({
+                        data: {
+                            type: "REMOVED_FROM_ORG",
+                            title: `You've been removed from ${kickedOrganization.name} on Comend`,
+                            message: `If you believe this was a mistake, please contact the owners of your organization.`,
+                            user: {connect: {id: session?.user.id || token?.user?.id}},
+                        }
+                    })
+                }
             }
 
             // Continue with your existing session logic

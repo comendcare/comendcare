@@ -1539,7 +1539,6 @@ export const getMembershipRemovedNotifications = async (
             where: {
                 userId: session.user.id,
                 type: "REMOVED_FROM_ORG"
-                // organizationId: session.user.organizationId
             },
             select
         })
