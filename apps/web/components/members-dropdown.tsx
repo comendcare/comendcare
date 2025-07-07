@@ -21,7 +21,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@comend/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {useEffect, useState} from "react";
-import {getAllMembershipsFromUserId, getMembers} from "@comend/lib/fetchers";
+import {getAllMembershipsFromUserId, getMembers, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {MembershipWithOrganization} from "@comend/lib/types";
 import {Ellipsis, Pencil, UserX} from "lucide-react";
 import {useRouter} from "next/navigation";
@@ -131,25 +131,18 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             const response = await deleteMember(session?.user.organizationId, member.id)
 
             if (response.success && response.data) {
-
-                // const notification = await prisma.platformNotification.create({
-                //     data: {
-                //         type: "REMOVED_FROM_ORG",
-                //         title: `You've been removed from ${kickedOrganization.name} on Comend`,
-                //         message: `If you believe this was a mistake, please contact the owners of your organization.`,
-                //         user: {connect: {id: session?.user.id || token?.user?.id}},
-                //     }
-                // })
-                const notification = await createNotification({
+                const revokedOrg = await getOrganizationFromOrganizationId(session?.user.organizationId, {
+                    id: true,
+                    name: true
+                })
+                await createNotification({
                     notificationData: {
                         type: "REMOVED_FROM_ORG",
-                        title: `You've been removed from ${session?.user.organizationId} on Comend`,
+                        title: `You've been removed from ${revokedOrg.data.name || 'an organization'} on Comend`,
                         message: `If you believe this was a mistake, please contact the owners of your organization.`,
                         user: {connect: {id: member.userId}},
                     }
                 })
-
-                console.log(`create notification`, notification)
 
                 mixpanelTrack("Membership Revoked", {
                     "Member Name": response.data.user.name,
@@ -163,7 +156,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 toast.error(response.error)
             }
 
-            window.location.reload() // force full page refresh
+            // window.location.reload() // force full page refresh
         }
     }
 
