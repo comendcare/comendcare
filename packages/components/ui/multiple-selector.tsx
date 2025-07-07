@@ -19,7 +19,7 @@ export interface Option {
     fixed?: boolean;
 
     /** Group the options by providing key. */
-    [key: string]: string | boolean | undefined;
+    [key: string]: string | boolean | undefined | null;
 }
 
 interface GroupOption {
