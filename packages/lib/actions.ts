@@ -3625,6 +3625,49 @@ export const saveCRO = withOrganizationAuth(
     }
 )
 
+export const contactCRO = withOrganizationAuth(
+    async (organization: Organization, croId: string, formData: FormData) => {
+
+        const description = formData.get("description") as string;
+        const services = formData.get("services")
+            ? (formData.get("services") as string).split(",")
+            : [];
+
+        try {
+            const response = await prisma.companyContactRequest.create({
+                data: {
+                    company: {
+                        connect: {
+                            id: croId
+                        }
+                    },
+                    organization: {
+                        connect: {
+                            id: organization.id
+                        }
+                    },
+                    description: description,
+                    services: {
+                        connect: services.map((id) => ({ id }))
+                    }
+                }
+            });
+
+            if (!response) {
+                console.error("Error creating contact request.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            console.log(`response`, response)
+
+            return {success: true, data: response}
+        } catch (error: any) {
+            console.error("Error creating contact request:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
+
 export const saveOrganization = withOrganizationAuth(
     async (organization: Organization, savedOrganizationId: string) => {
         try {

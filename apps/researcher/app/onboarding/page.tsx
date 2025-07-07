@@ -31,7 +31,7 @@ import {Skeleton} from "@comend/components/ui/skeleton";
 import MultipleSelector from "@/packages/components/ui/multiple-selector";
 import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
-import { badgeVariants } from "@comend/components/ui/badge"
+import {badgeVariants} from "@comend/components/ui/badge"
 
 const optionSchema = z.object({
     label: z.string(),
@@ -320,8 +320,8 @@ export default function ResearcherOnboardingForm() {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-x-8">
-            <div className="col-span-1">
+        <div className="w-screen flex items-center justify-center">
+            <div>
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(
@@ -531,8 +531,8 @@ export default function ResearcherOnboardingForm() {
                         </Button>
                     </form>
                 </Form>
-            </div>
 
+            </div>
         </div>
     )
 }

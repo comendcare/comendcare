@@ -34,7 +34,11 @@ async function main() {
     const dataTypeIds: string[] = ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'PATIENTRECRUITMENT']
     await prisma.toolType.deleteMany()
     const toolTypes = await prisma.toolType.createMany({
-        data: MILESTONE_TYPE_OPTIONS.map(({id, label}) => ({id, label, type: biosampleTypeIds.includes(id) ? 'biosample': 'data'})),
+        data: MILESTONE_TYPE_OPTIONS.map(({id, label}) => ({
+            id,
+            label,
+            type: biosampleTypeIds.includes(id) ? 'biosample' : 'data'
+        })),
         skipDuplicates: true,
     })
 
@@ -43,6 +47,15 @@ async function main() {
         update: {},
         create: {
             email: 'flawnsontong1@gmail.com',
+            name: 'Flawnson Tong',
+        },
+    })
+
+    const flawnsonTwo = await prisma.user.upsert({
+        where: {email: 'flawnson@comendcare.com'},
+        update: {},
+        create: {
+            email: 'flawnson@comendcare.com',
             name: 'Flawnson Tong',
         },
     })
@@ -66,9 +79,9 @@ async function main() {
     })
 
     const megan = await prisma.user.upsert({
-        where: { email: 'megan@comendcare.com' },
+        where: {email: 'megan@comendcare.com'},
         update: {},
-        create: { 
+        create: {
             email: 'megan@comendcare.com',
             name: 'Megan McClure',
         }
@@ -208,6 +221,14 @@ async function main() {
                     id: flawnson.id
                 }
             },
+            members: {
+                create: [
+                    {userId: flawnsonTwo.id, email: "flawnson@comendcare.com", role: "owner"},
+                    {userId: megan.id, email: "megan@comendcare.com", role: "owner"},
+                    {userId: betty.id, email: "betty.trevino@comendcare.com", role: "owner"},
+                    {userId: albert.id, email: "albert@comendcare.com", role: "owner"},
+                ]
+            }
         },
     });
 
@@ -229,6 +250,9 @@ async function main() {
                     id: alice.id
                 }
             },
+            members: {
+                connect: [flawnsonTwo.id, megan.id, betty.id, albert.id].map((id) => ({id})),
+            }
         },
     });
 
@@ -399,12 +423,12 @@ async function main() {
     console.log(arcadion)
 
     await createTypeSenseCollection(
-        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
         (
             process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                 ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                 : process.env.TYPESENSE_ADMIN_API_KEY
-        )!, 
+        )!,
         {
             name: 'organizations',
             "fields": [
@@ -559,12 +583,12 @@ async function main() {
     for (const organization of organizations) {
         try {
             await addTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 (
                     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                         : process.env.TYPESENSE_ADMIN_API_KEY
-                )!, 
+                )!,
                 {
                     id: organization.id,
                     name: organization.name,
@@ -834,7 +858,7 @@ async function createConditions(organizationIds: string[]) {
             diseaseCategories: ["Neuroencephalomyelopathy"],
             prevalenceNumerator: 1,
             prevalenceDenominator: 1000000,
-            prevalenceRatio: 1/1000000,
+            prevalenceRatio: 1 / 1000000,
             numberOfPatientsEngaged: 37,
             relevantDiseaseMechanisms: ["HAPLOINSUFFICIENCY"],
             associatedSystems: ["Neurological", "Musculoskeletal"],
@@ -861,7 +885,7 @@ async function createConditions(organizationIds: string[]) {
             diseaseCategories: ["Neurodegenerative Disorder"],
             prevalenceNumerator: 1,
             prevalenceDenominator: 700000,
-            prevalenceRatio: 1/700000,
+            prevalenceRatio: 1 / 700000,
             numberOfPatientsEngaged: 22,
             relevantDiseaseMechanisms: ["LOSS_OF_FUNCTION"],
             associatedSystems: ["Musculoskeletal"],
