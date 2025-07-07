@@ -262,68 +262,88 @@ export function NavUser() {
             }
         }
 
-        // async function fetchMemberRemovedNotifications() {
-        //     try {
-        //         const response = await getMembershipRemovedNotifications({
-        //             id: true,
-        //             type: true,
-        //             title: true,
-        //             message: true,
-        //             lastViewedAt: true,
-        //         });
+        async function fetchMemberRemovedNotifications() {
+            try {
+                const response = await getMembershipRemovedNotifications({
+                    id: true,
+                    type: true,
+                    title: true,
+                    message: true,
+                    lastViewedAt: true,
+                });
 
-        //         console.log(`fetch member removed notifications`, response)
+                console.log(`fetch member removed notifications`, response)
 
-        //         if (response.success && response.data) {
-        //             const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
-        //             console.log(`filtered notifications`, filteredNotifications)
-        //             setMembershipRemovedNotifications(filteredNotifications)
-        //         } else if (response.error) {
-        //             console.error(response.error);
-        //             toast.error(response.error);
-        //         } else {
-        //             console.error("Unexpected response structure:", response);
-        //             toast.error("Couldn't fetch notifications. Please try again.");
-        //         }
-        //     } catch (error) {
-        //         console.error("Error fetching notifications:", error);
-        //         toast.error("An unexpected error occurred while fetching notifications.");
-        //     }
-        // }
-
-        async function fetchKickedData() {
-            const memberships = await getAllMembershipsFromUserId(session?.user?.id, {
-                id: true,
-                organizationId: true,
-            })
-
-            console.log(`prev session ref`, prevSessionRef?.current)
-
-            if (
-                // !isLoading &&
-                // status !== "authenticated" || 
-                // !session || 
-                // JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
-                prevSessionRef?.current &&
-                prevSessionRef?.current?.user?.organizationId && 
-                !(memberships.data || []).map((membership: any) => membership.organizationId).includes(prevSessionRef?.current?.user?.organizationId)
-            ) {
-                // handleSessionUpdate()
-                setMembershipRemovedNotifications([{title: "you've been removed from an organization", message: "If you believe this was a mistake, please contact the owners of your organization."}])
-                router.refresh()
+                if (response.success && response.data) {
+                    const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
+                    console.log(`filtered notifications`, filteredNotifications)
+                    setMembershipRemovedNotifications(filteredNotifications)
+                } else if (response.error) {
+                    console.error(response.error);
+                    toast.error(response.error);
+                } else {
+                    console.error("Unexpected response structure:", response);
+                    toast.error("Couldn't fetch notifications. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+                toast.error("An unexpected error occurred while fetching notifications.");
             }
-
-            // Update the ref to the latest session
-            prevSessionRef.current = session
         }
+
+        // async function fetchKickedData() {
+        //     const memberships = await getAllMembershipsFromUserId(session?.user?.id, {
+        //         id: true,
+        //         organizationId: true,
+        //     })
+
+        //     console.log(`prev session ref`, prevSessionRef?.current)
+
+        //     if (
+        //         // !isLoading &&
+        //         // status !== "authenticated" || 
+        //         // !session || 
+        //         // JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+        //         prevSessionRef?.current &&
+        //         prevSessionRef?.current?.user?.organizationId && 
+        //         !(memberships.data || []).map((membership: any) => membership.organizationId).includes(prevSessionRef?.current?.user?.organizationId)
+        //     ) {
+        //         // handleSessionUpdate()
+        //         setMembershipRemovedNotifications([{title: "you've been removed from an organization", message: "If you believe this was a mistake, please contact the owners of your organization."}])
+        //         router.refresh()
+        //     }
+
+        //     // Update the ref to the latest session
+        //     prevSessionRef.current = session
+        // }
 
         fetchUserData()
         fetchOrgData()
         fetchInvitationData()
         fetchMemberRequestData()
-        // fetchMemberRemovedNotifications()
-        fetchKickedData()
+        fetchMemberRemovedNotifications()
+        // fetchKickedData()
     }, [status, session, router]);
+
+    //     useEffect(() => {
+    //     // Only run if the session data has changed or the session has not yet been set up
+    //     console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
+    //     if (
+    //         // !isLoading &&
+    //         // status !== "authenticated" ||
+    //         // !session ||
+    //         prevSessionRef?.current &&
+    //         JSON.stringify(prevSessionRef?.current.user.organizationId) != JSON.stringify(session?.user.organizationId)
+    //     ) {
+    //         // handleSessionUpdate()
+    //         console.log(`session changed!`)
+    //         console.log(`old session`, prevSessionRef?.current)
+    //         console.log(`new session`, session)
+    //     }
+
+    //             // Update the ref to the latest session
+    //     prevSessionRef.current = session
+    // }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
 
     async function handleAcceptInvitation(invitationId: string) {
         try {
@@ -429,9 +449,9 @@ export function NavUser() {
             {membershipRemovedNotifications && membershipRemovedNotifications.length > 0 && (
                 <AlertDialog open={membershipRemovedNotifications.length > 0} onOpenChange={async (open) => {
                     if (!open) {
-                        // console.log(`notification`, [membershipRemovedNotifications[0] as PlatformNotification])
-                        // const notification = await notificationsViewed({notifications: [membershipRemovedNotifications[0] as PlatformNotification]})
-                        // console.log(`notification`, notification)
+                        console.log(`notification`, [membershipRemovedNotifications[0] as PlatformNotification])
+                        const notification = await notificationsViewed({notifications: [membershipRemovedNotifications[0] as PlatformNotification]})
+                        console.log(`notification`, notification)
                         setMembershipRemovedNotifications(membershipRemovedNotifications.splice(1))
                     }
                 }}>

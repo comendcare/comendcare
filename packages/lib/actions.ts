@@ -3214,7 +3214,7 @@ export const createNotification = withAuth(
             const notification = await prisma.platformNotification.create({
                 data: {
                     ...notificationData,
-                    user: {connect: {id: session?.user.id}},
+                    user: {connect: {id: notificationData.user.connect.id || session?.user.id}},
                     organization: {connect: {id: session.user.organizationId}},
                 }
             })

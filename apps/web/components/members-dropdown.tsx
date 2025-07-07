@@ -2,7 +2,7 @@
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
 import {MemberWithUser} from "@comend/lib/types";
-import {deleteMember, leaveOrganization, updateMemberWithOwnerPermission, updateMemberWithMemberPermission} from "@comend/lib/actions";
+import {deleteMember, leaveOrganization, updateMemberWithOwnerPermission, updateMemberWithMemberPermission, createNotification} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@comend/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
@@ -131,6 +131,26 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             const response = await deleteMember(session?.user.organizationId, member.id)
 
             if (response.success && response.data) {
+
+                // const notification = await prisma.platformNotification.create({
+                //     data: {
+                //         type: "REMOVED_FROM_ORG",
+                //         title: `You've been removed from ${kickedOrganization.name} on Comend`,
+                //         message: `If you believe this was a mistake, please contact the owners of your organization.`,
+                //         user: {connect: {id: session?.user.id || token?.user?.id}},
+                //     }
+                // })
+                const notification = await createNotification({
+                    notificationData: {
+                        type: "REMOVED_FROM_ORG",
+                        title: `You've been removed from ${session?.user.organizationId} on Comend`,
+                        message: `If you believe this was a mistake, please contact the owners of your organization.`,
+                        user: {connect: {id: member.userId}},
+                    }
+                })
+
+                console.log(`create notification`, notification)
+
                 mixpanelTrack("Membership Revoked", {
                     "Member Name": response.data.user.name,
                     "Member Email": response.data.user.email,
