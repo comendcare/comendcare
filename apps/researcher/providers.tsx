@@ -6,8 +6,9 @@ import {ModalProvider} from "@comend/components/modal/provider"
 // import {OnbordaProvider} from "@comend/components/onborda/OnbordaContext"
 import {ReactFlowProvider} from "@xyflow/react"
 import {MixpanelProvider} from "@comend/lib/mixpanel"
-import { SettingsProvider } from "@comend/components/editor/settings"
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import {SettingsProvider} from "@comend/components/editor/settings"
+import {NuqsAdapter} from 'nuqs/adapters/next/app'
+import {TooltipProvider} from "@/packages/components/ui/tooltip";
 
 export function Providers({children}: { children: React.ReactNode }) {
     return (
@@ -27,9 +28,11 @@ export function Providers({children}: { children: React.ReactNode }) {
                     <ReactFlowProvider>
                         <MixpanelProvider>
                             {/* <OnbordaProvider> */}
+                            <TooltipProvider>
                                 <SettingsProvider>
                                     {children}
                                 </SettingsProvider>
+                            </TooltipProvider>
                             {/* </OnbordaProvider> */}
                         </MixpanelProvider>
                     </ReactFlowProvider>

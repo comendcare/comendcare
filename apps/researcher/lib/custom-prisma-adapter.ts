@@ -27,9 +27,6 @@ export function CustomPrismaAdapter(prisma: PrismaClient): Adapter {
                 oauth_token_secret,
                 oauth_token,
                 userId,
-                // ⚠️ These are stripped because your model doesn't support them:
-                // name,
-                // orcid,
             } = account;
 
             await prisma.account.create({
@@ -40,6 +37,7 @@ export function CustomPrismaAdapter(prisma: PrismaClient): Adapter {
                     refresh_token: refresh_token as string | null | undefined,
                     refresh_token_expires_in: refresh_token_expires_in as number | null | undefined,
                     access_token: access_token as string | null | undefined,
+                    // Will error out without the MAX_INT_32
                     expires_at: expires_at && Number(expires_at) > MAX_INT_32
                         ? MAX_INT_32
                         : Number(expires_at) ?? null,
