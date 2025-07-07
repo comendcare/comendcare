@@ -401,7 +401,9 @@ export function NavUser() {
             {membershipRemovedNotifications && membershipRemovedNotifications.length > 0 && (
                 <AlertDialog open={membershipRemovedNotifications.length > 0} onOpenChange={async (open) => {
                     if (!open) {
-                        await notificationsViewed([membershipRemovedNotifications[0].id])
+                        console.log(`notification`, [membershipRemovedNotifications[0] as PlatformNotification])
+                        const notification = await notificationsViewed({notifications: [membershipRemovedNotifications[0] as PlatformNotification]})
+                        console.log(`notification`, notification)
                         setMembershipRemovedNotifications(membershipRemovedNotifications.splice(1))
                     }
                 }}>

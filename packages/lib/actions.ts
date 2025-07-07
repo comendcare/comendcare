@@ -3181,6 +3181,8 @@ export const notificationsViewed = withAuth(
         try {
             const updatedNotifications: PlatformNotification[] = []
 
+            console.log(`notifications`, notifications)
+
             await Promise.all(
                 notifications.map(async (notification: PlatformNotification) => {
                     if (!notification) return

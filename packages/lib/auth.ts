@@ -156,6 +156,8 @@ export const authOptions: NextAuthOptions = {
                 include: {memberships: true}, // Ensure we get latest memberships
             });
 
+            console.log(`JWT token`, token)
+
             const organizationIds = dbUser?.memberships.map((m) => m.organizationId);
 
             // Storing both the current organizationId AND the membership object is redundant
@@ -239,6 +241,9 @@ export const authOptions: NextAuthOptions = {
                     where: {id: token.organizationId}
                 })
 
+                console.log(`active organization id`, activeOrganizationId)
+                console.log(`JWT token organization id`, token.organizationId)
+
                 const matchingNotifications = await prisma.platformNotification.findMany({
                     where: {
                         userId: session?.user?.id || token?.user?.id,
@@ -246,6 +251,8 @@ export const authOptions: NextAuthOptions = {
                         lastViewedAt: null
                     }
                 })
+
+                console.log(`matching notifications`, matchingNotifications)
 
                 if (matchingNotifications.length === 0 && kickedOrganization) {
                     const notification = await prisma.platformNotification.create({
