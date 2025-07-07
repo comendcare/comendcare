@@ -1,6 +1,5 @@
 import OrganizationOnboardingForm from "~web/components/organization-onboarding-form";
 import {Separator} from "@comend/components/ui/separator";
-import {Timer} from "lucide-react";
 
 export default function OrganizationOnboardingPage() {
     return (

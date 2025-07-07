@@ -15,7 +15,6 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { Input } from "@comend/components/ui/input"
-import { Label } from "@comend/components/ui/label"
 import { Textarea } from "@comend/components/ui/textarea"
 import { toast } from "sonner"
 import {

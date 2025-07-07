@@ -8,7 +8,6 @@ import React, {useEffect, useState} from "react";
 import {createPharmaProject} from "@comend/lib/actions";
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
 import {Input} from "@comend/components/ui/input";
-import {Textarea} from "@comend/components/ui/textarea";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
@@ -22,14 +21,15 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {formatNumberWithCommas} from "@comend/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {optionSchema} from "@comend/components/research-onboarding-form";
-import mixpanel from "mixpanel-browser";
-import {Organization} from "@prisma/client";
 import {SidebarMenuButton} from "@comend/components/ui/sidebar"
-import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {Info, Plus} from "lucide-react";
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+});
 
 const newPharmaProjectSchema = z.object({
     name: z.string()

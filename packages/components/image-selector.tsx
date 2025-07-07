@@ -11,13 +11,6 @@ import ReactCrop, {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar"
 import { Button } from "@comend/components/ui/button"
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogTrigger,
-} from "@comend/components/ui/dialog"
 
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Image, Pencil, Trash2Icon, Upload } from "lucide-react"

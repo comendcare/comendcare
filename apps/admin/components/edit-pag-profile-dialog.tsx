@@ -29,23 +29,61 @@ import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, yea
 import {handleImageUpload} from "@comend/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Slider} from "@comend/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
-import {financesFormSchema} from "@comend/components/finances-onboarding-form";
-import {researchFormSchema} from "@comend/components/research-onboarding-form";
-import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import MoneyInput from "@comend/components/money-input";
-import {FormImageSelector} from "@comend/components/form-image-selector";
-import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
-import {ProfilePhoto} from "@comend/components/profile-photo";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";
+import { EditableProfilePhoto } from "./editable-profile-photo";
+import { EditablePAGBannerPhoto } from "./editable-pag-banner-photo";
 
-const optionSchema = z.object({
+export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
     disable: z.boolean().optional(),
 });
+
+export const financesFormSchema = z.object({
+    // raising: z.enum(["yes", "no-but", "no"]).optional(),
+    raised: z.number().optional(),
+    budget: z.number().optional(),
+    deployed: z.number().optional(),
+})
+
+export const researchFormSchema = z.object({
+    disorder: z.array(optionSchema).optional(),
+    summary: z.string()
+        // .min(30, {
+        //     message: "The summary of your condition needs to be longer than 30 characters",
+        // })
+        .max(500, {
+            message: "The name of your condition needs to be shorter than 500 characters",
+        })
+        .optional(),
+    categories: z.array(optionSchema).optional(),
+    otherCategories: z.string().optional(),
+    prevalenceNumerator: z.string().min(1, {
+        message: "Your prevalence numerator must be at least 1",
+    }).optional(),
+    prevalenceDenominator: z.string().min(1, {
+        message: "Your prevalence denominator must be at least 1",
+    }).optional(),
+    engaged: z.string().min(1, {  // These need to be strings because
+        message: "The number of patients your organization has engaged with must be at least 1.",
+    }).optional(),
+    national: z.string().optional(),
+    global: z.string().optional(),
+    // mechanisms: z.array(optionSchema).min(0),
+    mechanisms: z.array(z.string()).optional(),
+    otherMechanisms: z.string().optional(),
+    causal: z.array(optionSchema).optional(),
+    genes: z.array(optionSchema).optional(),
+    biomarkers: z.array(optionSchema).optional(),
+    systems: z.array(optionSchema).optional(),
+    otherSystems: z.string().optional(),
+    symptoms: z.array(optionSchema).optional(),
+    studies: z.array(optionSchema).optional(),
+    tools: z.array(optionSchema).optional(),
+})
 
 const editOrgFormSchema = z.object({
     orgName: z.string().min(2, {
@@ -801,19 +839,17 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         )}
                                     />
 
-                                    <ProfilePhoto
+                                    <EditableProfilePhoto
+                                        orgId={organization.id}
                                         img={organization.image}
                                         name={organization.name}
                                         className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                                         textSize="large"
-                                        editable={true}
                                     />
 
-                                    <PAGBannerPhoto
+                                    <EditablePAGBannerPhoto
+                                        orgId={organization.id}
                                         img={organization.headerImage}
-                                        name={organization.headerImage}
-                                        className="rounded-full ring-4 ring-white w-full"
-                                        editable={true}
                                     />
 
                                     {/*<FormField*/}

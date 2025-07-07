@@ -7,7 +7,7 @@ import { MilestoneMarketplaceListElement } from "./marketplace-milestone-list-el
 import { MilestoneMarketplaceCard } from "./marketplace-milestone-card";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
-import ComendLoadingSpinner from "./comend-loading-spinner";
+import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
 
 const selector = (state: MilestoneSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,

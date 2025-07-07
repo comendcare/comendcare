@@ -7,17 +7,14 @@ import { SetStateAction, useState } from "react";
 import { templateMilestones, templateResearchPlans } from '@comend/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import ComendLoadingSpinner from "./comend-loading-spinner";
+import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
 import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { DialogClose } from "@comend/components/ui/dialog";
 import { Plus, Router, X } from "lucide-react";
 import { cn, getCookie } from "@comend/lib/utils";
 import { ASSOCIATED_CATEGORIES } from "@comend/lib/types";
-import { MilestoneType } from "@prisma/client";
 import { createRoadmap } from "@comend/lib/actions";
-import Link from "next/link";
-import { Badge } from "@comend/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 // import { consentedLocalStorage } from "@comend/lib/consent-scripts/functionalConsent";
 

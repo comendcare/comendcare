@@ -25,11 +25,9 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas} from "@comend/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {researchFormSchema} from "@comend/components/research-onboarding-form";
-import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { researchFormSchema } from "./research-onboarding-form";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session} = useSession()
@@ -155,7 +153,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             if (response.success) {
                 toast.success("Condition updated successfully!");
                 setOpen(false)
-                router.refresh(); // Refresh the page to reflect changes
+                window.location.reload()
             } else {
                 console.error(response.error);
                 toast.error(response.error || "Failed to update condition.");

@@ -28,7 +28,6 @@ model User {
   name                  String? /// @encrypted
   nameHash              String? /// @encryption:hash(name)
   username              String?
-  gh_username           String?
   email                 String?                @unique /// @encrypted
   emailHash             String?                @unique /// @encryption:hash(email)
   emailVerified         DateTime?
@@ -938,4 +937,80 @@ model PharmaProject {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   metadata  Json?
+}
+
+model Institution {
+  id           String   @id @default(uuid())
+  rorId        String   @unique
+  name         String
+  established  Int?
+  types        String[]
+  aliases      String[]
+  acronyms     String[]
+  status       String
+  wikipediaUrl String?
+  website      String?
+  city         String?
+  countryName  String?
+  countryCode  String?
+
+  fundrefAll       String[]
+  fundrefPreferred String?
+  gridAll          String
+  gridPreferred    String?
+  isniAll          String[]
+  wikidataAll      String[]
+
+  relationships InstitutionRelationship[] @relation("InstitutionRelationships")
+  relatedTo     InstitutionRelationship[] @relation("InstitutionRelatedTo")
+  affiliation   Affiliation[]
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  metadata      Json?
+}
+
+model InstitutionRelationship {
+  id            String @id @default(uuid())
+  type          String
+  label         String
+  institutionId String
+  relatedId     String
+
+  institution Institution @relation("InstitutionRelationships", fields: [institutionId], references: [id])
+  related     Institution @relation("InstitutionRelatedTo", fields: [relatedId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  metadata    Json?
+}
+
+model Affiliation {
+  id            String    @id @default(uuid())
+  researcherId  String
+  institutionId String
+  startDate     DateTime?
+  endDate       DateTime?
+
+  researcher  Researcher  @relation(fields: [researcherId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([researcherId, institutionId])
+}
+
+model Researcher {
+  id                   String        @id @default(uuid())
+  orcid                String        @unique
+  email                String?       @unique /// @encrypted
+  emailHash            String?       @unique /// @encryption:hash(email)
+  title                String?
+  name                 String
+  researchInterests    String[]
+  conditionsOfInterest String[]
+  genesOfInterest      String[]
+  affiliations         Affiliation[]
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  metadata             Json?
 }

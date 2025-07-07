@@ -28,6 +28,8 @@ import {Button} from "@comend/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Loading from "@/loading";
+import { EditableProfilePhoto } from "./editable-profile-photo";
+import { EditablePAGBannerPhoto } from "./editable-pag-banner-photo";
 
 export default function PAGProfilePage() {
     const {data: session} = useSession() 
@@ -192,22 +194,33 @@ export default function PAGProfilePage() {
                     <ScrollArea id="profile-scroll-area" className="w-full flex flex-col mx-4 space-y-2">
                         <div className="w-full h-fit flex flex-col space-y-4">
                             <Card className="pb-4 flex flex-col gap-4 overflow-hidden">
-                                <PAGBannerPhoto
-                                    img={organization.headerImage}
-                                    name={organization.headerImage}
-                                    className="rounded-full ring-4 ring-white w-full"
-                                    editable={true}
-                                />
+                                {session?.user?.membership?.role === "owner" ? (
+                                    <EditablePAGBannerPhoto
+                                        img={organization.headerImage}
+                                    />
+                                ) : (
+                                    <PAGBannerPhoto
+                                        img={organization.headerImage}
+                                    />
+                                )}
 
                                 <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start">
                                     <div className="h-fit w-fit -mt-16">
-                                        <ProfilePhoto
-                                            img={organization.image}
-                                            name={organization.name}
-                                            className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                            textSize="large"
-                                            editable={true}
-                                        />
+                                        {session?.user?.membership?.role === "owner" ? (
+                                            <EditableProfilePhoto
+                                                img={organization.image}
+                                                name={organization.name}
+                                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                                textSize="large"
+                                            />
+                                        ) : (
+                                            <ProfilePhoto
+                                                img={organization.image}
+                                                name={organization.name}
+                                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                                textSize="large"
+                                            />
+                                        )}
                                     </div>
                                     <div className="flex flex-col">
                                         <div className="flex gap-4 justify-between">

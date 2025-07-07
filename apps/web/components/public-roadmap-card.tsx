@@ -6,10 +6,7 @@ import "@xyflow/react/dist/base.css"
 import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
-import Image from "next/image"
 import {Button} from "@comend/components/ui/button";
-import Link from "next/link";
-import { buttonVariants } from "@comend/components/plate-ui/button";
 import { ChevronsUpDown, Pencil, Plus, Variable } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@comend/components/ui/table";
 import { Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@comend/lib/types";
@@ -17,9 +14,7 @@ import { Badge } from "@comend/components/ui/badge";
 import { Organization } from "@prisma/client";
 import { PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans } from "./no-research-plans";
 import { NoProjects } from "./no-projects";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@comend/components/ui/collapsible";
 import { FunctionComponent, ReactElement, useState } from "react";
-import { labels } from "@comend/lib/data";
 
 export const RoadmapsCard = ({
     roadmaps,

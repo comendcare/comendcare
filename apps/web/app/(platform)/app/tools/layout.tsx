@@ -4,8 +4,6 @@ import {getAssets, getOrganizationFromOrganizationId} from "@comend/lib/fetchers
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import { initializeAssetsStore} from "@comend/lib/initialize-client-state"
-import NoOrganization from "~web/components/no-organization";
-import Loading from "@/loading";;
 
 export default function ToolsLayout({children}: {children: React.ReactNode}) {
     const {data: session} = useSession()

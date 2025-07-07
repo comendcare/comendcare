@@ -7,8 +7,6 @@ import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
-import {User} from "next-auth";
-import {toast} from "sonner"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
@@ -74,20 +72,20 @@ export const authOptions: NextAuthOptions = {
                 }
             }
         }),
-        GitHubProvider({
-            clientId: process.env.AUTH_GITHUB_ID as string,
-            clientSecret: process.env.AUTH_GITHUB_SECRET as string,
-            allowDangerousEmailAccountLinking: true,
-            profile(profile) {
-                return {
-                    id: profile.id.toString(),
-                    name: profile.name || profile.login,
-                    gh_username: profile.login,
-                    email: profile.email,
-                    image: profile.avatar_url
-                }
-            }
-        })
+        // GitHubProvider({
+        //     clientId: process.env.AUTH_GITHUB_ID as string,
+        //     clientSecret: process.env.AUTH_GITHUB_SECRET as string,
+        //     allowDangerousEmailAccountLinking: true,
+        //     profile(profile) {
+        //         return {
+        //             id: profile.id.toString(),
+        //             name: profile.name || profile.login,
+        //             gh_username: profile.login,
+        //             email: profile.email,
+        //             image: profile.avatar_url
+        //         }
+        //     }
+        // })
     ],
     pages: {
         signIn: `/login`,
@@ -217,7 +215,8 @@ export const authOptions: NextAuthOptions = {
                     // @ts-expect-error
                     id: token.sub,
                     // @ts-expect-error
-                    username: token?.user?.username || token?.user?.gh_username,
+                    username: token?.user?.username,
+                    // username: token?.user?.username || token?.user?.gh_username,
                     organizationId: token.organizationId as string | null, // Ensure type matches
                     membership: token.membership as any
                 };
@@ -235,7 +234,8 @@ export const authOptions: NextAuthOptions = {
                 // @ts-expect-error
                 id: token.sub,
                 // @ts-expect-error
-                username: token?.user?.username || token?.user?.gh_username,
+                username: token?.user?.username,
+                // username: token?.user?.username || token?.user?.gh_username,
                 organizationId: activeOrganizationId,
                 membership: membership
             };

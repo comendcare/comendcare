@@ -1,4 +1,3 @@
-import {Company, Organization, Review, User} from "@prisma/client";
 import {CROReviewCard} from "~web/components/cro-review-card";
 import CROReviewDialog from "~web/components/cro-review-dialog";
 import CRORatingSection from "~web/components/cro-rating-section";

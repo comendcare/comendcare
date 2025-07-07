@@ -2,7 +2,6 @@ import { Prisma } from "@prisma/client"
 import {HoverCard} from "@comend/components/ui/hover-card";
 import { cn } from "@comend/lib/utils"
 import { PrivateBadge } from "./private-badge"
-import { TypeBadge } from "./type-badge"
 import { PublicBadge } from "./public-badge"
 
 type AssetType = Prisma.ToolGetPayload<{ 

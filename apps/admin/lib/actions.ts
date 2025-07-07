@@ -7,6 +7,7 @@ import {withAdminAuth} from "./auth"
 import {getSession} from "@comend/lib/auth"
 import {addTypeSenseDocument, deleteTypeSenseDocument, updateTypeSenseDocument} from "@comend/lib/utils";
 import {getCategoriesAndMilestones} from "@comend/lib/utils"
+import { JsonValue } from "@prisma/client/runtime/library"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -278,3 +279,69 @@ export const deleteCompany = withAdminAuth(
         }
     }
 )
+
+export const updateOrganization = withAdminAuth(
+    async (orgId: string, formData: FormData) => {
+        // Convert FormData to a plain object
+        const data: Record<string, any> = {};
+
+        formData.forEach((value, key) => {
+            // Attempt to parse numbers
+
+            if (!isNaN(Number(value)) && value !== "") {
+                data[key] = Number(value);
+            } else {
+                data[key] = value;
+            }
+
+            if (key === "yearFounded") {
+                data[key] = value.toString();
+            }
+
+            if ((key === "image" || key === "headerImage") && !value) {
+                // remove image
+                data[key] = null
+            }
+
+            if (key === "therapeuticsInDevelopment") {
+                data[key] = value.toString().split(",");
+            }
+
+            if (key === "therapeuticsOfInterest") {
+                data[key] = value.toString().split(",");
+            }
+
+            if (key === "metadata") {
+                data[key] = JSON.parse(value.toString()) as JsonValue
+            }
+
+        });
+
+        try {
+            const response = await prisma.organization.update({
+                where: {
+                    id: orgId,
+                },
+                data,
+            });
+
+            if (response.verified && response.published) {
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    response,
+                    'organizations'
+                );
+            }
+
+            return response;
+        } catch (error: any) {
+            console.error("Error updating organization:", error.message);
+            throw new Error(error.message || "Failed to update organization.");
+        }
+    }
+);

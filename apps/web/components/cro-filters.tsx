@@ -13,17 +13,14 @@ import {
     FormMessage
 } from "@comend/components/ui/form"
 import {useForm} from "react-hook-form"
-import {DoubleSliderBarChart} from "@comend/components/ui/slider-double"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
 import {Button} from "@comend/components/ui/button"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
-import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {useEffect} from "react"
 import {Info} from "lucide-react"
-import {useQueryState} from "nuqs"
 import { badgeVariants } from "@comend/components/ui/badge"
 import { usePathname, useSearchParams } from "next/navigation"
 

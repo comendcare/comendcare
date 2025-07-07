@@ -14,7 +14,6 @@ import {
 } from "@comend/components/ui/form"
 import { useForm } from "react-hook-form"
 import { sendBetaSignupEmail } from "@comend/lib/emails"
-import mixpanel from "mixpanel-browser"
 import { customerIOTrack } from "@comend/lib/customer-io"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 

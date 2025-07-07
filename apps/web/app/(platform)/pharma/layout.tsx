@@ -1,16 +1,12 @@
 "use client"
 
 import * as React from "react";
-import {useNavStore} from "@/state/nav/navStore"; // Zustand store
-import {ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable";
+// Zustand store
 import {useSession} from "next-auth/react";
 import {useEffect, useRef} from "react";
-import Image from "next/image"
-import logo from "@/public/logo-square.png"
 import {useState} from "react";
-import {Member, Organization} from "@prisma/client";
 import {redirect, usePathname, useSearchParams} from "next/navigation";
-import Loading from "@/loading";;
+import Loading from "@/loading";
 import {
     getAllNotifications,
     getAssets,
@@ -26,16 +22,6 @@ import {
     initializeRFPStore,
 } from "@comend/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
-import {AppSidebar} from "~web/components/app-sidebar";
-import {createKanban, createRoadmap} from "@comend/lib/actions";
-import {FeedbackSheet} from "~web/components/feedback";
-import {useOnborda} from "@comend/components/onborda/OnbordaContext";
-import {Button} from "@comend/components/ui/button";
-import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
-import {useShallow} from "zustand/react/shallow";
-import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore";
-import {cn, sleep} from "@comend/lib/utils";
-import {Wand2} from "lucide-react";
 import {useQueryState} from "nuqs"
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import {PharmaSidebar} from "~web/components/pharma-sidebar";
@@ -53,7 +39,6 @@ export default function AppLayout({children}: AppLayoutProps) {
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
     const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
-    const {startOnborda} = useOnborda()
     const pathname = usePathname()
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {

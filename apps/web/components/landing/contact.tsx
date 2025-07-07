@@ -1,5 +1,4 @@
 import React from "react"
-import { BetaSignup } from "~web/components/beta-signup"
 import {SimpleContactForm} from "~web/components/simple-contact-form";
 
 export default function ContactSection() {

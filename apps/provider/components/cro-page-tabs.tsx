@@ -10,8 +10,6 @@ import {
 } from "@comend/components/ui/tabs"
 import { Briefcase, Users } from "lucide-react";
 import CROMarketplaceProfileServicesTab from "@comend/components/cro-marketplace-profile-services-tab";
-import {Company} from "@prisma/client";
-import {CompanyWithReviewsAndServices} from "@comend/lib/types";
 import {getCROData} from "@comend/lib/fetchers";
 import { Skeleton } from "@comend/components/ui/skeleton";
 

@@ -1,5 +1,4 @@
 import { withProps } from '@udecode/cn';
-import { AIPlugin } from '@udecode/plate-ai/react';
 import {
   BoldPlugin,
   CodePlugin,
@@ -52,11 +51,8 @@ import {
 } from '@udecode/plate-table/react';
 import { TogglePlugin } from '@udecode/plate-toggle/react';
 
-import { copilotPlugins } from '@comend/components/editor/plugins/copilot-plugins';
 import { editorPlugins } from '@comend/components/editor/plugins/editor-plugins';
 import { FixedToolbarPlugin } from '@comend/components/editor/plugins/fixed-toolbar-plugin';
-import { FloatingToolbarPlugin } from '@comend/components/editor/plugins/floating-toolbar-plugin';
-import { AILeaf } from '@comend/components/plate-ui/ai-leaf';
 import { BlockquoteElement } from '@comend/components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '@comend/components/plate-ui/code-block-element';
 import { CodeLeaf } from '@comend/components/plate-ui/code-leaf';

@@ -13,7 +13,6 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {inviteUser} from "@comend/lib/actions";
 import {getIp} from "@comend/lib/utils";
 import {useSession} from "next-auth/react";
-import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
 import {Input} from "@comend/components/ui/input";
@@ -29,7 +28,6 @@ import {
 import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import { UserPlus } from "lucide-react";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import LoadingDots from "@comend/components/icons/loading-dots";
 

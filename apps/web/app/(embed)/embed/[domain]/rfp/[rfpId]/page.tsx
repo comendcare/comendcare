@@ -1,11 +1,7 @@
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
-import { ProfilePhoto } from "@comend/components/profile-photo";
-import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { RFPCard } from "~web/components/rfp-card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
 import { getOrganizationData, getPublicRFP, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
-import { formatMoney, standardizeYear } from "@comend/lib/utils";
-import { Building2, Calendar, HandCoins } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -50,7 +46,7 @@ export default async function EmbeddedRFPPage({params}: {params: {domain: string
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
+                        <BreadcrumbLink href={`https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
                             {organization.name}
                         </BreadcrumbLink>
                     </BreadcrumbItem>

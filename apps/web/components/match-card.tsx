@@ -1,7 +1,6 @@
 import {
     CircleIcon,
 } from "@radix-ui/react-icons"
-import Link from "next/link"
 import {
     Card,
     CardContent,

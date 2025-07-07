@@ -1,4 +1,3 @@
-import { ReactNode } from "react"
 import Form from "@comend/components/form"
 import { getSession } from "@comend/lib/auth"
 import { redirect } from "next/navigation"

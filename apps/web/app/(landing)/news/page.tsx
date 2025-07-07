@@ -1,5 +1,4 @@
 // "use client";
-import {cn} from "@comend/lib/utils";
 import {format} from "date-fns";
 import Image from "next/image";
 import Link from "next/link";

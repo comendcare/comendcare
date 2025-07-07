@@ -10,7 +10,6 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {getSession} from "@comend/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import React from "react";
-import { IncorporationStatus } from "@prisma/client";
 
 export default async function AnalyticsPage() {
     const session = await getSession()
