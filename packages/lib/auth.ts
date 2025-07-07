@@ -157,6 +157,7 @@ export const authOptions: NextAuthOptions = {
             });
 
             console.log(`JWT token`, token)
+            console.log(`previous session`, session)
 
             const organizationIds = dbUser?.memberships.map((m) => m.organizationId);
 

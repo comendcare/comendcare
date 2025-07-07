@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {signOut, useSession} from "next-auth/react";
 import {useRouter, useSearchParams} from "next/navigation";
 import {ChevronsUpDown, LogOut, User} from "lucide-react";
@@ -75,7 +75,8 @@ export function NavUser() {
     const [memberRequests, setMemberRequests] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [membershipRemovedNotifications, setMembershipRemovedNotifications] = useState<Partial<PlatformNotification>[]>([])
-
+    const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
+    
     useEffect(() => {
         const fetchUserData = async () => {
             if (status === "unauthenticated") {
@@ -261,40 +262,67 @@ export function NavUser() {
             }
         }
 
-        async function fetchMemberRemovedNotifications() {
-            try {
-                const response = await getMembershipRemovedNotifications({
-                    id: true,
-                    type: true,
-                    title: true,
-                    message: true,
-                    lastViewedAt: true,
-                });
+        // async function fetchMemberRemovedNotifications() {
+        //     try {
+        //         const response = await getMembershipRemovedNotifications({
+        //             id: true,
+        //             type: true,
+        //             title: true,
+        //             message: true,
+        //             lastViewedAt: true,
+        //         });
 
-                console.log(`fetch member removed notifications`, response)
+        //         console.log(`fetch member removed notifications`, response)
 
-                if (response.success && response.data) {
-                    const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
-                    console.log(`filtered notifications`, filteredNotifications)
-                    setMembershipRemovedNotifications(filteredNotifications)
-                } else if (response.error) {
-                    console.error(response.error);
-                    toast.error(response.error);
-                } else {
-                    console.error("Unexpected response structure:", response);
-                    toast.error("Couldn't fetch notifications. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error fetching notifications:", error);
-                toast.error("An unexpected error occurred while fetching notifications.");
+        //         if (response.success && response.data) {
+        //             const filteredNotifications = response.data.filter(notification => !notification.lastViewedAt)
+        //             console.log(`filtered notifications`, filteredNotifications)
+        //             setMembershipRemovedNotifications(filteredNotifications)
+        //         } else if (response.error) {
+        //             console.error(response.error);
+        //             toast.error(response.error);
+        //         } else {
+        //             console.error("Unexpected response structure:", response);
+        //             toast.error("Couldn't fetch notifications. Please try again.");
+        //         }
+        //     } catch (error) {
+        //         console.error("Error fetching notifications:", error);
+        //         toast.error("An unexpected error occurred while fetching notifications.");
+        //     }
+        // }
+
+        async function fetchKickedData() {
+            const memberships = await getAllMembershipsFromUserId(session?.user?.id, {
+                id: true,
+                organizationId: true,
+            })
+
+            console.log(`prev session ref`, prevSessionRef?.current)
+
+            if (
+                // !isLoading &&
+                // status !== "authenticated" || 
+                // !session || 
+                // JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+                prevSessionRef?.current &&
+                prevSessionRef?.current?.user?.organizationId && 
+                !(memberships.data || []).map((membership: any) => membership.organizationId).includes(prevSessionRef?.current?.user?.organizationId)
+            ) {
+                // handleSessionUpdate()
+                setMembershipRemovedNotifications([{title: "you've been removed from an organization", message: "If you believe this was a mistake, please contact the owners of your organization."}])
+                router.refresh()
             }
+
+            // Update the ref to the latest session
+            prevSessionRef.current = session
         }
 
         fetchUserData()
         fetchOrgData()
         fetchInvitationData()
         fetchMemberRequestData()
-        fetchMemberRemovedNotifications()
+        // fetchMemberRemovedNotifications()
+        fetchKickedData()
     }, [status, session, router]);
 
     async function handleAcceptInvitation(invitationId: string) {
@@ -401,9 +429,9 @@ export function NavUser() {
             {membershipRemovedNotifications && membershipRemovedNotifications.length > 0 && (
                 <AlertDialog open={membershipRemovedNotifications.length > 0} onOpenChange={async (open) => {
                     if (!open) {
-                        console.log(`notification`, [membershipRemovedNotifications[0] as PlatformNotification])
-                        const notification = await notificationsViewed({notifications: [membershipRemovedNotifications[0] as PlatformNotification]})
-                        console.log(`notification`, notification)
+                        // console.log(`notification`, [membershipRemovedNotifications[0] as PlatformNotification])
+                        // const notification = await notificationsViewed({notifications: [membershipRemovedNotifications[0] as PlatformNotification]})
+                        // console.log(`notification`, notification)
                         setMembershipRemovedNotifications(membershipRemovedNotifications.splice(1))
                     }
                 }}>
