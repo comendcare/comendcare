@@ -6,7 +6,9 @@ import {
     Store, User, Workflow,
     Bookmark,
     Star,
-    Megaphone
+    Megaphone,
+    TestTube,
+    Book
 } from "lucide-react"
 import {NavMain} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -28,6 +30,7 @@ const data = {
             icon: Store,
             variant: "ghost",
             url: "/app/marketplace/service-providers",
+            match: (path: string) => path.startsWith('/app/marketplace'),
             subPages: [{
                 title: "Shortlist",
                 icon: Bookmark,
@@ -40,6 +43,7 @@ const data = {
             icon: Workflow,
             variant: "ghost",
             url: `/app/research-plan`,
+            match: (path: string) => path.startsWith('/app/research-plan'),
             subPages: [
                 // {
                 //     title: "Assets",
@@ -61,8 +65,24 @@ const data = {
             title: "Tools",
             icon: Star,
             variant: "ghost",
-            url: `/app/tools`,
-            subPages: []
+            url: `/app/tools/biosample`,
+            match: (path: string) => path.startsWith('/app/tools'),
+            subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
+                {
+                    title: "Biosample Requests",
+                    icon: TestTube,
+                    variant: "ghost",
+                    url: `/app/requests/biosample`,
+                    subPages: []
+                },
+                {
+                    title: "Data Requests",
+                    icon: Book,
+                    variant: "ghost",
+                    url: `/app/requests/data`,
+                    subPages: []
+                }
+            ] : []
         },
         {
             title: "RFPs",

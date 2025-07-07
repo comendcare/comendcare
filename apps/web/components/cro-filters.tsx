@@ -16,7 +16,7 @@ import {useForm} from "react-hook-form"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
 import {Button} from "@comend/components/ui/button"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS, optionSchema} from "@comend/lib/types"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {useEffect} from "react"
@@ -34,12 +34,6 @@ const selector = (state: CROSearchState) => ({
     allResults: state.allResults,
     setFilters: state.setFilters
 })
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const filtersFormSchema = z.object({
     categories: z.array(optionSchema),
