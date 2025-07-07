@@ -1,18 +1,14 @@
 "use client"
 import React, { useEffect, useRef } from "react"
-import type { CardComponentProps } from "../onborda/types"
-import { useOnborda } from "../onborda/OnbordaContext"
+import type { CardComponentProps } from "comend-pag-platform/components/onborda/types"
+import { useOnborda } from "comend-pag-platform/components/onborda/OnbordaContext"
 import { XIcon } from "lucide-react"
 import confetti from "canvas-confetti"
 import { Button } from "@comend/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card"
 import { ReactFlowProvider, useReactFlow, useStoreApi } from "@xyflow/react"
-import { nanoid } from "nanoid"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { types } from "node:util"
-import mixpanel from "mixpanel-browser"
 
 const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,

@@ -17,7 +17,6 @@ import {
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAuth, withOrganizationAuth, withUserAuth} from "./auth"
 import {getSession} from "@comend/lib/auth"
-import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@comend/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {
@@ -41,11 +40,8 @@ import {
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@comend/lib/types";
-import {includes} from "lodash"
 import {templateResearchPlans} from "./templates"
-import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
-import {organizations} from "@/data/sample-pags"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -2130,7 +2126,7 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
             const nodes = await Promise.all(
                 milestones.map(async (milestone: any, index: number) => {
                     // find the node associated with the milestone, used to fetch position information
-                    const templateNode = roadmapTemplate.nodes.find(n => n.id === milestone.nodeId)
+                    const templateNode = roadmapTemplate.nodes.find((n: any) => n.id === milestone.nodeId)
 
                     // create Node & associated Milestone
                     const node = await prisma.node.create({

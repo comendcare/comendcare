@@ -10,7 +10,6 @@ import { Info, Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import mixpanel from "mixpanel-browser"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 
 const selector = (state: RoadmapState) => ({

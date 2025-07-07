@@ -87,19 +87,19 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
                             <Breadcrumb>
                                 <BreadcrumbList>
                                     <BreadcrumbItem>
-                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
+                                        <BreadcrumbLink href={`https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
                                             {organization.name}
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>
                                     <BreadcrumbSeparator />
                                     <BreadcrumbItem>
-                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`} target="_blank">
+                                        <BreadcrumbLink href={`https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`} target="_blank">
                                             Research Plans
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>
                                     <BreadcrumbSeparator />
                                     <BreadcrumbItem>
-                                        <BreadcrumbLink href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`} target="_blank">
+                                        <BreadcrumbLink href={`https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}`} target="_blank">
                                             {roadmap?.title || 'Untitled Research Plan'}
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>

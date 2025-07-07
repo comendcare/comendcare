@@ -14,7 +14,6 @@ import Pepi from "@/public/profiles/Pepi.jpg"
 import Betty from "@/public/profiles/Betty.jpeg"
 import Megan from "@/public/profiles/Megan.png"
 import Ashley from "@/public/profiles/Ashley.jpeg"
-import Link from "next/link"
 import {Instagram, Linkedin} from "lucide-react"
 
 export function TeamSection() {

@@ -1,11 +1,5 @@
 "use client"
-import { Badge } from "@comend/components/ui/badge"
-import hero from "@/public/illustrations/hero.png"
 import Image from "next/image"
-import Link from "next/link"
-import { cn } from "@comend/lib/utils"
-import { buttonVariants } from "@comend/components/ui/button"
-import { ArrowRight } from "lucide-react"
 import HeroIllustration from "~web/components/landing/hero-illustration"
 import {
     HeroHighlight,
@@ -16,7 +10,6 @@ import { LinkPreview } from "~web/components/link-preview"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
 import React from "react"
-import { BetaSignup } from "~web/components/beta-signup"
 
 export const HeroSection = () => {
     return (

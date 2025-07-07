@@ -1,6 +1,6 @@
 import {Separator} from "@comend/components/ui/separator";
-import FinancesOnboardingForm from "@comend/components/finances-onboarding-form";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
+import FinancesOnboardingForm from "~web/components/finances-onboarding-form";
 
 
 export default function CreateOrganizationFinancesPage() {

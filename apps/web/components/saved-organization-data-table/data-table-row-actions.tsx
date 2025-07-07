@@ -9,19 +9,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@comend/components/ui/dropdown-menu";
-import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {Prisma, SavedCompany} from "@prisma/client";
-import {
-    Dialog,
-    DialogContent,
-} from "@comend/components/ui/dialog";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
-import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
-import {useSession} from "next-auth/react";
 import {unsaveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";

@@ -33,7 +33,6 @@ import {GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
-import { ContextMenuTrigger } from "@comend/components/ui/context-menu"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 

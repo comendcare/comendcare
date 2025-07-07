@@ -1,6 +1,5 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
-import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
 import {cn} from "@comend/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@comend/components/ui/badge";

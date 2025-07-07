@@ -3,10 +3,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Input} from "@comend/components/ui/input";
 import {useShallow} from "zustand/react/shallow"
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {CROSearchState, useCROSearchStore, ViewType} from "@/state/search/croSearchStore";
 import { debounce } from "lodash";
-import mixpanel from "mixpanel-browser";
 
 const selector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,

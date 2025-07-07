@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import {useRouter, useSearchParams} from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@comend/components/ui/button'
 import {toast} from "sonner";
 
 export default function SignOutPage() {
@@ -20,8 +20,6 @@ export default function SignOutPage() {
             toast.error("Sorry! you're not on the user whitelist. If this is a mistake, please contact us.");
         } else if (reason === "terminated") {
             toast.error("Your account has been deleted. If this was a mistake, please contact us.");
-        } else if (reason === "roleChanged") {
-            toast.error("An owner of your organization has changed your role, for security reasons, you'll need to sign back in. If this was a mistake, please contact us.");
         }
 
         const timer = setInterval(() => {

@@ -1,12 +1,8 @@
-import Image from "next/image"
-import Link from "next/link"
 import {ReactNode} from "react"
 import {notFound, redirect} from "next/navigation"
 import {getOrganizationData} from "@comend/lib/fetchers"
 import {Metadata} from "next"
-import {LandingNavbar} from "~web/components/landing/landing-navbar";
 import PublicPageFooter from "~web/components/public-page-footer"
-import {Button} from "@comend/components/ui/button"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
 import {PublicPageNavbar} from "~web/components/public-page-navbar";
 
@@ -82,13 +78,16 @@ export async function generateMetadata({
         logo: string
     }
 
+    const baseUrl = `https://${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+
     return {
         title,
         description,
         openGraph: {
             title,
             description,
-            images: [image]
+            url: baseUrl,
+            images: image ? [image] : [],
         },
         twitter: {
             card: "summary_large_image",
@@ -97,8 +96,10 @@ export async function generateMetadata({
             images: [image],
             creator: "@comendcare"
         },
-        icons: [logo],
-        metadataBase: new URL(`https://${domain}`)
+        icons: {
+            icon: logo ? [logo] : undefined,
+        },
+        metadataBase: new URL(`https://${domain}`),
         // Optional: Set canonical URL to custom domain if it exists
         // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
         //   data.customDomain && {
@@ -106,6 +107,11 @@ export async function generateMetadata({
         //       canonical: `https://${data.customDomain}`,
         //     },
         //   }),
+        alternates: `https://${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+            ? {
+                canonical: baseUrl,
+            }
+            : undefined,
     }
 }
 

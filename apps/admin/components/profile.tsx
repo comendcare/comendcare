@@ -3,8 +3,6 @@
 import {signOut, useSession} from "next-auth/react"
 import {useEffect, useState} from "react"
 import {useRouter} from "next/navigation"
-import Link from "next/link"
-import LogoutButton from "comend-pag-platform/components/logout-button"
 import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuItem,
@@ -16,6 +14,7 @@ import Loading from "@/loading";
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import { LogOut } from "lucide-react"
 import { getUser } from "@/packages/lib/fetchers"
+import LogoutButton from "~admin/components/logout-button";
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()
