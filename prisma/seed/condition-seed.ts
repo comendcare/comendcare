@@ -1,5 +1,5 @@
 import prisma from "@comend/lib/prisma";
-import fs from "fs/promises";
+import * as fs from "fs/promises";
 import {toKebabCase} from "@comend/lib/utils"
 
 async function main() {

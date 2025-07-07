@@ -221,14 +221,6 @@ async function main() {
                     id: flawnson.id
                 }
             },
-            members: {
-                create: [
-                    {userId: flawnsonTwo.id, email: "flawnson@comendcare.com", role: "owner"},
-                    {userId: megan.id, email: "megan@comendcare.com", role: "owner"},
-                    {userId: betty.id, email: "betty.trevino@comendcare.com", role: "owner"},
-                    {userId: albert.id, email: "albert@comendcare.com", role: "owner"},
-                ]
-            }
         },
     });
 
@@ -250,9 +242,6 @@ async function main() {
                     id: alice.id
                 }
             },
-            members: {
-                connect: [flawnsonTwo.id, megan.id, betty.id, albert.id].map((id) => ({id})),
-            }
         },
     });
 
@@ -635,6 +624,24 @@ async function main() {
             user: {
                 connect: {
                     email: "flawnsontong1@gmail.com",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "owner",
+            email: "flawnson@comendcare.com",
+            title: "Director of Testing",
+            user: {
+                connect: {
+                    email: "flawnson@comendcare.com",
                 },
             },
             organization: {

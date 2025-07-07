@@ -103,7 +103,6 @@ model Member {
   emailHash      String? /// @encryption:hash(email)
   userId         String
   invitedById    String?
-  meta           Json?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organizationId String
