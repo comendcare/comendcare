@@ -18,7 +18,6 @@ import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/li
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
-import {useQueryState} from "nuqs";
 import { usePathname, useSearchParams } from "next/navigation"
 
 const selector = (state: OrganizationSearchState) => ({

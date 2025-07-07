@@ -5,10 +5,8 @@ import * as React from 'react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 
 import { cn } from '@comend/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 import { ChartConfig, ChartContainer, ChartTooltip } from './chart';
 import { Bar, BarChart, CartesianGrid, Cell, XAxis } from 'recharts';
-import { useEffect } from 'react';
 
 const DoubleSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,

@@ -6,16 +6,11 @@ import { Analytics } from '@vercel/analytics/next';
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
 import { Providers } from "~provider/providers"
-import Onborda from "@comend/components/onborda/Onborda"
-import OnboardingCard from "@comend/components/ui/onboarding-card"
-import { Tour } from "@comend/components/onborda/types"
-import gif1 from "@/public/onboarding-gif-1.gif"
-import Image from "next/image"
-import { FeedbackSheet } from "@/apps/web/components/feedback"
+// import Onborda from "@comend/components/onborda/Onborda"
+// import OnboardingCard from "@comend/components/ui/onboarding-card"
+// import { Tour } from "@comend/components/onborda/types"
 import { Suspense } from "react"
 import Loading from "@/loading";
-import { onbordaTours } from "@/state/onborda/onbordaStore";
-import Script from 'next/script';
 
 
 // Set up Playfair Display and Source Sans 3 fonts
@@ -129,11 +124,11 @@ export default function RootLayout({
                         enableSystem={false}
                         disableTransitionOnChange
                     >
-                        <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
+                        {/* <Onborda steps={onbordaTours} cardComponent={OnboardingCard}> */}
                             {children}
                             {/* <FeedbackForm /> */}
                             <Analytics />
-                        </Onborda>
+                        {/* </Onborda> */}
                     </ThemeProvider>
                 </Providers>
                 </Suspense>

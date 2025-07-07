@@ -34,9 +34,7 @@
 //     );
 // }
 
-import { type ExtendedRecordMap } from 'notion-types'
 import { NotionPage } from '~web/components/notion-page'
-import notion from '@comend/lib/react-notion'
 
 import 'react-notion-x/src/styles.css'
 

@@ -6,8 +6,6 @@ import {
     ResizablePanelGroup,
     ResizableHandle
 } from "@comend/components/ui/resizable"
-import { Separator } from "@comend/components/ui/separator"
-import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/tabs"
 import { TooltipProvider } from "@comend/components/ui/tooltip"
 import Browse from "~web/components/browse"
 import { useNavStore } from "@/state/nav/navStore"

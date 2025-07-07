@@ -3,8 +3,6 @@
 import {signOut, useSession} from "next-auth/react"
 import {useEffect, useState} from "react"
 import {useRouter} from "next/navigation"
-import Link from "next/link"
-import LogoutButton from "comend-pag-platform/components/logout-button"
 import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuItem,

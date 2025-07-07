@@ -18,9 +18,7 @@ import UnverifiedOrganizationPage from "~web/components/unverified-organization-
 import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
 import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
-import ContactPAGDialog from "~web/components/contact-pag-dialog";
 import {Mail, Share} from "lucide-react";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({

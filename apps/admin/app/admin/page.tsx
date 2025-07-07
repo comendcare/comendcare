@@ -2,7 +2,6 @@ import {Suspense} from "react";
 import Organizations from "~admin/components/organizations";
 import OverviewStats from "~admin/components/overview-stats";
 import Roadmaps from "~admin/components/roadmaps";
-import Link from "next/link";
 import PlaceholderCard from "@comend/components/placeholder-card";
 import OverviewOrganizationsCTA from "~admin/components/overview-organizations-cta";
 

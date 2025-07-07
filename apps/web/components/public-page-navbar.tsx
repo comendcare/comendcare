@@ -14,7 +14,6 @@ import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { X, Menu as MenuIcon } from "lucide-react"
 import {Menu, MenuItem, ProductItem} from "./landing/navbar-menu";
-import {buttonVariants} from "@comend/components/ui/button";
 
 interface NavbarItem {
     name: string

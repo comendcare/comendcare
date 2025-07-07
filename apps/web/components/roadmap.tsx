@@ -40,7 +40,6 @@ import { Milestone } from "@comend/lib/types"
 import Loading from "@/loading";
 import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { useOnborda } from "@comend/components/onborda/OnbordaContext"
 import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
@@ -54,6 +53,7 @@ import {
   ContextMenuTrigger,
 } from "@comend/components/ui/context-menu"
 import { NotificationBubble } from "./notification-bubble"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,

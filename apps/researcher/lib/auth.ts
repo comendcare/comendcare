@@ -4,8 +4,43 @@ import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
 import {PrismaClient} from "@prisma/client";
+import {OAuthConfig} from "next-auth/providers/oauth";
+import {CustomPrismaAdapter} from "~provider/lib/custom-prisma-adapter";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
+
+const OrcidProvider = (): OAuthConfig<any> => (    {
+    id: 'orcid',
+    name: 'ORCID',
+    type: 'oauth',
+    version: '2.0',
+    wellKnown: 'https://orcid.org/.well-known/openid-configuration',
+    clientId: process.env.ORCID_CLIENT_ID,
+    clientSecret: process.env.ORCID_CLIENT_SECRET,
+    authorization: {
+        url: 'https://orcid.org/oauth/authorize',
+        params: {
+            scope: 'openid profile',
+            response_type: 'code',
+        },
+    },
+    token: 'https://orcid.org/oauth/token',
+    userinfo: 'https://orcid.org/oauth/userinfo',
+    checks: ['pkce', 'state'],
+    allowDangerousEmailAccountLinking: true,
+    profile(profile) {
+        const given = profile.given_name ?? '';
+        const family = profile.family_name ?? '';
+        const fallbackEmail = `orcid-${profile.sub}@orcid.org`; // fallback to synthetic email
+
+        return {
+            id: profile.sub,
+            name: `${given} ${family}`.trim(),
+            email: profile.email ?? fallbackEmail, // ORCID doesn’t return real email
+            image: undefined, // ORCID usually doesn’t return profile image
+        };
+    },
+});
 
 export const researcherAuthOptions: NextAuthOptions = {
     providers: [
@@ -36,14 +71,16 @@ export const researcherAuthOptions: NextAuthOptions = {
                 }
             }
         }),
+        OrcidProvider(),
     ],
     pages: {
         signIn: `/login`,
         verifyRequest: `/login/verify-request`,
         error: "/error", // Error code passed in query string as ?error=
-        newUser: "/onboarding/welcome"
+        newUser: "/onboarding"
     },
-    adapter: PrismaAdapter(prisma as PrismaClient),
+    // adapter: PrismaAdapter(prisma as PrismaClient),
+    adapter: CustomPrismaAdapter(prisma as PrismaClient),
     session: {strategy: "jwt"},
     cookies: {
         sessionToken: {
@@ -88,18 +125,27 @@ export const researcherAuthOptions: NextAuthOptions = {
     },
 
     callbacks: {
-        jwt: async ({ token, user }) => {
+        jwt: async ({token, user, account}) => {
             if (user) {
                 token.user = user;
             }
+            if (account?.provider === "orcid") {
+                token.accessToken = account.access_token;
+                token.orcid = account.providerAccountId; // ORCID iD
+            }
             return token;
         },
-        session: async ({ session, token }) => {
+        session: async ({session, token}) => {
             session.user = {
                 ...session.user,
                 // @ts-expect-error
                 id: token.sub,
             };
+            // Optional: Add ORCID iD to session if available
+            if (token.orcid) {
+                session.user.orcid = token.orcid;
+                session.accessToken = token.accessToken;
+            }
             return session;
         },
     },
@@ -119,6 +165,7 @@ export function getSession() {
             image: string
             organizationId: string
             membership: any
+            orcid?: string
         }
     } | null>
 }

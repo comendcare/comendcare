@@ -7,7 +7,6 @@ import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@comend/components/ui/dropdown-menu";
 import {useSession} from "next-auth/react";
 import { Ellipsis, UserCheck, UserX } from "lucide-react";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export default function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {

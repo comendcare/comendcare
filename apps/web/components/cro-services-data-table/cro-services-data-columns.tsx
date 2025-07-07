@@ -2,9 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@comend/components/ui/checkbox"
-import { Badge } from "@comend/components/ui/badge"
 
 // Assuming your data shape looks like this:
 export type StrainData = {

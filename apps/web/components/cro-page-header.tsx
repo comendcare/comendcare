@@ -2,7 +2,6 @@ import {getCROData} from "@comend/lib/fetchers";
 import {notFound} from "next/navigation";
 // import {Star} from "@comend/components/cro-rating-section";
 import {CertificationBadge} from "@comend/components/certification-badge";
-import {cn} from "@comend/lib/utils";
 import SaveCRODialog from "~web/components/save-cro-dialog";
 import {
     BriefcaseBusiness,
@@ -20,9 +19,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import {buttonVariants} from "@comend/components/ui/button";
-import mixpanel from "mixpanel-browser";
-import {Button} from "@comend/components/plate-ui/button";
 import {ServiceProviderWebsiteButton} from "./service-provider-website-button";
 import {companyTypeMap} from "@comend/lib/types";
 

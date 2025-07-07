@@ -1,6 +1,6 @@
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
-import Spinner from "@comend/components/ui/spinner"
+import Spinner from "./ui/spinner"
 
 export default function ComendLoadingSpinner() {
     return (

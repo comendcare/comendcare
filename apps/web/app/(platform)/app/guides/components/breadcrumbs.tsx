@@ -1,6 +1,4 @@
 "use client"
-import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
 import { ChevronRight, House } from "lucide-react"
 
 export default function Breadcrumbs({pathname}: {pathname: string}) {

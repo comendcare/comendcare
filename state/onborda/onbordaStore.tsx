@@ -1,12 +1,9 @@
 import Image from 'next/image';
-import gif1 from "@/public/onboarding-gif-1.gif"
 import gif2 from "@/public/Screen Recording 2025-05-22 at 3.33.16 PM.gif"
 import { temporal } from 'zundo';
 import { create } from 'zustand';
-import { Tour } from '@comend/components/onborda/types';
-import { Step } from 'comend-pag-platform/components/onboarding-steps';
 
-export const onbordaTours: Tour[] = [
+export const onbordaTours: any[] = [
     {
         tour: "research-plan-tour",
         steps: [
@@ -204,7 +201,7 @@ export const useOnbordaStore = create<ResearchPlanOnbordaState>()(
                 if (!currentStep) return undefined
                 if (!activeTour) return undefined
 
-                const currentStepIndex = activeTour.steps.map(step => step.selector).indexOf(currentStep)
+                const currentStepIndex = activeTour.steps.map((step: any) => step.selector).indexOf(currentStep)
                 if (!currentStepIndex) {
                     console.error(`Could not find current onborda step: `, currentStep)
                     return undefined
@@ -225,7 +222,7 @@ export const useOnbordaStore = create<ResearchPlanOnbordaState>()(
                 if (!currentStep) return undefined
                 if (!activeTour) return undefined
 
-                const currentStepIndex = activeTour.steps.map(step => step.selector).indexOf(currentStep)
+                const currentStepIndex = activeTour.steps.map((step: any) => step.selector).indexOf(currentStep)
                 if (!currentStepIndex) {
                     console.error(`Could not find current onborda step: `, currentStep)
                     return undefined

@@ -12,7 +12,6 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Info} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {faker} from "@faker-js/faker";
 import LoadingDots from "@comend/components/icons/loading-dots";

@@ -1,9 +1,7 @@
 "use client"
 
 import { cn } from "@comend/lib/utils"
-import { Company } from "@prisma/client"
 import { ExternalLink } from "lucide-react"
-import mixpanel from "mixpanel-browser"
 import Link from "next/link"
 import { buttonVariants } from "@comend/components/ui/button"
 import { mixpanelTrack } from "@comend/lib/mixpanel"

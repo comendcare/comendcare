@@ -172,7 +172,7 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
             setOpen(false);
-            router.refresh();
+            window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");

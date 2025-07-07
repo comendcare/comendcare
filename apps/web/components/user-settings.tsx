@@ -1,21 +1,8 @@
 "use client"
 
 import {useState} from "react";
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@comend/components/ui/form";
 import {Button} from "@comend/components/ui/button";
-import {Input} from "@comend/components/ui/input";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,7 +19,6 @@ import {useSession} from "next-auth/react";
 import {revalidatePath} from "next/cache";
 import { signOut } from "next-auth/react"
 import {getAllMembershipsFromUserId} from "@comend/lib/fetchers";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export default function UserSettings() {

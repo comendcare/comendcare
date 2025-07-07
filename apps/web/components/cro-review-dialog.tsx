@@ -47,7 +47,6 @@ import {StarRatingSelector} from "~web/components/star-rating-selector";
 import {getMilestones} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";
-import mixpanel from "mixpanel-browser";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 

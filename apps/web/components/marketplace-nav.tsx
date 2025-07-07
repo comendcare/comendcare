@@ -5,7 +5,6 @@ import {usePathname} from "next/navigation"
 
 import {cn} from "@comend/lib/utils"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Button} from "@comend/components/ui/button";
 
 const links = [
     {

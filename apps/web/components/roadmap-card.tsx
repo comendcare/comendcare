@@ -1,7 +1,4 @@
-import BlurImage from "@comend/components/blur-image"
-import { placeholderBlurhash, random } from "@comend/lib/utils"
 import { Roadmap, Organization } from "@prisma/client"
-import { BarChart, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 export default function RoadmapCard({

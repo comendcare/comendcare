@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Import } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { FileUploadForm } from "~web/components/file-upload-form";
-import Papa from "papaparse";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseCSV } from "@comend/lib/utils";

@@ -10,10 +10,6 @@ import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "~web/components/marketplace-breadcrumb";
 import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
-import {DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@comend/components/ui/dialog";
-import {Label} from "@comend/components/ui/label";
-import {Input} from "@comend/components/ui/input";
-import {Button} from "@comend/components/ui/button";
 import ShareDialog from "~web/components/share-dialog";
 import {FloatingDock} from "~web/components/floating-dock";
 import React from "react";

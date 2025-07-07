@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { HoverCard } from "@comend/components/ui/hover-card";
 import { PrivateBadge } from "./private-badge"
-import { TypeBadge } from "./type-badge"
 import { PublicBadge } from "./public-badge"
 
 type RFPType = Prisma.RFPGetPayload<{}>
