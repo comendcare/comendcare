@@ -33,15 +33,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@comend/components/ui/select"
-import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types"
+import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, optionSchema} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge";
 import { createCompany } from "~admin/lib/actions"
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),

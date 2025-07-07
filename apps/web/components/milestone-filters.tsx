@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
 import { Button } from "@comend/components/ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
-import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@comend/lib/types"
+import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS, optionSchema } from "@comend/lib/types"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { useEffect } from "react"
@@ -24,12 +24,6 @@ const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
     setFilters: state.setFilters
 })
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const filtersFormSchema = z.object({
     milestoneTypes: z.array(optionSchema),

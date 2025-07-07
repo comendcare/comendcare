@@ -21,15 +21,10 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {TooltipProvider} from "@comend/components/ui/tooltip";
+import {optionSchema} from "@comend/lib/types";
 import {SidebarMenuButton} from "@comend/components/ui/sidebar"
 import {Info, Plus} from "lucide-react";
-
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const newPharmaProjectSchema = z.object({
     name: z.string()

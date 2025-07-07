@@ -293,10 +293,21 @@ model Tool {
   private     Boolean              @default(true)
   pinned      Boolean              @default(false)
   metadata    Json?
+  types       String[] // values (ToolType ids)
 
   organizationId String?
   organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     ToolToMilestone[]
+}
+
+model ToolType {
+  id          String   @id // value
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  label       String
+  type        String // biosample | data
+  description String?
+  metadata    Json?
 }
 
 model ToolToMilestone {
@@ -405,18 +416,24 @@ model Column {
 
 model Task {
   id             String            @id @unique @default(uuid())
-  status         String?           @default("PLANNED")
   name           String            @default("")
   description    String?           @default("")
   milestoneId    String?
   kanbanPosition Int
   orderPosition  Int
   columnId       String
+  code           String            @unique @db.VarChar(128)
+  title          String?           @db.VarChar(128)
+  label          Label             @default(bug)
+  estimatedHours Float             @default(0)
+  archived       Boolean           @default(false)
+  // status         String?           @default("PLANNED")
+  status         Status?           @default(todo)
+  priority       Priority?         @default(medium)
   createdAt      DateTime          @default(now())
   date           DateTime?         @default(now())
   updatedAt      DateTime          @updatedAt
   endDate        DateTime?
-  priority       String?
   private        Boolean           @default(true)
   startDate      DateTime?
   checklist      ChecklistItem[]
@@ -1013,4 +1030,24 @@ model Researcher {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   metadata             Json?
+}
+
+enum Status {
+  todo
+  in_progress
+  done
+  canceled
+}
+
+enum Label {
+  bug
+  feature
+  enhancement
+  documentation
+}
+
+enum Priority {
+  low
+  medium
+  high
 }

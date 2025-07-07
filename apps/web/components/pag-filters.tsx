@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
 import { Button } from "@comend/components/ui/button"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, optionSchema } from "@comend/lib/types"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
@@ -25,12 +25,6 @@ const selector = (state: OrganizationSearchState) => ({
     allResults: state.allResults,
     setFilters: state.setFilters
 })
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const filtersFormSchema = z.object({
     mechanisms: z.array(optionSchema),

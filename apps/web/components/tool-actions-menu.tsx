@@ -10,15 +10,15 @@ import {
 import { Button } from "@comend/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import { Asset } from "@comend/lib/types"
-import { AssetState, useAssetStore } from "@/state/asset/assetStore"
+import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import { useSession } from "next-auth/react"
 import { Dialog, DialogPortal } from "@comend/components/ui/dialog"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 
-const toolSelector = (state: AssetState) => ({
-    createAsset: state.createAsset,
-    updateAsset: state.updateAsset
+const toolSelector = (state: ToolState) => ({
+    createTool: state.createTool,
+    updateTool: state.updateTool
 })
 
 export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
@@ -26,10 +26,10 @@ export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
-    const { createAsset } = useAssetStore(useShallow(toolSelector))
+    const { createTool } = useToolStore(useShallow(toolSelector))
 
     const handleDuplicate = () => {
-        if (session?.user?.organizationId) createAsset({...tool, id: undefined}, session.user.organizationId)
+        if (session?.user?.organizationId) createTool({...tool, id: undefined}, session.user.organizationId)
     }
 
     const handleDelete = () => {
