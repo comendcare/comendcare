@@ -1,9 +1,11 @@
 "use client"
 import React, {useEffect, useState} from "react";
-import {getAssets, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
+import {getAssets, getOrganizationFromOrganizationId, getToolTypes} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import { initializeAssetsStore} from "@comend/lib/initialize-client-state"
+import NoOrganization from "~web/components/no-organization";
+import Loading from "@/loading";import { ToolsNav } from "~web/components/tools-nav";
 
 export default function ToolsLayout({children}: {children: React.ReactNode}) {
     const {data: session} = useSession()
@@ -25,14 +27,22 @@ export default function ToolsLayout({children}: {children: React.ReactNode}) {
                 id: true,
                 title: true,
                 description: true,
+                types: true,
                 contacts: true,
                 attachments: true,
                 private: true,
                 pinned: true,
                 milestones: true
             })
-            if (toolResponse.success) {
-                initializeAssetsStore(toolResponse.data || [])
+            let toolTypesResponse = await getToolTypes({
+                id: true,
+                label: true,
+                type: true,
+                description: true,
+                metadata: true
+            })
+            if (toolResponse.success && toolTypesResponse.success && toolTypesResponse.data) {
+                initializeAssetsStore(toolResponse.data || [], toolTypesResponse.data)
                 console.log(`Tools initialized...`)
             } else {
                 console.error(toolResponse.error)
@@ -49,5 +59,10 @@ export default function ToolsLayout({children}: {children: React.ReactNode}) {
 
     // if (!isInitialized) return <Loading />
     // if (!organization) return <NoOrganization />
-    return <>{children}</>
+    return (
+        <div className="container relative flex flex-col items-center">
+            <ToolsNav />
+            {children}
+        </div>
+    )
 }

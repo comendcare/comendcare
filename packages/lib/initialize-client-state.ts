@@ -1,7 +1,7 @@
 "use client";
 
 import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
-import { PlatformNotification, Prisma } from "@prisma/client";
+import { PlatformNotification, Prisma, ToolType } from "@prisma/client";
 import { useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { useCROSearchStore } from "@/state/search/croSearchStore";
 import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
@@ -9,7 +9,7 @@ import { useOrganizationSearchStore } from "@/state/search/organizationSearchSto
 import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
 import { Asset, RFP, Roadmap } from '@comend/lib/types';
-import { useAssetStore } from "@/state/asset/assetStore";
+import { useToolStore } from "@/state/tool/toolStore";
 import { useRFPStore } from "@/state/rfp/rfpStore";
 
 export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
@@ -80,12 +80,12 @@ export function initializeNotificationsState(initData: {
     }
 }
 
-export function initializeAssetsStore(tools: Asset[]) {
+export function initializeAssetsStore(tools: Asset[], toolTypes: ToolType[]) {
     if (typeof window !== "undefined") {
-        const initAssetState = useAssetStore.getState().initState;
+        const initAssetState = useToolStore.getState().initState;
 
         // Call Zustand's initState directly
-        initAssetState(tools)
+        initAssetState(tools, toolTypes)
     }
 }
 

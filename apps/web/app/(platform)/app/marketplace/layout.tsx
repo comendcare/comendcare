@@ -198,7 +198,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
         >
             <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}
                             className="container relative flex flex-col items-center">
-                <MarketplaceNav projectId=""/>
+                <MarketplaceNav />
                 {children}
             </ResizablePanel>
 

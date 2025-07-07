@@ -14,7 +14,7 @@ import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import React, {useCallback, useEffect, useState} from "react";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
-import {AddressType, MODALITIES, Option} from "@comend/lib/types";
+import {AddressType, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
 import {Bold, Info, Italic} from "lucide-react";
@@ -32,12 +32,6 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 import {Member, Organization} from "@prisma/client";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const joinOrgFormSchema = z.object({
     org: z.array(optionSchema).min(0).optional(),

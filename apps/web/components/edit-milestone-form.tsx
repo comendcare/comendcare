@@ -79,13 +79,6 @@ const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
     step: state.step
 })
 
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    description: z.string().optional()
-    // disable: z.boolean().optional(),
-});
-
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone,
     selectedNodeIds: state.selectedNodeIds

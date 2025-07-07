@@ -17,13 +17,7 @@ import {faker} from "@faker-js/faker";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {Organization} from "@prisma/client";
-import {MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
-
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
+import {MOLECULAR_MECHANISMS, Option, optionSchema} from "@comend/lib/types";
 
 export const researchFormSchema = z.object({
     disorder: z.array(optionSchema).optional(),

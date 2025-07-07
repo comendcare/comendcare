@@ -90,13 +90,6 @@ const HEADER_IMAGE_OPTIONS = [
     }
 ]
 
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    description: z.string().optional()
-    // disable: z.boolean().optional(),
-});
-
 const editRFPForm = z.object({
     headerImage: z.string().optional(),
     title: z
