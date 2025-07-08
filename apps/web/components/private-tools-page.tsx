@@ -32,7 +32,12 @@ export const PrivateToolsPage = ({type}: {type: 'biosample' | 'data'}) => {
 
     async function filterTools(tools: Asset[], type: 'biosample' | 'data') {
         const filteredTypes = toolTypes.filter(t => t.type === type)
-        return tools.filter(tool => filteredTypes.some(t => tool.types.includes(t.id)))
+        return tools.filter(tool => 
+            // filter by type
+            filteredTypes.some(t => tool.types.includes(t.id) ||
+            // if the tool does not have a type, sort it into the 'data' bucket 
+            (tool.types.length === 0 && type === 'data'))
+        )
     }
 
     return (

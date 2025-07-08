@@ -1,7 +1,7 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
 import prisma from "@comend/lib/prisma"
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@comend/lib/utils";
-import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS} from '@comend/lib/types';
+import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS} from '@comend/lib/types';
 
 
 async function main() {
@@ -30,14 +30,14 @@ async function main() {
     })
 
     // seed tool types
-    const biosampleTypeIds: string[] = ['BIOMARKER', 'OUTCOMEMEASURE', 'BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL', 'TARGETVALIDATION', 'ASSAYDEVELOPMENT', 'DRUGSCREEN', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY', 'GENETHERAPYPRODUCTION', 'GPMANUFACTURING', 'INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'SITESELECTION', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'FDAAPPROVAL', 'PHASE4']
-    const dataTypeIds: string[] = ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'PATIENTRECRUITMENT']
+    // const biosampleTypeIds: string[] = ['BIOMARKER', 'OUTCOMEMEASURE', 'BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL', 'TARGETVALIDATION', 'ASSAYDEVELOPMENT', 'DRUGSCREEN', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY', 'GENETHERAPYPRODUCTION', 'GPMANUFACTURING', 'INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'SITESELECTION', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'FDAAPPROVAL', 'PHASE4']
+    // const dataTypeIds: string[] = ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'PATIENTRECRUITMENT']
     await prisma.toolType.deleteMany()
     const toolTypes = await prisma.toolType.createMany({
-        data: MILESTONE_TYPE_OPTIONS.map(({id, label}) => ({
+        data: TOOL_TYPE_OPTIONS.map(({id, label, type}) => ({
             id,
             label,
-            type: biosampleTypeIds.includes(id) ? 'biosample' : 'data'
+            type
         })),
         skipDuplicates: true,
     })
