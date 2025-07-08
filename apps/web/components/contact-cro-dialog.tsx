@@ -98,8 +98,6 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
 
     const onSubmit = async (values: RequestMeetingFormData) => {
         setIsSubmitting(true);
-        console.log(values)
-        console.log(form.getValues("services"))
         try {
             const formData = new FormData()
             formData.set("description", values.meetingObjective)

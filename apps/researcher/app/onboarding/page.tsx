@@ -64,6 +64,7 @@ export default function ResearcherOnboardingForm() {
     const [invitations, setInvitations] = useState<any[]>([]);
     const hasInvitations = invitations.length > 0;
     const [isInitializing, setIsInitializing] = useState(true)
+    console.log('shit', session)
 
     useEffect(() => {
         const fetchUserData = async () => {

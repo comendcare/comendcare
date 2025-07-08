@@ -1066,7 +1066,7 @@ model Affiliation {
 
 model Researcher {
   id                   String        @id @default(uuid())
-  orcid                String        @unique
+  orcid                String?       @unique
   email                String?       @unique /// @encrypted
   emailHash            String?       @unique /// @encryption:hash(email)
   title                String?
