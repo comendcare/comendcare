@@ -16,19 +16,19 @@ import { BiosampleToolDataTable } from "./biosample-tool-data-table/biosample-to
 
 import * as React from "react";
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { Shell } from "@comend/components/biorepo/advanced-data-table/data-table/shell";
+import { Shell } from "@comend/components/biorepo/advanced-data-table/tasks-table/shell";
 import { getValidFilters } from "@comend/lib/data-table";
 import type { SearchParams } from "@comend/components/types";
 
-import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/data-table/feature-flags-provider";
-import { TasksTable } from "@comend/components/biorepo/advanced-data-table/data-table/tasks-table";
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/tasks-table/feature-flags-provider";
+import { TasksTable } from "@comend/components/biorepo/advanced-data-table/tasks-table/tasks-table";
+import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosample-table/biosample-table"
 import {
     getEstimatedHoursRange,
     getTaskPriorityCounts,
     getTaskStatusCounts,
     getTasks,
 } from "@comend/components/biorepo/advanced-data-table/lib/queries";
-import { searchParamsCache } from "@comend/components/biorepo/advanced-data-table/lib/validations";
 
 const toolSelector = (state: ToolState) => ({
     tools: state.tools,
@@ -38,20 +38,6 @@ const toolSelector = (state: ToolState) => ({
 export const PrivateToolsPage = ({type, search, validFilters}: {type: 'biosample' | 'data', search: any, validFilters: any}) => {
     const { tools, toolTypes } = useToolStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
-
-    // const search = searchParamsCache.parse(searchParams);
-
-    // const validFilters = getValidFilters(search.filters);
-
-    const promises = Promise.all([
-        getTasks({
-            ...search,
-            filters: validFilters,
-        }),
-        getTaskStatusCounts(),
-        getTaskPriorityCounts(),
-        getEstimatedHoursRange(),
-    ]);
 
     useEffect(() => {
         const init = async () => {
@@ -70,6 +56,16 @@ export const PrivateToolsPage = ({type, search, validFilters}: {type: 'biosample
             (tool.types.length === 0 && type === 'data'))
         )
     }
+
+    const promises = Promise.all([
+        getTasks({
+            ...search,
+            filters: validFilters,
+        }),
+        getTaskStatusCounts(),
+        getTaskPriorityCounts(),
+        getEstimatedHoursRange(),
+    ]);
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
