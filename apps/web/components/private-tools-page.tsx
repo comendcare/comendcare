@@ -13,14 +13,45 @@ import { useEffect, useState } from "react"
 import { Asset } from "@/packages/lib/types"
 import { BiosampleToolDataTable } from "./biosample-tool-data-table/biosample-tool-data-table"
 
+
+import * as React from "react";
+import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
+import { Shell } from "@comend/components/biorepo/advanced-data-table/data-table/shell";
+import { getValidFilters } from "@comend/lib/data-table";
+import type { SearchParams } from "@comend/components/types";
+
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/data-table/feature-flags-provider";
+import { TasksTable } from "@comend/components/biorepo/advanced-data-table/data-table/tasks-table";
+import {
+    getEstimatedHoursRange,
+    getTaskPriorityCounts,
+    getTaskStatusCounts,
+    getTasks,
+} from "@comend/components/biorepo/advanced-data-table/lib/queries";
+import { searchParamsCache } from "@comend/components/biorepo/advanced-data-table/lib/validations";
+
 const toolSelector = (state: ToolState) => ({
     tools: state.tools,
     toolTypes: state.toolTypes
 })
 
-export const PrivateToolsPage = ({type}: {type: 'biosample' | 'data'}) => {
+export const PrivateToolsPage = ({type, searchParams}: {type: 'biosample' | 'data', searchParams: SearchParams}) => {
     const { tools, toolTypes } = useToolStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
+
+    const search = searchParamsCache.parse(searchParams);
+
+    const validFilters = getValidFilters(search.filters);
+
+    const promises = Promise.all([
+        getTasks({
+            ...search,
+            filters: validFilters,
+        }),
+        getTaskStatusCounts(),
+        getTaskPriorityCounts(),
+        getEstimatedHoursRange(),
+    ]);
 
     useEffect(() => {
         const init = async () => {
@@ -63,7 +94,31 @@ export const PrivateToolsPage = ({type}: {type: 'biosample' | 'data'}) => {
             </div>
         )}
         {filteredTools.length > 0 && type === 'biosample' && (
-            <BiosampleToolDataTable data={filteredTools} columns={BiosampleToolColumns} />
+            // <BiosampleToolDataTable data={filteredTools} columns={BiosampleToolColumns} />
+            <Shell className="gap-2">
+                <FeatureFlagsProvider>
+                    <React.Suspense
+                        fallback={
+                            <DataTableSkeleton
+                                columnCount={7}
+                                filterCount={2}
+                                cellWidths={[
+                                    "10rem",
+                                    "30rem",
+                                    "10rem",
+                                    "10rem",
+                                    "6rem",
+                                    "6rem",
+                                    "6rem",
+                                ]}
+                                shrinkZero
+                            />
+                        }
+                    >
+                        <TasksTable promises={promises} />
+                    </React.Suspense>
+                </FeatureFlagsProvider>
+            </Shell>
         )}
         {filteredTools.length > 0 && type === 'data' && (
             <DataToolDataTable data={filteredTools} columns={DataToolColumns} />
