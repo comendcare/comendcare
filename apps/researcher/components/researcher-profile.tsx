@@ -19,7 +19,6 @@ import {
 } from "lucide-react"
 
 export default function ResearcherProfile(researcherData: any) {
-    console.log("fuck", researcherData)
     const publications = [
         {
             title: "CRISPR-Cas9 mediated genome editing in human embryonic stem cells for modeling genetic diseases",
