@@ -4,10 +4,10 @@ import React, {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {Company, Prisma, RFP, Service} from "@prisma/client";
+import {Company, Service} from "@prisma/client";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-
+import {RFP, Option} from "@comend/lib/types"
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@comend/components/ui/dialog";
 import {Button} from "@comend/components/ui/button";
 import {
@@ -24,11 +24,10 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/too
 import {toast} from "sonner";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import va from "@vercel/analytics";
-import {contactCRO} from "@comend/lib/actions"; // placeholder function
-// import RFPSelector from "./rfp-selector";
+import {contactCRO} from "@comend/lib/actions";
 import MultipleSelector from "@/packages/components/ui/multiple-selector";
-import {CompanyWithReviewsAndServices, ReviewWithAuthor} from "@/packages/lib/types";
 import {Handshake} from "lucide-react";
+import {getRFPs} from "@/packages/lib/fetchers";
 
 export interface CompanyWithServices extends Company {
     services: Service[]
@@ -41,7 +40,6 @@ export const optionSchema = z.object({
 });
 
 const formSchema = z.object({
-    rfpIds: z.array(z.string()).min(1, "Select at least one RFP"),
     services: z.array(optionSchema).optional(),
     rfps: z.array(optionSchema).optional(),
     meetingObjective: z.string().min(10, "Please describe your objective for the meeting")
@@ -55,25 +53,61 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
 
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
 
     const form = useForm<RequestMeetingFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            rfpIds: [],
+            services: [],
+            rfps: [],
             meetingObjective: ""
         }
     });
 
+    useEffect(() => {
+        const init = async () => {
+            if (session?.user.organizationId) {
+
+                const rfpsResponse = await getRFPs(session.user.organizationId, {
+                    id: true,
+                    title: true,
+                    description: true,
+                    openTo: true,
+                    startDate: true,
+                    endDate: true,
+                    contacts: true,
+                    attachments: true,
+                    budget: true,
+                    private: true,
+                    headerImage: true,
+                    pinned: true,
+                    milestones: true
+                })
+                if (rfpsResponse.success && rfpsResponse.data) {
+                    setFetchedRFPs(rfpsResponse.data || [])
+                }
+            }
+
+            form.trigger()
+
+        }
+
+        init()
+
+    }, [])
+
     const onSubmit = async (values: RequestMeetingFormData) => {
         setIsSubmitting(true);
+        console.log(values)
+        console.log(form.getValues("services"))
         try {
             const formData = new FormData()
             formData.set("description", values.meetingObjective)
 
             // Map form values into FormData
             const data = {
-                services: values.services?.map((service) => service.label).join(",") || "",
-                rfps: values.rfps?.map((service) => service.label).join(",") || "",
+                services: values.services?.map((service) => service.value).join(",") || "",
+                rfps: values.rfps?.map((rfp) => rfp.value).join(",") || "",
             };
 
             // Append data to FormData
@@ -116,7 +150,7 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
                             disabled={!session?.user?.organizationId}
                         >
                             <Handshake className="mr-2" />
-                            Request Meeting
+                            Request a Meeting
                         </Button>
                     </DialogTrigger>
                 </TooltipTrigger>
@@ -137,15 +171,44 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="rfpIds"
+                            name="rfps"
                             render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Attach RFP(s)</FormLabel>
-                                    <FormDescription>Select the relevant RFP(s) to discuss.</FormDescription>
+                                <FormItem className="w-full">
+                                    <FormLabel>
+                                        Open RFPs
+                                    </FormLabel>
+                                    <FormDescription className="flex items-center">
+                                        {`Is there an RFP relating to your service request that you'd like to send to this service provider?`}
+                                    </FormDescription>
                                     <FormControl>
-                                        {/*<RFPSelector value={field.value} onChange={field.onChange} />*/}
+                                        <MultipleSelector
+                                            value={field.value?.map(rfp => ({
+                                                ...rfp,
+                                                value: rfp.value,
+                                                label: rfp.label
+                                            } as Option))}
+                                            onChange={field.onChange}
+                                            defaultOptions={fetchedRFPs.map(rfp => ({
+                                                ...rfp,
+                                                value: rfp.id,
+                                                label: rfp.title
+                                            } as Option))}
+                                            options={fetchedRFPs.map(rfp => ({
+                                                ...rfp,
+                                                value: rfp.id,
+                                                label: rfp.title
+                                            } as Option))}
+                                            hidePlaceholderWhenSelected={true}
+                                            showHoverCard={false}
+                                            placeholder="Link RFPs"
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                        />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage className="text-primary"/>
                                 </FormItem>
                             )}
                         />

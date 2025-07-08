@@ -3627,10 +3627,14 @@ export const saveCRO = withOrganizationAuth(
 
 export const contactCRO = withOrganizationAuth(
     async (organization: Organization, croId: string, formData: FormData) => {
-
         const description = formData.get("description") as string;
+
         const services = formData.get("services")
             ? (formData.get("services") as string).split(",")
+            : [];
+
+        const rfpIds = formData.get("rfps")
+            ? (formData.get("rfps") as string).split(",")
             : [];
 
         try {
@@ -3638,35 +3642,43 @@ export const contactCRO = withOrganizationAuth(
                 data: {
                     company: {
                         connect: {
-                            id: croId
-                        }
+                            id: croId,
+                        },
                     },
                     organization: {
                         connect: {
-                            id: organization.id
-                        }
+                            id: organization.id,
+                        },
                     },
-                    description: description,
+                    description,
                     services: {
-                        connect: services.map((id) => ({ id }))
-                    }
-                }
+                        create: services.map((serviceId) => ({
+                            service: {
+                                connect: { id: serviceId },
+                            },
+                        })),
+                    },
+                    rfps: {
+                        create: rfpIds.map((rfpId) => ({
+                            rfp: {
+                                connect: { id: rfpId },
+                            },
+                        })),
+                    },
+                },
+                include: {
+                    services: true,
+                    rfps: true,
+                },
             });
 
-            if (!response) {
-                console.error("Error creating contact request.")
-                return {success: false, error: "Database error. please try again later."}
-            }
-
-            console.log(`response`, response)
-
-            return {success: true, data: response}
+            return { success: true, data: response };
         } catch (error: any) {
-            console.error("Error creating contact request:", error)
-            return {success: false, error: "Database error. please try again later."}
+            console.error("Error creating contact request:", error);
+            return { success: false, error: "Database error. please try again later." };
         }
     }
-)
+);
 
 export const saveOrganization = withOrganizationAuth(
     async (organization: Organization, savedOrganizationId: string) => {
