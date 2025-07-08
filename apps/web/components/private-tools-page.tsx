@@ -35,13 +35,13 @@ const toolSelector = (state: ToolState) => ({
     toolTypes: state.toolTypes
 })
 
-export const PrivateToolsPage = ({type, searchParams}: {type: 'biosample' | 'data', searchParams: SearchParams}) => {
+export const PrivateToolsPage = ({type, search, validFilters}: {type: 'biosample' | 'data', search: any, validFilters: any}) => {
     const { tools, toolTypes } = useToolStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
 
-    const search = searchParamsCache.parse(searchParams);
+    // const search = searchParamsCache.parse(searchParams);
 
-    const validFilters = getValidFilters(search.filters);
+    // const validFilters = getValidFilters(search.filters);
 
     const promises = Promise.all([
         getTasks({
