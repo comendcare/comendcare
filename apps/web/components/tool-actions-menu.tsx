@@ -18,6 +18,7 @@ import { DeleteAssetDialog } from "comend-pag-platform/components/delete-asset-d
 import { EditAssetDialog } from "./edit-tool-dialog"
 
 const toolSelector = (state: ToolState) => ({
+    tools: state.tools,
     createTool: state.createTool,
     updateTool: state.updateTool
 })
@@ -28,7 +29,7 @@ export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
-    const { createTool } = useToolStore(useShallow(toolSelector))
+    const { tools, createTool } = useToolStore(useShallow(toolSelector))
 
     const handleDuplicate = () => {
         if (session?.user?.organizationId) createTool({...tool, id: undefined}, session.user.organizationId)
@@ -123,8 +124,7 @@ export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
                         <EditAssetDialog
                             key={tool.id}
                             data={tool} 
-                            numAssetsPinned={0}
-                            // numAssetsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Asset>).pinned).length}
+                            numAssetsPinned={tools.filter(tool => tool.pinned).length}
                             type={'biosample'}
                         />
                     </div>
