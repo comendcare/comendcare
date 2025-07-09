@@ -19,8 +19,6 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
 
                 let where: any = {};
 
-                console.log(`input value`, input)
-
                 if (advancedTable) {
                     where = filterColumns({
                         // table: "biosample",
@@ -74,13 +72,17 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                     ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
                     : [{ createdAt: "asc" }];
 
-                console.log(`where object`, where)
-
                 const [data, total] = await prisma.$transaction([
                     prisma.tool.findMany({
                         skip: offset,
                         take: input.perPage,
                         where,
+                        include: {
+                            milestones: true,
+                            contacts: true,
+                            attachments: true,
+                            // types: true
+                        },
                         orderBy,
                     }),
                     prisma.tool.count({ where }),

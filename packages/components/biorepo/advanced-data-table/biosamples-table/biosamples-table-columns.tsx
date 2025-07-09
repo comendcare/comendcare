@@ -39,7 +39,8 @@ import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-
 import { updateTask } from "../lib/actions";
 import { getPriorityIcon, getStatusIcon } from "../lib/utils";
 import { Status, Priority } from "@prisma/client";
-import { Asset } from "@comend/lib/types";
+import { Asset, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 // import { AssetActionsMenu } from "~/web/components/tool-actions-menu"
 
 
@@ -142,7 +143,7 @@ export function getBiosamplesTableColumns({
         enableHiding: true,
     },
     {
-        accessorKey: "tool.contacts",
+        accessorKey: "contacts",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Contacts" />
         ),
@@ -158,7 +159,7 @@ export function getBiosamplesTableColumns({
         enableHiding: true,
     },
     {
-        accessorKey: "tool.links",
+        accessorKey: "links",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Links" />
         ),
@@ -174,7 +175,7 @@ export function getBiosamplesTableColumns({
         enableHiding: true,
     },
     {
-        accessorKey: "tool.pinned",
+        accessorKey: "pinned",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Pinned"/>
         ),
@@ -185,6 +186,32 @@ export function getBiosamplesTableColumns({
         ),
         enableHiding: true,
     },
+    {
+        accessorKey: "types",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Type" />
+        ),
+        cell: ({ row }) => (
+          <>
+            {(row.original.types || []).map((type: string) => {
+              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
+              return (
+                <MilestoneTypeBadge label={typeOption.label}/>
+              )
+            })}
+          </>
+        ),
+        enableHiding: true,
+        enableColumnFilter: true
+    },
+    // {
+    //     id: 'countryCurrent',
+    //     accessorKey: 'countryCurrent',
+    //     header: ({ column }) => {
+    //       <DataTableColumnHeader column={column} title="Current Location (country)" />
+    //     },
+    //     enableHiding: true,
+    // }
     // {
     //     id: "actions",
     //     cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,

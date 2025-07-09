@@ -8,6 +8,6 @@
     //   }
     // }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/cro-searchbar.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/cro-searchbar.tsx", "../../apps/web/components/type-badge.tsx"],
   "exclude": ["node_modules", "dist"]
 }
