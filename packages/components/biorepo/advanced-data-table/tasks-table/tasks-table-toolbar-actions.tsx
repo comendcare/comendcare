@@ -5,9 +5,8 @@ import { Download } from "lucide-react";
 import { Button } from "@comend/components/ui/button";
 import type { Task } from "@prisma/client";
 import { exportTableToCSV } from "@comend/lib/export";
-
-import { CreateTaskSheet } from "./create-task-sheet";
 import { DeleteTasksDialog } from "./delete-tasks-dialog";
+import { CreateTaskSheet } from "./create-task-sheet";
 
 interface TasksTableToolbarActionsProps {
   table: Table<Task>;

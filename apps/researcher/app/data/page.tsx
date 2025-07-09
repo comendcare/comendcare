@@ -1,11 +1,11 @@
 import * as React from "react";
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { Shell } from "@comend/components/biorepo/advanced-data-table/data-table/shell";
+import { Shell } from "@comend/components/biorepo/advanced-data-table/tasks-table/shell";
 import { getValidFilters } from "@comend/lib/data-table";
 import type { SearchParams } from "@comend/components/types";
 
-import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/data-table/feature-flags-provider";
-import { TasksTable } from "@comend/components/biorepo/advanced-data-table/data-table/tasks-table";
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/tasks-table/feature-flags-provider";
+import { TasksTable } from "@comend/components/biorepo/advanced-data-table/tasks-table/tasks-table";
 import {
     getEstimatedHoursRange,
     getTaskPriorityCounts,

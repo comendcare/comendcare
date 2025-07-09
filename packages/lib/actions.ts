@@ -3106,37 +3106,37 @@ export const deleteColumn = withOrganizationAuth(
 export const createTask = withOrganizationAuth(
     async (_: Organization, columnId: string, properties?: any) => {
         try {
-            const newTask: Task = await prisma.task.create({
-                include: {checklist: true, stakeholders: {include: {user: true}}},
-                data: {
-                    name: 'New Task',
-                    id: nanoid(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    kanbanPosition: 0,
-                    // status: null,
-                    // description: null,
-                    // milestoneId: null,
-                    orderPosition: 0,
-                    columnId,
-                    // date: null,
-                    // endDate: null,
-                    // priority: null,
-                    private: true,
-                    // startDate: null,
-                    // checklist: []
-                    ...(properties?.stakeholders ? {
-                        stakeholders: {
-                            createMany: {
-                                data: (properties.stakeholders || []).map((stakeholder: any) => ({
-                                    userId: stakeholder?.user?.id || stakeholder?.userId,
-                                    // user: { connect: { id: stakeholder.id }},
-                                }))
-                            }
-                        }
-                    } : undefined)
-                }
-            })
+            // const newTask: Task = await prisma.task.create({
+            //     include: {checklist: true, stakeholders: {include: {user: true}}},
+            //     data: {
+            //         name: 'New Task',
+            //         id: nanoid(),
+            //         createdAt: new Date(),
+            //         updatedAt: new Date(),
+            //         kanbanPosition: 0,
+            //         // status: null,
+            //         // description: null,
+            //         // milestoneId: null,
+            //         orderPosition: 0,
+            //         columnId,
+            //         // date: null,
+            //         // endDate: null,
+            //         // priority: null,
+            //         private: true,
+            //         // startDate: null,
+            //         // checklist: []
+            //         ...(properties?.stakeholders ? {
+            //             stakeholders: {
+            //                 createMany: {
+            //                     data: (properties.stakeholders || []).map((stakeholder: any) => ({
+            //                         userId: stakeholder?.user?.id || stakeholder?.userId,
+            //                         // user: { connect: { id: stakeholder.id }},
+            //                     }))
+            //                 }
+            //             }
+            //         } : undefined)
+            //     }
+            // })
 
             // const organizations = await prisma.organization.findMany({
             //     where: {Kanban: {columns: {some: {id: columnId}}}},
@@ -3161,12 +3161,13 @@ export const createTask = withOrganizationAuth(
             //     )
             // }
 
-            if (!newTask) {
-                return {success: false, error: "Could not create task"}
-            }
+            // if (!newTask) {
+            //     return {success: false, error: "Could not create task"}
+            // }
 
             // Typesense - if updating typesense, update here...
 
+            const newTask = null
             return {success: true, data: newTask}
         } catch (error: any) {
             logError("Could not create task", error)
@@ -3627,10 +3628,14 @@ export const saveCRO = withOrganizationAuth(
 
 export const contactCRO = withOrganizationAuth(
     async (organization: Organization, croId: string, formData: FormData) => {
-
         const description = formData.get("description") as string;
+
         const services = formData.get("services")
             ? (formData.get("services") as string).split(",")
+            : [];
+
+        const rfpIds = formData.get("rfps")
+            ? (formData.get("rfps") as string).split(",")
             : [];
 
         try {
@@ -3638,35 +3643,43 @@ export const contactCRO = withOrganizationAuth(
                 data: {
                     company: {
                         connect: {
-                            id: croId
-                        }
+                            id: croId,
+                        },
                     },
                     organization: {
                         connect: {
-                            id: organization.id
-                        }
+                            id: organization.id,
+                        },
                     },
-                    description: description,
+                    description,
                     services: {
-                        connect: services.map((id) => ({ id }))
-                    }
-                }
+                        create: services.map((serviceId) => ({
+                            service: {
+                                connect: { id: serviceId },
+                            },
+                        })),
+                    },
+                    rfps: {
+                        create: rfpIds.map((rfpId) => ({
+                            rfp: {
+                                connect: { id: rfpId },
+                            },
+                        })),
+                    },
+                },
+                include: {
+                    services: true,
+                    rfps: true,
+                },
             });
 
-            if (!response) {
-                console.error("Error creating contact request.")
-                return {success: false, error: "Database error. please try again later."}
-            }
-
-            console.log(`response`, response)
-
-            return {success: true, data: response}
+            return { success: true, data: response };
         } catch (error: any) {
-            console.error("Error creating contact request:", error)
-            return {success: false, error: "Database error. please try again later."}
+            console.error("Error creating contact request:", error);
+            return { success: false, error: "Database error. please try again later." };
         }
     }
-)
+);
 
 export const saveOrganization = withOrganizationAuth(
     async (organization: Organization, savedOrganizationId: string) => {
