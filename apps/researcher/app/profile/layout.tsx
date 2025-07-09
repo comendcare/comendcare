@@ -16,7 +16,7 @@ export default async function ProviderLayout({children}: { children: ReactNode }
             <Suspense fallback={<div>Loading...</div>}>
                 <ProviderNavbar/>
             </Suspense>
-            <div className="min-h-screen dark:bg-black">
+            <div className="min-h-screen">
                 {children}
             </div>
         </div>
