@@ -2,7 +2,7 @@ import { CommandIcon, FileSpreadsheetIcon } from "lucide-react";
 
 export type FlagConfig = typeof flagConfig;
 
-export const flagConfig = {
+export const flagConfig: {featureFlags: any[]} = {
   featureFlags: [
     // {
     //   label: "Advanced filters",

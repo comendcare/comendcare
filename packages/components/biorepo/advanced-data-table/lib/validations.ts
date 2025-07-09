@@ -19,9 +19,9 @@ const priorityEnum = z.enum(["low", "medium", "high"]);
 const labelEnum = z.enum(["bug", "feature", "enhancement", "documentation"]);
 
 export const searchParamsCache = createSearchParamsCache({
-  // filterFlag: parseAsStringEnum(
-  //     flagConfig.featureFlags.map((flag) => flag.value),
-  // ),
+  filterFlag: parseAsStringEnum(
+      flagConfig.featureFlags.map((flag) => flag.value),
+  ),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
   sort: getSortingStateParser<Task>().withDefault([
@@ -38,15 +38,16 @@ export const searchParamsCache = createSearchParamsCache({
 });
 
 export const biosampleSearchParamsCache = createSearchParamsCache({
-  // filterFlag: parseAsStringEnum(
-  //     flagConfig.featureFlags.map((flag) => flag.value),
-  // ),
+  filterFlag: parseAsStringEnum(
+      flagConfig.featureFlags.map((flag) => flag.value),
+  ),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
   sort: getSortingStateParser<Tool>().withDefault([
     { id: "createdAt", desc: true },
   ]),
   title: parseAsString.withDefault(""),
+  types: parseAsArrayOf(z.string()).withDefault([]),
   private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
   createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
   // advanced filter

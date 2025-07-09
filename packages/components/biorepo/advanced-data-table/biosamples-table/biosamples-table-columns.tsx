@@ -66,15 +66,6 @@ export function getBiosamplesTableColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Title" />
       ),
-      // cell: ({ row }) => {
-      //   return (
-      //     <div className="flex items-center gap-2">
-      //       <span className="max-w-[31.25rem] truncate font-medium">
-      //         {row.getValue("title")}
-      //       </span>
-      //     </div>
-      //   );
-      // },
       meta: {
         label: "Title",
         placeholder: "Search titles...",
@@ -187,6 +178,7 @@ export function getBiosamplesTableColumns({
         enableHiding: true,
     },
     {
+        id: "types",
         accessorKey: "types",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Type" />
@@ -202,16 +194,17 @@ export function getBiosamplesTableColumns({
           </>
         ),
         enableHiding: true,
-        enableColumnFilter: true
+        enableColumnFilter: true,
+        meta: {
+          label: "Type",
+          variant: "multiSelect",
+          options: TOOL_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
+              label: type.label, 
+              value: type.id,
+          })),
+          icon: CircleDashed,
+        },
     },
-    // {
-    //     id: 'countryCurrent',
-    //     accessorKey: 'countryCurrent',
-    //     header: ({ column }) => {
-    //       <DataTableColumnHeader column={column} title="Current Location (country)" />
-    //     },
-    //     enableHiding: true,
-    // }
     // {
     //     id: "actions",
     //     cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,

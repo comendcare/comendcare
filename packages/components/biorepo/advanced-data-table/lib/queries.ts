@@ -37,6 +37,10 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         where.private = input.private[0]
                     }
 
+                    if (input.types.length > 0) {
+                        where.types = { hasSome: input.types }
+                    }
+
                     // if (input.status.length > 0) {
                     //     where.status = { in: input.status };
                     // }
