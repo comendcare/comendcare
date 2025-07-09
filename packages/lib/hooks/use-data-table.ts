@@ -46,7 +46,7 @@ interface UseDataTableProps<TData>
       | "state"
       | "pageCount"
       | "getCoreRowModel"
-      // | "manualFiltering"
+      | "manualFiltering"
       | "manualPagination"
       | "manualSorting"
     >,
@@ -289,7 +289,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     manualPagination: true,
     manualSorting: true,
-    // manualFiltering: true,
+    manualFiltering: true,
   });
 
   return { table, shallow, debounceMs, throttleMs };

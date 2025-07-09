@@ -2,10 +2,10 @@ import React from "react"
 import { getSession } from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization"
 import { SearchParams } from "@/packages/components/types"
-import { searchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
+import { biosampleSearchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import { getValidFilters } from "@/packages/lib/data-table"
 import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
-import { getBiosamples, getEstimatedHoursRange, getTaskPriorityCounts, getTasks, getTaskStatusCounts } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
+import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>;
@@ -16,7 +16,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const orgId = session?.user.organizationId
 
     const searchParams = await props.searchParams;
-    const search = searchParamsCache.parse(searchParams);
+    const search = biosampleSearchParamsCache.parse(searchParams);
 
     const validFilters = getValidFilters(search.filters);
 
@@ -25,9 +25,6 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             ...search,
             filters: validFilters,
         }),
-        // getTaskStatusCounts(),
-        // getTaskPriorityCounts(),
-        // getEstimatedHoursRange(),
     ]);
 
     if (!orgId) return <NoOrganization />

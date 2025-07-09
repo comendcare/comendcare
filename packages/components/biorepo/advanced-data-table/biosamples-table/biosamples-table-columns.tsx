@@ -107,6 +107,7 @@ export function getBiosamplesTableColumns({
             </div>
         ),
         enableHiding: true,
+        enableColumnFilter: true,
         meta: {
           label: "Visibility",
           variant: "multiSelect",
@@ -114,13 +115,10 @@ export function getBiosamplesTableColumns({
             {
               label: "Private", 
               value: "true",
-              // count: statusCounts[status],
-              count: 1,
               icon: Lock,
             }, {
               label: "Public", 
               value: "false",
-              count: 1,
               icon: Globe
             }
           ],

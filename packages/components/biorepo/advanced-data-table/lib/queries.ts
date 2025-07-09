@@ -19,15 +19,24 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
 
                 let where: any = {};
 
+                console.log(`input value`, input)
+
                 if (advancedTable) {
                     where = filterColumns({
-                        table: "biosample",
+                        // table: "biosample",
                         filters: input.filters,
                         joinOperator: input.joinOperator,
                     });
                 } else {
                     if (input.title) {
                         where.title = { contains: input.title, mode: "insensitive" };
+                    }
+
+                    if (input.private.length == 1) {
+                        console.log(`private`, input.private)
+                        // private only has two options, we only filter if ONE of them
+                        // is selected...
+                        where.private = input.private[0]
                     }
 
                     // if (input.status.length > 0) {
@@ -64,6 +73,8 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                 const orderBy = input.sort.length
                     ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
                     : [{ createdAt: "asc" }];
+
+                console.log(`where object`, where)
 
                 const [data, total] = await prisma.$transaction([
                     prisma.tool.findMany({
