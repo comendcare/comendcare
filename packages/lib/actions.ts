@@ -3106,37 +3106,37 @@ export const deleteColumn = withOrganizationAuth(
 export const createTask = withOrganizationAuth(
     async (_: Organization, columnId: string, properties?: any) => {
         try {
-            const newTask: Task = await prisma.task.create({
-                include: {checklist: true, stakeholders: {include: {user: true}}},
-                data: {
-                    name: 'New Task',
-                    id: nanoid(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    kanbanPosition: 0,
-                    // status: null,
-                    // description: null,
-                    // milestoneId: null,
-                    orderPosition: 0,
-                    columnId,
-                    // date: null,
-                    // endDate: null,
-                    // priority: null,
-                    private: true,
-                    // startDate: null,
-                    // checklist: []
-                    ...(properties?.stakeholders ? {
-                        stakeholders: {
-                            createMany: {
-                                data: (properties.stakeholders || []).map((stakeholder: any) => ({
-                                    userId: stakeholder?.user?.id || stakeholder?.userId,
-                                    // user: { connect: { id: stakeholder.id }},
-                                }))
-                            }
-                        }
-                    } : undefined)
-                }
-            })
+            // const newTask: Task = await prisma.task.create({
+            //     include: {checklist: true, stakeholders: {include: {user: true}}},
+            //     data: {
+            //         name: 'New Task',
+            //         id: nanoid(),
+            //         createdAt: new Date(),
+            //         updatedAt: new Date(),
+            //         kanbanPosition: 0,
+            //         // status: null,
+            //         // description: null,
+            //         // milestoneId: null,
+            //         orderPosition: 0,
+            //         columnId,
+            //         // date: null,
+            //         // endDate: null,
+            //         // priority: null,
+            //         private: true,
+            //         // startDate: null,
+            //         // checklist: []
+            //         ...(properties?.stakeholders ? {
+            //             stakeholders: {
+            //                 createMany: {
+            //                     data: (properties.stakeholders || []).map((stakeholder: any) => ({
+            //                         userId: stakeholder?.user?.id || stakeholder?.userId,
+            //                         // user: { connect: { id: stakeholder.id }},
+            //                     }))
+            //                 }
+            //             }
+            //         } : undefined)
+            //     }
+            // })
 
             // const organizations = await prisma.organization.findMany({
             //     where: {Kanban: {columns: {some: {id: columnId}}}},
@@ -3161,12 +3161,13 @@ export const createTask = withOrganizationAuth(
             //     )
             // }
 
-            if (!newTask) {
-                return {success: false, error: "Could not create task"}
-            }
+            // if (!newTask) {
+            //     return {success: false, error: "Could not create task"}
+            // }
 
             // Typesense - if updating typesense, update here...
 
+            const newTask = null
             return {success: true, data: newTask}
         } catch (error: any) {
             logError("Could not create task", error)

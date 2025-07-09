@@ -38,7 +38,7 @@ export default async function CompanyHomePage({
 
     return (
         <div
-            className="flex flex-col w-full max-w-7xl mx-auto p-8 gap-4"
+            className="bg-red"
         >
             <ResearcherProfile researcherData={userData} />
         </div>
