@@ -19,9 +19,9 @@ const priorityEnum = z.enum(["low", "medium", "high"]);
 const labelEnum = z.enum(["bug", "feature", "enhancement", "documentation"]);
 
 export const searchParamsCache = createSearchParamsCache({
-  filterFlag: parseAsStringEnum(
-      flagConfig.featureFlags.map((flag) => flag.value),
-  ),
+  // filterFlag: parseAsStringEnum(
+  //     flagConfig.featureFlags.map((flag) => flag.value),
+  // ),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
   sort: getSortingStateParser<Task>().withDefault([
@@ -57,5 +57,6 @@ export const updateTaskSchema = z.object({
 export type GetTasksSchema = Awaited<
     ReturnType<typeof searchParamsCache.parse>
 >;
+export type GetBiosamplesSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>;
 export type UpdateTaskSchema = z.infer<typeof updateTaskSchema>;

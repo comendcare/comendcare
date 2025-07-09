@@ -1,10 +1,11 @@
 import React from "react"
 import { getSession } from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization"
-import { PrivateToolsPage } from "~web/components/private-tools-page"
 import { SearchParams } from "@/packages/components/types"
 import { searchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import { getValidFilters } from "@/packages/lib/data-table"
+import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
+import { getBiosamples, getEstimatedHoursRange, getTaskPriorityCounts, getTasks, getTaskStatusCounts } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>;
@@ -19,6 +20,16 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
 
     const validFilters = getValidFilters(search.filters);
 
+    const promises = Promise.all([
+        getBiosamples({
+            ...search,
+            filters: validFilters,
+        }),
+        // getTaskStatusCounts(),
+        // getTaskPriorityCounts(),
+        // getEstimatedHoursRange(),
+    ]);
+
     if (!orgId) return <NoOrganization />
-    return <PrivateToolsPage type={'biosample'} search={search} validFilters={validFilters}/>
+    return <PrivateBiosampleToolsPage search={search} validFilters={validFilters} promises={promises}/>
 }

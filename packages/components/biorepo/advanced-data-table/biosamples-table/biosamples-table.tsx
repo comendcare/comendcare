@@ -7,61 +7,45 @@ import { DataTableFilterList } from "@comend/components/biorepo/advanced-data-ta
 import { DataTableFilterMenu } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-filter-menu";
 import { DataTableSortList } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-sort-list";
 import { DataTableToolbar } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-toolbar";
-import type { Task } from "@prisma/client";
 import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import type { DataTableRowAction } from "@comend/components/types/data-table";
-import type {
-  getEstimatedHoursRange,
-  getTaskPriorityCounts,
-  getTaskStatusCounts,
-  getTasks,
-} from "../lib/queries";
-import { DeleteTasksDialog } from "./delete-tasks-dialog";
 import { useFeatureFlags } from "./feature-flags-provider";
-import { TasksTableActionBar } from "./tasks-table-action-bar";
-import { getTasksTableColumns } from "./tasks-table-columns";
-import { UpdateTaskSheet } from "./update-task-sheet";
+import { getBiosamplesTableColumns } from "./biosamples-table-columns";
+import { Asset } from "@comend/lib/types";
+import { getBiosamples } from "../lib/queries";
 
-interface TasksTableProps {
+interface BiosamplesTableProps {
+  // data: Asset[],
   promises: Promise<
     [
-      Awaited<ReturnType<typeof getTasks>>,
-      Awaited<ReturnType<typeof getTaskStatusCounts>>,
-      Awaited<ReturnType<typeof getTaskPriorityCounts>>,
-      Awaited<ReturnType<typeof getEstimatedHoursRange>>,
+      Awaited<ReturnType<typeof getBiosamples>>,
+      // Awaited<ReturnType<typeof getTaskStatusCounts>>,
+      // Awaited<ReturnType<typeof getTaskPriorityCounts>>,
+      // Awaited<ReturnType<typeof getEstimatedHoursRange>>,
     ]
   >;
 }
 
-export function BiosamplesTable({ promises }: TasksTableProps) {
-  const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
+export function BiosamplesTable({promises}: BiosamplesTableProps) {
+  // const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
 
   const [
     { data, pageCount },
-    statusCounts,
-    priorityCounts,
-    estimatedHoursRange,
+    // statusCounts,
+    // priorityCounts,
+    // estimatedHoursRange,
   ] = React.use(promises);
 
-  const [rowAction, setRowAction] =
-    React.useState<DataTableRowAction<Task> | null>(null);
-
   const columns = React.useMemo(
-    () =>
-      getTasksTableColumns({
-        statusCounts,
-        priorityCounts,
-        estimatedHoursRange,
-        setRowAction,
-      }),
-    [statusCounts, priorityCounts, estimatedHoursRange],
+    () => getBiosamplesTableColumns({}),
+    []
   );
 
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,
     pageCount,
-    enableAdvancedFilter,
+    // enableAdvancedFilter,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },
@@ -75,9 +59,8 @@ export function BiosamplesTable({ promises }: TasksTableProps) {
     <>
       <DataTable
         table={table}
-        actionBar={<TasksTableActionBar table={table} />}
       >
-        {enableAdvancedFilter ? (
+        {/* {enableAdvancedFilter ? (
           <DataTableAdvancedToolbar table={table}>
             <DataTableSortList table={table} align="start" />
             {filterFlag === "advancedFilters" ? (
@@ -97,24 +80,13 @@ export function BiosamplesTable({ promises }: TasksTableProps) {
               />
             )}
           </DataTableAdvancedToolbar>
-        ) : (
+        ) : ( */}
           <DataTableToolbar table={table}>
+            {/* <DataTableFilterList table={table} align="end" /> */}
             <DataTableSortList table={table} align="end" />
           </DataTableToolbar>
-        )}
+        {/* )} */}
       </DataTable>
-      <UpdateTaskSheet
-        open={rowAction?.variant === "update"}
-        onOpenChange={() => setRowAction(null)}
-        task={rowAction?.row.original ?? null}
-      />
-      <DeleteTasksDialog
-        open={rowAction?.variant === "delete"}
-        onOpenChange={() => setRowAction(null)}
-        tasks={rowAction?.row.original ? [rowAction?.row.original] : []}
-        showTrigger={false}
-        onSuccess={() => rowAction?.row.toggleSelected(false)}
-      />
     </>
   );
 }
