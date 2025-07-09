@@ -88,6 +88,34 @@ export function getBiosamplesTableColumns({
         enableColumnFilter: true
     },
     {
+        id: "types",
+        accessorKey: "types",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Type" />
+        ),
+        cell: ({ row }) => (
+          <>
+            {(row.original.types || []).map((type: string) => {
+              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
+              return (
+                <MilestoneTypeBadge label={typeOption.label}/>
+              )
+            })}
+          </>
+        ),
+        enableHiding: true,
+        enableColumnFilter: true,
+        meta: {
+          label: "Type",
+          variant: "multiSelect",
+          options: TOOL_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
+              label: type.label, 
+              value: type.id,
+          })),
+          icon: CircleDashed,
+        },
+    },
+    {
         id: "private",
         accessorKey: "private",
         header: ({ column }) => (
@@ -178,33 +206,160 @@ export function getBiosamplesTableColumns({
         enableHiding: true,
     },
     {
-        id: "types",
-        accessorKey: "types",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Type" />
-        ),
-        cell: ({ row }) => (
-          <>
-            {(row.original.types || []).map((type: string) => {
-              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
-              return (
-                <MilestoneTypeBadge label={typeOption.label}/>
-              )
-            })}
-          </>
-        ),
-        enableHiding: true,
-        enableColumnFilter: true,
-        meta: {
-          label: "Type",
-          variant: "multiSelect",
-          options: TOOL_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
-              label: type.label, 
-              value: type.id,
-          })),
-          icon: CircleDashed,
-        },
+      id: "currentCountry",
+      accessorKey: "currentCountry",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Current Location" />
+      ),
     },
+    {
+      id: "collectionCountry",
+      accessorKey: "collectionCountry",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Location of Collection" />
+      ),
+    },
+    {
+      id: "volume",
+      accessorKey: "volume",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Available Volume" />
+      ),
+    },
+    {
+      id: "institution",
+      accessorKey: "institution",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Institution" />
+      ),
+    },
+    {
+      id: "pathology",
+      accessorKey: "pathology",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Pathology" />
+      ),
+    },
+    {
+      id: "preservationMethod",
+      accessorKey: "preservationMethod",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Preservation Method" />
+      ),
+    },
+    {
+      id: "anatomicalSite",
+      accessorKey: "anatomicalSite",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Anatomical Site" />
+      ),
+    },
+    {
+      id: "format",
+      accessorKey: "format",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Format" />
+      ),
+    },
+    {
+      id: "transportMethod",
+      accessorKey: "transportMethod",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Method of Transport" />
+      ),
+    },
+    {
+      id: "excisionYear",
+      accessorKey: "excisionYear",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Year of Excision" />
+      ),
+    },
+    {
+      id: "donorId",
+      accessorKey: "donorId",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Donor Id" />
+      ),
+    },
+    {
+      id: "diagnoses",
+      accessorKey: "diagnoses",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Diagnoses" />
+      ),
+    },
+    {
+      id: "age",
+      accessorKey: "age",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Age" />
+      ),
+    },
+    {
+      id: "sex",
+      accessorKey: "sex",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Sex" />
+      ),
+    },
+    {
+      id: "gender",
+      accessorKey: "gender",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Gender" />
+      ),
+    },
+    {
+      id: "race",
+      accessorKey: "race",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Race" />
+      ),
+    },
+    {
+      id: "ethnicity",
+      accessorKey: "ethnicity",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Ethnicity" />
+      ),
+    },
+    {
+      id: "height",
+      accessorKey: "height",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Height" />
+      ),
+    },
+    {
+      id: "weight",
+      accessorKey: "weight",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Weight" />
+      ),
+    },
+    {
+      id: "bmi",
+      accessorKey: "bmi",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="BMI" />
+      ),
+    },
+    {
+      id: "medications",
+      accessorKey: "medications",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Medications" />
+      ),
+    },
+    {
+      id: "medicalTreatments",
+      accessorKey: "medicalTreatments",
+      header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Medical Treatments" />
+      ),
+    },
+
     // {
     //     id: "actions",
     //     cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,
