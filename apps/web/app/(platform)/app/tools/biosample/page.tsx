@@ -20,6 +20,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
 
     const validFilters = getValidFilters(search.filters);
 
+
     const promises = Promise.all([
         getBiosamples({
             ...search,
@@ -28,5 +29,5 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     ]);
 
     if (!orgId) return <NoOrganization />
-    return <PrivateBiosampleToolsPage search={search} validFilters={validFilters} promises={promises}/>
+    return <PrivateBiosampleToolsPage promises={promises} />
 }

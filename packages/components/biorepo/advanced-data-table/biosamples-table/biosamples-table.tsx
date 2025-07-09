@@ -10,9 +10,10 @@ import { DataTableToolbar } from "@comend/components/biorepo/advanced-data-table
 import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import type { DataTableRowAction } from "@comend/components/types/data-table";
 import { useFeatureFlags } from "./feature-flags-provider";
-import { getBiosamplesTableColumns } from "./biosamples-table-columns";
 import { Asset } from "@comend/lib/types";
 import { getBiosamples } from "../lib/queries";
+import { ColumnDef } from "@tanstack/react-table";
+import { getBiosamplesTableColumns } from "./biosamples-table-columns";
 
 interface BiosamplesTableProps {
   // data: Asset[],
@@ -23,10 +24,11 @@ interface BiosamplesTableProps {
       // Awaited<ReturnType<typeof getTaskPriorityCounts>>,
       // Awaited<ReturnType<typeof getEstimatedHoursRange>>,
     ]
-  >;
+  >,
+  columns: ColumnDef<any>[]
 }
 
-export function BiosamplesTable({promises}: BiosamplesTableProps) {
+export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
   // const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
 
   const [
@@ -36,10 +38,12 @@ export function BiosamplesTable({promises}: BiosamplesTableProps) {
     // estimatedHoursRange,
   ] = React.use(promises);
 
-  const columns = React.useMemo(
-    () => getBiosamplesTableColumns({}),
-    []
-  );
+  console.log(`data values`, data)
+
+  // const columns = React.useMemo(
+  //   () => getBiosamplesTableColumns(),
+  //   []
+  // );
 
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,

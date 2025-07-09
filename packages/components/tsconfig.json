@@ -7,7 +7,15 @@
     //   "paths": {
     //   }
     // }
+    "paths": {
+        // "@comend/lib/*": ["lib/*"],
+        // "@/components/*": ["components/*"],
+        "@/state/*": ["state/*"],
+        // "@/data/*": ["data/*"],
+        // "@/public/*": ["public/*"],
+        // "@/loading": ["loading.tsx"],
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/cro-searchbar.tsx", "../../apps/web/components/type-badge.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/tool-actions-menu.tsx", "biorepo/advanced-data-table/biosamples-table/biosamples-table-columns.tsx"],
   "exclude": ["node_modules", "dist"]
 }

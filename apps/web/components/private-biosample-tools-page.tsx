@@ -1,42 +1,29 @@
 "use client"
 
+import * as React from "react";
 import Image from "next/image"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import { NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
-import { columns } from "./assets-data-table/assets-data-columns";
-import { columns as DataToolColumns, DataToolDataTable } from "./data-tool-data-table/data-tool-data-table"
-import { columns as BiosampleToolColumns } from "./biosample-tool-data-table/biosample-tool-data-table"
-import { AssetsDataTable } from "./assets-data-table/assets-data-table"
 import { useEffect, useState } from "react"
 import { Asset } from "@/packages/lib/types"
-import { BiosampleToolDataTable } from "./biosample-tool-data-table/biosample-tool-data-table"
-
-
-import * as React from "react";
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { Shell } from "@comend/components/biorepo/advanced-data-table/tasks-table/shell";
-import { getValidFilters } from "@comend/lib/data-table";
-import type { SearchParams } from "@comend/components/types";
-
 import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/biosamples-table/feature-flags-provider";
 import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
-import {
-    getEstimatedHoursRange,
-    getTaskPriorityCounts,
-    getTaskStatusCounts,
-    getTasks,
-} from "@comend/components/biorepo/advanced-data-table/lib/queries";
+import { getBiosamplesTableColumns } from "./biosample-tool-data-table/biosamples-table-columns";
 
 const toolSelector = (state: ToolState) => ({
     tools: state.tools,
     toolTypes: state.toolTypes
 })
 
-export const PrivateBiosampleToolsPage = ({search, validFilters, promises}: {search: any, validFilters: any, promises: any}) => {
+export const PrivateBiosampleToolsPage = ({promises}: {promises: any}) => {
     const { tools, toolTypes } = useToolStore(useShallow(toolSelector))
     const [filteredTools, setFilteredTools] = useState<Asset[]>([])
+
+    const columns = getBiosamplesTableColumns()
 
     async function filterTools(tools: Asset[], type: 'biosample' | 'data') {
         const filteredTypes = toolTypes.filter(t => t.type === type)
@@ -99,7 +86,7 @@ export const PrivateBiosampleToolsPage = ({search, validFilters, promises}: {sea
                         }
                     >
                         {/* <BiosamplesTable data={filteredTools} /> */}
-                        <BiosamplesTable promises={promises} />
+                        <BiosamplesTable promises={promises} columns={columns}/>
                     </React.Suspense>
                 </FeatureFlagsProvider>
             </Shell>

@@ -31,7 +31,6 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                     }
 
                     if (input.private.length == 1) {
-                        console.log(`private`, input.private)
                         // private only has two options, we only filter if ONE of them
                         // is selected...
                         where.private = input.private[0]
@@ -82,7 +81,7 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         take: input.perPage,
                         where,
                         include: {
-                            milestones: true,
+                            milestones: { include: {milestone: true} },
                             contacts: true,
                             attachments: true,
                             // types: true

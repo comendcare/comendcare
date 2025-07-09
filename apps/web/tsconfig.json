@@ -7,6 +7,6 @@
       "~web/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/type-badge.tsx", "../../packages/components/milestone-type-badge.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/type-badge.tsx", "../../packages/components/milestone-type-badge.tsx", "components/tool-actions-menu.tsx", "../../packages/components/biorepo/advanced-data-table/biosamples-table/biosamples-table-columns.tsx"],
   "exclude": ["node_modules"]
 }

@@ -2,64 +2,19 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
-  CalendarIcon,
   CircleDashed,
-  Clock,
-  Ellipsis,
   Globe,
   Lock,
   Pin,
   Text,
 } from "lucide-react";
 import * as React from "react";
-// import { toast } from "sonner";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
-// import { Badge } from "@comend/components/ui/badge";
-// import { Button } from "@comend/components/ui/button";
-// import { Checkbox } from "@comend/components/ui/checkbox";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuRadioGroup,
-//   DropdownMenuRadioItem,
-//   DropdownMenuSeparator,
-//   DropdownMenuShortcut,
-//   DropdownMenuSub,
-//   DropdownMenuSubContent,
-//   DropdownMenuSubTrigger,
-//   DropdownMenuTrigger,
-// } from "@comend/components/ui/dropdown-menu";
-// import { type Task } from "@prisma/client";
-// import { formatDate } from "@comend/lib/format";
-// import { getErrorMessage } from "@comend/lib/handle-error";
-// import {DataTableRowAction, PRIORITIES, LABELS, STATUSES} from "@comend/components/types/data-table";
-
-import { updateTask } from "../lib/actions";
-import { getPriorityIcon, getStatusIcon } from "../lib/utils";
-import { Status, Priority } from "@prisma/client";
-import { Asset, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
-// import { AssetActionsMenu } from "~/web/components/tool-actions-menu"
 
-
-interface GetBiosamplesTableColumnsProps {
-  // statusCounts: Record<Status, number>;
-  // priorityCounts: Record<Priority, number>;
-  // estimatedHoursRange: { min: number; max: number };
-  // setRowAction: React.Dispatch<
-  //   React.SetStateAction<DataTableRowAction<Task> | null>
-  // >;
-}
-
-export function getBiosamplesTableColumns({
-  // statusCounts,
-  // priorityCounts,
-  // estimatedHoursRange,
-  // setRowAction,
-}: GetBiosamplesTableColumnsProps): ColumnDef<any>[] {
-  return [
+export function getBiosamplesTableColumns(): ColumnDef<any>[] {
+  const comendColumns: ColumnDef<any>[] = [
     {
       id: "title",
       accessorKey: "title",
@@ -205,6 +160,9 @@ export function getBiosamplesTableColumns({
         ),
         enableHiding: true,
     },
+  ]
+
+  const sampleInfoColumns: ColumnDef<any>[] = [
     {
       id: "currentCountry",
       accessorKey: "currentCountry",
@@ -275,6 +233,9 @@ export function getBiosamplesTableColumns({
           <DataTableColumnHeader column={column} title="Year of Excision" />
       ),
     },
+  ]
+
+  const donorInfoColumns: ColumnDef<any>[] = [
     {
       id: "donorId",
       accessorKey: "donorId",
@@ -359,6 +320,24 @@ export function getBiosamplesTableColumns({
           <DataTableColumnHeader column={column} title="Medical Treatments" />
       ),
     },
+  ]
+
+  const actionsColumn: ColumnDef<any>[] = [
+    // {
+    //     id: "actions",
+    //     cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,
+    //     enableHiding: false,
+    // },
+  ]
+
+  // Temporarily hide additional biobank columns from users on production
+  // This can be removed, and all columns enabled once our biobank feature is built out
+  if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+    return [...comendColumns, ...actionsColumn]
+  }
+
+  return [...comendColumns, ...sampleInfoColumns, ...donorInfoColumns, ...actionsColumn]
+  return [
 
     // {
     //     id: "actions",
