@@ -124,6 +124,29 @@ export const researcherAuthOptions: NextAuthOptions = {
         },
     },
 
+    events: {
+        async signIn({ user, account }) {
+            if (!user?.id) return;
+
+            const existingResearcher = await prisma.researcher.findUnique({
+                where: { id: user.id },
+            });
+
+            if (!existingResearcher) {
+                await prisma.researcher.create({
+                    data: {
+                        id: user.id,
+                        email: user.email ?? undefined,
+                        name: user.name ?? "",
+                        ...(account?.provider === "orcid" && {
+                            orcid: account.providerAccountId,
+                        }),
+                    },
+                });
+            }
+        },
+    },
+
     callbacks: {
         jwt: async ({token, user, account}) => {
             if (user) {

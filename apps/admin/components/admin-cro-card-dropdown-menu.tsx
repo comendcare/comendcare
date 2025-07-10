@@ -33,13 +33,8 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types";
 import React from "react";
+import {optionSchema} from "@comend/lib/types"
 import { deleteCompany, updateCompany } from "~admin/lib/actions";
-
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
 
 const formSchema = z.object({
     name: z.string().min(1),

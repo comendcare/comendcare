@@ -32,7 +32,7 @@ export default function EditMilestoneDetailsProjectsTab({projectId}: {projectId:
             try {
                 const response = await getProjectRecommendations(projectId, MILESTONE_SELECT)
                 if (response?.success && response?.data) {
-                    setProjects(response.data)
+                    setProjects(response.data as any)
                 } else {
                     toast.error(response?.error ?? "Failed to fetch projects")
                     setProjects([])

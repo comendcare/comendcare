@@ -1,7 +1,7 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
 import prisma from "@comend/lib/prisma"
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@comend/lib/utils";
-import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS} from '@comend/lib/types';
+import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS} from '@comend/lib/types';
 
 
 async function main() {
@@ -29,11 +29,33 @@ async function main() {
         skipDuplicates: true
     })
 
+    // seed tool types
+    // const biosampleTypeIds: string[] = ['BIOMARKER', 'OUTCOMEMEASURE', 'BIOBANK', 'PATIENTDERIVEDCELLLINE', 'ENGINEEREDCELLLINE', 'MOUSEMODEL', 'OTHERDISEASEMODEL', 'TARGETVALIDATION', 'ASSAYDEVELOPMENT', 'DRUGSCREEN', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY', 'GENETHERAPYPRODUCTION', 'GPMANUFACTURING', 'INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'SITESELECTION', 'TRIALDESIGN', 'PHASE1', 'PHASE1/2', 'PHASE2', 'PHASE3', 'FDAAPPROVAL', 'PHASE4']
+    // const dataTypeIds: string[] = ['BASICSCIENCE', 'FUNCTIONALSTUDY', 'NATURALHISTORYSTUDY', 'PATIENTREGISTRY', 'PATIENTRECRUITMENT']
+    await prisma.toolType.deleteMany()
+    const toolTypes = await prisma.toolType.createMany({
+        data: TOOL_TYPE_OPTIONS.map(({id, label, type}) => ({
+            id,
+            label,
+            type
+        })),
+        skipDuplicates: true,
+    })
+
     const flawnson = await prisma.user.upsert({
         where: {email: 'flawnsontong1@gmail.com'},
         update: {},
         create: {
             email: 'flawnsontong1@gmail.com',
+            name: 'Flawnson Tong',
+        },
+    })
+
+    const flawnsonTwo = await prisma.user.upsert({
+        where: {email: 'flawnson@comendcare.com'},
+        update: {},
+        create: {
+            email: 'flawnson@comendcare.com',
             name: 'Flawnson Tong',
         },
     })
@@ -57,9 +79,9 @@ async function main() {
     })
 
     const megan = await prisma.user.upsert({
-        where: { email: 'megan@comendcare.com' },
+        where: {email: 'megan@comendcare.com'},
         update: {},
-        create: { 
+        create: {
             email: 'megan@comendcare.com',
             name: 'Megan McClure',
         }
@@ -390,12 +412,12 @@ async function main() {
     console.log(arcadion)
 
     await createTypeSenseCollection(
-        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
         (
             process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                 ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                 : process.env.TYPESENSE_ADMIN_API_KEY
-        )!, 
+        )!,
         {
             name: 'organizations',
             "fields": [
@@ -550,12 +572,12 @@ async function main() {
     for (const organization of organizations) {
         try {
             await addTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 (
                     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                         : process.env.TYPESENSE_ADMIN_API_KEY
-                )!, 
+                )!,
                 {
                     id: organization.id,
                     name: organization.name,
@@ -604,6 +626,24 @@ async function main() {
             user: {
                 connect: {
                     email: "flawnsontong1@gmail.com",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "owner",
+            email: "flawnson@comendcare.com",
+            title: "Director of Testing",
+            user: {
+                connect: {
+                    email: "flawnson@comendcare.com",
                 },
             },
             organization: {
@@ -827,7 +867,7 @@ async function createConditions(organizationIds: string[]) {
             diseaseCategories: ["Neuroencephalomyelopathy"],
             prevalenceNumerator: 1,
             prevalenceDenominator: 1000000,
-            prevalenceRatio: 1/1000000,
+            prevalenceRatio: 1 / 1000000,
             numberOfPatientsEngaged: 37,
             relevantDiseaseMechanisms: ["HAPLOINSUFFICIENCY"],
             associatedSystems: ["Neurological", "Musculoskeletal"],
@@ -854,7 +894,7 @@ async function createConditions(organizationIds: string[]) {
             diseaseCategories: ["Neurodegenerative Disorder"],
             prevalenceNumerator: 1,
             prevalenceDenominator: 700000,
-            prevalenceRatio: 1/700000,
+            prevalenceRatio: 1 / 700000,
             numberOfPatientsEngaged: 22,
             relevantDiseaseMechanisms: ["LOSS_OF_FUNCTION"],
             associatedSystems: ["Musculoskeletal"],

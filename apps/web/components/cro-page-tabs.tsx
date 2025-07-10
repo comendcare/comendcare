@@ -53,7 +53,7 @@ export default function CROPageTabs() {
                 params.set("tab", value)
                 router.replace(`${pathname}?${params.toString()}`)
             }}
-            className="space-y-4 w-full"
+            className="space-y-4 w-full py-4"
         >
             <TabsList variant="outline">
                 <TabsTrigger value="services" variant="outline" className="px-8">

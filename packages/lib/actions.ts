@@ -5,14 +5,10 @@ import {
     Roadmap,
     Organization,
     Prisma,
-    Kanban,
-    Post,
     User,
-    Condition,
-    TaskStakeholder, Invitation,
+    Invitation,
     PlatformNotification,
     Review,
-    SavedCompany, Company, MemberRequest
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAuth, withOrganizationAuth, withUserAuth} from "./auth"
@@ -24,7 +20,6 @@ import {
     deleteTypeSenseDocument,
     getBlurDataURL,
     logError,
-    sleep,
     toKebabCase,
     updateTypeSenseDocument
 } from "@comend/lib/utils";
@@ -41,7 +36,7 @@ import {
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@comend/lib/types";
 import {templateResearchPlans} from "./templates"
-import {JsonObject, JsonValue} from "@prisma/client/runtime/library"
+import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -1854,6 +1849,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                 update: {
                     title: toolData.title,
                     description: toolData.description,
+                    types: toolData.types,
                     attachments: {
                         deleteMany: {}, // clear all existing attachments
                         createMany: {
@@ -1884,6 +1880,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     },
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
+                    metadata: toolData.metadata as InputJsonObject
                 },
                 create: {
                     // create with the given id if it's available. This is useful for situations like 'undo'
@@ -1891,6 +1888,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     ...(toolData.id ? {id: toolData.id} : undefined),
                     title: toolData.title || "",
                     description: toolData.description,
+                    types: toolData.types,
                     attachments: {
                         createMany: {
                             data: (toolData?.attachments || []).map((attachment: any) => ({
@@ -1918,7 +1916,8 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     },
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
-                    organization: {connect: {id: organization.id}}
+                    organization: {connect: {id: organization.id}},
+                    metadata: toolData.metadata as InputJsonObject
                 },
             })
 
@@ -3107,37 +3106,37 @@ export const deleteColumn = withOrganizationAuth(
 export const createTask = withOrganizationAuth(
     async (_: Organization, columnId: string, properties?: any) => {
         try {
-            const newTask: Task = await prisma.task.create({
-                include: {checklist: true, stakeholders: {include: {user: true}}},
-                data: {
-                    name: 'New Task',
-                    id: nanoid(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    kanbanPosition: 0,
-                    // status: null,
-                    // description: null,
-                    // milestoneId: null,
-                    orderPosition: 0,
-                    columnId,
-                    // date: null,
-                    // endDate: null,
-                    // priority: null,
-                    private: true,
-                    // startDate: null,
-                    // checklist: []
-                    ...(properties?.stakeholders ? {
-                        stakeholders: {
-                            createMany: {
-                                data: (properties.stakeholders || []).map((stakeholder: any) => ({
-                                    userId: stakeholder?.user?.id || stakeholder?.userId,
-                                    // user: { connect: { id: stakeholder.id }},
-                                }))
-                            }
-                        }
-                    } : undefined)
-                }
-            })
+            // const newTask: Task = await prisma.task.create({
+            //     include: {checklist: true, stakeholders: {include: {user: true}}},
+            //     data: {
+            //         name: 'New Task',
+            //         id: nanoid(),
+            //         createdAt: new Date(),
+            //         updatedAt: new Date(),
+            //         kanbanPosition: 0,
+            //         // status: null,
+            //         // description: null,
+            //         // milestoneId: null,
+            //         orderPosition: 0,
+            //         columnId,
+            //         // date: null,
+            //         // endDate: null,
+            //         // priority: null,
+            //         private: true,
+            //         // startDate: null,
+            //         // checklist: []
+            //         ...(properties?.stakeholders ? {
+            //             stakeholders: {
+            //                 createMany: {
+            //                     data: (properties.stakeholders || []).map((stakeholder: any) => ({
+            //                         userId: stakeholder?.user?.id || stakeholder?.userId,
+            //                         // user: { connect: { id: stakeholder.id }},
+            //                     }))
+            //                 }
+            //             }
+            //         } : undefined)
+            //     }
+            // })
 
             // const organizations = await prisma.organization.findMany({
             //     where: {Kanban: {columns: {some: {id: columnId}}}},
@@ -3162,12 +3161,13 @@ export const createTask = withOrganizationAuth(
             //     )
             // }
 
-            if (!newTask) {
-                return {success: false, error: "Could not create task"}
-            }
+            // if (!newTask) {
+            //     return {success: false, error: "Could not create task"}
+            // }
 
             // Typesense - if updating typesense, update here...
 
+            const newTask = null
             return {success: true, data: newTask}
         } catch (error: any) {
             logError("Could not create task", error)
@@ -3625,6 +3625,61 @@ export const saveCRO = withOrganizationAuth(
         }
     }
 )
+
+export const contactCRO = withOrganizationAuth(
+    async (organization: Organization, croId: string, formData: FormData) => {
+        const description = formData.get("description") as string;
+
+        const services = formData.get("services")
+            ? (formData.get("services") as string).split(",")
+            : [];
+
+        const rfpIds = formData.get("rfps")
+            ? (formData.get("rfps") as string).split(",")
+            : [];
+
+        try {
+            const response = await prisma.companyContactRequest.create({
+                data: {
+                    company: {
+                        connect: {
+                            id: croId,
+                        },
+                    },
+                    organization: {
+                        connect: {
+                            id: organization.id,
+                        },
+                    },
+                    description,
+                    services: {
+                        create: services.map((serviceId) => ({
+                            service: {
+                                connect: { id: serviceId },
+                            },
+                        })),
+                    },
+                    rfps: {
+                        create: rfpIds.map((rfpId) => ({
+                            rfp: {
+                                connect: { id: rfpId },
+                            },
+                        })),
+                    },
+                },
+                include: {
+                    services: true,
+                    rfps: true,
+                },
+            });
+
+            return { success: true, data: response };
+        } catch (error: any) {
+            console.error("Error creating contact request:", error);
+            return { success: false, error: "Database error. please try again later." };
+        }
+    }
+);
 
 export const saveOrganization = withOrganizationAuth(
     async (organization: Organization, savedOrganizationId: string) => {

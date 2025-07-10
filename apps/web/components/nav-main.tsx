@@ -33,6 +33,7 @@ type Item = {
     badge?: string | number,
     notificationKeys?: string[],
     subPages?: Item[]
+    match?: (pathname: string) => boolean
 }
 
 const notificationsSelector = (state: NotificationsState) => ({
@@ -47,7 +48,8 @@ export function NavMain({items}: { items: Item[] }) {
         <TooltipProvider>
             <SidebarMenu className="px-2">
                 {items.map((item) => {
-                    const isActive = pathname === item.url
+                    // const isActive = pathname === item.url
+                    const isActive = item.match ? item.match(pathname) : pathname === item.url
                     const badge = item.badge
                     const isComingSoon = item.comingSoon
 

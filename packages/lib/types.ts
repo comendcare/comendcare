@@ -261,6 +261,129 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // },
 ]
 
+export const TOOL_TYPE_OPTIONS: any[] = [
+    {
+        id: 'IPSCS',
+        label: 'Induced pluripotent stem cells (iPSCs)',
+        type: 'biosample'
+    },
+    {
+        id: 'FIBROBLAST',
+        label: 'Fibroblast',
+        type: 'biosample'
+    },
+    {
+        id: 'PBMC',
+        label: 'PBMC',
+        type: 'biosample'
+    },
+    {
+        id: 'PLASMA',
+        label: 'Plasma',
+        type: 'biosample'
+    },
+    {
+        id: 'SERUM',
+        label: 'Serum',
+        type: 'biosample'
+    },
+    {
+        id: 'WBC',
+        label: 'WBC — buffy coat',
+        type: 'biosample'
+    },
+    {
+        id: 'URINE',
+        label: 'Urine',
+        type: 'biosample'
+    },
+    {
+        id: 'BLOODSPOT',
+        label: 'Blood spot',
+        type: 'biosample'
+    },
+    {
+        id: 'WHOLEBLOOD',
+        label: 'Whole blood',
+        type: 'biosample'
+    },
+    {
+        id: 'TISSUE',
+        label: 'Tissue',
+        type: 'biosample'
+    },
+    {
+        id: 'AQUEOUSHUMOR',
+        label: 'Aqueous humor',
+        type: 'biosample'
+    },
+    {
+        id: 'CSF',
+        label: 'Cerebrospinal fluid (CSF)',
+        type: 'biosample'
+    },
+    {
+        id: 'DNA',
+        label: 'DNA',
+        type: 'biosample'
+    },
+    {
+        id: 'RNA',
+        label: 'RNA',
+        type: 'biosample'
+    },
+    {
+        id: 'SALIVA',
+        label: 'Saliva',
+        type: 'biosample'
+    },
+    {
+        id: 'STOOL',
+        label: 'Stool',
+        type: 'biosample'
+    },
+    {
+        id: 'FUNCTIONALSTUDY',
+        label: 'Functional study',
+        type: 'data'
+    },
+    {
+        id: 'NATURALHISTORYSTUDY',
+        label: 'Natural history study',
+        type: 'data'
+    },
+    {
+        id: 'PATIENTREGISTRY',
+        label: 'Patient registry',
+        type: 'data'
+    },
+    {
+        id: 'BIOMARKER',
+        label: 'Biomarker',
+        type: 'data'
+    },
+    {
+        id: 'DRUGSCREEN',
+        label: 'Drug screen',
+        type: 'data'
+    }, 
+    {
+        id: 'EFFICASYSTUDY',
+        label: 'Efficacy study',
+        type: 'data'
+    }, 
+    {
+        id: 'DOSEFINDINGSTUDY',
+        label: 'Dose finding study',
+        type: 'data'
+    }, 
+    {
+        id: 'TOXICOLOGYSTUDY',
+        label: 'Toxicology study',
+        type: 'data'
+    },
+]
+
 export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'BASICSCIENCE',

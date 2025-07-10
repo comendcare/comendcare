@@ -25,12 +25,6 @@ import { Option } from "@comend/lib/types";
 import { Info } from "lucide-react";
 import { researchFormSchema } from "./research-onboarding-form";
 
-export const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
-
 // const researchOnboardingFormSchema = z.object({
 //     modalities: z.array(optionSchema).min(0).optional(),
 //     disorder: z.string()

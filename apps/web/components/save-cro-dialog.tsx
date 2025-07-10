@@ -183,7 +183,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                                 <FormItem>
                                     <FormLabel>Project</FormLabel>
                                     <FormDescription>
-                                        For which project would you like to connect with this company?
+                                        {`Is there a project you'd like to work with this company for?`}
                                     </FormDescription>
                                     <FormControl>
                                         <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>

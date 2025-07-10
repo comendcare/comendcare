@@ -9,10 +9,16 @@ import {Condition, Organization, Prisma, Researcher, User} from "@prisma/client"
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {IPSchema, biosampleSchema, clinicalStudySchema, preclinicalStudySchema, taskSchema} from "../../data/pharma-data/schema";
-import { InternalArgs } from "@prisma/client/runtime/library"
-import { omit } from "lodash";
-import { getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
+import {
+    IPSchema,
+    biosampleSchema,
+    clinicalStudySchema,
+    preclinicalStudySchema,
+    taskSchema
+} from "../../data/pharma-data/schema";
+import {InternalArgs} from "@prisma/client/runtime/library"
+import {omit} from "lodash";
+import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -53,7 +59,7 @@ export async function getPublicAssetsForOrganization(
 }
 
 export async function getPublicRFPsForOrganization(
-    domain: string, 
+    domain: string,
     select: Prisma.RFPSelect<InternalArgs & {
         result: {};
         model: {};
@@ -72,7 +78,7 @@ export async function getPublicRFPsForOrganization(
             },
             private: {equals: false}
         },
-        select:{
+        select: {
             ...select,
             // filter out any private milestones if the user has requested to access milestones
             milestones: select.milestones ? ({
@@ -140,11 +146,11 @@ export async function getPublicRoadmapsForOrganization(
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: { include: { milestoneType: true } },
-                            tools: { 
-                                include: { 
+                            types: {include: {milestoneType: true}},
+                            tools: {
+                                include: {
                                     tool: {
-                                        include: { 
+                                        include: {
                                             milestones: {
                                                 include: {
                                                     milestone: true
@@ -158,18 +164,18 @@ export async function getPublicRoadmapsForOrganization(
                                                 }
                                             }
                                         }
-                                    }, 
-                                }, 
-                                where: { 
+                                    },
+                                },
+                                where: {
                                     tool: {
                                         private: {
                                             equals: false
                                         }
                                     }
-                                } 
+                                }
                             },
-                            rfps: { 
-                                include: { 
+                            rfps: {
+                                include: {
                                     rfp: {
                                         include: {
                                             milestones: {
@@ -185,15 +191,15 @@ export async function getPublicRoadmapsForOrganization(
                                                 }
                                             }
                                         }
-                                    }, 
-                                }, 
-                                where: { 
+                                    },
+                                },
+                                where: {
                                     rfp: {
                                         private: {
                                             equals: false
                                         }
                                     }
-                                } 
+                                }
                             }
                         }
                     }
@@ -201,8 +207,8 @@ export async function getPublicRoadmapsForOrganization(
                 where: {
                     data: {private: false}
                 },
-                orderBy: [{ createdAt: "desc" }]
-            }): undefined,
+                orderBy: [{createdAt: "desc"}]
+            }) : undefined,
             milestones: select.milestones ? ({
                 where: {
                     private: false
@@ -211,11 +217,11 @@ export async function getPublicRoadmapsForOrganization(
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: { include: { milestoneType: true } },
-                    tools: { 
-                        include: { 
+                    types: {include: {milestoneType: true}},
+                    tools: {
+                        include: {
                             tool: {
-                                include: { 
+                                include: {
                                     milestones: {
                                         include: {
                                             milestone: true
@@ -229,18 +235,18 @@ export async function getPublicRoadmapsForOrganization(
                                         }
                                     }
                                 }
-                            }, 
-                        }, 
-                        where: { 
+                            },
+                        },
+                        where: {
                             tool: {
                                 private: {
                                     equals: false
                                 }
                             }
-                        } 
+                        }
                     },
-                    rfps: { 
-                        include: { 
+                    rfps: {
+                        include: {
                             rfp: {
                                 include: {
                                     milestones: {
@@ -256,21 +262,21 @@ export async function getPublicRoadmapsForOrganization(
                                         }
                                     }
                                 }
-                            }, 
-                        }, 
-                        where: { 
+                            },
+                        },
+                        where: {
                             rfp: {
                                 private: {
                                     equals: false
                                 }
                             }
-                        } 
+                        }
                     }
                 },
-                orderBy: [{ createdAt: "desc" }]
+                orderBy: [{createdAt: "desc"}]
             }) : undefined
         },
-        orderBy: [{ createdAt: "desc" }]
+        orderBy: [{createdAt: "desc"}]
     })
 
     const sanitizedRoadmaps = roadmaps.map(roadmap => omit(roadmap, [
@@ -347,7 +353,7 @@ export async function getOrganizationData(
         query: {};
         client: {};
     }>,
-)  {
+) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -565,6 +571,23 @@ export async function getPublicUser(
     }
 }
 
+export async function getToolTypes(
+    select: Prisma.ToolTypeSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
+    try {
+        const types = await prisma.toolType.findMany({select})
+        return {success: true, data: types}
+    } catch (error: any) {
+        console.error("Database error finding tool types:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
 export async function getMilestoneTypes(
     select: Prisma.MilestoneTypeSelect<InternalArgs & {
         result: {};
@@ -597,21 +620,21 @@ export async function getPublicMilestoneDetails(
             select: {
                 ...select,
                 types: select.types ? ({include: {milestoneType: true}}) : undefined,
-                tools: select.tools ? ({ 
-                    include: { 
+                tools: select.tools ? ({
+                    include: {
                         tool: {
-                            include: { 
+                            include: {
                                 milestones: {
                                     include: {milestone: true},
                                     where: {milestone: {private: {equals: false}}}
                                 }
                             }
-                        }, 
-                    }, 
-                    where: {tool: {private: {equals: false}}} 
+                        },
+                    },
+                    where: {tool: {private: {equals: false}}}
                 }) : undefined,
-                rfps: select.rfps ? ({ 
-                    include: { 
+                rfps: select.rfps ? ({
+                    include: {
                         rfp: {
                             include: {
                                 milestones: {
@@ -619,11 +642,11 @@ export async function getPublicMilestoneDetails(
                                     where: {milestone: {private: {equals: false}}}
                                 }
                             }
-                        }, 
-                    }, 
-                    where: { 
+                        },
+                    },
+                    where: {
                         rfp: {private: {equals: false}}
-                    } 
+                    }
                 }) : undefined
             }
         })
@@ -639,7 +662,7 @@ export async function getPublicMilestoneDetails(
 
 export async function checkSubdomainAvailability(
     nickname: string,
-): Promise<Boolean | {error: string}> {
+): Promise<Boolean | { error: string }> {
     try {
         const existingOrg = await prisma.organization.findUnique({
             where: {subdomain: nickname},
@@ -681,7 +704,7 @@ export async function getPostComments(
     }
 }
 
-export async function getPosts(    
+export async function getPosts(
     select: Prisma.PostSelect<InternalArgs & {
         result: {};
         model: {};
@@ -707,14 +730,16 @@ export async function getPosts(
 }
 
 type SanitizeSelect<T extends Prisma.MilestoneSelect, K> = K extends keyof T ? never : T;
-export async function getProjectRecommendations<
-    TSelect extends Prisma.MilestoneSelect
->(
+
+export async function getProjectRecommendations(
     projectId: string,
-    select: SanitizeSelect<TSelect, 'notes'> // exclude private field notes from select param
-): Promise<
-    { success: boolean; data?: Array<Prisma.MilestoneGetPayload<{ select: SanitizeSelect<TSelect, 'notes'> }>>; error?: string }
-> {
+    select: Prisma.MilestoneSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
     try {
         const currentProject = await prisma.milestone.findUnique({
             where: {id: projectId},
@@ -734,7 +759,7 @@ export async function getProjectRecommendations<
 
         const typeIds = currentProject.types.map(t => t.milestoneTypeId)
         if (typeIds.length === 0) {
-            return { success: true, data: [] } // no types to match on
+            return {success: true, data: []} // no types to match on
         }
 
         // Find all other milestones that share at least one of the same milestone types
@@ -782,7 +807,7 @@ export const getAssets = withOrganizationAuth(
                         include: {milestone: true}
                     }) : undefined
                 },
-                orderBy: [{ createdAt: "desc" }]
+                orderBy: [{createdAt: "desc"}]
             })
 
             if (!fetchedAssets) {
@@ -817,7 +842,7 @@ export const getRFPs = withOrganizationAuth(
                     ...select,
                     milestones: {include: {milestone: true}}
                 },
-                orderBy: [{ createdAt: "desc" }]
+                orderBy: [{createdAt: "desc"}]
             })
 
             if (!fetchedRFPs) {
@@ -1043,7 +1068,7 @@ export const getRoadmaps = withOrganizationAuth(
 
 export const getRoadmap = withOrganizationAuth(
     async (
-        authOrg: Organization, 
+        authOrg: Organization,
         roadmapId: string | null | undefined,
         select: Prisma.RoadmapSelect<InternalArgs & {
             result: {};
@@ -1090,18 +1115,18 @@ export const getRoadmap = withOrganizationAuth(
                     ...select,
                     nodes: {
                         include: {data: true},
-                        orderBy: [{ createdAt: "desc" }]
+                        orderBy: [{createdAt: "desc"}]
                     },
                     milestones: {
                         include: {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: {include: { milestoneType: true }},
+                            types: {include: {milestoneType: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
-                        orderBy: [{ createdAt: "desc" }]
+                        orderBy: [{createdAt: "desc"}]
                     }
                 }
             })
@@ -1507,7 +1532,7 @@ export const getAllNotifications = async (
     try {
         const session = await getSession()
         if (!session?.user.id) throw new Error("User ID or Organization ID not in session")
-        
+
         const notifications = await prisma.platformNotification.findMany({
             where: {
                 userId: session.user.id,
@@ -1534,7 +1559,7 @@ export async function getPharmaProjects(
 ) {
     try {
         const projects = await prisma.pharmaProject.findMany({
-            orderBy: { createdAt: "desc" },
+            orderBy: {createdAt: "desc"},
             select
         })
 
@@ -1639,9 +1664,23 @@ export async function getPharmaProjectData<
 export async function getAllOrganizations<
     TSelect extends Prisma.OrganizationSelect
 >(
-    select: TSelect
+    select: Prisma.OrganizationSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
 ): Promise<
-    {success: boolean; data?: Array<Prisma.OrganizationGetPayload<{ select: TSelect }>>; error?: string}
+    {
+        success: boolean; data?: Array<Prisma.OrganizationGetPayload<{
+            select: Prisma.OrganizationSelect<InternalArgs & {
+                result: {};
+                model: {};
+                query: {};
+                client: {};
+            }>
+        }>>; error?: string
+    }
 > {
     try {
         const organizations = await prisma.organization.findMany({
@@ -1694,11 +1733,11 @@ export async function getTopPubMedPublications(keyword?: string) {
                 }
             }
         } else {
-            return { success: false, error: "Failed to find relevant conditions." }
+            return {success: false, error: "Failed to find relevant conditions."}
         }
     } catch (error: any) {
         logError?.("Error fetching PubMed publications", error)
-        return { success: false, error: "Failed to fetch publications" }
+        return {success: false, error: "Failed to fetch publications"}
     }
 }
 
