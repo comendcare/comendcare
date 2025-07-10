@@ -25,7 +25,7 @@
             "@comend/lib/*": ["lib/*"],
             "@/components/*": ["components/*"],
             "@/state/*": ["state/*"],
-            "@/data/*": ["data/*"],
+            "@comend/data/*": ["data/*"],
             "@/public/*": ["public/*"],
             "@/loading": ["loading.tsx"],
         }

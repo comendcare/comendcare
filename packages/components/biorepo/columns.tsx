@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { Checkbox } from "@comend/components/ui/checkbox"
 
-import { Biosample } from "@/data/pharma-data/schema"
+import { Biosample } from "@comend/data/pharma-data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 
 export const columns: ColumnDef<Biosample>[] = [

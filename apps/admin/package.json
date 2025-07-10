@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@comend/components": "*",
+    "@comend/data": "*",
     "@comend/lib": "*",
     "@ai-sdk/openai": "^1.0.7",
     "@ariakit/react": "^0.4.15",
