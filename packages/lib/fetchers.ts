@@ -15,7 +15,7 @@ import {
     clinicalStudySchema,
     preclinicalStudySchema,
     taskSchema
-} from "../../data/pharma-data/schema";
+} from "@comend/data/pharma-data/schema";
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
