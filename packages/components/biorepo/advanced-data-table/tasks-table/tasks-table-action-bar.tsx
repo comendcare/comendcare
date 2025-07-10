@@ -17,7 +17,7 @@ import {
   SelectItem,
 } from "@comend/components/ui/select";
 import { Separator } from "@comend/components/ui/separator";
-import { type Task } from "@prisma/client";
+import {Priority, Status, type Task} from "@prisma/client";
 import { exportTableToCSV } from "@comend/lib/export";
 import { deleteTasks, updateTasks } from "../lib/actions";
 import {STATUSES, PRIORITIES} from "@comend/components/types/data-table";
@@ -106,7 +106,7 @@ export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
       />
       <div className="flex items-center gap-1.5">
         <Select
-          onValueChange={(value: Task["status"]) =>
+          onValueChange={(value: Status) =>
             onTaskUpdate({ field: "status", value })
           }
         >
@@ -130,7 +130,7 @@ export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
           </SelectContent>
         </Select>
         <Select
-          onValueChange={(value: Task["priority"]) =>
+          onValueChange={(value: Priority) =>
             onTaskUpdate({ field: "priority", value })
           }
         >
