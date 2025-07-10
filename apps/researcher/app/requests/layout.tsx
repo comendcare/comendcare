@@ -1,7 +1,7 @@
 import {ReactNode, Suspense} from "react";
 import {redirect} from "next/navigation";
 import {getSession} from "~provider/lib/auth";
-import {ProviderNavbar} from "~provider/components/provider-navbar";
+import {ResearcherNavbar} from "~provider/components/researcher-navbar";
 
 export default async function ProviderLayout({children}: { children: ReactNode }) {
     const session = await getSession()
@@ -14,7 +14,7 @@ export default async function ProviderLayout({children}: { children: ReactNode }
     return (
         <div>
             <Suspense fallback={<div>Loading...</div>}>
-                <ProviderNavbar/>
+                <ResearcherNavbar/>
             </Suspense>
             <div className="min-h-screen">
                 {children}

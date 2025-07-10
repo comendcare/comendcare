@@ -14,7 +14,7 @@ import {
 } from "@comend/components/ui/navigation-menu"
 
 
-export function ProviderNavbarMenu() {
+export function ResearcherNavbarMenu() {
     return (
         <NavigationMenu viewport={false} className="w-full">
             <NavigationMenuList>

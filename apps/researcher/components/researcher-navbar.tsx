@@ -1,10 +1,10 @@
-import {ProviderNavbarMenu} from "~provider/components/provider-navbar-menu";
+import {ResearcherNavbarMenu} from "~provider/components/researcher-navbar-menu";
 import ComendLogo from "@/public/logos/comend-logo.png"
 import Image from "next/image";
 import UserNavbarProfile from "~provider/components/user-navbar-profile";
 
 
-export function ProviderNavbar() {
+export function ResearcherNavbar() {
     return (
         <nav className="w-full border-b p-4 flex justify-between items-center">
             <div className="flex justify-start items-center space-x-8">
@@ -16,7 +16,7 @@ export function ProviderNavbar() {
                     className="w-8 h-auto"
                 />
 
-                <ProviderNavbarMenu/>
+                <ResearcherNavbarMenu/>
             </div>
             <UserNavbarProfile/>
         </nav>
