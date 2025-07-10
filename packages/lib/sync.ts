@@ -77,6 +77,24 @@ const bulkImportDocuments = async (
         });
         const result = await response.text();
         console.log(`Bulk import result for ${collectionName}:`, result);
+
+        const lines = result.trim().split('\n');
+        const failed = lines.filter((line) => {
+            try {
+                const parsed = JSON.parse(line);
+                return parsed.success === false;
+            } catch {
+                return true;
+            }
+        });
+
+        if (failed.length > 0) {
+            console.error(`Failed to import ${failed.length} documents to ${collectionName}`);
+            failed.forEach(f => console.error(f));
+        } else {
+            console.log(`All documents imported successfully to ${collectionName}`);
+        }
+
     } catch (error) {
         console.error(`Error during bulk import for ${collectionName}:`, error);
         throw error;

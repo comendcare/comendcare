@@ -568,6 +568,8 @@ async function main() {
                     moneyRaised: organization.moneyRaised,
                     moneyDeployed: organization.moneyDeployed,
                     researchBudget: organization.researchBudget,
+                    updatedAt: organization.updatedAt,
+                    createdAt: organization.createdAt,
                 }, 'organizations');
             console.log(`Added organization ${organization.name} to TypeSense`);
         } catch (error) {
