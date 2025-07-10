@@ -1,11 +1,11 @@
 import "@/globals.css"
-import { ThemeProvider } from "~provider/theme-provider"
+import { ThemeProvider } from "~researcher/theme-provider"
 import type { Metadata, ResolvingMetadata } from "next"
 import { Analytics } from '@vercel/analytics/next';
 
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
-import { Providers } from "~provider/providers"
+import { Providers } from "~researcher/providers"
 // import Onborda from "@comend/components/onborda/Onborda"
 // import OnboardingCard from "@comend/components/ui/onboarding-card"
 // import { Tour } from "@comend/components/onborda/types"

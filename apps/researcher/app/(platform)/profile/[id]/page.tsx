@@ -1,5 +1,5 @@
 import React from "react";
-import ResearcherProfile from "~provider/components/researcher-profile";
+import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@/packages/lib/auth";
 import {getResearcher} from "@/packages/lib/fetchers";
 import {toast} from "sonner";

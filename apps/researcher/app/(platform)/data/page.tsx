@@ -1,18 +1,18 @@
 import * as React from "react";
-import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { Shell } from "@comend/components/biorepo/advanced-data-table/tasks-table/shell";
-import { getValidFilters } from "@comend/lib/data-table";
-import type { SearchParams } from "@comend/components/types";
+import { DataTableSkeleton } from "@/packages/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
+import { Shell } from "@/packages/components/biorepo/advanced-data-table/tasks-table/shell";
+import { getValidFilters } from "@/packages/lib/data-table";
+import type { SearchParams } from "@/packages/components/types";
 
-import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/tasks-table/feature-flags-provider";
-import { TasksTable } from "@comend/components/biorepo/advanced-data-table/tasks-table/tasks-table";
+import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/tasks-table/feature-flags-provider";
+import { TasksTable } from "@/packages/components/biorepo/advanced-data-table/tasks-table/tasks-table";
 import {
     getEstimatedHoursRange,
     getTaskPriorityCounts,
     getTaskStatusCounts,
     getTasks,
-} from "@comend/components/biorepo/advanced-data-table/lib/queries";
-import { searchParamsCache } from "@comend/components/biorepo/advanced-data-table/lib/validations";
+} from "@/packages/components/biorepo/advanced-data-table/lib/queries";
+import { searchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>;

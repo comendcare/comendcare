@@ -8,30 +8,30 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@comend/components/ui/form";
-import {Input} from "@comend/components/ui/input";
-import {Button} from "@comend/components/ui/button";
+} from "@/packages/components/ui/form";
+import {Input} from "@/packages/components/ui/input";
+import {Button} from "@/packages/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser, updateResearcher} from "@comend/lib/actions";
-import {Checkbox} from "@comend/components/ui/checkbox";
-import {AddressType, Option} from "@comend/lib/types";
+import {editUser, updateResearcher} from "@/packages/lib/actions";
+import {Checkbox} from "@/packages/components/ui/checkbox";
+import {AddressType, Option} from "@/packages/lib/types";
 import React, {useEffect, useState} from "react";
-import {FileWithPreview} from "@comend/components/image-selector";
-import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@comend/lib/fetchers";
-import {handleImageUpload} from "@comend/lib/upload";
-import LoadingDots from "@comend/components/icons/loading-dots";
-import {getPublicFile} from "@comend/lib/utils";
+import {FileWithPreview} from "@/packages/components/image-selector";
+import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@/packages/lib/fetchers";
+import {handleImageUpload} from "@/packages/lib/upload";
+import LoadingDots from "@/packages/components/icons/loading-dots";
+import {getPublicFile} from "@/packages/lib/utils";
 import mixpanel from "mixpanel-browser";
-import {Skeleton} from "@comend/components/ui/skeleton";
+import {Skeleton} from "@/packages/components/ui/skeleton";
 import MultipleSelector from "@/packages/components/ui/multiple-selector";
-import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
-import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
-import {badgeVariants} from "@comend/components/ui/badge"
+import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@/packages/components/ui/select"
+import {MILESTONE_TYPE_OPTIONS} from "@/packages/lib/types"
+import {badgeVariants} from "@/packages/components/ui/badge"
 
 const optionSchema = z.object({
     label: z.string(),
@@ -74,7 +74,7 @@ export default function ResearcherOnboardingForm() {
     });
 
     useEffect(() => {
-        async function fetchUserData() {
+        async function fetchResearcherData() {
             if (session?.user?.id) {
                 let userData
                 const response = await getResearcher(session.user.id, {
@@ -145,7 +145,47 @@ export default function ResearcherOnboardingForm() {
             setIsInitializing(false)
         }
 
+        async function fetchUserData() {
+            if (session?.user?.id) {
+                let userData
+                const response = await getUser(session.user.id, {
+                    id: true,
+                    name: true,
+                });
+                if (response.success) {
+                    userData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
+                if (userData) {
+                    const fetchedValues = {
+                        name: userData.name || "",
+                    };
+
+                    if (userData.image) {
+                        try {
+                            const userPhoto: File = await getPublicFile(userData.image)
+                            if (userPhoto) {
+                                const fileWithPreview = Object.assign(userPhoto, {
+                                    preview: URL.createObjectURL(userPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
+                    form.setValue("name", fetchedValues.name);
+                }
+            }
+            setIsInitializing(false)
+        }
+
         fetchUserData();
+        fetchResearcherData();
     }, [session, form]);
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
@@ -257,8 +297,22 @@ export default function ResearcherOnboardingForm() {
     }
 
     return (
-        <div className="w-screen flex items-center justify-center">
-            <div>
+        <div className="w-screen h-screen flex items-center justify-center overflow-auto">
+            <div className="space-y-4">
+                <div
+                    className="flex flex-col space-y-1.5 text-center sm:text-left"
+                >
+                    <div
+                        className="text-lg font-semibold leading-none tracking-tight"
+                    >
+                        Welcome to Comend
+                    </div>
+                    <div
+                        className="text-sm text-muted-foreground"
+                    >
+                        We have a few questions about you to get started.
+                    </div>
+                </div>
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(

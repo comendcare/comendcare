@@ -1,4 +1,4 @@
-import { researcherAuthOptions } from "~provider/lib/auth"
+import { researcherAuthOptions } from "~researcher/lib/auth"
 import NextAuth from "next-auth"
 
 const handler = NextAuth(researcherAuthOptions)

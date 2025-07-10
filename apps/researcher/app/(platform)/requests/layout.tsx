@@ -1,7 +1,7 @@
 import {ReactNode, Suspense} from "react";
 import {redirect} from "next/navigation";
-import {getSession} from "~provider/lib/auth";
-import {ResearcherNavbar} from "~provider/components/researcher-navbar";
+import {getSession} from "~researcher/lib/auth";
+import {ResearcherNavbar} from "~researcher/components/researcher-navbar";
 
 export default async function ProviderLayout({children}: { children: ReactNode }) {
     const session = await getSession()

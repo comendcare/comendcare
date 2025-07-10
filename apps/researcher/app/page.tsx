@@ -4,5 +4,5 @@ const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export default function ResearcherLandingPage() {
     redirect(process.env.NEXT_PUBLIC_VERCEL_ENV
-        ? `https://researcher.${rootDomain}/profile` : `http://researcher.${rootDomain}/profile`)
+        ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`)
 }

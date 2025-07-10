@@ -1,9 +1,9 @@
 "use client"
 
-import RequestCard from "~provider/components/request-card";
-import RequestStats from "~provider/components/request-stats";
+import RequestCard from "~researcher/components/request-card";
+import RequestStats from "~researcher/components/request-stats";
 import * as React from "react"
-import RequestToolbar from "~provider/components/request-toolbar";
+import RequestToolbar from "~researcher/components/request-toolbar";
 
 const requests = [
     {

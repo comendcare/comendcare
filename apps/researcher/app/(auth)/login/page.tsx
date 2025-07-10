@@ -5,7 +5,7 @@ import {Suspense, useEffect, useRef, useState} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSession} from "next-auth/react";
-import ResearcherLoginForm from "~provider/components/login-form";
+import ResearcherLoginForm from "~researcher/components/login-form";
 
 export default function LoginPage() {
     const {data: session} = useSession()
