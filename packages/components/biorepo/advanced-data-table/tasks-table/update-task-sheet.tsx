@@ -15,7 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@comend/components/ui/sheet";
-import type { Task } from "@prisma/client";
+import type {Priority, Status, Label, Task} from "@prisma/client";
 
 import { updateTask } from "../lib/actions";
 import { type UpdateTaskSchema, updateTaskSchema } from "../lib/validations";
@@ -33,9 +33,9 @@ export function UpdateTaskSheet({ task, ...props }: UpdateTaskSheetProps) {
     resolver: zodResolver(updateTaskSchema),
     defaultValues: {
       title: task?.title ?? "",
-      label: task?.label,
-      status: task?.status,
-      priority: task?.priority,
+      label: task?.label as Label,
+      status: task?.status as Status,
+      priority: task?.priority as Priority,
     },
   });
 
