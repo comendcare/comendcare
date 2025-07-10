@@ -12,6 +12,11 @@ const links = [
         href: "/database",
         comingSoon: false
     },
+    {
+        name: "Contact requests",
+        href: "/contact-requests",
+        comingSoon: false
+    },
 ]
 
 export function AdminCompaniesNav({className}: React.HTMLAttributes<HTMLDivElement>) {

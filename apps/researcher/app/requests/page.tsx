@@ -74,12 +74,11 @@ const requests = [
 ]
 
 const stats = [
-    {name: 'Number of deploys', value: '405'},
-    {name: 'Average deploy time', value: '3.65', unit: 'mins'},
-    {name: 'Number of servers', value: '3'},
-    {name: 'Success rate', value: '98.5%'},
+    { name: 'Total Requests Submitted', value: '12' },
+    { name: 'Average Approval Time', value: '14.2', unit: 'days' },
+    { name: 'Samples Received', value: '184' },
+    { name: 'Approval Rate', value: '75%' },
 ]
-
 
 export default function ResearcherAccessRequestsPage() {
     return (
