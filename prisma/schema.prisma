@@ -422,7 +422,7 @@ model Task {
   kanbanPosition Int
   orderPosition  Int
   columnId       String
-  code           String            @unique @db.VarChar(128)
+  code           String            @unique @default(uuid()) @db.VarChar(128)
   title          String?           @db.VarChar(128)
   label          Label             @default(bug)
   estimatedHours Float             @default(0)
