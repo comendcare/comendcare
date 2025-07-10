@@ -20,7 +20,7 @@ export async function getTasks(input: GetTasksSchema) {
 
                 if (advancedTable) {
                     where = filterColumns({
-                        table: "task",
+                        // table: "task",
                         filters: input.filters,
                         joinOperator: input.joinOperator,
                     });
@@ -102,7 +102,7 @@ export async function getTaskStatusCounts() {
                 };
 
                 for (const row of result) {
-                    counts[row.status] = row._count;
+                    counts[row.status as Status] = row._count;
                 }
 
                 return counts;
@@ -136,7 +136,7 @@ export async function getTaskPriorityCounts() {
                 };
 
                 for (const row of result) {
-                    counts[row.priority] = row._count;
+                    counts[row.priority as Priority] = row._count;
                 }
 
                 return counts;
