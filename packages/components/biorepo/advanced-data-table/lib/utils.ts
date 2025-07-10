@@ -10,7 +10,7 @@ import {
   Timer,
 } from "lucide-react";
 import { customAlphabet } from "nanoid";
-import {Status, Priority, type Task} from "@prisma/client";
+import { Prisma, Label, Priority, Status, type Task } from "@prisma/client";
 
 import { generateId } from "@comend/lib/id";
 import {PRIORITIES, LABELS, STATUSES} from "@comend/components/types/data-table";
@@ -18,17 +18,28 @@ import {PRIORITIES, LABELS, STATUSES} from "@comend/components/types/data-table"
 export function generateRandomTask(): Task {
   return {
     id: generateId("task"),
+    name: faker.commerce.productName(),
     code: `TASK-${customAlphabet("0123456789", 4)()}`,
     title: faker.hacker
-      .phrase()
-      .replace(/^./, (letter) => letter.toUpperCase()),
+        .phrase()
+        .replace(/^./, (letter) => letter.toUpperCase()),
+    description: faker.lorem.sentence(),
+    milestoneId: faker.datatype.boolean() ? generateId("milestone") : null,
+    kanbanPosition: faker.number.int({ min: 1, max: 100 }),
+    orderPosition: faker.number.int({ min: 1, max: 100 }),
+    columnId: generateId("column"),
     estimatedHours: faker.number.int({ min: 1, max: 24 }),
-    status: faker.helpers.shuffle(STATUSES)[0] ?? "todo",
-    label: faker.helpers.shuffle(LABELS)[0] ?? "bug",
-    priority: faker.helpers.shuffle(PRIORITIES)[0] ?? "low",
+    status: faker.helpers.shuffle(Object.values(Status))[0] ?? "todo",
+    label: faker.helpers.shuffle(Object.values(Label))[0] ?? "bug",
+    priority: faker.helpers.shuffle(Object.values(Priority))[0] ?? "low",
     archived: faker.datatype.boolean({ probability: 0.2 }),
     createdAt: new Date(),
     updatedAt: new Date(),
+    date: faker.date.recent(),
+    endDate: faker.date.soon(),
+    startDate: faker.date.recent(),
+    private: faker.datatype.boolean(),
+    metadata: faker.datatype.boolean() ? { source: "seed" } : null,
   };
 }
 

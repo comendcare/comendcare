@@ -18,7 +18,7 @@ export async function seedTasks({ count = 100 }: { count: number }) {
 
     await prisma.task.deleteMany(); // Clear old tasks
     console.log("📝 Inserting tasks", tasks.length);
-    await prisma.task.createMany({ data: tasks, skipDuplicates: true });
+    await prisma.task.createMany({ data: tasks as any, skipDuplicates: true });
   } catch (err) {
     console.error(err);
   }
@@ -40,7 +40,7 @@ export async function createTask(input: CreateTaskSchema) {
           status: input.status,
           label: input.label,
           priority: input.priority,
-        },
+        } as any,
         select: { id: true },
       });
 
@@ -139,7 +139,7 @@ export async function deleteTask({ id }: { id: string }) {
   try {
     await prisma.$transaction(async (tx) => {
       await tx.task.delete({ where: { id } });
-      await tx.task.create({ data: generateRandomTask() });
+      await tx.task.create({ data: generateRandomTask() as any });
     });
 
     revalidateTag("tasks");
@@ -163,7 +163,7 @@ export async function deleteTasks({ ids }: { ids: string[] }) {
     await prisma.$transaction(async (tx) => {
       await tx.task.deleteMany({ where: { id: { in: ids } } });
       await tx.task.createMany({
-        data: ids.map(() => generateRandomTask()),
+        data: ids.map(() => generateRandomTask()) as any,
       });
     });
 
