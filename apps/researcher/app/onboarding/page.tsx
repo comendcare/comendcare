@@ -17,7 +17,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser} from "@comend/lib/actions";
+import {editUser, updateResearcher} from "@comend/lib/actions";
 import {Checkbox} from "@comend/components/ui/checkbox";
 import {AddressType, Option} from "@comend/lib/types";
 import React, {useEffect, useState} from "react";
@@ -230,20 +230,14 @@ export default function ResearcherOnboardingForm() {
                 values.image = imgUrl || undefined
             }
 
-            for (const [key, value] of Object.entries(values)) {
-                const res: any = await editUser(session?.user?.id as string, {[key]: value});
-                if (res?.error) {
-                    toast.error(res.error);
-                    return;
-                }
+            const res: any = await updateResearcher(session?.user?.id, values);
+            if (res?.error) {
+                toast.error(res.error);
+                return;
             }
 
             toast.success("Successfully updated researcher profile!");
-            if (hasInvitations) {
-                router.push("/app/profile");
-            } else {
-                router.push("/onboarding/organization");
-            }
+            router.push("/profile");
         } catch (error) {
             toast.error("An error occurred while updating your profile.");
         } finally {

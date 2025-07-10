@@ -3886,3 +3886,35 @@ export const deletePharmaProject = withAuth(
         }
     }
 )
+
+export const updateResearcher = withAuth(
+    async (_id: unknown, data: { [key: string]: unknown }) => {
+        const session = await getSession();
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            };
+        }
+
+        try {
+            const response = await prisma.researcher.update({
+                where: {
+                    id: session.user.id
+                },
+                data: data, // Pass the data object directly
+            });
+            return response;
+        } catch (error: any) {
+            if (error.code === "P2002") {
+                const field = Object.keys(data)[0]; // Identify which field caused the conflict
+                return {
+                    error: `This ${field} is already in use`
+                };
+            } else {
+                return {
+                    error: error.message
+                };
+            }
+        }
+    }
+)
