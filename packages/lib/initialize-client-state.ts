@@ -1,16 +1,16 @@
 "use client";
 
-import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useRoadmapStore } from "../../state/roadmap/roadmapStore";
 import { PlatformNotification, Prisma, ToolType } from "@prisma/client";
-import { useNotificationsStore } from "@/state/notifications/notificationsStore";
-import { useCROSearchStore } from "@/state/search/croSearchStore";
-import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
-import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
-import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
-import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
+import { useNotificationsStore } from "../../state/notifications/notificationsStore";
+import { useCROSearchStore } from "../../state/search/croSearchStore";
+import { useMilestoneSearchStore } from "../../state/search/milestoneSearchStore";
+import { useOrganizationSearchStore } from "../../state/search/organizationSearchStore";
+import { FiltersType as CROMarketplaceFiltersType } from "../../state/search/croSearchStore";
+import { FiltersType as PAGMarketplaceFiltersType} from "../../state/search/organizationSearchStore";
 import { Asset, RFP, Roadmap } from '@comend/lib/types';
-import { useToolStore } from "@/state/tool/toolStore";
-import { useRFPStore } from "@/state/rfp/rfpStore";
+import { useToolStore } from "../../state/tool/toolStore";
+import { useRFPStore } from "../../state/rfp/rfpStore";
 
 export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
