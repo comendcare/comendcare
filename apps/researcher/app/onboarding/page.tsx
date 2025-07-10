@@ -65,63 +65,6 @@ export default function ResearcherOnboardingForm() {
     const hasInvitations = invitations.length > 0;
     const [isInitializing, setIsInitializing] = useState(true)
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await getInvitations({
-                    id: true,
-                    email: true,
-                    role: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    accepted: true,
-                    organizationId: true,
-                });
-
-                if (response.success && response.data) {
-                    const invitationsWithDetails = await Promise.all(
-                        response.data.map(async (invitation) => {
-                            const orgResponse = await getPublicOrganizationData(invitation.organizationId, {
-                                id: true,
-                                name: true,
-                                published: true,
-                                verified: true,
-                                public: true,
-                                description: true,
-                                contactEmail: true,
-                                image: true,
-                                headerImage: true,
-                                subdomain: true,
-                                yearFounded: true,
-                                incorporationStatus: true,
-                                therapeuticsOfInterest: true,
-                                therapeuticsInDevelopment: true,
-                                website: true,
-                                moneyRaised: true,
-                                moneyDeployed: true,
-                                researchBudget: true,
-                                members: true,
-                                conditions: true,
-                            });
-                            return {
-                                ...invitation,
-                                organization: orgResponse.success ? orgResponse.data : null,
-                            };
-                        })
-                    );
-
-                    setInvitations(invitationsWithDetails);
-                }
-            } catch (error) {
-                console.error("Failed to fetch user data:", error);
-            }
-            setIsInitializing(false)
-        };
-
-        fetchUserData()
-    }, [session, router]);
-
-
     const [defaultValues, setDefaultValues] = useState<z.infer<typeof userFormSchema> | undefined>(undefined);
 
     const form = useForm<z.infer<typeof userFormSchema>>({

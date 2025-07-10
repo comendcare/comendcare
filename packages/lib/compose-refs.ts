@@ -15,10 +15,16 @@ function setRef<T>(ref: PossibleRef<T>, value: T) {
     return ref(value);
   }
 
-  if (ref !== null && ref !== undefined) {
-    ref.current = value;
+  if (ref != null) {
+    try {
+      // Cast to MutableRefObject to safely assign
+      (ref as React.MutableRefObject<T>).current = value;
+    } catch {
+      // Optionally handle or ignore immutable ref objects
+    }
   }
 }
+
 
 /**
  * A utility to compose multiple refs together
