@@ -47,7 +47,7 @@ import {
 } from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import { removeEmailFromWhitelist } from "~admin/lib/actions"
+import {removeEmailFromWhitelist, removeProviderContactRequest} from "~admin/lib/actions"
 import {getCompanyContactRequests, getUserWhitelist} from "~admin/lib/fetchers"
 import {Company, Organization} from "@prisma/client";
 
@@ -199,20 +199,20 @@ interface DataTableRowActionsProps<TData> {
 export function ProviderContactRequestDataTableRowActions<TData>({
                                                row,
                                            }: DataTableRowActionsProps<TData>) {
-    const email = (row.original as { email: string }).email;
+    const id = (row.original as { id: string }).id;
 
     const onDeleteClick = async () => {
         try {
-            const response = await removeEmailFromWhitelist(email);
+            const response = await removeProviderContactRequest(id);
 
             if (response.success) {
-                toast.success("Successfully deleted email from whitelist");
+                toast.success("Successfully deleted provider contact request.");
             } else {
-                toast.error(response.error || "An error occurred while deleting email.");
+                toast.error(response.error || "An error occurred while deleting provider contact request.");
             }
         } catch (error) {
-            console.error("Whitelist deletion error:", error);
-            toast.error("An error occurred while deleting email.");
+            console.error("Provider contact request deletion error:", error);
+            toast.error("An error occurred while deleting provider contact request..");
         }
     };
 

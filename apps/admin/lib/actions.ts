@@ -17,8 +17,6 @@ export const getSessionInfo = async () => {
 export const addEmailToWhitelist = withAdminAuth(
     async (email: string) => {
         try {
-            // Check if the user has already provided feedback for this review
-            // Otherwise, create new feedback
             const response = await prisma.whitelist.create({
                 data: {
                     email: email
@@ -38,8 +36,6 @@ export const addEmailToWhitelist = withAdminAuth(
 export const addEmailToBlacklist = withAdminAuth(
     async (email: string) => {
         try {
-            // Check if the user has already provided feedback for this review
-            // Otherwise, create new feedback
             const response = await prisma.blacklist.create({
                 data: {
                     email: email
@@ -59,8 +55,6 @@ export const addEmailToBlacklist = withAdminAuth(
 export const removeEmailFromWhitelist = withAdminAuth(
     async (email: string) => {
         try {
-            // Check if the user has already provided feedback for this review
-            // Otherwise, create new feedback
             const response = await prisma.whitelist.delete({
                 where: {
                     email: email
@@ -80,8 +74,6 @@ export const removeEmailFromWhitelist = withAdminAuth(
 export const removeEmailFromBlacklist = withAdminAuth(
     async (email: string) => {
         try {
-            // Check if the user has already provided feedback for this review
-            // Otherwise, create new feedback
             const response = await prisma.blacklist.delete({
                 where: {
                     email: email
@@ -345,3 +337,23 @@ export const updateOrganization = withAdminAuth(
         }
     }
 );
+
+export const removeProviderContactRequest = withAdminAuth(
+    async (id: string) => {
+        try {
+            const response = await prisma.companyContactRequest.delete({
+                where: {
+                    id: id
+                }
+            });
+
+            revalidatePath("/admin/users/contact-requests")
+
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error removing provider contact request:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
