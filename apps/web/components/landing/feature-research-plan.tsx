@@ -26,7 +26,7 @@ export default function FeatureResearchPlan() {
             initial={{opacity: 0, y: 50}}
             animate={{opacity: 1, y: [50, -10, 0]}}
             transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-            className="overflow-hidden bg-white py-24 sm:py-32 mt-16"
+            className="overflow-hidden bg-white py-16 sm:py-24 mt-8"
         >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div
