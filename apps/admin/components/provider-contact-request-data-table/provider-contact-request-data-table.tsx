@@ -23,11 +23,11 @@ import {
     TableHeader,
     TableRow,
 } from "@comend/components/ui/table"
-import {ChevronDown, Trash} from "lucide-react"
+import {ArrowUpDown, ChevronDown, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
-    DropdownMenuContent, 
+    DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
@@ -48,30 +48,56 @@ import {
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
 import { removeEmailFromWhitelist } from "~admin/lib/actions"
-import { getUserWhitelist } from "~admin/lib/fetchers"
+import {getCompanyContactRequests, getUserWhitelist} from "~admin/lib/fetchers"
+import {Company, Organization} from "@prisma/client";
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
 }
 
-export type Whitelist = {
+export type CompanyContactRequest = {
     id: string
-    email: string
+    organization: Organization
+    company: Company
     createdAt: Date
 }
 
-const columns: ColumnDef<Whitelist>[] = [
+const columns: ColumnDef<CompanyContactRequest>[] = [
     {
-        accessorKey: "email",
-        header: ({column}) => (
+        accessorFn: (row) => row.organization?.name ?? "",
+        id: "organization",
+        header: ({ column }) => (
             <Button
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Email
+                Organization
+                <ArrowUpDown />
             </Button>
         ),
-        cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
+        cell: ({ row }) => (
+            <div className="normal-case">
+                {row.getValue("organization")}
+            </div>
+        ),
+    },
+    {
+        accessorFn: (row) => row.company?.title ?? "",
+        id: "company",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                Company
+                <ArrowUpDown />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <div className="normal-case">
+                {row.getValue("company")}
+            </div>
+        ),
     },
     {
         accessorKey: "createdAt",
@@ -214,7 +240,7 @@ export function ProviderContactRequestDataTableRowActions<TData>({
 }
 
 export function ProviderContactRequestDataTable() {
-    const [data, setData] = React.useState<Whitelist[]>([])
+    const [data, setData] = React.useState<CompanyContactRequest[]>([])
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -222,9 +248,10 @@ export function ProviderContactRequestDataTable() {
 
     useEffect(() => {
         async function fetchData() {
-            const response = await getUserWhitelist({
+            const response = await getCompanyContactRequests({
                 id: true,
-                email: true,
+                organization: true,
+                company: true,
                 createdAt: true
             });
             if (response.success) {

@@ -444,7 +444,7 @@ export const getUserChartAnalytics = withAdminAuth(
 
 export const getUserWhitelist = withAdminAuth(
     async (
-        select: Prisma.PlatformNotificationSelect<InternalArgs & {
+        select: Prisma.WhitelistSelect<InternalArgs & {
             result: {};
             model: {};
             query: {};
@@ -516,5 +516,35 @@ export const getOverviewAnalytics = withAdminAuth(
             totalCompanies,
             totalProjects,
         };
+    }
+)
+
+export const getCompanyContactRequests = withAdminAuth(
+    async (
+        select: Prisma.CompanyContactRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const companyContactRequests = await prisma.companyContactRequest.findMany({
+                orderBy: { createdAt: "desc" },
+                select
+            })
+
+            if (!companyContactRequests) {
+                return {success: false, error: "Company contact requests not found"};
+            }
+
+            return {
+                success: true,
+                data: companyContactRequests
+            };
+        } catch (error: any) {
+            logError("Error fetching company contact requests", error);
+            return {success: false, error: "Internal server error"};
+        }
     }
 )

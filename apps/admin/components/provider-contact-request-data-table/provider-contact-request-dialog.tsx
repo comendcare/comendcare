@@ -42,7 +42,7 @@ export function ProviderContactRequestDialog() {
         <Dialog>
             <DialogTrigger asChild>
                 <Button>
-                    Add Email
+                    Create Contact Request
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

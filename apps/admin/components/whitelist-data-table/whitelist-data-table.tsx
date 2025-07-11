@@ -23,7 +23,7 @@ import {
     TableHeader,
     TableRow,
 } from "@comend/components/ui/table"
-import {ChevronDown, Trash} from "lucide-react"
+import {ArrowUpDown, ChevronDown, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -69,6 +69,7 @@ const columns: ColumnDef<Whitelist>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Email
+                <ArrowUpDown />
             </Button>
         ),
         cell: ({row}) => <div className="lowercase">{row.getValue("email")}</div>,
