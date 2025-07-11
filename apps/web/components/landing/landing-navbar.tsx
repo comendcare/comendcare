@@ -108,7 +108,7 @@ export const LandingNavbar: React.FC = () => {
         {
             name: "News",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
-                ? `https://${rootDomain}/#news` : `http://${rootDomain}/#news`
+                ? `https://${rootDomain}/about#news` : `http://${rootDomain}/about#news`
         },
         // {
         //     name: "Contact",

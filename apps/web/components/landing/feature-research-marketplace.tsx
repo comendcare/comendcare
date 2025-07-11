@@ -6,15 +6,15 @@ import {motion} from "framer-motion"
 
 const features = [
     {
-        name: "Save to shortlist.",
+        name: "Submit requests.",
         description:
-            "Save relevant service providers to a shortlist to easily find and contact them when you're ready.",
+            "Fill in details about your open projects to share them directly with potential partners.",
         icon: Bookmark,
     },
     {
-        name: "Ratings and reviews.",
+        name: "Reviews.",
         description:
-            "Share your experience with a service provider or learn from the experiences of other patient groups.",
+            "Share about your experiences or hear from other groups.",
         icon: Star,
     },
 ];
@@ -50,7 +50,7 @@ export default function FeatureResearchMarketplace() {
                                 Discover partners
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Discover synergies with other patient groups. Search and filter for relevant Service Providers, or browse recommended service providers based on your research plan.
+                                Find complementary patient groups and service providers in our marketplace based on your research plan.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (

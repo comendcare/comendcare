@@ -38,7 +38,6 @@ export default function App() {
             <FeatureResearchPlan />
             <FeatureResearchMarketplace  />
             <FeaturePublicPages />
-            <News />
             {/*<TabsFeaturesSection />*/}
             {/*<MoreFeaturesSection />*/}
             {/*<WhoSection/>*/}

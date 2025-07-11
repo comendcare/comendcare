@@ -7,15 +7,15 @@ import {motion} from "framer-motion"
 
 const features = [
     {
-        name: "Privacy controls.",
+        name: "Toolkits.",
         description:
-            "Publish or un-publish your profile and tune your research plan projects to be public or private.",
+            "Streamline requests and inventory for your biosamples, datasets, and more.",
         icon: Lock,
     },
     {
-        name: "Get in touch.",
+        name: "Attract biopharma.",
         description:
-            "Found a patient group you like? Get in touch directly from their public page.",
+            "Opt-in for us to highlight opportunities in your disease area to industry.",
         icon: Megaphone,
     },
 ];
@@ -34,11 +34,10 @@ export default function FeaturePublicPages() {
                     <div className="lg:pr-8 lg:pt-4">
                         <div className="lg:max-w-lg">
                             <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-                                Share your progress
+                                Showcase your progress
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Easily keep your profile up-to-date and share it with your community, donors, biopharma,
-                                and more.
+                                Broadcast your projects, assets, and funding opportunities directly to your community, researchers, and drug developers.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (

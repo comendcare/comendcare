@@ -12,38 +12,36 @@ import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
 
 const bubbles = [
-    {title: "Basic science", href: "#"},
-    {title: "Functional study", href: "#"},
-    {title: "Natural history study", href: "#"},
-    {title: "Patient registry", href: "#"},
-    {title: "Biomarker", href: "#"},
-    {title: "Outcome measure", href: "#"},
-    {title: "Biobank", href: "#"},
-    {title: "Patient-derived cell line", href: "#"},
-    {title: "Engineered cell line", href: "#"},
-    {title: "Mouse model", href: "#"},
-    {title: "Other disease model", href: "#"},
-    {title: "Target validation", href: "#"},
-    {title: "Assay development", href: "#"},
-    {title: "Drug screen", href: "#"},
-    {title: "Efficacy study", href: "#"},
-    {title: "Dose finding study", href: "#"},
-    {title: "Toxicology study", href: "#"},
-    {title: "Biodistribution study", href: "#"},
-    {title: "Gene therapy production", href: "#"},
-    {title: "GMP manufacturing", href: "#"},
-    {title: "INTERACT meeting", href: "#"},
-    {title: "Pre-IND meeting", href: "#"},
-    {title: "IND submission", href: "#"},
-    {title: "Site selection", href: "#"},
-    {title: "Patient recruitment", href: "#"},
-    {title: "Trial design", href: "#"},
-    {title: "Phase 1", href: "#"},
-    {title: "Phase 1/2", href: "#"},
-    {title: "Phase 2", href: "#"},
-    {title: "Phase 3", href: "#"},
-    {title: "FDA approval", href: "#"},
-    {title: "Phase 4", href: "#"}
+    { title: "Gap analysis", href: "#" },
+    { title: "Animal models", href: "#" },
+    { title: "Cell lines", href: "#" },
+    { title: "Organoids", href: "#" },
+    { title: "Assay development", href: "#" },
+    { title: "Oligo synthesis", href: "#" },
+    { title: "GMP manufacturing", href: "#" },
+    { title: "Toxicology", href: "#" },
+    { title: "Gene therapy", href: "#" },
+    { title: "ASO", href: "#" },
+    { title: "Drug repurposing", href: "#" },
+    { title: "Gene editing", href: "#" },
+    { title: "RNAi", href: "#" },
+    { title: "IND", href: "#" },
+    { title: "Biomarkers", href: "#" },
+    { title: "Patient registry", href: "#" },
+    { title: "Natural history study", href: "#" },
+    { title: "Biobanking", href: "#" },
+    { title: "Outcome measures", href: "#" },
+    { title: "IP", href: "#" },
+    { title: "Clinical trials", href: "#" },
+    { title: "Academics", href: "#" },
+    { title: "CROs", href: "#" },
+    { title: "Biotech", href: "#" },
+    { title: "Pharma", href: "#" },
+    { title: "Consultants", href: "#" },
+    { title: "Target validation", href: "#" },
+    { title: "Lead optimization", href: "#" },
+    { title: "Real world evidence", href: "#" },
+    { title: "Trial design", href: "#" }
 ];
 
 export const CloudHeroSection = () => {
@@ -255,11 +253,11 @@ export const CloudHeroSection = () => {
                         initial={{opacity: 0, y: 50}}
                         animate={{opacity: 1, y: [50, -10, 0]}}
                         transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                        className="max-w-screen-md text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
+                        className="max-w-screen-lg text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
                     >
-                        Where patient groups
+                        The drug development platform
                         <Highlight className="text-black dark:text-white">
-                            advance treatments
+                            for patient groups
                         </Highlight>
                     </motion.h1>
                 </HeroHighlight>
@@ -272,7 +270,7 @@ export const CloudHeroSection = () => {
                     className="flex flex-col justify-center items-center mx-auto space-y-4"
                 >
                     <p className="max-w-screen-sm text-2xl">
-                        {`Translate research into impact — strategize, collaborate, and showcase your progress.`}
+                        {`Plan, partner, and showcase your progress with the rare disease ecosystem.`}
                     </p>
                     <PulsatingButton
                         className="w-fit"

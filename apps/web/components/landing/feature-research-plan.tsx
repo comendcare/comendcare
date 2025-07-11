@@ -7,15 +7,15 @@ import {motion} from "framer-motion"
 
 const features = [
     {
-        name: "Team workspaces.",
+        name: "Team accounts.",
         description:
-            "Invite members of your organization or partners to collaborate on your plan as owners or members.",
+            "Invite members of your team along to view and edit your plan.",
         icon: Users,
     },
     {
         name: "Bulk imports.",
         description:
-            "Effortlessly import and manage your tools, projects, and RFPs.",
+            "Upload and manage many projects at once using spreadsheets.",
         icon: CloudUpload,
     },
 ];
@@ -34,11 +34,11 @@ export default function FeatureResearchPlan() {
                     <div className="lg:pr-8 lg:pt-4">
                         <div className="lg:max-w-lg">
                             <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-                                Build your research plan
+                                Develop your research plan
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Map out your efforts intuitively, with your team. Showcase your tools and funding
-                                opportunities to prospective researchers. </p>
+                                Map out projects intuitively with help from templates, recommendations, and the patient group network.
+                            </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (
                                     <div key={feature.name} className="relative pl-9">

@@ -1772,3 +1772,35 @@ export const getResearcher = withUserAuth(
         }
     }
 )
+
+export const getResearcherRequests = withUserAuth(
+    async (
+        researcher: Researcher,
+        select: Prisma.ResearcherSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: {id: researcher.id},
+                // include: {organizations: true},
+                select
+            })
+
+            if (!fetchedResearcher) {
+                return {success: false, error: "Researcher not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedResearcher
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
