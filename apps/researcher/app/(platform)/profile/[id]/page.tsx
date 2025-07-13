@@ -5,14 +5,14 @@ import {getResearcher} from "@/packages/lib/fetchers";
 import {toast} from "sonner";
 
 export default async function CompanyHomePage({
-                                            params
-                                        }: {
+                                                  params
+                                              }: {
     params: { id: string }
 }) {
     const id = decodeURIComponent(params.id)
     const session = await getSession()
 
-    let userData
+    let researcherData
     if (session?.user?.id) {
         const response = await getResearcher(session.user.id, {
             id: true,
@@ -30,17 +30,15 @@ export default async function CompanyHomePage({
             metadata: true
         });
         if (response.success) {
-            userData = response.data
+            researcherData = response.data
         } else {
             console.error(response.error)
         }
     }
 
     return (
-        <div
-            className="bg-red"
-        >
-            <ResearcherProfile researcherData={userData} />
+        <div className="w-screen h-screen flex items-center justify-center overflow-auto">
+            <ResearcherProfile researcherData={researcherData}/>
         </div>
     )
 }

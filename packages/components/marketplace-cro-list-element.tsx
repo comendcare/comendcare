@@ -27,13 +27,13 @@ export function CROMarketplaceListElement({ cro }: { cro: any }) {
             </CardHeader>
             <CardContent className="w-full flex flex-row gap-4 flex-wrap">
                 {cro?.associatedGenes && cro.associatedGenes.length > 0 && (
-                    <span className="flex flex-row gap-2 flex-wrap">
+                    <div className="flex flex-row gap-2 flex-wrap">
                         {cro?.associatedGenes.map((gene: string, index: number) => (
                             <Badge key={index} className="flex text-sm">
                                 {gene}
                             </Badge>
                         ))}
-                    </span>
+                    </div>
                 )}
                 {cro?.moneyRaised &&
                     <div className="m-0 flex items-center text-gray-500">

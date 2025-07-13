@@ -2,6 +2,7 @@ import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@/packages/lib/auth";
 import {getResearcherRequests} from "@/packages/lib/fetchers";
+import RequestPage from "~researcher/components/request-page";
 
 
 export default async function ResearcherRequestsPage({
@@ -12,25 +13,21 @@ export default async function ResearcherRequestsPage({
     const id = decodeURIComponent(params.id)
     const session = await getSession()
 
-    let userData
+    let requestData
     if (session?.user?.id) {
         const response = await getResearcherRequests(session.user.id, {
-            id: true,
-            orcid: true,
-            email: true,
-            emailHash: true,
             title: true,
-            name: true,
-            researchInterests: true,
-            conditionsOfInterest: true,
-            genesOfInterest: true,
-            affiliations: true,
+            description: true,
+            status: true,
+            organization: true,
+            organizationId: true,
+            researcher: true,
+            researcherId: true,
             createdAt: true,
-            updatedAt: true,
-            metadata: true
+            updatedAt: true
         });
         if (response.success) {
-            userData = response.data
+            requestData = response.data
         } else {
             console.error(response.error)
         }
@@ -40,7 +37,7 @@ export default async function ResearcherRequestsPage({
         <div
             className="bg-red"
         >
-            <ResearcherProfile researcherData={userData} />
+            <RequestPage requestData={requestData} />
         </div>
     )
 }

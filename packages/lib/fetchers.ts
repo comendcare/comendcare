@@ -5,7 +5,7 @@ import prisma from "@comend/lib/prisma"
 import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
 import {getSession, withOrganizationAuth, withUserAuth} from "@comend/lib/auth";
-import {Condition, Organization, Prisma, Researcher, User} from "@prisma/client";
+import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
@@ -1775,8 +1775,8 @@ export const getResearcher = withUserAuth(
 
 export const getResearcherRequests = withUserAuth(
     async (
-        researcher: Researcher,
-        select: Prisma.ResearcherSelect<InternalArgs & {
+        request: MaterialAndDataAccessRequest,
+        select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
             result: {};
             model: {};
             query: {};
@@ -1784,22 +1784,22 @@ export const getResearcherRequests = withUserAuth(
         }>
     ) => {
         try {
-            const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {id: researcher.id},
+            const fetchedRequest = await prisma.materialAndDataAccessRequest.findUnique({
+                where: {id: request.id},
                 // include: {organizations: true},
                 select
             })
 
-            if (!fetchedResearcher) {
-                return {success: false, error: "Researcher not found"};
+            if (!fetchedRequest) {
+                return {success: false, error: "Request not found"};
             }
 
             return {
                 success: true,
-                data: fetchedResearcher
+                data: fetchedRequest
             };
         } catch (error: any) {
-            logError("Error fetching researcher", error);
+            logError("Error fetching request", error);
             return {success: false, error: "Internal server error"};
         }
     }
