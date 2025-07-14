@@ -6,10 +6,13 @@ import { filterColumns } from "@comend/lib/filter-columns";
 import type { GetBiosamplesSchema, GetTasksSchema } from "./validations";
 import {Status, Priority} from "@prisma/client";
 import { nanoid } from "nanoid";
+import { isEmpty } from "lodash";
+import { getSession } from "@comend/lib/auth";
 
 export async function getBiosamples(input: GetBiosamplesSchema) {
     return unstable_cache(
         async () => {
+            const session = await getSession()
             try {
                 const offset = (input.page - 1) * input.perPage;
                 const advancedTable =
@@ -81,7 +84,8 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         take: input.perPage,
                         where: {
                             ...where,
-                            types: { hasSome: toolTypes.map(type => type.id) }
+                            types: { hasSome: toolTypes.map(type => type.id) },
+                            organizationId: session?.user.organizationId
                         },
                         include: {
                             milestones: { include: {milestone: true} },
@@ -107,6 +111,7 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
 export async function getDatasamples(input: GetBiosamplesSchema) {
     return unstable_cache(
         async () => {
+            const session = await getSession()
             try {
                 const offset = (input.page - 1) * input.perPage;
                 const advancedTable =
@@ -178,7 +183,11 @@ export async function getDatasamples(input: GetBiosamplesSchema) {
                         take: input.perPage,
                         where: {
                             ...where,
-                            types: { hasSome: toolTypes.map(type => type.id) }
+                            OR: [
+                                {types: { hasSome: toolTypes.map(type => type.id) }},
+                                {types: { isEmpty: true }},
+                            ],
+                            organizationId: session?.user.organizationId
                         },
                         include: {
                             milestones: { include: {milestone: true} },
