@@ -21,10 +21,10 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
 
     const promises = Promise.all([
-        getBiosamples({
-            ...search,
-            filters: validFilters,
-        }),
+        getBiosamples(
+            session?.user.organizationId,
+            {...search, filters: validFilters}
+        ),
     ]);
 
     if (!orgId) return <NoOrganization />

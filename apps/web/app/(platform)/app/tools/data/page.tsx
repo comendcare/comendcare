@@ -21,10 +21,9 @@ export default async function DataToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
 
     const promises = Promise.all([
-        getDatasamples({
-            ...search,
-            filters: validFilters,
-        }),
+        getDatasamples(
+            session?.user.organizationId,
+            {...search, filters: validFilters})
     ]);
 
     if (!orgId) return <NoOrganization />

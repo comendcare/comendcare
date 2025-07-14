@@ -4,211 +4,414 @@ import prisma from "@comend/lib/prisma"
 import { unstable_cache } from "@comend/lib/unstable-cache";
 import { filterColumns } from "@comend/lib/filter-columns";
 import type { GetBiosamplesSchema, GetTasksSchema } from "./validations";
-import {Status, Priority} from "@prisma/client";
+import {Status, Priority, Organization} from "@prisma/client";
 import { nanoid } from "nanoid";
 import { isEmpty } from "lodash";
-import { getSession } from "@comend/lib/auth";
+import { getSession, withOrganizationAuth } from "@comend/lib/auth";
 
-export async function getBiosamples(input: GetBiosamplesSchema) {
-    const session = await getSession()
-    return unstable_cache(
-        async () => {
-            try {
-                const offset = (input.page - 1) * input.perPage;
-                const advancedTable =
-                    input.filterFlag === "advancedFilters"
+export const getBiosamples = withOrganizationAuth(
+    async (organization: Organization, input: GetBiosamplesSchema) => {
+        return unstable_cache(
+            async () => {
+                try {
+                    const offset = (input.page - 1) * input.perPage;
+                    const advancedTable =
+                        input.filterFlag === "advancedFilters"
 
-                let where: any = {};
+                    let where: any = {};
 
-                if (advancedTable) {
-                    const preProcessedFilters: any = input.filters.map(filter => ({
-                        ...filter,
-                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-                    }))
+                    if (advancedTable) {
+                        const preProcessedFilters: any = input.filters.map(filter => ({
+                            ...filter,
+                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                        }))
 
-                    where = filterColumns({
-                        filters: preProcessedFilters,
-                        joinOperator: input.joinOperator,
+                        where = filterColumns({
+                            filters: preProcessedFilters,
+                            joinOperator: input.joinOperator,
+                        })
+                    } else {
+                        const filters: any[] = []
+                        if (input.title) {
+                            filters.push({
+                                id: 'title',
+                                value: input.title,
+                                variant: 'text',
+                                operator: 'iLike',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.private.length == 1) {
+                            // private only has two options, we only filter if ONE of them
+                            // is selected...
+                            filters.push({
+                                id: 'private',
+                                value: input.private[0],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.types.length > 0) {
+                            filters.push({
+                                id: 'types',
+                                value: input.types,
+                                variant: 'multiSelect',
+                                operator: 'inArray',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        where = filterColumns({
+                            filters,
+                            joinOperator: "and"
+                        })
+                    }
+
+                    const orderBy = input.sort.length
+                        ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
+                        : [{ createdAt: "asc" }];
+
+                    const toolTypes = await prisma.toolType.findMany({
+                        where: { type: 'biosample' }
                     })
-                } else {
-                    const filters: any[] = []
-                    if (input.title) {
-                        filters.push({
-                            id: 'title',
-                            value: input.title,
-                            variant: 'text',
-                            operator: 'iLike',
-                            filterId: nanoid()
-                        })
-                    }
 
-                    if (input.private.length == 1) {
-                        // private only has two options, we only filter if ONE of them
-                        // is selected...
-                        filters.push({
-                            id: 'private',
-                            value: input.private[0],
-                            variant: 'select',
-                            operator: 'eq',
-                            filterId: nanoid()
-                        })
-                    }
+                    const [data, total] = await prisma.$transaction([
+                        prisma.tool.findMany({
+                            skip: offset,
+                            take: input.perPage,
+                            where: {
+                                ...where,
+                                types: { hasSome: toolTypes.map(type => type.id) },
+                                organizationId: organization.id
+                            },
+                            include: {
+                                milestones: { include: {milestone: true} },
+                                contacts: true,
+                                attachments: true,
+                            },
+                            orderBy,
+                        }),
+                        prisma.tool.count({ where }),
+                    ]);
 
-                    if (input.types.length > 0) {
-                        filters.push({
-                            id: 'types',
-                            value: input.types,
-                            variant: 'multiSelect',
-                            operator: 'inArray',
-                            filterId: nanoid()
-                        })
-                    }
-
-                    where = filterColumns({
-                        filters,
-                        joinOperator: "and"
-                    })
+                    const pageCount = Math.ceil(total / input.perPage);
+                    return { data, pageCount };
+                } catch {
+                    return { data: [], pageCount: 0 };
                 }
+            },
+            [JSON.stringify(input)],
+            { revalidate: 1, tags: ["biosamples"] },
+        )();
+    }
+)
 
-                const orderBy = input.sort.length
-                    ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
-                    : [{ createdAt: "asc" }];
+// export async function getBiosamples(input: GetBiosamplesSchema) {
+//     const session = await getSession()
+//     return unstable_cache(
+//         async () => {
+//             try {
+//                 const offset = (input.page - 1) * input.perPage;
+//                 const advancedTable =
+//                     input.filterFlag === "advancedFilters"
 
-                const toolTypes = await prisma.toolType.findMany({
-                    where: { type: 'biosample' }
-                })
+//                 let where: any = {};
 
-                const [data, total] = await prisma.$transaction([
-                    prisma.tool.findMany({
-                        skip: offset,
-                        take: input.perPage,
-                        where: {
-                            ...where,
-                            types: { hasSome: toolTypes.map(type => type.id) },
-                            organizationId: session?.user.organizationId
-                        },
-                        include: {
-                            milestones: { include: {milestone: true} },
-                            contacts: true,
-                            attachments: true,
-                        },
-                        orderBy,
-                    }),
-                    prisma.tool.count({ where }),
-                ]);
+//                 if (advancedTable) {
+//                     const preProcessedFilters: any = input.filters.map(filter => ({
+//                         ...filter,
+//                         ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+//                     }))
 
-                const pageCount = Math.ceil(total / input.perPage);
-                return { data, pageCount };
-            } catch {
-                return { data: [], pageCount: 0 };
-            }
-        },
-        [JSON.stringify(input)],
-        { revalidate: 1, tags: ["biosamples"] },
-    )();
-}
+//                     where = filterColumns({
+//                         filters: preProcessedFilters,
+//                         joinOperator: input.joinOperator,
+//                     })
+//                 } else {
+//                     const filters: any[] = []
+//                     if (input.title) {
+//                         filters.push({
+//                             id: 'title',
+//                             value: input.title,
+//                             variant: 'text',
+//                             operator: 'iLike',
+//                             filterId: nanoid()
+//                         })
+//                     }
 
-export async function getDatasamples(input: GetBiosamplesSchema) {
-    const session = await getSession()
-    return unstable_cache(
-        async () => {
-            try {
-                const offset = (input.page - 1) * input.perPage;
-                const advancedTable =
-                    input.filterFlag === "advancedFilters"
+//                     if (input.private.length == 1) {
+//                         // private only has two options, we only filter if ONE of them
+//                         // is selected...
+//                         filters.push({
+//                             id: 'private',
+//                             value: input.private[0],
+//                             variant: 'select',
+//                             operator: 'eq',
+//                             filterId: nanoid()
+//                         })
+//                     }
 
-                let where: any = {};
+//                     if (input.types.length > 0) {
+//                         filters.push({
+//                             id: 'types',
+//                             value: input.types,
+//                             variant: 'multiSelect',
+//                             operator: 'inArray',
+//                             filterId: nanoid()
+//                         })
+//                     }
 
-                if (advancedTable) {
-                    const preProcessedFilters: any = input.filters.map(filter => ({
-                        ...filter,
-                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-                    }))
+//                     where = filterColumns({
+//                         filters,
+//                         joinOperator: "and"
+//                     })
+//                 }
 
-                    where = filterColumns({
-                        filters: preProcessedFilters,
-                        joinOperator: input.joinOperator,
+//                 const orderBy = input.sort.length
+//                     ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
+//                     : [{ createdAt: "asc" }];
+
+//                 const toolTypes = await prisma.toolType.findMany({
+//                     where: { type: 'biosample' }
+//                 })
+
+//                 const [data, total] = await prisma.$transaction([
+//                     prisma.tool.findMany({
+//                         skip: offset,
+//                         take: input.perPage,
+//                         where: {
+//                             ...where,
+//                             types: { hasSome: toolTypes.map(type => type.id) },
+//                             organizationId: session?.user.organizationId
+//                         },
+//                         include: {
+//                             milestones: { include: {milestone: true} },
+//                             contacts: true,
+//                             attachments: true,
+//                         },
+//                         orderBy,
+//                     }),
+//                     prisma.tool.count({ where }),
+//                 ]);
+
+//                 const pageCount = Math.ceil(total / input.perPage);
+//                 return { data, pageCount };
+//             } catch {
+//                 return { data: [], pageCount: 0 };
+//             }
+//         },
+//         [JSON.stringify(input)],
+//         { revalidate: 1, tags: ["biosamples"] },
+//     )();
+// }
+
+export const getDatasamples = withOrganizationAuth(
+    async (organization: Organization, input: GetBiosamplesSchema) => {
+        return unstable_cache(
+            async () => {
+                try {
+                    const offset = (input.page - 1) * input.perPage;
+                    const advancedTable =
+                        input.filterFlag === "advancedFilters"
+
+                    let where: any = {};
+
+                    if (advancedTable) {
+                        const preProcessedFilters: any = input.filters.map(filter => ({
+                            ...filter,
+                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                        }))
+
+                        where = filterColumns({
+                            filters: preProcessedFilters,
+                            joinOperator: input.joinOperator,
+                        })
+                    } else {
+                        const filters: any[] = []
+                        if (input.title) {
+                            filters.push({
+                                id: 'title',
+                                value: input.title,
+                                variant: 'text',
+                                operator: 'iLike',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.private.length == 1) {
+                            // private only has two options, we only filter if ONE of them
+                            // is selected...
+                            filters.push({
+                                id: 'private',
+                                value: input.private[0],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.types.length > 0) {
+                            filters.push({
+                                id: 'types',
+                                value: input.types,
+                                variant: 'multiSelect',
+                                operator: 'inArray',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        where = filterColumns({
+                            filters,
+                            joinOperator: "and"
+                        })
+                    }
+
+                    const orderBy = input.sort.length
+                        ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
+                        : [{ createdAt: "asc" }];
+
+                    const toolTypes = await prisma.toolType.findMany({
+                        where: { type: 'data' }
                     })
-                } else {
-                    const filters: any[] = []
-                    if (input.title) {
-                        filters.push({
-                            id: 'title',
-                            value: input.title,
-                            variant: 'text',
-                            operator: 'iLike',
-                            filterId: nanoid()
-                        })
-                    }
 
-                    if (input.private.length == 1) {
-                        // private only has two options, we only filter if ONE of them
-                        // is selected...
-                        filters.push({
-                            id: 'private',
-                            value: input.private[0],
-                            variant: 'select',
-                            operator: 'eq',
-                            filterId: nanoid()
-                        })
-                    }
+                    const [data, total] = await prisma.$transaction([
+                        prisma.tool.findMany({
+                            skip: offset,
+                            take: input.perPage,
+                            where: {
+                                ...where,
+                                OR: [
+                                    {types: { hasSome: toolTypes.map(type => type.id) }},
+                                    {types: { isEmpty: true }},
+                                ],
+                                organizationId: organization.id
+                            },
+                            include: {
+                                milestones: { include: {milestone: true} },
+                                contacts: true,
+                                attachments: true,
+                            },
+                            orderBy,
+                        }),
+                        prisma.tool.count({ where }),
+                    ]);
 
-                    if (input.types.length > 0) {
-                        filters.push({
-                            id: 'types',
-                            value: input.types,
-                            variant: 'multiSelect',
-                            operator: 'inArray',
-                            filterId: nanoid()
-                        })
-                    }
-
-                    where = filterColumns({
-                        filters,
-                        joinOperator: "and"
-                    })
+                    const pageCount = Math.ceil(total / input.perPage);
+                    return { data, pageCount };
+                } catch {
+                    return { data: [], pageCount: 0 };
                 }
+            },
+            [JSON.stringify(input)],
+            { revalidate: 1, tags: ["biosamples"] },
+        )(); 
+    }
+)
 
-                const orderBy = input.sort.length
-                    ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
-                    : [{ createdAt: "asc" }];
+// export async function getDatasamples(input: GetBiosamplesSchema) {
+//     const session = await getSession()
+//     return unstable_cache(
+//         async () => {
+//             try {
+//                 const offset = (input.page - 1) * input.perPage;
+//                 const advancedTable =
+//                     input.filterFlag === "advancedFilters"
 
-                const toolTypes = await prisma.toolType.findMany({
-                    where: { type: 'data' }
-                })
+//                 let where: any = {};
 
-                const [data, total] = await prisma.$transaction([
-                    prisma.tool.findMany({
-                        skip: offset,
-                        take: input.perPage,
-                        where: {
-                            ...where,
-                            OR: [
-                                {types: { hasSome: toolTypes.map(type => type.id) }},
-                                {types: { isEmpty: true }},
-                            ],
-                            organizationId: session?.user.organizationId
-                        },
-                        include: {
-                            milestones: { include: {milestone: true} },
-                            contacts: true,
-                            attachments: true,
-                        },
-                        orderBy,
-                    }),
-                    prisma.tool.count({ where }),
-                ]);
+//                 if (advancedTable) {
+//                     const preProcessedFilters: any = input.filters.map(filter => ({
+//                         ...filter,
+//                         ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+//                     }))
 
-                const pageCount = Math.ceil(total / input.perPage);
-                return { data, pageCount };
-            } catch {
-                return { data: [], pageCount: 0 };
-            }
-        },
-        [JSON.stringify(input)],
-        { revalidate: 1, tags: ["biosamples"] },
-    )();
-}
+//                     where = filterColumns({
+//                         filters: preProcessedFilters,
+//                         joinOperator: input.joinOperator,
+//                     })
+//                 } else {
+//                     const filters: any[] = []
+//                     if (input.title) {
+//                         filters.push({
+//                             id: 'title',
+//                             value: input.title,
+//                             variant: 'text',
+//                             operator: 'iLike',
+//                             filterId: nanoid()
+//                         })
+//                     }
+
+//                     if (input.private.length == 1) {
+//                         // private only has two options, we only filter if ONE of them
+//                         // is selected...
+//                         filters.push({
+//                             id: 'private',
+//                             value: input.private[0],
+//                             variant: 'select',
+//                             operator: 'eq',
+//                             filterId: nanoid()
+//                         })
+//                     }
+
+//                     if (input.types.length > 0) {
+//                         filters.push({
+//                             id: 'types',
+//                             value: input.types,
+//                             variant: 'multiSelect',
+//                             operator: 'inArray',
+//                             filterId: nanoid()
+//                         })
+//                     }
+
+//                     where = filterColumns({
+//                         filters,
+//                         joinOperator: "and"
+//                     })
+//                 }
+
+//                 const orderBy = input.sort.length
+//                     ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
+//                     : [{ createdAt: "asc" }];
+
+//                 const toolTypes = await prisma.toolType.findMany({
+//                     where: { type: 'data' }
+//                 })
+
+//                 const [data, total] = await prisma.$transaction([
+//                     prisma.tool.findMany({
+//                         skip: offset,
+//                         take: input.perPage,
+//                         where: {
+//                             ...where,
+//                             OR: [
+//                                 {types: { hasSome: toolTypes.map(type => type.id) }},
+//                                 {types: { isEmpty: true }},
+//                             ],
+//                             organizationId: session?.user.organizationId
+//                         },
+//                         include: {
+//                             milestones: { include: {milestone: true} },
+//                             contacts: true,
+//                             attachments: true,
+//                         },
+//                         orderBy,
+//                     }),
+//                     prisma.tool.count({ where }),
+//                 ]);
+
+//                 const pageCount = Math.ceil(total / input.perPage);
+//                 return { data, pageCount };
+//             } catch {
+//                 return { data: [], pageCount: 0 };
+//             }
+//         },
+//         [JSON.stringify(input)],
+//         { revalidate: 1, tags: ["biosamples"] },
+//     )();
+// }
 
 export async function getTasks(input: GetTasksSchema) {
     return unstable_cache(
