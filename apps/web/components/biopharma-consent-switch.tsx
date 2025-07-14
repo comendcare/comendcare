@@ -19,7 +19,7 @@ import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/
 import React from "react";
 import { Info } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { cn } from "@/packages/lib/utils"
+import { cn } from "@comend/lib/utils"
 
 const FormSchema = z.object({
     biopharmaConsentSettings: z.boolean().default(false).optional(),

@@ -1,7 +1,7 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
-import {getSession} from "@/packages/lib/auth";
-import {getResearcher} from "@/packages/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
+import {getResearcher} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 
 export default async function CompanyHomePage({

@@ -1,7 +1,7 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
-import {getSession} from "@/packages/lib/auth";
-import {getResearcherRequests} from "@/packages/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
+import {getResearcherRequests} from "@comend/lib/fetchers";
 import RequestPage from "~researcher/components/request-page";
 
 

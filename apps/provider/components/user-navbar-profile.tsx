@@ -13,7 +13,7 @@ import {
 import Loading from "@/loading";
 import {ProfilePhoto} from "@comend/components/profile-photo"
 import {LogOut} from "lucide-react"
-import {getUser} from "@/packages/lib/fetchers"
+import {getUser} from "@comend/lib/fetchers"
 
 export default function UserNavbarProfile() {
     const {data: session, status} = useSession()

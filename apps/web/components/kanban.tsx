@@ -34,7 +34,7 @@ import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Button } from "@comend/components/ui/button"
 import { Redo2, Undo2 } from "lucide-react"
-import {Task} from "@/packages/lib/types";
+import {Task} from "@comend/lib/types";
 
 export type ColumnId = string
 

@@ -1,7 +1,7 @@
 "use client"
 
-import {Button} from "@/packages/components/ui/button";
-import {mixpanelReset, mixpanelTrack} from "@/packages/lib/mixpanel";
+import {Button} from "@comend/components/ui/button";
+import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
 import {signOut} from "next-auth/react";
 import {LogOut} from "lucide-react";
 

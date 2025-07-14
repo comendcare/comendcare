@@ -8,30 +8,30 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/packages/components/ui/form";
-import {Input} from "@/packages/components/ui/input";
-import {Button} from "@/packages/components/ui/button";
+} from "@comend/components/ui/form";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser, updateResearcher} from "@/packages/lib/actions";
-import {Checkbox} from "@/packages/components/ui/checkbox";
-import {AddressType, Option} from "@/packages/lib/types";
+import {editUser, updateResearcher} from "@comend/lib/actions";
+import {Checkbox} from "@comend/components/ui/checkbox";
+import {AddressType, Option} from "@comend/lib/types";
 import React, {useEffect, useState} from "react";
-import {FileWithPreview} from "@/packages/components/image-selector";
-import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@/packages/lib/fetchers";
-import {handleImageUpload} from "@/packages/lib/upload";
-import LoadingDots from "@/packages/components/icons/loading-dots";
-import {getPublicFile} from "@/packages/lib/utils";
+import {FileWithPreview} from "@comend/components/image-selector";
+import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@comend/lib/fetchers";
+import {handleImageUpload} from "@comend/lib/upload";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import {getPublicFile} from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
-import {Skeleton} from "@/packages/components/ui/skeleton";
-import MultipleSelector from "@/packages/components/ui/multiple-selector";
-import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@/packages/components/ui/select"
-import {MILESTONE_TYPE_OPTIONS} from "@/packages/lib/types"
-import {badgeVariants} from "@/packages/components/ui/badge"
+import {Skeleton} from "@comend/components/ui/skeleton";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
+import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
+import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
+import {badgeVariants} from "@comend/components/ui/badge"
 
 const optionSchema = z.object({
     label: z.string(),

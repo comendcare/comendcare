@@ -32,7 +32,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog";
-import {ColumnType, Task} from "@/packages/lib/types";
+import {ColumnType, Task} from "@comend/lib/types";
 
 interface ColumnDragData {
     type: ColumnType

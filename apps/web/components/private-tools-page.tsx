@@ -10,7 +10,7 @@ import { columns as DataToolColumns, DataToolDataTable } from "./data-tool-data-
 import { columns as BiosampleToolColumns } from "./biosample-tool-data-table/biosample-tool-data-table"
 import { AssetsDataTable } from "./assets-data-table/assets-data-table"
 import { useEffect, useState } from "react"
-import { Asset } from "@/packages/lib/types"
+import { Asset } from "@comend/lib/types"
 import { BiosampleToolDataTable } from "./biosample-tool-data-table/biosample-tool-data-table"
 
 const toolSelector = (state: ToolState) => ({

@@ -21,7 +21,7 @@ import { useSession } from "next-auth/react";
 import { Organization } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 // Schema for validating the contact email
 const editContactEmailSchema = z.object({

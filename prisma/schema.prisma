@@ -76,6 +76,7 @@ model User {
   reportOnComments      ReportOnComment[]
   reviewFeedbacks       ReviewFeedback[]
   metadata              Json?
+  researcher            Researcher?
 }
 
 model PlatformNotification {
@@ -1080,6 +1081,8 @@ model Affiliation {
 
 model Researcher {
   id                            String                         @id @default(uuid())
+  userId                        String                         @unique
+  user                          User?                          @relation(fields: [userId], references: [id], onDelete: Cascade)
   orcid                         String?                        @unique
   email                         String?                        @unique /// @encrypted
   emailHash                     String?                        @unique /// @encryption:hash(email)

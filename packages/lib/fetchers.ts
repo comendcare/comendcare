@@ -685,19 +685,19 @@ export async function getPostComments(
     }>,
 ) {
     try {
-        const comments = await prisma.comment.findMany({
-            where: {
-                postId: postId
-            },
-            select,
-            orderBy: {
-                createdAt: "desc"
-            }
-        })
+        // const comments = await prisma.comment.findMany({
+        //     where: {
+        //         postId: postId
+        //     },
+        //     select,
+        //     orderBy: {
+        //         createdAt: "desc"
+        //     }
+        // })
 
-        const sanitizedComments = comments.map(comment => omit(comment, []))
+        // const sanitizedComments = comments.map(comment => omit(comment, []))
 
-        return {success: true, data: sanitizedComments}
+        return {success: true, data: null}
     } catch (error: any) {
         console.error("Database error finding comments:", error)
         return {success: false, error: "Database error. please try again later."}
@@ -1755,6 +1755,37 @@ export const getResearcher = withUserAuth(
             const fetchedResearcher = await prisma.researcher.findUnique({
                 where: {id: researcher.id},
                 // include: {organizations: true},
+                select
+            })
+
+            if (!fetchedResearcher) {
+                return {success: false, error: "Researcher not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedResearcher
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getResearcherFromUserId = withUserAuth(
+    async (
+        userId: string,
+        select: Prisma.ResearcherSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: {userId: userId},
                 select
             })
 

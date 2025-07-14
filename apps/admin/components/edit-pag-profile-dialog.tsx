@@ -32,7 +32,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {Organization} from "@prisma/client";
 import MoneyInput from "@comend/components/money-input";
-import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@/packages/lib/fetchers";
+import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@comend/lib/fetchers";
 import { EditableProfilePhoto } from "./editable-profile-photo";
 import { EditablePAGBannerPhoto } from "./editable-pag-banner-photo";
 
