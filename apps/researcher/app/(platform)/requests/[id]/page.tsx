@@ -16,6 +16,7 @@ export default async function ResearcherRequestsPage({
     let requestData
     if (session?.user?.id) {
         const response = await getResearcherRequests(session.user.id, {
+            id: true,
             title: true,
             description: true,
             status: true,
@@ -24,7 +25,8 @@ export default async function ResearcherRequestsPage({
             researcher: true,
             researcherId: true,
             createdAt: true,
-            updatedAt: true
+            updatedAt: true,
+            comments: true
         });
         if (response.success) {
             requestData = response.data

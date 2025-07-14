@@ -10,7 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@comend/components/ui/dropdown-menu";
-import Loading from "@/loading";
+import Spinner from "@comend/components/ui/spinner"
 import {ProfilePhoto} from "@comend/components/profile-photo"
 import {LogOut} from "lucide-react"
 import {getUser} from "@/packages/lib/fetchers"
@@ -70,7 +70,7 @@ export default function UserNavbarProfile() {
 
     // Handle loading state while session is being fetched
     if (status === "loading") {
-        return <Loading/>
+        return <Spinner/>
     }
 
     return (

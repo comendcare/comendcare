@@ -34,6 +34,13 @@ export function ResearcherNavbarMenu() {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                     <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link href="/data">
+                            Biobank
+                        </Link>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                         <Link href="/requests">
                             Requests
                         </Link>

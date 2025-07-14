@@ -15,7 +15,8 @@ import {
     SavedCompany,
     Service,
     Tool as DBAsset,
-    User
+    User,
+    MaterialAndDataAccessRequest
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -1323,3 +1324,7 @@ export const companyTypeMap: Record<string, string> = {
     "Large Business (>100M TTM Revenue)": "Large Business",
     "Consultant (<5 employees)": "Consultant",
 };
+
+export interface MaterialAndDataAccessRequestWithComents extends MaterialAndDataAccessRequest {
+    comments: Comment[];
+}
