@@ -47,15 +47,15 @@ export function OrganizationSwitcher({memberships}: {memberships: MembershipWith
             membership: membership,
         });
         if (pathname === "/app/profile") {
+            await revalidate("/app/tools/biosample")
+            await revalidate("/app/tools/data")
             window.location.reload()
-            revalidate("/app/tools/biosample")
-            revalidate("/app/tools/data")
             // router.refresh(); // Stay and refresh
         } else {
-            // window.location.reload()
-            revalidate("/app/tools/biosample")
-            revalidate("/app/tools/data")
+            await revalidate("/app/tools/biosample")
+            await revalidate("/app/tools/data")
             router.push("/app/profile"); // Navigate if not already there
+            // window.location.reload()
         }
     };
 
