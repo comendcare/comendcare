@@ -41,7 +41,6 @@ export function getDatasamplesTableColumns(): ColumnDef<any>[] {
             </div>
         ),
         enableHiding: true,
-        enableColumnFilter: true
     },
     {
         id: "types",
