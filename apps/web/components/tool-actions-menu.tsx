@@ -23,7 +23,7 @@ const toolSelector = (state: ToolState) => ({
     updateTool: state.updateTool
 })
 
-export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
+export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data'}) => {
     const {data: session} = useSession()
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
@@ -125,7 +125,7 @@ export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
                             key={tool.id}
                             data={tool} 
                             numAssetsPinned={tools.filter(tool => tool.pinned).length}
-                            type={'biosample'}
+                            type={type}
                         />
                     </div>
                 </DialogPortal>

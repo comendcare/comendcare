@@ -8,11 +8,8 @@ import { DataTableFilterMenu } from "@comend/components/biorepo/advanced-data-ta
 import { DataTableSortList } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-sort-list";
 import { DataTableToolbar } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-toolbar";
 import { useDataTable } from "@comend/lib/hooks/use-data-table";
-import type { DataTableRowAction } from "@comend/components/types/data-table";
-import { Asset } from "@comend/lib/types";
 import { getBiosamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
-import { getBiosamplesTableColumns } from "./biosamples-table-columns";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
 
 interface BiosamplesTableProps {

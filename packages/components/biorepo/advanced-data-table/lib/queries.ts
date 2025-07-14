@@ -87,7 +87,103 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                             milestones: { include: {milestone: true} },
                             contacts: true,
                             attachments: true,
-                            // types: true
+                        },
+                        orderBy,
+                    }),
+                    prisma.tool.count({ where }),
+                ]);
+
+                const pageCount = Math.ceil(total / input.perPage);
+                return { data, pageCount };
+            } catch {
+                return { data: [], pageCount: 0 };
+            }
+        },
+        [JSON.stringify(input)],
+        { revalidate: 1, tags: ["biosamples"] },
+    )();
+}
+
+export async function getDatasamples(input: GetBiosamplesSchema) {
+    return unstable_cache(
+        async () => {
+            try {
+                const offset = (input.page - 1) * input.perPage;
+                const advancedTable =
+                    input.filterFlag === "advancedFilters"
+
+                let where: any = {};
+
+                if (advancedTable) {
+                    const preProcessedFilters: any = input.filters.map(filter => ({
+                        ...filter,
+                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                    }))
+
+                    where = filterColumns({
+                        filters: preProcessedFilters,
+                        joinOperator: input.joinOperator,
+                    })
+                } else {
+                    const filters: any[] = []
+                    if (input.title) {
+                        filters.push({
+                            id: 'title',
+                            value: input.title,
+                            variant: 'text',
+                            operator: 'iLike',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    if (input.private.length == 1) {
+                        // private only has two options, we only filter if ONE of them
+                        // is selected...
+                        filters.push({
+                            id: 'private',
+                            value: input.private[0],
+                            variant: 'select',
+                            operator: 'eq',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    if (input.types.length > 0) {
+                        filters.push({
+                            id: 'types',
+                            value: input.types,
+                            variant: 'multiSelect',
+                            operator: 'inArray',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    where = filterColumns({
+                        filters,
+                        joinOperator: "and"
+                    })
+                }
+
+                const orderBy = input.sort.length
+                    ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
+                    : [{ createdAt: "asc" }];
+
+                const toolTypes = await prisma.toolType.findMany({
+                    where: { type: 'data' }
+                })
+
+                const [data, total] = await prisma.$transaction([
+                    prisma.tool.findMany({
+                        skip: offset,
+                        take: input.perPage,
+                        where: {
+                            ...where,
+                            types: { hasSome: toolTypes.map(type => type.id) }
+                        },
+                        include: {
+                            milestones: { include: {milestone: true} },
+                            contacts: true,
+                            attachments: true,
                         },
                         orderBy,
                     }),

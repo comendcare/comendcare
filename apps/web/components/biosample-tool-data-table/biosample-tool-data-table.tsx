@@ -145,7 +145,7 @@ export const columns: ColumnDef<Asset>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,
+        cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
         enableHiding: false,
         meta: { name: "Actions" }
     },

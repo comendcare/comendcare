@@ -5,9 +5,9 @@ import { NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
-import { getBiosamplesTableColumns } from "./biosample-tool-data-table/biosamples-table-columns";
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
+import { getBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/biosamples-table-columns";
 
 export const PrivateBiosampleToolsPage = ({promises}: {promises: any}) => {
     const columns = getBiosamplesTableColumns()

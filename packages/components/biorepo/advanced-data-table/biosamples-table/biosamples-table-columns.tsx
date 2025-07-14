@@ -12,6 +12,7 @@ import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
+import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 
 export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
@@ -85,7 +86,7 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
         enableColumnFilter: true,
         meta: {
           label: "Visibility",
-          variant: "multiSelect",
+          variant: "select",
           options: [
             {
               label: "Private", 
@@ -323,11 +324,11 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   ]
 
   const actionsColumn: ColumnDef<any>[] = [
-    // {
-    //     id: "actions",
-    //     cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,
-    //     enableHiding: false,
-    // },
+    {
+        id: "actions",
+        cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+        enableHiding: false,
+    },
   ]
 
   // Temporarily hide additional biobank columns from users on production
