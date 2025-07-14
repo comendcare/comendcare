@@ -11,6 +11,7 @@ import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import { getBiosamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
+import { revalidate } from "@comend/lib/revalidate";
 
 interface BiosamplesTableProps {
   // data: Asset[],
