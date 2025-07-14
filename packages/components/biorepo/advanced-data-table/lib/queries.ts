@@ -5,6 +5,7 @@ import { unstable_cache } from "@comend/lib/unstable-cache";
 import { filterColumns } from "@comend/lib/filter-columns";
 import type { GetBiosamplesSchema, GetTasksSchema } from "./validations";
 import {Status, Priority} from "@prisma/client";
+import { nanoid } from "nanoid";
 
 export async function getBiosamples(input: GetBiosamplesSchema) {
     return unstable_cache(
@@ -29,60 +30,61 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         joinOperator: input.joinOperator,
                     })
                 } else {
+                    const filters: any[] = []
                     if (input.title) {
-                        where.title = { contains: input.title, mode: "insensitive" };
+                        filters.push({
+                            id: 'title',
+                            value: input.title,
+                            variant: 'text',
+                            operator: 'iLike',
+                            filterId: nanoid()
+                        })
                     }
 
                     if (input.private.length == 1) {
                         // private only has two options, we only filter if ONE of them
                         // is selected...
-                        where.private = input.private[0]
+                        filters.push({
+                            id: 'private',
+                            value: [JSON.stringify(input.private[0])],
+                            variant: 'select',
+                            operator: 'inArray',
+                            filterId: nanoid()
+                        })
                     }
 
                     if (input.types.length > 0) {
-                        where.types = { hasSome: input.types }
+                        filters.push({
+                            id: 'types',
+                            value: input.types,
+                            variant: 'multiSelect',
+                            operator: 'inArray',
+                            filterId: nanoid()
+                        })
                     }
 
-                    // if (input.status.length > 0) {
-                    //     where.status = { in: input.status };
-                    // }
-
-                    // if (input.priority.length > 0) {
-                    //     where.priority = { in: input.priority };
-                    // }
-
-                    // if (input.estimatedHours.length === 2) {
-                    //     const [min, max] = input.estimatedHours;
-                    //     where.estimatedHours = {
-                    //         ...(min !== undefined ? { gte: min } : {}),
-                    //         ...(max !== undefined ? { lte: max } : {}),
-                    //     };
-                    // }
-
-                    // if (input.createdAt.length === 2) {
-                    //     const [from, to] = input.createdAt;
-                    //     const fromDate = from ? new Date(from) : undefined;
-                    //     const toDate = to ? new Date(to) : undefined;
-
-                    //     if (fromDate) fromDate.setHours(0, 0, 0, 0);
-                    //     if (toDate) toDate.setHours(23, 59, 59, 999);
-
-                    //     where.createdAt = {
-                    //         ...(fromDate ? { gte: fromDate } : {}),
-                    //         ...(toDate ? { lte: toDate } : {}),
-                    //     };
-                    // }
+                    where = filterColumns({
+                        filters,
+                        joinOperator: "and"
+                    })
                 }
 
                 const orderBy = input.sort.length
                     ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
                     : [{ createdAt: "asc" }];
 
+                const toolTypes = await prisma.toolType.findMany({
+                    where: { type: 'biosample' }
+                })
+
                 const [data, total] = await prisma.$transaction([
                     prisma.tool.findMany({
                         skip: offset,
                         take: input.perPage,
-                        where,
+                        where: {
+                            ...where,
+                            types: { hasSome: toolTypes.map(type => type.id) }
+                        },
                         include: {
                             milestones: { include: {milestone: true} },
                             contacts: true,
