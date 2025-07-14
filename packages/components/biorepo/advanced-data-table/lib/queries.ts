@@ -4,8 +4,7 @@ import prisma from "@comend/lib/prisma"
 import { unstable_cache } from "@comend/lib/unstable-cache";
 import { filterColumns } from "@comend/lib/filter-columns";
 import type { GetBiosamplesSchema, GetTasksSchema } from "./validations";
-import { PRIORITIES, STATUSES } from "@comend/components/types/data-table";
-import {Status, Priority, Task} from "@prisma/client";
+import {Status, Priority} from "@prisma/client";
 
 export async function getBiosamples(input: GetBiosamplesSchema) {
     return unstable_cache(
@@ -13,8 +12,7 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
             try {
                 const offset = (input.page - 1) * input.perPage;
                 const advancedTable =
-                    input.filterFlag === "advancedFilters" ||
-                    input.filterFlag === "commandFilters";
+                    input.filterFlag === "advancedFilters"
 
                 let where: any = {};
 

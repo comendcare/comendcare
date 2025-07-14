@@ -7,6 +7,8 @@ import { getValidFilters } from "@/packages/lib/data-table"
 import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
 import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
 
+export const dynamic = "force-dynamic";
+
 interface IndexPageProps {
     searchParams: Promise<SearchParams>;
 }
@@ -14,12 +16,9 @@ interface IndexPageProps {
 export default async function BiosampleToolsPage(props: IndexPageProps) {
     const session = await getSession()
     const orgId = session?.user.organizationId
-
     const searchParams = await props.searchParams;
     const search = biosampleSearchParamsCache.parse(searchParams);
-
     const validFilters = getValidFilters(search.filters);
-
 
     const promises = Promise.all([
         getBiosamples({
