@@ -4,10 +4,10 @@ import * as React from "react";
 import { NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { Shell } from "@comend/components/biorepo/advanced-data-table/tasks-table/shell";
-import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/biosamples-table/feature-flags-provider";
 import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
 import { getBiosamplesTableColumns } from "./biosample-tool-data-table/biosamples-table-columns";
+import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 
 export const PrivateBiosampleToolsPage = ({promises}: {promises: any}) => {
     const columns = getBiosamplesTableColumns()

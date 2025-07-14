@@ -9,11 +9,11 @@ import { DataTableSortList } from "@comend/components/biorepo/advanced-data-tabl
 import { DataTableToolbar } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-toolbar";
 import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import type { DataTableRowAction } from "@comend/components/types/data-table";
-import { useFeatureFlags } from "./feature-flags-provider";
 import { Asset } from "@comend/lib/types";
 import { getBiosamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
 import { getBiosamplesTableColumns } from "./biosamples-table-columns";
+import { useFeatureFlags } from "../lib/feature-flags-provider";
 
 interface BiosamplesTableProps {
   // data: Asset[],

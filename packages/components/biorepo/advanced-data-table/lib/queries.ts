@@ -23,8 +23,6 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
                     }))
 
-                    console.log(`pre processed filters`, preProcessedFilters)
-
                     where = filterColumns({
                         filters: preProcessedFilters,
                         joinOperator: input.joinOperator,
@@ -46,9 +44,9 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         // is selected...
                         filters.push({
                             id: 'private',
-                            value: [JSON.stringify(input.private[0])],
+                            value: input.private[0],
                             variant: 'select',
-                            operator: 'inArray',
+                            operator: 'eq',
                             filterId: nanoid()
                         })
                     }
