@@ -22,6 +22,8 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
                         ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
                     }))
 
+                    console.log(`pre processed filters`, preProcessedFilters)
+
                     where = filterColumns({
                         filters: preProcessedFilters,
                         joinOperator: input.joinOperator,

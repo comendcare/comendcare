@@ -64,18 +64,18 @@ export function filterColumns({
             : undefined;
       case "notILike":
         return filter.variant === "text" && typeof filter.value === "string"
-            ? { [column]: { not: { contains: filter.value, mode: "insensitive" } } }
+            ? { NOT: { [column]: { contains: filter.value, mode: "insensitive" } } }
             : undefined;
 
       case "inArray":
         if (Array.isArray(filter.value)) {
-          return {[column]: { in: filter.value }}
+          return {[column]: { hasSome: filter.value }}
         }
         return undefined;
 
       case "notInArray":
         if (Array.isArray(filter.value)) {
-          return {[column]: { notIn: filter.value }}
+          return { NOT: { [column]: { hasSome: filter.value } }}
         }
         return undefined;
 
@@ -144,9 +144,9 @@ export function filterColumns({
         }
         return undefined;
       case "isEmpty":
-        return { [column]: null };
+        return { [column]: {isEmpty: true} };
       case "isNotEmpty":
-        return { NOT: { [column]: null } };
+        return { NOT: { [column]: {isEmpty: true} } };
       default:
         throw new Error(`Unsupported operator: ${filter.operator}`);
     }
