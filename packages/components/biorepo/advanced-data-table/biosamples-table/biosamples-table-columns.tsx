@@ -90,11 +90,11 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {
               label: "Private", 
               value: "true",
-              icon: Lock,
+              // icon: Lock,
             }, {
               label: "Public", 
               value: "false",
-              icon: Globe
+              // icon: Globe
             }
           ],
           icon: CircleDashed,
