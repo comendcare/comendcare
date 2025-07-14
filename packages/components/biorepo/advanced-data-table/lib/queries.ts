@@ -12,19 +12,22 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
         async () => {
             try {
                 const offset = (input.page - 1) * input.perPage;
-                // const advancedTable =
-                //     input.filterFlag === "advancedFilters" ||
-                //     input.filterFlag === "commandFilters";
-                const advancedTable = false
+                const advancedTable =
+                    input.filterFlag === "advancedFilters" ||
+                    input.filterFlag === "commandFilters";
 
                 let where: any = {};
 
                 if (advancedTable) {
+                    const preProcessedFilters: any = input.filters.map(filter => ({
+                        ...filter,
+                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                    }))
+
                     where = filterColumns({
-                        // table: "biosample",
-                        filters: input.filters,
+                        filters: preProcessedFilters,
                         joinOperator: input.joinOperator,
-                    });
+                    })
                 } else {
                     if (input.title) {
                         where.title = { contains: input.title, mode: "insensitive" };

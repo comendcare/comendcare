@@ -29,7 +29,7 @@ interface BiosamplesTableProps {
 }
 
 export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
-  // const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
+  const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
 
   const [
     { data, pageCount },
@@ -49,7 +49,7 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
     data,
     columns,
     pageCount,
-    // enableAdvancedFilter,
+    enableAdvancedFilter,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },
@@ -64,7 +64,7 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
       <DataTable
         table={table}
       >
-        {/* {enableAdvancedFilter ? (
+        {enableAdvancedFilter ? (
           <DataTableAdvancedToolbar table={table}>
             <DataTableSortList table={table} align="start" />
             {filterFlag === "advancedFilters" ? (
@@ -84,12 +84,12 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
               />
             )}
           </DataTableAdvancedToolbar>
-        ) : ( */}
+        ) : (
           <DataTableToolbar table={table}>
             {/* <DataTableFilterList table={table} align="end" /> */}
             <DataTableSortList table={table} align="end" />
           </DataTableToolbar>
-        {/* )} */}
+        )}
       </DataTable>
     </>
   );

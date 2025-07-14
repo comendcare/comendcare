@@ -86,7 +86,7 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
         enableColumnFilter: true,
         meta: {
           label: "Visibility",
-          variant: "multiSelect",
+          variant: "select",
           options: [
             {
               label: "Private", 

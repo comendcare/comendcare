@@ -35,9 +35,9 @@ export function filterColumns({
       case "eq":
         if (Array.isArray(filter.value)) {
           return { [column]: { in: filter.value } };
-        } else if (filter.type === "boolean" && typeof filter.value === "string") {
+        } else if (filter.variant === "boolean" && typeof filter.value === "string") {
           return { [column]: filter.value === "true" };
-        } else if (filter.type === "date") {
+        } else if (filter.variant === "date") {
           const date = new Date(filter.value);
           const start = startOfDay(date);
           const end = endOfDay(date);
@@ -48,9 +48,9 @@ export function filterColumns({
       case "ne":
         if (Array.isArray(filter.value)) {
           return { [column]: { notIn: filter.value } };
-        } else if (filter.type === "boolean") {
+        } else if (filter.variant === "boolean") {
           return { [column]: { not: filter.value === "true" } };
-        } else if (filter.type === "date") {
+        } else if (filter.variant === "date") {
           const date = new Date(filter.value);
           const start = startOfDay(date);
           const end = endOfDay(date);
@@ -59,39 +59,52 @@ export function filterColumns({
           return { [column]: { not: filter.value } };
         }
       case "iLike":
-        return filter.type === "text" && typeof filter.value === "string"
+        return filter.variant === "text" && typeof filter.value === "string"
             ? { [column]: { contains: filter.value, mode: "insensitive" } }
             : undefined;
       case "notILike":
-        return filter.type === "text" && typeof filter.value === "string"
+        return filter.variant === "text" && typeof filter.value === "string"
             ? { [column]: { not: { contains: filter.value, mode: "insensitive" } } }
             : undefined;
+
+      case "inArray":
+        if (Array.isArray(filter.value)) {
+          return {[column]: { in: filter.value }}
+        }
+        return undefined;
+
+      case "notInArray":
+        if (Array.isArray(filter.value)) {
+          return {[column]: { notIn: filter.value }}
+        }
+        return undefined;
+
       case "lt":
-        return filter.type === "number"
+        return filter.variant === "number"
             ? { [column]: { lt: filter.value } }
-            : filter.type === "date" && typeof filter.value === "string"
+            : filter.variant === "date" && typeof filter.value === "string"
                 ? { [column]: { lt: endOfDay(new Date(filter.value)) } }
                 : undefined;
       case "lte":
-        return filter.type === "number"
+        return filter.variant === "number"
             ? { [column]: { lte: filter.value } }
-            : filter.type === "date" && typeof filter.value === "string"
+            : filter.variant === "date" && typeof filter.value === "string"
                 ? { [column]: { lte: endOfDay(new Date(filter.value)) } }
                 : undefined;
       case "gt":
-        return filter.type === "number"
+        return filter.variant === "number"
             ? { [column]: { gt: filter.value } }
-            : filter.type === "date" && typeof filter.value === "string"
+            : filter.variant === "date" && typeof filter.value === "string"
                 ? { [column]: { gt: startOfDay(new Date(filter.value)) } }
                 : undefined;
       case "gte":
-        return filter.type === "number"
+        return filter.variant === "number"
             ? { [column]: { gte: filter.value } }
-            : filter.type === "date" && typeof filter.value === "string"
+            : filter.variant === "date" && typeof filter.value === "string"
                 ? { [column]: { gte: startOfDay(new Date(filter.value)) } }
                 : undefined;
       case "isBetween":
-        return filter.type === "date" &&
+        return filter.variant === "date" &&
         Array.isArray(filter.value) &&
         filter.value.length === 2
             ? {
@@ -102,7 +115,7 @@ export function filterColumns({
             }
             : undefined;
       case "isRelativeToToday":
-        if (filter.type === "date" && typeof filter.value === "string") {
+        if (filter.variant === "date" && typeof filter.value === "string") {
           const today = new Date();
           const [amount, unit] = filter.value.split(" ") ?? [];
           let startDate: Date;
