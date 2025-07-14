@@ -10,9 +10,9 @@ import { isEmpty } from "lodash";
 import { getSession } from "@comend/lib/auth";
 
 export async function getBiosamples(input: GetBiosamplesSchema) {
+    const session = await getSession()
     return unstable_cache(
         async () => {
-            const session = await getSession()
             try {
                 const offset = (input.page - 1) * input.perPage;
                 const advancedTable =
@@ -109,9 +109,9 @@ export async function getBiosamples(input: GetBiosamplesSchema) {
 }
 
 export async function getDatasamples(input: GetBiosamplesSchema) {
+    const session = await getSession()
     return unstable_cache(
         async () => {
-            const session = await getSession()
             try {
                 const offset = (input.page - 1) * input.perPage;
                 const advancedTable =
