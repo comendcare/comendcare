@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import {Input} from "@comend/components/ui/input"
 import {Button} from "@comend/components/ui/button"

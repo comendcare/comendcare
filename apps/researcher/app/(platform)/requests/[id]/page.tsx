@@ -1,7 +1,7 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@comend/lib/auth";
-import {getResearcherRequests} from "@comend/lib/fetchers";
+import {getResearcherRequest} from "@comend/lib/fetchers";
 import RequestPage from "~researcher/components/request-page";
 
 
@@ -15,7 +15,7 @@ export default async function ResearcherRequestsPage({
 
     let requestData
     if (session?.user?.id) {
-        const response = await getResearcherRequests(session.user.id, {
+        const response = await getResearcherRequest(session.user.id, {
             id: true,
             title: true,
             description: true,

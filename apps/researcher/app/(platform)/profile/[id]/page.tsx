@@ -11,7 +11,7 @@ export default async function CompanyHomePage({
 }) {
     const id = decodeURIComponent(params.id)
     const session = await getSession()
-    //
+
     // let researcherData
     // if (session?.user?.id) {
     //     const response = await getResearcher(session.user.id, {

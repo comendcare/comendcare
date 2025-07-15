@@ -1804,7 +1804,7 @@ export const getResearcherFromUserId = withUserAuth(
     }
 )
 
-export const getResearcherRequests = withUserAuth(
+export const getResearcherRequest = withUserAuth(
     async (
         request: MaterialAndDataAccessRequest,
         select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
@@ -1831,6 +1831,51 @@ export const getResearcherRequests = withUserAuth(
             };
         } catch (error: any) {
             logError("Error fetching request", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getAllResearcherRequests = withUserAuth(
+    async (
+        request: MaterialAndDataAccessRequest,
+        select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        const session = await getSession();
+
+        try {
+            if (!session) {
+                return { success: false, error: "Session not found." };
+            }
+
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: { userId: session.user.id },
+            });
+
+            if (!fetchedResearcher) {
+                return { success: false, error: "Researcher not found" };
+            }
+
+            const fetchedRequests = await prisma.materialAndDataAccessRequest.findMany({
+                where: {researcherId: fetchedResearcher.id},
+                select
+            })
+
+            if (!fetchedRequests) {
+                return {success: false, error: "Requests not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedRequests
+            };
+        } catch (error: any) {
+            logError("Error fetching requests", error);
             return {success: false, error: "Internal server error"};
         }
     }

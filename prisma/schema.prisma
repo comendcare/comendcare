@@ -1041,12 +1041,13 @@ model Institution {
   isniAll          String[]
   wikidataAll      String[]
 
-  relationships InstitutionRelationship[] @relation("InstitutionRelationships")
-  relatedTo     InstitutionRelationship[] @relation("InstitutionRelatedTo")
-  affiliation   Affiliation[]
-  createdAt     DateTime                  @default(now())
-  updatedAt     DateTime                  @updatedAt
-  metadata      Json?
+  relationships         InstitutionRelationship[] @relation("InstitutionRelationships")
+  relatedTo             InstitutionRelationship[] @relation("InstitutionRelatedTo")
+  affiliation           Affiliation[]
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  metadata              Json?
+  institutionToRequests InstitutionToRequest[]
 }
 
 model InstitutionRelationship {
@@ -1119,18 +1120,37 @@ enum Priority {
 }
 
 model MaterialAndDataAccessRequest {
-  id             String        @id @default(cuid())
+  id             String                 @id @default(cuid())
   title          String
   description    String
-  status         RequestStatus @default(PENDING)
-  organization   Organization  @relation(fields: [organizationId], references: [id])
+  status         RequestStatus          @default(PENDING)
+  organization   Organization           @relation(fields: [organizationId], references: [id])
   organizationId String
-  researcher     Researcher    @relation(fields: [researcherId], references: [id])
+  researcher     Researcher             @relation(fields: [researcherId], references: [id])
   researcherId   String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  metadata       Json?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  submittedAt    DateTime
+  approvedAt     DateTime?
+  expiresAt      DateTime?
+  sampleTypes    String[]
+  dataTypes      String[]
+  sampleCount    Int
+  institutions   InstitutionToRequest[]
   comments       Comment[]
+  metadata       Json?
+}
+
+model InstitutionToRequest {
+  id            String                       @id @default(cuid())
+  institutionId String
+  requestId     String
+  institution   Institution                  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  request       MaterialAndDataAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt     DateTime                     @default(now())
+  metadata      Json?
+
+  @@unique([institutionId, requestId]) // Prevent duplicates
 }
 
 enum RequestStatus {

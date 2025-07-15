@@ -1,3 +1,5 @@
+"use client"
+
 import {Badge} from "@comend/components/ui/badge"
 import {Button} from "@comend/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
@@ -14,15 +16,15 @@ import {useRouter} from "next/navigation";
 
 const getStatusColor = (status: string) => {
     switch (status) {
-        case "approved":
+        case "APPROVED":
             return "bg-green-100 text-green-800 border-green-200"
-        case "pending":
+        case "PENDING":
             return "bg-yellow-100 text-yellow-800 border-yellow-200"
-        case "in-progress":
+        case "IN-PROGRESS":
             return "bg-blue-100 text-blue-800 border-blue-200"
-        case "rejected":
+        case "REJECTED":
             return "bg-red-100 text-red-800 border-red-200"
-        case "completed":
+        case "COMPLETED":
             return "bg-gray-100 text-gray-800 border-gray-200"
         default:
             return "bg-gray-100 text-gray-800 border-gray-200"
@@ -31,15 +33,15 @@ const getStatusColor = (status: string) => {
 
 const getStatusText = (status: string) => {
     switch (status) {
-        case "approved":
+        case "APPROVED":
             return "Approved"
-        case "pending":
+        case "PENDING":
             return "Under Review"
-        case "in-progress":
+        case "IN-PROGRESS":
             return "In Progress"
-        case "rejected":
+        case "REJECTED":
             return "Rejected"
-        case "completed":
+        case "COMPLETED":
             return "Completed"
         default:
             return status
