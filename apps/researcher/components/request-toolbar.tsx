@@ -3,12 +3,12 @@
 import * as React from "react"
 import {Input} from "@comend/components/ui/input"
 import {Button} from "@comend/components/ui/button"
-import {Filter, Settings2} from "lucide-react"
+import {ArrowUpDown, Filter, Settings2} from "lucide-react"
 import {DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu"
 import {
     DropdownMenu,
+    DropdownMenuContent, DropdownMenuItem,
     DropdownMenuCheckboxItem,
-    DropdownMenuContent,
     DropdownMenuLabel,
     DropdownMenuSeparator,
 } from "@comend/components/ui/dropdown-menu"
@@ -21,10 +21,44 @@ export default function RequestToolbar() {
                 className="h-8 w-[150px] lg:w-[250px]"
             />
             <div className="flex flex-row items-center space-x-2">
-                <Button variant="outline" className="ml-auto hidden h-8 lg:flex">
-                    <Filter className="mr-2 h-4 w-4"/>
-                    Filter requests
-                </Button>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="ml-auto hidden h-8 lg:flex"
+                        >
+                            <Filter className="mr-2 h-4 w-4"/>
+                            Filter requests
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                        <DropdownMenuLabel>
+                            Statuses
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuCheckboxItem
+                            checked={showStatusBar}
+                            onCheckedChange={setShowStatusBar}
+                        >
+                            Status Bar
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={showActivityBar}
+                            onCheckedChange={setShowActivityBar}
+                            disabled
+                        >
+                            Activity Bar
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={showPanel}
+                            onCheckedChange={setShowPanel}
+                        >
+                            Panel
+                        </DropdownMenuCheckboxItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
@@ -32,18 +66,26 @@ export default function RequestToolbar() {
                             size="sm"
                             className="ml-auto hidden h-8 lg:flex"
                         >
-                            <Settings2/>
-                            View
+                            <ArrowUpDown/>
+                            Sort
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[150px]">
-                        <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuCheckboxItem
+                        <DropdownMenuItem
                             className="capitalize"
                         >
-                            View option 1
-                        </DropdownMenuCheckboxItem>
+                            Recently updated
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="capitalize"
+                        >
+                            Newest created
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="capitalize"
+                        >
+                            Oldest created
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
