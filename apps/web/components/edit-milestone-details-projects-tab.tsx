@@ -7,7 +7,7 @@ import { getProjectRecommendations } from "@comend/lib/fetchers"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card"
 import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
-import { MilestoneTypeBadge } from "./milestone-type-badge"
+import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
 import { Prisma } from "@prisma/client"
 import StatusButton from "./milestone-status-button"
 

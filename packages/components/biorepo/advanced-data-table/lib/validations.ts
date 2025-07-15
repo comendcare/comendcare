@@ -7,7 +7,7 @@ import {
 } from "nuqs/server";
 import * as z from "zod";
 import { flagConfig } from "@comend/lib/config/flag";
-import { type Task, Status, Priority, Label } from "@prisma/client";
+import { type Task, Status, Priority, Label, Tool } from "@prisma/client";
 import {
   getFiltersStateParser,
   getSortingStateParser,
@@ -37,6 +37,24 @@ export const searchParamsCache = createSearchParamsCache({
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 });
 
+export const biosampleSearchParamsCache = createSearchParamsCache({
+  filterFlag: parseAsStringEnum(
+      flagConfig.featureFlags.map((flag) => flag.value),
+  ),
+  page: parseAsInteger.withDefault(1),
+  perPage: parseAsInteger.withDefault(10),
+  sort: getSortingStateParser<Tool>().withDefault([
+    { id: "createdAt", desc: true },
+  ]),
+  title: parseAsString.withDefault(""),
+  types: parseAsArrayOf(z.string()).withDefault([]),
+  private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
+  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  // advanced filter
+  filters: getFiltersStateParser().withDefault([]),
+  joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
+});
+
 export const createTaskSchema = z.object({
   title: z.string(),
   label: labelEnum,
@@ -57,5 +75,8 @@ export const updateTaskSchema = z.object({
 export type GetTasksSchema = Awaited<
     ReturnType<typeof searchParamsCache.parse>
 >;
+export type GetBiosamplesSchema = Awaited<
+    ReturnType<typeof biosampleSearchParamsCache.parse>
+>
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>;
 export type UpdateTaskSchema = z.infer<typeof updateTaskSchema>;

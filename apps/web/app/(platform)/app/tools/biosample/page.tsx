@@ -1,12 +1,32 @@
 import React from "react"
 import { getSession } from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization"
-import { PrivateToolsPage } from "~web/components/private-tools-page"
+import { SearchParams } from "@/packages/components/types"
+import { biosampleSearchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
+import { getValidFilters } from "@/packages/lib/data-table"
+import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
+import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
 
-export default async function BiosampleToolsPage() {
+export const dynamic = "force-dynamic";
+
+interface IndexPageProps {
+    searchParams: Promise<SearchParams>;
+}
+
+export default async function BiosampleToolsPage(props: IndexPageProps) {
     const session = await getSession()
     const orgId = session?.user.organizationId
+    const searchParams = await props.searchParams;
+    const search = biosampleSearchParamsCache.parse(searchParams);
+    const validFilters = getValidFilters(search.filters);
+
+    const promises = Promise.all([
+        getBiosamples(
+            session?.user.organizationId,
+            {...search, filters: validFilters}
+        ),
+    ]);
 
     if (!orgId) return <NoOrganization />
-    return <PrivateToolsPage type={'biosample'}/>
+    return <PrivateBiosampleToolsPage promises={promises} />
 }

@@ -127,6 +127,8 @@ export function DataTableFilterList<TData>({
 
     if (!column) return;
 
+    console.log(`filter added`, filters)
+
     debouncedSetFilters([
       ...filters,
       {
@@ -146,6 +148,8 @@ export function DataTableFilterList<TData>({
       filterId: string,
       updates: Partial<Omit<ExtendedColumnFilter<TData>, "filterId">>,
     ) => {
+
+      console.log(`filter updated`, updates)
       debouncedSetFilters((prevFilters) => {
         const updatedFilters = prevFilters.map((filter) => {
           if (filter.filterId === filterId) {

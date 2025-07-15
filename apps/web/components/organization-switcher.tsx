@@ -22,6 +22,7 @@ import {
 } from "@comend/components/ui/sidebar";
 import {MembershipWithOrganization} from "@comend/lib/types";
 import {ProfilePhoto} from "@comend/components/profile-photo";
+import { revalidate } from "@/packages/lib/revalidate";
 
 export function OrganizationSwitcher({memberships}: {memberships: MembershipWithOrganization[]}) {
     const {isMobile} = useSidebar();
@@ -46,9 +47,15 @@ export function OrganizationSwitcher({memberships}: {memberships: MembershipWith
             membership: membership,
         });
         if (pathname === "/app/profile") {
-            router.refresh(); // Stay and refresh
+            await revalidate("/app/tools/biosample")
+            await revalidate("/app/tools/data")
+            window.location.reload()
+            // router.refresh(); // Stay and refresh
         } else {
+            await revalidate("/app/tools/biosample")
+            await revalidate("/app/tools/data")
             router.push("/app/profile"); // Navigate if not already there
+            // window.location.reload()
         }
     };
 
