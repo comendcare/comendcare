@@ -55,7 +55,7 @@ export const NewToolDialog = ({iconOnly = false, numAssetsPinned, type}: {iconOn
     )
 }
 
-export const EditAssetDialog = ({children, data, numAssetsPinned, type}: {children: ReactNode, data: Partial<Asset>, numAssetsPinned: number, type: 'biosample' | 'data'}) => {
+export const EditAssetDialog = ({children, data, numAssetsPinned, type}: {children?: ReactNode, data: Partial<Asset>, numAssetsPinned: number, type: 'biosample' | 'data'}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -63,10 +63,10 @@ export const EditAssetDialog = ({children, data, numAssetsPinned, type}: {childr
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild className="cursor-pointer">
-                {children}
-            </DialogTrigger>
+        // <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        //     <DialogTrigger asChild className="cursor-pointer">
+        //         {children}
+        //     </DialogTrigger>
 
             <DialogContent>
                 <DialogHeader>
@@ -84,6 +84,6 @@ export const EditAssetDialog = ({children, data, numAssetsPinned, type}: {childr
                     <EditDataToolForm toolData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
                 )}
             </DialogContent>
-        </Dialog>
+        // </Dialog>
     )
 }

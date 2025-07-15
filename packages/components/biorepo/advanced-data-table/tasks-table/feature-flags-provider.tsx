@@ -41,7 +41,7 @@ export function FeatureFlagsProvider({ children }: FeatureFlagsProviderProps) {
     {
       parse: (value) => {
         if (!value) return null;
-        const validValues = flagConfig.featureFlags.map((flag) => flag.value);
+        const validValues = flagConfig.featureFlags.map((flag: any) => flag.value);
         return validValues.includes(value as FilterFlag)
           ? (value as FilterFlag)
           : null;

@@ -8,10 +8,9 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import { TypeBadge } from "./type-badge"
 import { Milestone, StatusType } from "@comend/lib/types"
 import StatusButton from "./milestone-status-button"
-import { MilestoneTypeBadge } from "./milestone-type-badge"
+import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
 import {
     DndContext,
     useSensor,
@@ -33,6 +32,7 @@ import {GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
+import { TypeBadge } from "./type-badge";
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 

@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin } from "lucide-react"
+import { Delete, Pin, Router } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -44,6 +44,8 @@ import { badgeVariants } from "@/packages/components/ui/badge"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { JsonObject } from "@prisma/client/runtime/library"
 import type { Option } from "@comend/lib/types"
+import { useRouter } from "next/navigation"
+import { revalidate } from "@comend/lib/revalidate"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -88,6 +90,7 @@ export function EditBiosampleToolForm({
     closeDialog?: () => void
 }) {
     const initializing = useRef(true)
+    const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const { toolTypes, createTool, updateTool } = useToolStore(useShallow(toolSelector))
@@ -177,12 +180,16 @@ export function EditBiosampleToolForm({
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
+                await revalidate("/app/tools/biosample")
+                router.refresh()
             } else {
                 await createTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
+                await revalidate("/app/tools/biosample")
+                router.refresh()
             }
             if (closeDialog) closeDialog()
         } catch (error) {

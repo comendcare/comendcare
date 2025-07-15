@@ -4,7 +4,6 @@ import {truncate} from "@comend/lib/utils";
 import React from "react";
 import {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
-import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "~web/components/save-cro-dialog";
 import {
     Briefcase,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import {companyTypeMap, Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "./property-badge";
+import { TypeBadge } from "./type-badge";
 
 type NodeTypeCount = Record<string, number>;
 
