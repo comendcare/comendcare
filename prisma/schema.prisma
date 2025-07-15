@@ -312,7 +312,7 @@ model Biosample {
   preservationMethod         String?
   methodOfTransport          String?
   clinicalData               String?
-  currentCountry                    String?
+  currentCountry             String?
   countryOfCollection        String?
   pmi                        Float?
   volume                     Float?
@@ -324,7 +324,6 @@ model Biosample {
   priceGBP                   Float?
   priceEUR                   Float?
   premiumGroup               String?
-  countryOfCollection        String?
   caseId                     String?
   specimenId                 String?
   format                     String?
@@ -356,13 +355,14 @@ model Biosample {
   hercepTest                 String?
   matchedPairId              String?
   mirroredPairId             String?
-  donorAgeAtExcision Int?
+  donorAgeAtExcision         Int?
 
   toolId        String       @unique
   tool          Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
   institutionId String?
   institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull)
-  donor         Donor?
+  donor         Donor?       @relation(fields: [donorId], references: [id])
+  donorId       String?
 }
 
 model Donor {
@@ -370,7 +370,7 @@ model Donor {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  age Int?
+  age                      Int?
   sex                      String?
   gender                   String?
   race                     String?
@@ -395,8 +395,7 @@ model Donor {
   causeOfDeath             String?
   conditionSeverity        String?
 
-  biosampleId String    @unique
-  biosample   Biosample @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
+  biosamples Biosample[]
 }
 
 model ToolType {

@@ -954,7 +954,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="pmi"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`PMI`}</FormLabel>
+                        <FormLabel className="w-[80px]">{`PMI (in hours)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -976,7 +976,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="volume"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Volume`}</FormLabel>
+                        <FormLabel className="w-[80px]">{`Volume (in ml)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -998,7 +998,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="mass"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Mass`}</FormLabel>
+                        <FormLabel className="w-[80px]">{`Mass (in mg)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1020,7 +1020,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="area"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Area`}</FormLabel>
+                        <FormLabel className="w-[80px]">{`Area (in square mm)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1168,70 +1168,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
-            {/* <FormField
-                control={form.control}
-                name="premiumGroup"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Premium Group`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="premiumGroup"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            {/* <FormField
-                control={form.control}
-                name="format"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Format`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="format"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="subFormat"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Sub Format`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="subFormat"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-
             <FormField
                 control={form.control}
                 name="biosampleDiagnosis"
@@ -1252,90 +1188,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                     </FormItem>
                 )}
             />
-
-            {/* <FormField
-                control={form.control}
-                name="significantVariantPositive"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Significant Variant Positive`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="significantVariantPositive"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="significantVariantWildtype"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Significant Variant Wildtype`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="significantVariantWildtype"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="fusionPositive"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Fusion Positive`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="fusionPositive"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="fusionWildtype"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Fusion Wildtype`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="fusionWildtype"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
         </div>
         </>
     )
