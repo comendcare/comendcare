@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin, Plus, Router } from "lucide-react"
+import { Delete, Pin, Plus, Router, Trash } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -133,7 +133,7 @@ const editAssetForm = z.object({
     gender: z.string().optional(),
     race: z.string().optional(),
     ethnicity: z.string().optional(),
-    treatments: z.array(z.string()),
+    treatments: z.array(z.string()).optional(),
     primaryDiagnosis: z.string().optional(),
     diagnoses: z.array(z.string()).optional(),
     yearOfDeath: z.number().optional(),
@@ -149,7 +149,7 @@ const editAssetForm = z.object({
     alcoholStatus: z.boolean().optional(),
     drinksPerDay: z.number().optional(),
     alcoholDuration: z.number().optional(),
-    medications: z.array(z.string()),
+    medications: z.array(z.string()).optional(),
     causeOfDeath: z.string().optional(),
     conditionSeverity: z.string().optional(),
 })
@@ -804,7 +804,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 <TooltipTrigger>
                                     <Button
                                         variant="secondary"
-                                        size={"icon"}
+                                        // size={"icon"}
+                                        className="h-full w-[34px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
                                             form.setValue("diagnoses", [...(field.value || []),""])
@@ -822,17 +823,33 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         {field?.value && field.value.length > 0 && (
                             <ol className="flex flex-col gap-2">
                                 {field.value.map((value: string, index: number) => (
-                                    <Input
-                                        id={`diagnosis-${index}`}
-                                        className="w-full"
-                                        placeholder={`Enter a value`}
-                                        value={value}
-                                        onChange={(event: React.FormEvent<HTMLInputElement>) => {
-                                            let newDiagnoses = field.value
-                                            newDiagnoses[index] = event.currentTarget.value
-                                            form.setValue("diagnoses", newDiagnoses)
-                                        }}
-                                    />
+                                    <span className="flex gap-2 w-full">
+                                        <div className="w-full">
+                                        <Input
+                                            id={`diagnosis-${index}`}
+                                            className="w-full"
+                                            placeholder={`Enter a value`}
+                                            value={value}
+                                            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                                                let newValue = field.value
+                                                newValue[index] = event.currentTarget.value
+                                                form.setValue("diagnoses", newValue)
+                                            }}
+                                        />
+                                        </div>
+                                        <Button 
+                                            className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                            variant="ghost"
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                const newValue = field.value
+                                                newValue.splice(index, 1)
+                                                form.setValue("diagnoses", newValue)
+                                            }}
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </span>
                                 ))}
                             </ol>
                         )}
@@ -842,6 +859,381 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     </FormItem>
                 )}
             />  
+
+            <FormField
+                control={form.control}
+                name="treatments"
+                render={({field}) => (
+                    <FormItem>
+                        <div className="flex flex-row justify-between gap-2 items-center">
+                            <FormLabel>{`Treatments`}</FormLabel>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant="secondary"
+                                        // size={"icon"}
+                                        className="h-full w-[34px]"
+                                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                            e.preventDefault()
+                                            form.setValue("treatments", [...(field.value || []),""])
+                                        }}
+                                    >
+                                        <Plus/>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                    {`Add a treatment`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        {field?.value && field.value.length > 0 && (
+                            <ol className="flex flex-col gap-2">
+                                {field.value.map((value: string, index: number) => (
+                                    <span className="flex gap-2 w-full">
+                                        <div className="w-full">
+                                        <Input
+                                            id={`treatment-${index}`}
+                                            className="w-full"
+                                            placeholder={`Enter a value`}
+                                            value={value}
+                                            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                                                let newValue = field.value
+                                                newValue[index] = event.currentTarget.value
+                                                form.setValue("treatments", newValue)
+                                            }}
+                                        />
+                                        </div>
+                                        <Button 
+                                            className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                            variant="ghost"
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                const newValue = field.value
+                                                newValue.splice(index, 1)
+                                                form.setValue("treatments", newValue)
+                                            }}
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </span>
+                                ))}
+                            </ol>
+                        )}
+
+                        <FormMessage />
+
+                    </FormItem>
+                )}
+            /> 
+
+
+            <FormField
+                control={form.control}
+                name="medications"
+                render={({field}) => (
+                    <FormItem>
+                        <div className="flex flex-row justify-between gap-2 items-center">
+                            <FormLabel>{`Medications`}</FormLabel>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant="secondary"
+                                        className="h-full w-[34px]"
+                                        // size={"icon"}
+                                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                            e.preventDefault()
+                                            form.setValue("medications", [...(field.value || []),""])
+                                        }}
+                                    >
+                                        <Plus/>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                    {`Add a medication`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        {field?.value && field.value.length > 0 && (
+                            <ol className="flex flex-col gap-2">
+                                {field.value.map((value: string, index: number) => (
+                                    <span className="flex gap-2 w-full">
+                                        <div className="w-full">
+                                        <Input
+                                            id={`medication-${index}`}
+                                            className="w-full"
+                                            placeholder={`Enter a value`}
+                                            value={value}
+                                            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                                                let newValue = field.value
+                                                newValue[index] = event.currentTarget.value
+                                                form.setValue("medications", newValue)
+                                            }}
+                                        />
+                                        </div>
+                                        <Button 
+                                            className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                            variant="ghost"
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                const newValue = field.value
+                                                newValue.splice(index, 1)
+                                                form.setValue("medications", newValue)
+                                            }}
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </span>
+                                ))}
+                            </ol>
+                        )}
+
+                        <FormMessage />
+
+                    </FormItem>
+                )}
+            /> 
+
+            <FormField
+                control={form.control}
+                name="conditionSeverity"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Condition Severity`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="conditionSeverity"
+                                    className="w-full"
+                                    placeholder={`Enter a value`}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            {/* <FormField
+                control={form.control}
+                name="menopausalStatus"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Menopausal Status`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="menopausalStatus"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            /> */}
+
+            {/* <FormField
+                control={form.control}
+                name="ageAtLastMenstrualPeriod"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Age at last Menstrual Period`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="ageAtLastMenstrualPeriod"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="numberOfPregnancies"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Number of Pregnancies`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="numberOfPregnancies"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="numberOfLiveBirths"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Number if Live Births`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="numberOfLiveBirths"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            /> */}
+
+            {/* <FormField
+                control={form.control}
+                name="smokingStatus"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Smoking Status`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="smokingStatus"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            /> */}
+
+            {/* <FormField
+                control={form.control}
+                name="cigarettesPerDay"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Cigarettes Per Day`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="cigarettesPerDay"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            /> */}
+
+            {/* <FormField
+                control={form.control}
+                name="alcoholStatus"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Alcohol Status`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="alcoholStatus"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            /> */}
+
+            {/* <FormField
+                control={form.control}
+                name="drinksPerDay"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Drinks Per Day`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="drinksPerDay"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="alcoholDuration"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Alcohol Duration (in years)`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="bmi"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            /> */}
+
+            <FormField
+                control={form.control}
+                name="causeOfDeath"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Cause Of Death`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="causeOfDeath"
+                                    className="w-full"
+                                    placeholder={`Enter a value`}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
         </div>
         </>
     )
