@@ -25,7 +25,7 @@ function generateFiltersString(filters: FiltersType) {
     // addative filters
     if (filters.statuses.length > 0) {
         filters.statuses.forEach(system => {
-            filtersList.push(`condition.condition.associatedSystems:=[${system.value}]`)
+            filtersList.push(`status:=[${system.value}]`)
             typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
         })
     }
@@ -38,11 +38,8 @@ function generateFiltersString(filters: FiltersType) {
 
 const sortByFilters: { [key: string]: string } = {
     "recently-updated": "updatedAt:desc",
-    "alphabetical": "name:asc",
-    "money-deployed-low-high": "moneyDeployed:asc",
-    "money-deployed-high-low": "moneyDeployed:desc",
-    "patients-engaged-low-high": "firstConditionPatientsEngaged:asc",
-    "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
+    "newest-created": "createdAt:desc",
+    "oldest-created": "createdAt:asc",
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
@@ -119,7 +116,7 @@ export interface OrganizationSearchState {
     setTotalResults: (total: number) => void,
 }
 
-export const useOrganizationSearchStore = create<OrganizationSearchState>()(
+export const useRequestSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: (filters: FiltersType) => {

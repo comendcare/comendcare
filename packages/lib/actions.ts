@@ -3941,6 +3941,8 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
                 data: {
                     title: name,
                     description,
+                    submittedAt: new Date(),
+                    sampleCount: 0,
                     organization: {
                         connect: {
                             id: organizationId
