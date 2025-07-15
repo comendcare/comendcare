@@ -28,7 +28,7 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog"
 import {Asset, optionSchema} from "@comend/lib/types"
-import {MilestoneType, Prisma, ToolType} from "@prisma/client"
+import {Institution, MilestoneType, Prisma, ToolType} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -46,6 +46,8 @@ import { JsonObject } from "@prisma/client/runtime/library"
 import type { Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
+import { Separator } from "@/packages/components/ui/separator"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -69,7 +71,85 @@ const editAssetForm = z.object({
     isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
-    milestones: z.array(z.custom<Milestone>()).optional()
+    milestones: z.array(z.custom<Milestone>()).optional(),
+
+    // biosmaple properties
+    institution: z.custom<Institution>().optional(),
+    anatomicalSite: z.string().optional(),
+    pathology: z.string().optional(),
+    preservationMethod: z.string().optional(),
+    preservation: z.string().optional(),
+    methodOfTransport: z.string().optional(),
+    clinicalData: z.string().optional(),
+    country: z.string().optional(),
+    pmi: z.string().optional(),
+    volume: z.number().optional(),
+    mass: z.number().optional(),
+    area: z.number().optional(),
+    repository: z.string().optional(),
+    productCode: z.string().optional(),
+    priceUSD: z.number().optional(),
+    priceGBP: z.number().optional(),
+    priceEUR: z.number().optional(),
+    premiumGroup: z.string().optional(),
+    countryOfCollection: z.string().optional(),
+    caseId: z.string().optional(),
+    specimenId: z.string().optional(),
+    format: z.string().optional(),
+    subFormat: z.string().optional(),
+    biosampleDiagnosis: z.string().optional(),
+    measurement: z.number().optional(),
+    significantVariantPositive: z.string().optional(),
+    significantVariantWildtype: z.string().optional(),
+    fusionPositive: z.string().optional(),
+    fusionWildtype: z.string().optional(),
+    cnvAbnormal: z.boolean().optional(),
+    cnvNormal: z.boolean().optional(),
+    hlaType: z.string().optional(),
+    icf: z.string().optional(),
+    irbLetter: z.string().optional(),
+    yearOfExcision: z.number().optional(),
+    classifier: z.string().optional(),
+    primaryTumorOrgan: z.string().optional(),
+    stage: z.string().optional(),
+    stageGroup: z.string().optional(),
+    serology: z.string().optional(),
+    clinicalTestResults: z.string().optional(),
+    serumAvailable: z.boolean().optional(),
+    plasmaAvailable: z.boolean().optional(),
+    wholeBloodAvailable: z.boolean().optional(),
+    ffpeTumorAvailable: z.boolean().optional(),
+    frozenTumorAvailable: z.boolean().optional(),
+    er: z.string().optional(),
+    pr: z.string().optional(),
+    hercepTest: z.string().optional(),
+    matchedPairId: z.string().optional(),
+    mirroredPairId: z.string().optional(),
+
+    // donor properties
+    age: z.number().optional(),
+    sex: z.string().optional(),
+    gender: z.string().optional(),
+    race: z.string().optional(),
+    ethnicity: z.string().optional(),
+    treatments: z.array(z.string()),
+    primaryDiagnosis: z.string().optional(),
+    yearOfDeath: z.number().optional(),
+    height: z.number().optional(),
+    weight: z.number().optional(),
+    bmi: z.number().optional(),
+    menopausalStatus: z.boolean().optional(),
+    ageAtLastMenstualPeriod: z.number().optional(),
+    numberOfPregnancies: z.number().optional(),
+    numberOfLiveBirths: z.number().optional(),
+    smokingStatus: z.boolean().optional(),
+    cigarettesPerDay: z.number().optional(),
+    alcoholStatus: z.boolean().optional(),
+    drinksPerDay: z.number().optional(),
+    alcoholDuration: z.number().optional(),
+    medications: z.array(z.string()),
+    causeOfDeath: z.string().optional(),
+    conditionSeverity: z.string().optional(),
 })
 
 const toolSelector = (state: ToolState) => ({
@@ -440,6 +520,203 @@ export function EditBiosampleToolForm({
 
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
+
+                    <Separator className="w-full"/>
+                    <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
+                    <FormField
+                        control={form.control}
+                        name="age"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[120px]">{`Age`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="-mt-2 w-full">
+                                        <Input
+                                            id="age"
+                                            className="w-full"
+                                            placeholder={`Enter a number`}
+                                            type="number"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="sex"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[120px]">{`Sex`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Select>
+                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                            <SelectValue placeholder="Select a value" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="M">Male</SelectItem>
+                                            <SelectItem value="F">Female</SelectItem>
+                                            <SelectItem value="O">Other</SelectItem>
+                                            <SelectItem value="NA">Not Applicable</SelectItem>
+                                        </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[120px]">{`Gender`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Select>
+                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                            <SelectValue placeholder="Select a value" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="M">Male</SelectItem>
+                                            <SelectItem value="F">Female</SelectItem>
+                                            <SelectItem value="NB">Non-Binary</SelectItem>
+                                            <SelectItem value="O">Other</SelectItem>
+                                            <SelectItem value="NA">Not Applicable</SelectItem>
+                                        </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="race"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[120px]">{`Race`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Select>
+                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                            <SelectValue placeholder="Select a value" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="M">Male</SelectItem>
+                                            <SelectItem value="F">Female</SelectItem>
+                                            <SelectItem value="NB">Non-Binary</SelectItem>
+                                            <SelectItem value="O">Other</SelectItem>
+                                            <SelectItem value="NA">Not Applicable</SelectItem>
+                                        </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="ethnicity"
+                        render={({field}) => (
+                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
+                                <FormLabel>{`Ethnicity`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Select>
+                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                            <SelectValue placeholder="Select a value" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="M">Male</SelectItem>
+                                            <SelectItem value="F">Female</SelectItem>
+                                            <SelectItem value="NB">Non-Binary</SelectItem>
+                                            <SelectItem value="O">Other</SelectItem>
+                                            <SelectItem value="NA">Not Applicable</SelectItem>
+                                        </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="height"
+                        render={({field}) => (
+                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
+                                <FormLabel>{`Height`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="-mt-2 w-full">
+                                        <Input
+                                            id="height"
+                                            className="w-full"
+                                            placeholder={`Enter a number`}
+                                            type="number"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="weight"
+                        render={({field}) => (
+                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
+                                <FormLabel>{`Weight`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="-mt-2 w-full">
+                                        <Input
+                                            id="weight"
+                                            className="w-full"
+                                            placeholder={`Enter a number`}
+                                            type="number"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="bmi"
+                        render={({field}) => (
+                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
+                                <FormLabel>{`BMI`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="-mt-2 w-full">
+                                        <Input
+                                            id="bmi"
+                                            className="w-full"
+                                            placeholder={`Enter a number`}
+                                            type="number"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>

@@ -299,6 +299,103 @@ model Tool {
   organizationId String?
   organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     ToolToMilestone[]
+  biosample      Biosample?
+}
+
+model Biosample {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  anatomicalSite             String?
+  pathology                  String?
+  preservationMethod         String?
+  preservation               String?
+  methodOfTransport          String?
+  clinicalData               String?
+  country                    String?
+  pmi                        String?
+  volume                     Float?
+  mass                       Float?
+  area                       Float?
+  repository                 String?
+  productCode                String?
+  priceUSD                   Float?
+  priceGBP                   Float?
+  priceEUR                   Float?
+  premiumGroup               String?
+  countryOfCollection        String?
+  caseId                     String?
+  specimenId                 String?
+  format                     String?
+  subFormat                  String?
+  biosampleDiagnosis         String?
+  measurement                Float?
+  significantVariantPositive String?
+  significantVariantWildtype String?
+  fusionPositive             String?
+  fusionWildtype             String?
+  cnvAbnormal                Boolean?
+  cnvNormal                  Boolean?
+  hlaType                    String?
+  icf                        String?
+  irbLetter                  String?
+  yearOfExcision             Int?
+  classifier                 String?
+  primaryTumorOrgan          String?
+  stage                      String?
+  stageGroup                 String?
+  serology                   String?
+  clinicalTestResults        String?
+  serumAvailable             Boolean?
+  plasmaAvailable            Boolean?
+  wholeBloodAvailable        Boolean?
+  ffpeTumorAvailable         Boolean?
+  frozenTumorAvailable       Boolean?
+  er                         String?
+  pr                         String?
+  hercepTest                 String?
+  matchedPairId              String?
+  mirroredPairId             String?
+
+  toolId        String       @unique
+  tool          Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  donor         Donor?
+}
+
+model Donor {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  age                      Int?
+  sex                      String?
+  gender                   String?
+  race                     String?
+  ethnicity                String?
+  treatments               String[]
+  primaryDiagnosis         String?
+  yearOfDeath              Int?
+  height                   Float?
+  weight                   Float?
+  bmi                      Float?
+  menopausalStatus         Boolean?
+  ageAtLastMenstrualPeriod Int?
+  numberOfPregnancies      Int?
+  numberOfLiveBirths       Int?
+  smokingStatus            Boolean?
+  cigarettesPerDay         Float?
+  alcoholStatus            Boolean?
+  drinksPerDay             Float?
+  alcoholDuration          Float?
+  medications              String[]
+  causeOfDeath             String?
+  conditionSeverity        String?
+
+  biosampleId String    @unique
+  biosample   Biosample @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
 }
 
 model ToolType {
@@ -1044,6 +1141,7 @@ model Institution {
   relationships         InstitutionRelationship[] @relation("InstitutionRelationships")
   relatedTo             InstitutionRelationship[] @relation("InstitutionRelatedTo")
   affiliation           Affiliation[]
+  biosamples            Biosample[]
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
   metadata              Json?
