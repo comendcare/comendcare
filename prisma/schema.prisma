@@ -310,11 +310,11 @@ model Biosample {
   anatomicalSite             String?
   pathology                  String?
   preservationMethod         String?
-  preservation               String?
   methodOfTransport          String?
   clinicalData               String?
-  country                    String?
-  pmi                        String?
+  currentCountry                    String?
+  countryOfCollection        String?
+  pmi                        Float?
   volume                     Float?
   mass                       Float?
   area                       Float?
@@ -330,7 +330,6 @@ model Biosample {
   format                     String?
   subFormat                  String?
   biosampleDiagnosis         String?
-  measurement                Float?
   significantVariantPositive String?
   significantVariantWildtype String?
   fusionPositive             String?
@@ -357,6 +356,7 @@ model Biosample {
   hercepTest                 String?
   matchedPairId              String?
   mirroredPairId             String?
+  donorAgeAtExcision Int?
 
   toolId        String       @unique
   tool          Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
@@ -370,7 +370,7 @@ model Donor {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  age                      Int?
+  age Int?
   sex                      String?
   gender                   String?
   race                     String?
