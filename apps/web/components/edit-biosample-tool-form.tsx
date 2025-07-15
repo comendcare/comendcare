@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm} from "react-hook-form"
+import {useForm, UseFormReturn} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin, Router } from "lucide-react"
+import { Delete, Pin, Plus, Router } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -48,6 +48,7 @@ import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
+import { map } from "lodash"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -134,6 +135,7 @@ const editAssetForm = z.object({
     ethnicity: z.string().optional(),
     treatments: z.array(z.string()),
     primaryDiagnosis: z.string().optional(),
+    diagnoses: z.array(z.string()).optional(),
     yearOfDeath: z.number().optional(),
     height: z.number().optional(),
     weight: z.number().optional(),
@@ -522,201 +524,7 @@ export function EditBiosampleToolForm({
                     <AttachmentsFormField form={form} />
 
                     <Separator className="w-full"/>
-                    <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
-                    <FormField
-                        control={form.control}
-                        name="age"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[120px]">{`Age`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="-mt-2 w-full">
-                                        <Input
-                                            id="age"
-                                            className="w-full"
-                                            placeholder={`Enter a number`}
-                                            type="number"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="sex"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[120px]">{`Sex`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Select>
-                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
-                                            <SelectValue placeholder="Select a value" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="M">Male</SelectItem>
-                                            <SelectItem value="F">Female</SelectItem>
-                                            <SelectItem value="O">Other</SelectItem>
-                                            <SelectItem value="NA">Not Applicable</SelectItem>
-                                        </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="gender"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[120px]">{`Gender`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Select>
-                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
-                                            <SelectValue placeholder="Select a value" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="M">Male</SelectItem>
-                                            <SelectItem value="F">Female</SelectItem>
-                                            <SelectItem value="NB">Non-Binary</SelectItem>
-                                            <SelectItem value="O">Other</SelectItem>
-                                            <SelectItem value="NA">Not Applicable</SelectItem>
-                                        </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="race"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[120px]">{`Race`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Select>
-                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
-                                            <SelectValue placeholder="Select a value" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="M">Male</SelectItem>
-                                            <SelectItem value="F">Female</SelectItem>
-                                            <SelectItem value="NB">Non-Binary</SelectItem>
-                                            <SelectItem value="O">Other</SelectItem>
-                                            <SelectItem value="NA">Not Applicable</SelectItem>
-                                        </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="ethnicity"
-                        render={({field}) => (
-                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
-                                <FormLabel>{`Ethnicity`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Select>
-                                        <SelectTrigger className="-mt-2 w-full h-[32px]">
-                                            <SelectValue placeholder="Select a value" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="M">Male</SelectItem>
-                                            <SelectItem value="F">Female</SelectItem>
-                                            <SelectItem value="NB">Non-Binary</SelectItem>
-                                            <SelectItem value="O">Other</SelectItem>
-                                            <SelectItem value="NA">Not Applicable</SelectItem>
-                                        </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="height"
-                        render={({field}) => (
-                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
-                                <FormLabel>{`Height`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="-mt-2 w-full">
-                                        <Input
-                                            id="height"
-                                            className="w-full"
-                                            placeholder={`Enter a number`}
-                                            type="number"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="weight"
-                        render={({field}) => (
-                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
-                                <FormLabel>{`Weight`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="-mt-2 w-full">
-                                        <Input
-                                            id="weight"
-                                            className="w-full"
-                                            placeholder={`Enter a number`}
-                                            type="number"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="bmi"
-                        render={({field}) => (
-                            <FormItem className="w-full flex flex-[120px-auto] gap-4 items-center">
-                                <FormLabel>{`BMI`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="-mt-2 w-full">
-                                        <Input
-                                            id="bmi"
-                                            className="w-full"
-                                            placeholder={`Enter a number`}
-                                            type="number"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
+                    <DonorFormFields form={form} />
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>
@@ -751,5 +559,290 @@ export function EditBiosampleToolForm({
                 </form>
             </ScrollArea>
         </Form>
+    )
+}
+
+export const DonorFormFields = ({form}: {form: any}) => {
+    return (
+        <>
+        <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
+        <div className="flex-col space-y-4">
+            <FormField
+                control={form.control}
+                name="age"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Age`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="age"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="sex"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Sex`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <Select>
+                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                    <SelectValue placeholder="Select a value" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="M">Male</SelectItem>
+                                    <SelectItem value="F">Female</SelectItem>
+                                    <SelectItem value="I">Intersex</SelectItem>
+                                    <SelectItem value="O">Other</SelectItem>
+                                    <SelectItem value="U">Unknown</SelectItem>
+                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="gender"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Gender`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <Select>
+                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                    <SelectValue placeholder="Select a value" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="M">Man</SelectItem>
+                                    <SelectItem value="F">Woman</SelectItem>
+                                    <SelectItem value="NB">Non-Binary</SelectItem>
+                                    <SelectItem value="O">Other</SelectItem>
+                                    <SelectItem value="U">Unknown</SelectItem>
+                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            {/* Race selections from the National Center for Education Studies (US Gov) */}
+            {/* https://nces.ed.gov/ipeds/report-your-data/race-ethnicity-definitions */}
+            <FormField
+                control={form.control}
+                name="race"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Race`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <Select>
+                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                    <SelectValue placeholder="Select a value" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="AIAN">American Indian or Alaska Native</SelectItem>
+                                    <SelectItem value="A">Asian</SelectItem>
+                                    <SelectItem value="BAA">Black or African American</SelectItem>
+                                    <SelectItem value="NHPI">Native Hawaiian or Other Pacific Islander</SelectItem>
+                                    <SelectItem value="W">White</SelectItem>
+                                    <SelectItem value="O">Other</SelectItem>
+                                    <SelectItem value="U">Unknown</SelectItem>
+                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            {/* Ethnicity selections from the National Center for Education Studies (US Gov) */}
+            {/* https://nces.ed.gov/ipeds/report-your-data/race-ethnicity-definitions */}
+            <FormField
+                control={form.control}
+                name="ethnicity"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Ethnicity`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <Select>
+                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                    <SelectValue placeholder="Select a value" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="HL">Hispanic or Latino</SelectItem>
+                                    <SelectItem value="NHL">Not Hispanic or Latino</SelectItem>
+                                    <SelectItem value="O">Other</SelectItem>
+                                    <SelectItem value="U">Unknown</SelectItem>
+                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="height"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Height`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="height"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="weight"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Weight`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="weight"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="bmi"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`BMI`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="bmi"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="primaryDiagnosis"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Primary Diagnosis`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="primaryDiagnosis"
+                                    className="w-full"
+                                    placeholder={`Enter a value`}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="diagnoses"
+                render={({field}) => (
+                    <FormItem>
+                        <div className="flex flex-row justify-between gap-2 items-center">
+                            <FormLabel>{`Diagnoses`}</FormLabel>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant="secondary"
+                                        size={"icon"}
+                                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                            e.preventDefault()
+                                            form.setValue("diagnoses", [...(field.value || []),""])
+                                        }}
+                                    >
+                                        <Plus/>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                    {`Add a diagnosis`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        {field?.value && field.value.length > 0 && (
+                            <ol className="flex flex-col gap-2">
+                                {field.value.map((value: string, index: number) => (
+                                    <Input
+                                        id={`diagnosis-${index}`}
+                                        className="w-full"
+                                        placeholder={`Enter a value`}
+                                        value={value}
+                                        onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                                            let newDiagnoses = field.value
+                                            newDiagnoses[index] = event.currentTarget.value
+                                            form.setValue("diagnoses", newDiagnoses)
+                                        }}
+                                    />
+                                ))}
+                            </ol>
+                        )}
+
+                        <FormMessage />
+
+                    </FormItem>
+                )}
+            />  
+        </div>
+        </>
     )
 }

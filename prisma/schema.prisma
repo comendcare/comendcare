@@ -377,6 +377,7 @@ model Donor {
   ethnicity                String?
   treatments               String[]
   primaryDiagnosis         String?
+  diagnoses                String[]
   yearOfDeath              Int?
   height                   Float?
   weight                   Float?
