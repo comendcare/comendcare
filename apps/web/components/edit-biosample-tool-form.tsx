@@ -1124,6 +1124,50 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
+            <FormField
+                control={form.control}
+                name="yearOfExcision"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Year of Excision`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="yearOfExcision"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="donorAgeAtExcision"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[80px]">{`Donor Age at Excision`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="donorAgeAtExcision"
+                                    className="w-full"
+                                    placeholder={`Enter a number`}
+                                    type="number"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
             {/* <FormField
                 control={form.control}
                 name="premiumGroup"
