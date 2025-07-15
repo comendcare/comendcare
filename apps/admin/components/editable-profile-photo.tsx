@@ -21,7 +21,7 @@ import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
-import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 import { updateOrganization } from "~admin/lib/actions";
 
 const editOrgProfileImageSchema = z.object({

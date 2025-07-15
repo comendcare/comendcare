@@ -135,7 +135,7 @@ export const researcherAuthOptions: NextAuthOptions = {
             if (!existingResearcher) {
                 await prisma.researcher.create({
                     data: {
-                        id: user.id,
+                        userId: user.id,
                         email: user.email ?? undefined,
                         name: user.name ?? "",
                         ...(account?.provider === "orcid" && {

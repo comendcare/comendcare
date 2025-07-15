@@ -21,7 +21,7 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import { Pencil } from "lucide-react";
-import { PAGBannerPhoto } from "@/packages/components/pag-banner-photo";
+import { PAGBannerPhoto } from "@comend/components/pag-banner-photo";
 import { updateOrganization } from "~admin/lib/actions";
 
 const editOrgProfileImageSchema = z.object({

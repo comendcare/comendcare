@@ -15,7 +15,8 @@ import {
     SavedCompany,
     Service,
     Tool as DBAsset,
-    User
+    User,
+    MaterialAndDataAccessRequest
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -1323,3 +1324,35 @@ export const companyTypeMap: Record<string, string> = {
     "Large Business (>100M TTM Revenue)": "Large Business",
     "Consultant (<5 employees)": "Consultant",
 };
+
+export interface MaterialAndDataAccessRequestWithComents extends MaterialAndDataAccessRequest {
+    comments: Comment[];
+}
+
+export const REQUEST_STATUS_TYPE_OPTIONS: any[] = [
+    {
+        id: 'APPROVED',
+        label: 'Approved',
+        value: 'APPROVED'
+    },
+    {
+        id: 'PENDING',
+        label: 'Pending',
+        value: 'PENDING'
+    },
+    {
+        id: 'IN-PROGRESS',
+        label: 'In Progress',
+        value: 'IN-PROGRESS'
+    },
+    {
+        id: 'REJECTED',
+        label: 'Rejected',
+        value: 'REJECTED'
+    },
+    {
+        id: 'COMPLETED',
+        label: 'Completed',
+        value: 'COMPLETED'
+    },
+];

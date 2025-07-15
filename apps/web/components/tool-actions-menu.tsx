@@ -1,6 +1,6 @@
 "use client"
 
-import {Copy, Ellipsis, Trash} from "lucide-react"
+import {Copy, Ellipsis, Pencil, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,22 +14,29 @@ import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import { useSession } from "next-auth/react"
 import { Dialog, DialogPortal } from "@comend/components/ui/dialog"
-import { DeleteAssetDialog } from "./delete-asset-dialog"
+import { DeleteAssetDialog } from "comend-pag-platform/components/delete-asset-dialog"
+import { EditAssetDialog } from "./edit-tool-dialog"
 
 const toolSelector = (state: ToolState) => ({
+    tools: state.tools,
     createTool: state.createTool,
     updateTool: state.updateTool
 })
 
-export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
+export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data'}) => {
     const {data: session} = useSession()
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [editIsOpen, setEditIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
-    const { createTool } = useToolStore(useShallow(toolSelector))
+    const { tools, createTool } = useToolStore(useShallow(toolSelector))
 
     const handleDuplicate = () => {
         if (session?.user?.organizationId) createTool({...tool, id: undefined}, session.user.organizationId)
+    }
+
+    const handleEdit = () => {
+        setEditIsOpen(true)
     }
 
     const handleDelete = () => {
@@ -82,6 +89,16 @@ export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
                         onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
+                            handleEdit()
+                        }}
+                    >
+                        <Pencil/>
+                        Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
                             handleDuplicate()
                         }}
                     >
@@ -100,6 +117,19 @@ export const AssetActionsMenu = ({tool}: {tool: Asset}) => {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            <Dialog open={editIsOpen} onOpenChange={setEditIsOpen}>
+                <DialogPortal>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <EditAssetDialog
+                            key={tool.id}
+                            data={tool} 
+                            numAssetsPinned={tools.filter(tool => tool.pinned).length}
+                            type={type}
+                        />
+                    </div>
+                </DialogPortal>
+            </Dialog>
 
             <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                 <DialogPortal>

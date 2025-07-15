@@ -33,8 +33,9 @@ export function CommentList({postId}: PostCommentProps) {
                         author: true,
                         createdAt: true,
                     });
-                    if (response.success && response.data) {
-                        setComments(response.data);
+                    const responseData = response.data
+                    if (response.success && responseData) {
+                        setComments(responseData);
                     } else {
                         console.error(response.error)
                         toast.error(response.error)

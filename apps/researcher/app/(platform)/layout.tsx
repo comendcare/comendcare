@@ -7,7 +7,7 @@ interface PlatformLayoutProps {
 
 export default async function PlatformLayout({children}: PlatformLayoutProps) {
     const session = await getSession()
-    console.log("shit", session)
+
     if (!session) {
         redirect("/?error=unauthenticated");
     } else if (session.terminate) {

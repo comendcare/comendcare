@@ -4,7 +4,7 @@ import Placeholder from "@/public/placeholder.png"
 import { Organization } from "@prisma/client"
 import {FolderKanban} from "lucide-react"
 import Link from "next/link"
-import prisma from "@/packages/lib/prisma";
+import prisma from "@comend/lib/prisma";
 
 export default async function OrganizationCard({ data }: { data: Organization }) {
     const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`

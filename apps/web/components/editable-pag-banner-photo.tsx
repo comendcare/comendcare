@@ -22,7 +22,7 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import { Pencil } from "lucide-react";
-import { PAGBannerPhoto } from "@/packages/components/pag-banner-photo";
+import { PAGBannerPhoto } from "@comend/components/pag-banner-photo";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),

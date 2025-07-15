@@ -2,52 +2,45 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import {
     NavigationMenu,
-    NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
-    NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from "@comend/components/ui/navigation-menu"
 
+function isActive(pathname: string, href: string): boolean {
+    return pathname === href || pathname.startsWith(href + "/")
+}
 
 export function ResearcherNavbarMenu() {
+    const pathname = usePathname()
+
     return (
         <NavigationMenu viewport={false} className="w-full">
             <NavigationMenuList>
-                <NavigationMenuItem>
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                        <Link href="/profile">
-                            Profile
-                        </Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                        <Link href="/dashboard">
-                            Dashboard
-                        </Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                        <Link href="/requests">
-                            Requests
-                        </Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                        <Link href="/cohorts">
-                            Cohorts
-                        </Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
+                {[
+                    { href: "/profile", label: "Profile" },
+                    { href: "/dashboard", label: "Dashboard" },
+                    { href: "/data", label: "Biobank" },
+                    { href: "/requests", label: "Requests" },
+                    { href: "/cohorts", label: "Cohorts" },
+                ].map(({ href, label }) => (
+                    <NavigationMenuItem key={href}>
+                        <NavigationMenuLink
+                            asChild
+                            className={navigationMenuTriggerStyle({
+                                className: isActive(pathname, href) ? "bg-muted text-foreground" : ""
+                            })}
+                        >
+                            <Link href={href}>{label}</Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                ))}
             </NavigationMenuList>
         </NavigationMenu>
     )
 }
-

@@ -1,3 +1,5 @@
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar"
 import { Badge } from "@comend/components/ui/badge"
 import { Button } from "@comend/components/ui/button"
@@ -17,80 +19,39 @@ import {
     TrendingUp,
     Users,
 } from "lucide-react"
+import Link from "next/link"
 
-export default function ResearcherProfile(researcherData: any) {
-    const publications = [
-        {
-            title: "CRISPR-Cas9 mediated genome editing in human embryonic stem cells for modeling genetic diseases",
-            authors: "Dr. Sarah Chen, M. Rodriguez, K. Thompson, J. Liu",
-            journal: "Nature Biotechnology",
-            year: 2024,
-            citations: 127,
-            type: "Article",
-            doi: "10.1038/s41587-024-0123-4",
-        },
-        {
-            title: "Single-cell RNA sequencing reveals novel biomarkers for early detection of pancreatic cancer",
-            authors: "Dr. Sarah Chen, A. Patel, R. Kumar, S. Williams",
-            journal: "Cell",
-            year: 2023,
-            citations: 89,
-            type: "Article",
-            doi: "10.1016/j.cell.2023.05.012",
-        },
-        {
-            title: "Therapeutic applications of CAR-T cell therapy in hematological malignancies: A comprehensive review",
-            authors: "Dr. Sarah Chen, L. Zhang, M. Johnson",
-            journal: "Blood Reviews",
-            year: 2023,
-            citations: 156,
-            type: "Review",
-            doi: "10.1016/j.blre.2023.03.008",
-        },
-        {
-            title: "Machine learning approaches for predicting drug resistance in tuberculosis",
-            authors: "P. Singh, Dr. Sarah Chen, T. Brown, K. Lee",
-            journal: "Nature Medicine",
-            year: 2022,
-            citations: 203,
-            type: "Article",
-            doi: "10.1038/s41591-022-1789-3",
-        },
-        {
-            title: "Epigenetic modifications in cancer stem cells: Implications for targeted therapy",
-            authors: "Dr. Sarah Chen, R. Davis, M. Wilson",
-            journal: "Cancer Research",
-            year: 2022,
-            citations: 178,
-            type: "Article",
-            doi: "10.1158/0008-5472.CAN-22-0456",
-        },
-    ]
+export default function ResearcherProfile({researcherData}: any) {
+    const publications = researcherData?.publications ?? [];
 
-    const coAuthors = [
-        { name: "Dr. Michael Rodriguez", affiliation: "Stanford University", collaborations: 12 },
-        { name: "Dr. Priya Patel", affiliation: "Harvard Medical School", collaborations: 8 },
-        { name: "Dr. James Liu", affiliation: "MIT", collaborations: 6 },
-        { name: "Dr. Lisa Zhang", affiliation: "UCSF", collaborations: 5 },
-        { name: "Dr. Robert Kumar", affiliation: "Johns Hopkins", collaborations: 4 },
-    ]
+    const openAlex = researcherData?.openAlex ?? {};
 
-    const researchInterests = [
-        "Cancer Biology",
-        "Stem Cell Research",
-        "CRISPR Gene Editing",
-        "Immunotherapy",
-        "Single-cell Genomics",
-        "Precision Medicine",
-        "Biomarker Discovery",
-        "Drug Resistance",
-    ]
+    const displayName = openAlex.display_name || "Unknown Researcher";
+    const email = researcherData?.researcher?.email || "Email not available";
+    const institution = openAlex.last_known_institutions?.[0]?.display_name || "Institution not available";
+    const location = openAlex.last_known_institutions?.[0]?.country_code || "Country not available";
+
+    const metrics = {
+        citations: openAlex.cited_by_count ?? 0,
+        hIndex: openAlex.summary_stats?.h_index ?? 0,
+        publications: openAlex.works_count ?? 0,
+        yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0
+    };
+
+    const researchInterests = openAlex?.topics?.map((topic: any) => topic.display_name) || [];
+
+    const coAuthors = (openAlex?.display_name_alternatives || []).slice(0, 5).map((name: string, index: number) => ({
+        name,
+        affiliation: institution,
+        collaborations: Math.floor(Math.random() * 10) + 1
+    }));
+
+    // const publications = [];
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
+        <div className="max-w-7xl mx-auto flex flex-col">
             <div className="bg-white border-b">
-                <div className="max-w-6xl mx-auto px-4 py-6">
+                <div className="px-4 py-6">
                     <div className="flex flex-col md:flex-row gap-6">
                         <Avatar className="w-32 h-32">
                             <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Dr. Sarah Chen" />
@@ -100,7 +61,9 @@ export default function ResearcherProfile(researcherData: any) {
                         <div className="flex-1">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-gray-900">Dr. Sarah Chen</h1>
+                                    <h1 className="text-3xl font-bold text-gray-900">
+                                        {displayName}
+                                    </h1>
                                     <p className="text-xl text-gray-600 mt-1">Professor of Molecular Biology & Cancer Research</p>
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
@@ -110,11 +73,15 @@ export default function ResearcherProfile(researcherData: any) {
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <MapPin className="w-4 h-4" />
-                                            <span>San Francisco, CA</span>
+                                            <span>
+                                                {location}
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <Mail className="w-4 h-4" />
-                                            <span>sarah.chen@ucsf.edu</span>
+                                            <span>
+                                                {email}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -135,7 +102,7 @@ export default function ResearcherProfile(researcherData: any) {
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="px-4 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Sidebar */}
                     <div className="space-y-6">
@@ -150,19 +117,27 @@ export default function ResearcherProfile(researcherData: any) {
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-blue-600">753</div>
+                                        <div className="text-2xl font-bold text-blue-600">
+                                            {metrics.citations}
+                                        </div>
                                         <div className="text-sm text-gray-600">Citations</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-green-600">24</div>
+                                        <div className="text-2xl font-bold text-green-600">
+                                            {metrics.hIndex}
+                                        </div>
                                         <div className="text-sm text-gray-600">h-index</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-purple-600">47</div>
+                                        <div className="text-2xl font-bold text-purple-600">
+                                            {metrics.publications}
+                                        </div>
                                         <div className="text-sm text-gray-600">Publications</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-orange-600">12</div>
+                                        <div className="text-2xl font-bold text-orange-600">
+                                            {metrics.yearsActive}
+                                        </div>
                                         <div className="text-sm text-gray-600">Years Active</div>
                                     </div>
                                 </div>
@@ -179,7 +154,7 @@ export default function ResearcherProfile(researcherData: any) {
                             </CardHeader>
                             <CardContent>
                                 <div className="flex flex-wrap gap-2">
-                                    {researchInterests.map((interest, index) => (
+                                    {researchInterests.map((interest: string, index: number) => (
                                         <Badge key={index} variant="secondary" className="text-xs">
                                             {interest}
                                         </Badge>
@@ -221,7 +196,7 @@ export default function ResearcherProfile(researcherData: any) {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                {coAuthors.slice(0, 5).map((author, index) => (
+                                {coAuthors.slice(0, 5).map((author: {name: string, affiliation: string, collaborations: string}, index: number) => (
                                     <div key={index} className="flex items-center justify-between">
                                         <div>
                                             <div className="font-medium text-sm">{author.name}</div>
@@ -255,18 +230,25 @@ export default function ResearcherProfile(researcherData: any) {
                                 </div>
 
                                 <div className="space-y-4">
-                                    {publications.map((pub, index) => (
+                                    {publications.map((pub: any, index: number) => (
                                         <Card key={index} className="hover:shadow-md transition-shadow">
                                             <CardContent className="pt-4">
                                                 <div className="flex items-start justify-between gap-4">
                                                     <div className="flex-1">
-                                                        <h3 className="font-semibold text-blue-700 hover:text-blue-800 cursor-pointer leading-tight">
+                                                        <a
+                                                            href={pub.doi ? `https://doi.org/${pub.doi}` : pub.id || "#"}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="font-semibold text-blue-700 hover:text-blue-800 cursor-pointer leading-tight"
+                                                        >
                                                             {pub.title}
-                                                        </h3>
-                                                        <p className="text-sm text-gray-600 mt-1">{pub.authors}</p>
+                                                        </a>
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            {pub.authorships?.map((a: any) => a.author.display_name).join(", ")}
+                                                        </p>
                                                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                                            <span className="font-medium">{pub.journal}</span>
-                                                            <span>{pub.year}</span>
+                                                            <span className="font-medium">{pub.host_venue?.display_name || "Unknown Journal"}</span>
+                                                            <span>{pub.publication_year}</span>
                                                             <Badge variant="outline" className="text-xs">
                                                                 {pub.type}
                                                             </Badge>
@@ -274,12 +256,19 @@ export default function ResearcherProfile(researcherData: any) {
                                                         <div className="flex items-center gap-4 mt-2">
                                                             <div className="flex items-center gap-1 text-sm text-gray-600">
                                                                 <Citation className="w-4 h-4" />
-                                                                <span>{pub.citations} citations</span>
+                                                                <span>{pub.cited_by_count ?? 0} citations</span>
                                                             </div>
-                                                            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                                                                <ExternalLink className="w-3 h-3 mr-1" />
-                                                                DOI
-                                                            </Button>
+                                                            {pub.doi && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-6 px-2 text-xs"
+                                                                    onClick={() => window.open(`https://doi.org/${pub.doi}`, "_blank")}
+                                                                >
+                                                                    <ExternalLink className="w-3 h-3 mr-1" />
+                                                                    DOI
+                                                                </Button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

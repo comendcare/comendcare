@@ -8,7 +8,7 @@ import {ReactFlowProvider} from "@xyflow/react"
 import {MixpanelProvider} from "@comend/lib/mixpanel"
 import {SettingsProvider} from "@comend/components/editor/settings"
 import {NuqsAdapter} from 'nuqs/adapters/next/app'
-import {TooltipProvider} from "@/packages/components/ui/tooltip";
+import {TooltipProvider} from "@comend/components/ui/tooltip";
 
 export function Providers({children}: { children: React.ReactNode }) {
     return (

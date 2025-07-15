@@ -1,5 +1,5 @@
 "use client"
-import { TabNav } from "@/packages/components/tab-nav";
+import { TabNav } from "@comend/components/tab-nav";
 
 const links = [
     {

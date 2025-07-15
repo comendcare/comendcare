@@ -10,10 +10,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@comend/components/ui/dropdown-menu";
-import Loading from "@/loading";
+import Spinner from "@comend/components/ui/spinner"
 import {ProfilePhoto} from "@comend/components/profile-photo"
-import {LogOut} from "lucide-react"
-import {getUser} from "@/packages/lib/fetchers"
+import {LogOut, Settings} from "lucide-react"
+import {getUser} from "@comend/lib/fetchers"
 
 export default function UserNavbarProfile() {
     const {data: session, status} = useSession()
@@ -70,19 +70,12 @@ export default function UserNavbarProfile() {
 
     // Handle loading state while session is being fetched
     if (status === "loading") {
-        return <Loading/>
+        return <Spinner/>
     }
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                {/* <Image
-                        src={getUserPhoto(userData?.data, session)}
-                        width={40}
-                        height={40}
-                        alt={session?.user?.name ?? "User avatar"}
-                        className="h-8 w-8 rounded-full"
-                    /> */}
+            <DropdownMenuTrigger>
                 <ProfilePhoto
                     img={userData?.data?.image}
                     name={userData?.data?.name}
@@ -90,17 +83,22 @@ export default function UserNavbarProfile() {
                 />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuLabel
-                    onClick={() => router.push(`/user/${session?.user?.id}`)}
+                <DropdownMenuItem
+                    onClick={() => router.push("/settings")}
                 >
-                    My profile
-                </DropdownMenuLabel>
+                    <Settings/>
+                    <span>
+                        Settings
+                    </span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem
                     onClick={() => signOut()}
                 >
                     <LogOut/>
-                    <span>Logout</span>
+                    <span>
+                        Logout
+                    </span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

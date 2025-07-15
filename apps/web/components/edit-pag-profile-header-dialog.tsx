@@ -39,8 +39,8 @@ import React, {useEffect, useState} from "react";
 import MoneyInput from "@comend/components/money-input";
 import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
-import { Tooltip } from "@/packages/components/plate-ui/tooltip";
-import { TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Tooltip } from "@comend/components/plate-ui/tooltip";
+import { TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),

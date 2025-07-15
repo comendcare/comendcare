@@ -73,8 +73,10 @@ model User {
   replies               Reply[]
   reportOnReviews       ReportOnReview[]
   reportOnReplies       ReportOnReply[]
+  reportOnComments      ReportOnComment[]
   reviewFeedbacks       ReviewFeedback[]
   metadata              Json?
+  researcher            Researcher?
 }
 
 model PlatformNotification {
@@ -662,23 +664,23 @@ model Post {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   text      String?
-  comments  Comment[]
   mentions  Mention[]
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   metadata  Json?
 }
 
 model Comment {
-  id        String    @id @default(cuid())
-  text      String
-  userId    String
-  postId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  author    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mentions  Mention[]
-  metadata  Json?
+  id                             String                       @id @default(cuid())
+  text                           String
+  userId                         String
+  materialAndDataAccessRequestId String
+  createdAt                      DateTime                     @default(now())
+  updatedAt                      DateTime                     @updatedAt
+  materialAndDataAccessRequest   MaterialAndDataAccessRequest @relation(fields: [materialAndDataAccessRequestId], references: [id], onDelete: Cascade)
+  author                         User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports                        ReportOnComment[]
+  mentions                       Mention[]
+  metadata                       Json?
 }
 
 model Reaction {
@@ -969,6 +971,18 @@ model ReportOnReview {
   metadata    Json?
 }
 
+model ReportOnComment {
+  id          String                  @id @default(uuid())
+  userId      String
+  replyId     String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment     Comment                 @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
+  metadata    Json?
+}
+
 model ReportOnReply {
   id          String                  @id @default(uuid())
   userId      String
@@ -1027,12 +1041,13 @@ model Institution {
   isniAll          String[]
   wikidataAll      String[]
 
-  relationships InstitutionRelationship[] @relation("InstitutionRelationships")
-  relatedTo     InstitutionRelationship[] @relation("InstitutionRelatedTo")
-  affiliation   Affiliation[]
-  createdAt     DateTime                  @default(now())
-  updatedAt     DateTime                  @updatedAt
-  metadata      Json?
+  relationships         InstitutionRelationship[] @relation("InstitutionRelationships")
+  relatedTo             InstitutionRelationship[] @relation("InstitutionRelatedTo")
+  affiliation           Affiliation[]
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  metadata              Json?
+  institutionToRequests InstitutionToRequest[]
 }
 
 model InstitutionRelationship {
@@ -1067,6 +1082,8 @@ model Affiliation {
 
 model Researcher {
   id                            String                         @id @default(uuid())
+  userId                        String                         @unique
+  user                          User?                          @relation(fields: [userId], references: [id], onDelete: Cascade)
   orcid                         String?                        @unique
   email                         String?                        @unique /// @encrypted
   emailHash                     String?                        @unique /// @encryption:hash(email)
@@ -1103,17 +1120,37 @@ enum Priority {
 }
 
 model MaterialAndDataAccessRequest {
-  id             String        @id @default(cuid())
+  id             String                 @id @default(cuid())
   title          String
   description    String
-  status         RequestStatus @default(PENDING)
-  organization   Organization  @relation(fields: [organizationId], references: [id])
+  status         RequestStatus          @default(PENDING)
+  organization   Organization           @relation(fields: [organizationId], references: [id])
   organizationId String
-  researcher     Researcher    @relation(fields: [researcherId], references: [id])
+  researcher     Researcher             @relation(fields: [researcherId], references: [id])
   researcherId   String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  submittedAt    DateTime
+  approvedAt     DateTime?
+  expiresAt      DateTime?
+  sampleTypes    String[]
+  dataTypes      String[]
+  sampleCount    Int
+  institutions   InstitutionToRequest[]
+  comments       Comment[]
   metadata       Json?
+}
+
+model InstitutionToRequest {
+  id            String                       @id @default(cuid())
+  institutionId String
+  requestId     String
+  institution   Institution                  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  request       MaterialAndDataAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt     DateTime                     @default(now())
+  metadata      Json?
+
+  @@unique([institutionId, requestId]) // Prevent duplicates
 }
 
 enum RequestStatus {

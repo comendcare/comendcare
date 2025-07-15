@@ -25,9 +25,9 @@ import {toast} from "sonner";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import va from "@vercel/analytics";
 import {contactCRO} from "@comend/lib/actions";
-import MultipleSelector from "@/packages/components/ui/multiple-selector";
+import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Handshake} from "lucide-react";
-import {getRFPs} from "@/packages/lib/fetchers";
+import {getRFPs} from "@comend/lib/fetchers";
 
 export interface CompanyWithServices extends Company {
     services: Service[]

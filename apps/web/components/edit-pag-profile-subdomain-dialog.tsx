@@ -23,7 +23,7 @@ import {useEffect, useState} from "react";
 import {useDebounce} from "use-debounce";
 import {checkSubdomainAvailability, getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import { Pencil } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 const editSubdomainFormSchema = z.object({
     subdomain: z.string().min(2, {

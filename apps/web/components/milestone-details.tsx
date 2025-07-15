@@ -15,8 +15,7 @@ import {BudgetView} from "./milestone-budget-view"
 import {Separator} from "@comend/components/ui/separator"
 import Link from "next/link"
 import {Button} from "@comend/components/ui/button"
-import { TypeBadge } from "./type-badge"
-import { MilestoneTypeBadge } from "./milestone-type-badge"
+import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
 import { ExternalLink } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { RFPCard } from "./rfp-card"
@@ -30,6 +29,7 @@ import {
 } from "@comend/components/ui/table"
 import { PrivateBadge } from "./private-badge"
 import { AssetDetails, RFPDetails } from "./pag-profile-assets-and-projects-hoverable-card"
+import { TypeBadge } from "./type-badge"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (

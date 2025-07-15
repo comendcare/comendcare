@@ -1,6 +1,8 @@
-import { Badge } from "@comend/components/ui/badge"
-import { Button } from "@comend/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card"
+"use client"
+
+import {Badge} from "@comend/components/ui/badge"
+import {Button} from "@comend/components/ui/button"
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,19 +11,20 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
-import { Calendar, Download, Eye, MoreHorizontal, User } from "lucide-react"
+import {Calendar, Download, Eye, MoreHorizontal, User} from "lucide-react"
+import {useRouter} from "next/navigation";
 
 const getStatusColor = (status: string) => {
     switch (status) {
-        case "approved":
+        case "APPROVED":
             return "bg-green-100 text-green-800 border-green-200"
-        case "pending":
+        case "PENDING":
             return "bg-yellow-100 text-yellow-800 border-yellow-200"
-        case "in-progress":
+        case "IN-PROGRESS":
             return "bg-blue-100 text-blue-800 border-blue-200"
-        case "rejected":
+        case "REJECTED":
             return "bg-red-100 text-red-800 border-red-200"
-        case "completed":
+        case "COMPLETED":
             return "bg-gray-100 text-gray-800 border-gray-200"
         default:
             return "bg-gray-100 text-gray-800 border-gray-200"
@@ -30,15 +33,15 @@ const getStatusColor = (status: string) => {
 
 const getStatusText = (status: string) => {
     switch (status) {
-        case "approved":
+        case "APPROVED":
             return "Approved"
-        case "pending":
+        case "PENDING":
             return "Under Review"
-        case "in-progress":
+        case "IN-PROGRESS":
             return "In Progress"
-        case "rejected":
+        case "REJECTED":
             return "Rejected"
-        case "completed":
+        case "COMPLETED":
             return "Completed"
         default:
             return status
@@ -46,26 +49,34 @@ const getStatusText = (status: string) => {
 }
 
 export default function RequestCard({request}: any) {
+    const router = useRouter()
+
     return (
         <Card key={request.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">{request.title}</h3>
+                            <h3
+                                className="text-lg font-semibold text-gray-900 hover:cursor-pointer hover:underline"
+                                onClick={() => router.push(`/requests/${request.id}`)}
+                            >
+                                {request.title}
+                            </h3>
                             <Badge className={getStatusColor(request.status)}>{getStatusText(request.status)}</Badge>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
+                        <div
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
                             <div>
                                 <span className="font-medium">Request ID:</span> {request.id}
                             </div>
                             <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1" />
+                                <Calendar className="h-4 w-4 mr-1"/>
                                 <span className="font-medium">Submitted:</span> {request.submittedDate}
                             </div>
                             <div className="flex items-center">
-                                <User className="h-4 w-4 mr-1" />
+                                <User className="h-4 w-4 mr-1"/>
                                 <span className="font-medium">PI:</span> {request.pi}
                             </div>
                             <div>
@@ -113,14 +124,10 @@ export default function RequestCard({request}: any) {
                     </div>
 
                     <div className="flex items-center space-x-2 ml-4">
-                        <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                        </Button>
 
                         {request.status === "approved" || request.status === "completed" ? (
                             <Button variant="outline" size="sm">
-                                <Download className="h-4 w-4 mr-1" />
+                                <Download className="h-4 w-4 mr-1"/>
                                 Download
                             </Button>
                         ) : null}
@@ -128,7 +135,7 @@ export default function RequestCard({request}: any) {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="sm">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                    <MoreHorizontal className="h-4 w-4"/>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -137,14 +144,14 @@ export default function RequestCard({request}: any) {
                                 <DropdownMenuItem>Download Agreement</DropdownMenuItem>
                                 {request.status === "pending" && (
                                     <>
-                                        <DropdownMenuSeparator />
+                                        <DropdownMenuSeparator/>
                                         <DropdownMenuItem>Edit Request</DropdownMenuItem>
                                         <DropdownMenuItem className="text-red-600">Cancel Request</DropdownMenuItem>
                                     </>
                                 )}
                                 {(request.status === "approved" || request.status === "completed") && (
                                     <>
-                                        <DropdownMenuSeparator />
+                                        <DropdownMenuSeparator/>
                                         <DropdownMenuItem>Download Data</DropdownMenuItem>
                                         <DropdownMenuItem>Access Instructions</DropdownMenuItem>
                                     </>

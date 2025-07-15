@@ -39,11 +39,13 @@ import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
-import { badgeVariants } from "@/packages/components/ui/badge"
+import { badgeVariants } from "@comend/components/ui/badge"
 // import { DeleteAssetDialog } from "./delete-tool-dialog"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { JsonObject } from "@prisma/client/runtime/library"
 import type { Option } from "@comend/lib/types"
+import { revalidate } from "@/packages/lib/revalidate"
+import { useRouter } from "next/navigation"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -88,6 +90,7 @@ export function EditDataToolForm({
     closeDialog?: () => void
 }) {
     const initializing = useRef(true)
+    const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const { toolTypes, createTool, updateTool } = useToolStore(useShallow(toolSelector))
@@ -177,12 +180,16 @@ export function EditDataToolForm({
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
+                await revalidate("/app/tools/data")
+                router.refresh()
             } else {
                 await createTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
+                await revalidate("/app/tools/data")
+                router.refresh()
             }
             if (closeDialog) closeDialog()
         } catch (error) {

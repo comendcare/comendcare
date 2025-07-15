@@ -5,7 +5,7 @@ import {CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {useShallow} from "zustand/react/shallow";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
-import ComendLoadingSpinner from "@/packages/components/comend-loading-spinner";
+import ComendLoadingSpinner from "@comend/components/comend-loading-spinner";
 import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
 import {Card, CardContent} from "@comend/components/ui/card";
 import {AdminCROCard} from "~admin/components/admin-cro-card";

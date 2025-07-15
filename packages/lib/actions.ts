@@ -11,7 +11,7 @@ import {
     Review,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAuth, withUserAuth} from "./auth"
+import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
 import {getSession} from "@comend/lib/auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
@@ -1360,7 +1360,7 @@ export const leaveOrganization = withOrganizationAuth(
 
 export const updateMemberWithMemberPermission = withOrganizationAuth(
     async (
-        organization: Organization, 
+        organization: Organization,
         membershipId: string,
         data: Prisma.MemberUpdateInput
     ) => {
@@ -1607,9 +1607,9 @@ export const createComment = withAuth(
 
             const comment = prisma.comment.create({
                 data: {
-                    post: {
+                    materialAndDataAccessRequest: {
                         connect: {
-                            id: postId
+                            id: ""
                         }
                     },
                     author: {
@@ -1758,19 +1758,19 @@ export const updateCondition = withOrganizationAuth(
             });
 
             const conditions = await prisma.conditionToOrganization.findMany({
-                where: { organizationId: organization.id },
-                include: { condition: true },
+                where: {organizationId: organization.id},
+                include: {condition: true},
             });
 
             if (conditions.length > 0 && conditions[0].conditionId) {
                 // ✅ Update existing condition
                 const updatedCondition = await prisma.condition.update({
-                    where: { id: conditions[0].conditionId },
+                    where: {id: conditions[0].conditionId},
                     data,
                 });
 
                 revalidatePath("app/profile/");
-                return { success: true, data: updatedCondition };
+                return {success: true, data: updatedCondition};
             } else {
                 // ✅ Create new condition and link to organization
                 const newCondition = await prisma.condition.create({
@@ -1789,11 +1789,11 @@ export const updateCondition = withOrganizationAuth(
                 });
 
                 revalidatePath("app/profile/");
-                return { success: true, data: newCondition };
+                return {success: true, data: newCondition};
             }
         } catch (error: any) {
             console.error("Error in updateCondition:", error);
-            return { success: false, error: error.message || "Failed to update or create condition." };
+            return {success: false, error: error.message || "Failed to update or create condition."};
         }
     }
 );
@@ -3655,14 +3655,14 @@ export const contactCRO = withOrganizationAuth(
                     services: {
                         create: services.map((serviceId) => ({
                             service: {
-                                connect: { id: serviceId },
+                                connect: {id: serviceId},
                             },
                         })),
                     },
                     rfps: {
                         create: rfpIds.map((rfpId) => ({
                             rfp: {
-                                connect: { id: rfpId },
+                                connect: {id: rfpId},
                             },
                         })),
                     },
@@ -3673,10 +3673,10 @@ export const contactCRO = withOrganizationAuth(
                 },
             });
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         } catch (error: any) {
             console.error("Error creating contact request:", error);
-            return { success: false, error: "Database error. please try again later." };
+            return {success: false, error: "Database error. please try again later."};
         }
     }
 );
@@ -3914,6 +3914,90 @@ export const updateResearcher = withAuth(
                 return {
                     error: error.message
                 };
+            }
+        }
+    }
+)
+
+export const createMaterialAndDataAccessRequest = withResearcherAuth(
+    async (formData: FormData) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
+        }
+
+        const name = formData.get("orgName") as string;
+        const description = formData.get("description") as string;
+        const organizationId = formData.get("organizationId") as string;
+        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
+        const metadata: JsonObject = metadataValue
+            ? JSON.parse(metadataValue.toString()) as JsonObject
+            : {}
+
+        try {
+            const request = await prisma.materialAndDataAccessRequest.create({
+                data: {
+                    title: name,
+                    description,
+                    submittedAt: new Date(),
+                    sampleCount: 0,
+                    organization: {
+                        connect: {
+                            id: organizationId
+                        },
+                    },
+                    researcher: {
+                        connect: {
+                            userId: session.user.id
+                        }
+                    },
+                    metadata
+                },
+            });
+
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                request,
+                'requests'
+            );
+
+            revalidatePath("/requests")
+
+            // await sendNewOrganizationEmail(
+            //     {
+            //         user: {
+            //             name: session.user.name,
+            //             email: session.user.email
+            //         },
+            //         organization: {
+            //             name: organization.name,
+            //             subdomain: organization.subdomain
+            //         }
+            //     }
+            // ).then(() => {
+            //     console.log("email sent")
+            // })
+
+            return {success: true, data: request}
+        } catch (error: any) {
+            if (error.code === "P2002") {
+                const target = error.meta?.target?.[0];
+
+                switch (target) {
+                    default:
+                        return {error: `Unique constraint failed on ${target}`};
+                }
+            } else {
+                return {
+                    error: error.message
+                }
             }
         }
     }

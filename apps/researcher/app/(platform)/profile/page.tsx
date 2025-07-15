@@ -1,11 +1,11 @@
-export default function ResearcherProfilePage() {
-    return (
-        <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
-            <div className="flex flex-col space-y-6">
-                <h1 className="font-cal text-3xl font-bold dark:text-white">
-                    Researcher Hub
-                </h1>
-            </div>
-        </div>
-    );
+import { redirect } from 'next/navigation';
+import {getSession} from "~researcher/lib/auth";
+
+export default async function ResearcherProfilePage() {
+    const session = await getSession()
+    // Redirect to the target page immediately
+    redirect(`/profile/${session?.user?.id}`);
+
+    // You can return null because this page won't render
+    return null;
 }

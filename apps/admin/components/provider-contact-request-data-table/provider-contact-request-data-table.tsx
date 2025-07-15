@@ -58,7 +58,7 @@ import {
     DialogDescription,
     DialogClose,
 } from "@comend/components/ui/dialog"
-import {Badge} from "@/packages/components/ui/badge";
+import {Badge} from "@comend/components/ui/badge";
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>

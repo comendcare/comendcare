@@ -23,7 +23,7 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
-import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),

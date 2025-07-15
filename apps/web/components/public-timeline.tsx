@@ -4,11 +4,11 @@ import React, {ReactNode, useEffect, useRef, useState} from "react"
 import {getDates} from "@comend/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import {cn} from "@comend/lib/utils"
-import {TypeBadge} from "./type-badge"
 import {TimelineCardContents} from "./private-timeline"
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {ExternalLink} from "lucide-react"
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { TypeBadge } from "./type-badge";
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,

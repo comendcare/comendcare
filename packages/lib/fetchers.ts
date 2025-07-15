@@ -685,19 +685,19 @@ export async function getPostComments(
     }>,
 ) {
     try {
-        const comments = await prisma.comment.findMany({
-            where: {
-                postId: postId
-            },
-            select,
-            orderBy: {
-                createdAt: "desc"
-            }
-        })
+        // const comments = await prisma.comment.findMany({
+        //     where: {
+        //         postId: postId
+        //     },
+        //     select,
+        //     orderBy: {
+        //         createdAt: "desc"
+        //     }
+        // })
 
-        const sanitizedComments = comments.map(comment => omit(comment, []))
+        // const sanitizedComments = comments.map(comment => omit(comment, []))
 
-        return {success: true, data: sanitizedComments}
+        return {success: true, data: null}
     } catch (error: any) {
         console.error("Database error finding comments:", error)
         return {success: false, error: "Database error. please try again later."}
@@ -1773,7 +1773,38 @@ export const getResearcher = withUserAuth(
     }
 )
 
-export const getResearcherRequests = withUserAuth(
+export const getResearcherFromUserId = withUserAuth(
+    async (
+        userId: string,
+        select: Prisma.ResearcherSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: {userId: userId},
+                select
+            })
+
+            if (!fetchedResearcher) {
+                return {success: false, error: "Researcher not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedResearcher
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getResearcherRequest = withUserAuth(
     async (
         request: MaterialAndDataAccessRequest,
         select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
@@ -1804,3 +1835,109 @@ export const getResearcherRequests = withUserAuth(
         }
     }
 )
+
+export const getAllResearcherRequests = withUserAuth(
+    async (
+        request: MaterialAndDataAccessRequest,
+        select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        const session = await getSession();
+
+        try {
+            if (!session) {
+                return { success: false, error: "Session not found." };
+            }
+
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: { userId: session.user.id },
+            });
+
+            if (!fetchedResearcher) {
+                return { success: false, error: "Researcher not found" };
+            }
+
+            const fetchedRequests = await prisma.materialAndDataAccessRequest.findMany({
+                where: {researcherId: fetchedResearcher.id},
+                select
+            })
+
+            if (!fetchedRequests) {
+                return {success: false, error: "Requests not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedRequests
+            };
+        } catch (error: any) {
+            logError("Error fetching requests", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getResearcherFromOrcidApi = withUserAuth(
+    async () => {
+        const session = await getSession();
+
+        try {
+            if (!session) {
+                return { success: false, error: "Session not found." };
+            }
+
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: { userId: session.user.id },
+            });
+
+            if (!fetchedResearcher) {
+                return { success: false, error: "Researcher not found" };
+            }
+
+            if (!fetchedResearcher.orcid) {
+                return { success: false, error: "Researcher ORCID not available" };
+            }
+
+            const openAlexResponse = await fetch(
+                `https://api.openalex.org/authors?filter=orcid:${fetchedResearcher.orcid}`
+            );
+
+            if (!openAlexResponse.ok) {
+                throw new Error(`OpenAlex API error: ${openAlexResponse.statusText}`);
+            }
+
+            const openAlexData = await openAlexResponse.json();
+            const authorData = openAlexData.results?.[0] || null;
+
+            if (!authorData) {
+                return { success: false, error: "OpenAlex author data not found." };
+            }
+
+            // Fetch publications (works)
+            const worksUrl = authorData.works_api_url;
+            const worksResponse = await fetch(`${worksUrl}&per-page=25`); // adjust per-page if needed
+
+            if (!worksResponse.ok) {
+                throw new Error(`OpenAlex works API error: ${worksResponse.statusText}`);
+            }
+
+            const worksData = await worksResponse.json();
+
+            return {
+                success: true,
+                data: {
+                    researcher: fetchedResearcher,
+                    openAlex: authorData,
+                    publications: worksData.results || [],
+                },
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return { success: false, error: "Internal server error" };
+        }
+    }
+);
