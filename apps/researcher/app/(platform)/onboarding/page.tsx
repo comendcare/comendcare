@@ -297,8 +297,8 @@ export default function ResearcherOnboardingForm() {
     }
 
     return (
-        <div className="w-screen h-screen flex items-center justify-center overflow-auto">
-            <div className="space-y-4">
+        <div className="w-screen h-screen overflow-auto p-8 flex flex-col items-center">
+            <div className="flex flex-col items-start space-y-4">
                 <div
                     className="flex flex-col space-y-1.5 text-center sm:text-left"
                 >
