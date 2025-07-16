@@ -77,8 +77,8 @@ export default function ResearcherOnboardingForm() {
     useEffect(() => {
         async function fetchResearcherData() {
             if (session?.user?.id) {
-                let userData
-                const response = await getResearcherFromUserId(session.user.id, {
+                let researcherData
+                const researcherResponse = await getResearcherFromUserId(session.user.id, {
                     id: true,
                     orcid: true,
                     email: true,
@@ -88,43 +88,35 @@ export default function ResearcherOnboardingForm() {
                     researchInterests: true,
                     conditionsOfInterest: true,
                     genesOfInterest: true,
-                    affiliations: true,
+                    affiliations: {
+                        select: {
+                            institution: true
+                        }
+                    },
                     createdAt: true,
                     updatedAt: true,
                     metadata: true
                 });
-                if (response.success) {
-                    userData = response.data
+                if (researcherResponse.success) {
+                    researcherData = researcherResponse.data
                 } else {
-                    console.error(response.error)
-                    toast.error(response.error)
+                    console.error(researcherResponse.error)
+                    toast.error(researcherResponse.error)
+                }
+
+                let userData
+                const userResponse = await getUser(session.user.id, {
+                    id: true,
+                    name: true,
+                });
+                if (userResponse.success) {
+                    userData = userResponse.data
+                } else {
+                    console.error(userResponse.error)
+                    toast.error(userResponse.error)
                 }
 
                 if (userData) {
-                    const fetchedValues = {
-                        name: userData.name || "",
-                        title: userData.name || "",
-                        affiliations: userData.affiliations.map((affiliation: any) => ({
-                            label: affiliation,
-                            value: affiliation
-                        })) || [],
-                        researchInterests: userData.researchInterests.map((interests: any) => ({
-                            label: interests,
-                            value: interests
-                        })) || [],
-                        conditionsOfInterest: userData.conditionsOfInterest.map((condition: any) => ({
-                            label: condition,
-                            value: condition
-                        })) || [],
-                        genesOfInterest: userData.genesOfInterest.map((gene: any) => ({
-                            label: gene,
-                            value: gene
-                        })) || [],
-                        notificationSettings: userData.notificationSettings ?? true,
-                        consentSettings: userData.consentSettings ?? true,
-                        image: userData.image || "",
-                    };
-
                     if (userData.image) {
                         try {
                             const userPhoto: File = await getPublicFile(userData.image)
@@ -138,6 +130,31 @@ export default function ResearcherOnboardingForm() {
                             console.error(e)
                         }
                     }
+                }
+
+                if (researcherData && userData) {
+                    const fetchedValues = {
+                        name: userData.name || "",
+                        title: researcherData.title || "",
+                        affiliations: researcherData.affiliations.map((affiliation: any) => ({
+                            label: affiliation.institution.name,
+                            value: affiliation.id
+                        })) || [],
+                        researchInterests: researcherData.researchInterests.map((interests: any) => ({
+                            label: interests,
+                            value: interests
+                        })) || [],
+                        conditionsOfInterest: researcherData.conditionsOfInterest.map((condition: any) => ({
+                            label: condition,
+                            value: condition
+                        })) || [],
+                        genesOfInterest: researcherData.genesOfInterest.map((gene: any) => ({
+                            label: gene,
+                            value: gene
+                        })) || [],
+                        notificationSettings: userData.notificationSettings ?? true,
+                        consentSettings: userData.consentSettings ?? true,
+                    };
 
                     setDefaultValues(fetchedValues);
                     form.reset(fetchedValues); // Reset form with fetched data
@@ -146,46 +163,6 @@ export default function ResearcherOnboardingForm() {
             setIsInitializing(false)
         }
 
-        async function fetchUserData() {
-            if (session?.user?.id) {
-                let userData
-                const response = await getUser(session.user.id, {
-                    id: true,
-                    name: true,
-                });
-                if (response.success) {
-                    userData = response.data
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
-
-                if (userData) {
-                    const fetchedValues = {
-                        name: userData.name || "",
-                    };
-
-                    if (userData.image) {
-                        try {
-                            const userPhoto: File = await getPublicFile(userData.image)
-                            if (userPhoto) {
-                                const fileWithPreview = Object.assign(userPhoto, {
-                                    preview: URL.createObjectURL(userPhoto),
-                                })
-                                setSelectedFile(fileWithPreview)
-                            }
-                        } catch (e) {
-                            console.error(e)
-                        }
-                    }
-
-                    form.setValue("name", fetchedValues.name);
-                }
-            }
-            setIsInitializing(false)
-        }
-
-        fetchUserData();
         fetchResearcherData();
     }, [session, form]);
 

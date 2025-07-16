@@ -1783,11 +1783,20 @@ export const getResearcherFromUserId = withUserAuth(
             client: {};
         }>
     ) => {
+        const session = await getSession();
+
+        console.log("shit")
         try {
+            if (!session) {
+                return { success: false, error: "Session not found." };
+            }
+
+            console.log("Fuck")
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {userId: userId},
+                where: {userId: session.user.id},
                 select
             })
+            console.log(fetchedResearcher);
 
             if (!fetchedResearcher) {
                 return {success: false, error: "Researcher not found"};
