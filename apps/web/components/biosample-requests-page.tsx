@@ -7,9 +7,9 @@ import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-dat
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { BiosampleRequestsTable } from "@/packages/components/biorepo/advanced-data-table/biosample-requests-table/biosample-requests-table"
 import { getBiosampleRequestsTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosample-requests-table/biosample-requests-table-columns"
-import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries";
+import { getBiosampleRequests } from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 
-export const PrivateBiosampleRequestsPage = ({promises}: {promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>}) => {
+export const PrivateBiosampleRequestsPage = ({promises}: {promises: Promise<[Awaited<ReturnType<typeof getBiosampleRequests>>]>}) => {
     const columns = getBiosampleRequestsTableColumns()
     const [{ data }] = React.use(promises);
 

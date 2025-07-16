@@ -23,7 +23,8 @@ export default async function DataToolsPage(props: IndexPageProps) {
     const promises = Promise.all([
         getDatasamples(
             session?.user.organizationId,
-            {...search, filters: validFilters})
+            {...search, filters: validFilters}
+        )
     ]);
 
     if (!orgId) return <NoOrganization />
