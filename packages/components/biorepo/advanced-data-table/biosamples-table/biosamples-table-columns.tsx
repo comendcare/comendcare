@@ -204,7 +204,9 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
       },
     },
     {
-      id: "volume",
+      // NOTE: in order for filters to access the proper nested database object the path to
+      // the nested object must be defined in BOTH the id & accessorKey
+      id: "biosample.volume",
       accessorKey: "biosample.volume",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Available Volume" />

@@ -38,7 +38,8 @@ export const getBiosamples = withOrganizationAuth(
                     if (advancedTable) {
                         const preProcessedFilters: any = input.filters.map(filter => ({
                             ...filter,
-                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                            // ...(filter.id === "biosample.volume" && typeof filter.value === 'string' ? {value: JSON.parse(filter.value)} : undefined)
                         }))
 
                         where = filterColumns({
@@ -103,8 +104,6 @@ export const getBiosamples = withOrganizationAuth(
                             filters,
                             joinOperator: "and"
                         })
-
-                        console.log(`WHERE`, where)
                     }
 
                     const orderBy = input.sort.length

@@ -38,7 +38,6 @@ export function filterColumns({
     const columns = filter.id.split(".")
 
     console.log(`COLUMNS`, columns)
-    console.log(`where object`, getColumn(columns, { in: filter.value }))
 
     switch (filter.operator) {
       case "eq":
@@ -102,28 +101,32 @@ export function filterColumns({
 
       case "lt":
         return filter.variant === "number"
-            ? { [column]: { lt: filter.value } }
+            // ? { [column]: { lt: filter.value } }
+            ? getColumn(columns, { lt: filter.value })
             : filter.variant === "date" && typeof filter.value === "string"
                 // ? { [column]: { lt: endOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { lt: endOfDay(new Date(filter.value)) })
                 : undefined;
       case "lte":
         return filter.variant === "number"
-            ? { [column]: { lte: filter.value } }
+            // ? { [column]: { lte: filter.value } }
+            ? getColumn(columns, { lte: filter.value })
             : filter.variant === "date" && typeof filter.value === "string"
                 // ? { [column]: { lte: endOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { lte: endOfDay(new Date(filter.value)) })
                 : undefined;
       case "gt":
         return filter.variant === "number"
-            ? { [column]: { gt: filter.value } }
+            // ? { [column]: { gt: filter.value } }
+            ? getColumn(columns, { gt: filter.value })
             : filter.variant === "date" && typeof filter.value === "string"
                 // ? { [column]: { gt: startOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { gt: startOfDay(new Date(filter.value)) })
                 : undefined;
       case "gte":
         return filter.variant === "number"
-            ? { [column]: { gte: filter.value } }
+            // ? { [column]: { gte: filter.value } }
+            ? getColumn(columns, { gte: filter.value })
             : filter.variant === "date" && typeof filter.value === "string"
                 // ? { [column]: { gte: startOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { gte: startOfDay(new Date(filter.value)) })
