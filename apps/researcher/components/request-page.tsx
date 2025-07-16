@@ -1,14 +1,12 @@
-import {Paperclip} from "lucide-react";
-import {MaterialAndDataAccessRequest} from "@prisma/client";
+import { Paperclip } from "lucide-react";
 import RequestPageCommentSection from "~researcher/components/request-page-comment-section";
-import {MaterialAndDataAccessRequestWithComments} from "@comend/lib/types";
+import { MaterialAndDataAccessRequestWithResearcherAndComments } from "@comend/lib/types";
 
-export default function RequestPage({requestData}: { requestData: MaterialAndDataAccessRequestWithComments }) {
-
+export default function RequestPage({ requestData }: { requestData: MaterialAndDataAccessRequestWithResearcherAndComments }) {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex flex-row">
-                <div className="flex flex-col">
+            <div className="grid grid-cols-3 space-x-8">
+                <div className="col-span-2 flex flex-col">
                     <div className="px-4 sm:px-0">
                         <h3 className="text-base/7 font-semibold text-gray-900">
                             {requestData?.title ?? "Untitled Request"}
@@ -17,12 +15,15 @@ export default function RequestPage({requestData}: { requestData: MaterialAndDat
                             {requestData?.description ?? "No description provided."}
                         </p>
                     </div>
+
                     <div className="mt-6 border-t border-gray-100">
                         <dl className="divide-y divide-gray-100">
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                <dt className="text-sm/6 font-medium text-gray-900">Full name</dt>
+                                <dt className="text-sm/6 font-medium text-gray-900">Researcher</dt>
                                 <dd className="mt-1 flex text-sm/6 text-gray-700 sm:col-div-2 sm:mt-0">
-                                    <div className="grow">Margot Foster</div>
+                                    <div className="grow">
+                                        {requestData.researcher.name}
+                                    </div>
                                     <div className="ml-4 shrink-0">
                                         <button type="button"
                                                 className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">
@@ -31,10 +32,11 @@ export default function RequestPage({requestData}: { requestData: MaterialAndDat
                                     </div>
                                 </dd>
                             </div>
+
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                <dt className="text-sm/6 font-medium text-gray-900">Salary expectation</dt>
+                                <dt className="text-sm/6 font-medium text-gray-900">Sample Count</dt>
                                 <dd className="mt-1 flex text-sm/6 text-gray-700 sm:col-div-2 sm:mt-0">
-                                    <div className="grow">$120,000</div>
+                                    <div className="grow">{requestData.sampleCount}</div>
                                     <div className="ml-4 shrink-0">
                                         <button type="button"
                                                 className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">
@@ -43,17 +45,18 @@ export default function RequestPage({requestData}: { requestData: MaterialAndDat
                                     </div>
                                 </dd>
                             </div>
+
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm/6 font-medium text-gray-900">About</dt>
                                 <dd className="mt-1 flex text-sm/6 text-gray-700 sm:col-div-2 sm:mt-0">
                                     <div className="grow">
-                                        Fugiat ipsum ipsum deserunt culpa aute sint do nostrud anim incididunt cillum
-                                        culpa
-                                        consequat. Excepteur
-                                        qui ipsum aliquip consequat sint. Sit id mollit nulla mollit nostrud in ea
-                                        officia
-                                        proident. Irure
-                                        nostrud pariatur mollit ad adipisicing reprehenderit deserunt qui eu.
+                                        <p>Status: {requestData.status}</p>
+                                        <p>Submitted: {new Date(requestData.submittedAt).toLocaleString()}</p>
+                                        {requestData.expiresAt && (
+                                            <p>Expires: {new Date(requestData.expiresAt).toLocaleString()}</p>
+                                        )}
+                                        <p>Sample Types: {requestData.sampleTypes?.join(", ")}</p>
+                                        <p>Data Types: {requestData.dataTypes?.join(", ")}</p>
                                     </div>
                                     <div className="ml-4 shrink-0">
                                         <button type="button"
@@ -63,6 +66,7 @@ export default function RequestPage({requestData}: { requestData: MaterialAndDat
                                     </div>
                                 </dd>
                             </div>
+
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm/6 font-medium text-gray-900">Attachments</dt>
                                 <dd className="mt-1 text-sm/6 text-gray-700 sm:col-div-2 sm:mt-0">
@@ -129,8 +133,10 @@ export default function RequestPage({requestData}: { requestData: MaterialAndDat
                     </div>
                 </div>
 
-                <RequestPageCommentSection requestData={requestData}/>
+                <div className="col-span-1">
+                    <RequestPageCommentSection requestData={requestData} />
+                </div>
             </div>
         </div>
-    )
+    );
 }

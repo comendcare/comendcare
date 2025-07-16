@@ -16,7 +16,8 @@ import {
     Service,
     Tool as DBAsset,
     User,
-    MaterialAndDataAccessRequest
+    MaterialAndDataAccessRequest,
+    Researcher
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -1739,7 +1740,8 @@ export const companyTypeMap: Record<string, string> = {
     "Consultant (<5 employees)": "Consultant",
 };
 
-export interface MaterialAndDataAccessRequestWithComments extends MaterialAndDataAccessRequest {
+export interface MaterialAndDataAccessRequestWithResearcherAndComments extends MaterialAndDataAccessRequest {
+    researcher: Researcher;
     comments: Comment[];
 }
 

@@ -30,6 +30,7 @@ export default async function ResearcherRequestsPage({
                 researcherId: true,
                 createdAt: true,
                 updatedAt: true,
+                researcher: true,
                 comments: true
             }
         });
