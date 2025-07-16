@@ -79,20 +79,20 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
-                        if (input.currentCountry) {
+                        if (input['biosample.currentCountry']) {
                             filters.push({
                                 id: 'biosample.currentCountry',
-                                value: input.currentCountry,
+                                value: input['biosample.currentCountry'],
                                 variant: 'select',
                                 operator: 'eq',
                                 filterId: nanoid()
                             })
                         }
 
-                        if (input.countryOfCollection) {
+                        if (input['biosample.countryOfCollection']) {
                             filters.push({
                                 id: 'biosample.countryOfCollection',
-                                value: input.countryOfCollection,
+                                value: input['biosample.countryOfCollection'],
                                 variant: 'select',
                                 operator: 'eq',
                                 filterId: nanoid()
