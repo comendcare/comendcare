@@ -1825,7 +1825,7 @@ export const deleteAsset = withOrganizationAuth(
 )
 
 export const createOrUpdateAsset = withOrganizationAuth(
-    async (organization: Organization, toolData: Partial<Asset>) => {
+    async (organization: Organization, toolData: any, biosampleData?: any, donorData?: any) => {
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.")
@@ -1844,7 +1844,8 @@ export const createOrUpdateAsset = withOrganizationAuth(
                                 include: {types: {include: {milestoneType: true}}}
                             }
                         }
-                    }
+                    },
+                    biosample: true
                 },
                 update: {
                     title: toolData.title,
@@ -1880,7 +1881,26 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     },
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
-                    metadata: toolData.metadata as InputJsonObject
+                    metadata: toolData.metadata as InputJsonObject,
+                    biosample: {
+                        upsert: {
+                            update: {
+                                ...biosampleData,
+                                donor: {
+                                    upsert: {
+                                        update: {...donorData},
+                                        create: {...donorData}
+                                    }
+                                }
+                            },
+                            create: {
+                                ...biosampleData,
+                                donor: { 
+                                    create: { ...donorData } 
+                                }
+                            }
+                        }
+                    }
                 },
                 create: {
                     // create with the given id if it's available. This is useful for situations like 'undo'

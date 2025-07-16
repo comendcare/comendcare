@@ -28,7 +28,7 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog"
 import {Asset, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS} from "@comend/lib/types"
-import {Institution, MilestoneType, Prisma, ToolType} from "@prisma/client"
+import {Biosample, Donor, Institution, MilestoneType, Prisma, ToolType} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -49,6 +49,8 @@ import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
 import { map } from "lodash"
+import { createOrUpdateAsset } from "@/packages/lib/actions"
+import { mixpanelTrack } from "@/packages/lib/mixpanel"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -293,7 +295,6 @@ export function EditBiosampleToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
-        // console.log(`handle form submit`, values)
         const {
             title,
             description,
@@ -304,6 +305,39 @@ export function EditBiosampleToolForm({
             isPrivate,
             contacts,
             milestones,
+            anatomicalSite,
+            pathology,
+            preservationMethod,
+            methodOfTransport,
+            clinicalData,
+            currentCountry,
+            countryOfCollection,
+            pmi,
+            volume,
+            mass,
+            area,
+            repository,
+            priceUSD,
+            priceGBP,
+            priceEUR,
+            biosampleDiagnosis,
+            yearOfExcision,
+            donorAgeAtExcision,
+            age,
+            sex,
+            gender,
+            race,
+            ethnicity,
+            treatments,
+            primaryDiagnosis,
+            diagnoses,
+            yearOfDeath,
+            height,
+            weight,
+            bmi,
+            medications,
+            causeOfDeath,
+            conditionSeverity
         } = values;
 
         const updateData: Partial<Asset> = {
@@ -327,6 +361,46 @@ export function EditBiosampleToolForm({
             ...(contacts ? {contacts} : undefined),
         }
 
+        const biosampleData: Partial<Biosample> = {
+            anatomicalSite,
+            pathology,
+            preservationMethod,
+            methodOfTransport,
+            clinicalData,
+            currentCountry,
+            countryOfCollection,
+            pmi: typeof pmi == 'string' ? parseInt(pmi, 10) : pmi,
+            volume: typeof volume === 'string' ? parseInt(volume, 10) : volume,
+            mass: typeof mass === 'string' ? parseInt(mass, 10) : mass,
+            area: typeof area === 'string' ? parseInt(area, 10) : area,
+            repository,
+            priceUSD: typeof priceUSD === 'string' ? parseInt(priceUSD, 10) : priceUSD,
+            priceGBP: typeof priceGBP === 'string' ? parseInt(priceGBP, 10) : priceGBP,
+            priceEUR: typeof priceEUR === 'string' ? parseInt(priceEUR, 10) : priceEUR,
+            biosampleDiagnosis,
+            yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+            donorAgeAtExcision: typeof donorAgeAtExcision === 'string' ? parseInt(donorAgeAtExcision, 10) : donorAgeAtExcision,
+        }
+
+
+        const donorData: Partial<Donor> = {
+            age: typeof age === 'string' ? parseInt(age, 10) : age,
+            sex,
+            gender,
+            race,
+            ethnicity,
+            treatments,
+            primaryDiagnosis,
+            diagnoses,
+            yearOfDeath: typeof yearOfDeath === 'string' ? parseInt(yearOfDeath, 10) : yearOfDeath,
+            height: typeof height === 'string' ? parseInt(height, 10) : height,
+            weight: typeof weight === 'string' ? parseInt(weight, 10) : weight,
+            bmi: typeof bmi === 'string' ? parseInt(bmi, 10) : bmi,
+            medications,
+            causeOfDeath,
+            conditionSeverity
+        }
+
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -337,7 +411,20 @@ export function EditBiosampleToolForm({
 
         try {
             if (toolData.id) {
-                await updateTool(updateData, session.user.organizationId)
+                const updatedAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
+                console.log(`updated tool`, updatedAsset)
+
+                mixpanelTrack("Tool Updated", {
+                    "ID": updatedAsset.id,
+                    "Tool Name": updatedAsset.title,
+                    "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                        (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
+                // await updateTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool updated successfully!",
                     {position: "bottom-left"}
@@ -705,7 +792,10 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Preservation Method`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("preservationMethod", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -730,7 +820,10 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Method of Transport`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("methodOfTransport", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -776,7 +869,10 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Current Location`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("currentCountry", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -801,7 +897,10 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Collection Location`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("countryOfCollection", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -1097,7 +1196,10 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Sex`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("sex", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -1122,7 +1224,10 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Gender`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("gender", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -1149,7 +1254,10 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Race`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("race", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
@@ -1176,7 +1284,10 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Ethnicity`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select {...field}>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("ethnicity", newVal)}
+                                >
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
