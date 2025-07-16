@@ -27,7 +27,7 @@ export const PrivateBiosampleToolsPage = ({promises}: {promises: Promise<[Awaite
                     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                         <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
                         <Image
-                            alt="No Tools"
+                            alt="No Biosample Tools"
                             src="https://illustrations.popsy.co/gray/graphic-design.svg"
                             width={300}
                             height={300}
