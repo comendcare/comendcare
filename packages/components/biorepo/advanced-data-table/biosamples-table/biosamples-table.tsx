@@ -11,45 +11,22 @@ import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import { getBiosamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
-import { revalidate } from "@comend/lib/revalidate";
 
 interface BiosamplesTableProps {
-  // data: Asset[],
-  promises: Promise<
-    [
-      Awaited<ReturnType<typeof getBiosamples>>,
-      // Awaited<ReturnType<typeof getTaskStatusCounts>>,
-      // Awaited<ReturnType<typeof getTaskPriorityCounts>>,
-      // Awaited<ReturnType<typeof getEstimatedHoursRange>>,
-    ]
-  >,
+  promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>,
   columns: ColumnDef<any>[]
 }
 
 export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
-  const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
-
-  const [
-    { data, pageCount },
-    // statusCounts,
-    // priorityCounts,
-    // estimatedHoursRange,
-  ] = React.use(promises);
-
-  console.log(`data values`, data)
-
-  // const columns = React.useMemo(
-  //   () => getBiosamplesTableColumns(),
-  //   []
-  // );
-
+  const { enableAdvancedFilter, filterFlag } = useFeatureFlags()
+  const [{ data, pageCount }] = React.use(promises)
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,
     pageCount,
     enableAdvancedFilter,
     initialState: {
-      sorting: [{ id: "createdAt", desc: true }],
+      sorting: [],
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow) => originalRow.id,
@@ -84,7 +61,6 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
           </DataTableAdvancedToolbar>
         ) : (
           <DataTableToolbar table={table}>
-            {/* <DataTableFilterList table={table} align="end" /> */}
             <DataTableSortList table={table} align="end" />
           </DataTableToolbar>
         )}

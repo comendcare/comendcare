@@ -11,50 +11,29 @@ import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import { getBiosamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
+import Image from "next/image"
 
-interface BiosamplesTableProps {
-  // data: Asset[],
-  promises: Promise<
-    [
-      Awaited<ReturnType<typeof getBiosamples>>,
-      // Awaited<ReturnType<typeof getTaskStatusCounts>>,
-      // Awaited<ReturnType<typeof getTaskPriorityCounts>>,
-      // Awaited<ReturnType<typeof getEstimatedHoursRange>>,
-    ]
-  >,
+interface BiosampleRequestsTableProps {
+  promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>,
   columns: ColumnDef<any>[]
 }
 
-export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
+export function BiosampleRequestsTable({promises, columns}: BiosampleRequestsTableProps) {
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
-
-  const [
-    { data, pageCount },
-    // statusCounts,
-    // priorityCounts,
-    // estimatedHoursRange,
-  ] = React.use(promises);
-
-  console.log(`data values`, data)
-
-  // const columns = React.useMemo(
-  //   () => getBiosamplesTableColumns(),
-  //   []
-  // );
-
+  const [{ data, pageCount }] = React.use(promises);
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,
     pageCount,
     enableAdvancedFilter,
     initialState: {
-      sorting: [{ id: "createdAt", desc: true }],
+      sorting: [],
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,
     clearOnDefault: true,
-  });
+  })
 
   return (
     <>
@@ -83,7 +62,6 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
           </DataTableAdvancedToolbar>
         ) : (
           <DataTableToolbar table={table}>
-            {/* <DataTableFilterList table={table} align="end" /> */}
             <DataTableSortList table={table} align="end" />
           </DataTableToolbar>
         )}

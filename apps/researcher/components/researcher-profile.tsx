@@ -49,9 +49,9 @@ export default function ResearcherProfile({researcherData}: any) {
     // const publications = [];
 
     return (
-        <div className="max-w-7xl mx-auto flex flex-col">
+        <div className="max-w-7xl mx-auto flex flex-col py-4">
             <div className="bg-white border-b">
-                <div className="px-4 py-6">
+                <div className="px-4 py-8">
                     <div className="flex flex-col md:flex-row gap-6">
                         <Avatar className="w-32 h-32">
                             <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Dr. Sarah Chen" />

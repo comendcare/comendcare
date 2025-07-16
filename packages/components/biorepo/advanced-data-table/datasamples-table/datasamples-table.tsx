@@ -48,7 +48,7 @@ export function DatasamplesTable({promises, columns}: DatasamplesTableProps) {
     pageCount,
     enableAdvancedFilter,
     initialState: {
-      sorting: [{ id: "createdAt", desc: true }],
+      sorting: [],
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow) => originalRow.id,

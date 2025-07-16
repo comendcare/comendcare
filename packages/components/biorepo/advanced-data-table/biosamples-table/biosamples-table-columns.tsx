@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
-import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 
@@ -165,70 +165,95 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const sampleInfoColumns: ColumnDef<any>[] = [
     {
       id: "currentCountry",
-      accessorKey: "currentCountry",
+      accessorKey: "biosample.currentCountry",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Current Location" />
       ),
+      cell: ({ row }) => (
+          <>
+            {COUNTRY_OPTIONS.find(t => t.value === row.original.biosample?.currentCountry)?.label}
+          </>
+      ),
     },
     {
-      id: "collectionCountry",
-      accessorKey: "collectionCountry",
+      id: "countryOfCollection",
+      accessorKey: "biosample.countryOfCollection",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Location of Collection" />
+      ),
+      cell: ({ row }) => (
+          <>
+            {COUNTRY_OPTIONS.find(t => t.value === row.original.biosample?.countryOfCollection)?.label}
+          </>
       ),
     },
     {
       id: "volume",
-      accessorKey: "volume",
+      accessorKey: "biosample.volume",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Available Volume" />
       ),
     },
     {
       id: "institution",
-      accessorKey: "institution",
+      accessorKey: "biosample.institution.name",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Institution" />
+      ),
+      cell: ({ row }) => (
+          <a href={row.original.biosample?.institution?.website}>
+            {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.biosample?.institution?.name)?.label}
+          </a>
       ),
     },
     {
       id: "pathology",
-      accessorKey: "pathology",
+      accessorKey: "biosample.pathology",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Pathology" />
       ),
     },
     {
       id: "preservationMethod",
-      accessorKey: "preservationMethod",
+      accessorKey: "biosample.preservationMethod",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Preservation Method" />
+      ),
+      cell: ({ row }) => (
+          <>
+            {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.biosample?.preservationMethod)?.label}
+          </>
       ),
     },
     {
       id: "anatomicalSite",
-      accessorKey: "anatomicalSite",
+      accessorKey: "biosample.anatomicalSite",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Anatomical Site" />
       ),
     },
     {
       id: "format",
-      accessorKey: "format",
+      accessorKey: "biosample.format",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Format" />
       ),
     },
     {
-      id: "transportMethod",
-      accessorKey: "transportMethod",
+      id: "methodOfTransport",
+      accessorKey: "biosample.methodOfTransport",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Method of Transport" />
       ),
+      cell: ({ row }) => (
+          <>
+            {SAMPLE_TRANSPORT_METHOD_OPTIONS.find(t => t.value === row.original.biosample?.methodOfTransport)?.label}
+          </>
+      ),
     },
     {
-      id: "excisionYear",
-      accessorKey: "excisionYear",
+      id: "yearOfExcision",
+      accessorKey: "biosample.yearOfExcision",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Year of Excision" />
       ),
@@ -238,86 +263,133 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const donorInfoColumns: ColumnDef<any>[] = [
     {
       id: "donorId",
-      accessorKey: "donorId",
+      accessorKey: "biosample.donor.id",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Donor Id" />
       ),
     },
     {
       id: "diagnoses",
-      accessorKey: "diagnoses",
+      accessorKey: "biosample.donor.diagnoses",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Diagnoses" />
+      ),
+      cell: ({ row }) => (
+          <ul className="flex flex-col gap-2">
+              {row.original.biosample?.donor?.diagnoses?.map((diagnosis: string, index: number) => (
+                  <li key={index} className="line-clamp-2">
+                      {diagnosis}
+                  </li>
+              ))}
+          </ul>
       ),
     },
     {
       id: "age",
-      accessorKey: "age",
+      accessorKey: "biosample.donor.age",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Age" />
       ),
     },
     {
       id: "sex",
-      accessorKey: "sex",
+      accessorKey: "biosample.donor.sex",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Sex" />
+      ),
+      cell: ({ row }) => (
+          <>
+            {DONOR_SEX_OPTIONS.find(t => t.value === row.original.biosample?.donor?.sex)?.label}
+          </>
       ),
     },
     {
       id: "gender",
-      accessorKey: "gender",
+      accessorKey: "biosample.donor.gender",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Gender" />
+      ),
+      cell: ({ row }) => (
+          <>
+            {DONOR_GENDER_OPTIONS.find(t => t.value === row.original.biosample?.donor?.gender)?.label}
+          </>
       ),
     },
     {
       id: "race",
-      accessorKey: "race",
+      accessorKey: "biosample.donor.race",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Race" />
+      ),
+      cell: ({ row }) => (
+          <>
+            {DONOR_RACE_OPTIONS.find(t => t.value === row.original.biosample?.donor?.race)?.label}
+          </>
       ),
     },
     {
       id: "ethnicity",
-      accessorKey: "ethnicity",
+      accessorKey: "biosample.donor.ethnicity",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Ethnicity" />
+      ),
+      cell: ({ row }) => (
+          <>
+            {DONOR_ETHNICITY_OPTIONS.find(t => t.value === row.original.biosample?.donor?.ethnicity)?.label}
+          </>
       ),
     },
     {
       id: "height",
-      accessorKey: "height",
+      accessorKey: "biosample.donor.height",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Height" />
       ),
     },
     {
       id: "weight",
-      accessorKey: "weight",
+      accessorKey: "biosample.donor.weight",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Weight" />
       ),
     },
     {
       id: "bmi",
-      accessorKey: "bmi",
+      accessorKey: "biosample.donor.bmi",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="BMI" />
       ),
     },
     {
       id: "medications",
-      accessorKey: "medications",
+      accessorKey: "biosample.donor.medications",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Medications" />
       ),
+      cell: ({ row }) => (
+          <ul className="flex flex-col gap-2">
+              {row.original.biosample?.donor?.medications?.map((medication: string, index: number) => (
+                  <li key={index} className="line-clamp-2">
+                      {medication}
+                  </li>
+              ))}
+          </ul>
+      ),
     },
     {
-      id: "medicalTreatments",
-      accessorKey: "medicalTreatments",
+      id: "treatments",
+      accessorKey: "biosample.donor.treatments",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Medical Treatments" />
+      ),
+      cell: ({ row }) => (
+          <ul className="flex flex-col gap-2">
+              {row.original.biosample?.donor?.treatments?.map((treatment: string, index: number) => (
+                  <li key={index} className="line-clamp-2">
+                      {treatment}
+                  </li>
+              ))}
+          </ul>
       ),
     },
   ]
@@ -337,251 +409,4 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   }
 
   return [...comendColumns, ...sampleInfoColumns, ...donorInfoColumns, ...actionsColumn]
-  return [
-
-    // {
-    //     id: "actions",
-    //     cell: ({ row }) => <AssetActionsMenu tool={row.original}/>,
-    //     enableHiding: false,
-    //     // meta: { name: "Actions" }
-    // },
-
-
-    // ORIGINAL COLUMNS FROM TASK TABLE -----------------------------------------------------------------------------
-    // {
-    //   id: "select",
-    //   header: ({ table }) => (
-    //     <Checkbox
-    //       checked={
-    //         table.getIsAllPageRowsSelected() ||
-    //         (table.getIsSomePageRowsSelected() && "indeterminate")
-    //       }
-    //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-    //       aria-label="Select all"
-    //       className="translate-y-0.5"
-    //     />
-    //   ),
-    //   cell: ({ row }) => (
-    //     <Checkbox
-    //       checked={row.getIsSelected()}
-    //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-    //       aria-label="Select row"
-    //       className="translate-y-0.5"
-    //     />
-    //   ),
-    //   enableSorting: false,
-    //   enableHiding: false,
-    //   size: 40,
-    // },
-    // {
-    //   id: "code",
-    //   accessorKey: "code",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Task" />
-    //   ),
-    //   cell: ({ row }) => <div className="w-20">{row.getValue("code")}</div>,
-    //   enableSorting: false,
-    //   enableHiding: false,
-    // },
-    // {
-    //   id: "title",
-    //   accessorKey: "title",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Title" />
-    //   ),
-    //   cell: ({ row }) => {
-    //     const label = LABELS.find(
-    //       (label) => label === row.original.label,
-    //     );
-
-    //     return (
-    //       <div className="flex items-center gap-2">
-    //         {label && <Badge variant="outline">{label}</Badge>}
-    //         <span className="max-w-[31.25rem] truncate font-medium">
-    //           {row.getValue("title")}
-    //         </span>
-    //       </div>
-    //     );
-    //   },
-    //   meta: {
-    //     label: "Title",
-    //     placeholder: "Search titles...",
-    //     variant: "text",
-    //     icon: Text,
-    //   },
-    //   enableColumnFilter: true,
-    // },
-    // {
-    //   id: "status",
-    //   accessorKey: "status",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Status" />
-    //   ),
-    //   cell: ({ cell }) => {
-    //     const status = STATUSES.find(
-    //       (status) => status === cell.getValue<Task["status"]>(),
-    //     );
-
-    //     if (!status) return null;
-
-    //     const Icon = getStatusIcon(status);
-
-    //     return (
-    //       <Badge variant="outline" className="py-1 [&>svg]:size-3.5">
-    //         <Icon />
-    //         <span className="capitalize">{status}</span>
-    //       </Badge>
-    //     );
-    //   },
-    //   meta: {
-    //     label: "Status",
-    //     variant: "multiSelect",
-    //     options: STATUSES.map((status) => ({
-    //       label: status.charAt(0).toUpperCase() + status.slice(1),
-    //       value: status,
-    //       count: statusCounts[status],
-    //       icon: getStatusIcon(status),
-    //     })),
-    //     icon: CircleDashed,
-    //   },
-    //   enableColumnFilter: true,
-    // },
-    // {
-    //   id: "priority",
-    //   accessorKey: "priority",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Priority" />
-    //   ),
-    //   cell: ({ cell }) => {
-    //     const priority = PRIORITIES.find(
-    //       (priority) => priority === cell.getValue<Task["priority"]>(),
-    //     );
-
-    //     if (!priority) return null;
-
-    //     const Icon = getPriorityIcon(priority);
-
-    //     return (
-    //       <Badge variant="outline" className="py-1 [&>svg]:size-3.5">
-    //         <Icon />
-    //         <span className="capitalize">{priority}</span>
-    //       </Badge>
-    //     );
-    //   },
-    //   meta: {
-    //     label: "Priority",
-    //     variant: "multiSelect",
-    //     options: PRIORITIES.map((priority) => ({
-    //       label: priority.charAt(0).toUpperCase() + priority.slice(1),
-    //       value: priority,
-    //       count: priorityCounts[priority],
-    //       icon: getPriorityIcon(priority),
-    //     })),
-    //     icon: ArrowUpDown,
-    //   },
-    //   enableColumnFilter: true,
-    // },
-    // {
-    //   id: "estimatedHours",
-    //   accessorKey: "estimatedHours",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Est. Hours" />
-    //   ),
-    //   cell: ({ cell }) => {
-    //     const estimatedHours = cell.getValue<number>();
-    //     return <div className="w-20 text-right">{estimatedHours}</div>;
-    //   },
-    //   meta: {
-    //     label: "Est. Hours",
-    //     variant: "range",
-    //     range: [estimatedHoursRange.min, estimatedHoursRange.max],
-    //     unit: "hr",
-    //     icon: Clock,
-    //   },
-    //   enableColumnFilter: true,
-    // },
-    // {
-    //   id: "createdAt",
-    //   accessorKey: "createdAt",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Created At" />
-    //   ),
-    //   cell: ({ cell }) => formatDate(cell.getValue<Date>()),
-    //   meta: {
-    //     label: "Created At",
-    //     variant: "dateRange",
-    //     icon: CalendarIcon,
-    //   },
-    //   enableColumnFilter: true,
-    // },
-    // {
-    //   id: "actions",
-    //   cell: function Cell({ row }) {
-    //     const [isUpdatePending, startUpdateTransition] = React.useTransition();
-
-    //     return (
-    //       <DropdownMenu>
-    //         <DropdownMenuTrigger asChild>
-    //           <Button
-    //             aria-label="Open menu"
-    //             variant="ghost"
-    //             className="flex size-8 p-0 data-[state=open]:bg-muted"
-    //           >
-    //             <Ellipsis className="size-4" aria-hidden="true" />
-    //           </Button>
-    //         </DropdownMenuTrigger>
-    //         <DropdownMenuContent align="end" className="w-40">
-    //           <DropdownMenuItem
-    //             onSelect={() => setRowAction({ row, variant: "update" })}
-    //           >
-    //             Edit
-    //           </DropdownMenuItem>
-    //           <DropdownMenuSub>
-    //             <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
-    //             <DropdownMenuSubContent>
-    //               <DropdownMenuRadioGroup
-    //                 value={row.original.label}
-    //                 onValueChange={(value) => {
-    //                   startUpdateTransition(() => {
-    //                     toast.promise(
-    //                       updateTask({
-    //                         id: row.original.id,
-    //                         label: value as Task["label"],
-    //                       }),
-    //                       {
-    //                         loading: "Updating...",
-    //                         success: "Label updated",
-    //                         error: (err) => getErrorMessage(err),
-    //                       },
-    //                     );
-    //                   });
-    //                 }}
-    //               >
-    //                 {LABELS.map((label) => (
-    //                   <DropdownMenuRadioItem
-    //                     key={label}
-    //                     value={label}
-    //                     className="capitalize"
-    //                     disabled={isUpdatePending}
-    //                   >
-    //                     {label}
-    //                   </DropdownMenuRadioItem>
-    //                 ))}
-    //               </DropdownMenuRadioGroup>
-    //             </DropdownMenuSubContent>
-    //           </DropdownMenuSub>
-    //           <DropdownMenuSeparator />
-    //           <DropdownMenuItem
-    //             onSelect={() => setRowAction({ row, variant: "delete" })}
-    //           >
-    //             Delete
-    //             <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-    //           </DropdownMenuItem>
-    //         </DropdownMenuContent>
-    //       </DropdownMenu>
-    //     );
-    //   },
-    //   size: 40,
-    // },
-  ];
 }

@@ -16,7 +16,8 @@ import {
     Service,
     Tool as DBAsset,
     User,
-    MaterialAndDataAccessRequest
+    MaterialAndDataAccessRequest,
+    Researcher
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -243,6 +244,397 @@ export const DEFAULT_KANBAN_COLUMNS = [
     }
 ]
 
+export const SAMPLE_PRESERVATION_METHOD_OPTIONS: Option[] = [
+    {
+        label: 'Fresh',
+        value: 'FRESH'
+    },
+    {
+        label: 'Frozen',
+        value: 'FROZEN'
+    },
+    {
+        label: 'Formalin-Fixed Paraffin-Embedded (FFPE)',
+        value: 'FFPE'
+    },
+    {
+        label: 'Stabilized in RNAlater',
+        value: 'RNALATER'
+    },
+    {
+        label: 'Lyophilized (Freeze-Dried)',
+        value: 'LYOPHILIZED'
+    },
+    {
+        label: 'Cryopreserved',
+        value: 'CRYOPRESERVED'
+    },
+    {
+        label: 'Preserved in Alcohol',
+        value: 'ALCOHOL'
+    },
+    {
+        label: 'Room Temperature Stabilized',
+        value: 'ROOMTEMP'
+    },
+    {
+        label: 'Other Chemical Fixative',
+        value: 'FIXED_OTHER'
+    },
+    {
+        label: 'Unknown',
+        value: 'UNKNOWN'
+    }
+];
+
+export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
+    {
+        label: 'Ambient Temperature',
+        value: 'AMBIENT'
+    },
+    {
+        label: 'Cold Pack (2–8°C)',
+        value: 'COLD_PACK'
+    },
+    {
+        label: 'Dry Ice (−78.5°C)',
+        value: 'DRY_ICE'
+    },
+    {
+        label: 'Liquid Nitrogen (LN₂)',
+        value: 'LN2'
+    },
+    {
+        label: 'Courier / Hand Delivery',
+        value: 'COURIER'
+    },
+    {
+        label: 'Standard Mail / Postal Service',
+        value: 'MAIL'
+    },
+    {
+        label: 'Specialized Medical Transport',
+        value: 'SPECIALIZED'
+    },
+    {
+        label: 'Transport with Electronic Tracking',
+        value: 'ELECTRONIC_TRACKING'
+    },
+    {
+        label: 'Unknown',
+        value: 'UNKNOWN'
+    }
+];
+
+export const COUNTRY_OPTIONS: Option[] = [
+  { label: 'United States of America', value: 'US' },
+  { label: 'Canada', value: 'CA' },
+  { label: 'Afghanistan', value: 'AF' },
+  { label: 'Albania', value: 'AL' },
+  { label: 'Algeria', value: 'DZ' },
+  { label: 'Andorra', value: 'AD' },
+  { label: 'Angola', value: 'AO' },
+  { label: 'Antigua and Barbuda', value: 'AG' },
+  { label: 'Argentina', value: 'AR' },
+  { label: 'Armenia', value: 'AM' },
+  { label: 'Australia', value: 'AU' },
+  { label: 'Austria', value: 'AT' },
+  { label: 'Azerbaijan', value: 'AZ' },
+  { label: 'Bahamas', value: 'BS' },
+  { label: 'Bahrain', value: 'BH' },
+  { label: 'Bangladesh', value: 'BD' },
+  { label: 'Barbados', value: 'BB' },
+  { label: 'Belarus', value: 'BY' },
+  { label: 'Belgium', value: 'BE' },
+  { label: 'Belize', value: 'BZ' },
+  { label: 'Benin', value: 'BJ' },
+  { label: 'Bhutan', value: 'BT' },
+  { label: 'Bolivia', value: 'BO' },
+  { label: 'Bosnia and Herzegovina', value: 'BA' },
+  { label: 'Botswana', value: 'BW' },
+  { label: 'Brazil', value: 'BR' },
+  { label: 'Brunei', value: 'BN' },
+  { label: 'Bulgaria', value: 'BG' },
+  { label: 'Burkina Faso', value: 'BF' },
+  { label: 'Burundi', value: 'BI' },
+  { label: 'Cabo Verde', value: 'CV' },
+  { label: 'Cambodia', value: 'KH' },
+  { label: 'Cameroon', value: 'CM' },
+  { label: 'Central African Republic', value: 'CF' },
+  { label: 'Chad', value: 'TD' },
+  { label: 'Chile', value: 'CL' },
+  { label: 'China', value: 'CN' },
+  { label: 'Colombia', value: 'CO' },
+  { label: 'Comoros', value: 'KM' },
+  { label: 'Congo (DRC)', value: 'CD' },
+  { label: 'Congo (Republic)', value: 'CG' },
+  { label: 'Costa Rica', value: 'CR' },
+  { label: 'Côte d’Ivoire', value: 'CI' },
+  { label: 'Croatia', value: 'HR' },
+  { label: 'Cuba', value: 'CU' },
+  { label: 'Cyprus', value: 'CY' },
+  { label: 'Czechia', value: 'CZ' },
+  { label: 'Denmark', value: 'DK' },
+  { label: 'Djibouti', value: 'DJ' },
+  { label: 'Dominica', value: 'DM' },
+  { label: 'Dominican Republic', value: 'DO' },
+  { label: 'Ecuador', value: 'EC' },
+  { label: 'Egypt', value: 'EG' },
+  { label: 'El Salvador', value: 'SV' },
+  { label: 'Equatorial Guinea', value: 'GQ' },
+  { label: 'Eritrea', value: 'ER' },
+  { label: 'Estonia', value: 'EE' },
+  { label: 'Eswatini', value: 'SZ' },
+  { label: 'Ethiopia', value: 'ET' },
+  { label: 'Fiji', value: 'FJ' },
+  { label: 'Finland', value: 'FI' },
+  { label: 'France', value: 'FR' },
+  { label: 'Gabon', value: 'GA' },
+  { label: 'Gambia', value: 'GM' },
+  { label: 'Georgia', value: 'GE' },
+  { label: 'Germany', value: 'DE' },
+  { label: 'Ghana', value: 'GH' },
+  { label: 'Greece', value: 'GR' },
+  { label: 'Grenada', value: 'GD' },
+  { label: 'Guatemala', value: 'GT' },
+  { label: 'Guinea', value: 'GN' },
+  { label: 'Guinea-Bissau', value: 'GW' },
+  { label: 'Guyana', value: 'GY' },
+  { label: 'Haiti', value: 'HT' },
+  { label: 'Honduras', value: 'HN' },
+  { label: 'Hungary', value: 'HU' },
+  { label: 'Iceland', value: 'IS' },
+  { label: 'India', value: 'IN' },
+  { label: 'Indonesia', value: 'ID' },
+  { label: 'Iran', value: 'IR' },
+  { label: 'Iraq', value: 'IQ' },
+  { label: 'Ireland', value: 'IE' },
+  { label: 'Israel', value: 'IL' },
+  { label: 'Italy', value: 'IT' },
+  { label: 'Jamaica', value: 'JM' },
+  { label: 'Japan', value: 'JP' },
+  { label: 'Jordan', value: 'JO' },
+  { label: 'Kazakhstan', value: 'KZ' },
+  { label: 'Kenya', value: 'KE' },
+  { label: 'Kiribati', value: 'KI' },
+  { label: 'North Korea', value: 'KP' },
+  { label: 'South Korea', value: 'KR' },
+  { label: 'Kuwait', value: 'KW' },
+  { label: 'Kyrgyzstan', value: 'KG' },
+  { label: 'Laos', value: 'LA' },
+  { label: 'Latvia', value: 'LV' },
+  { label: 'Lebanon', value: 'LB' },
+  { label: 'Lesotho', value: 'LS' },
+  { label: 'Liberia', value: 'LR' },
+  { label: 'Libya', value: 'LY' },
+  { label: 'Liechtenstein', value: 'LI' },
+  { label: 'Lithuania', value: 'LT' },
+  { label: 'Luxembourg', value: 'LU' },
+  { label: 'Madagascar', value: 'MG' },
+  { label: 'Malawi', value: 'MW' },
+  { label: 'Malaysia', value: 'MY' },
+  { label: 'Maldives', value: 'MV' },
+  { label: 'Mali', value: 'ML' },
+  { label: 'Malta', value: 'MT' },
+  { label: 'Marshall Islands', value: 'MH' },
+  { label: 'Mauritania', value: 'MR' },
+  { label: 'Mauritius', value: 'MU' },
+  { label: 'Mexico', value: 'MX' },
+  { label: 'Micronesia', value: 'FM' },
+  { label: 'Moldova', value: 'MD' },
+  { label: 'Monaco', value: 'MC' },
+  { label: 'Mongolia', value: 'MN' },
+  { label: 'Montenegro', value: 'ME' },
+  { label: 'Morocco', value: 'MA' },
+  { label: 'Mozambique', value: 'MZ' },
+  { label: 'Myanmar', value: 'MM' },
+  { label: 'Namibia', value: 'NA' },
+  { label: 'Nauru', value: 'NR' },
+  { label: 'Nepal', value: 'NP' },
+  { label: 'Netherlands', value: 'NL' },
+  { label: 'New Zealand', value: 'NZ' },
+  { label: 'Nicaragua', value: 'NI' },
+  { label: 'Niger', value: 'NE' },
+  { label: 'Nigeria', value: 'NG' },
+  { label: 'North Macedonia', value: 'MK' },
+  { label: 'Norway', value: 'NO' },
+  { label: 'Oman', value: 'OM' },
+  { label: 'Pakistan', value: 'PK' },
+  { label: 'Palau', value: 'PW' },
+  { label: 'Palestine', value: 'PS' },
+  { label: 'Panama', value: 'PA' },
+  { label: 'Papua New Guinea', value: 'PG' },
+  { label: 'Paraguay', value: 'PY' },
+  { label: 'Peru', value: 'PE' },
+  { label: 'Philippines', value: 'PH' },
+  { label: 'Poland', value: 'PL' },
+  { label: 'Portugal', value: 'PT' },
+  { label: 'Qatar', value: 'QA' },
+  { label: 'Romania', value: 'RO' },
+  { label: 'Russia', value: 'RU' },
+  { label: 'Rwanda', value: 'RW' },
+  { label: 'Saint Kitts and Nevis', value: 'KN' },
+  { label: 'Saint Lucia', value: 'LC' },
+  { label: 'Saint Vincent and the Grenadines', value: 'VC' },
+  { label: 'Samoa', value: 'WS' },
+  { label: 'San Marino', value: 'SM' },
+  { label: 'Sao Tome and Principe', value: 'ST' },
+  { label: 'Saudi Arabia', value: 'SA' },
+  { label: 'Senegal', value: 'SN' },
+  { label: 'Serbia', value: 'RS' },
+  { label: 'Seychelles', value: 'SC' },
+  { label: 'Sierra Leone', value: 'SL' },
+  { label: 'Singapore', value: 'SG' },
+  { label: 'Slovakia', value: 'SK' },
+  { label: 'Slovenia', value: 'SI' },
+  { label: 'Solomon Islands', value: 'SB' },
+  { label: 'Somalia', value: 'SO' },
+  { label: 'South Africa', value: 'ZA' },
+  { label: 'South Sudan', value: 'SS' },
+  { label: 'Spain', value: 'ES' },
+  { label: 'Sri Lanka', value: 'LK' },
+  { label: 'Sudan', value: 'SD' },
+  { label: 'Suriname', value: 'SR' },
+  { label: 'Sweden', value: 'SE' },
+  { label: 'Switzerland', value: 'CH' },
+  { label: 'Syria', value: 'SY' },
+  { label: 'Tajikistan', value: 'TJ' },
+  { label: 'Tanzania', value: 'TZ' },
+  { label: 'Thailand', value: 'TH' },
+  { label: 'Timor-Leste', value: 'TL' },
+  { label: 'Togo', value: 'TG' },
+  { label: 'Tonga', value: 'TO' },
+  { label: 'Trinidad and Tobago', value: 'TT' },
+  { label: 'Tunisia', value: 'TN' },
+  { label: 'Turkey', value: 'TR' },
+  { label: 'Turkmenistan', value: 'TM' },
+  { label: 'Tuvalu', value: 'TV' },
+  { label: 'Uganda', value: 'UG' },
+  { label: 'Ukraine', value: 'UA' },
+  { label: 'United Arab Emirates', value: 'AE' },
+  { label: 'United Kingdom', value: 'GB' },
+  { label: 'Uruguay', value: 'UY' },
+  { label: 'Uzbekistan', value: 'UZ' },
+  { label: 'Vanuatu', value: 'VU' },
+  { label: 'Venezuela', value: 'VE' },
+  { label: 'Vietnam', value: 'VN' },
+  { label: 'Yemen', value: 'YE' },
+  { label: 'Zambia', value: 'ZM' },
+  { label: 'Zimbabwe', value: 'ZW' }
+];
+
+export const DONOR_SEX_OPTIONS: Option[] = [
+    {
+        label: 'Male',
+        value: 'M'
+    },
+    {
+        label: 'Female',
+        value: 'F'
+    },
+    {
+        label: 'Intersex',
+        value: 'I'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
+export const DONOR_GENDER_OPTIONS: Option[] = [
+    {
+        label: 'Man',
+        value: 'M'
+    },
+    {
+        label: 'Woman',
+        value: 'F'
+    },
+    {
+        label: 'Non-Binary',
+        value: 'NB'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
+export const DONOR_RACE_OPTIONS: Option[] = [
+    {
+        label: 'American Indian or Alaska Native',
+        value: 'AIAN'
+    },
+    {
+        label: 'Asian',
+        value: 'A'
+    },
+    {
+        label: 'Black or African American',
+        value: 'BAA'
+    },
+    {
+        label: 'Native Hawaiian or Other Pacific Islander',
+        value: 'NHPI'
+    },
+    {
+        label: 'White',
+        value: 'W'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
+export const DONOR_ETHNICITY_OPTIONS: Option[] = [
+    {
+        label: 'Hispanic or Latino',
+        value: 'HL'
+    },
+    {
+        label: 'Not Hispanic or Latino',
+        value: 'NHL'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // {
     //     label: 'All',
@@ -382,6 +774,29 @@ export const TOOL_TYPE_OPTIONS: any[] = [
         id: 'TOXICOLOGYSTUDY',
         label: 'Toxicology study',
         type: 'data'
+    },
+]
+
+export const REQUEST_STATUS_OPTIONS: any[] = [
+    {
+        id: 'REQUESTED',
+        label: 'Requested',
+    },
+    {
+        id: 'ADDITIONAL_INFORMATION',
+        label: 'Additional Information Required',
+    },
+    {
+        id: 'ACCEPTED',
+        label: 'Accepted',
+    },
+    {
+        id: 'SHIPPED',
+        label: 'Shipped',
+    },
+    {
+        id: 'DENIED',
+        label: 'Denied',
     },
 ]
 
@@ -1325,7 +1740,8 @@ export const companyTypeMap: Record<string, string> = {
     "Consultant (<5 employees)": "Consultant",
 };
 
-export interface MaterialAndDataAccessRequestWithComents extends MaterialAndDataAccessRequest {
+export interface MaterialAndDataAccessRequestWithResearcherAndComments extends MaterialAndDataAccessRequest {
+    researcher: Researcher;
     comments: Comment[];
 }
 
