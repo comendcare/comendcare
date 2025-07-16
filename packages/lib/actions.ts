@@ -1827,6 +1827,8 @@ export const deleteAsset = withOrganizationAuth(
 export const createOrUpdateAsset = withOrganizationAuth(
     async (organization: Organization, toolData: any, biosampleData?: any, donorData?: any) => {
         try {
+            console.log(`biosample data`, biosampleData)
+            console.log(`donor data`, donorData)
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -1937,7 +1939,15 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
                     organization: {connect: {id: organization.id}},
-                    metadata: toolData.metadata as InputJsonObject
+                    metadata: toolData.metadata as InputJsonObject,
+                    biosample: {
+                        create: {
+                            ...biosampleData,
+                            donor: { 
+                                create: { ...donorData } 
+                            }
+                        }
+                    }
                 },
             })
 

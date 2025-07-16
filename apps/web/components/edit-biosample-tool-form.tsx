@@ -411,9 +411,8 @@ export function EditBiosampleToolForm({
 
         try {
             if (toolData.id) {
+                // await updateTool(updateData, session.user.organizationId)
                 const updatedAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
-                console.log(`updated tool`, updatedAsset)
-
                 mixpanelTrack("Tool Updated", {
                     "ID": updatedAsset.id,
                     "Tool Name": updatedAsset.title,
@@ -424,7 +423,6 @@ export function EditBiosampleToolForm({
                         (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
-                // await updateTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool updated successfully!",
                     {position: "bottom-left"}
@@ -432,7 +430,18 @@ export function EditBiosampleToolForm({
                 await revalidate("/app/tools/biosample")
                 router.refresh()
             } else {
-                await createTool(updateData, session.user.organizationId)
+                // await createTool(updateData, session.user.organizationId)
+                const newAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
+                mixpanelTrack("Tool Created", {
+                    "ID": newAsset.id,
+                    "Name": newAsset.title,
+                    "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                        (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
+                    )
+                })
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}
