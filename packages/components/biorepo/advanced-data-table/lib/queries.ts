@@ -34,12 +34,18 @@ export const getBiosamples = withOrganizationAuth(
                         input.filterFlag === "advancedFilters"
 
                     let where: any = {};
+                    console.log(`input`, input)
 
                     if (advancedTable) {
                         const preProcessedFilters: any = input.filters.map(filter => ({
                             ...filter,
                             ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                            // ...(filter.id === "biosample.volume" && typeof filter.value === 'string' ? {value: JSON.parse(filter.value)} : undefined)
+                            // ...(filter.id === "biosample.volume" 
+                            //         && (
+                            //             (typeof filter.value === 'string' && {value: JSON.parse(filter.value)}) ||
+                            //             (Array.isArray(filter.value) && typeof filter.value[0] === 'string' && {value: filter.value.map(val => JSON.parse(val))})
+                            //         )
+                            //     )
                         }))
 
                         where = filterColumns({
@@ -100,11 +106,23 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
+                        if (input['biosample.volume']) {
+                            filters.push({
+                                id: 'biosample.volume',
+                                value: input['biosample.volume'],
+                                variant: 'range',
+                                operator: 'isBetween',
+                                filterId: nanoid()
+                            })
+                        }
+
                         where = filterColumns({
                             filters,
                             joinOperator: "and"
                         })
                     }
+
+                    console.log(`where object`, where)
 
                     const orderBy = input.sort.length
                         ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))

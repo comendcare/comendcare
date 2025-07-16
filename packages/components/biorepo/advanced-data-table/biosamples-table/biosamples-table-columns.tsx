@@ -211,6 +211,13 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Available Volume" />
       ),
+      enableColumnFilter: true,
+      meta: {
+        label: "Available Volume",
+        variant: "range",
+        range: [0, 1000],
+        unit: 'ml'
+      },
     },
     {
       id: "institution",

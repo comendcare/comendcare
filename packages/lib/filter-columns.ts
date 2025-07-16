@@ -132,22 +132,41 @@ export function filterColumns({
                 ? getColumn(columns, { gte: startOfDay(new Date(filter.value)) })
                 : undefined;
       case "isBetween":
-        return filter.variant === "date" &&
-        Array.isArray(filter.value) &&
-        filter.value.length === 2
-            // ? {
-            //   AND: [
-            //     filter.value[0] ? { [column]: { gte: startOfDay(new Date(filter.value[0])) } } : undefined,
-            //     filter.value[1] ? { [column]: { lte: endOfDay(new Date(filter.value[1])) } } : undefined,
-            //   ].filter(Boolean),
-            // }
-            ? {
-              AND: [
-                filter.value[0] ? getColumn(columns, { gte: startOfDay(new Date(filter.value[0])) }) : undefined,
-                filter.value[1] ? getColumn(columns, { lte: endOfDay(new Date(filter.value[1])) }) : undefined,
-              ].filter(Boolean),
-            }
-            : undefined;
+        if (filter.variant === "date") {
+          return (
+            Array.isArray(filter.value) &&
+            filter.value.length === 2
+                // ? {
+                //   AND: [
+                //     filter.value[0] ? { [column]: { gte: startOfDay(new Date(filter.value[0])) } } : undefined,
+                //     filter.value[1] ? { [column]: { lte: endOfDay(new Date(filter.value[1])) } } : undefined,
+                //   ].filter(Boolean),
+                // }
+                ? {
+                  AND: [
+                    filter.value[0] ? getColumn(columns, { gte: startOfDay(new Date(filter.value[0])) }) : undefined,
+                    filter.value[1] ? getColumn(columns, { lte: endOfDay(new Date(filter.value[1])) }) : undefined,
+                  ].filter(Boolean),
+                }
+                : undefined
+          )
+        }
+
+        if (filter.variant === 'range') {
+          return (
+            Array.isArray(filter.value) &&
+            filter.value.length === 2
+              ? {
+                AND: [
+                  filter.value[0] ? getColumn(columns, { gte: JSON.parse(filter.value[0]) }) : undefined,
+                  filter.value[1] ? getColumn(columns, { lte: JSON.parse(filter.value[1]) }) : undefined
+                ]
+              }
+              : undefined
+          )
+        }
+
+        return undefined
       case "isRelativeToToday":
         if (filter.variant === "date" && typeof filter.value === "string") {
           const today = new Date();
