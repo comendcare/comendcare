@@ -142,6 +142,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                   <CommandItem
                     key={option.value}
                     onSelect={() => onItemSelect(option, isSelected)}
+                    className="flex gap-2"
                   >
                     <div
                       className={cn(

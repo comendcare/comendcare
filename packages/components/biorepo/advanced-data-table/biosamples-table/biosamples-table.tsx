@@ -26,7 +26,7 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
     pageCount,
     enableAdvancedFilter,
     initialState: {
-      sorting: [{ id: "createdAt", desc: true }],
+      sorting: [],
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow) => originalRow.id,

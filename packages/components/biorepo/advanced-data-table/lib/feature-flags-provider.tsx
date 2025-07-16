@@ -88,7 +88,7 @@ export function FeatureFlagsProvider({ children }: FeatureFlagsProviderProps) {
                 className="whitespace-nowrap px-3 text-xs data-[state=on]:bg-accent/70 data-[state=on]:hover:bg-accent/90"
                 asChild
               >
-                <TooltipTrigger>
+                <TooltipTrigger className="flex gap-2 items-center">
                   <flag.icon className="size-3.5 shrink-0" />
                   {flag.label}
                 </TooltipTrigger>

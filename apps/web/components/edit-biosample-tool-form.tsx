@@ -756,7 +756,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="anatomicalSite"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Anatomical Site`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Anatomical Site`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -777,7 +777,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="pathology"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Pathology`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Pathology`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -798,7 +798,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="preservationMethod"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Preservation Method`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Preservation Method`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -826,7 +826,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="methodOfTransport"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Method of Transport`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Method of Transport`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -854,7 +854,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="clinicalData"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Clinical Data`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Clinical Data`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -875,7 +875,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="currentCountry"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Current Location`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Current Location`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -903,7 +903,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="countryOfCollection"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Collection Location`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Collection Location`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -931,7 +931,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="pmi"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`PMI (in hours)`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`PMI (in hours)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -953,7 +953,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="volume"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Volume (in ml)`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Volume (in ml)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -975,7 +975,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="mass"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Mass (in mg)`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Mass (in mg)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -997,7 +997,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="area"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Area (in square mm)`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Area (in square mm)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1019,7 +1019,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="repository"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Repository`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Repository`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1040,7 +1040,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="priceUSD"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Price USD`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Price USD`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1062,7 +1062,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="priceGBP"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Price GBP`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Price GBP`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1084,7 +1084,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="priceEUR"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Price EUR`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Price EUR`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1106,7 +1106,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="yearOfExcision"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Year of Excision`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Year of Excision`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1128,7 +1128,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="donorAgeAtExcision"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Donor Age at Excision`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Donor Age at Excision`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1150,7 +1150,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 name="biosampleDiagnosis"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Biosample Diagnosis`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Biosample Diagnosis`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1180,7 +1180,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="age"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Age`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Age`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1202,7 +1202,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="sex"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Sex`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Sex`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1230,7 +1230,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="gender"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Gender`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Gender`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1260,7 +1260,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="race"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Race`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Race`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1290,7 +1290,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="ethnicity"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Ethnicity`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Ethnicity`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1318,7 +1318,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="height"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Height`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Height`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1340,7 +1340,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="weight"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Weight`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Weight`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1362,7 +1362,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="bmi"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`BMI`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`BMI`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1384,7 +1384,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="primaryDiagnosis"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Primary Diagnosis`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Primary Diagnosis`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1607,7 +1607,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="conditionSeverity"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Condition Severity`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Condition Severity`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1628,7 +1628,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="menopausalStatus"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Menopausal Status`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Menopausal Status`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1650,7 +1650,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="ageAtLastMenstrualPeriod"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Age at last Menstrual Period`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Age at last Menstrual Period`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1672,7 +1672,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="numberOfPregnancies"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Number of Pregnancies`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Number of Pregnancies`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1694,7 +1694,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="numberOfLiveBirths"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Number if Live Births`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Number if Live Births`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1716,7 +1716,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="smokingStatus"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Smoking Status`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Smoking Status`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1738,7 +1738,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="cigarettesPerDay"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Cigarettes Per Day`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Cigarettes Per Day`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1760,7 +1760,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="alcoholStatus"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Alcohol Status`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Alcohol Status`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1782,7 +1782,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="drinksPerDay"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Drinks Per Day`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Drinks Per Day`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1804,7 +1804,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="alcoholDuration"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Alcohol Duration (in years)`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Alcohol Duration (in years)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
@@ -1826,7 +1826,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="causeOfDeath"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[80px]">{`Cause Of Death`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Cause Of Death`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
