@@ -6,8 +6,8 @@ import RequestPage from "~researcher/components/request-page";
 
 
 export default async function ResearcherRequestsPage({
-                                                  params
-                                              }: {
+                                                         params
+                                                     }: {
     params: { id: string }
 }) {
     const id = decodeURIComponent(params.id)
@@ -16,17 +16,22 @@ export default async function ResearcherRequestsPage({
     let requestData
     if (session?.user?.id) {
         const response = await getResearcherRequest(session.user.id, {
-            id: true,
-            title: true,
-            description: true,
-            status: true,
-            organization: true,
-            organizationId: true,
-            researcher: true,
-            researcherId: true,
-            createdAt: true,
-            updatedAt: true,
-            comments: true
+            where: {
+                id
+            },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                status: true,
+                organization: true,
+                organizationId: true,
+                researcher: true,
+                researcherId: true,
+                createdAt: true,
+                updatedAt: true,
+                comments: true
+            }
         });
         if (response.success) {
             requestData = response.data
@@ -39,7 +44,7 @@ export default async function ResearcherRequestsPage({
         <div
             className="bg-red"
         >
-            <RequestPage requestData={requestData} />
+            <RequestPage requestData={requestData}/>
         </div>
     )
 }

@@ -1785,18 +1785,15 @@ export const getResearcherFromUserId = withUserAuth(
     ) => {
         const session = await getSession();
 
-        console.log("shit")
         try {
             if (!session) {
-                return { success: false, error: "Session not found." };
+                return {success: false, error: "Session not found."};
             }
 
-            console.log("Fuck")
             const fetchedResearcher = await prisma.researcher.findUnique({
                 where: {userId: session.user.id},
                 select
             })
-            console.log(fetchedResearcher);
 
             if (!fetchedResearcher) {
                 return {success: false, error: "Researcher not found"};
@@ -1815,20 +1812,20 @@ export const getResearcherFromUserId = withUserAuth(
 
 export const getResearcherRequest = withUserAuth(
     async (
-        request: MaterialAndDataAccessRequest,
-        select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>
+        user: any,
+        {
+            where,
+            select
+        }: {
+            where: { id: string },
+            select: { [key: string]: boolean }
+        }
     ) => {
         try {
             const fetchedRequest = await prisma.materialAndDataAccessRequest.findUnique({
-                where: {id: request.id},
-                // include: {organizations: true},
+                where,
                 select
-            })
+            });
 
             if (!fetchedRequest) {
                 return {success: false, error: "Request not found"};
@@ -1843,7 +1840,7 @@ export const getResearcherRequest = withUserAuth(
             return {success: false, error: "Internal server error"};
         }
     }
-)
+);
 
 export const getAllResearcherRequests = withUserAuth(
     async (
@@ -1859,15 +1856,15 @@ export const getAllResearcherRequests = withUserAuth(
 
         try {
             if (!session) {
-                return { success: false, error: "Session not found." };
+                return {success: false, error: "Session not found."};
             }
 
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: { userId: session.user.id },
+                where: {userId: session.user.id},
             });
 
             if (!fetchedResearcher) {
-                return { success: false, error: "Researcher not found" };
+                return {success: false, error: "Researcher not found"};
             }
 
             const fetchedRequests = await prisma.materialAndDataAccessRequest.findMany({
@@ -1896,19 +1893,19 @@ export const getResearcherFromOrcidApi = withUserAuth(
 
         try {
             if (!session) {
-                return { success: false, error: "Session not found." };
+                return {success: false, error: "Session not found."};
             }
 
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: { userId: session.user.id },
+                where: {userId: session.user.id},
             });
 
             if (!fetchedResearcher) {
-                return { success: false, error: "Researcher not found" };
+                return {success: false, error: "Researcher not found"};
             }
 
             if (!fetchedResearcher.orcid) {
-                return { success: false, error: "Researcher ORCID not available" };
+                return {success: false, error: "Researcher ORCID not available"};
             }
 
             const openAlexResponse = await fetch(
@@ -1923,7 +1920,7 @@ export const getResearcherFromOrcidApi = withUserAuth(
             const authorData = openAlexData.results?.[0] || null;
 
             if (!authorData) {
-                return { success: false, error: "OpenAlex author data not found." };
+                return {success: false, error: "OpenAlex author data not found."};
             }
 
             // Fetch publications (works)
@@ -1946,7 +1943,7 @@ export const getResearcherFromOrcidApi = withUserAuth(
             };
         } catch (error: any) {
             logError("Error fetching researcher", error);
-            return { success: false, error: "Internal server error" };
+            return {success: false, error: "Internal server error"};
         }
     }
 );

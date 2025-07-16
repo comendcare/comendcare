@@ -1,11 +1,11 @@
 import WriteAComment from "~researcher/components/write-a-comment"
 import Comment from "~researcher/components/comment"
 import CommentsEmpty from "~researcher/components/comments-empty"
-import {MaterialAndDataAccessRequestWithComents} from "@comend/lib/types";
+import {MaterialAndDataAccessRequestWithComments} from "@comend/lib/types";
 
-export default function RequestPageCommentSection({requestData}: {requestData: MaterialAndDataAccessRequestWithComents}) {
+export default function RequestPageCommentSection({requestData}: {requestData: MaterialAndDataAccessRequestWithComments}) {
     return (
-        <section className="bg-white py-8 lg:py-16 antialiased">
+        <section className="bg-white antialiased">
             <div className="w-full mx-auto space-y-8">
                 <div className="flex justify-between items-center">
                     <h2 className="text-4xl font-bold">

@@ -1,12 +1,12 @@
 import {Paperclip} from "lucide-react";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
 import RequestPageCommentSection from "~researcher/components/request-page-comment-section";
-import {MaterialAndDataAccessRequestWithComents} from "@comend/lib/types";
+import {MaterialAndDataAccessRequestWithComments} from "@comend/lib/types";
 
-export default function RequestPage({requestData}: { requestData: MaterialAndDataAccessRequestWithComents }) {
-    console.log(requestData)
+export default function RequestPage({requestData}: { requestData: MaterialAndDataAccessRequestWithComments }) {
+
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="flex flex-row">
                 <div className="flex flex-col">
                     <div className="px-4 sm:px-0">

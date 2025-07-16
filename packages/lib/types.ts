@@ -1739,7 +1739,7 @@ export const companyTypeMap: Record<string, string> = {
     "Consultant (<5 employees)": "Consultant",
 };
 
-export interface MaterialAndDataAccessRequestWithComents extends MaterialAndDataAccessRequest {
+export interface MaterialAndDataAccessRequestWithComments extends MaterialAndDataAccessRequest {
     comments: Comment[];
 }
 
