@@ -243,6 +243,200 @@ export const DEFAULT_KANBAN_COLUMNS = [
     }
 ]
 
+export const SAMPLE_PRESERVATION_METHOD_OPTIONS: Option[] = [
+    {
+        label: 'Fresh',
+        value: 'FRESH'
+    },
+    {
+        label: 'Frozen',
+        value: 'FROZEN'
+    },
+    {
+        label: 'Formalin-Fixed Paraffin-Embedded (FFPE)',
+        value: 'FFPE'
+    },
+    {
+        label: 'Stabilized in RNAlater',
+        value: 'RNALATER'
+    },
+    {
+        label: 'Lyophilized (Freeze-Dried)',
+        value: 'LYOPHILIZED'
+    },
+    {
+        label: 'Cryopreserved',
+        value: 'CRYOPRESERVED'
+    },
+    {
+        label: 'Preserved in Alcohol',
+        value: 'ALCOHOL'
+    },
+    {
+        label: 'Room Temperature Stabilized',
+        value: 'ROOMTEMP'
+    },
+    {
+        label: 'Other Chemical Fixative',
+        value: 'FIXED_OTHER'
+    },
+    {
+        label: 'Unknown',
+        value: 'UNKNOWN'
+    }
+];
+
+export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
+    {
+        label: 'Ambient Temperature',
+        value: 'AMBIENT'
+    },
+    {
+        label: 'Cold Pack (2–8°C)',
+        value: 'COLD_PACK'
+    },
+    {
+        label: 'Dry Ice (−78.5°C)',
+        value: 'DRY_ICE'
+    },
+    {
+        label: 'Liquid Nitrogen (LN₂)',
+        value: 'LN2'
+    },
+    {
+        label: 'Courier / Hand Delivery',
+        value: 'COURIER'
+    },
+    {
+        label: 'Standard Mail / Postal Service',
+        value: 'MAIL'
+    },
+    {
+        label: 'Specialized Medical Transport',
+        value: 'SPECIALIZED'
+    },
+    {
+        label: 'Transport with Electronic Tracking',
+        value: 'ELECTRONIC_TRACKING'
+    },
+    {
+        label: 'Unknown',
+        value: 'UNKNOWN'
+    }
+];
+
+export const DONOR_SEX_OPTIONS: Option[] = [
+    {
+        label: 'Male',
+        value: 'M'
+    },
+    {
+        label: 'Female',
+        value: 'F'
+    },
+    {
+        label: 'Intersex',
+        value: 'I'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
+export const DONOR_GENDER_OPTIONS: Option[] = [
+    {
+        label: 'Man',
+        value: 'M'
+    },
+    {
+        label: 'Woman',
+        value: 'F'
+    },
+    {
+        label: 'Non-Binary',
+        value: 'NB'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
+export const DONOR_RACE_OPTIONS: Option[] = [
+    {
+        label: 'American Indian or Alaska Native',
+        value: 'AIAN'
+    },
+    {
+        label: 'Asian',
+        value: 'A'
+    },
+    {
+        label: 'Black or African American',
+        value: 'BAA'
+    },
+    {
+        label: 'Native Hawaiian or Other Pacific Islander',
+        value: 'NHPI'
+    },
+    {
+        label: 'White',
+        value: 'W'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
+export const DONOR_ETHNICITY_OPTIONS: Option[] = [
+    {
+        label: 'Hispanic or Latino',
+        value: 'HL'
+    },
+    {
+        label: 'Not Hispanic or Latino',
+        value: 'NHL'
+    },
+    {
+        label: 'Other',
+        value: 'O'
+    },
+    {
+        label: 'Unknown',
+        value: 'U'
+    },
+    {
+        label: 'Prefer not to say',
+        value: 'PNTS'
+    }
+];
+
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // {
     //     label: 'All',

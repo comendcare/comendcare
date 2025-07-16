@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog"
-import {Asset, optionSchema} from "@comend/lib/types"
+import {Asset, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS} from "@comend/lib/types"
 import {Institution, MilestoneType, Prisma, ToolType} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -369,7 +369,7 @@ export function EditBiosampleToolForm({
     numAssetsPinned,
     closeDialog
 }: {
-    toolData: Partial<Asset>,
+    toolData: any,
     numAssetsPinned: number,
     closeDialog?: () => void
 }) {
@@ -399,6 +399,86 @@ export function EditBiosampleToolForm({
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
             contacts: toolData?.contacts || undefined,
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+
+            // biosmaple properties
+            // institution: toolData?.biosample?.institution?.name || undefined,
+            // anatomicalSite: toolData?.biosample?.anatomicalSite || undefined,
+            // pathology: toolData?.biosample?.anatomicalSite || undefined,
+            // preservationMethod: toolData?.biosample?.anatomicalSite || undefined,
+            // preservation: toolData?.biosample?.anatomicalSite || undefined,
+            // methodOfTransport: toolData?.biosample?.anatomicalSite || undefined,
+            // clinicalData: toolData?.biosample?.anatomicalSite || undefined,
+            // currentCountry: toolData?.biosample?.anatomicalSite || undefined,
+            // countryOfCollection: toolData?.biosample?.anatomicalSite || undefined,
+            // pmi: toolData?.biosample?.anatomicalSite || undefined,
+            // volume: toolData?.biosample?.anatomicalSite || undefined,
+            // mass: toolData?.biosample?.anatomicalSite || undefined,
+            // area: toolData?.biosample?.anatomicalSite || undefined,
+            // repository: toolData?.biosample?.anatomicalSite || undefined,
+            // productCode: toolData?.biosample?.anatomicalSite || undefined,
+            // priceUSD: toolData?.biosample?.anatomicalSite || undefined,
+            // priceGBP: toolData?.biosample?.anatomicalSite || undefined,
+            // priceEUR: toolData?.biosample?.anatomicalSite || undefined,
+            // premiumGroup: toolData?.biosample?.anatomicalSite || undefined,
+            // caseId: toolData?.biosample?.anatomicalSite || undefined,
+            // specimenId: toolData?.biosample?.anatomicalSite || undefined,
+            // format: toolData?.biosample?.anatomicalSite || undefined,
+            // subFormat: toolData?.biosample?.anatomicalSite || undefined,
+            // biosampleDiagnosis: toolData?.biosample?.anatomicalSite || undefined,
+            // measurement: toolData?.biosample?.anatomicalSite || undefined,
+            // significantVariantPositive: toolData?.biosample?.anatomicalSite || undefined,
+            // significantVariantWildtype: toolData?.biosample?.anatomicalSite || undefined,
+            // fusionPositive: toolData?.biosample?.anatomicalSite || undefined,
+            // fusionWildtype: toolData?.biosample?.anatomicalSite || undefined,
+            // cnvAbnormal: toolData?.biosample?.anatomicalSite || undefined,
+            // cnvNormal: toolData?.biosample?.anatomicalSite || undefined,
+            // hlaType: toolData?.biosample?.anatomicalSite || undefined,
+            // icf: toolData?.biosample?.anatomicalSite || undefined,
+            // irbLetter: toolData?.biosample?.anatomicalSite || undefined,
+            // yearOfExcision: toolData?.biosample?.anatomicalSite || undefined,
+            // classifier: toolData?.biosample?.anatomicalSite || undefined,
+            // primaryTumorOrgan: toolData?.biosample?.anatomicalSite || undefined,
+            // stage: toolData?.biosample?.anatomicalSite || undefined,
+            // stageGroup: toolData?.biosample?.anatomicalSite || undefined,
+            // serology: toolData?.biosample?.anatomicalSite || undefined,
+            // clinicalTestResults: toolData?.biosample?.anatomicalSite || undefined,
+            // serumAvailable: toolData?.biosample?.anatomicalSite || undefined,
+            // plasmaAvailable: toolData?.biosample?.anatomicalSite || undefined,
+            // wholeBloodAvailable: toolData?.biosample?.anatomicalSite || undefined,
+            // ffpeTumorAvailable: toolData?.biosample?.anatomicalSite || undefined,
+            // frozenTumorAvailable: toolData?.biosample?.anatomicalSite || undefined,
+            // er: toolData?.biosample?.anatomicalSite || undefined,
+            // pr: toolData?.biosample?.anatomicalSite || undefined,
+            // hercepTest: toolData?.biosample?.anatomicalSite || undefined,
+            // matchedPairId: toolData?.biosample?.anatomicalSite || undefined,
+            // mirroredPairId: toolData?.biosample?.anatomicalSite || undefined,
+            // donorAgeAtExcision: toolData?.biosample?.anatomicalSite || undefined,
+
+            // donor properties
+            age: toolData?.biosample?.donor?.age?.toString() || undefined,
+            sex: toolData?.biosample?.donor?.sex || undefined,
+            gender: toolData?.biosample?.donor?.gender || undefined,
+            race: toolData?.biosample?.donor?.race || undefined,
+            ethnicity: toolData?.biosample?.donor?.ethnicity || undefined,
+            treatments: toolData?.biosample?.donor?.treatments || undefined,
+            primaryDiagnosis: toolData?.biosample?.donor?.primaryDiagnosis || undefined,
+            diagnoses: toolData?.biosample?.donor?.diagnoses || undefined,
+            yearOfDeath: toolData?.biosample?.donor?.yearOfDeath?.toString() || undefined,
+            height: toolData?.biosample?.donor?.height?.toString() || undefined,
+            weight: toolData?.biosample?.donor?.weight?.toString() || undefined,
+            bmi: toolData?.biosample?.donor?.bmi?.toString() || undefined,
+            // menopausalStatus: z.boolean().optional(),
+            // ageAtLastMenstualPeriod: z.string().optional(),
+            // numberOfPregnancies: z.string().optional(),
+            // numberOfLiveBirths: z.string().optional(),
+            // smokingStatus: z.boolean().optional(),
+            // cigarettesPerDay: z.string().optional(),
+            // alcoholStatus: z.boolean().optional(),
+            // drinksPerDay: z.string().optional(),
+            // alcoholDuration: z.string().optional(),
+            medications: toolData?.biosample?.donor?.medications || undefined,
+            causeOfDeath: toolData?.biosample?.donor?.causeOfDeath || undefined,
+            conditionSeverity: toolData?.biosample?.donor?.conditionSeverity || undefined,
         }
     })
 
@@ -832,16 +912,9 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="FRESH">Fresh</SelectItem>
-                                    <SelectItem value="FROZEN">Frozen</SelectItem>
-                                    <SelectItem value="FFPE">Formalin-Fixed Paraffin-Embedded (FFPE)</SelectItem>
-                                    <SelectItem value="RNALATER">Stabilized in RNAlater</SelectItem>
-                                    <SelectItem value="LYOPHILIZED">Lyophilized (Freeze-Dried)</SelectItem>
-                                    <SelectItem value="CRYOPRESERVED">Cryopreserved</SelectItem>
-                                    <SelectItem value="ALCOHOL">Preserved in Alcohol</SelectItem>
-                                    <SelectItem value="ROOMTEMP">Room Temperature Stabilized</SelectItem>
-                                    <SelectItem value="FIXED_OTHER">Other Chemical Fixative</SelectItem>
-                                    <SelectItem value="UNKNOWN">Unknown</SelectItem>
+                                    {SAMPLE_PRESERVATION_METHOD_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                                 </Select>
                             </FormControl>
@@ -864,15 +937,9 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="AMBIENT">Ambient Temperature</SelectItem>
-                                    <SelectItem value="COLD_PACK">Cold Pack (2–8°C)</SelectItem>
-                                    <SelectItem value="DRY_ICE">Dry Ice (−78.5°C)</SelectItem>
-                                    <SelectItem value="LN2">Liquid Nitrogen (LN₂)</SelectItem>
-                                    <SelectItem value="COURIER">Courier / Hand Delivery</SelectItem>
-                                    <SelectItem value="MAIL">Standard Mail / Postal Service</SelectItem>
-                                    <SelectItem value="SPECIALIZED">Specialized Medical Transport</SelectItem>
-                                    <SelectItem value="ELECTRONIC_TRACKING">Transport with Electronic Tracking</SelectItem>
-                                    <SelectItem value="UNKNOWN">Unknown</SelectItem>
+                                    {SAMPLE_TRANSPORT_METHOD_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                                 </Select>
                             </FormControl>
@@ -1228,17 +1295,14 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Sex`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select>
+                                <Select {...field}>
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="M">Male</SelectItem>
-                                    <SelectItem value="F">Female</SelectItem>
-                                    <SelectItem value="I">Intersex</SelectItem>
-                                    <SelectItem value="O">Other</SelectItem>
-                                    <SelectItem value="U">Unknown</SelectItem>
-                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                    {DONOR_SEX_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                                 </Select>
                             </FormControl>
@@ -1256,17 +1320,14 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Gender`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select>
+                                <Select {...field}>
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="M">Man</SelectItem>
-                                    <SelectItem value="F">Woman</SelectItem>
-                                    <SelectItem value="NB">Non-Binary</SelectItem>
-                                    <SelectItem value="O">Other</SelectItem>
-                                    <SelectItem value="U">Unknown</SelectItem>
-                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                    {DONOR_GENDER_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                                 </Select>
                             </FormControl>
@@ -1286,19 +1347,14 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Race`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select>
+                                <Select {...field}>
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="AIAN">American Indian or Alaska Native</SelectItem>
-                                    <SelectItem value="A">Asian</SelectItem>
-                                    <SelectItem value="BAA">Black or African American</SelectItem>
-                                    <SelectItem value="NHPI">Native Hawaiian or Other Pacific Islander</SelectItem>
-                                    <SelectItem value="W">White</SelectItem>
-                                    <SelectItem value="O">Other</SelectItem>
-                                    <SelectItem value="U">Unknown</SelectItem>
-                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                    {DONOR_RACE_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                                 </Select>
                             </FormControl>
@@ -1318,16 +1374,14 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[80px]">{`Ethnicity`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
-                                <Select>
+                                <Select {...field}>
                                 <SelectTrigger className="-mt-2 w-full h-[32px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="HL">Hispanic or Latino</SelectItem>
-                                    <SelectItem value="NHL">Not Hispanic or Latino</SelectItem>
-                                    <SelectItem value="O">Other</SelectItem>
-                                    <SelectItem value="U">Unknown</SelectItem>
-                                    <SelectItem value="PNTS">Prefer not to say</SelectItem>
+                                    {DONOR_ETHNICITY_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                                 </Select>
                             </FormControl>
