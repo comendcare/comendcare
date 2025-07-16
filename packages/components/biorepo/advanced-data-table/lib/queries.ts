@@ -3,11 +3,26 @@
 import prisma from "@comend/lib/prisma"
 import { unstable_cache } from "@comend/lib/unstable-cache";
 import { filterColumns } from "@comend/lib/filter-columns";
-import type { GetBiosamplesSchema, GetTasksSchema } from "./validations";
+import type { GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema } from "./validations";
 import {Status, Priority, Organization} from "@prisma/client";
 import { nanoid } from "nanoid";
-import { isEmpty } from "lodash";
-import { getSession, withOrganizationAuth } from "@comend/lib/auth";
+import { withOrganizationAuth } from "@comend/lib/auth";
+
+export const getBiosampleRequests = withOrganizationAuth(
+    async (organization: Organization, input: GetBiosampleRequestsSchema) => {
+        return unstable_cache(
+            async () => {
+                try {
+                    return { data: [], pageCount: 0 }
+                } catch {
+                    return { data: [], pageCount: 0 };
+                }
+            },
+            [JSON.stringify(input)],
+            { revalidate: 1, tags: ["biosamples"] },
+        )();
+    }
+)
 
 export const getBiosamples = withOrganizationAuth(
     async (organization: Organization, input: GetBiosamplesSchema) => {

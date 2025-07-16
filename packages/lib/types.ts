@@ -385,6 +385,29 @@ export const TOOL_TYPE_OPTIONS: any[] = [
     },
 ]
 
+export const REQUEST_STATUS_OPTIONS: any[] = [
+    {
+        id: 'REQUESTED',
+        label: 'Requested',
+    },
+    {
+        id: 'ADDITIONAL_INFORMATION',
+        label: 'Additional Information Required',
+    },
+    {
+        id: 'ACCEPTED',
+        label: 'Accepted',
+    },
+    {
+        id: 'SHIPPED',
+        label: 'Shipped',
+    },
+    {
+        id: 'DENIED',
+        label: 'Denied',
+    },
+]
+
 export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'BASICSCIENCE',
