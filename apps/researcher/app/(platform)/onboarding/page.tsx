@@ -22,7 +22,10 @@ import {Checkbox} from "@comend/components/ui/checkbox";
 import {AddressType, Option} from "@comend/lib/types";
 import React, {useEffect, useState} from "react";
 import {FileWithPreview} from "@comend/components/image-selector";
-import {getInvitations, getPublicOrganizationData, getResearcher, getUser} from "@comend/lib/fetchers";
+import {
+    getResearcherFromUserId,
+    getUser
+} from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {getPublicFile} from "@comend/lib/utils";
@@ -61,8 +64,6 @@ export default function ResearcherOnboardingForm() {
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
-    const [invitations, setInvitations] = useState<any[]>([]);
-    const hasInvitations = invitations.length > 0;
     const [isInitializing, setIsInitializing] = useState(true)
 
     const [defaultValues, setDefaultValues] = useState<z.infer<typeof userFormSchema> | undefined>(undefined);
@@ -77,7 +78,7 @@ export default function ResearcherOnboardingForm() {
         async function fetchResearcherData() {
             if (session?.user?.id) {
                 let userData
-                const response = await getResearcher(session.user.id, {
+                const response = await getResearcherFromUserId(session.user.id, {
                     id: true,
                     orcid: true,
                     email: true,
@@ -213,7 +214,23 @@ export default function ResearcherOnboardingForm() {
                 values.image = imgUrl || undefined
             }
 
-            const res: any = await updateResearcher(session?.user?.id, values);
+            // Extract and update User fields
+            const userFields = {
+                name: values.name,
+                notificationSettings: values.notificationSettings,
+                consentSettings: values.consentSettings,
+            };
+
+            const userUpdateRes = await editUser(session?.user?.id as string, userFields);
+            if (userUpdateRes?.error) {
+                toast.error(userUpdateRes.error);
+                return;
+            }
+
+            const { name, notificationSettings, consentSettings, ...researcherOnlyValues } = values;
+
+            console.log(researcherOnlyValues)
+            const res: any = await updateResearcher(session?.user?.id, researcherOnlyValues);
             if (res?.error) {
                 toast.error(res.error);
                 return;
@@ -223,6 +240,7 @@ export default function ResearcherOnboardingForm() {
             router.push("/profile");
         } catch (error) {
             toast.error("An error occurred while updating your profile.");
+            console.log(error)
         } finally {
             setLoading(false);
         }

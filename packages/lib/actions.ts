@@ -3888,36 +3888,66 @@ export const deletePharmaProject = withAuth(
 )
 
 export const updateResearcher = withAuth(
-    async (_id: unknown, data: { [key: string]: unknown }) => {
+    async (_id: unknown, data: { [key: string]: any }) => {
         const session = await getSession();
         if (!session?.user.id) {
-            return {
-                error: "Not authenticated"
-            };
+            return { error: "Not authenticated" };
         }
 
         try {
-            const response = await prisma.researcher.update({
-                where: {
-                    id: session.user.id
-                },
-                data: data, // Pass the data object directly
+            const researcher = await prisma.researcher.findUnique({
+                where: { userId: session.user.id },
+                select: { id: true },
             });
+
+            if (!researcher) return { error: "Researcher not found" };
+
+            // 1. Delete existing affiliations
+            await prisma.affiliation.deleteMany({
+                where: { researcherId: researcher.id },
+            });
+
+            // 2. Create new affiliations if provided
+            if (Array.isArray(data.affiliations)) {
+                const newAffiliations = data.affiliations.map((a: any) => ({
+                    researcherId: researcher.id,
+                    institutionId: a.value, // `value` is institutionId
+                }));
+
+                await prisma.affiliation.createMany({
+                    data: newAffiliations,
+                });
+            }
+
+            // 3. Update researcher fields
+            const response = await prisma.researcher.update({
+                where: { userId: session.user.id },
+                data: {
+                    title: data.title,
+                    researchInterests: {
+                        set: data.researchInterests?.map((r: any) => r.value) || [],
+                    },
+                    genesOfInterest: {
+                        set: data.genesOfInterest?.map((g: any) => g.value) || [],
+                    },
+                    conditionsOfInterest: {
+                        set: data.conditionsOfInterest?.map((c: any) => c.value) || [],
+                    },
+                },
+            });
+
             return response;
         } catch (error: any) {
             if (error.code === "P2002") {
-                const field = Object.keys(data)[0]; // Identify which field caused the conflict
-                return {
-                    error: `This ${field} is already in use`
-                };
+                const field = Object.keys(data)[0];
+                return { error: `This ${field} is already in use` };
             } else {
-                return {
-                    error: error.message
-                };
+                console.error(error);
+                return { error: error.message };
             }
         }
     }
-)
+);
 
 export const createMaterialAndDataAccessRequest = withResearcherAuth(
     async (formData: FormData) => {
