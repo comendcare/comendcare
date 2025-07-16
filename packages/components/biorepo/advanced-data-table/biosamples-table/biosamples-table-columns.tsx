@@ -165,70 +165,70 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const sampleInfoColumns: ColumnDef<any>[] = [
     {
       id: "currentCountry",
-      accessorKey: "currentCountry",
+      accessorKey: "biosample.currentCountry",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Current Location" />
       ),
     },
     {
-      id: "collectionCountry",
-      accessorKey: "collectionCountry",
+      id: "countryOfCollection",
+      accessorKey: "biosample.countryOfCollection",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Location of Collection" />
       ),
     },
     {
       id: "volume",
-      accessorKey: "volume",
+      accessorKey: "biosample.volume",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Available Volume" />
       ),
     },
     {
       id: "institution",
-      accessorKey: "institution",
+      accessorKey: "biosample.institution.name",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Institution" />
       ),
     },
     {
       id: "pathology",
-      accessorKey: "pathology",
+      accessorKey: "biosample.pathology",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Pathology" />
       ),
     },
     {
       id: "preservationMethod",
-      accessorKey: "preservationMethod",
+      accessorKey: "biosample.preservationMethod",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Preservation Method" />
       ),
     },
     {
       id: "anatomicalSite",
-      accessorKey: "anatomicalSite",
+      accessorKey: "biosample.anatomicalSite",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Anatomical Site" />
       ),
     },
     {
       id: "format",
-      accessorKey: "format",
+      accessorKey: "biosample.format",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Format" />
       ),
     },
     {
-      id: "transportMethod",
-      accessorKey: "transportMethod",
+      id: "methodOfTransport",
+      accessorKey: "biosample.methodOfTransport",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Method of Transport" />
       ),
     },
     {
-      id: "excisionYear",
-      accessorKey: "excisionYear",
+      id: "yearOfExcision",
+      accessorKey: "biosample.yearOfExcision",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Year of Excision" />
       ),
@@ -238,86 +238,113 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const donorInfoColumns: ColumnDef<any>[] = [
     {
       id: "donorId",
-      accessorKey: "donorId",
+      accessorKey: "biosample.donor.id",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Donor Id" />
       ),
     },
     {
       id: "diagnoses",
-      accessorKey: "diagnoses",
+      accessorKey: "biosample.donor.diagnoses",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Diagnoses" />
+      ),
+      cell: ({ row }) => (
+          <ul className="flex flex-col gap-2">
+              {row.original.biosample.donor.diagnoses.map((diagnosis: string, index: number) => (
+                  <li key={index} className="line-clamp-2">
+                      {diagnosis}
+                  </li>
+              ))}
+          </ul>
       ),
     },
     {
       id: "age",
-      accessorKey: "age",
+      accessorKey: "biosample.donor.age",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Age" />
       ),
     },
     {
       id: "sex",
-      accessorKey: "sex",
+      accessorKey: "biosample.donor.sex",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Sex" />
       ),
     },
     {
       id: "gender",
-      accessorKey: "gender",
+      accessorKey: "biosample.donor.gender",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Gender" />
       ),
     },
     {
       id: "race",
-      accessorKey: "race",
+      accessorKey: "biosample.donor.race",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Race" />
       ),
     },
     {
       id: "ethnicity",
-      accessorKey: "ethnicity",
+      accessorKey: "biosample.donor.ethnicity",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Ethnicity" />
       ),
     },
     {
       id: "height",
-      accessorKey: "height",
+      accessorKey: "biosample.donor.height",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Height" />
       ),
     },
     {
       id: "weight",
-      accessorKey: "weight",
+      accessorKey: "biosample.donor.weight",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Weight" />
       ),
     },
     {
       id: "bmi",
-      accessorKey: "bmi",
+      accessorKey: "biosample.donor.bmi",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="BMI" />
       ),
     },
     {
       id: "medications",
-      accessorKey: "medications",
+      accessorKey: "biosample.donor.medications",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Medications" />
       ),
+      cell: ({ row }) => (
+          <ul className="flex flex-col gap-2">
+              {row.original.biosample.donor.medications.map((medication: string, index: number) => (
+                  <li key={index} className="line-clamp-2">
+                      {medication}
+                  </li>
+              ))}
+          </ul>
+      ),
     },
     {
-      id: "medicalTreatments",
-      accessorKey: "medicalTreatments",
+      id: "treatments",
+      accessorKey: "biosample.donor.treatments",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Medical Treatments" />
+      ),
+      cell: ({ row }) => (
+          <ul className="flex flex-col gap-2">
+              {row.original.biosample.donor.treatments.map((treatment: string, index: number) => (
+                  <li key={index} className="line-clamp-2">
+                      {treatment}
+                  </li>
+              ))}
+          </ul>
       ),
     },
   ]
