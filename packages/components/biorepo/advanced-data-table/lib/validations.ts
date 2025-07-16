@@ -67,6 +67,8 @@ export const biosampleSearchParamsCache = createSearchParamsCache({
   ]),
   title: parseAsString.withDefault(""),
   types: parseAsArrayOf(z.string()).withDefault([]),
+  currentCountry: parseAsString.withDefault(""),
+  countryOfCollection: parseAsString.withDefault(""),
   private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
   createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
   // advanced filter

@@ -79,10 +79,32 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
+                        if (input.currentCountry) {
+                            filters.push({
+                                id: 'biosample.currentCountry',
+                                value: input.currentCountry,
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.countryOfCollection) {
+                            filters.push({
+                                id: 'biosample.countryOfCollection',
+                                value: input.countryOfCollection,
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
                         where = filterColumns({
                             filters,
                             joinOperator: "and"
                         })
+
+                        console.log(`WHERE`, where)
                     }
 
                     const orderBy = input.sort.length

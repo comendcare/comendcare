@@ -90,11 +90,9 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {
               label: "Private", 
               value: "true",
-              // icon: Lock,
             }, {
               label: "Public", 
               value: "false",
-              // icon: Globe
             }
           ],
           icon: CircleDashed,
@@ -164,7 +162,9 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
 
   const sampleInfoColumns: ColumnDef<any>[] = [
     {
-      id: "currentCountry",
+      // NOTE: in order for filters to access the proper nested database object the path to
+      // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
+      id: "biosample.currentCountry",
       accessorKey: "biosample.currentCountry",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Current Location" />
@@ -174,9 +174,18 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {COUNTRY_OPTIONS.find(t => t.value === row.original.biosample?.currentCountry)?.label}
           </>
       ),
+      enableColumnFilter: true,
+      meta: {
+        label: "Current Location",
+        variant: "select",
+        options: COUNTRY_OPTIONS,
+        icon: CircleDashed,
+      },
     },
     {
-      id: "countryOfCollection",
+      // NOTE: in order for filters to access the proper nested database object the path to
+      // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.countryOfCollection)
+      id: "biosample.countryOfCollection",
       accessorKey: "biosample.countryOfCollection",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Location of Collection" />
@@ -186,6 +195,13 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {COUNTRY_OPTIONS.find(t => t.value === row.original.biosample?.countryOfCollection)?.label}
           </>
       ),
+      enableColumnFilter: true,
+      meta: {
+        label: "Location of Collection",
+        variant: "select",
+        options: COUNTRY_OPTIONS,
+        icon: CircleDashed,
+      },
     },
     {
       id: "volume",
