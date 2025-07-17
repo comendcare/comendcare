@@ -4,7 +4,7 @@ import prisma from "@comend/lib/prisma"
 import { unstable_cache } from "@comend/lib/unstable-cache";
 import { filterColumns } from "@comend/lib/filter-columns";
 import type { GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema } from "./validations";
-import {Status, Priority, Organization} from "@prisma/client";
+import {Status, Priority, Organization, Tool} from "@prisma/client";
 import { nanoid } from "nanoid";
 import { withOrganizationAuth } from "@comend/lib/auth";
 
@@ -23,9 +23,9 @@ export const getBiosampleRequests = withOrganizationAuth(
         )();
     }
 )
-
+ 
 export const getBiosamples = withOrganizationAuth(
-    async (organization: Organization, input: GetBiosamplesSchema) => {
+    async (organization: Organization, input: GetBiosamplesSchema): Promise<{data: Tool[], pageCount: number}> => {
         return unstable_cache(
             async () => {
                 try {
@@ -34,11 +34,18 @@ export const getBiosamples = withOrganizationAuth(
                         input.filterFlag === "advancedFilters"
 
                     let where: any = {};
+                    console.log(`input`, input)
 
                     if (advancedTable) {
                         const preProcessedFilters: any = input.filters.map(filter => ({
                             ...filter,
-                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                            // ...(filter.id === "biosample.volume" 
+                            //         && (
+                            //             (typeof filter.value === 'string' && {value: JSON.parse(filter.value)}) ||
+                            //             (Array.isArray(filter.value) && typeof filter.value[0] === 'string' && {value: filter.value.map(val => JSON.parse(val))})
+                            //         )
+                            //     )
                         }))
 
                         where = filterColumns({
@@ -79,11 +86,43 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
+                        if (input['biosample.currentCountry']) {
+                            filters.push({
+                                id: 'biosample.currentCountry',
+                                value: input['biosample.currentCountry'],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input['biosample.countryOfCollection']) {
+                            filters.push({
+                                id: 'biosample.countryOfCollection',
+                                value: input['biosample.countryOfCollection'],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input['biosample.volume']) {
+                            filters.push({
+                                id: 'biosample.volume',
+                                value: input['biosample.volume'],
+                                variant: 'range',
+                                operator: 'isBetween',
+                                filterId: nanoid()
+                            })
+                        }
+
                         where = filterColumns({
                             filters,
                             joinOperator: "and"
                         })
                     }
+
+                    console.log(`where object`, where)
 
                     const orderBy = input.sort.length
                         ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))

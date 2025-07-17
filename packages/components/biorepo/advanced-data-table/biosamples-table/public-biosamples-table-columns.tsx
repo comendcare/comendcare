@@ -12,7 +12,6 @@ import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import { COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
-import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 
 export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
@@ -90,11 +89,9 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {
               label: "Private", 
               value: "true",
-              // icon: Lock,
             }, {
               label: "Public", 
               value: "false",
-              // icon: Globe
             }
           ],
           icon: CircleDashed,
@@ -164,7 +161,9 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
 
   const sampleInfoColumns: ColumnDef<any>[] = [
     {
-      id: "currentCountry",
+      // NOTE: in order for filters to access the proper nested database object the path to
+      // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
+      id: "biosample.currentCountry",
       accessorKey: "biosample.currentCountry",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Current Location" />
@@ -174,9 +173,18 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {COUNTRY_OPTIONS.find(t => t.value === row.original.biosample?.currentCountry)?.label}
           </>
       ),
+      enableColumnFilter: true,
+      meta: {
+        label: "Current Location",
+        variant: "select",
+        options: COUNTRY_OPTIONS,
+        icon: CircleDashed,
+      },
     },
     {
-      id: "countryOfCollection",
+      // NOTE: in order for filters to access the proper nested database object the path to
+      // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.countryOfCollection)
+      id: "biosample.countryOfCollection",
       accessorKey: "biosample.countryOfCollection",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Location of Collection" />
@@ -186,13 +194,29 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             {COUNTRY_OPTIONS.find(t => t.value === row.original.biosample?.countryOfCollection)?.label}
           </>
       ),
+      enableColumnFilter: true,
+      meta: {
+        label: "Location of Collection",
+        variant: "select",
+        options: COUNTRY_OPTIONS,
+        icon: CircleDashed,
+      },
     },
     {
-      id: "volume",
+      // NOTE: in order for filters to access the proper nested database object the path to
+      // the nested object must be defined in BOTH the id & accessorKey
+      id: "biosample.volume",
       accessorKey: "biosample.volume",
       header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Available Volume" />
       ),
+      enableColumnFilter: true,
+      meta: {
+        label: "Available Volume",
+        variant: "range",
+        range: [0, 1000],
+        unit: 'ml'
+      },
     },
     {
       id: "institution",
@@ -397,7 +421,7 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const actionsColumn: ColumnDef<any>[] = [
     {
         id: "actions",
-        cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+        // cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
         enableHiding: false,
     },
   ]

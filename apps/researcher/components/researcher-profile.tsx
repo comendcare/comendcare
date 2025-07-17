@@ -20,6 +20,7 @@ import {
     Users,
 } from "lucide-react"
 import Link from "next/link"
+import {formatNumberWithCommas} from "@/packages/lib/utils";
 
 export default function ResearcherProfile({researcherData}: any) {
     const publications = researcherData?.publications ?? [];
@@ -118,7 +119,7 @@ export default function ResearcherProfile({researcherData}: any) {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="text-center">
                                         <div className="text-2xl font-bold text-blue-600">
-                                            {metrics.citations}
+                                            {formatNumberWithCommas(metrics.citations)}
                                         </div>
                                         <div className="text-sm text-gray-600">Citations</div>
                                     </div>

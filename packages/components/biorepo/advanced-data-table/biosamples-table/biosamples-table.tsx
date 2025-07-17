@@ -8,18 +8,12 @@ import { DataTableFilterMenu } from "@comend/components/biorepo/advanced-data-ta
 import { DataTableSortList } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-sort-list";
 import { DataTableToolbar } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-toolbar";
 import { useDataTable } from "@comend/lib/hooks/use-data-table";
-import { getBiosamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
+import { Tool } from "@prisma/client";
 
-interface BiosamplesTableProps {
-  promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>,
-  columns: ColumnDef<any>[]
-}
-
-export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
+export function BiosamplesTable({data, pageCount, columns}: {data: Tool[], pageCount: number, columns: ColumnDef<any>[]}) {
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags()
-  const [{ data, pageCount }] = React.use(promises)
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,
@@ -27,7 +21,7 @@ export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
     enableAdvancedFilter,
     initialState: {
       sorting: [],
-      columnPinning: { right: ["actions"] },
+      columnPinning: { right: ["actions"], left: ["title"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,

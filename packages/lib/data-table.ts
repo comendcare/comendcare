@@ -58,7 +58,14 @@ export function getFilterOperators(filterVariant: FilterVariant) {
 export function getDefaultFilterOperator(filterVariant: FilterVariant) {
   const operators = getFilterOperators(filterVariant);
 
-  return operators[0]?.value ?? (filterVariant === "text" ? "iLike" : "eq");
+  if (operators[0]?.value) {
+    if (filterVariant === 'text') return 'iLike'
+    if (filterVariant === 'range') return 'isBetween'
+  }
+
+  return 'eq'
+
+  // return operators[0]?.value ?? (filterVariant === "text" ? "iLike" : "eq")
 }
 
 export function getValidFilters<TData>(
