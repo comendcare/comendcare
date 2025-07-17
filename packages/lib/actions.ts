@@ -1853,34 +1853,40 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     title: toolData.title,
                     description: toolData.description,
                     types: toolData.types,
-                    attachments: {
-                        deleteMany: {}, // clear all existing attachments
-                        createMany: {
-                            data: (toolData?.attachments || []).map((attachment: any) => ({
-                                link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
-                    },
-                    contacts: {
-                        deleteMany: {},
-                        createMany: {
-                            data: (toolData?.contacts || []).map((contact: any) => ({
-                                name: contact.name,
-                                email: contact.email,
-                                ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
-                    },
-                    milestones: {
-                        deleteMany: {},
-                        create: (toolData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
+                    ...(toolData.attachments ? (
+                        {attachments: {
+                            deleteMany: {}, // clear all existing attachments
+                            createMany: {
+                                data: (toolData?.attachments || []).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
+                                }))
                             }
-                        }))
-                    },
+                        }}
+                    ): undefined),
+                    ...(toolData.contacts ? (
+                        {contacts: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (toolData?.contacts || []).map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(toolData.milestones ? (
+                        {milestones: {
+                            deleteMany: {},
+                            create: (toolData.milestones || []).map((milestone: any) => ({
+                                milestone: {
+                                    connect: {id: milestone.milestoneId}
+                                }
+                            }))
+                        },}
+                    ): undefined),
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
                     metadata: toolData.metadata as InputJsonObject,
