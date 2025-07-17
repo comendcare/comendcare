@@ -1,45 +1,9 @@
 "use client"
 
-import {Suspense} from "react";
-import Image from "next/image"
-import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import {BiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import {
-    getBiosamplesTableColumns
-} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
-import {getBiosamples} from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 
-export default function PublicBiosampleToolsPage({promises}: {promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>}) {
-    const columns = getBiosamplesTableColumns()
+export default function PublicBiosampleToolsPage() {
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-8">
-            <Shell className="">
-                <FeatureFlagsProvider>
-                    <Suspense
-                        fallback={
-                            <DataTableSkeleton
-                                columnCount={7}
-                                filterCount={2}
-                                cellWidths={[
-                                    "10rem",
-                                    "30rem",
-                                    "10rem",
-                                    "10rem",
-                                    "6rem",
-                                    "6rem",
-                                    "6rem",
-                                ]}
-                                shrinkZero
-                            />
-                        }
-                    >
-                        <BiosamplesTable promises={promises} columns={columns}/>
-                    </Suspense>
-                </FeatureFlagsProvider>
-            </Shell>
-        </main>
+        <></>
     )
 }
