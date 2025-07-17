@@ -27,9 +27,6 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
         {...search, filters: validFilters}
     )
 
-    console.log(`search`, search.filters)
-    console.log(`search params`, searchParams)
-
     // not part of an org
     if (!orgId) return <NoOrganization />
 

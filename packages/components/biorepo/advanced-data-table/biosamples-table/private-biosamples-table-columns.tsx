@@ -13,8 +13,18 @@ import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-
 import { COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
+import { revalidate } from "@comend/lib/revalidate";
+import { Button } from "@comend/components/ui/button";
+import { createOrUpdateAsset } from "@comend/lib/actions";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { Textarea } from "@comend/components/ui/textarea";
 
 export function getBiosamplesTableColumns(): ColumnDef<any>[] {
+  const {data: session} = useSession()
+  const pathname = usePathname()
+
   const comendColumns: ColumnDef<any>[] = [
     {
       id: "title",
@@ -22,6 +32,52 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Title" />
       ),
+      cell: ({ row, column }) => {
+        const [isEditing, setIsEditing] = useState(false)
+        const [value, setValue] = useState(row.original.title)
+        const inputRef = useRef<HTMLTextAreaElement>(null)
+
+        const onBlur = async () => {
+          await createOrUpdateAsset(
+            session?.user.organizationId,
+            {
+              id: row.original.id,
+              title: value
+            }
+          )
+          setIsEditing(false)
+          await revalidate(pathname)
+        };
+
+        useEffect(() => {
+          if (inputRef.current && isEditing) {
+            setTimeout(() => {
+              inputRef?.current?.focus()
+            }, 50)
+          } 
+        }, [isEditing])
+
+        if (!isEditing) {
+          return (
+            <div 
+              onClick={() => setIsEditing(true)} 
+              className={'min-w-[200px]'}
+            >
+              {value}
+            </div>
+          )
+        }
+
+        return (
+          <Textarea
+            ref={inputRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={onBlur}
+            className="border-none min-w-[200px]"
+          />
+        )
+      },
       meta: {
         label: "Title",
         placeholder: "Search titles...",
@@ -46,7 +102,7 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
         id: "types",
         accessorKey: "types",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Type" />
+            <DataTableColumnHeader column={column} title="Type"/>
         ),
         cell: ({ row }) => (
           <>
@@ -152,9 +208,23 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Pinned"/>
         ),
         cell: ({ row }) => (
-            <>
+            <Button 
+              onClick={
+                async () => {
+                  await createOrUpdateAsset(
+                    session?.user.organizationId, 
+                    {
+                      id: row.original.id,
+                      pinned: !row.original.pinned
+                    }
+                  )
+                  revalidate(pathname)
+                }
+              }
+              variant={'ghost'}
+            >
                 {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-            </>
+            </Button>
         ),
         enableHiding: true,
     },
