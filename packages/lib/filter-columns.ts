@@ -82,7 +82,7 @@ export function filterColumns({
       case "notILike":
         return filter.variant === "text" && typeof filter.value === "string"
             // ? { NOT: { [column]: { contains: filter.value, mode: "insensitive" } } }
-            ? getColumn(columns, { contains: filter.value, mode: "insensitive" })
+            ? { NOT: getColumn(columns, { contains: filter.value, mode: "insensitive" }) }
             : undefined;
 
       case "inArray":
