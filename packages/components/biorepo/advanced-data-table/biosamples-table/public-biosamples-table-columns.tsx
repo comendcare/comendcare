@@ -26,7 +26,6 @@ import {
     TOOL_TYPE_OPTIONS
 } from "@comend/lib/types";
 import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
-import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {revalidate} from "@comend/lib/revalidate";
 import {Button} from "@comend/components/ui/button";
 import {createOrUpdateAsset} from "@comend/lib/actions";
@@ -459,7 +458,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const actionsColumn: ColumnDef<any>[] = [
         {
             id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+            // cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+            cell: ({row}) => <></>,
             enableHiding: false,
         },
     ]
