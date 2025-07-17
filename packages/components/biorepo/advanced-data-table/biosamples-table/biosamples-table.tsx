@@ -17,9 +17,9 @@ interface BiosamplesTableProps {
   columns: ColumnDef<any>[]
 }
 
-export function BiosamplesTable({promises, columns}: BiosamplesTableProps) {
+export function BiosamplesTable({data, pageCount, columns}: {data: any, pageCount: number, columns: ColumnDef<any>[]}) {
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags()
-  const [{ data, pageCount }] = React.use(promises)
+  // const [{ data, pageCount }] = React.use(promises)
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,

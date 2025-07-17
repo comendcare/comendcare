@@ -20,13 +20,17 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
 
-    const promises = Promise.all([
-        getBiosamples(
-            session?.user.organizationId,
-            {...search, filters: validFilters}
-        ),
-    ]);
+    // const promises = Promise.all([
+    //     getBiosamples(
+    //         session?.user.organizationId,
+    //         {...search, filters: validFilters}
+    //     ),
+    // ]);
+    const {data, pageCount} = await getBiosamples(
+        session?.user.organizationId,
+        {...search, filters: validFilters}
+    )
 
     if (!orgId) return <NoOrganization />
-    return <PrivateBiosampleToolsPage promises={promises} />
+    return <PrivateBiosampleToolsPage data={data} pageCount={pageCount} />
 }

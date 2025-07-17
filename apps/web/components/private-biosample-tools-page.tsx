@@ -11,9 +11,9 @@ import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/she
 import { getBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
 import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 
-export const PrivateBiosampleToolsPage = ({promises}: {promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>}) => {
+export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: any, pageCount: number}) => {
     const columns = getBiosamplesTableColumns()
-    const [{ data }] = React.use(promises);
+    // const [{ data }] = React.use(promises);
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
@@ -60,7 +60,7 @@ export const PrivateBiosampleToolsPage = ({promises}: {promises: Promise<[Awaite
                                 />
                             }
                         >
-                            <BiosamplesTable promises={promises} columns={columns}/>
+                            <BiosamplesTable data={data} pageCount={pageCount} columns={columns}/>
                         </React.Suspense>
                     </FeatureFlagsProvider>
                 </Shell>
