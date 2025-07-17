@@ -4,7 +4,7 @@ import prisma from "@comend/lib/prisma"
 import { unstable_cache } from "@comend/lib/unstable-cache";
 import { filterColumns } from "@comend/lib/filter-columns";
 import type { GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema } from "./validations";
-import {Status, Priority, Organization} from "@prisma/client";
+import {Status, Priority, Organization, Tool} from "@prisma/client";
 import { nanoid } from "nanoid";
 import { withOrganizationAuth } from "@comend/lib/auth";
 
@@ -23,9 +23,9 @@ export const getBiosampleRequests = withOrganizationAuth(
         )();
     }
 )
-
+ 
 export const getBiosamples = withOrganizationAuth(
-    async (organization: Organization, input: GetBiosamplesSchema) => {
+    async (organization: Organization, input: GetBiosamplesSchema): Promise<{data: Tool[], pageCount: number}> => {
         return unstable_cache(
             async () => {
                 try {

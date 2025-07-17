@@ -11,37 +11,10 @@ import { useDataTable } from "@comend/lib/hooks/use-data-table";
 import { getDatasamples } from "../lib/queries";
 import { ColumnDef } from "@tanstack/react-table";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
+import { Tool } from "@prisma/client";
 
-interface DatasamplesTableProps {
-  // data: Asset[],
-  promises: Promise<
-    [
-      Awaited<ReturnType<typeof getDatasamples>>,
-      // Awaited<ReturnType<typeof getTaskStatusCounts>>,
-      // Awaited<ReturnType<typeof getTaskPriorityCounts>>,
-      // Awaited<ReturnType<typeof getEstimatedHoursRange>>,
-    ]
-  >,
-  columns: ColumnDef<any>[]
-}
-
-export function DatasamplesTable({promises, columns}: DatasamplesTableProps) {
+export function DatasamplesTable({data, pageCount, columns}: {data: Tool[], pageCount: number, columns: ColumnDef<any>[]}) {
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
-
-  const [
-    { data, pageCount },
-    // statusCounts,
-    // priorityCounts,
-    // estimatedHoursRange,
-  ] = React.use(promises);
-
-  console.log(`data values`, data)
-
-  // const columns = React.useMemo(
-  //   () => getDatasamplesTableColumns(),
-  //   []
-  // );
-
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,
