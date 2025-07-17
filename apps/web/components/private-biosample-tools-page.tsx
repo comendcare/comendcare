@@ -8,12 +8,12 @@ import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-tabl
 import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import { getBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
+import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
 import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 import { Tool } from "@prisma/client";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {
-    const columns = getBiosamplesTableColumns()
+    const columns = useBiosamplesTableColumns()
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
