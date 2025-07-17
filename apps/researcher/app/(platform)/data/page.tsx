@@ -8,12 +8,10 @@ import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-
 import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import {
     getBiosamplesTableColumns
-} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/biosamples-table-columns";
+} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import {getBiosamples} from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 
-export const PublicBiosampleToolsPage = ({promises}: {
-    promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>
-}) => {
+export default function PublicBiosampleToolsPage({promises}: {promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>}) {
     const columns = getBiosamplesTableColumns()
     const [{data}] = React.use(promises);
 

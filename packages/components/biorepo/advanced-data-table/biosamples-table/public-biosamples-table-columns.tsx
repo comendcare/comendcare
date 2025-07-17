@@ -12,7 +12,6 @@ import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import { COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
-import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 
 export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
@@ -422,7 +421,7 @@ export function getBiosamplesTableColumns(): ColumnDef<any>[] {
   const actionsColumn: ColumnDef<any>[] = [
     {
         id: "actions",
-        cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+        // cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
         enableHiding: false,
     },
   ]
