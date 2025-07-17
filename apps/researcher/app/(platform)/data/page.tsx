@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react";
+import {Suspense} from "react";
 import Image from "next/image"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {BiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
@@ -13,13 +13,12 @@ import {getBiosamples} from "@/packages/components/biorepo/advanced-data-table/l
 
 export default function PublicBiosampleToolsPage({promises}: {promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>}) {
     const columns = getBiosamplesTableColumns()
-    const [{data}] = React.use(promises);
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-8">
             <Shell className="">
                 <FeatureFlagsProvider>
-                    <React.Suspense
+                    <Suspense
                         fallback={
                             <DataTableSkeleton
                                 columnCount={7}
@@ -38,7 +37,7 @@ export default function PublicBiosampleToolsPage({promises}: {promises: Promise<
                         }
                     >
                         <BiosamplesTable promises={promises} columns={columns}/>
-                    </React.Suspense>
+                    </Suspense>
                 </FeatureFlagsProvider>
             </Shell>
         </main>
