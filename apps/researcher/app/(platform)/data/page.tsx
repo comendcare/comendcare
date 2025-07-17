@@ -1,63 +1,48 @@
+"use client"
+
 import * as React from "react";
-import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { Shell } from "@comend/components/biorepo/advanced-data-table/tasks-table/shell";
-import { getValidFilters } from "@comend/lib/data-table";
-import type { SearchParams } from "@comend/components/types";
-
-import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/tasks-table/feature-flags-provider";
-import { TasksTable } from "@comend/components/biorepo/advanced-data-table/tasks-table/tasks-table";
+import Image from "next/image"
+import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
+import {BiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
+import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import {
-    getEstimatedHoursRange,
-    getTaskPriorityCounts,
-    getTaskStatusCounts,
-    getTasks,
-} from "@comend/components/biorepo/advanced-data-table/lib/queries";
-import { searchParamsCache } from "@comend/components/biorepo/advanced-data-table/lib/validations";
+    getBiosamplesTableColumns
+} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/biosamples-table-columns";
+import {getBiosamples} from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 
-interface IndexPageProps {
-    searchParams: Promise<SearchParams>;
-}
-
-export default async function IndexPage(props: IndexPageProps) {
-    const searchParams = await props.searchParams;
-    const search = searchParamsCache.parse(searchParams);
-
-    const validFilters = getValidFilters(search.filters);
-
-    const promises = Promise.all([
-        getTasks({
-            ...search,
-            filters: validFilters,
-        }),
-        getTaskStatusCounts(),
-        getTaskPriorityCounts(),
-        getEstimatedHoursRange(),
-    ]);
+export const PublicBiosampleToolsPage = ({promises}: {
+    promises: Promise<[Awaited<ReturnType<typeof getBiosamples>>]>
+}) => {
+    const columns = getBiosamplesTableColumns()
+    const [{data}] = React.use(promises);
 
     return (
-        <Shell className="gap-2">
-            <FeatureFlagsProvider>
-                <React.Suspense
-                    fallback={
-                        <DataTableSkeleton
-                            columnCount={7}
-                            filterCount={2}
-                            cellWidths={[
-                                "10rem",
-                                "30rem",
-                                "10rem",
-                                "10rem",
-                                "6rem",
-                                "6rem",
-                                "6rem",
-                            ]}
-                            shrinkZero
-                        />
-                    }
-                >
-                    <TasksTable promises={promises} />
-                </React.Suspense>
-            </FeatureFlagsProvider>
-        </Shell>
-    );
+        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-8">
+            <Shell className="">
+                <FeatureFlagsProvider>
+                    <React.Suspense
+                        fallback={
+                            <DataTableSkeleton
+                                columnCount={7}
+                                filterCount={2}
+                                cellWidths={[
+                                    "10rem",
+                                    "30rem",
+                                    "10rem",
+                                    "10rem",
+                                    "6rem",
+                                    "6rem",
+                                    "6rem",
+                                ]}
+                                shrinkZero
+                            />
+                        }
+                    >
+                        <BiosamplesTable promises={promises} columns={columns}/>
+                    </React.Suspense>
+                </FeatureFlagsProvider>
+            </Shell>
+        </main>
+    )
 }
