@@ -1,4 +1,6 @@
-import {Paperclip} from "lucide-react";
+"use client"
+
+import {ArrowLeft, Paperclip} from "lucide-react";
 import RequestPageCommentSection from "~researcher/components/request-page-comment-section";
 import {MaterialAndDataAccessRequestWithResearcherAndComments} from "@comend/lib/types";
 import {Button} from "@comend/components/ui/button"
@@ -6,6 +8,7 @@ import {Card, CardContent} from "@comend/components/ui/card"
 import {Badge} from "@comend/components/ui/badge"
 import RequestPageTermsAndConditionsCard from "~researcher/components/request-page-terms-and-conditions-card";
 import RequestPageRequestStatusCard from "~researcher/components/request-page-request-status-card";
+import {useRouter} from "next/navigation";
 
 
 const getStatusBadge = (status: string) => {
@@ -26,10 +29,20 @@ const getStatusBadge = (status: string) => {
 export default function RequestPage({requestData}: {
     requestData: MaterialAndDataAccessRequestWithResearcherAndComments
 }) {
+    const router = useRouter()
+
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="grid grid-cols-3 space-x-8">
                 <div className="col-span-2 flex flex-col space-y-4">
+                    <Button
+                        variant="secondary"
+                        onClick={() => router.push("/requests")}
+                        className="w-min"
+                    >
+                        <ArrowLeft/>
+                        Back to all requests
+                    </Button>
                     <div className="flex items-center justify-between mb-4">
                         <div className="px-4 sm:px-0">
                             <h3 className="text-2xl font-semibold text-gray-900">

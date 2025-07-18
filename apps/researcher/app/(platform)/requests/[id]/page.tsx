@@ -41,10 +41,6 @@ export default async function ResearcherRequestsPage({
     }
 
     return (
-        <div
-            className="bg-red"
-        >
-            <RequestPage requestData={requestData}/>
-        </div>
+        <RequestPage requestData={requestData}/>
     )
 }
