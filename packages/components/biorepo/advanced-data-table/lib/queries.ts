@@ -1,31 +1,31 @@
 "use server";
 
 import prisma from "@comend/lib/prisma"
-import { unstable_cache } from "@comend/lib/unstable-cache";
-import { filterColumns } from "@comend/lib/filter-columns";
-import type { GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema } from "./validations";
+import {unstable_cache} from "@comend/lib/unstable-cache";
+import {filterColumns} from "@comend/lib/filter-columns";
+import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "./validations";
 import {Status, Priority, Organization, Tool} from "@prisma/client";
-import { nanoid } from "nanoid";
-import { withOrganizationAuth } from "@comend/lib/auth";
+import {nanoid} from "nanoid";
+import {withOrganizationAuth, withResearcherAuth} from "@comend/lib/auth";
 
 export const getBiosampleRequests = withOrganizationAuth(
     async (organization: Organization, input: GetBiosampleRequestsSchema) => {
         return unstable_cache(
             async () => {
                 try {
-                    return { data: [], pageCount: 0 }
+                    return {data: [], pageCount: 0}
                 } catch {
-                    return { data: [], pageCount: 0 };
+                    return {data: [], pageCount: 0};
                 }
             },
             [JSON.stringify(input)],
-            { revalidate: 1, tags: ["biosamples"] },
+            {revalidate: 1, tags: ["biosamples"]},
         )();
     }
 )
- 
+
 export const getBiosamples = withOrganizationAuth(
-    async (organization: Organization, input: GetBiosamplesSchema): Promise<{data: Tool[], pageCount: number}> => {
+    async (organization: Organization, input: GetBiosamplesSchema): Promise<{ data: Tool[], pageCount: number }> => {
         return unstable_cache(
             async () => {
                 try {
@@ -123,11 +123,11 @@ export const getBiosamples = withOrganizationAuth(
                     }
 
                     const orderBy = input.sort.length
-                        ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
-                        : [{ createdAt: "asc" }];
+                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                        : [{createdAt: "asc"}];
 
                     const toolTypes = await prisma.toolType.findMany({
-                        where: { type: 'biosample' }
+                        where: {type: 'biosample'}
                     })
 
                     const [data, total] = await prisma.$transaction([
@@ -136,31 +136,167 @@ export const getBiosamples = withOrganizationAuth(
                             take: input.perPage,
                             where: {
                                 ...where,
-                                types: { hasSome: toolTypes.map(type => type.id) },
+                                types: {hasSome: toolTypes.map(type => type.id)},
                                 organizationId: organization.id
                             },
                             include: {
-                                milestones: { include: {milestone: true} },
+                                milestones: {include: {milestone: true}},
                                 contacts: true,
                                 attachments: true,
-                                biosample: { include: { donor: true, institution: true } }
+                                biosample: {include: {donor: true, institution: true}}
                             },
                             orderBy,
                         }),
-                        prisma.tool.count({ where }),
+                        prisma.tool.count({where}),
                     ]);
 
                     const pageCount = Math.ceil(total / input.perPage);
-                    return { data, pageCount };
+                    return {data, pageCount};
                 } catch {
-                    return { data: [], pageCount: 0 };
+                    return {data: [], pageCount: 0};
                 }
             },
             [JSON.stringify(input)],
-            { revalidate: 1, tags: ["biosamples"] },
+            {revalidate: 1, tags: ["biosamples"]},
         )();
     }
 )
+
+export const getAllBiosamples = withResearcherAuth(
+    async (
+        _organization: Organization, // still required by the auth wrapper
+        input: GetBiosamplesSchema
+    ): Promise<{ data: Tool[]; pageCount: number }> => {
+        try {
+            const offset = (input.page - 1) * input.perPage;
+            const advancedTable = input.filterFlag === "advancedFilters";
+
+            let where: any = {};
+
+            if (advancedTable) {
+                const preProcessedFilters: any = input.filters.map((filter) => ({
+                    ...filter,
+                    ...(filter.id === "private"
+                        ? {value: filter.value === "true" ? true : false}
+                        : undefined),
+                }));
+
+                where = filterColumns({
+                    filters: preProcessedFilters,
+                    joinOperator: input.joinOperator,
+                });
+            } else {
+                const filters: any[] = [];
+
+                if (input.title) {
+                    filters.push({
+                        id: "title",
+                        value: input.title,
+                        variant: "text",
+                        operator: "iLike",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.private.length === 1) {
+                    filters.push({
+                        id: "private",
+                        value: input.private[0],
+                        variant: "select",
+                        operator: "eq",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.types.length > 0) {
+                    filters.push({
+                        id: "types",
+                        value: input.types,
+                        variant: "multiSelect",
+                        operator: "inArray",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input["biosample.currentCountry"]) {
+                    filters.push({
+                        id: "biosample.currentCountry",
+                        value: input["biosample.currentCountry"],
+                        variant: "select",
+                        operator: "eq",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input["biosample.countryOfCollection"]) {
+                    filters.push({
+                        id: "biosample.countryOfCollection",
+                        value: input["biosample.countryOfCollection"],
+                        variant: "select",
+                        operator: "eq",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input["biosample.volume"]) {
+                    filters.push({
+                        id: "biosample.volume",
+                        value: input["biosample.volume"],
+                        variant: "range",
+                        operator: "isBetween",
+                        filterId: nanoid(),
+                    });
+                }
+
+                where = filterColumns({
+                    filters,
+                    joinOperator: "and",
+                });
+            }
+
+            const orderBy = input.sort.length
+                ? input.sort.map((s) => ({
+                    [s.id]: s.desc ? "desc" : "asc",
+                }))
+                : [{createdAt: "asc"}];
+
+            const toolTypes = await prisma.toolType.findMany({
+                where: {type: "biosample"},
+            });
+
+            const [data, total] = await prisma.$transaction([
+                prisma.tool.findMany({
+                    skip: offset,
+                    take: input.perPage,
+                    where: {
+                        ...where,
+                        // types: {hasSome: toolTypes.map((type) => type.id)},
+                    },
+                    include: {
+                        milestones: {include: {milestone: true}},
+                        contacts: true,
+                        attachments: true,
+                        biosample: {include: {donor: true, institution: true}},
+                    },
+                    orderBy,
+                }),
+                prisma.tool.count({
+                    where: {
+                        ...where,
+                        types: {hasSome: toolTypes.map((type) => type.id)},
+                    },
+                }),
+            ]);
+
+            const pageCount = Math.ceil(total / input.perPage);
+
+            return {data, pageCount};
+        } catch (error) {
+            console.log(error)
+            return {data: [], pageCount: 0};
+        }
+    }
+);
 
 // export async function getBiosamples(input: GetBiosamplesSchema) {
 //     const session = await getSession()
@@ -323,11 +459,11 @@ export const getDatasamples = withOrganizationAuth(
                     }
 
                     const orderBy = input.sort.length
-                        ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
-                        : [{ createdAt: "asc" }];
+                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                        : [{createdAt: "asc"}];
 
                     const toolTypes = await prisma.toolType.findMany({
-                        where: { type: 'data' }
+                        where: {type: 'data'}
                     })
 
                     const [data, total] = await prisma.$transaction([
@@ -337,30 +473,30 @@ export const getDatasamples = withOrganizationAuth(
                             where: {
                                 ...where,
                                 OR: [
-                                    {types: { hasSome: toolTypes.map(type => type.id) }},
-                                    {types: { isEmpty: true }},
+                                    {types: {hasSome: toolTypes.map(type => type.id)}},
+                                    {types: {isEmpty: true}},
                                 ],
                                 organizationId: organization.id
                             },
                             include: {
-                                milestones: { include: {milestone: true} },
+                                milestones: {include: {milestone: true}},
                                 contacts: true,
                                 attachments: true,
                             },
                             orderBy,
                         }),
-                        prisma.tool.count({ where }),
+                        prisma.tool.count({where}),
                     ]);
 
                     const pageCount = Math.ceil(total / input.perPage);
-                    return { data, pageCount };
+                    return {data, pageCount};
                 } catch {
-                    return { data: [], pageCount: 0 };
+                    return {data: [], pageCount: 0};
                 }
             },
             [JSON.stringify(input)],
-            { revalidate: 1, tags: ["biosamples"] },
-        )(); 
+            {revalidate: 1, tags: ["biosamples"]},
+        )();
     }
 )
 
@@ -485,22 +621,22 @@ export async function getTasks(input: GetTasksSchema) {
                     });
                 } else {
                     if (input.title) {
-                        where.title = { contains: input.title, mode: "insensitive" };
+                        where.title = {contains: input.title, mode: "insensitive"};
                     }
 
                     if (input.status.length > 0) {
-                        where.status = { in: input.status };
+                        where.status = {in: input.status};
                     }
 
                     if (input.priority.length > 0) {
-                        where.priority = { in: input.priority };
+                        where.priority = {in: input.priority};
                     }
 
                     if (input.estimatedHours.length === 2) {
                         const [min, max] = input.estimatedHours;
                         where.estimatedHours = {
-                            ...(min !== undefined ? { gte: min } : {}),
-                            ...(max !== undefined ? { lte: max } : {}),
+                            ...(min !== undefined ? {gte: min} : {}),
+                            ...(max !== undefined ? {lte: max} : {}),
                         };
                     }
 
@@ -513,15 +649,15 @@ export async function getTasks(input: GetTasksSchema) {
                         if (toDate) toDate.setHours(23, 59, 59, 999);
 
                         where.createdAt = {
-                            ...(fromDate ? { gte: fromDate } : {}),
-                            ...(toDate ? { lte: toDate } : {}),
+                            ...(fromDate ? {gte: fromDate} : {}),
+                            ...(toDate ? {lte: toDate} : {}),
                         };
                     }
                 }
 
                 const orderBy = input.sort.length
-                    ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
-                    : [{ createdAt: "asc" }];
+                    ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                    : [{createdAt: "asc"}];
 
                 const [data, total] = await prisma.$transaction([
                     prisma.task.findMany({
@@ -530,17 +666,17 @@ export async function getTasks(input: GetTasksSchema) {
                         where,
                         orderBy,
                     }),
-                    prisma.task.count({ where }),
+                    prisma.task.count({where}),
                 ]);
 
                 const pageCount = Math.ceil(total / input.perPage);
-                return { data, pageCount };
+                return {data, pageCount};
             } catch {
-                return { data: [], pageCount: 0 };
+                return {data: [], pageCount: 0};
             }
         },
         [JSON.stringify(input)],
-        { revalidate: 1, tags: ["tasks"] },
+        {revalidate: 1, tags: ["tasks"]},
     )();
 }
 
@@ -575,7 +711,7 @@ export async function getTaskStatusCounts() {
             }
         },
         ["task-status-counts"],
-        { revalidate: 3600 },
+        {revalidate: 3600},
     )();
 }
 
@@ -608,7 +744,7 @@ export async function getTaskPriorityCounts() {
             }
         },
         ["task-priority-counts"],
-        { revalidate: 3600 },
+        {revalidate: 3600},
     )();
 }
 
@@ -617,8 +753,8 @@ export async function getEstimatedHoursRange() {
         async () => {
             try {
                 const result = await prisma.task.aggregate({
-                    _min: { estimatedHours: true },
-                    _max: { estimatedHours: true },
+                    _min: {estimatedHours: true},
+                    _max: {estimatedHours: true},
                 });
 
                 return {
@@ -626,10 +762,10 @@ export async function getEstimatedHoursRange() {
                     max: result._max.estimatedHours ?? 0,
                 };
             } catch {
-                return { min: 0, max: 0 };
+                return {min: 0, max: 0};
             }
         },
         ["estimated-hours-range"],
-        { revalidate: 3600 },
+        {revalidate: 3600},
     )();
 }

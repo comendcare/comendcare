@@ -5,7 +5,7 @@ import {SearchParams} from "@/packages/components/types"
 import {biosampleSearchParamsCache} from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import {getValidFilters} from "@/packages/lib/data-table"
 import PublicBiosampleToolsPage from "~researcher/components/public-biosamples-tools-page"
-import {getAllBiosamples} from "~researcher/lib/fetchers";
+import {getAllBiosamples} from "@comend/components/biorepo/advanced-data-table/lib/queries"
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,6 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
         session?.user.id,
         {...search, filters: validFilters}
     )
-    console.log("flawnson", data[4])
 
     // this org has no biosample tools (i.e. filters are empty and there is still no data)
     if (data.length === 0 && Object.keys(searchParams).length === 0) {
