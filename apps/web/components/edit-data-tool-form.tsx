@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin } from "lucide-react"
+import { Delete, Info, Pin } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -373,46 +373,39 @@ export function EditDataToolForm({
                         </>
                     )}
 
-                    <FormItem className="flex gap-4 items-center">
-                        <div className="grow">
-                        <FormLabel>Visibility</FormLabel>
-                        <FormDescription>
-                            {`Private tools will not be shown to people outside of your organization.`}
-                        </FormDescription>
-                        </div>
-                        <div className="w-[90px]">
+                    <FormItem className="flex gap-2 items-center">
+                        <FormLabel className="flex items-center gap-1 grow">
+                            Visibility
+                            <Tooltip delayDuration={0}>
+                                <TooltipTrigger>
+                                    <Info className="h-4 w-4"/>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                    {`Private tools will not be shown to people outside of your organization.`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </FormLabel>
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                        </div>
-                    </FormItem>
-
-                    {formData.isPrivate === false && (
                         <Tooltip>
                             <TooltipTrigger onClick={(e) => e.preventDefault()}>
                                 <FormField 
                                     control={form.control}
                                     name="isPinned"
                                     render={({field}) => (
-                                        <FormItem className="flex gap-2 items-center text-left">
-                                            <div>
-                                            <FormLabel>{`Pinned to Profile`}</FormLabel>
-                                            <FormDescription>
-                                                {`Showcase this Tool at the top of your organization’s Tool section so it's easy to find and stands out.`}
-                                            </FormDescription>
-                                            </div>
-                                            <FormControl className="justify-self-end">
-                                                <Button 
-                                                    disabled={!toolData.pinned && numAssetsPinned >= 5}
-                                                    variant="ghost" 
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        form.setValue("isPinned", !field.value)
-                                                    }}
-                                                >
-                                                    {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                                </Button>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                        <FormControl className="-mt-2">
+                                            <Button 
+                                                disabled={formData.isPrivate || (!toolData.pinned && numAssetsPinned >= 5)}
+                                                variant="ghost" 
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    form.setValue("isPinned", !field.value)
+                                                }}
+                                                className="p-2"
+                                            >
+                                                {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                                Pinned to profile
+                                            </Button>
+                                        </FormControl>
                                     )}
                                 />
                             </TooltipTrigger>
@@ -421,8 +414,13 @@ export function EditDataToolForm({
                                     <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
                                 </TooltipContent>
                             )}
+                            {formData.isPrivate && (
+                                <TooltipContent className="max-w-[200px]">
+                                    <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
+                                </TooltipContent>
+                            )}
                         </Tooltip>
-                    )}
+                    </FormItem>
 
                     <FormField
                         control={form.control}
