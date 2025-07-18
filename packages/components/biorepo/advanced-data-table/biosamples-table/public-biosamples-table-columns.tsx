@@ -75,7 +75,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {(row.original.types || []).map((type: string, index: number) => {
                         const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
                         return (
-                            <MilestoneTypeBadge key={index} label={typeOption.label}/>
+                            <MilestoneTypeBadge key={index} label={typeOption?.label}/>
                         )
                     })}
                 </>

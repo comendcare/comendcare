@@ -20,10 +20,10 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
 
     const {data, pageCount} = await getAllBiosamples(
-        session?.user.organizationId,
+        session?.user.id,
         {...search, filters: validFilters}
     )
-    console.log(data)
+    console.log("flawnson", data[4])
 
     // this org has no biosample tools (i.e. filters are empty and there is still no data)
     if (data.length === 0 && Object.keys(searchParams).length === 0) {
