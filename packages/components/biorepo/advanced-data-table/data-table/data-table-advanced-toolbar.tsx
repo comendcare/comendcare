@@ -5,6 +5,7 @@ import type * as React from "react";
 
 import { DataTableViewOptions } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-view-options";
 import { cn } from "@comend/lib/utils";
+import { DataTableSortList } from "./data-table-sort-list";
 
 interface DataTableAdvancedToolbarProps<TData>
   extends React.ComponentProps<"div"> {
@@ -29,6 +30,7 @@ export function DataTableAdvancedToolbar<TData>({
     >
       <div className="flex flex-1 flex-wrap items-center gap-2">{children}</div>
       <div className="flex items-center gap-2">
+        <DataTableSortList table={table} />
         <DataTableViewOptions table={table} />
       </div>
     </div>

@@ -35,27 +35,16 @@ export function BiosamplesTable({data, pageCount, columns}: {data: Tool[], pageC
       >
         {enableAdvancedFilter ? (
           <DataTableAdvancedToolbar table={table}>
-            <DataTableSortList table={table} align="start" />
-            {filterFlag === "advancedFilters" ? (
-              <DataTableFilterList
-                table={table}
-                shallow={shallow}
-                debounceMs={debounceMs}
-                throttleMs={throttleMs}
-                align="start"
-              />
-            ) : (
-              <DataTableFilterMenu
-                table={table}
-                shallow={shallow}
-                debounceMs={debounceMs}
-                throttleMs={throttleMs}
-              />
-            )}
+            <DataTableFilterList
+              table={table}
+              shallow={shallow}
+              debounceMs={debounceMs}
+              throttleMs={throttleMs}
+              align="start"
+            />
           </DataTableAdvancedToolbar>
         ) : (
           <DataTableToolbar table={table}>
-            <DataTableSortList table={table} align="end" />
           </DataTableToolbar>
         )}
       </DataTable>

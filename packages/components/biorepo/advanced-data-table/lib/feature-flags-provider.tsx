@@ -10,6 +10,8 @@ import {
   TooltipTrigger,
 } from "@comend/components/ui/tooltip";
 import { type FlagConfig, flagConfig } from "@comend/lib/config/flag";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs";
+import { Card, CardDescription, CardHeader, CardTitle } from "ui/card";
 
 type FilterFlag = FlagConfig["featureFlags"][number]["value"];
 
@@ -73,7 +75,38 @@ export function FeatureFlagsProvider({ children }: FeatureFlagsProviderProps) {
   return (
     <FeatureFlagsContext.Provider value={contextValue}>
       <div className="w-full overflow-x-auto p-1">
-        <ToggleGroup
+
+        <Tabs 
+          // defaultValue={flagConfig.featureFlags[0].value}
+          value={filterFlag || flagConfig.featureFlags[0].value }
+          onValueChange={onFilterFlagChange}
+        >
+          <TabsList>
+            {flagConfig.featureFlags.map((flag) => (
+              <Tooltip key={flag.value}>
+                  <TooltipTrigger>
+                    <TabsTrigger value={flag.value} className="flex gap-2">
+                        <flag.icon className="size-3.5 shrink-0" />
+                        {flag.label}
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                <TooltipContent
+                  align="start"
+                  side="top"
+                  sideOffset={6}
+                  className="flex flex-col gap-1.5 border bg-background py-2 font-semibold text-foreground [&>span]:hidden"
+                >
+                  <div>{flag.tooltipTitle}</div>
+                  <p className="text-balance text-muted-foreground text-xs">
+                    {flag.tooltipDescription}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </TabsList>
+        </Tabs>
+
+        {/* <ToggleGroup
           type="single"
           variant="outline"
           size="sm"
@@ -88,7 +121,7 @@ export function FeatureFlagsProvider({ children }: FeatureFlagsProviderProps) {
                 className="whitespace-nowrap px-3 text-xs data-[state=on]:bg-accent/70 data-[state=on]:hover:bg-accent/90"
                 asChild
               >
-                <TooltipTrigger className="flex gap-2 items-center">
+                <TooltipTrigger>
                   <flag.icon className="size-3.5 shrink-0" />
                   {flag.label}
                 </TooltipTrigger>
@@ -106,7 +139,7 @@ export function FeatureFlagsProvider({ children }: FeatureFlagsProviderProps) {
               </TooltipContent>
             </Tooltip>
           ))}
-        </ToggleGroup>
+        </ToggleGroup> */}
       </div>
       {children}
     </FeatureFlagsContext.Provider>

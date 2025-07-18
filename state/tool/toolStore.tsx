@@ -25,6 +25,7 @@ export const useToolStore = create<ToolState>()(
                 set({tools, toolTypes, initialized: true})
             },
             createTool: async (tool: Partial<Asset>, orgId: string) => {
+                console.log(`create tool`, tool)
                 const newAsset = await createOrUpdateAsset(orgId, tool)
 
                 mixpanelTrack("Tool Created", {
