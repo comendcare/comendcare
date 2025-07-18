@@ -36,8 +36,6 @@ export function DatasamplesTable({data, pageCount, columns}: {data: Tool[], page
       >
         {enableAdvancedFilter ? (
           <DataTableAdvancedToolbar table={table}>
-            <DataTableSortList table={table} align="start" />
-            {filterFlag === "advancedFilters" ? (
               <DataTableFilterList
                 table={table}
                 shallow={shallow}
@@ -45,20 +43,9 @@ export function DatasamplesTable({data, pageCount, columns}: {data: Tool[], page
                 throttleMs={throttleMs}
                 align="start"
               />
-            ) : (
-              <DataTableFilterMenu
-                table={table}
-                shallow={shallow}
-                debounceMs={debounceMs}
-                throttleMs={throttleMs}
-              />
-            )}
           </DataTableAdvancedToolbar>
         ) : (
-          <DataTableToolbar table={table}>
-            {/* <DataTableFilterList table={table} align="end" /> */}
-            <DataTableSortList table={table} align="end" />
-          </DataTableToolbar>
+          <DataTableToolbar table={table} />
         )}
       </DataTable>
     </>

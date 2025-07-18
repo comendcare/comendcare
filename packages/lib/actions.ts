@@ -1827,8 +1827,8 @@ export const deleteAsset = withOrganizationAuth(
 export const createOrUpdateAsset = withOrganizationAuth(
     async (organization: Organization, toolData: any, biosampleData?: any, donorData?: any) => {
         try {
-            // console.log(`biosample data`, biosampleData)
-            // console.log(`donor data`, donorData)
+            console.log(`biosample data`, biosampleData)
+            console.log(`donor data`, donorData)
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -1893,18 +1893,18 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     biosample: {
                         upsert: {
                             update: {
-                                ...toolData?.biosample,
+                                ...biosampleData,
                                 donor: {
                                     upsert: {
-                                        update: {...toolData?.biosample?.donor},
-                                        create: {...toolData?.biosample?.donor}
+                                        update: {...donorData},
+                                        create: {...donorData}
                                     }
                                 }
                             },
                             create: {
-                                ...toolData?.biosample,
+                                ...biosampleData,
                                 donor: { 
-                                    create: { ...toolData?.biosample?.donor } 
+                                    create: { ...donorData } 
                                 }
                             }
                         }
@@ -1948,9 +1948,9 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     metadata: toolData.metadata as InputJsonObject,
                     biosample: {
                         create: {
-                            ...toolData?.biosample,
+                            ...biosampleData,
                             donor: { 
-                                create: { ...toolData?.biosample?.donor } 
+                                create: { ...donorData } 
                             }
                         }
                     }
