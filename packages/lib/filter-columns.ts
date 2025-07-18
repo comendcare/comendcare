@@ -158,8 +158,8 @@ export function filterColumns({
             filter.value.length === 2
               ? {
                 AND: [
-                  filter.value[0] ? getColumn(columns, { gte: JSON.parse(filter.value[0]) }) : undefined,
-                  filter.value[1] ? getColumn(columns, { lte: JSON.parse(filter.value[1]) }) : undefined
+                  filter.value[0] !== undefined && filter.value[0] !== null ? getColumn(columns, { gte: JSON.parse(filter.value[0]) }) : undefined,
+                  filter.value[1] !== undefined && filter.value[1] !== null ? getColumn(columns, { lte: JSON.parse(filter.value[1]) }) : undefined
                 ]
               }
               : undefined

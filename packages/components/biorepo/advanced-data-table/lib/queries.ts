@@ -122,8 +122,6 @@ export const getBiosamples = withOrganizationAuth(
                         })
                     }
 
-                    console.log(`where object`, where)
-
                     const orderBy = input.sort.length
                         ? input.sort.map((s) => ({ [s.id]: s.desc ? "desc" : "asc" }))
                         : [{ createdAt: "asc" }];
