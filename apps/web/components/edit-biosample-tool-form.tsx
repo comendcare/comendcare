@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin, Plus, Router, Trash } from "lucide-react"
+import { Delete, Pin, Plus, Router, Trash, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -87,14 +87,18 @@ const editAssetForm = z.object({
     currentCountry: z.string().optional(),
     countryOfCollection: z.string().optional(),
     pmi: z.string().optional(),
-    volume: z.string().optional(),
-    mass: z.string().optional(),
-    area: z.string().optional(),
+    // volume: z.string().optional(),
+    // mass: z.string().optional(),
+    // area: z.string().optional(),
+    quantity: z.string().optional(),
+    quantityMeasurement: z.string(),
     repository: z.string().optional(),
     productCode: z.string().optional(),
-    priceUSD: z.string().optional(),
-    priceGBP: z.string().optional(),
-    priceEUR: z.string().optional(),
+    // priceUSD: z.string().optional(),
+    // priceGBP: z.string().optional(),
+    // priceEUR: z.string().optional(),
+    price: z.string().optional(),
+    priceMeasurement: z.string(),
     premiumGroup: z.string().optional(),
     caseId: z.string().optional(),
     specimenId: z.string().optional(),
@@ -165,6 +169,36 @@ const toolSelector = (state: ToolState) => ({
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
+const QUANTITY_OPTIONS: Option[] = [
+    {
+        value: 'ml',
+        label: 'ml'
+    },
+    {
+        value: 'mg',
+        label: 'mg'
+    },
+    {
+        value: 'sqmm',
+        label: 'mm'
+    }
+]
+
+const PRICE_OPTIONS: Option[] = [
+    {
+        value: 'usd',
+        label: 'USD'
+    },
+    {
+        value: 'gbp',
+        label: 'GBP'
+    },
+    {
+        value: 'eur',
+        label: 'EUR'
+    }
+]
+
 export function EditBiosampleToolForm({
     toolData,
     numAssetsPinned,
@@ -178,7 +212,7 @@ export function EditBiosampleToolForm({
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { toolTypes, createTool, updateTool } = useToolStore(useShallow(toolSelector))
+    const { toolTypes } = useToolStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editAssetForm>>({
@@ -211,14 +245,36 @@ export function EditBiosampleToolForm({
             currentCountry: toolData?.biosample?.currentCountry || undefined,
             countryOfCollection: toolData?.biosample?.countryOfCollection || undefined,
             pmi: toolData?.biosample?.pmi?.toString() || undefined,
-            volume: toolData?.biosample?.volume?.toString() || undefined,
-            mass: toolData?.biosample?.mass?.toString() || undefined,
-            area: toolData?.biosample?.area?.toString() || undefined,
-            repository: toolData?.biosample?.repository || undefined,
+
+            quantity: toolData.biosample?.volume?.toString() || toolData?.biosample?.mass?.toString() || toolData?.biosample?.area?.toString() || undefined,
+            quantityMeasurement: (() => {
+                if (toolData?.biosample?.volume) return 'ml'
+                if (toolData?.biosample?.mass) return 'mg'
+                if (toolData?.biosample?.area) return 'sqmm'
+
+                return 'ml'
+            })(),
+
+            // volume: toolData?.biosample?.volume?.toString() || undefined,
+            // mass: toolData?.biosample?.mass?.toString() || undefined,
+            // area: toolData?.biosample?.area?.toString() || undefined,
+            // repository: toolData?.biosample?.repository || undefined,
+
             // productCode: toolData?.biosample?.anatomicalSite || undefined,
-            priceUSD: toolData?.biosample?.priceUSD?.toString() || undefined,
-            priceGBP: toolData?.biosample?.priceGBP?.toString() || undefined,
-            priceEUR: toolData?.biosample?.priceEUR?.toString() || undefined,
+
+            price: toolData.biosample?.priceUSD?.toString() || toolData?.biosample?.priceGBP?.toString() || toolData?.biosample?.priceEUR?.toString() || undefined,
+            priceMeasurement: (() => {
+                if (toolData?.biosample?.priceUSD) return 'usd'
+                if (toolData?.biosample?.priceGBP) return 'gbp'
+                if (toolData?.biosample?.priceEUR) return 'eur'
+
+                return 'usd'
+            })(),
+
+            // priceUSD: toolData?.biosample?.priceUSD?.toString() || undefined,
+            // priceGBP: toolData?.biosample?.priceGBP?.toString() || undefined,
+            // priceEUR: toolData?.biosample?.priceEUR?.toString() || undefined,
+
             // premiumGroup: toolData?.biosample?.anatomicalSite || undefined,
             // caseId: toolData?.biosample?.anatomicalSite || undefined,
             // specimenId: toolData?.biosample?.anatomicalSite || undefined,
@@ -313,13 +369,13 @@ export function EditBiosampleToolForm({
             currentCountry,
             countryOfCollection,
             pmi,
-            volume,
-            mass,
-            area,
+            // volume,
+            // mass,
+            // area,
             repository,
-            priceUSD,
-            priceGBP,
-            priceEUR,
+            // priceUSD,
+            // priceGBP,
+            // priceEUR,
             biosampleDiagnosis,
             yearOfExcision,
             donorAgeAtExcision,
@@ -370,13 +426,13 @@ export function EditBiosampleToolForm({
             currentCountry,
             countryOfCollection,
             pmi: typeof pmi == 'string' ? parseInt(pmi, 10) : pmi,
-            volume: typeof volume === 'string' ? parseInt(volume, 10) : volume,
-            mass: typeof mass === 'string' ? parseInt(mass, 10) : mass,
-            area: typeof area === 'string' ? parseInt(area, 10) : area,
+            // volume: typeof volume === 'string' ? parseInt(volume, 10) : volume,
+            // mass: typeof mass === 'string' ? parseInt(mass, 10) : mass,
+            // area: typeof area === 'string' ? parseInt(area, 10) : area,
             repository,
-            priceUSD: typeof priceUSD === 'string' ? parseInt(priceUSD, 10) : priceUSD,
-            priceGBP: typeof priceGBP === 'string' ? parseInt(priceGBP, 10) : priceGBP,
-            priceEUR: typeof priceEUR === 'string' ? parseInt(priceEUR, 10) : priceEUR,
+            // priceUSD: typeof priceUSD === 'string' ? parseInt(priceUSD, 10) : priceUSD,
+            // priceGBP: typeof priceGBP === 'string' ? parseInt(priceGBP, 10) : priceGBP,
+            // priceEUR: typeof priceEUR === 'string' ? parseInt(priceEUR, 10) : priceEUR,
             biosampleDiagnosis,
             yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
             donorAgeAtExcision: typeof donorAgeAtExcision === 'string' ? parseInt(donorAgeAtExcision, 10) : donorAgeAtExcision,
@@ -458,6 +514,10 @@ export function EditBiosampleToolForm({
             )
         }
     }
+
+    useEffect(() => {
+        if (formData.isPrivate) form.setValue("isPinned", false)
+    }, [formData.isPrivate])
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -631,46 +691,39 @@ export function EditBiosampleToolForm({
                         </>
                     )}
 
-                    <FormItem className="flex gap-4 items-center">
-                        <div className="grow">
-                        <FormLabel>Visibility</FormLabel>
-                        <FormDescription>
-                            {`Private tools will not be shown to people outside of your organization.`}
-                        </FormDescription>
-                        </div>
-                        <div className="w-[90px]">
+                    <FormItem className="flex gap-2 items-center">
+                        <FormLabel className="flex items-center gap-1 grow">
+                            Visibility
+                            <Tooltip delayDuration={0}>
+                                <TooltipTrigger>
+                                    <Info className="h-4 w-4"/>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                    {`Private tools will not be shown to people outside of your organization.`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </FormLabel>
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                        </div>
-                    </FormItem>
-
-                    {formData.isPrivate === false && (
                         <Tooltip>
                             <TooltipTrigger onClick={(e) => e.preventDefault()}>
                                 <FormField 
                                     control={form.control}
                                     name="isPinned"
                                     render={({field}) => (
-                                        <FormItem className="flex gap-2 items-center text-left">
-                                            <div>
-                                            <FormLabel>{`Pinned to Profile`}</FormLabel>
-                                            <FormDescription>
-                                                {`Showcase this Tool at the top of your organization’s Tool section so it's easy to find and stands out.`}
-                                            </FormDescription>
-                                            </div>
-                                            <FormControl className="justify-self-end">
-                                                <Button 
-                                                    disabled={!toolData.pinned && numAssetsPinned >= 5}
-                                                    variant="ghost" 
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        form.setValue("isPinned", !field.value)
-                                                    }}
-                                                >
-                                                    {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                                </Button>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                        <FormControl className="-mt-2">
+                                            <Button 
+                                                disabled={formData.isPrivate || (!toolData.pinned && numAssetsPinned >= 5)}
+                                                variant="ghost" 
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    form.setValue("isPinned", !field.value)
+                                                }}
+                                                className="p-2"
+                                            >
+                                                {field.value ? <Pin fill="currentColor"/> : <Pin />}
+                                                Pinned to profile
+                                            </Button>
+                                        </FormControl>
                                     )}
                                 />
                             </TooltipTrigger>
@@ -679,8 +732,13 @@ export function EditBiosampleToolForm({
                                     <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
                                 </TooltipContent>
                             )}
+                            {formData.isPrivate && (
+                                <TooltipContent className="max-w-[200px]">
+                                    <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
+                                </TooltipContent>
+                            )}
                         </Tooltip>
-                    )}
+                    </FormItem>
 
                     <FormField
                         control={form.control}
@@ -948,71 +1006,51 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="volume"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Volume (in ml)`}</FormLabel>
-                        <div className="w-full">
+            <FormItem className="w-full flex gap-4 items-center">
+                <FormLabel className="w-[100px]">{'Quantity'}</FormLabel>
+                <div className="w-full gap-2 flex">
+                    <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({field}) => (
                             <FormControl className="-mt-2 w-full">
+                                <div className="w-full"> 
                                 <Input
-                                    id="volume"
+                                    id="quantity"
                                     className="w-full"
                                     placeholder={`Enter a number`}
                                     type="number"
                                     {...field}
                                 />
+                                </div>
                             </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
+                        )}
+                    />
 
-            <FormField
-                control={form.control}
-                name="mass"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Mass (in mg)`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="mass"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
+                    <FormField 
+                        control={form.control}
+                        name="quantityMeasurement"
+                        render={({ field }) => (
+                            <FormControl>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("quantityMeasurement", newVal)}
+                                >
+                                    <SelectTrigger className="-mt-2 w-[100px] h-[32px]">
+                                        <SelectValue placeholder="Select a value" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {QUANTITY_OPTIONS.map(option => (
+                                            <SelectItem value={option.value}>{option.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="area"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Area (in square mm)`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="area"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
+                        )}
+                    />
+                </div>
+                <FormMessage />
+            </FormItem>
 
             <FormField
                 control={form.control}
@@ -1035,71 +1073,51 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="priceUSD"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Price USD`}</FormLabel>
-                        <div className="w-full">
+            <FormItem className="w-full flex gap-4 items-center">
+                <FormLabel className="w-[100px]">{'Price Per Unit'}</FormLabel>
+                <div className="w-full gap-2 flex">
+                    <FormField
+                        control={form.control}
+                        name="price"
+                        render={({field}) => (
                             <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="priceUSD"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
+                                <div className="w-full">
+                                    <Input
+                                        id="price"
+                                        className="w-full"
+                                        placeholder={`Enter a number`}
+                                        type="number"
+                                        {...field}
+                                    />
+                                </div>
                             </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
+                        )}
+                    />
 
-            <FormField
-                control={form.control}
-                name="priceGBP"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Price GBP`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="priceGBP"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
+                    <FormField 
+                        control={form.control}
+                        name="priceMeasurement"
+                        render={({ field }) => (
+                            <FormControl>
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("priceMeasurement", newVal)}
+                                >
+                                    <SelectTrigger className="-mt-2 w-[100px] h-[32px]">
+                                        <SelectValue placeholder="Select a value" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PRICE_OPTIONS.map(option => (
+                                            <SelectItem value={option.value}>{option.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="priceEUR"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Price EUR`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="priceEUR"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
+                        )}
+                    />
+                </div>
+                <FormMessage />
+            </FormItem>
 
             <FormField
                 control={form.control}
@@ -1173,9 +1191,19 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 export const DonorFormFields = ({form}: {form: any}) => {
     return (
         <>
-        <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
+        <div className="flex gap-1 items-center">
+            <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
+            <Tooltip delayDuration={0}>
+                <TooltipTrigger>
+                    <Info className="h-4 w-4"/>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-80 text-wrap text-left">
+                    {`Donor information (PHI) is kept confidential and only shared with the requestor upon your group’s approval.`}
+                </TooltipContent>
+            </Tooltip>
+        </div>
         <div className="flex-col space-y-4">
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="age"
                 render={({field}) => (
@@ -1195,14 +1223,15 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
+            <div className="grid gap-x-8 gap-y-2 grid-cols-2">
             <FormField
                 control={form.control}
                 name="sex"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Sex`}</FormLabel>
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel>{`Sex`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1229,8 +1258,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="gender"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Gender`}</FormLabel>
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel>{`Gender`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1259,8 +1288,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="race"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Race`}</FormLabel>
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel>{`Race`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1289,8 +1318,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="ethnicity"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Ethnicity`}</FormLabel>
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel>{`Ethnicity`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Select
@@ -1317,7 +1346,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="height"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className="w-full gap-4 items-center">
                         <FormLabel className="w-[100px]">{`Height`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -1339,7 +1368,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="weight"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className="w-full gap-4 items-center">
                         <FormLabel className="w-[100px]">{`Weight`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -1361,7 +1390,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="bmi"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className="w-full gap-4 items-center">
                         <FormLabel className="w-[100px]">{`BMI`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -1378,8 +1407,9 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     </FormItem>
                 )}
             />
+            </div>
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="primaryDiagnosis"
                 render={({field}) => (
@@ -1398,7 +1428,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
             <FormField
                 control={form.control}
@@ -1411,7 +1441,6 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 <TooltipTrigger>
                                     <Button
                                         variant="secondary"
-                                        // size={"icon"}
                                         className="h-full w-[34px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
@@ -1444,6 +1473,21 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                             }}
                                         />
                                         </div>
+                                        <Select
+                                            value={'mild'} 
+                                            // onValueChange={(newVal) => form.setValue("ethnicity", newVal)}
+                                        >
+                                        <SelectTrigger className="w-[200px] h-[32px]">
+                                            <SelectValue placeholder="Select a value" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={'mild'}>Mild</SelectItem>
+                                            <SelectItem value={'moderate'}>Moderate</SelectItem>
+                                            <SelectItem value={'severe'}>Severe</SelectItem>
+                                            <SelectItem value={'critical'}>Life-threatening/Critical</SelectItem>
+                                            <SelectItem value={'terminal'}>Terminal</SelectItem>
+                                        </SelectContent>
+                                        </Select>
                                         <Button 
                                             className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
                                             variant="ghost"
@@ -1601,246 +1645,6 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     </FormItem>
                 )}
             /> 
-
-            <FormField
-                control={form.control}
-                name="conditionSeverity"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Condition Severity`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="conditionSeverity"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            {/* <FormField
-                control={form.control}
-                name="menopausalStatus"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Menopausal Status`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="menopausalStatus"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            {/* <FormField
-                control={form.control}
-                name="ageAtLastMenstrualPeriod"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Age at last Menstrual Period`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="ageAtLastMenstrualPeriod"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="numberOfPregnancies"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Number of Pregnancies`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="numberOfPregnancies"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="numberOfLiveBirths"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Number if Live Births`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="numberOfLiveBirths"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            {/* <FormField
-                control={form.control}
-                name="smokingStatus"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Smoking Status`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="smokingStatus"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            {/* <FormField
-                control={form.control}
-                name="cigarettesPerDay"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Cigarettes Per Day`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="cigarettesPerDay"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            {/* <FormField
-                control={form.control}
-                name="alcoholStatus"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Alcohol Status`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="alcoholStatus"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            {/* <FormField
-                control={form.control}
-                name="drinksPerDay"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Drinks Per Day`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="drinksPerDay"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="alcoholDuration"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Alcohol Duration (in years)`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="bmi"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
-            <FormField
-                control={form.control}
-                name="causeOfDeath"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Cause Of Death`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="causeOfDeath"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
         </div>
         </>
     )
