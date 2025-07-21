@@ -287,6 +287,10 @@ export const SAMPLE_PRESERVATION_METHOD_OPTIONS: Option[] = [
     }
 ];
 
+export const ANATOMICAL_SITE_OPTIONS: Option[] = [
+    {label: 'Unknown', value: "UNKNOWN"}
+]
+
 export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
     {
         label: 'Ambient Temperature',

@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog"
-import {Asset, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS} from "@comend/lib/types"
+import {ANATOMICAL_SITE_OPTIONS, Asset, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS} from "@comend/lib/types"
 import {Biosample, Donor, Institution, MilestoneType, Prisma, ToolType} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -56,12 +56,6 @@ type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
 const editAssetForm = z.object({
-    title: z
-        .string({
-            required_error: "Please provide a title"
-        })
-        .min(1, "Title is required")
-        .max(200, "Title must be less than 200 characters"),
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
@@ -79,20 +73,16 @@ const editAssetForm = z.object({
     // biosmaple properties
     institution: z.custom<Institution>().optional(),
     anatomicalSite: z.string().optional(),
-    pathology: z.string().optional(),
     preservationMethod: z.string().optional(),
     preservation: z.string().optional(),
     methodOfTransport: z.string().optional(),
-    clinicalData: z.string().optional(),
     currentCountry: z.string().optional(),
     countryOfCollection: z.string().optional(),
-    pmi: z.string().optional(),
     // volume: z.string().optional(),
     // mass: z.string().optional(),
     // area: z.string().optional(),
     quantity: z.string().optional(),
     quantityMeasurement: z.string(),
-    repository: z.string().optional(),
     productCode: z.string().optional(),
     // priceUSD: z.string().optional(),
     // priceGBP: z.string().optional(),
@@ -132,7 +122,7 @@ const editAssetForm = z.object({
     hercepTest: z.string().optional(),
     matchedPairId: z.string().optional(),
     mirroredPairId: z.string().optional(),
-    donorAgeAtExcision: z.string().optional(),
+    ageAtExcision: z.string().optional(),
 
     // donor properties
     age: z.string().optional(),
@@ -141,9 +131,7 @@ const editAssetForm = z.object({
     race: z.string().optional(),
     ethnicity: z.string().optional(),
     treatments: z.array(z.string()).optional(),
-    primaryDiagnosis: z.string().optional(),
     diagnoses: z.array(z.string()).optional(),
-    yearOfDeath: z.string().optional(),
     height: z.string().optional(),
     weight: z.string().optional(),
     bmi: z.string().optional(),
@@ -157,8 +145,6 @@ const editAssetForm = z.object({
     drinksPerDay: z.string().optional(),
     alcoholDuration: z.string().optional(),
     medications: z.array(z.string()).optional(),
-    causeOfDeath: z.string().optional(),
-    conditionSeverity: z.string().optional(),
 })
 
 const toolSelector = (state: ToolState) => ({
@@ -219,7 +205,6 @@ export function EditBiosampleToolForm({
         mode: "onChange",
         resolver: zodResolver(editAssetForm),
         defaultValues: {
-            title: toolData?.title || "",
             description: toolData?.description || "",
             types: toolTypes
                         .filter(type => type.type === 'biosample')
@@ -238,13 +223,10 @@ export function EditBiosampleToolForm({
             // biosmaple properties
             // institution: toolData?.biosample?.institution?.name || undefined,
             anatomicalSite: toolData?.biosample?.anatomicalSite || undefined,
-            pathology: toolData?.biosample?.pathology || undefined,
             preservationMethod: toolData?.biosample?.preservationMethod|| undefined,
             methodOfTransport: toolData?.biosample?.methodOfTransport || undefined,
-            clinicalData: toolData?.biosample?.clinicalData || undefined,
             currentCountry: toolData?.biosample?.currentCountry || undefined,
             countryOfCollection: toolData?.biosample?.countryOfCollection || undefined,
-            pmi: toolData?.biosample?.pmi?.toString() || undefined,
 
             quantity: toolData.biosample?.volume?.toString() || toolData?.biosample?.mass?.toString() || toolData?.biosample?.area?.toString() || undefined,
             quantityMeasurement: (() => {
@@ -255,13 +237,6 @@ export function EditBiosampleToolForm({
                 return 'ml'
             })(),
 
-            // volume: toolData?.biosample?.volume?.toString() || undefined,
-            // mass: toolData?.biosample?.mass?.toString() || undefined,
-            // area: toolData?.biosample?.area?.toString() || undefined,
-            // repository: toolData?.biosample?.repository || undefined,
-
-            // productCode: toolData?.biosample?.anatomicalSite || undefined,
-
             price: toolData.biosample?.priceUSD?.toString() || toolData?.biosample?.priceGBP?.toString() || toolData?.biosample?.priceEUR?.toString() || undefined,
             priceMeasurement: (() => {
                 if (toolData?.biosample?.priceUSD) return 'usd'
@@ -270,45 +245,9 @@ export function EditBiosampleToolForm({
 
                 return 'usd'
             })(),
-
-            // priceUSD: toolData?.biosample?.priceUSD?.toString() || undefined,
-            // priceGBP: toolData?.biosample?.priceGBP?.toString() || undefined,
-            // priceEUR: toolData?.biosample?.priceEUR?.toString() || undefined,
-
-            // premiumGroup: toolData?.biosample?.anatomicalSite || undefined,
-            // caseId: toolData?.biosample?.anatomicalSite || undefined,
-            // specimenId: toolData?.biosample?.anatomicalSite || undefined,
-            // format: toolData?.biosample?.anatomicalSite || undefined,
-            // subFormat: toolData?.biosample?.anatomicalSite || undefined,
             biosampleDiagnosis: toolData?.biosample?.biosampleDiagnosis || undefined,
-            // measurement: toolData?.biosample?.anatomicalSite || undefined,
-            // significantVariantPositive: toolData?.biosample?.anatomicalSite || undefined,
-            // significantVariantWildtype: toolData?.biosample?.anatomicalSite || undefined,
-            // fusionPositive: toolData?.biosample?.anatomicalSite || undefined,
-            // fusionWildtype: toolData?.biosample?.anatomicalSite || undefined,
-            // cnvAbnormal: toolData?.biosample?.anatomicalSite || undefined,
-            // cnvNormal: toolData?.biosample?.anatomicalSite || undefined,
-            // hlaType: toolData?.biosample?.anatomicalSite || undefined,
-            // icf: toolData?.biosample?.anatomicalSite || undefined,
-            // irbLetter: toolData?.biosample?.anatomicalSite || undefined,
             yearOfExcision: toolData?.biosample?.yearOfExcision?.toString() || undefined,
-            // classifier: toolData?.biosample?.anatomicalSite || undefined,
-            // primaryTumorOrgan: toolData?.biosample?.anatomicalSite || undefined,
-            // stage: toolData?.biosample?.anatomicalSite || undefined,
-            // stageGroup: toolData?.biosample?.anatomicalSite || undefined,
-            // serology: toolData?.biosample?.anatomicalSite || undefined,
-            // clinicalTestResults: toolData?.biosample?.anatomicalSite || undefined,
-            // serumAvailable: toolData?.biosample?.anatomicalSite || undefined,
-            // plasmaAvailable: toolData?.biosample?.anatomicalSite || undefined,
-            // wholeBloodAvailable: toolData?.biosample?.anatomicalSite || undefined,
-            // ffpeTumorAvailable: toolData?.biosample?.anatomicalSite || undefined,
-            // frozenTumorAvailable: toolData?.biosample?.anatomicalSite || undefined,
-            // er: toolData?.biosample?.anatomicalSite || undefined,
-            // pr: toolData?.biosample?.anatomicalSite || undefined,
-            // hercepTest: toolData?.biosample?.anatomicalSite || undefined,
-            // matchedPairId: toolData?.biosample?.anatomicalSite || undefined,
-            // mirroredPairId: toolData?.biosample?.anatomicalSite || undefined,
-            donorAgeAtExcision: toolData?.biosample?.donorAgeAtExcision?.toString() || undefined,
+            ageAtExcision: toolData?.biosample?.ageAtExcision?.toString() || undefined,
 
             // donor properties
             age: toolData?.biosample?.donor?.age?.toString() || undefined,
@@ -317,29 +256,15 @@ export function EditBiosampleToolForm({
             race: toolData?.biosample?.donor?.race || undefined,
             ethnicity: toolData?.biosample?.donor?.ethnicity || undefined,
             treatments: toolData?.biosample?.donor?.treatments || undefined,
-            primaryDiagnosis: toolData?.biosample?.donor?.primaryDiagnosis || undefined,
             diagnoses: toolData?.biosample?.donor?.diagnoses || undefined,
-            yearOfDeath: toolData?.biosample?.donor?.yearOfDeath?.toString() || undefined,
             height: toolData?.biosample?.donor?.height?.toString() || undefined,
             weight: toolData?.biosample?.donor?.weight?.toString() || undefined,
             bmi: toolData?.biosample?.donor?.bmi?.toString() || undefined,
-            // menopausalStatus: z.boolean().optional(),
-            // ageAtLastMenstualPeriod: z.string().optional(),
-            // numberOfPregnancies: z.string().optional(),
-            // numberOfLiveBirths: z.string().optional(),
-            // smokingStatus: z.boolean().optional(),
-            // cigarettesPerDay: z.string().optional(),
-            // alcoholStatus: z.boolean().optional(),
-            // drinksPerDay: z.string().optional(),
-            // alcoholDuration: z.string().optional(),
             medications: toolData?.biosample?.donor?.medications || undefined,
-            causeOfDeath: toolData?.biosample?.donor?.causeOfDeath || undefined,
-            conditionSeverity: toolData?.biosample?.donor?.conditionSeverity || undefined,
         }
     })
 
     const formData = {
-        title: form.watch("title"),
         description: form.watch("description"),
         types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
@@ -352,7 +277,6 @@ export function EditBiosampleToolForm({
 
     const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
         const {
-            title,
             description,
             types,
             otherTypeDetails,
@@ -362,43 +286,28 @@ export function EditBiosampleToolForm({
             contacts,
             milestones,
             anatomicalSite,
-            pathology,
             preservationMethod,
             methodOfTransport,
-            clinicalData,
             currentCountry,
             countryOfCollection,
-            pmi,
-            // volume,
-            // mass,
-            // area,
-            repository,
-            // priceUSD,
-            // priceGBP,
-            // priceEUR,
             biosampleDiagnosis,
             yearOfExcision,
-            donorAgeAtExcision,
+            ageAtExcision,
             age,
             sex,
             gender,
             race,
             ethnicity,
             treatments,
-            primaryDiagnosis,
             diagnoses,
-            yearOfDeath,
             height,
             weight,
             bmi,
             medications,
-            causeOfDeath,
-            conditionSeverity
         } = values;
 
         const updateData: Partial<Asset> = {
             ...toolData,
-            title,
             types: types.map(type => type.value),
             metadata: {
                 ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
@@ -419,23 +328,12 @@ export function EditBiosampleToolForm({
 
         const biosampleData: Partial<Biosample> = {
             anatomicalSite,
-            pathology,
             preservationMethod,
             methodOfTransport,
-            clinicalData,
             currentCountry,
             countryOfCollection,
-            pmi: typeof pmi == 'string' ? parseInt(pmi, 10) : pmi,
-            // volume: typeof volume === 'string' ? parseInt(volume, 10) : volume,
-            // mass: typeof mass === 'string' ? parseInt(mass, 10) : mass,
-            // area: typeof area === 'string' ? parseInt(area, 10) : area,
-            repository,
-            // priceUSD: typeof priceUSD === 'string' ? parseInt(priceUSD, 10) : priceUSD,
-            // priceGBP: typeof priceGBP === 'string' ? parseInt(priceGBP, 10) : priceGBP,
-            // priceEUR: typeof priceEUR === 'string' ? parseInt(priceEUR, 10) : priceEUR,
-            biosampleDiagnosis,
-            yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
-            donorAgeAtExcision: typeof donorAgeAtExcision === 'string' ? parseInt(donorAgeAtExcision, 10) : donorAgeAtExcision,
+            // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+            // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
         }
 
 
@@ -446,15 +344,11 @@ export function EditBiosampleToolForm({
             race,
             ethnicity,
             treatments,
-            primaryDiagnosis,
             diagnoses,
-            yearOfDeath: typeof yearOfDeath === 'string' ? parseInt(yearOfDeath, 10) : yearOfDeath,
             height: typeof height === 'string' ? parseInt(height, 10) : height,
             weight: typeof weight === 'string' ? parseInt(weight, 10) : weight,
             bmi: typeof bmi === 'string' ? parseInt(bmi, 10) : bmi,
             medications,
-            causeOfDeath,
-            conditionSeverity
         }
 
         if (!session?.user?.organizationId) {
@@ -471,7 +365,6 @@ export function EditBiosampleToolForm({
                 const updatedAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
                 mixpanelTrack("Tool Updated", {
                     "ID": updatedAsset.id,
-                    "Tool Name": updatedAsset.title,
                     "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
@@ -490,7 +383,6 @@ export function EditBiosampleToolForm({
                 const newAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
                 mixpanelTrack("Tool Created", {
                     "ID": newAsset.id,
-                    "Name": newAsset.title,
                     "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                     // we flatten them into a single list that can be parsed
@@ -599,24 +491,6 @@ export function EditBiosampleToolForm({
                     onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1"
                 >
-                    <FormField
-                        control={form.control}
-                        name="title"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>{`Title`}</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        id="title"
-                                        placeholder={`Enter a title`}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
                     <FormField
                         control={form.control}
                         name="description"
@@ -817,33 +691,19 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                         <FormLabel className="w-[100px]">{`Anatomical Site`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="anatomicalSite"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="pathology"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Pathology`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="pathology"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
+                                <Select
+                                    value={field.value} 
+                                    onValueChange={(newVal) => form.setValue("anatomicalSite", newVal)}
+                                >
+                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                    <SelectValue placeholder="Select a value" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {ANATOMICAL_SITE_OPTIONS.map(option => (
+                                        <SelectItem value={option.value}>{option.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                                </Select>
                             </FormControl>
                             <FormMessage />
                         </div>
@@ -909,27 +769,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 
             <FormField
                 control={form.control}
-                name="clinicalData"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Clinical Data`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="clinicalData"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
                 name="currentCountry"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
@@ -984,28 +823,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="pmi"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`PMI (in hours)`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="pmi"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
-
             <FormItem className="w-full flex gap-4 items-center">
                 <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
                 <div className="w-full gap-2 flex">
@@ -1051,27 +868,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 </div>
                 <FormMessage />
             </FormItem>
-
-            <FormField
-                control={form.control}
-                name="repository"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Repository`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="weight"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
 
             <FormItem className="w-full flex gap-4 items-center">
                 <FormLabel className="w-[100px]">{'Price Per Unit'}</FormLabel>
@@ -1143,14 +939,14 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 
             <FormField
                 control={form.control}
-                name="donorAgeAtExcision"
+                name="ageAtExcision"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
                         <FormLabel className="w-[100px]">{`Donor Age at Excision`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
-                                    id="donorAgeAtExcision"
+                                    id="ageAtExcision"
                                     className="w-full"
                                     placeholder={`Enter a number`}
                                     type="number"
@@ -1408,27 +1204,6 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             />
             </div>
-
-            {/* <FormField
-                control={form.control}
-                name="primaryDiagnosis"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Primary Diagnosis`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="primaryDiagnosis"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
 
             <FormField
                 control={form.control}
