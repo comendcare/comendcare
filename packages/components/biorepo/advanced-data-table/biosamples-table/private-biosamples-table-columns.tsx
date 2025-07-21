@@ -114,7 +114,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "gene",
+            id: "biosample.gene",
             accessorKey: "biosample.gene",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
@@ -125,7 +125,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "variant",
+            id: "biosample.variant",
             accessorKey: "biosample.variant",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Variant"/>
@@ -138,17 +138,26 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         {
             // NOTE: in order for filters to access the proper nested database object the path to
             // the nested object must be defined in BOTH the id & accessorKey
-            id: "biosample.volume",
-            accessorKey: "biosample.volume",
+            id: "biosample.quantity",
+            accessorKey: "biosample.quantity",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Available Quantity"/>
+            ),
+            cell: ({row}) => (
+                <>
+                    {
+                        row.original.biosample.quantity >= 0 && 
+                        row.original.biosample.quantityUnit && 
+                        `${row.original.biosample.quantity}${row.original.biosample.quantityUnit}`
+                    }
+                </>
             ),
             enableColumnFilter: true,
             meta: {
                 label: "Available Quantity",
-                variant: "range",
-                range: [0, 1000],
-                unit: 'ml'
+                // variant: "range",
+                // range: [0, 1000],
+                // unit: 'ml'
             },
         },
         {

@@ -313,10 +313,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
         },
         {
-            id: "yearOfExcision",
-            accessorKey: "biosample.yearOfExcision",
+            id: "dateOfCollection",
+            accessorKey: "biosample.dateOfCollection",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Year of Excision"/>
+                <DataTableColumnHeader column={column} title="Date of Collection"/>
             ),
         },
     ]

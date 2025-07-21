@@ -106,15 +106,15 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
-                        if (input['biosample.volume']) {
-                            filters.push({
-                                id: 'biosample.volume',
-                                value: input['biosample.volume'],
-                                variant: 'range',
-                                operator: 'isBetween',
-                                filterId: nanoid()
-                            })
-                        }
+                        // if (input['biosample.volume']) {
+                        //     filters.push({
+                        //         id: 'biosample.volume',
+                        //         value: input['biosample.volume'],
+                        //         variant: 'range',
+                        //         operator: 'isBetween',
+                        //         filterId: nanoid()
+                        //     })
+                        // }
 
                         where = filterColumns({
                             filters,
