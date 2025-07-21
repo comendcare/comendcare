@@ -32,233 +32,141 @@ import {Button} from "@comend/components/ui/button";
 import {createOrUpdateAsset} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
-import { Textarea } from "@comend/components/ui/textarea";
+
+// columns temporarily hidden on production
+const hiddenColumnIds = [
+    'diagnoses',
+    'gene',
+    'variant',
+    'biosample.volume',
+    'biosample.currentCountry',
+    'biosample.countryOfCollection',
+    'institution',
+    'pathology',
+    'preservationMethod',
+    'anatomicalSite',
+    'methodOfTransport',
+    'collectionDate',
+    'donorId',
+    'age',
+    'sex',
+    'gender',
+    'race',
+    'ethnicity',
+    'height',
+    'weight',
+    'bmi',
+    'medications',
+    'treatments',
+]
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
     const pathname = usePathname()
 
-  const comendColumns: ColumnDef<any>[] = [
-    {
-      id: "title",
-      accessorKey: "title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Title" />
-      ),
-      cell: ({ row, column }) => {
-        const [isEditing, setIsEditing] = React.useState(false)
-        const [value, setValue] = React.useState(row.original.title)
-        const inputRef = React.useRef<HTMLTextAreaElement>(null)
-
-        const onBlur = async () => {
-          await createOrUpdateAsset(
-            session?.user.organizationId,
-            {
-              id: row.original.id,
-              title: value
+    const columns: ColumnDef<any>[] = [
+        {
+            id: "types",
+            accessorKey: "types",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Type"/>
+            ),
+            cell: ({ row }) => (
+            <>
+                {(row.original.types || []).map((type: string) => {
+                const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
+                return (
+                    <MilestoneTypeBadge label={typeOption.label}/>
+                )
+                })}
+            </>
+            ),
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Type",
+                variant: "multiSelect",
+                options: TOOL_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
+                    label: type.label, 
+                    value: type.id,
+                })),
+                icon: CircleDashed,
+            },
+        },
+        {
+            id: "diagnoses",
+            accessorKey: "biosample.donor.diagnoses",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Diagnoses"/>
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.biosample?.donor?.diagnoses?.map((diagnosis: string, index: number) => (
+                        <li key={index} className="line-clamp-2">
+                            {diagnosis}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Diagnoses"
             }
-          )
-          setIsEditing(false)
-          await revalidate(pathname)
-        };
-
-        React.useEffect(() => {
-          if (inputRef.current && isEditing) {
-            setTimeout(() => {
-              inputRef?.current?.focus()
-            }, 50)
-          } 
-        }, [isEditing])
-
-        if (!isEditing) {
-          return (
-            <div 
-              onClick={() => setIsEditing(true)} 
-              className={'min-w-[200px]'}
-            >
-              {value}
-            </div>
-          )
-        }
-
-        return (
-          <Textarea
-            ref={inputRef}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onBlur={onBlur}
-            className="border-none min-w-[200px]"
-          />
-        )
-      },
-      meta: {
-        label: "Title",
-        placeholder: "Search titles...",
-        variant: "text",
-        icon: Text,
-      },
-      enableColumnFilter: true,
-    },
-    {
-        accessorKey: "description",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
-        ),
-        cell: ({ row }) => (
-            <div className="line-clamp-3">
-                {row.original.description}
-            </div>
-        ),
-        meta: {
-          label: "Description"
         },
-        enableHiding: true,
-    },
-    {
-        id: "types",
-        accessorKey: "types",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Type"/>
-        ),
-        cell: ({ row }) => (
-          <>
-            {(row.original.types || []).map((type: string) => {
-              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
-              return (
-                <MilestoneTypeBadge label={typeOption.label}/>
-              )
-            })}
-          </>
-        ),
-        enableHiding: true,
-        enableColumnFilter: true,
-        meta: {
-          label: "Type",
-          variant: "multiSelect",
-          options: TOOL_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
-              label: type.label, 
-              value: type.id,
-          })),
-          icon: CircleDashed,
-        },
-    },
-    {
-        id: "private",
-        accessorKey: "private",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Visibility" />
-        ),
-        cell: ({ row }) => (
-            <div>
-                {row.getValue("private") ? 'Private' : 'Public'}
-            </div>
-        ),
-        enableHiding: true,
-        enableColumnFilter: true,
-        meta: {
-          label: "Visibility",
-          variant: "select",
-          options: [
-            {
-              label: "Private", 
-              value: "true",
-            }, {
-              label: "Public", 
-              value: "false",
+        {
+            id: "gene",
+            accessorKey: "biosample.gene",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Gene"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Gene"
             }
-          ],
-          icon: CircleDashed,
         },
-    },
-    {
-        accessorKey: "milestones",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.milestones?.map((milestone: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
-                        {milestone.milestone?.title || undefined}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
-        meta: {
-          label: "Linked Projects"
-        }
-    },
-    {
-        accessorKey: "contacts",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Contacts" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.contacts?.map((contact: any, index: number) => (
-                    <li key={index}>
-                        {contact.name || contact.email || contact.affiliation}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
-        meta: {
-          label: "Contacts"
-        }
-    },
-    {
-        accessorKey: "links",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Links" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.attachments?.map((attachment: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
-                        {attachment.name || attachment.link}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
-        meta: {
-          label: "Links"
-        }
-    },
-    {
-        accessorKey: "pinned",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Pinned"/>
-        ),
-        cell: ({ row }) => (
-            <Button 
-              onClick={
-                async () => {
-                  await createOrUpdateAsset(
-                    session?.user.organizationId, 
-                    {
-                      id: row.original.id,
-                      pinned: !row.original.pinned
-                    }
-                  )
-                  revalidate(pathname)
-                }
-              }
-              variant={'ghost'}
-            >
-                {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-            </Button>
-        ),
-        enableHiding: true,
-        meta: {
-          label: "Pinned"
-        }
-    },
-  ]
-
-    const sampleInfoColumns: ColumnDef<any>[] = [
+        {
+            id: "variant",
+            accessorKey: "biosample.variant",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Variant"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Variant"
+            }
+        },
+        {
+            // NOTE: in order for filters to access the proper nested database object the path to
+            // the nested object must be defined in BOTH the id & accessorKey
+            id: "biosample.volume",
+            accessorKey: "biosample.volume",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Available Quantity"/>
+            ),
+            enableColumnFilter: true,
+            meta: {
+                label: "Available Quantity",
+                variant: "range",
+                range: [0, 1000],
+                unit: 'ml'
+            },
+        },
+        {
+            id: "description",
+            accessorKey: "description",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Description" />
+            ),
+            cell: ({ row }) => (
+                <div className="line-clamp-3">
+                    {row.original.description}
+                </div>
+            ),
+            meta: {
+            label: "Description"
+            },
+            enableHiding: true,
+        },
         {
             // NOTE: in order for filters to access the proper nested database object the path to
             // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
@@ -302,22 +210,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            // NOTE: in order for filters to access the proper nested database object the path to
-            // the nested object must be defined in BOTH the id & accessorKey
-            id: "biosample.volume",
-            accessorKey: "biosample.volume",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Available Volume (ml)"/>
-            ),
-            enableColumnFilter: true,
-            meta: {
-                label: "Available Volume (ml)",
-                variant: "range",
-                range: [0, 1000],
-                unit: 'ml'
-            },
-        },
-        {
             id: "institution",
             accessorKey: "biosample.institution.name",
             header: ({column}) => (
@@ -330,7 +222,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Institution"
+                label: "Institution"
             }
         },
         {
@@ -341,7 +233,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Pathology"
+                label: "Pathology"
             }
         },
         {
@@ -357,7 +249,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Preservation Method"
+                label: "Preservation Method"
             }
         },
         {
@@ -368,18 +260,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Anatomical Site"
-            }
-        },
-        {
-            id: "format",
-            accessorKey: "biosample.format",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Format"/>
-            ),
-            enableHiding: true,
-            meta: {
-              label: "Format"
+                label: "Anatomical Site"
             }
         },
         {
@@ -395,23 +276,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Method of Transport"
+                label: "Method of Transport"
             }
         },
         {
-            id: "yearOfExcision",
-            accessorKey: "biosample.yearOfExcision",
+            id: "collectionDate",
+            accessorKey: "biosample.collectionDate",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Year of Excision"/>
+                <DataTableColumnHeader column={column} title="Collection Date"/>
             ),
             enableHiding: true,
             meta: {
-              label: "Year of Excision"
+                label: "Collection Date"
             }
         },
-    ]
-
-    const donorInfoColumns: ColumnDef<any>[] = [
         {
             id: "donorId",
             accessorKey: "biosample.donor.id",
@@ -420,38 +298,18 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Donor Id"
-            }
-        },
-        {
-            id: "diagnoses",
-            accessorKey: "biosample.donor.diagnoses",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Diagnoses"/>
-            ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.biosample?.donor?.diagnoses?.map((diagnosis: string, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            {diagnosis}
-                        </li>
-                    ))}
-                </ul>
-            ),
-            enableHiding: true,
-            meta: {
-              label: "Diagnoses"
+                label: "Donor Id"
             }
         },
         {
             id: "age",
             accessorKey: "biosample.donor.age",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Age"/>
+                <DataTableColumnHeader column={column} title="Age at Collection"/>
             ),
             enableHiding: true,
             meta: {
-              label: "Age"
+                label: "Age at Collection"
             }
         },
         {
@@ -467,7 +325,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Sex"
+                label: "Sex"
             }
         },
         {
@@ -483,7 +341,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Gender"
+                label: "Gender"
             }
         },
         {
@@ -499,7 +357,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Race"
+                label: "Race"
             }
         },
         {
@@ -515,7 +373,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Ethnicity"
+                label: "Ethnicity"
             }
         },
         {
@@ -526,7 +384,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Height"
+                label: "Height"
             }
         },
         {
@@ -537,7 +395,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Weight"
+                label: "Weight"
             }
         },
         {
@@ -548,7 +406,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "BMI"
+                label: "BMI"
             }
         },
         {
@@ -568,7 +426,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Medications"
+                label: "Medications"
             }
         },
         {
@@ -588,12 +446,129 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-              label: "Medical Treatments"
+                label: "Medical Treatments"
             }
         },
-    ]
 
-    const actionsColumn: ColumnDef<any>[] = [
+
+        {
+            id: "private",
+            accessorKey: "private",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Visibility" />
+            ),
+            cell: ({ row }) => (
+                <div>
+                    {row.getValue("private") ? 'Private' : 'Public'}
+                </div>
+            ),
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+            label: "Visibility",
+            variant: "select",
+            options: [
+                {
+                label: "Private", 
+                value: "true",
+                }, {
+                label: "Public", 
+                value: "false",
+                }
+            ],
+            icon: CircleDashed,
+            },
+        },
+        {
+            id: "milestones",
+            accessorKey: "milestones",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Linked Projects" />
+            ),
+            cell: ({ row }) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.milestones?.map((milestone: any, index: number) => (
+                        <li key={index} className="line-clamp-2">
+                            {milestone.milestone?.title || undefined}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: true,
+            meta: {
+            label: "Linked Projects"
+            }
+        },
+        {
+            id: "contacts",
+            accessorKey: "contacts",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Contacts" />
+            ),
+            cell: ({ row }) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.contacts?.map((contact: any, index: number) => (
+                        <li key={index}>
+                            {contact.name || contact.email || contact.affiliation}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: true,
+            meta: {
+            label: "Contacts"
+            }
+        },
+        {
+            id: "links",
+            accessorKey: "links",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Links" />
+            ),
+            cell: ({ row }) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.attachments?.map((attachment: any, index: number) => (
+                        <li key={index} className="line-clamp-2">
+                            {attachment.name || attachment.link}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: true,
+            meta: {
+            label: "Links"
+            }
+        },
+        {
+            id: "pinned",
+            accessorKey: "pinned",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Pinned"/>
+            ),
+            cell: ({ row }) => (
+                <Button 
+                onClick={
+                    async () => {
+                    await createOrUpdateAsset(
+                        session?.user.organizationId, 
+                        {
+                        id: row.original.id,
+                        pinned: !row.original.pinned
+                        }
+                    )
+                    revalidate(pathname)
+                    }
+                }
+                variant={'ghost'}
+                >
+                    {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
+                </Button>
+            ),
+            enableHiding: true,
+            meta: {
+            label: "Pinned"
+            }
+        },
         {
             id: "actions",
             cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
@@ -604,8 +579,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     // Temporarily hide additional biobank columns from users on production
     // This can be removed, and all columns enabled once our biobank feature is built out
     if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-        return [...comendColumns, ...actionsColumn]
+        return columns.filter(column => column.id && !hiddenColumnIds.includes(column.id))
     }
 
-    return [...comendColumns, ...sampleInfoColumns, ...donorInfoColumns, ...actionsColumn]
+    return columns
 }

@@ -1007,7 +1007,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
             />
 
             <FormItem className="w-full flex gap-4 items-center">
-                <FormLabel className="w-[100px]">{'Quantity'}</FormLabel>
+                <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
                 <div className="w-full gap-2 flex">
                     <FormField
                         control={form.control}

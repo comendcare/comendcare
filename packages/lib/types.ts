@@ -376,7 +376,6 @@ export const COUNTRY_OPTIONS: Option[] = [
   { label: 'Czechia', value: 'CZ' },
   { label: 'Denmark', value: 'DK' },
   { label: 'Djibouti', value: 'DJ' },
-  { label: 'Dominica', value: 'DM' },
   { label: 'Dominican Republic', value: 'DO' },
   { label: 'Ecuador', value: 'EC' },
   { label: 'Egypt', value: 'EG' },
@@ -773,6 +772,16 @@ export const TOOL_TYPE_OPTIONS: any[] = [
     {
         id: 'TOXICOLOGYSTUDY',
         label: 'Toxicology study',
+        type: 'data'
+    },
+    {
+        id: 'EEG',
+        label: 'EEG',
+        type: 'data'
+    },
+    {
+        id: 'STRUCTURALMRI',
+        label: 'Structural MRI',
         type: 'data'
     },
 ]
