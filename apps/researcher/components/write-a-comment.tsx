@@ -1,17 +1,19 @@
 "use client"
-import React, {useEffect, useState} from "react"
+import {useEffect, useState, useCallback} from "react"
 import va from "@vercel/analytics"
 import {useSession} from "next-auth/react"
 import {toast} from "sonner"
 import {usePathname, useRouter} from "next/navigation"
+import {createComment} from "~researcher/lib/actions";
 
 export default function WriteAComment({
-    requestId
-}: {requestId: string}) {
+                                          requestId
+                                      }: { requestId: string }) {
     const router = useRouter()
     const pathname = usePathname()
     const {data: session, status} = useSession()
     const [comment, setComment] = useState("")
+    const [loading, setLoading] = useState(false)
     const [canSubmit, setCanSubmit] = useState(false)
 
     useEffect(() => {
@@ -19,8 +21,20 @@ export default function WriteAComment({
     }, [comment])
 
 
-    const handleCreateCommentSubmit = () => {
-    };
+    const handleCreateCommentSubmit = useCallback(async () => {
+        setLoading(true)
+        const response = await createComment(requestId, comment)
+        setLoading(false)
+
+        if (response.success) {
+            setComment("")
+            toast.success("Comment posted!")
+            router.refresh()
+        } else {
+            console.error(response.error)
+            toast.error("Something went wrong and we couldn't post your comment... Please try again later.")
+        }
+    }, [comment, requestId])
 
     return (
         <div className="mb-6">
@@ -36,12 +50,17 @@ export default function WriteAComment({
                     required
                     onChange={e => setComment(e.target.value)}
                     value={comment}
+                    onKeyDown={(e) => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                            handleCreateCommentSubmit()
+                        }
+                    }}
                 ></textarea>
             </div>
             <button
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none focus:ring-4 focus:ring-blue-200 hover:bg-blue-800"
                 onClick={handleCreateCommentSubmit}
-                disabled={!canSubmit}
+                disabled={!canSubmit || loading}
             >
                 Post comment
             </button>

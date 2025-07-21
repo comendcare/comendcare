@@ -18,7 +18,7 @@ export default function Comment(props: {
             <footer className="flex justify-between items-center mb-2">
                 <div className="relative flex items-center">
                     <img
-                        className="rounded-full mr-2"
+                        className="rounded-full mr-2 size-8"
                         // src={session?.user?.image || defaultAvatar}
                         src={props.commentData.author.image}
                         alt="Your profile picture"
@@ -26,7 +26,7 @@ export default function Comment(props: {
                     <p className="inline-flex items-center mr-3 text-sm text-gray-900 font-semibold">
                         {props.commentData.author.name}
                     </p>
-                    <p className="text-sm text-gray-600 ">
+                    <p className="text-sm text-gray-600">
                         <time title={formatDate(props.commentData.createdAt)}>
                             {formatDate(props.commentData.createdAt)}
                         </time>
@@ -37,7 +37,7 @@ export default function Comment(props: {
                     id={props.commentData.id}
                 />
             </footer>
-            <p className="text-gray-500">{props.commentData.body}</p>
+            <p className="text-gray-500">{props.commentData.text}</p>
         </article>
     )
 }

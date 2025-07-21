@@ -30,7 +30,13 @@ export default async function ResearcherRequestsPage({
                 researcherId: true,
                 createdAt: true,
                 updatedAt: true,
-                comments: true
+                comments: {
+                    select: {
+                        text: true,
+                        author: true,
+                        createdAt: true,
+                    }
+                }
             }
         });
         if (response.success) {

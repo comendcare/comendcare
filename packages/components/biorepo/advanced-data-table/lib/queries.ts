@@ -264,6 +264,8 @@ export const getAllBiosamples = withResearcherAuth(
                 where: {type: "biosample"},
             });
 
+            console.log("toolTypes:", toolTypes);
+
             const [data, total] = await prisma.$transaction([
                 prisma.tool.findMany({
                     skip: offset,
@@ -271,6 +273,10 @@ export const getAllBiosamples = withResearcherAuth(
                     where: {
                         ...where,
                         // types: {hasSome: toolTypes.map((type) => type.id)},
+                        // OR: [
+                        //     { types: { hasSome: toolTypes.map((type) => type.id) } },
+                        //     { types: { isEmpty: true } },
+                        // ],
                     },
                     include: {
                         milestones: {include: {milestone: true}},

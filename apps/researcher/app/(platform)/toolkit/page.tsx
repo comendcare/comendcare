@@ -24,12 +24,14 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
         {...search, filters: validFilters}
     )
 
-    // this org has no biosample tools (i.e. filters are empty and there is still no data)
-    if (data.length === 0 && Object.keys(searchParams).length === 0) {
+    // If there are somehow now biosamples returned, show a message
+    if (data.length === 0) {
         return (
             <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                 <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                    <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
+                    <h1 className="font-cal text-4xl">
+                        {`We don't have any Biosample Tools right now`}
+                    </h1>
                     <Image
                         alt="No Biosample Tools"
                         src="https://illustrations.popsy.co/gray/graphic-design.svg"
