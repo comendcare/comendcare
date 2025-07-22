@@ -1,7 +1,7 @@
 "use client";
 
 import { useRoadmapStore } from "../../state/roadmap/roadmapStore";
-import { PlatformNotification, Prisma, ToolType } from "@prisma/client";
+import { PlatformNotification, Prisma } from "@prisma/client";
 import { useNotificationsStore } from "../../state/notifications/notificationsStore";
 import { useCROSearchStore } from "../../state/search/croSearchStore";
 import { useMilestoneSearchStore } from "../../state/search/milestoneSearchStore";
@@ -80,12 +80,12 @@ export function initializeNotificationsState(initData: {
     }
 }
 
-export function initializeAssetsStore(tools: Asset[], toolTypes: ToolType[]) {
+export function initializeAssetsStore(tools: Asset[]) {
     if (typeof window !== "undefined") {
         const initAssetState = useToolStore.getState().initState;
 
         // Call Zustand's initState directly
-        initAssetState(tools, toolTypes)
+        initAssetState(tools)
     }
 }
 
