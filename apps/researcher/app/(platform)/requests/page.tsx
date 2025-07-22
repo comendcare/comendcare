@@ -1,10 +1,9 @@
-import RequestCard from "~researcher/components/request-card";
 import RequestStats from "~researcher/components/request-stats";
 import * as React from "react"
 import RequestToolbar from "~researcher/components/request-toolbar";
 import {getAllResearcherRequests} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
-import {MaterialAndDataAccessRequest} from "@prisma/client";
+import RequestHistory from "~researcher/components/request-history";
 
 const stats = [
     { name: 'Total Requests Submitted', value: '12' },
@@ -32,11 +31,7 @@ export default async function ResearcherAccessRequestsPage() {
 
             <RequestToolbar/>
 
-            <div className="space-y-4">
-                {requestsData.map((request: MaterialAndDataAccessRequest) => (
-                    <RequestCard request={request} key={request.id}/>
-                ))}
-            </div>
+            <RequestHistory/>
         </div>
     )
 }

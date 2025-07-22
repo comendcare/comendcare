@@ -3,6 +3,7 @@ import {temporal} from 'zundo';
 import {create} from 'zustand';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import {getRequests} from "comend-researcher-hub/lib/fetchers";
 
 export type ViewType = 'grid' | 'list'
 
@@ -137,40 +138,43 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const {results: newSearchResults, total} = await getUpdatedSearchResults({
-                    ...get(),
+                const response = await getRequests({
                     searchTerm: newSearch,
-                    lastFetchedPage: 1,
-                }, true)
+                    filters: get().filters,
+                    sortBy: get().sortBy,
+                    page: 1,
+                })
 
-                if (newSearch.length > 0) {
-                    // only track searches if the user has entered text in the searchbar
-                    const filters = get().filters
-                    mixpanelTrack("Search Requests", {
-                        "Search Term": newSearch,
-                        "Results": total,
-                        "Filters": {
-                            "Statuses": filters.statuses.map(filter => filter.label),
-                            "Types": filters.types.map(filter => filter.label),
-                        }
-                    })
-                }
+                mixpanelTrack("Search Requests", {
+                    "Search Term": newSearch,
+                    "Results": response.total,
+                    "Filters": {
+                        "Statuses": get().filters.statuses.map(s => s.label),
+                        "Types": get().filters.types.map(t => t.label),
+                    }
+                })
 
                 set({
                     searchTerm: newSearch,
-                    searchResults: newSearchResults,
+                    searchResults: response.data,
                     lastFetchedPage: 1,
-                    totalResults: total,
+                    totalResults: response.total,
                 })
             },
             sortBy: "recently-updated",
             setSortBy: async (sortBy: string | undefined) => {
-                const {results: newSearchResults, total} = await getUpdatedSearchResults({
-                    ...get(),
+                const response = await getRequests({
+                    searchTerm: get().searchTerm,
+                    filters: get().filters,
                     sortBy,
+                    page: 1,
+                })
+                set({
+                    sortBy,
+                    searchResults: response.data,
                     lastFetchedPage: 1,
-                }, true)
-                set({sortBy, searchResults: newSearchResults, lastFetchedPage: 1, totalResults: total})
+                    totalResults: response.total,
+                })
             },
             lastFetchedPage: 1, // page numbers in TypeSense start at 1
             setLastFetchedPage: async (page: number) => {
@@ -193,11 +197,12 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
                     ...updatedFilters
                 }
 
-                const { results: newSearchResults, total } = await getUpdatedSearchResults({
-                    ...get(),
+                const response = await getRequests({
+                    searchTerm: get().searchTerm,
                     filters: newFilters,
-                    lastFetchedPage: 1,
-                }, true)
+                    sortBy: get().sortBy,
+                    page: 1,
+                })
 
                 const recentlySelected = {
                     statuses: getExclusiveToFirstGroup(newFilters, get().filters, 'statuses'),
@@ -215,7 +220,7 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
                 ) {
                     // only track in mixpanel if something in the filters has been updated
                     mixpanelTrack("Researcher Requests Page Filters", {
-                        "Results": total,
+                        "Results": response.data.length,
                         "Filters": {
                             "Statuses": newFilters.statuses.map(filter => filter.label),
                             "Types": newFilters.types.map(filter => filter.label),
@@ -234,8 +239,8 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
                 set({
                     filters: newFilters,
                     lastFetchedPage: 1,
-                    searchResults: newSearchResults,
-                    totalResults: total,
+                    searchResults: response.data,
+                    totalResults: response.data.length,
                 })
             },
             totalResults: undefined,

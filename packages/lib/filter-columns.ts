@@ -19,13 +19,13 @@ import type { ExtendedColumnFilter, JoinOperator } from "@comend/components/type
  * @returns A Prisma query object representing the combined filters, or undefined if no valid
  * filters are found.
  */
-export function filterColumns({
-                                filters,
-                                joinOperator,
-                              }: {
+export function filterColumns<TWhere extends object>({
+                                                       filters,
+                                                       joinOperator,
+                                                     }: {
   filters: ExtendedColumnFilter<any>[];
   joinOperator: JoinOperator;
-}): Prisma.PrismaClientKnownRequestError | undefined {
+}): TWhere | undefined {
   const joinFn = joinOperator === "and" ? "AND" : "OR";
 
   const getColumn = (keys: string[], finalVal: Object): Object => {
@@ -87,10 +87,14 @@ export function filterColumns({
 
       case "inArray":
         if (Array.isArray(filter.value)) {
-          // return {[column]: { hasSome: filter.value }}
-          return getColumn(columns, { hasSome: filter.value })
+          return getColumn(
+              columns,
+              filter.id === "status"
+                  ? { in: filter.value }         // use `in` just for "status"
+                  : { hasSome: filter.value }   // use `hasSome` for everything else
+          );
         }
-        return undefined;
+        return undefined
 
       case "notInArray":
         if (Array.isArray(filter.value)) {
