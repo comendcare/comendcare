@@ -16,6 +16,7 @@ import {
     DataTableColumnHeader
 } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import {
+    BIOSAMPLE_TYPE_OPTIONS,
     COUNTRY_OPTIONS,
     DONOR_ETHNICITY_OPTIONS,
     DONOR_GENDER_OPTIONS,
@@ -28,9 +29,9 @@ import {
 import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
 import {revalidate} from "@comend/lib/revalidate";
 import {Button} from "@comend/components/ui/button";
-import {createOrUpdateAsset} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
+import { createOrUpdateBiosample } from "@comend/lib/actions";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
@@ -73,7 +74,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <>
                     {(row.original.types || []).map((type: string, index: number) => {
-                        const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
+                        const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.id === type)
                         return (
                             <MilestoneTypeBadge key={index} label={typeOption?.label}/>
                         )
@@ -85,7 +86,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: {
                 label: "Type",
                 variant: "multiSelect",
-                options: TOOL_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
+                options: BIOSAMPLE_TYPE_OPTIONS.filter(type => type.type === "biosample").map(type => ({
                     label: type.label,
                     value: type.id,
                 })),
@@ -177,7 +178,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <Button
                     onClick={
                         async () => {
-                            await createOrUpdateAsset(
+                            await createOrUpdateBiosample(
                                 session?.user.organizationId,
                                 {
                                     id: row.original.id,

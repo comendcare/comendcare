@@ -27,8 +27,8 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog"
-import {Asset, optionSchema} from "@comend/lib/types"
-import {MilestoneType, Prisma, ToolType} from "@prisma/client"
+import {Asset, optionSchema, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
+import {MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -73,7 +73,6 @@ const editAssetForm = z.object({
 })
 
 const toolSelector = (state: ToolState) => ({
-    toolTypes: state.toolTypes,
     createTool: state.createTool,
     updateTool: state.updateTool
 })
@@ -93,7 +92,7 @@ export function EditDataToolForm({
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { toolTypes, createTool, updateTool } = useToolStore(useShallow(toolSelector))
+    const { createTool, updateTool } = useToolStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editAssetForm>>({
@@ -102,11 +101,9 @@ export function EditDataToolForm({
         defaultValues: {
             title: toolData?.title || "",
             description: toolData?.description || "",
-            types: toolTypes
-                        .filter(type => type.type === 'data')
+            types: TOOL_TYPE_OPTIONS
                         .filter(toolType => (toolData?.types || [])
-                        .includes(toolType.id))
-                        .map(toolType => ({value: toolType.id, label: toolType.label}) as Option),
+                        .includes(toolType.id)),
             otherTypeDetails: typeof toolData?.metadata === 'object' ? (toolData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -327,11 +324,7 @@ export function EditDataToolForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
-                                        options={
-                                            toolTypes
-                                                .filter(type => type.type === 'data')
-                                                .map(toolType => ({value: toolType.id, label: toolType.label})) as Option[]
-                                        }
+                                        options={TOOL_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
                                         placeholder="Select a type..."

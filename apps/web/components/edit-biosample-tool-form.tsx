@@ -27,8 +27,8 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog"
-import {ANATOMICAL_SITE_OPTIONS, Asset, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS} from "@comend/lib/types"
-import {Biosample, Donor, Institution, MilestoneType, Prisma, ToolType} from "@prisma/client"
+import {ANATOMICAL_SITE_OPTIONS, Asset, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
+import {Biosample, Donor, Institution, MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -49,7 +49,7 @@ import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
 import { map } from "lodash"
-import { createOrUpdateAsset } from "@/packages/lib/actions"
+import { createOrUpdateAsset, createOrUpdateBiosample } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -82,13 +82,13 @@ const editAssetForm = z.object({
     // mass: z.string().optional(),
     // area: z.string().optional(),
     quantity: z.string().optional(),
-    quantityMeasurement: z.string(),
+    quantityUnit: z.string(),
     productCode: z.string().optional(),
     // priceUSD: z.string().optional(),
     // priceGBP: z.string().optional(),
     // priceEUR: z.string().optional(),
     price: z.string().optional(),
-    priceMeasurement: z.string(),
+    priceUnit: z.string(),
     premiumGroup: z.string().optional(),
     caseId: z.string().optional(),
     specimenId: z.string().optional(),
@@ -198,7 +198,6 @@ export function EditBiosampleToolForm({
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { toolTypes } = useToolStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     const form = useForm<z.infer<typeof editAssetForm>>({
@@ -206,11 +205,9 @@ export function EditBiosampleToolForm({
         resolver: zodResolver(editAssetForm),
         defaultValues: {
             description: toolData?.description || "",
-            types: toolTypes
-                        .filter(type => type.type === 'biosample')
+            types: BIOSAMPLE_TYPE_OPTIONS
                         .filter(toolType => (toolData?.types || [])
-                        .includes(toolType.id))
-                        .map(toolType => ({value: toolType.id, label: toolType.label}) as Option),
+                        .includes(toolType.value)),
             otherTypeDetails: typeof toolData?.metadata === 'object' ? (toolData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -221,46 +218,34 @@ export function EditBiosampleToolForm({
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
             // biosmaple properties
-            // institution: toolData?.biosample?.institution?.name || undefined,
-            anatomicalSite: toolData?.biosample?.anatomicalSite || undefined,
-            preservationMethod: toolData?.biosample?.preservationMethod|| undefined,
-            methodOfTransport: toolData?.biosample?.methodOfTransport || undefined,
-            currentCountry: toolData?.biosample?.currentCountry || undefined,
-            countryOfCollection: toolData?.biosample?.countryOfCollection || undefined,
+            // institution: toolData?.institution?.name || undefined,
+            anatomicalSite: toolData?.anatomicalSite || undefined,
+            preservationMethod: toolData?.preservationMethod|| undefined,
+            methodOfTransport: toolData?.methodOfTransport || undefined,
+            currentCountry: toolData?.currentCountry || undefined,
+            countryOfCollection: toolData?.countryOfCollection || undefined,
 
-            quantity: toolData.biosample?.volume?.toString() || toolData?.biosample?.mass?.toString() || toolData?.biosample?.area?.toString() || undefined,
-            quantityMeasurement: (() => {
-                if (toolData?.biosample?.volume) return 'ml'
-                if (toolData?.biosample?.mass) return 'mg'
-                if (toolData?.biosample?.area) return 'sqmm'
+            quantity: toolData?.quantity?.toString() || undefined,
+            quantityUnit: toolData?.quantityUnit || 'ml',
 
-                return 'ml'
-            })(),
-
-            price: toolData.biosample?.priceUSD?.toString() || toolData?.biosample?.priceGBP?.toString() || toolData?.biosample?.priceEUR?.toString() || undefined,
-            priceMeasurement: (() => {
-                if (toolData?.biosample?.priceUSD) return 'usd'
-                if (toolData?.biosample?.priceGBP) return 'gbp'
-                if (toolData?.biosample?.priceEUR) return 'eur'
-
-                return 'usd'
-            })(),
-            biosampleDiagnosis: toolData?.biosample?.biosampleDiagnosis || undefined,
-            yearOfExcision: toolData?.biosample?.yearOfExcision?.toString() || undefined,
-            ageAtExcision: toolData?.biosample?.ageAtExcision?.toString() || undefined,
+            price: toolData?.price?.toString() || undefined,
+            priceUnit: toolData?.priceUnit || 'usd',
+            biosampleDiagnosis: toolData?.biosampleDiagnosis || undefined,
+            yearOfExcision: toolData?.yearOfExcision?.toString() || undefined,
+            ageAtExcision: toolData?.ageAtExcision?.toString() || undefined,
 
             // donor properties
-            age: toolData?.biosample?.donor?.age?.toString() || undefined,
-            sex: toolData?.biosample?.donor?.sex || undefined,
-            gender: toolData?.biosample?.donor?.gender || undefined,
-            race: toolData?.biosample?.donor?.race || undefined,
-            ethnicity: toolData?.biosample?.donor?.ethnicity || undefined,
-            treatments: toolData?.biosample?.donor?.treatments || undefined,
-            diagnoses: toolData?.biosample?.donor?.diagnoses || undefined,
-            height: toolData?.biosample?.donor?.height?.toString() || undefined,
-            weight: toolData?.biosample?.donor?.weight?.toString() || undefined,
-            bmi: toolData?.biosample?.donor?.bmi?.toString() || undefined,
-            medications: toolData?.biosample?.donor?.medications || undefined,
+            age: toolData?.donor?.age?.toString() || undefined,
+            sex: toolData?.donor?.sex || undefined,
+            gender: toolData?.donor?.gender || undefined,
+            race: toolData?.donor?.race || undefined,
+            ethnicity: toolData?.donor?.ethnicity || undefined,
+            treatments: toolData?.donor?.treatments || undefined,
+            diagnoses: toolData?.donor?.diagnoses || undefined,
+            height: toolData?.donor?.height?.toString() || undefined,
+            weight: toolData?.donor?.weight?.toString() || undefined,
+            bmi: toolData?.donor?.bmi?.toString() || undefined,
+            medications: toolData?.donor?.medications || undefined,
         }
     })
 
@@ -304,10 +289,14 @@ export function EditBiosampleToolForm({
             weight,
             bmi,
             medications,
+            quantity,
+            quantityUnit,
+            price,
+            priceUnit,
         } = values;
 
-        const updateData: Partial<Asset> = {
-            ...toolData,
+        const biosampleData: any = {
+            id: toolData.id,
             types: types.map(type => type.value),
             metadata: {
                 ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
@@ -318,24 +307,24 @@ export function EditBiosampleToolForm({
             milestones: (milestones || []).map((milestone) => {
                 return ({
                     milestoneId: milestone.id,
-                    toolId: toolData.id  || '',
+                    biosampleId: toolData.id  || '',
                 })
             }),
             ...(description !== undefined && description !== null ? {description} : undefined),
             ...(attachments ? {attachments} : undefined),
             ...(contacts ? {contacts} : undefined),
-        }
-
-        const biosampleData: Partial<Biosample> = {
             anatomicalSite,
             preservationMethod,
             methodOfTransport,
             currentCountry,
             countryOfCollection,
+            ...(quantity !== undefined && quantity !== null ? {quantity: JSON.parse(quantity)} : undefined),
+            quantityUnit,
+            ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
+            priceUnit,
             // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
             // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
         }
-
 
         const donorData: Partial<Donor> = {
             age: typeof age === 'string' ? parseInt(age, 10) : age,
@@ -361,9 +350,8 @@ export function EditBiosampleToolForm({
 
         try {
             if (toolData.id) {
-                // await updateTool(updateData, session.user.organizationId)
-                const updatedAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
-                mixpanelTrack("Tool Updated", {
+                const updatedAsset = await createOrUpdateBiosample(session.user.organizationId, biosampleData, donorData)
+                mixpanelTrack("Biosample Updated", {
                     "ID": updatedAsset.id,
                     "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
@@ -379,9 +367,8 @@ export function EditBiosampleToolForm({
                 await revalidate("/app/tools/biosample")
                 router.refresh()
             } else {
-                // await createTool(updateData, session.user.organizationId)
-                const newAsset = await createOrUpdateAsset(session.user.organizationId, updateData, biosampleData, donorData)
-                mixpanelTrack("Tool Created", {
+                const newAsset = await createOrUpdateBiosample(session.user.organizationId, biosampleData, donorData)
+                mixpanelTrack("Biosample Created", {
                     "ID": newAsset.id,
                     "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
                     // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
@@ -519,11 +506,7 @@ export function EditBiosampleToolForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
-                                        options={
-                                            toolTypes
-                                                .filter(type => type.type === 'biosample')
-                                                .map(toolType => ({value: toolType.id, label: toolType.label})) as Option[]
-                                        }
+                                        options={BIOSAMPLE_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
                                         placeholder="Select a type..."
@@ -846,12 +829,12 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 
                     <FormField 
                         control={form.control}
-                        name="quantityMeasurement"
+                        name="quantityUnit"
                         render={({ field }) => (
                             <FormControl>
                                 <Select
                                     value={field.value} 
-                                    onValueChange={(newVal) => form.setValue("quantityMeasurement", newVal)}
+                                    onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
                                 >
                                     <SelectTrigger className="-mt-2 w-[100px] h-[32px]">
                                         <SelectValue placeholder="Select a value" />
@@ -892,12 +875,12 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 
                     <FormField 
                         control={form.control}
-                        name="priceMeasurement"
+                        name="priceUnit"
                         render={({ field }) => (
                             <FormControl>
                                 <Select
                                     value={field.value} 
-                                    onValueChange={(newVal) => form.setValue("priceMeasurement", newVal)}
+                                    onValueChange={(newVal) => form.setValue("priceUnit", newVal)}
                                 >
                                     <SelectTrigger className="-mt-2 w-[100px] h-[32px]">
                                         <SelectValue placeholder="Select a value" />

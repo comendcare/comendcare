@@ -267,8 +267,9 @@ model Milestone {
   timelineOrder    Int                        @default(0)
   nodeType         String                     @default("PROJECT")
 
-  tools ToolToMilestone[]
-  rfps  RFPToMilestone[]
+  tools      ToolToMilestone[]
+  biosamples BiosampleToMilestone[]
+  rfps       RFPToMilestone[]
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -299,7 +300,6 @@ model Tool {
   organizationId String?
   organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     ToolToMilestone[]
-  biosample      Biosample?
 }
 
 model Biosample {
@@ -307,8 +307,17 @@ model Biosample {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  description String?
+  contacts    ExternalContact[]
+  attachments ExternalAttachment[]
+  private     Boolean              @default(true)
+  pinned      Boolean              @default(false)
+  metadata    Json?
+  types       String[] // values (BiosampleType ids)
+
   gene                Gene?     @relation(fields: [geneId], references: [id])
   variant             String?
+  availability        String?
   quantity            Float?
   quantityUnit        String?
   currentCountry      String?
@@ -321,13 +330,14 @@ model Biosample {
   price               Float?
   priceUnit           String?
 
-  toolId        String       @unique
-  tool          Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  institutionId String?
-  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull)
-  donor         Donor?       @relation(fields: [donorId], references: [id])
-  donorId       String?
-  geneId        Int?
+  institutionId  String?
+  institution    Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  donor          Donor?                 @relation(fields: [donorId], references: [id])
+  donorId        String?
+  geneId         Int?
+  organizationId String?
+  organization   Organization?          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones     BiosampleToMilestone[]
 }
 
 model Donor {
@@ -351,16 +361,6 @@ model Donor {
   biosamples Biosample[]
 }
 
-model ToolType {
-  id          String   @id // value
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  label       String
-  type        String // biosample | data
-  description String?
-  metadata    Json?
-}
-
 model ToolToMilestone {
   id          String @id @default(uuid())
   toolId      String
@@ -371,6 +371,18 @@ model ToolToMilestone {
   metadata  Json?
 
   @@unique([toolId, milestoneId])
+}
+
+model BiosampleToMilestone {
+  id          String @id @default(uuid())
+  biosampleId String
+  milestoneId String
+
+  biosample Biosample @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
+  milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  metadata  Json?
+
+  @@unique([biosampleId, milestoneId])
 }
 
 model RFP {
@@ -527,6 +539,8 @@ model ExternalAttachment {
 
   toolId      String?
   tool        Tool?      @relation(fields: [toolId], references: [id])
+  biosampleId String?
+  biosample   Biosample? @relation(fields: [biosampleId], references: [id])
   rfpId       String?
   rfp         RFP?       @relation(fields: [rfpId], references: [id])
   milestoneId String?
@@ -545,6 +559,8 @@ model ExternalContact {
 
   toolId      String?
   tool        Tool?      @relation(fields: [toolId], references: [id])
+  biosampleId String?
+  biosample   Biosample? @relation(fields: [biosampleId], references: [id])
   rfpId       String?
   rfp         RFP?       @relation(fields: [rfpId], references: [id])
   milestoneId String?
@@ -617,6 +633,7 @@ model Organization {
   savedOrganizations            SavedOrganization[]            @relation("org_save_organization")
   savedByOrganizations          SavedOrganization[]            @relation("org_save_savedOrganization")
   tools                         Tool[]
+  biosamples                    Biosample[]
   rfps                          RFP[]
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
