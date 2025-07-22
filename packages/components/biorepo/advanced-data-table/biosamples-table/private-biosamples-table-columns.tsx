@@ -3,15 +3,9 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
-    Globe,
-    Lock,
     Pin,
-    Text,
 } from "lucide-react";
 import * as React from "react";
-import {
-    EditableCell
-} from "@comend/components/biorepo/advanced-data-table/data-table/editable-cell";
 import {
     DataTableColumnHeader
 } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
@@ -25,7 +19,6 @@ import {
     DONOR_SEX_OPTIONS,
     SAMPLE_PRESERVATION_METHOD_OPTIONS,
     SAMPLE_TRANSPORT_METHOD_OPTIONS,
-    TOOL_TYPE_OPTIONS
 } from "@comend/lib/types";
 import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
@@ -154,9 +147,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Available Quantity",
-                // variant: "range",
-                // range: [0, 1000],
-                // unit: 'ml'
+                variant: "range",
+                range: [0, 1000],
+                unit: 'ml',
             },
         },
         {
@@ -194,6 +187,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 variant: "select",
                 options: COUNTRY_OPTIONS,
                 icon: CircleDashed,
+                showInAdvancedOnly: true
             },
         },
         {
@@ -215,6 +209,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 variant: "select",
                 options: COUNTRY_OPTIONS,
                 icon: CircleDashed,
+                showInAdvancedOnly: true,
             },
         },
         {
@@ -256,9 +251,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Preservation Method"
-            }
+                label: "Preservation Method",
+                variant: "multiSelect",
+                options: SAMPLE_PRESERVATION_METHOD_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true
+            },
         },
         {
             id: "anatomicalSite",
@@ -272,8 +272,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Anatomical Site"
+                label: "Anatomical Site",
+                variant: "multiSelect",
+                options: ANATOMICAL_SITE_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -288,8 +293,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Method of Transport"
+                label: "Method of Transport",
+                variant: "multiSelect",
+                options: SAMPLE_TRANSPORT_METHOD_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -299,8 +309,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Collection Date"/>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Collection Date"
+                label: "Collection Date",
+                variant: "dateRange",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -322,7 +336,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Age at Collection"
+                label: "Age at Collection",
+                variant: "range",
+                range: [0, 150],
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -337,8 +354,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Sex"
+                label: "Sex",
+                variant: "multiSelect",
+                options: DONOR_SEX_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -353,8 +375,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Gender"
+                label: "Gender",
+                variant: "multiSelect",
+                options: DONOR_GENDER_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true
             }
         },
         {
@@ -369,8 +396,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Race"
+                label: "Race",
+                variant: "multiSelect",
+                options: DONOR_RACE_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true
             }
         },
         {
@@ -385,8 +417,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Ethnicity"
+                label: "Ethnicity",
+                variant: "multiSelect",
+                options: DONOR_ETHNICITY_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -396,8 +433,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Height"/>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Height"
+                label: "Height",
+                variant: "range",
+                range: [0, 500],
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -408,7 +449,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Weight"
+                label: "Weight",
+                variant: "range",
+                range: [0, 500],
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -419,7 +463,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "BMI"
+                label: "BMI",
+                variant: "range",
+                range: [0, 500],
+                showInAdvancedOnly: true,
             }
         },
         {
@@ -439,7 +486,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Medications"
+                label: "Medications",
             }
         },
         {
@@ -478,18 +525,18 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-            label: "Visibility",
-            variant: "select",
-            options: [
-                {
-                label: "Private", 
-                value: "true",
-                }, {
-                label: "Public", 
-                value: "false",
-                }
-            ],
-            icon: CircleDashed,
+                label: "Visibility",
+                variant: "select",
+                options: [
+                    {
+                        label: "Private", 
+                        value: "true",
+                    }, {
+                        label: "Public", 
+                        value: "false",
+                    }
+                ],
+                icon: CircleDashed,
             },
         },
         {
@@ -509,7 +556,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-            label: "Linked Projects"
+                label: "Linked Projects"
             }
         },
         {
@@ -578,9 +625,21 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </Button>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-            label: "Pinned"
-            }
+                label: "Pinned",
+                variant: "select",
+                options: [
+                    {
+                        label: "Pinned", 
+                        value: "true",
+                    }, {
+                        label: "Not Pinned", 
+                        value: "false",
+                    }
+                ],
+                icon: CircleDashed,
+            },
         },
         {
             id: "actions",
