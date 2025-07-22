@@ -12,10 +12,16 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    types: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
 }
 
 export const defaultFilters = {
     statuses: [],
+    types: [],
 }
 
 function generateFiltersString(filters: FiltersType) {
@@ -26,6 +32,13 @@ function generateFiltersString(filters: FiltersType) {
     if (filters.statuses.length > 0) {
         filters.statuses.forEach(system => {
             filtersList.push(`status:=[${system.value}]`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
+        })
+    }
+
+    if (filters.types.length > 0) {
+        filters.types.forEach(system => {
+            filtersList.push(`type:=[${system.value}]`)
             typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
         })
     }
@@ -111,7 +124,7 @@ export interface OrganizationSearchState {
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void,
+    setFilters: (updatedFilters: Partial<FiltersType>) => void,
     totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
@@ -138,6 +151,7 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
                         "Results": total,
                         "Filters": {
                             "Statuses": filters.statuses.map(filter => filter.label),
+                            "Types": filters.types.map(filter => filter.label),
                         }
                     })
                 }
@@ -173,13 +187,13 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
             searchResults: undefined,
             setSearchResults: (results: any[]) => set({searchResults: results}),
             filters: defaultFilters,
-            setFilters: async (updatedFilters: FiltersType) => {
+            setFilters: async (updatedFilters: Partial<FiltersType>) => {
                 const newFilters = {
                     ...get().filters,
                     ...updatedFilters
                 }
 
-                const {results: newSearchResults, total} = await getUpdatedSearchResults({
+                const { results: newSearchResults, total } = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
@@ -187,24 +201,32 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
 
                 const recentlySelected = {
                     statuses: getExclusiveToFirstGroup(newFilters, get().filters, 'statuses'),
+                    types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
                 }
 
                 const recentlyRemoved = {
                     statuses: getExclusiveToFirstGroup(get().filters, newFilters, 'statuses'),
+                    types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
                 }
 
-                if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
+                if (
+                    Object.values(recentlySelected).flatMap(value => value).length > 0 ||
+                    Object.values(recentlyRemoved).flatMap(value => value).length > 0
+                ) {
                     // only track in mixpanel if something in the filters has been updated
                     mixpanelTrack("Researcher Requests Page Filters", {
                         "Results": total,
                         "Filters": {
                             "Statuses": newFilters.statuses.map(filter => filter.label),
+                            "Types": newFilters.types.map(filter => filter.label),
                         },
                         "Added": {
                             "Statuses": recentlySelected.statuses.map(filter => filter.label),
+                            "Types": recentlySelected.types.map(filter => filter.label),
                         },
                         "Removed": {
                             "Statuses": recentlyRemoved.statuses.map(filter => filter.label),
+                            "Types": recentlyRemoved.types.map(filter => filter.label),
                         },
                     })
                 }

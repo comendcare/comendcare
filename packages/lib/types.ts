@@ -1758,6 +1758,19 @@ export interface MaterialAndDataAccessRequestWithResearcherAndComments extends M
     comments: Comment[];
 }
 
+export const REQUEST_TYPE_OPTIONS: any[] = [
+    {
+        id: 'BIOSAMPLE',
+        label: 'Biosample',
+        value: 'BIOSAMPLE'
+    },
+    {
+        id: 'DATA',
+        label: 'Data',
+        value: 'DATA'
+    },
+];
+
 export const REQUEST_STATUS_TYPE_OPTIONS: any[] = [
     {
         id: 'APPROVED',
