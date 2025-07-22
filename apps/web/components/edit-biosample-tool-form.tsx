@@ -71,6 +71,7 @@ const editAssetForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional(),
 
     // biosmaple properties
+    genes: z.array(optionSchema).optional(),
     institution: z.custom<Institution>().optional(),
     anatomicalSite: z.string().optional(),
     preservationMethod: z.string().optional(),
@@ -145,12 +146,6 @@ const editAssetForm = z.object({
     drinksPerDay: z.string().optional(),
     alcoholDuration: z.string().optional(),
     medications: z.array(z.string()).optional(),
-})
-
-const toolSelector = (state: ToolState) => ({
-    toolTypes: state.toolTypes,
-    createTool: state.createTool,
-    updateTool: state.updateTool
 })
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
@@ -662,9 +657,57 @@ export function EditBiosampleToolForm({
 }
 
 export const AdditionalBiosampleFields = ({form}: {form: any}) => {
+    const [loading, setLoading] = useState(false)
+
+    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
         <h1 className="font-semibold text-md py-0 my-0">Biosample Information</h1>
+
+        {/* <FormField
+            control={form.control}
+            name="genes"
+            render={({field}) => (
+                <FormItem className="w-full flex gap-4 items-center">
+                    <FormLabel className="w-[100px]">{`Gene`}</FormLabel>
+                    <div className="w-full">
+                        <FormControl>
+                            <MultipleSelector
+                                className="-mt-2 w-full h-[32px]"
+                                {...field}
+                                onSearch={handleAsyncSearch}
+                                placeholder="Search for genes..."
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading genes...</p>}
+                                emptyIndicator={<p>No genes found.</p>}
+                                showHoverCard={false}
+                                maxSelected={1}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </div>
+                </FormItem>
+            )}
+        /> */}
+
         <div className="flex-col space-y-4">
             <FormField
                 control={form.control}
