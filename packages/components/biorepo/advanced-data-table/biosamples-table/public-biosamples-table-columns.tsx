@@ -62,9 +62,6 @@ const hiddenColumnIds = [
 ]
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
-    const {data: session} = useSession()
-    const pathname = usePathname()
-
     const columns: ColumnDef<any>[] = [
         {
             id: "select",
@@ -638,48 +635,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: {
                 label: "Links"
             }
-        },
-        {
-            id: "pinned",
-            accessorKey: "pinned",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Pinned"/>
-            ),
-            cell: ({row}) => (
-                <Button
-                    onClick={
-                        async () => {
-                            await createOrUpdateBiosample(
-                                session?.user.organizationId,
-                                {
-                                    id: row.original.id,
-                                    pinned: !row.original.pinned
-                                }
-                            )
-                            revalidate(pathname)
-                        }
-                    }
-                    variant={'ghost'}
-                >
-                    {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-                </Button>
-            ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Pinned",
-                variant: "select",
-                options: [
-                    {
-                        label: "Pinned",
-                        value: "true",
-                    }, {
-                        label: "Not Pinned",
-                        value: "false",
-                    }
-                ],
-                icon: CircleDashed,
-            },
         },
     ]
 
