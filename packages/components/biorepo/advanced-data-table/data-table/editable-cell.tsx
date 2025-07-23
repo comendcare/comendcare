@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { revalidate } from "@comend/lib/revalidate";
-import { createOrUpdateAsset } from "@comend/lib/actions";
+import { createOrUpdateBiosample } from "@comend/lib/actions";
 import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@comend/components/ui/textarea";
 
@@ -12,7 +12,7 @@ export function EditableCell({ row, session, pathname }: { row: any, session: an
     const inputRef = useRef<HTMLTextAreaElement>(null)
 
     const onBlur = async () => {
-        await createOrUpdateAsset(
+        await createOrUpdateBiosample(
             session?.user.organizationId,
             {
                 id: row.original.id,

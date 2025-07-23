@@ -12,7 +12,6 @@ import {
     getAssets,
     getMilestoneTypes,
     getRFPs,
-    getToolTypes,
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {
@@ -24,7 +23,7 @@ import {
 } from "@comend/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
 import {useQueryState} from "nuqs"
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, TOOL_TYPE_OPTIONS} from "@comend/lib/types";
 import {PharmaSidebar} from "~web/components/pharma-sidebar";
 import {PharmaHeader} from "~web/components/pharma-header";
 import { rule } from "postcss";
@@ -201,15 +200,8 @@ export default function AppLayout({children}: AppLayoutProps) {
                 pinned: true,
                 milestones: true,
             })
-            let toolTypesResponse = await getToolTypes({
-                id: true,
-                label: true,
-                type: true,
-                description: true,
-                metadata: true
-            })
-            if (toolResponse.success && toolTypesResponse.success && toolTypesResponse.data) {
-                initializeAssetsStore(toolResponse.data || [], toolTypesResponse.data)
+            if (toolResponse.success) {
+                initializeAssetsStore(toolResponse.data || [])
                 console.log(`Tools initialized...`)
             } else {
                 console.error(toolResponse.error)

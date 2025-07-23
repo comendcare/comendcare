@@ -1824,11 +1824,128 @@ export const deleteAsset = withOrganizationAuth(
     }
 )
 
-export const createOrUpdateAsset = withOrganizationAuth(
-    async (organization: Organization, toolData: any, biosampleData?: any, donorData?: any) => {
+export const createOrUpdateBiosample = withOrganizationAuth(
+    async (organization: Organization, biosampleData?: any, donorData?: any) => {
         try {
             console.log(`biosample data`, biosampleData)
             console.log(`donor data`, donorData)
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            const response = await prisma.biosample.upsert({
+                where: { id: biosampleData.id || nanoid() },
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                update: {
+                    ...biosampleData,
+                    ...(biosampleData.attachments ? (
+                        {attachments: {
+                            deleteMany: {}, // clear all existing attachments
+                            createMany: {
+                                data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.contacts ? (
+                        {contacts: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.milestones ? (
+                        {milestones: {
+                            deleteMany: {},
+                            create: (biosampleData.milestones || []).map((milestone: any) => ({
+                                milestone: {
+                                    connect: {id: milestone.milestoneId}
+                                }
+                            }))
+                        },}
+                    ): undefined),
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    donor: {
+                        upsert: {
+                            update: {...donorData},
+                            create: {...donorData}
+                        }
+                    }
+                }, 
+                create: {
+                    ...biosampleData,
+                    // create with the given id if it's available. This is useful for situations like 'undo'
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
+                    milestones: {
+                        create: (biosampleData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    donor: { 
+                        create: { ...donorData } 
+                    }
+                }
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating or updating biosample:", error.message);
+            throw new Error(error.message || "Failed to create or update biosample.");
+        }
+    }
+)
+
+export const createOrUpdateAsset = withOrganizationAuth(
+    async (organization: Organization, toolData: any) => {
+        try {
+            console.log(`tool data`, toolData)
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -1847,7 +1964,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                             }
                         }
                     },
-                    biosample: true
                 },
                 update: {
                     title: toolData.title,
@@ -1890,25 +2006,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
                     metadata: toolData.metadata as InputJsonObject,
-                    biosample: {
-                        upsert: {
-                            update: {
-                                ...biosampleData,
-                                donor: {
-                                    upsert: {
-                                        update: {...donorData},
-                                        create: {...donorData}
-                                    }
-                                }
-                            },
-                            create: {
-                                ...biosampleData,
-                                donor: { 
-                                    create: { ...donorData } 
-                                }
-                            }
-                        }
-                    }
                 },
                 create: {
                     // create with the given id if it's available. This is useful for situations like 'undo'
@@ -1946,14 +2043,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     pinned: toolData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: toolData.metadata as InputJsonObject,
-                    biosample: {
-                        create: {
-                            ...biosampleData,
-                            donor: { 
-                                create: { ...donorData } 
-                            }
-                        }
-                    }
                 },
             })
 

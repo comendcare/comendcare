@@ -51,9 +51,9 @@ export function getDatasamplesTableColumns(): ColumnDef<any>[] {
         cell: ({ row }) => (
           <>
             {(row.original.types || []).map((type: string) => {
-              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.id === type)
+              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.value === type)
               return (
-                <MilestoneTypeBadge label={typeOption.label}/>
+                <MilestoneTypeBadge label={typeOption?.label}/>
               )
             })}
           </>
@@ -63,10 +63,7 @@ export function getDatasamplesTableColumns(): ColumnDef<any>[] {
         meta: {
           label: "Type",
           variant: "multiSelect",
-          options: TOOL_TYPE_OPTIONS.filter(type => type.type === "data").map(type => ({
-              label: type.label, 
-              value: type.id,
-          })),
+          options: TOOL_TYPE_OPTIONS,
           icon: CircleDashed,
         },
     },

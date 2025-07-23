@@ -3,13 +3,12 @@ import { create } from 'zustand';
 import { Asset } from '@comend/lib/types';
 import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@comend/lib/actions';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { ToolType } from '@prisma/client';
+import type { Option } from '@comend/lib/types';
 
 export interface ToolState {
     tools: Asset[],
-    toolTypes: ToolType[],
     initialized: boolean,
-    initState: (tools: Asset[], toolTypes: ToolType[]) => void,
+    initState: (tools: Asset[]) => void,
     createTool: (tool: Partial<Asset>, orgId: string) => Promise<void>,
     updateTool: (tool: Partial<Asset>, orgId: string) => Promise<void>,
     deleteTool: (toolId: string, orgId: string) => Promise<void>,
@@ -21,8 +20,8 @@ export const useToolStore = create<ToolState>()(
             tools: [],
             toolTypes: [],
             initialized: false,
-            initState: (tools: Asset[], toolTypes: ToolType[]) => {
-                set({tools, toolTypes, initialized: true})
+            initState: (tools: Asset[]) => {
+                set({tools, initialized: true})
             },
             createTool: async (tool: Partial<Asset>, orgId: string) => {
                 console.log(`create tool`, tool)
