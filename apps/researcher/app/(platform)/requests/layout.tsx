@@ -1,4 +1,4 @@
-import {ReactNode, Suspense} from "react";
+import {ReactNode} from "react";
 import {redirect} from "next/navigation";
 import {getSession} from "~researcher/lib/auth";
 import {ResearcherNavbar} from "~researcher/components/researcher-navbar";
@@ -13,9 +13,7 @@ export default async function ProviderLayout({children}: { children: ReactNode }
 
     return (
         <div>
-            <Suspense fallback={<div>Loading...</div>}>
-                <ResearcherNavbar/>
-            </Suspense>
+            <ResearcherNavbar/>
             <div className="min-h-screen">
                 {children}
             </div>
