@@ -27,6 +27,7 @@ import {Button} from "@comend/components/ui/button";
 import {createOrUpdateBiosample} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
+import { Badge } from "@comend/components/ui/badge";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
@@ -94,8 +95,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => (
-                        <li key={index}>
-                            {diagnosis?.type?.label} - {diagnosis?.severity}
+                        <li key={index} className="flex gap-2 items-center">
+                            {diagnosis?.type?.label} 
+                            {diagnosis?.severity && <Badge variant={'orange'} className="rounded-full">{diagnosis.severity}</Badge>}
                         </li>
                     ))}
                 </ul>

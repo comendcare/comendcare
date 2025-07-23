@@ -57,10 +57,8 @@ type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
 export const diagnosisSchema = z.object({
-    diagnosis: z.array(optionSchema)
-        .min(1, "A diagnosis type is required")
-        .max(1, "Only one diagnosis type is allowed"),
-    severity: z.string(),
+    diagnosis: z.array(optionSchema),
+    severity: z.string().optional(),
 })
 
 export const editBiosampleForm = z.object({
@@ -246,7 +244,7 @@ export function EditBiosampleToolForm({
             treatments: toolData?.donor?.treatments || undefined,
             diagnoses: toolData?.donor?.diagnoses?.map((diagnosis: any) => ({
                 diagnosis: [{label: diagnosis.type.label, value: diagnosis.type.id}],
-                severity: diagnosis.severity
+                severity: diagnosis.severity || undefined
             })),
             height: toolData?.donor?.height?.toString() || undefined,
             weight: toolData?.donor?.weight?.toString() || undefined,
