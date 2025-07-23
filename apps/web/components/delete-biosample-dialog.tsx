@@ -38,7 +38,7 @@ export const DeleteBiosampleDialog = ({toolId, closeDialog}: {toolId: string | u
         }
 
         try {
-            await deleteBiosample(session.user.organizationId, toolId, )
+            await deleteBiosample(session.user.organizationId, toolId)
             await revalidate(pathname)
             if (closeDialog) closeDialog()
             // toast(

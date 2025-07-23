@@ -12,24 +12,42 @@ import { toast } from "sonner";
 import { createOrUpdateAsset, createOrUpdateBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { parseCSV, validateImport } from "@comend/lib/utils";
-import { BIOSAMPLE_TYPE_OPTIONS } from "@/packages/lib/types";
+import { ANATOMICAL_SITE_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import { editBiosampleForm } from "./edit-biosample-tool-form";
 import z from "zod";
-import { unescape } from "lodash";
 
 export function formatBiosampleData(biosample: any): z.infer<typeof editBiosampleForm> {
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
-            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(b => b.label === biosample.Type)
+            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === biosample.Type)
             if (foundOption) return [foundOption]
             return []
         })(),
+        diagnoses: biosample["Diagnoses"].split(",").map((diagnosis: string) => ({
+            severity: undefined,
+            diagnosis: [{label: diagnosis, value: diagnosis.toUpperCase()?.replace(/[^0-9a-z]/gi, '')}]
+        })),
+        quantity: biosample['Available Quantity'],
+        quantityUnit: biosample['Available Quantity Measurement'] || 'ml',
+        sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Donor Biological Sex at Birth'])?.value,
         description: biosample.Description,
+        currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
+        countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection'])?.value,
+        preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
+        anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site'])?.value,
+        methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport'])?.value,
+        age: biosample['Donor Age at Collection'],
+        gender: DONOR_GENDER_OPTIONS.find(option => option.label === biosample['Donor Gender'])?.value,
+        race: DONOR_RACE_OPTIONS.find(option => option.label === biosample['Donor Race'])?.value,
+        ethnicity: DONOR_ETHNICITY_OPTIONS.find(option => option.label === biosample['Donor Ethnicity'])?.value,
+        height: biosample['Donor Height'],
+        weight: biosample['Donor Weight'],
+        bmi: biosample['Donor BMI'],
+        medications: biosample['Donor Medications']?.split(","),
+        treatments: biosample['Donor Medical Treatments']?.split(","),
         isPinned: false,
         isPrivate: false,
-        quantity: biosample['Available Quantity'],
-        quantityUnit: 'ml',
         priceUnit: 'usd',
     }
     return data
@@ -48,10 +66,26 @@ export function BiosampleBulkImportDialog() {
                 const result = await parseCSV(
                     file,
                     [
-                        {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(biosample => biosample.labal === entry.Type) !== undefined},
+                        {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Available Quantity', required: false, defaultValue: undefined, isValid: (entry) => JSON.parse(entry) > 0},
-                        {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'}
+                        {key: 'Available Quantity Measurement', required: false, defaultValue: 'ml', isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor Biological Sex at Birth', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Current Location', required: false, defaultValue: undefined, isValid: (entry) => COUNTRY_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Location of Collection', required: false, defaultValue: undefined, isValid: (entry) => COUNTRY_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Preservation Method', required: false, defaultValue: undefined, isValid: (entry) => SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Anatomical Site', required: false, defaultValue: undefined, isValid: (entry) => ANATOMICAL_SITE_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Method of Transport', required: false, defaultValue: undefined, isValid: (entry) => SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Donor Age at Collection', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor Gender', required: false, defaultValue: undefined, isValid: (entry) => DONOR_GENDER_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Donor Race', required: false, defaultValue: undefined, isValid: (entry) => DONOR_RACE_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Donor Ethnicity', required: false, defaultValue: undefined, isValid: (entry) => DONOR_ETHNICITY_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Donor Height', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor Weight', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor BMI', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor Medications', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor Medical Treatments', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                     ]
                 )
     

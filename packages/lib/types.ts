@@ -295,7 +295,29 @@ export const SAMPLE_PRESERVATION_METHOD_OPTIONS: Option[] = [
 ];
 
 export const ANATOMICAL_SITE_OPTIONS: Option[] = [
-    {label: 'Unknown', value: "UNKNOWN"}
+    {label: 'Anterior abdominal wall / Peritoneal cavity', value: 'ANTERIORABDOMINALWALL/PERITONEALCAVITY'},
+    { label: 'Blood vessels', value: 'BLOODVESSELS' },
+    { label: 'Bladder', value: 'BLADDER' },
+    { label: 'Bone marrow', value: 'BONEMARROW' },
+    { label: 'Brain', value: 'BRAIN' },
+    { label: 'Buccal mucosa (cheek)', value: 'BUCCALMUCOSA(CHEEK)' },
+    { label: 'Colon / Rectum', value: 'COLON/RECTUM' },
+    { label: 'Eye (anterior chamber)', value: 'EYE(ANTERIORCHAMBER)' },
+    { label: 'Eye (retro-orbital sinus)', value: 'EYE(RETRO-ORBITALSINUS' },
+    { label: 'Fingertip / Heel', value: 'FINGERTIP/HEEL' },
+    { label: 'Hair follicle / Nails', value: 'HAIRFOLLICLE/NAILS' },
+    { label: 'Heart', value: 'HEART' },
+    { label: 'Liver', value: 'LIVER' },
+    { label: 'Lung', value: 'LUNG' },
+    { label: 'Muscle', value: 'MUSCLE' },
+    { label: 'Oral cavity / Salivary', value: 'ORALCAVITY/SALIVARY' },
+    { label: 'Skin', value: 'SKIN' },
+    { label: 'Spinal cord / Cistern', value: 'SPINALCORD/CISTERN' },
+    { label: 'Tail (mouse)', value: 'TAIL' },
+    { label: 'Tissues / Organs (general)', value: 'TISSUES/ORGANS' },
+    { label: 'Urinary tract / Urethr', value: 'URINARYTRACT/URETHR' },
+    { label: 'Other', value: 'OTHER' },
+    { label: 'Unknown', value: 'UNKNOWN' }
 ]
 
 export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
