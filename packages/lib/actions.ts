@@ -34,7 +34,7 @@ import {
     sendMemberDeletedEmail,
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@comend/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, Option, RFP} from "@comend/lib/types";
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 
@@ -1889,8 +1889,41 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     donor: {
                         upsert: {
-                            update: {...donorData},
-                            create: {...donorData}
+                            update: {
+                                ...donorData,
+                                diagnoses: {
+                                    deleteMany: {},
+                                    create: donorData.diagnoses.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                        severity: diagnosis.severity,
+                                        type: {
+                                            connectOrCreate: {
+                                                where: { id: diagnosis.diagnosis[0].value },
+                                                create: { 
+                                                    id: diagnosis.diagnosis[0].value,
+                                                    label: diagnosis.diagnosis[0].label
+                                                }
+                                            }
+                                        }
+                                    }))
+                                }
+                            },
+                            create: {
+                                ...donorData,
+                                diagnoses: {
+                                    create: donorData.diagnoses.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                        severity: diagnosis.severity,
+                                        type: {
+                                            connectOrCreate: {
+                                                where: { id: diagnosis.diagnosis[0].value },
+                                                create: { 
+                                                    id: diagnosis.diagnosis[0].value,
+                                                    label: diagnosis.diagnosis[0].label
+                                                }
+                                            }
+                                        }
+                                    }))
+                                }
+                            }
                         }
                     }
                 }, 
@@ -1929,7 +1962,23 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
                     donor: { 
-                        create: { ...donorData } 
+                        create: { 
+                            ...donorData,
+                            diagnoses: {
+                                create: donorData.diagnoses.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                    severity: diagnosis.severity,
+                                    type: {
+                                        connectOrCreate: {
+                                            where: { id: diagnosis.diagnosis[0].value },
+                                            create: { 
+                                                id: diagnosis.diagnosis[0].value,
+                                                label: diagnosis.diagnosis[0].label
+                                            }
+                                        }
+                                    }
+                                }))
+                            }
+                        } 
                     }
                 }
             })

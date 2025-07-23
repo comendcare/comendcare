@@ -340,6 +340,23 @@ model Biosample {
   milestones     BiosampleToMilestone[]
 }
 
+model DonorDiagnosis {
+  id       String  @id @unique @default(uuid())
+  severity String?
+
+  donorId String
+  donor   Donor         @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  typeId  String
+  type    DiagnosisType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model DiagnosisType {
+  id    String @id @unique @default(uuid())
+  label String
+
+  diagnoses DonorDiagnosis[]
+}
+
 model Donor {
   id        String   @id @unique @default(uuid())
   createdAt DateTime @default(now())
@@ -351,7 +368,7 @@ model Donor {
   race        String?
   ethnicity   String?
   treatments  String[]
-  diagnoses   String[]
+  diagnoses   DonorDiagnosis[]
   height      Float?
   weight      Float?
   bmi         Float?

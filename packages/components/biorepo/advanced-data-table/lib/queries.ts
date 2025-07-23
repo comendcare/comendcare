@@ -140,7 +140,9 @@ export const getBiosamples = withOrganizationAuth(
                                 milestones: {include: {milestone: true}},
                                 contacts: true,
                                 attachments: true,
-                                donor: true,
+                                donor: {
+                                    include: {diagnoses: {include: {type: true}}}
+                                },
                                 institution: true
                             },
                             orderBy,

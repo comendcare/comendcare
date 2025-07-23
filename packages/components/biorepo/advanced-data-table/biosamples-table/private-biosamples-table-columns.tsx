@@ -93,9 +93,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
-                    {row.original.donor?.diagnoses?.map((diagnosis: string, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            {diagnosis}
+                    {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => (
+                        <li key={index}>
+                            {diagnosis?.type?.label} - {diagnosis?.severity}
                         </li>
                     ))}
                 </ul>

@@ -28,7 +28,7 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog"
 import {ANATOMICAL_SITE_OPTIONS, Asset, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
-import {Biosample, Donor, Institution, MilestoneType, Prisma} from "@prisma/client"
+import {Biosample, Donor, DonorDiagnosis, Institution, MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -54,6 +54,13 @@ import { mixpanelTrack } from "@/packages/lib/mixpanel"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
+
+export const diagnosisSchema = z.object({
+    diagnosis: z.array(optionSchema)
+        .min(1, "A diagnosis type is required")
+        .max(1, "Only one diagnosis type is allowed"),
+    severity: z.string(),
+})
 
 const editAssetForm = z.object({
     description: z
@@ -132,7 +139,7 @@ const editAssetForm = z.object({
     race: z.string().optional(),
     ethnicity: z.string().optional(),
     treatments: z.array(z.string()).optional(),
-    diagnoses: z.array(z.string()).optional(),
+    diagnoses: z.array(diagnosisSchema).optional(),
     height: z.string().optional(),
     weight: z.string().optional(),
     bmi: z.string().optional(),
@@ -236,7 +243,10 @@ export function EditBiosampleToolForm({
             race: toolData?.donor?.race || undefined,
             ethnicity: toolData?.donor?.ethnicity || undefined,
             treatments: toolData?.donor?.treatments || undefined,
-            diagnoses: toolData?.donor?.diagnoses || undefined,
+            diagnoses: toolData?.donor?.diagnoses?.map((diagnosis: any) => ({
+                diagnosis: [{label: diagnosis.type.label, value: diagnosis.type.id}],
+                severity: diagnosis.severity
+            })),
             height: toolData?.donor?.height?.toString() || undefined,
             weight: toolData?.donor?.weight?.toString() || undefined,
             bmi: toolData?.donor?.bmi?.toString() || undefined,
@@ -252,8 +262,17 @@ export function EditBiosampleToolForm({
         isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
-        milestones: form.watch("milestones")
+        milestones: form.watch("milestones"),
+        diagnoses: form.watch("diagnoses")
     }
+
+    useEffect(() => {
+        console.log('diagnoses updated', formData.diagnoses)
+        console.log(`defautl diagnoses`, toolData?.donor?.diagnoses?.map((diagnosis: any) => ({
+                diagnosis: {label: diagnosis.type.label, value: diagnosis.type.id},
+                severity: diagnosis.severity
+            })))
+    }, [formData.diagnoses])
 
     const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
         const {
@@ -321,7 +340,7 @@ export function EditBiosampleToolForm({
             // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
         }
 
-        const donorData: Partial<Donor> = {
+        const donorData: any = {
             age: typeof age === 'string' ? parseInt(age, 10) : age,
             sex,
             gender,
@@ -657,57 +676,9 @@ export function EditBiosampleToolForm({
 }
 
 export const AdditionalBiosampleFields = ({form}: {form: any}) => {
-    const [loading, setLoading] = useState(false)
-
-    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        setLoading(true);
-
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
         <>
         <h1 className="font-semibold text-md py-0 my-0">Biosample Information</h1>
-
-        {/* <FormField
-            control={form.control}
-            name="genes"
-            render={({field}) => (
-                <FormItem className="w-full flex gap-4 items-center">
-                    <FormLabel className="w-[100px]">{`Gene`}</FormLabel>
-                    <div className="w-full">
-                        <FormControl>
-                            <MultipleSelector
-                                className="-mt-2 w-full h-[32px]"
-                                {...field}
-                                onSearch={handleAsyncSearch}
-                                placeholder="Search for genes..."
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={<p>Loading genes...</p>}
-                                emptyIndicator={<p>No genes found.</p>}
-                                showHoverCard={false}
-                                maxSelected={1}
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </div>
-                </FormItem>
-            )}
-        /> */}
-
         <div className="flex-col space-y-4">
             <FormField
                 control={form.control}
@@ -984,33 +955,33 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                     </FormItem>
                 )}
             />
-
-            <FormField
-                control={form.control}
-                name="biosampleDiagnosis"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Biosample Diagnosis`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="biosampleDiagnosis"
-                                    className="w-full"
-                                    placeholder={`Enter a value`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
         </div>
         </>
     )
 }
 
 export const DonorFormFields = ({form}: {form: any}) => {
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleDiagnosisTypesAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setIsLoading(true)
+
+        try {
+            const response = await fetch(`/api/diagnoses?search=${query}`)
+            const data = await response.json();
+
+            // Return the fetched options
+            return data
+        } catch (error) {
+            console.error("Failed to fetch conditions:", error)
+            return [];
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     return (
         <>
         <div className="flex gap-1 items-center">
@@ -1025,28 +996,6 @@ export const DonorFormFields = ({form}: {form: any}) => {
             </Tooltip>
         </div>
         <div className="flex-col space-y-4">
-            {/* <FormField
-                control={form.control}
-                name="age"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Age`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="age"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            /> */}
-
             <div className="grid gap-x-8 gap-y-2 grid-cols-2">
             <FormField
                 control={form.control}
@@ -1245,7 +1194,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                         className="h-full w-[34px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
-                                            form.setValue("diagnoses", [...(field.value || []),""])
+                                            form.setValue("diagnoses", [...(field.value || []), {diagnosis: undefined, severity: undefined}])
                                         }}
                                     >
                                         <Plus/>
@@ -1259,24 +1208,42 @@ export const DonorFormFields = ({form}: {form: any}) => {
 
                         {field?.value && field.value.length > 0 && (
                             <ol className="flex flex-col gap-2">
-                                {field.value.map((value: string, index: number) => (
+                                {field.value.map((value: any, index: number) => (
                                     <span className="flex gap-2 w-full">
                                         <div className="w-full">
-                                        <Input
-                                            id={`diagnosis-${index}`}
-                                            className="w-full"
-                                            placeholder={`Enter a value`}
-                                            value={value}
-                                            onChange={(event: React.FormEvent<HTMLInputElement>) => {
-                                                let newValue = field.value
-                                                newValue[index] = event.currentTarget.value
-                                                form.setValue("diagnoses", newValue)
-                                            }}
-                                        />
+                                            <MultipleSelector
+                                                value={value.diagnosis}
+                                                onChange={(value) => {
+                                                    let newValue = field.value
+                                                    newValue[index] = {
+                                                        ...newValue[index],
+                                                        diagnosis: value.map(val => ({
+                                                            ...val,
+                                                            value: val?.value?.toUpperCase()?.replace(/[^0-9a-z]/gi, '')
+                                                        }))
+                                                    }
+                                                    form.setValue("diagnoses", newValue)
+                                                }}
+                                                creatable={true}
+                                                maxSelected={1}
+                                                onSearch={handleDiagnosisTypesAsyncSearch}
+                                                placeholder="Search for conditions..."
+                                                hidePlaceholderWhenSelected={true}
+                                                loadingIndicator={<p>Loading diagnoses...</p>}
+                                                emptyIndicator={<p>No diagnoses found.</p>}
+                                                showHoverCard={false}
+                                            />
                                         </div>
                                         <Select
-                                            value={'mild'} 
-                                            // onValueChange={(newVal) => form.setValue("ethnicity", newVal)}
+                                            value={value.severity} 
+                                            onValueChange={(value) => {
+                                                let newValue = field.value
+                                                newValue[index] = {
+                                                    ...newValue[index],
+                                                    severity: value
+                                                }
+                                                form.setValue("diagnoses", newValue)
+                                            }}
                                         >
                                         <SelectTrigger className="w-[200px] h-[32px]">
                                             <SelectValue placeholder="Select a value" />

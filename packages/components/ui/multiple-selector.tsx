@@ -416,19 +416,19 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         );
 
         /** Avoid Creatable Selector freezing or lagging when paste a long string. */
-        const commandFilter = React.useCallback(() => {
-            if (commandProps?.filter) {
-                return commandProps.filter;
-            }
+        // const commandFilter = React.useCallback(() => {
+        //     if (commandProps?.filter) {
+        //         return commandProps.filter;
+        //     }
 
-            if (creatable) {
-                return (value: string, search: string) => {
-                    return value.toLowerCase().includes(search.toLowerCase()) ? 1 : -1;
-                };
-            }
-            // Using default filter in `cmdk`. We don't have to provide it.
-            return undefined;
-        }, [creatable, commandProps?.filter]);
+        //     if (creatable) {
+        //         return (value: string, search: string) => {
+        //             return value.toLowerCase().includes(search.toLowerCase()) ? 1 : -1;
+        //         };
+        //     }
+        //     // Using default filter in `cmdk`. We don't have to provide it.
+        //     return undefined;
+        // }, [creatable, commandProps?.filter]);
 
         return (
             <Command
@@ -442,7 +442,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 shouldFilter={
                     commandProps?.shouldFilter !== undefined ? commandProps.shouldFilter : !onSearch
                 } // When onSearch is provided, we don't want to filter the options. You can still override it.
-                filter={commandFilter()}
+                // filter={commandFilter()}
             >
                 <div
                     className={cn(

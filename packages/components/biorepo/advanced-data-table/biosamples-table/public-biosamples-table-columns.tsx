@@ -368,11 +368,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
-                    {row.original.biosample?.donor?.diagnoses?.map((diagnosis: string, index: number) => (
+                    {/* {row.original.biosample?.donor?.diagnoses?.map((diagnosis: string, index: number) => (
                         <li key={index} className="line-clamp-2">
                             {diagnosis}
                         </li>
-                    ))}
+                    ))} */}
                 </ul>
             ),
         },
