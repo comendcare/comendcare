@@ -63,18 +63,18 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         {
             id: "types",
             accessorKey: "types",
-            header: ({ column }) => (
+            header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Type"/>
             ),
-            cell: ({ row }) => (
-            <>
-                {(row.original.types || []).map((type: string) => {
-                const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
-                return (
-                    <MilestoneTypeBadge label={typeOption?.label}/>
-                )
-                })}
-            </>
+            cell: ({row}) => (
+                <>
+                    {(row.original.types || []).map((type: string, index: number) => {
+                        const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
+                        return (
+                            <MilestoneTypeBadge label={typeOption?.label} key={index}/>
+                        )
+                    })}
+                </>
             ),
             enableHiding: true,
             enableColumnFilter: true,
@@ -138,8 +138,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <>
                     {
-                        row.original.quantity >= 0 && 
-                        row.original.quantityUnit && 
+                        row.original.quantity >= 0 &&
+                        row.original.quantityUnit &&
                         `${row.original.quantity}${row.original.quantityUnit}`
                     }
                 </>
@@ -155,16 +155,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         {
             id: "description",
             accessorKey: "description",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Description" />
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Description"/>
             ),
-            cell: ({ row }) => (
+            cell: ({row}) => (
                 <div className="line-clamp-3">
                     {row.original.description}
                 </div>
             ),
             meta: {
-            label: "Description"
+                label: "Description"
             },
             enableHiding: true,
         },
@@ -509,15 +509,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 label: "Medical Treatments"
             }
         },
-
-
         {
             id: "private",
             accessorKey: "private",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Visibility" />
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Visibility"/>
             ),
-            cell: ({ row }) => (
+            cell: ({row}) => (
                 <div>
                     {row.getValue("private") ? 'Private' : 'Public'}
                 </div>
@@ -529,10 +527,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 variant: "select",
                 options: [
                     {
-                        label: "Private", 
+                        label: "Private",
                         value: "true",
                     }, {
-                        label: "Public", 
+                        label: "Public",
                         value: "false",
                     }
                 ],
@@ -542,10 +540,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         {
             id: "milestones",
             accessorKey: "milestones",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Linked Projects" />
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Linked Projects"/>
             ),
-            cell: ({ row }) => (
+            cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.milestones?.map((milestone: any, index: number) => (
                         <li key={index} className="line-clamp-2">
@@ -562,10 +560,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         {
             id: "contacts",
             accessorKey: "contacts",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Contacts" />
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Contacts"/>
             ),
-            cell: ({ row }) => (
+            cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.contacts?.map((contact: any, index: number) => (
                         <li key={index}>
@@ -576,16 +574,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-            label: "Contacts"
+                label: "Contacts"
             }
         },
         {
             id: "links",
             accessorKey: "links",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Links" />
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Links"/>
             ),
-            cell: ({ row }) => (
+            cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.attachments?.map((attachment: any, index: number) => (
                         <li key={index} className="line-clamp-2">
@@ -596,30 +594,30 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-            label: "Links"
+                label: "Links"
             }
         },
         {
             id: "pinned",
             accessorKey: "pinned",
-            header: ({ column }) => (
+            header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Pinned"/>
             ),
-            cell: ({ row }) => (
-                <Button 
-                onClick={
-                    async () => {
-                    await createOrUpdateBiosample(
-                        session?.user.organizationId, 
-                        {
-                            id: row.original.id,
-                            pinned: !row.original.pinned
+            cell: ({row}) => (
+                <Button
+                    onClick={
+                        async () => {
+                            await createOrUpdateBiosample(
+                                session?.user.organizationId,
+                                {
+                                    id: row.original.id,
+                                    pinned: !row.original.pinned
+                                }
+                            )
+                            revalidate(pathname)
                         }
-                    )
-                    revalidate(pathname)
                     }
-                }
-                variant={'ghost'}
+                    variant={'ghost'}
                 >
                     {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
                 </Button>
@@ -631,10 +629,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 variant: "select",
                 options: [
                     {
-                        label: "Pinned", 
+                        label: "Pinned",
                         value: "true",
                     }, {
-                        label: "Not Pinned", 
+                        label: "Not Pinned",
                         value: "false",
                     }
                 ],

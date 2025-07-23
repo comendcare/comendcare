@@ -286,7 +286,11 @@ export const getAllBiosamples = withResearcherAuth(
                 prisma.biosample.count({
                     where: {
                         ...where,
-                        types: {hasSome: biosampleTypes.map((type) => type.id)},
+                        types: {
+                            hasSome: biosampleTypes
+                                .map((type) => type?.id)
+                                .filter((id): id is string => typeof id === 'string'),
+                        },
                     },
                 }),
             ]);
