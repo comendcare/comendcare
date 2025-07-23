@@ -101,7 +101,7 @@ const agreementItems = [
     },
 ]
 
-export default function MaterialAndDataAccessRequestForm() {
+export default function MaterialAndDataAccessRequestForm({ materialIds = [] }: { materialIds: string[] }) {
     const { data: session } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
@@ -262,6 +262,21 @@ export default function MaterialAndDataAccessRequestForm() {
                     reviewed based on scientific merit, ethical considerations, participant burden, and logistical feasibility.
                 </p>
             </div>
+
+            {materialIds.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Requested Materials</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                            {materialIds.map(id => (
+                                <li key={id}>{id}</li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+            )}
 
             {selectedOrg && (
                 <Card className="border-blue-200 bg-blue-50">
