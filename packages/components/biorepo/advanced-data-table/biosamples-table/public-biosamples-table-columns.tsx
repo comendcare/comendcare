@@ -10,9 +10,6 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import {
-    EditableCell
-} from "@comend/components/biorepo/advanced-data-table/data-table/editable-cell";
-import {
     DataTableColumnHeader
 } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import {
@@ -31,6 +28,7 @@ import {Button} from "@comend/components/ui/button";
 import {createOrUpdateAsset} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
+import {Checkbox} from "@comend/components/ui/checkbox";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
@@ -38,12 +36,41 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
 
     const comendColumns: ColumnDef<any>[] = [
         {
+            id: "select",
+            header: ({table}) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                    className="translate-y-[2px] mr-4"
+                />
+            ),
+            cell: ({row}) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="translate-y-[2px] mr-4"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        },
+        {
             id: "title",
             accessorKey: "title",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Title"/>
             ),
-            cell: ({row}) => <EditableCell row={row} session={session} pathname={pathname}/>,
+            cell: ({row}) =>
+                <div
+                    className="min-w-[200px]"
+                >
+                    {row.original.title}
+                </div>,
             meta: {
                 label: "Title",
                 placeholder: "Search titles...",

@@ -21,7 +21,7 @@ export function BiosamplesTable({data, pageCount, columns}: {data: Tool[], pageC
     enableAdvancedFilter,
     initialState: {
       sorting: [],
-      columnPinning: { right: ["actions"], left: ["title"] },
+      columnPinning: { right: ["actions"], left: ["select"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,

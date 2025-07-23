@@ -7,7 +7,7 @@ export default async function ResearcherLayout({children}: { children: ReactNode
             <Suspense fallback={<div>Loading...</div>}>
                 <ResearcherNavbar/>
             </Suspense>
-            <div className="min-h-screen">
+            <div className="min-h-screen container relative flex flex-col items-center mx-auto">
                 {children}
             </div>
         </div>
