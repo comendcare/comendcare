@@ -51,6 +51,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { map } from "lodash"
 import { createOrUpdateAsset, createOrUpdateBiosample } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
+import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -62,7 +63,7 @@ export const diagnosisSchema = z.object({
     severity: z.string(),
 })
 
-const editAssetForm = z.object({
+export const editBiosampleForm = z.object({
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
@@ -202,9 +203,9 @@ export function EditBiosampleToolForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
-    const form = useForm<z.infer<typeof editAssetForm>>({
+    const form = useForm<z.infer<typeof editBiosampleForm>>({
         mode: "onChange",
-        resolver: zodResolver(editAssetForm),
+        resolver: zodResolver(editBiosampleForm),
         defaultValues: {
             description: toolData?.description || "",
             types: BIOSAMPLE_TYPE_OPTIONS
@@ -266,86 +267,7 @@ export function EditBiosampleToolForm({
         diagnoses: form.watch("diagnoses")
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
-        const {
-            description,
-            types,
-            otherTypeDetails,
-            attachments,
-            isPinned,
-            isPrivate,
-            contacts,
-            milestones,
-            anatomicalSite,
-            preservationMethod,
-            methodOfTransport,
-            currentCountry,
-            countryOfCollection,
-            biosampleDiagnosis,
-            yearOfExcision,
-            ageAtExcision,
-            age,
-            sex,
-            gender,
-            race,
-            ethnicity,
-            treatments,
-            diagnoses,
-            height,
-            weight,
-            bmi,
-            medications,
-            quantity,
-            quantityUnit,
-            price,
-            priceUnit,
-        } = values;
-
-        const biosampleData: any = {
-            id: toolData.id,
-            types: types.map(type => type.value),
-            metadata: {
-                ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
-                otherTypeDetails: otherTypeDetails
-            } as JsonObject,
-            pinned: (!isPrivate && isPinned) || false, // only save pinned if tool is public
-            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-            milestones: (milestones || []).map((milestone) => {
-                return ({
-                    milestoneId: milestone.id,
-                    biosampleId: toolData.id  || '',
-                })
-            }),
-            ...(description !== undefined && description !== null ? {description} : undefined),
-            ...(attachments ? {attachments} : undefined),
-            ...(contacts ? {contacts} : undefined),
-            anatomicalSite,
-            preservationMethod,
-            methodOfTransport,
-            currentCountry,
-            countryOfCollection,
-            ...(quantity !== undefined && quantity !== null ? {quantity: JSON.parse(quantity)} : undefined),
-            quantityUnit,
-            ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
-            priceUnit,
-            // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
-            // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
-        }
-
-        const donorData: any = {
-            age: typeof age === 'string' ? parseInt(age, 10) : age,
-            sex,
-            gender,
-            race,
-            ethnicity,
-            treatments,
-            diagnoses,
-            height: typeof height === 'string' ? parseInt(height, 10) : height,
-            weight: typeof weight === 'string' ? parseInt(weight, 10) : weight,
-            bmi: typeof bmi === 'string' ? parseInt(bmi, 10) : bmi,
-            medications,
-        }
-
+    const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>) => {
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -356,7 +278,7 @@ export function EditBiosampleToolForm({
 
         try {
             if (toolData.id) {
-                const updatedAsset = await createOrUpdateBiosample(session.user.organizationId, biosampleData, donorData)
+                const updatedAsset = await createOrUpdateBiosample(session.user.organizationId, values, toolData.id)
                 mixpanelTrack("Biosample Updated", {
                     "ID": updatedAsset.id,
                     "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -373,7 +295,7 @@ export function EditBiosampleToolForm({
                 await revalidate("/app/tools/biosample")
                 router.refresh()
             } else {
-                const newAsset = await createOrUpdateBiosample(session.user.organizationId, biosampleData, donorData)
+                const newAsset = await createOrUpdateBiosample(session.user.organizationId, values)
                 mixpanelTrack("Biosample Created", {
                     "ID": newAsset.id,
                     "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -645,7 +567,7 @@ export function EditBiosampleToolForm({
                             Delete Tool
                         </Button>
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                            <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
                         <DialogClose disabled={!form.formState.isValid}>
                             <Button

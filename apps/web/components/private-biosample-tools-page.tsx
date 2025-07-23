@@ -3,13 +3,13 @@
 import * as React from "react";
 import Image from "next/image"
 import { NewToolDialog } from "./edit-tool-dialog"
-import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
 import { Tool } from "@prisma/client";
+import { BiosampleBulkImportDialog } from "./biosample-bulk-import-dialog";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {
     const columns = useBiosamplesTableColumns()
@@ -21,7 +21,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: Tool[], page
                 additionalButtons={(
                     <>
                         <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"biosample"}/>
-                        <AssetBulkImportDialog />
+                        <BiosampleBulkImportDialog/>
                     </>
                 )}
             >

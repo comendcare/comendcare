@@ -17,7 +17,8 @@ import {
     Tool as DBAsset,
     User,
     MaterialAndDataAccessRequest,
-    Researcher
+    Researcher,
+    Institution
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -1703,3 +1704,106 @@ export const REQUEST_STATUS_TYPE_OPTIONS: any[] = [
         value: 'COMPLETED'
     },
 ];
+
+type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
+type ContactType = Prisma.ExternalContactGetPayload<{}>
+
+export const diagnosisSchema = z.object({
+    diagnosis: z.array(optionSchema)
+        .min(1, "A diagnosis type is required")
+        .max(1, "Only one diagnosis type is allowed"),
+    severity: z.string(),
+})
+
+export const editBiosampleForm = z.object({
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    types: z.array(optionSchema)
+        .min(1, "Type is required")
+        .max(1, "Max one type"),
+    otherTypeDetails: z.string().optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
+    isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
+
+    // biosmaple properties
+    genes: z.array(optionSchema).optional(),
+    institution: z.custom<Institution>().optional(),
+    anatomicalSite: z.string().optional(),
+    preservationMethod: z.string().optional(),
+    preservation: z.string().optional(),
+    methodOfTransport: z.string().optional(),
+    currentCountry: z.string().optional(),
+    countryOfCollection: z.string().optional(),
+    // volume: z.string().optional(),
+    // mass: z.string().optional(),
+    // area: z.string().optional(),
+    quantity: z.string().optional(),
+    quantityUnit: z.string(),
+    productCode: z.string().optional(),
+    // priceUSD: z.string().optional(),
+    // priceGBP: z.string().optional(),
+    // priceEUR: z.string().optional(),
+    price: z.string().optional(),
+    priceUnit: z.string(),
+    premiumGroup: z.string().optional(),
+    caseId: z.string().optional(),
+    specimenId: z.string().optional(),
+    format: z.string().optional(),
+    subFormat: z.string().optional(),
+    biosampleDiagnosis: z.string().optional(),
+    measurement: z.number().optional(),
+    significantVariantPositive: z.string().optional(),
+    significantVariantWildtype: z.string().optional(),
+    fusionPositive: z.string().optional(),
+    fusionWildtype: z.string().optional(),
+    cnvAbnormal: z.boolean().optional(),
+    cnvNormal: z.boolean().optional(),
+    hlaType: z.string().optional(),
+    icf: z.string().optional(),
+    irbLetter: z.string().optional(),
+    yearOfExcision: z.string().optional(),
+    classifier: z.string().optional(),
+    primaryTumorOrgan: z.string().optional(),
+    stage: z.string().optional(),
+    stageGroup: z.string().optional(),
+    serology: z.string().optional(),
+    clinicalTestResults: z.string().optional(),
+    serumAvailable: z.boolean().optional(),
+    plasmaAvailable: z.boolean().optional(),
+    wholeBloodAvailable: z.boolean().optional(),
+    ffpeTumorAvailable: z.boolean().optional(),
+    frozenTumorAvailable: z.boolean().optional(),
+    er: z.string().optional(),
+    pr: z.string().optional(),
+    hercepTest: z.string().optional(),
+    matchedPairId: z.string().optional(),
+    mirroredPairId: z.string().optional(),
+    ageAtExcision: z.string().optional(),
+
+    // donor properties
+    age: z.string().optional(),
+    sex: z.string().optional(),
+    gender: z.string().optional(),
+    race: z.string().optional(),
+    ethnicity: z.string().optional(),
+    treatments: z.array(z.string()).optional(),
+    diagnoses: z.array(diagnosisSchema).optional(),
+    height: z.string().optional(),
+    weight: z.string().optional(),
+    bmi: z.string().optional(),
+    menopausalStatus: z.boolean().optional(),
+    ageAtLastMenstualPeriod: z.string().optional(),
+    numberOfPregnancies: z.string().optional(),
+    numberOfLiveBirths: z.string().optional(),
+    smokingStatus: z.boolean().optional(),
+    cigarettesPerDay: z.string().optional(),
+    alcoholStatus: z.boolean().optional(),
+    drinksPerDay: z.string().optional(),
+    alcoholDuration: z.string().optional(),
+    medications: z.array(z.string()).optional(),
+})

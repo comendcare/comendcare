@@ -9,6 +9,7 @@ import {
     Invitation,
     PlatformNotification,
     Review,
+    Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
@@ -34,9 +35,10 @@ import {
     sendMemberDeletedEmail,
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, Option, RFP} from "@comend/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, editBiosampleForm, MemberRequestWithUser, Milestone, Option, optionSchema, RFP} from "@comend/lib/types";
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
+import z from "zod"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -1824,14 +1826,121 @@ export const deleteAsset = withOrganizationAuth(
     }
 )
 
-export const createOrUpdateBiosample = withOrganizationAuth(
-    async (organization: Organization, biosampleData?: any, donorData?: any) => {
+
+export const deleteBiosample = withOrganizationAuth(
+    async (_: Organization, id: string) => {
         try {
-            console.log(`biosample data`, biosampleData)
-            console.log(`donor data`, donorData)
+            const response = await prisma.biosample.delete({
+                where: {id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    }
+                },
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error deleting tool:", error.message);
+            throw new Error(error.message || "Failed to delete tool.");
+        }
+    }
+)
+
+export const createOrUpdateBiosample = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editBiosampleForm>, id?: string) => {
+        try {
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
+
+            const {
+                description,
+                types,
+                otherTypeDetails,
+                attachments,
+                isPinned,
+                isPrivate,
+                contacts,
+                milestones,
+                anatomicalSite,
+                preservationMethod,
+                methodOfTransport,
+                currentCountry,
+                countryOfCollection,
+                biosampleDiagnosis,
+                yearOfExcision,
+                ageAtExcision,
+                age,
+                sex,
+                gender,
+                race,
+                ethnicity,
+                treatments,
+                diagnoses,
+                height,
+                weight,
+                bmi,
+                medications,
+                quantity,
+                quantityUnit,
+                price,
+                priceUnit,
+            } = data;
+
+            const biosampleData: any = {
+                id,
+                types: (types || []).map(type => type.value),
+                metadata: {
+                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
+                    otherTypeDetails: otherTypeDetails
+                } as JsonObject,
+                pinned: (!isPrivate && isPinned) || false, // only save pinned if tool is public
+                private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+                milestones: (milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: id  || '',
+                    })
+                }),
+                ...(description !== undefined && description !== null ? {description} : undefined),
+                ...(attachments ? {attachments} : undefined),
+                ...(contacts ? {contacts} : undefined),
+                anatomicalSite,
+                preservationMethod,
+                methodOfTransport,
+                currentCountry,
+                countryOfCollection,
+                ...(quantity !== undefined && quantity !== null ? {quantity: JSON.parse(quantity)} : undefined),
+                quantityUnit,
+                ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
+                priceUnit,
+                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
+            }
+
+            const donorData: any = {
+                age: typeof age === 'string' ? parseInt(age, 10) : age,
+                sex,
+                gender,
+                race,
+                ethnicity,
+                treatments,
+                diagnoses,
+                height: typeof height === 'string' ? parseInt(height, 10) : height,
+                weight: typeof weight === 'string' ? parseInt(weight, 10) : weight,
+                bmi: typeof bmi === 'string' ? parseInt(bmi, 10) : bmi,
+                medications,
+            }
+
+            console.log(`biosample data`, biosampleData)
+            console.log(`donor data`, donorData)
 
             const response = await prisma.biosample.upsert({
                 where: { id: biosampleData.id || nanoid() },
@@ -1893,7 +2002,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                                 ...donorData,
                                 diagnoses: {
                                     deleteMany: {},
-                                    create: donorData.diagnoses.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                    create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
                                         severity: diagnosis.severity,
                                         type: {
                                             connectOrCreate: {
@@ -1910,7 +2019,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                             create: {
                                 ...donorData,
                                 diagnoses: {
-                                    create: donorData.diagnoses.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                    create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
                                         severity: diagnosis.severity,
                                         type: {
                                             connectOrCreate: {
@@ -1965,7 +2074,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                         create: { 
                             ...donorData,
                             diagnoses: {
-                                create: donorData.diagnoses.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
                                     severity: diagnosis.severity,
                                     type: {
                                         connectOrCreate: {

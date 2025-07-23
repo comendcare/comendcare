@@ -18,6 +18,7 @@ import { DeleteAssetDialog } from "comend-pag-platform/components/delete-asset-d
 import { EditAssetDialog } from "./edit-tool-dialog"
 import { revalidate } from "@/packages/lib/revalidate"
 import { usePathname } from "next/navigation"
+import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 
 const toolSelector = (state: ToolState) => ({
     tools: state.tools,
@@ -140,7 +141,11 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
             <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
-                        <DeleteAssetDialog toolId={tool.id} />
+                        {type === 'biosample' ? (
+                            <DeleteBiosampleDialog toolId={tool.id} />
+                        ): (
+                            <DeleteAssetDialog toolId={tool.id} />
+                        )}
                     </div>
                 </DialogPortal>
             </Dialog>
