@@ -266,14 +266,6 @@ export function EditBiosampleToolForm({
         diagnoses: form.watch("diagnoses")
     }
 
-    useEffect(() => {
-        console.log('diagnoses updated', formData.diagnoses)
-        console.log(`defautl diagnoses`, toolData?.donor?.diagnoses?.map((diagnosis: any) => ({
-                diagnosis: {label: diagnosis.type.label, value: diagnosis.type.id},
-                severity: diagnosis.severity
-            })))
-    }, [formData.diagnoses])
-
     const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
         const {
             description,
