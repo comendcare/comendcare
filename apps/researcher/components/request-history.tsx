@@ -3,8 +3,10 @@
 import RequestCard from "~researcher/components/request-card";
 import {useRequestSearchStore} from "@/state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
-import { useEffect } from "react";
-import { getRequests } from "comend-researcher-hub/lib/fetchers";
+import {useEffect} from "react";
+import {getRequests} from "comend-researcher-hub/lib/fetchers";
+import { Skeleton } from "@comend/components/ui/skeleton";
+
 
 export default function RequestHistory() {
     const {
@@ -36,17 +38,40 @@ export default function RequestHistory() {
         loadInitial();
     }, [initialized, filters, sortBy, setSearchResults, setTotalResults, initState]);
 
+    const isLoading = !initialized || searchResults === undefined;
+
     return (
         <>
-            {searchResults && searchResults.length > 0 ? (
+            {isLoading ? (
+                <div className="space-y-4">
+                    {Array.from({length: 6}).map((_, i) => (
+                        <div
+                            key={i}
+                            className="border border-border rounded-md p-4 space-y-4 bg-white shadow-sm"
+                        >
+                            <Skeleton className="h-6 w-1/3"/> {/* title */}
+                            <Skeleton className="h-4 w-full"/> {/* body line 1 */}
+                            <Skeleton className="h-4 w-5/6"/> {/* body line 2 */}
+                            <Skeleton className="h-4 w-2/3"/> {/* body line 3 */}
+                            <div className="flex space-x-2 pt-2">
+                                <Skeleton className="h-8 w-20 rounded-full"/> {/* tag/button */}
+                                <Skeleton className="h-8 w-20 rounded-full"/>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : searchResults.length > 0 ? (
                 <div className="space-y-4">
                     {searchResults.map((request: MaterialAndDataAccessRequest) => (
                         <RequestCard request={request} key={request.id}/>
                     ))}
                 </div>
             ) : (
-                <div className="space-y-4">There are no search results</div>
+                <div className="text-center text-gray-500 mt-4">
+                    <p>No requests found.</p>
+                    <p>Try adjusting your filters or search terms.</p>
+                </div>
             )}
         </>
-    );
+    )
 }

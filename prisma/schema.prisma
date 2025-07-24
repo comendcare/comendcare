@@ -1206,25 +1206,50 @@ enum Priority {
 }
 
 model MaterialAndDataAccessRequest {
-  id             String                 @id @default(cuid())
-  title          String
-  description    String
-  status         RequestStatus          @default(PENDING)
-  organization   Organization           @relation(fields: [organizationId], references: [id])
-  organizationId String
-  researcher     Researcher             @relation(fields: [researcherId], references: [id])
-  researcherId   String
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
-  submittedAt    DateTime
-  approvedAt     DateTime?
-  expiresAt      DateTime?
-  sampleTypes    String[]
-  dataTypes      String[]
-  sampleCount    Int
-  institutions   InstitutionToRequest[]
-  comments       Comment[]
-  metadata       Json?
+  id                       String                 @id @default(cuid())
+  title                    String
+  description              String
+  status                   RequestStatus          @default(PENDING)
+  organization             Organization           @relation(fields: [organizationId], references: [id])
+  organizationId           String
+  researcher               Researcher             @relation(fields: [researcherId], references: [id])
+  researcherId             String
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  submittedAt              DateTime
+  approvedAt               DateTime?
+  expiresAt                DateTime?
+  sampleTypes              String[]
+  dataTypes                String[]
+  sampleCount              Int
+  openToCollab             Boolean
+  studyTitle               String
+  studyDescription         String
+  justification            String
+  hasIrbApproval           Boolean
+  irbStatus                String?
+  hasRisks                 Boolean
+  riskDescription          String?
+  disseminationPlan        String
+  patientSignificance      String
+  otherSampleType          String?
+  processingRequirements   String?
+  timeline                 String
+  logisticsContact         String
+  providesCollectionKit    Boolean
+  needsCollectionMaterials Boolean
+  participantCompensation  Boolean
+  compensationDetails      String?
+  shippingAddress          String?
+  fedexAccount             String?
+  shippingMethod           String?
+  shippingContact          String?
+  shippingPhone            String?
+  isCommercial             Boolean
+  fundingOrganization      String?
+  institutions             InstitutionToRequest[]
+  comments                 Comment[]
+  metadata                 Json?
 }
 
 model InstitutionToRequest {

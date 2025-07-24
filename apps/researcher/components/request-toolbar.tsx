@@ -52,7 +52,7 @@ export default function RequestToolbar() {
         <div className="space-y-4 flex flex-row items-center justify-between">
             <Input
                 placeholder="Search requests..."
-                className="h-8 w-[150px] lg:w-[250px]"
+                className="h-8 w-[250px] lg:w-[500px]"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
             />

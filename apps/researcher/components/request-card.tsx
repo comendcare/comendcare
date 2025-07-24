@@ -13,6 +13,7 @@ import {
 } from "@comend/components/ui/dropdown-menu"
 import {Calendar, Download, Eye, MoreHorizontal, User} from "lucide-react"
 import {useRouter} from "next/navigation";
+import {formatDate} from "@/packages/lib/utils";
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,18 +70,11 @@ export default function RequestCard({request}: any) {
                         <div
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
                             <div>
-                                <span className="font-medium">Request ID:</span> {request.id}
+                                <span className="font-medium">Request ID:</span>&nbsp;{request.id}
                             </div>
                             <div className="flex items-center">
                                 <Calendar className="h-4 w-4 mr-1"/>
-                                <span className="font-medium">Submitted:</span> {request.submittedDate}
-                            </div>
-                            <div className="flex items-center">
-                                <User className="h-4 w-4 mr-1"/>
-                                <span className="font-medium">PI:</span> {request.pi}
-                            </div>
-                            <div>
-                                <span className="font-medium">Institution:</span> {request.institution}
+                                <span className="font-medium">Submitted:</span>&nbsp;{formatDate(request.submittedAt)}
                             </div>
                         </div>
 

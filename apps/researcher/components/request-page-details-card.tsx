@@ -28,7 +28,7 @@ export default function RequestPageDetailsCard({ requestData }: { requestData: M
                         <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                             <dt className="text-sm/6 font-medium text-gray-900">Sample Count</dt>
                             <dd className="mt-1 flex text-sm/6 text-gray-700 col-span-2 sm:mt-0">
-                                <div className="grow">{requestData.sampleCount}</div>
+                                <div className="grow">{requestData.sampleCount ?? "N/A"}</div>
                                 <div className="ml-4 shrink-0">
                                     <button type="button" className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">Update</button>
                                 </div>
@@ -41,10 +41,10 @@ export default function RequestPageDetailsCard({ requestData }: { requestData: M
                             <dd className="mt-1 flex text-sm/6 text-gray-700 col-span-2 sm:mt-0">
                                 <div className="grow">
                                     <p>Status: {requestData.status}</p>
-                                    <p>Submitted: {new Date(requestData.submittedAt).toLocaleString()}</p>
+                                    <p>Submitted: {requestData.submittedAt ? new Date(requestData.submittedAt).toLocaleString() : "N/A"}</p>
                                     {requestData.expiresAt && <p>Expires: {new Date(requestData.expiresAt).toLocaleString()}</p>}
-                                    <p>Sample Types: {requestData.sampleTypes?.join(", ")}</p>
-                                    <p>Data Types: {requestData.dataTypes?.join(", ")}</p>
+                                    <p>Sample Types: {requestData.sampleTypes?.length > 0 ? requestData.sampleTypes.join(", ") : "None"}</p>
+                                    <p>Data Types: {requestData.dataTypes?.length > 0 ? requestData.dataTypes.join(", ") : "None"}</p>
                                 </div>
                                 <div className="ml-4 shrink-0">
                                     <button type="button" className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">Update</button>
@@ -57,9 +57,13 @@ export default function RequestPageDetailsCard({ requestData }: { requestData: M
                             <dt className="text-sm/6 font-medium text-gray-900">Institutions</dt>
                             <dd className="mt-1 text-sm/6 text-gray-700 col-span-2 sm:mt-0">
                                 <ul className="list-disc pl-5">
-                                    {requestData.institutions?.map((i) => (
-                                        <li key={i.id}>{i.name}</li>
-                                    ))}
+                                    {requestData.institutions?.length > 0 ? (
+                                        requestData.institutions.map((i) => (
+                                            <li key={i.id}>{i.name}</li>
+                                        ))
+                                    ) : (
+                                        <li className="text-gray-400">None listed</li>
+                                    )}
                                 </ul>
                             </dd>
                         </div>

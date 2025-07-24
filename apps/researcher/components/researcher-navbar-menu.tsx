@@ -30,7 +30,7 @@ function isActive(pathname: string, href: string): boolean {
 
 const pages = [
     {href: "/profile", label: "Profile", icon: <UserIcon size={16}/>},
-    {href: "/dashboard", label: "Dashboard", icon: <LayoutDashboardIcon size={16}/>},
+    // {href: "/dashboard", label: "Dashboard", icon: <LayoutDashboardIcon size={16}/>},
     {
         href: "/toolkit",
         label: "Tools",
@@ -41,7 +41,7 @@ const pages = [
         ],
     },
     {href: "/requests", label: "Requests", icon: <ClipboardListIcon size={16}/>},
-    {href: "/cohorts", label: "Cohorts", icon: <UsersIcon size={16}/>},
+    // {href: "/cohorts", label: "Cohorts", icon: <UsersIcon size={16}/>},
 ]
 
 export function ResearcherNavbarMenu() {
