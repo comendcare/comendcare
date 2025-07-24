@@ -26,12 +26,12 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
             if (foundOption) return [foundOption]
             return []
         })(),
-        diagnoses: biosample["Diagnoses"].split(",").map((diagnosis: string) => ({
+        diagnoses: (biosample["Diagnoses"]?.split(",") || []).map((diagnosis: string) => ({
             severity: undefined,
             diagnosis: [{label: diagnosis, value: diagnosis.toUpperCase()?.replace(/[^0-9a-z]/gi, '')}]
         })),
         genes: (() => {
-            if (foundGenes && foundGenes.length > 0) return [{label: biosample['Gene'], value: biosample['Gene']}]
+            if (foundGenes && foundGenes.length > 0 && biosample['Gene']) return [{label: biosample['Gene'], value: biosample['Gene']}]
             return []
         })(),
         variant: biosample['Variant'],
@@ -42,7 +42,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         description: biosample.Description,
         currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
         countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection'])?.value,
-        collectionDate: new Date(biosample['Collection Date']),
+        collectionDate: biosample['Collection Date'] ? new Date(biosample['Collection Date']) : undefined,
         preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
         anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site'])?.value,
         methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport'])?.value,
@@ -53,10 +53,10 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         height: biosample['Donor Height'],
         weight: biosample['Donor Weight'],
         bmi: biosample['Donor BMI'],
-        medications: biosample['Donor Medications']?.split(","),
-        treatments: biosample['Donor Medical Treatments']?.split(","),
+        medications: biosample['Donor Medications']?.split(",") || [],
+        treatments: biosample['Donor Medical Treatments']?.split(",") || [],
         isPinned: false,
-        isPrivate: false,
+        isPrivate: true,
         priceUnit: 'usd',
     }
     return data

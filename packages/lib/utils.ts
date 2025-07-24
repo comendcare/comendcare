@@ -142,6 +142,9 @@ export const validateImport = (entry: any, expectedValues: ImportField[]) => {
     const errors: {key: string, message: string, object: any}[] = []
 
     expectedValues.forEach(({key, required, isValid}) => {
+        // not required, and doesn't exist, skip validation
+        if (!required && (entry[key] === undefined || entry[key] === null)) return
+
         // if required, check if value exists
         if (required && !entry[key]) {
             errors.push({key, message: `Required field ${key} is missing`, object: entry})

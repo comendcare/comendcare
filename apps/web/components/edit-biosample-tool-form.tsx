@@ -123,8 +123,8 @@ export function EditBiosampleToolForm({
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
             // biosample properties
-            // institution: toolData?.institution?.name || undefined,
-            // genes: toolData?.gene ? [{label: toolData.gene.uuid, value: toolData.gene.uuid}] : [],
+            institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
+            genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             variant: toolData?.variant || undefined, 
             anatomicalSite: toolData?.anatomicalSite || undefined,
             preservationMethod: toolData?.preservationMethod|| undefined,
@@ -226,10 +226,6 @@ export function EditBiosampleToolForm({
             )
         }
     }
-
-    useEffect(() => {
-        if (formData.isPrivate) form.setValue("isPinned", false)
-    }, [formData.isPrivate])
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -356,7 +352,7 @@ export function EditBiosampleToolForm({
                         )}
                     />
         
-                    {formData.types.map((type: any) => type?.value).includes("OTHER") && (
+                    {formData?.types?.map((type: any) => type?.value).includes("OTHER") && (
                         <>
                             <div>
                                 <FormLabel className="text-md">{`Type Description`}</FormLabel>
@@ -402,7 +398,7 @@ export function EditBiosampleToolForm({
                                     render={({field}) => (
                                         <FormControl className="-mt-2">
                                             <Button 
-                                                disabled={formData.isPrivate || (!toolData.pinned && numAssetsPinned >= 5)}
+                                                disabled={formData?.isPrivate || (!toolData.pinned && numAssetsPinned >= 5)}
                                                 variant="ghost" 
                                                 onClick={(e) => {
                                                     e.preventDefault()
@@ -422,7 +418,7 @@ export function EditBiosampleToolForm({
                                     <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
                                 </TooltipContent>
                             )}
-                            {formData.isPrivate && (
+                            {formData?.isPrivate && (
                                 <TooltipContent className="max-w-[200px]">
                                     <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
                                 </TooltipContent>
