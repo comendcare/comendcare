@@ -11,6 +11,7 @@ import {
 } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import {
     ANATOMICAL_SITE_OPTIONS,
+    AVAILABILITY_OPTIONS,
     BIOSAMPLE_TYPE_OPTIONS,
     COUNTRY_OPTIONS,
     DONOR_ETHNICITY_OPTIONS,
@@ -123,15 +124,45 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "variant",
-            accessorKey: "variant",
+            id: "availability",
+            accessorKey: "availability",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Variant"/>
+                <DataTableColumnHeader column={column} title="Availability"/>
             ),
+            cell: ({row}) => {
+                const availabilityOption = AVAILABILITY_OPTIONS.find(option => option.value === row.original.availability)
+                if (availabilityOption) return <Badge className="h-[20px]" variant={availabilityOption.badgeVariant}>{availabilityOption.label}</Badge>
+                return <></>
+            },
             enableHiding: true,
             meta: {
-                label: "Variant"
+                label: "Availability"
             }
+        },
+        {
+            // NOTE: in order for filters to access the proper nested database object the path to
+            // the nested object must be defined in BOTH the id & accessorKey
+            id: "quantity",
+            accessorKey: "quantity",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Available Quantity"/>
+            ),
+            cell: ({row}) => (
+                <>
+                    {
+                        row.original.quantity >= 0 &&
+                        row.original.quantityUnit &&
+                        `${row.original.quantity}${row.original.quantityUnit}`
+                    }
+                </>
+            ),
+            enableColumnFilter: true,
+            meta: {
+                label: "Available Quantity",
+                variant: "range",
+                range: [0, 1000],
+                unit: 'ml',
+            },
         },
         {
             // NOTE: in order for filters to access the proper nested database object the path to
