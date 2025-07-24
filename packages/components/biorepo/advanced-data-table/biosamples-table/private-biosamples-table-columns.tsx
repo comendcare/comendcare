@@ -154,33 +154,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <>
                     {
-                        row.original.quantity >= 0 &&
+                        row.original.quantity &&
                         row.original.quantityUnit &&
-                        `${row.original.quantity}${row.original.quantityUnit}`
-                    }
-                </>
-            ),
-            enableColumnFilter: true,
-            meta: {
-                label: "Available Quantity",
-                variant: "range",
-                range: [0, 1000],
-                unit: 'ml',
-            },
-        },
-        {
-            // NOTE: in order for filters to access the proper nested database object the path to
-            // the nested object must be defined in BOTH the id & accessorKey
-            id: "quantity",
-            accessorKey: "quantity",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Available Quantity"/>
-            ),
-            cell: ({row}) => (
-                <>
-                    {
                         row.original.quantity >= 0 &&
-                        row.original.quantityUnit &&
                         `${row.original.quantity}${row.original.quantityUnit}`
                     }
                 </>
