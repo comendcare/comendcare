@@ -1249,7 +1249,10 @@ model MaterialAndDataAccessRequest {
   fundingOrganization      String?
   institutions             InstitutionToRequest[]
   comments                 Comment[]
-  metadata                 Json?
+
+  linkedRequests   MaterialAndDataAccessRequest[] @relation("RequestLinks")
+  linkedByRequests MaterialAndDataAccessRequest[] @relation("RequestLinks")
+  metadata         Json?
 }
 
 model InstitutionToRequest {
