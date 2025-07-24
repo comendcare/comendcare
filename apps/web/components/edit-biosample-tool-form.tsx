@@ -221,6 +221,8 @@ export function EditBiosampleToolForm({
 
             // biosmaple properties
             // institution: toolData?.institution?.name || undefined,
+            genes: toolData?.gene ? [{label: toolData.gene.uuid, value: toolData.gene.uuid}] : [],
+            variant: toolData?.variant || undefined, 
             anatomicalSite: toolData?.anatomicalSite || undefined,
             preservationMethod: toolData?.preservationMethod|| undefined,
             methodOfTransport: toolData?.methodOfTransport || undefined,
@@ -1125,6 +1127,27 @@ export const DonorFormFields = ({form}: {form: any}) => {
                             />
                         </FormControl>
                         <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="variant"
+                render={({field}) => (
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="variant"
+                                    className="w-full"
+                                    placeholder={`Enter a variant`}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
                     </FormItem>
                 )}
             />
