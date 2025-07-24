@@ -78,6 +78,7 @@ export const editBiosampleForm = z.object({
 
     // biosmaple properties
     genes: z.array(optionSchema).optional(),
+    variant: z.string().optional(),
     institution: z.custom<Institution>().optional(),
     anatomicalSite: z.string().optional(),
     preservationMethod: z.string().optional(),
@@ -220,6 +221,8 @@ export function EditBiosampleToolForm({
 
             // biosmaple properties
             // institution: toolData?.institution?.name || undefined,
+            genes: toolData?.gene ? [{label: toolData.gene.uuid, value: toolData.gene.uuid}] : [],
+            variant: toolData?.variant || undefined, 
             anatomicalSite: toolData?.anatomicalSite || undefined,
             preservationMethod: toolData?.preservationMethod|| undefined,
             methodOfTransport: toolData?.methodOfTransport || undefined,
@@ -875,6 +878,13 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 export const DonorFormFields = ({form}: {form: any}) => {
     const [isLoading, setIsLoading] = useState(false)
 
+    const handleAsyncSearch = async (query: string) => {
+        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+        const genes = await res.json();
+
+        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+    };
+
     const handleDiagnosisTypesAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
 
@@ -1091,6 +1101,56 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             />
             </div>
+
+            <FormField
+                control={form.control}
+                name="genes"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Related Gene</FormLabel>
+                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
+                        <FormControl>
+                            <MultipleSelector
+                                {...field}
+                                onSearch={handleAsyncSearch}
+                                placeholder="Search for genes..."
+                                triggerSearchOnFocus={true}
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={
+                                <p
+                                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                >
+                                    Loading genes...
+                                </p>}
+                                emptyIndicator={<p>No genes found.</p>}
+                                showHoverCard={false}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="variant"
+                render={({field}) => (
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="variant"
+                                    className="w-full"
+                                    placeholder={`Enter a variant`}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
 
             <FormField
                 control={form.control}

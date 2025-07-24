@@ -1877,6 +1877,8 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 biosampleDiagnosis,
                 yearOfExcision,
                 ageAtExcision,
+                genes,
+                variant,
                 age,
                 sex,
                 gender,
@@ -1893,6 +1895,8 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 price,
                 priceUnit,
             } = data;
+
+            console.log(`incoming data`, data)
 
             const biosampleData: any = {
                 id,
@@ -1921,6 +1925,8 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 quantityUnit,
                 ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
                 priceUnit,
+                gene: genes && genes.length > 0 ? genes[0].value : undefined,
+                variant,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -1996,6 +2002,11 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     private: biosampleData.private || false,
                     pinned: biosampleData.pinned || false,
                     metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene ? ({
+                        gene: {
+                            connect: {uuid: biosampleData.gene}
+                        }
+                    }): {gene: { disconnect: true }}),
                     donor: {
                         upsert: {
                             update: {
@@ -2070,6 +2081,11 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     pinned: biosampleData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene ? ({
+                        gene: {
+                            connect: {uuid: biosampleData.gene}
+                        }
+                    }): undefined),
                     donor: { 
                         create: { 
                             ...donorData,
