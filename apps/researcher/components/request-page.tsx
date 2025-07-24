@@ -10,6 +10,7 @@ import RequestPageTermsAndConditionsCard from "~researcher/components/request-pa
 import RequestPageRequestStatusCard from "~researcher/components/request-page-request-status-card";
 import {useRouter} from "next/navigation";
 import RequestPageDetailsCard from "~researcher/components/request-page-details-card";
+import RequestPageStudyCard from "~researcher/components/request-page-study-card";
 
 
 const getStatusBadge = (status: string) => {
@@ -60,6 +61,8 @@ export default function RequestPage({requestData}: {
                     <RequestPageRequestStatusCard/>
 
                     <RequestPageDetailsCard requestData={requestData} />
+
+                    <RequestPageStudyCard requestData={requestData} />
 
                     <RequestPageTermsAndConditionsCard/>
 
