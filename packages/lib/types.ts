@@ -1770,7 +1770,7 @@ export const editBiosampleForm = z.object({
     // biosmaple properties
     genes: z.array(optionSchema).optional(),
     variant: z.string().optional(),
-    institution: z.custom<Institution>().optional(),
+    institutions: z.array(optionSchema).optional(),
     anatomicalSite: z.string().optional(),
     preservationMethod: z.string().optional(),
     preservation: z.string().optional(),

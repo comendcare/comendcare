@@ -31,6 +31,7 @@ import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
 import { Badge } from "@comend/components/ui/badge";
 import { format } from "date-fns";
+import Link from "next/link";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
@@ -120,7 +121,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
             cell: ({row}) => (
-                <>{row.original.gene?.uuid}</>
+                <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
             meta: {
@@ -231,15 +232,21 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         },
         {
             id: "institution",
-            accessorKey: "institution.name",
+            accessorKey: "institution",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Institution"/>
             ),
-            cell: ({row}) => (
-                <a href={row.original.institution?.website}>
-                    {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.institution?.name)?.label}
-                </a>
-            ),
+            cell: ({row}) => {
+                if (row.original.institution?.website && row.original.institution?.name) {
+                    return (
+                        <Link className="underline" href={row.original.institution?.website}>
+                            {row.original.institution?.name}
+                        </Link>
+                    )
+                }
+                if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
+                return <></>
+            },
             enableHiding: true,
             meta: {
                 label: "Institution"

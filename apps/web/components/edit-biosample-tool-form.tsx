@@ -124,7 +124,7 @@ export function EditBiosampleToolForm({
 
             // biosample properties
             // institution: toolData?.institution?.name || undefined,
-            genes: toolData?.gene ? [{label: toolData.gene.uuid, value: toolData.gene.uuid}] : [],
+            // genes: toolData?.gene ? [{label: toolData.gene.uuid, value: toolData.gene.uuid}] : [],
             variant: toolData?.variant || undefined, 
             anatomicalSite: toolData?.anatomicalSite || undefined,
             preservationMethod: toolData?.preservationMethod|| undefined,
@@ -822,11 +822,18 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
 export const DonorFormFields = ({form}: {form: any}) => {
     const [isLoading, setIsLoading] = useState(false)
 
-    const handleAsyncSearch = async (query: string) => {
+    const handleGeneAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
         const genes = await res.json();
 
         return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+    };
+
+    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            return data;
     };
 
     const handleDiagnosisTypesAsyncSearch = async (query: string): Promise<Option[]> => {
@@ -1048,15 +1055,39 @@ export const DonorFormFields = ({form}: {form: any}) => {
 
             <FormField
                 control={form.control}
+                name="institutions"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Institutions</FormLabel>
+                        <FormControl>
+                            <MultipleSelector
+                                {...field}
+                                // creatable={true}
+                                maxSelected={1}
+                                triggerSearchOnFocus={true}
+                                onSearch={handleInstitutionAsyncSearch}
+                                placeholder="Search for institutions..."
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading institutions...</p>}
+                                emptyIndicator={<p>No institutions found.</p>}
+                                showHoverCard={false}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
                 name="genes"
                 render={({field}) => (
                     <FormItem>
                         <FormLabel>Related Gene</FormLabel>
-                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                         <FormControl>
                             <MultipleSelector
                                 {...field}
-                                onSearch={handleAsyncSearch}
+                                onSearch={handleGeneAsyncSearch}
                                 placeholder="Search for genes..."
                                 triggerSearchOnFocus={true}
                                 hidePlaceholderWhenSelected={true}

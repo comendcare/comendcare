@@ -1863,6 +1863,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
             const {
                 description,
                 types,
+                institutions,
                 otherTypeDetails,
                 attachments,
                 isPinned,
@@ -1929,8 +1930,9 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 quantityUnit,
                 ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
                 priceUnit,
-                gene: genes && genes.length > 0 ? genes[0].value : undefined,
+                gene: genes && genes.length > 0 ? genes[0] : undefined,
                 variant,
+                institution: institutions && institutions.length > 0 ? institutions[0] : undefined
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -2008,9 +2010,12 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
-                            connect: {uuid: biosampleData.gene}
+                            connect: {symbol: biosampleData.gene.value}
                         }
                     }): {gene: { disconnect: true }}),
+                    ...(biosampleData.institution ? ({
+                        institution: {connect: {id: biosampleData.institution.value}}
+                    }): {institution: {disconnect: true}}),
                     donor: {
                         upsert: {
                             update: {
@@ -2087,8 +2092,11 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
-                            connect: {uuid: biosampleData.gene}
+                            connect: {symbol: biosampleData.gene.value}
                         }
+                    }): undefined),
+                    ...(biosampleData.institution ? ({
+                        institution: {connect: {id: biosampleData.institution.value}}
                     }): undefined),
                     donor: { 
                         create: { 
