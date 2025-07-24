@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin, Plus, Router, Trash, Info } from "lucide-react"
+import { Delete, Pin, Plus, Router, Trash, Info, CalendarIcon } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -43,7 +43,7 @@ import { badgeVariants } from "@comend/components/ui/badge"
 // import { DeleteAssetDialog } from "./delete-tool-dialog"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { JsonObject } from "@prisma/client/runtime/library"
-import type { Option } from "@comend/lib/types"
+import { editBiosampleForm, Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
@@ -52,108 +52,11 @@ import { map } from "lodash"
 import { createOrUpdateAsset, createOrUpdateBiosample } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
-
-type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
-type ContactType = Prisma.ExternalContactGetPayload<{}>
-
-export const diagnosisSchema = z.object({
-    diagnosis: z.array(optionSchema),
-    severity: z.string().optional(),
-})
-
-export const editBiosampleForm = z.object({
-    description: z
-        .string()
-        .max(1000, "Description must be less than 1000 characters")
-        .optional(),
-    types: z.array(optionSchema)
-        .min(1, "Type is required")
-        .max(1, "Max one type"),
-    otherTypeDetails: z.string().optional(),
-    attachments: z.array(z.custom<AttachmentType>()).optional(),
-    isPinned: z.boolean(),
-    isPrivate: z.boolean(),
-    contacts: z.array(z.custom<any>()).optional(),
-    milestones: z.array(z.custom<Milestone>()).optional(),
-
-    // biosmaple properties
-    genes: z.array(optionSchema).optional(),
-    variant: z.string().optional(),
-    institution: z.custom<Institution>().optional(),
-    anatomicalSite: z.string().optional(),
-    preservationMethod: z.string().optional(),
-    preservation: z.string().optional(),
-    methodOfTransport: z.string().optional(),
-    currentCountry: z.string().optional(),
-    countryOfCollection: z.string().optional(),
-    // volume: z.string().optional(),
-    // mass: z.string().optional(),
-    // area: z.string().optional(),
-    quantity: z.string().optional(),
-    quantityUnit: z.string(),
-    productCode: z.string().optional(),
-    // priceUSD: z.string().optional(),
-    // priceGBP: z.string().optional(),
-    // priceEUR: z.string().optional(),
-    price: z.string().optional(),
-    priceUnit: z.string(),
-    premiumGroup: z.string().optional(),
-    caseId: z.string().optional(),
-    specimenId: z.string().optional(),
-    format: z.string().optional(),
-    subFormat: z.string().optional(),
-    biosampleDiagnosis: z.string().optional(),
-    measurement: z.number().optional(),
-    significantVariantPositive: z.string().optional(),
-    significantVariantWildtype: z.string().optional(),
-    fusionPositive: z.string().optional(),
-    fusionWildtype: z.string().optional(),
-    cnvAbnormal: z.boolean().optional(),
-    cnvNormal: z.boolean().optional(),
-    hlaType: z.string().optional(),
-    icf: z.string().optional(),
-    irbLetter: z.string().optional(),
-    yearOfExcision: z.string().optional(),
-    classifier: z.string().optional(),
-    primaryTumorOrgan: z.string().optional(),
-    stage: z.string().optional(),
-    stageGroup: z.string().optional(),
-    serology: z.string().optional(),
-    clinicalTestResults: z.string().optional(),
-    serumAvailable: z.boolean().optional(),
-    plasmaAvailable: z.boolean().optional(),
-    wholeBloodAvailable: z.boolean().optional(),
-    ffpeTumorAvailable: z.boolean().optional(),
-    frozenTumorAvailable: z.boolean().optional(),
-    er: z.string().optional(),
-    pr: z.string().optional(),
-    hercepTest: z.string().optional(),
-    matchedPairId: z.string().optional(),
-    mirroredPairId: z.string().optional(),
-    ageAtExcision: z.string().optional(),
-
-    // donor properties
-    age: z.string().optional(),
-    sex: z.string().optional(),
-    gender: z.string().optional(),
-    race: z.string().optional(),
-    ethnicity: z.string().optional(),
-    treatments: z.array(z.string()).optional(),
-    diagnoses: z.array(diagnosisSchema).optional(),
-    height: z.string().optional(),
-    weight: z.string().optional(),
-    bmi: z.string().optional(),
-    menopausalStatus: z.boolean().optional(),
-    ageAtLastMenstualPeriod: z.string().optional(),
-    numberOfPregnancies: z.string().optional(),
-    numberOfLiveBirths: z.string().optional(),
-    smokingStatus: z.boolean().optional(),
-    cigarettesPerDay: z.string().optional(),
-    alcoholStatus: z.boolean().optional(),
-    drinksPerDay: z.string().optional(),
-    alcoholDuration: z.string().optional(),
-    medications: z.array(z.string()).optional(),
-})
+import { Popover } from "@/packages/components/ui/popover"
+import { PopoverContent, PopoverTrigger } from "@/packages/components/plate-ui/popover"
+import { cn } from "@/packages/lib/utils"
+import { format } from "date-fns"
+import { Calendar } from "@/packages/components/ui/calendar"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -219,7 +122,7 @@ export function EditBiosampleToolForm({
             contacts: toolData?.contacts || undefined,
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
-            // biosmaple properties
+            // biosample properties
             // institution: toolData?.institution?.name || undefined,
             genes: toolData?.gene ? [{label: toolData.gene.uuid, value: toolData.gene.uuid}] : [],
             variant: toolData?.variant || undefined, 
@@ -228,6 +131,7 @@ export function EditBiosampleToolForm({
             methodOfTransport: toolData?.methodOfTransport || undefined,
             currentCountry: toolData?.currentCountry || undefined,
             countryOfCollection: toolData?.countryOfCollection || undefined,
+            collectionDate: toolData?.collectionDate || undefined,
 
             quantity: toolData?.quantity?.toString() || undefined,
             quantityUnit: toolData?.quantityUnit || 'ml',
@@ -235,7 +139,6 @@ export function EditBiosampleToolForm({
             price: toolData?.price?.toString() || undefined,
             priceUnit: toolData?.priceUnit || 'usd',
             biosampleDiagnosis: toolData?.biosampleDiagnosis || undefined,
-            yearOfExcision: toolData?.yearOfExcision?.toString() || undefined,
             ageAtExcision: toolData?.ageAtExcision?.toString() || undefined,
 
             // donor properties
@@ -735,6 +638,40 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
+            <FormField
+                control={form.control}
+                name="collectionDate"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>{`Collection Date`}</FormLabel>
+                        <div>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                    >
+                                    <CalendarIcon className="mr-2" />
+                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value || new Date()}
+                                        onSelect={field.onChange}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                    </FormItem>
+                )}
+            />
+
             <FormItem className="w-full flex gap-4 items-center">
                 <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
                 <div className="w-full gap-2 flex">
@@ -826,28 +763,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 </div>
                 <FormMessage />
             </FormItem>
-
-            <FormField
-                control={form.control}
-                name="yearOfExcision"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Year of Excision`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="yearOfExcision"
-                                    className="w-full"
-                                    placeholder={`Enter a number`}
-                                    type="number"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
 
             <FormField
                 control={form.control}

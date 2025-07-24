@@ -1763,6 +1763,7 @@ export const editBiosampleForm = z.object({
     methodOfTransport: z.string().optional(),
     currentCountry: z.string().optional(),
     countryOfCollection: z.string().optional(),
+    collectionDate: z.date().optional(),
     // volume: z.string().optional(),
     // mass: z.string().optional(),
     // area: z.string().optional(),

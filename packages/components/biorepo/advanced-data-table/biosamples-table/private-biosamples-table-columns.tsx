@@ -28,6 +28,7 @@ import {createOrUpdateBiosample} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
 import { Badge } from "@comend/components/ui/badge";
+import { format } from "date-fns";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
@@ -302,6 +303,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Collection Date"/>
             ),
+            cell: ({row}) => {
+                return <>{row.original.collectionDate && format(row.original.collectionDate, "MMMM dd, yyyy")}</>
+            },
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
