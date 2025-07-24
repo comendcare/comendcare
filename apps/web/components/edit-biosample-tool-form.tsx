@@ -27,7 +27,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog"
-import {ANATOMICAL_SITE_OPTIONS, Asset, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
+import {ANATOMICAL_SITE_OPTIONS, Asset, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
 import {Biosample, Donor, DonorDiagnosis, Institution, MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -131,7 +131,7 @@ export function EditBiosampleToolForm({
             methodOfTransport: toolData?.methodOfTransport || undefined,
             currentCountry: toolData?.currentCountry || undefined,
             countryOfCollection: toolData?.countryOfCollection || undefined,
-            collectionDate: new Date(toolData?.collectionDate) || undefined,
+            collectionDate: toolData?.collectionDate ? new Date(toolData?.collectionDate) : undefined,
 
             availability: toolData?.availability || undefined,
             quantity: toolData?.quantity?.toString() || undefined,
@@ -1165,11 +1165,9 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                             <SelectValue placeholder="Select a value" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value={'mild'}>Mild</SelectItem>
-                                            <SelectItem value={'moderate'}>Moderate</SelectItem>
-                                            <SelectItem value={'severe'}>Severe</SelectItem>
-                                            <SelectItem value={'critical'}>Life-threatening/Critical</SelectItem>
-                                            <SelectItem value={'terminal'}>Terminal</SelectItem>
+                                            {DIAGNOSIS_SEVERITY_OPTIONS.map(option => (
+                                                <SelectItem value={option.value}>{option.label}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                         </Select>
                                         <Button 

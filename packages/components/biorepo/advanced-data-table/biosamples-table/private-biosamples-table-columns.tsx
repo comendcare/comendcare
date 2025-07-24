@@ -14,6 +14,7 @@ import {
     AVAILABILITY_OPTIONS,
     BIOSAMPLE_TYPE_OPTIONS,
     COUNTRY_OPTIONS,
+    DIAGNOSIS_SEVERITY_OPTIONS,
     DONOR_ETHNICITY_OPTIONS,
     DONOR_GENDER_OPTIONS,
     DONOR_RACE_OPTIONS,
@@ -96,12 +97,15 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
-                    {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => (
-                        <li key={index}>
-                            {diagnosis?.type?.label} 
-                            {diagnosis?.severity && <Badge variant={'orange'} className="rounded-full inline ml-2">{diagnosis.severity}</Badge>}
-                        </li>
-                    ))}
+                    {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => {
+                        const severityOption = DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.value === diagnosis.severity)
+                        return (
+                            <li key={index} className="grid grid-cols-[minmax(100px,_1fr)_150px] gap-4 items-center">
+                                {diagnosis?.type?.label} 
+                                {severityOption && <Badge className="w-fit" variant={severityOption.badgeVariant}>{severityOption.label}</Badge>}
+                            </li>
+                        )
+                    })}
                 </ul>
             ),
             enableHiding: true,
