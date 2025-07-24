@@ -95,9 +95,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => (
-                        <li key={index} className="flex gap-2 items-center">
+                        <li key={index}>
                             {diagnosis?.type?.label} 
-                            {diagnosis?.severity && <Badge variant={'orange'} className="rounded-full">{diagnosis.severity}</Badge>}
+                            {diagnosis?.severity && <Badge variant={'orange'} className="rounded-full inline ml-2">{diagnosis.severity}</Badge>}
                         </li>
                     ))}
                 </ul>
@@ -112,6 +112,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             accessorKey: "gene",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
+            ),
+            cell: ({row}) => (
+                <>{row.original.gene?.uuid}</>
             ),
             enableHiding: true,
             meta: {

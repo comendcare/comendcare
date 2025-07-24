@@ -9,7 +9,7 @@ import { FileUploadForm } from "~web/components/file-upload-form";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createOrUpdateAsset, createOrUpdateBiosample } from "@comend/lib/actions";
+import { createOrUpdateBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { parseCSV, validateImport } from "@comend/lib/utils";
 import { ANATOMICAL_SITE_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
@@ -17,7 +17,10 @@ import { revalidate } from "@/packages/lib/revalidate";
 import { editBiosampleForm } from "./edit-biosample-tool-form";
 import z from "zod";
 
-export function formatBiosampleData(biosample: any): z.infer<typeof editBiosampleForm> {
+export async function formatBiosampleData(biosample: any): Promise<z.infer<typeof editBiosampleForm>> {
+    const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene'] || "")}`);
+    const foundGenes = await res.json();
+
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
             const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === biosample.Type)
@@ -28,6 +31,11 @@ export function formatBiosampleData(biosample: any): z.infer<typeof editBiosampl
             severity: undefined,
             diagnosis: [{label: diagnosis, value: diagnosis.toUpperCase()?.replace(/[^0-9a-z]/gi, '')}]
         })),
+        genes: (() => {
+            if (foundGenes && foundGenes.length > 0) return [{label: biosample['Gene'], value: biosample['Gene']}]
+            return []
+        })(),
+        variant: biosample['Variant'],
         quantity: biosample['Available Quantity'],
         quantityUnit: biosample['Available Quantity Measurement'] || 'ml',
         sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Donor Biological Sex at Birth'])?.value,
@@ -67,7 +75,9 @@ export function BiosampleBulkImportDialog() {
                     file,
                     [
                         {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
+                        {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Variant', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Available Quantity', required: false, defaultValue: undefined, isValid: (entry) => JSON.parse(entry) > 0},
                         {key: 'Available Quantity Measurement', required: false, defaultValue: 'ml', isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Biological Sex at Birth', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
@@ -99,7 +109,8 @@ export function BiosampleBulkImportDialog() {
                 }
 
                 await Promise.all(result.values.map(async (biosample) => {
-                    await createOrUpdateBiosample(session?.user.organizationId, formatBiosampleData(biosample))
+                    const formattedBiosample = await formatBiosampleData(biosample)
+                    await createOrUpdateBiosample(session?.user.organizationId, formattedBiosample)
                     await revalidate(pathname)
                 }))
             } catch (e) {
