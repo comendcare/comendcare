@@ -101,7 +101,7 @@ const agreementItems = [
     },
 ]
 
-export default function MaterialAndDataAccessRequestForm({ materialIds = [] }: { materialIds: string[] }) {
+export default function MaterialAccessRequestForm({ materialIds = [] }: { materialIds: string[] }) {
     const { data: session } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)

@@ -1,7 +1,7 @@
 "use client"
 
 import {useSearchParams} from 'next/navigation'
-import MaterialAndDataAccessRequestForm from "~researcher/components/material-data-access-request-form"
+import MaterialAccessRequestForm from "~researcher/components/material-access-request-form"
 
 
 export default function NewRequestPage() {
@@ -10,6 +10,6 @@ export default function NewRequestPage() {
     const ids = idsParam ? idsParam.split(",") : []
 
     return (
-        <MaterialAndDataAccessRequestForm materialIds={ids} />
+        <MaterialAccessRequestForm materialIds={ids} />
     )
 }
