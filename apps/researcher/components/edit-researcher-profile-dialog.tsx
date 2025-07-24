@@ -47,6 +47,9 @@ const formSchema = z.object({
     name: z.string().min(2),
     title: z.string().min(2),
     affiliations: z.array(optionSchema).optional(),
+    orcid: z.string().regex(/^\\d{4}-\\d{4}-\\d{4}-\\d{4}$/, {
+        message: "ORCID must be in the format 0000-0000-0000-0000",
+    }),
     researchInterests: z.array(optionSchema).optional(),
     genesOfInterest: z.array(optionSchema).optional(),
     conditionsOfInterest: z.array(optionSchema).optional(),
@@ -75,6 +78,7 @@ export default function EditResearcherProfileDialog() {
             const researcherRes = await getResearcherFromUserId(session?.user.id, {
                 title: true,
                 affiliations: {select: {institution: true}},
+                orcid: true,
                 researchInterests: true,
                 conditionsOfInterest: true,
                 genesOfInterest: true,
@@ -90,6 +94,7 @@ export default function EditResearcherProfileDialog() {
                         label: a.institution.name,
                         value: a.institution.id,
                     })) || [],
+                    orcid: researcher.orcid || "",
                     researchInterests: researcher.researchInterests?.map((r: string) => ({
                         label: r,
                         value: r,
@@ -281,6 +286,38 @@ export default function EditResearcherProfileDialog() {
                                         />
                                     </FormControl>
                                     <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="orcid"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Your ORCID</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            {...field}
+                                            onChange={(e) => {
+                                                // Remove non-digit characters
+                                                let raw = e.target.value.replace(/\D/g, "");
+
+                                                // Limit to 16 digits max
+                                                raw = raw.substring(0, 16);
+
+                                                // Add dash every 4 digits
+                                                const formatted = raw.match(/.{1,4}/g)?.join("-") || "";
+
+                                                field.onChange(formatted);
+                                            }}
+                                            value={field.value}
+                                            placeholder="0000-0000-0000-0000"
+                                            inputMode="numeric"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

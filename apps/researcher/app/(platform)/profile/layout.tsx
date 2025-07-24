@@ -1,7 +1,7 @@
 import {ReactNode, Suspense} from "react";
 import {ResearcherNavbar} from "~researcher/components/researcher-navbar";
 
-export default async function ResearcherLayout({children}: { children: ReactNode }) {
+export default async function ProfileLayout({children}: { children: ReactNode }) {
     return (
         <div>
             <ResearcherNavbar/>
