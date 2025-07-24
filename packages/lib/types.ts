@@ -359,6 +359,12 @@ export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
     }
 ];
 
+export const AVAILABILITY_OPTIONS: Option[] = [
+    {label: 'Available', value: 'AVAILABLE', badgeVariant: 'green'},
+    {label: 'Reserved', value: 'RESERVED', badgeVariant: 'yellow'},
+    {label: 'Depleted', value: 'DEPLETED', badgeVariant: 'red'},
+]
+
 export const COUNTRY_OPTIONS: Option[] = [
   { label: 'United States of America', value: 'US' },
   { label: 'Canada', value: 'CA' },
@@ -1735,7 +1741,7 @@ export const diagnosisSchema = z.object({
     diagnosis: z.array(optionSchema)
         .min(1, "A diagnosis type is required")
         .max(1, "Only one diagnosis type is allowed"),
-    severity: z.string(),
+    severity: z.string().optional(),
 })
 
 export const editBiosampleForm = z.object({
@@ -1767,6 +1773,7 @@ export const editBiosampleForm = z.object({
     // volume: z.string().optional(),
     // mass: z.string().optional(),
     // area: z.string().optional(),
+    availability: z.string().optional(),
     quantity: z.string().optional(),
     quantityUnit: z.string(),
     productCode: z.string().optional(),

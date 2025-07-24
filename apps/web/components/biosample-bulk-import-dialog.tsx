@@ -12,9 +12,8 @@ import { toast } from "sonner";
 import { createOrUpdateBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { parseCSV, validateImport } from "@comend/lib/utils";
-import { ANATOMICAL_SITE_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
+import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
 import { revalidate } from "@/packages/lib/revalidate";
-import { editBiosampleForm } from "./edit-biosample-tool-form";
 import z from "zod";
 
 export async function formatBiosampleData(biosample: any): Promise<z.infer<typeof editBiosampleForm>> {
@@ -36,6 +35,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
             return []
         })(),
         variant: biosample['Variant'],
+        availability: AVAILABILITY_OPTIONS.find(option => option.label === biosample['Availability'])?.value,
         quantity: biosample['Available Quantity'],
         quantityUnit: biosample['Available Quantity Measurement'] || 'ml',
         sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Donor Biological Sex at Birth'])?.value,
@@ -79,6 +79,7 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Variant', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Availability', required: false, defaultValue: undefined, isValid: (entry) => AVAILABILITY_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Available Quantity', required: false, defaultValue: undefined, isValid: (entry) => JSON.parse(entry) > 0},
                         {key: 'Available Quantity Measurement', required: false, defaultValue: 'ml', isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Biological Sex at Birth', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
