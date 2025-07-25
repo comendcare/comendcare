@@ -337,7 +337,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             id: "donorId",
             accessorKey: "donorId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Donor Id"/>
+                <DataTableColumnHeader column={column} title="External Donor Id"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 min-w-[200px] items-center">
@@ -347,7 +347,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Donor Id"
+                label: "External Donor Id"
             }
         },
         {
@@ -358,7 +358,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Donor Id"
+                label: "internal Donor Id"
             }
         },
         {
