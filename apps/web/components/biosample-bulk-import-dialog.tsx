@@ -9,7 +9,7 @@ import { FileUploadForm } from "~web/components/file-upload-form";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createOrUpdateBiosample } from "@comend/lib/actions";
+import { createBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { parseCSV, validateImport } from "@comend/lib/utils";
 import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
@@ -46,6 +46,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
         anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site'])?.value,
         methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport'])?.value,
+        donorInternalId: biosample['Donor ID'],
         age: biosample['Donor Age at Collection'],
         gender: DONOR_GENDER_OPTIONS.find(option => option.label === biosample['Donor Gender'])?.value,
         race: DONOR_RACE_OPTIONS.find(option => option.label === biosample['Donor Race'])?.value,
@@ -91,6 +92,7 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Anatomical Site', required: false, defaultValue: undefined, isValid: (entry) => ANATOMICAL_SITE_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Method of Transport', required: false, defaultValue: undefined, isValid: (entry) => SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Age at Collection', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor ID', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Gender', required: false, defaultValue: undefined, isValid: (entry) => DONOR_GENDER_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Race', required: false, defaultValue: undefined, isValid: (entry) => DONOR_RACE_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Ethnicity', required: false, defaultValue: undefined, isValid: (entry) => DONOR_ETHNICITY_OPTIONS.find(option => option.label === entry) !== undefined},
@@ -111,11 +113,18 @@ export function BiosampleBulkImportDialog() {
                     console.error("Error: imported biosamples are missing required fields", result.errors)
                 }
 
-                await Promise.all(result.values.map(async (biosample) => {
-                    const formattedBiosample = await formatBiosampleData(biosample)
-                    await createOrUpdateBiosample(session?.user.organizationId, formattedBiosample)
+                let pagIDtoInternalID: {[key: string]: string}= {}
+
+                for (let i = 0; i < result.values.length; i++) {
+                    const biosample = result.values[i]
+                    let formattedBiosample = await formatBiosampleData(biosample)
+                    if (formattedBiosample.donorInternalId && pagIDtoInternalID[formattedBiosample.donorInternalId]) {
+                        formattedBiosample.donorId = pagIDtoInternalID[formattedBiosample.donorInternalId]
+                    }
+                    const newBiosample = await createBiosample(session?.user.organizationId, formattedBiosample)
+                    if (formattedBiosample.donorInternalId) pagIDtoInternalID[formattedBiosample.donorInternalId] = newBiosample.donorId
                     await revalidate(pathname)
-                }))
+                }
             } catch (e) {
                 toast('Error!', {
                     position: "bottom-left",

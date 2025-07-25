@@ -26,7 +26,7 @@ import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {revalidate} from "@comend/lib/revalidate";
 import {Button} from "@comend/components/ui/button";
-import {createOrUpdateBiosample} from "@comend/lib/actions";
+import {updateBiosample} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
 import { Badge } from "@comend/components/ui/badge";
@@ -335,9 +335,15 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         },
         {
             id: "donorId",
-            accessorKey: "donor.id",
+            accessorKey: "donorId",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Donor Id"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
             ),
             enableHiding: true,
             meta: {
@@ -623,7 +629,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <Button
                     onClick={
                         async () => {
-                            await createOrUpdateBiosample(
+                            await updateBiosample(
                                 session?.user.organizationId,
                                 {
                                     id: row.original.id,
