@@ -334,10 +334,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "donorId",
+            id: "donor.id",
             accessorKey: "donor.id",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Donor Id"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
             ),
             enableHiding: true,
             meta: {
