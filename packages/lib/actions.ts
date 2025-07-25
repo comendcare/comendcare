@@ -2046,9 +2046,7 @@ export const updateBiosample = withOrganizationAuth(
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
 
-            console.log(`biosample data`, biosampleData)
-
-            const response = await prisma.biosample.update({
+            const newBiosample = await prisma.biosample.update({
                 where: {id: data.id},
                 include: {
                     contacts: true,
@@ -2110,48 +2108,49 @@ export const updateBiosample = withOrganizationAuth(
                     ...(biosampleData.institution ? ({
                         institution: {connect: {id: biosampleData.institution.value}}
                     }): {institution: {disconnect: true}}),
-                    // donor: {
-                    //     upsert: {
-                    //         update: {
-                    //             ...donorData,
-                    //             organization: {connect: {id: organization.id}},
-                    //             diagnoses: {
-                    //                 deleteMany: {},
-                    //                 create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
-                    //                     severity: diagnosis.severity,
-                    //                     type: {
-                    //                         connectOrCreate: {
-                    //                             where: { id: diagnosis.diagnosis[0].value },
-                    //                             create: { 
-                    //                                 id: diagnosis.diagnosis[0].value,
-                    //                                 label: diagnosis.diagnosis[0].label
-                    //                             }
-                    //                         }
-                    //                     }
-                    //                 }))
-                    //             }
-                    //         },
-                    //         create: {
-                    //             ...donorData,
-                    //             organization: {connect: {id: organization.id}},
-                    //             diagnoses: {
-                    //                 create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
-                    //                     severity: diagnosis.severity,
-                    //                     type: {
-                    //                         connectOrCreate: {
-                    //                             where: { id: diagnosis.diagnosis[0].value },
-                    //                             create: { 
-                    //                                 id: diagnosis.diagnosis[0].value,
-                    //                                 label: diagnosis.diagnosis[0].label
-                    //                             }
-                    //                         }
-                    //                     }
-                    //                 }))
-                    //             }
-                    //         }
-                    //     }
-                    // }
+                    ...(data.donorId
+                        ? {donor: {connect: {id: data.donorId}}}
+                        : {donor: {disconnect: true}}
+                    )
                 }, 
+            })
+
+            if (data.donorId) {
+                const donor = await prisma.donor.update({
+                    where: {id: data.donorId},
+                    data: {
+                        age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
+                        sex: data.sex,
+                        gender: data.gender,
+                        race: data.race,
+                        ethnicity: data.ethnicity,
+                        treatments: data.treatments,
+                        height: typeof data.height === 'string' ? parseInt(data.height, 10) : data.height,
+                        weight: typeof data.weight === 'string' ? parseInt(data.weight, 10) : data.weight,
+                        bmi: typeof data.bmi === 'string' ? parseInt(data.bmi, 10) : data.bmi,
+                        medications: data.medications,
+                        // organization: {connect: {id: organization.id}},
+                        diagnoses: {
+                            deleteMany: {},
+                            create: data?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
+                                severity: diagnosis.severity,
+                                type: {
+                                    connectOrCreate: {
+                                        where: { id: diagnosis.diagnosis[0].value },
+                                        create: { 
+                                            id: diagnosis.diagnosis[0].value,
+                                            label: diagnosis.diagnosis[0].label
+                                        }
+                                    }
+                                }
+                            }))
+                        }
+                    }
+                })
+            }
+
+            const response = await prisma.biosample.findUnique({
+                where: {id: data.id}
             })
 
             return response

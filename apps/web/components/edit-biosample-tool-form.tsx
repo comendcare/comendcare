@@ -48,8 +48,7 @@ import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
-import { map } from "lodash"
-import { createBiosample, createOrUpdateAsset, createOrUpdateBiosample } from "@/packages/lib/actions"
+import { createBiosample, updateBiosample } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 import { Popover } from "@/packages/components/ui/popover"
@@ -109,6 +108,7 @@ export function EditBiosampleToolForm({
         mode: "onChange",
         resolver: zodResolver(editBiosampleForm),
         defaultValues: {
+            id: toolData?.id || undefined,
             description: toolData?.description || "",
             types: BIOSAMPLE_TYPE_OPTIONS
                         .filter(toolType => (toolData?.types || [])
@@ -184,7 +184,7 @@ export function EditBiosampleToolForm({
 
         try {
             if (toolData.id) {
-                const updatedAsset = await createOrUpdateBiosample(session.user.organizationId, values, toolData.id)
+                const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
                 mixpanelTrack("Biosample Updated", {
                     "ID": updatedAsset.id,
                     "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),

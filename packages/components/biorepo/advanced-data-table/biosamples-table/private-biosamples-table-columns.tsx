@@ -26,7 +26,7 @@ import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {revalidate} from "@comend/lib/revalidate";
 import {Button} from "@comend/components/ui/button";
-import {createOrUpdateBiosample} from "@comend/lib/actions";
+import {updateBiosample} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
 import { Badge } from "@comend/components/ui/badge";
@@ -623,7 +623,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <Button
                     onClick={
                         async () => {
-                            await createOrUpdateBiosample(
+                            await updateBiosample(
                                 session?.user.organizationId,
                                 {
                                     id: row.original.id,
