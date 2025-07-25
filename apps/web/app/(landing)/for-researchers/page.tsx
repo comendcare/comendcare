@@ -20,35 +20,18 @@ import { CloudHeroSection } from "~web/components/landing/cloud-hero"
 // import {ClientsLogoCloud} from "@comend/components/landing/sections/clients-logo-cloud";
 import ContactSection from "~web/components/landing/contact";
 import {News} from "~web/components/landing/news";
+import {ResearcherQuickFeaturesSection} from "~web/components/landing/researcher-quick-features-section";
+import ResearcherMainFeatures from "~web/components/landing/researcher-main-features";
+import {ResearcherHero} from "~web/components/landing/researcher-hero";
+import ResearcherStatsSection from "~web/components/landing/researcher-stats-section";
 
 export default function App() {
     return (
         <>
-            {/*<HeroSection/>*/}
-            <CloudHeroSection />
-            {/*<JoinWaitlistSection*/}
-            {/*    isSubscribedCallback={betaSubscribeCallback}*/}
-            {/*    isSubscribed={isSubscribed}*/}
-            {/*/>*/}
-            {/*<HowItWorks/>*/}
-            {/*<ClientsLogoCloud />*/}
-            {/*<FeatureResearchPlan />*/}
-            {/*<FeatureResearchMarketplace  />*/}
-            {/*<FeaturePublicPages />*/}
-            {/*<TabsFeaturesSection />*/}
-            {/*<MoreFeaturesSection />*/}
-            <WhoSection/>
-            {/*<FeaturesSection/>*/}
-            {/*<StatsSection />*/}
-            {/*<ComingSoonSection />*/}
-            {/*<FAQSection/>*/}
-            {/*<WhatElseSection />*/}
-            {/*<LibrareySection />*/}
-            {/*<ScimanticSection />*/}
-            {/*<CTASection*/}
-            {/*    isSubscribedCallback={betaSubscribeCallback}*/}
-            {/*    isSubscribed={isSubscribed}*/}
-            {/*/>*/}
+            <ResearcherHero />
+            <ResearcherMainFeatures />
+            <ResearcherStatsSection />
+            <ResearcherQuickFeaturesSection />
             <News />
             <ContactSection />
         </>

@@ -3,6 +3,12 @@
 import {Lock, Megaphone} from "lucide-react";
 import Image from "next/image"
 import publicProfile from "@/public/screenshots/public-profile.png"
+import fb from "@/public/logos/fb.svg"
+import x from "@/public/logos/x.svg"
+import insta from "@/public/logos/insta.svg"
+import gmail from "@/public/logos/gmail.svg"
+import linkedin from "@/public/logos/in.svg"
+import whatsapp from "@/public/logos/whatsapp.svg"
 import {motion} from "framer-motion"
 
 const features = [
@@ -37,7 +43,8 @@ export default function FeaturePublicPages() {
                                 Showcase your progress
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Broadcast your projects, assets, and funding opportunities directly to your community, researchers, and drug developers.
+                                Broadcast your projects, assets, and funding opportunities directly to your community,
+                                researchers, and drug developers.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (
@@ -54,6 +61,55 @@ export default function FeaturePublicPages() {
                                     </div>
                                 ))}
                             </dl>
+                        </div>
+                        <div className="lg:mt-10 mt-20 flex flex-col">
+                            <div className="flex items-center justify-start">
+                                <Image
+                                    src={insta}
+                                    alt="insta"
+                                    width="48"
+                                    height="48"
+                                    className="rotate-[7deg] mb-[24px]"
+                                />
+                                <Image
+                                    src={x}
+                                    alt="x"
+                                    width="48"
+                                    height="48"
+                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
+                                />
+                                <Image
+                                    src={fb}
+                                    alt="facebook"
+                                    width="48"
+                                    height="48"
+                                    className="rotate-[12deg] ml-[-7px] mb-[24px]"
+                                />
+                                <Image
+                                    src={linkedin}
+                                    alt="linkedin"
+                                    width="48"
+                                    height="48"
+                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
+                                />
+                                <Image
+                                    src={whatsapp}
+                                    alt="whatsapp"
+                                    width="48"
+                                    height="48"
+                                    className="rotate-[10deg] ml-[-7px] mb-[24px]"
+                                />
+                                <Image
+                                    src={gmail}
+                                    alt="gmail"
+                                    width="50"
+                                    height="50"
+                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
+                                />
+                            </div>
+                            <p className="text-balance text-base text-neutral-600 dark:text-neutral-300">
+                                {`Easily share on social media`}
+                            </p>
                         </div>
                     </div>
                     <Image
