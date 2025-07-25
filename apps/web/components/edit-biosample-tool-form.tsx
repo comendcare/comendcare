@@ -245,15 +245,15 @@ export function EditBiosampleToolForm({
                 donorData = response.data
             }
 
-            form.setValue("age", donorData?.age?.toString() ?? null, {shouldDirty: true})
-            form.setValue("sex", donorData?.sex ?? null, {shouldDirty: true})
-            form.setValue("gender", donorData?.gender ?? null, {shouldDirty: true})
-            form.setValue("race", donorData?.race ?? null, {shouldDirty: true})
-            form.setValue("ethnicity", donorData?.ethnicity ?? null, {shouldDirty: true})
+            form.setValue("age", donorData?.age?.toString() ?? "", {shouldDirty: true})
+            form.setValue("sex", donorData?.sex ?? "", {shouldDirty: true})
+            form.setValue("gender", donorData?.gender ?? "", {shouldDirty: true})
+            form.setValue("race", donorData?.race ?? "", {shouldDirty: true})
+            form.setValue("ethnicity", donorData?.ethnicity ?? "", {shouldDirty: true})
             form.setValue("treatments", donorData?.treatments || [], {shouldDirty: true})
             form.setValue("diagnoses", donorData?.diagnoses?.map((diagnosis: any) => ({
                     diagnosis: diagnosis.type ? [{label: diagnosis.type.label, value: diagnosis.type.id}] : [],
-                    severity: diagnosis.severity ?? null
+                    severity: diagnosis.severity ?? ""
                 })) || [], {shouldDirty: true})
             form.setValue("height", donorData?.height?.toString() ?? "", {shouldDirty: true})
             form.setValue("weight", donorData?.weight?.toString() ?? "", {shouldDirty: true})
@@ -512,7 +512,7 @@ export function EditBiosampleToolForm({
                         </Dialog>
                         <DialogClose disabled={!form.formState.isValid}>
                             <Button
-                                disabled={!form.formState.isValid}
+                                // disabled={!form.formState.isValid}
                                 variant={"cta"}
                                 onClick={(e) => {
                                     e.preventDefault()
@@ -984,7 +984,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 checked={createNewDonor} 
                                 onCheckedChange={(checked) => {
                                     setCreateNewDonor(checked)
-                                    if (checked) form.setValue("donor", null)
+                                    if (checked) form.setValue("donor", [])
                                 }}
                             />
                             <Label htmlFor="create-new-donor">Create New Donor</Label>
@@ -1001,6 +1001,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 loadingIndicator={<p>Loading donors...</p>}
                                 emptyIndicator={<p>No donors found.</p>}
                                 showHoverCard={false}
+                                maxSelected={1}
                             />
                         </FormControl>
                     )}
