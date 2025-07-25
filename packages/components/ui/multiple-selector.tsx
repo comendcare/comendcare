@@ -471,6 +471,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                     data-fixed={option.fixed}
                                     data-disabled={disabled || undefined}
                                 >
+                                    {typeof option.img === 'string' && (
+                                        <img className="h-8 w-8 rounded-full mr-2 my-1" src={option.img} alt="Option icon" />
+                                    )}
                                     {option.label}
                                     <button
                                         type="button"
@@ -601,6 +604,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                         }}
                                                                         className={cn("cursor-pointer multiselect-item", groupBy ? "pl-4" : "")}
                                                                     >
+                                                                        {typeof framework.img === 'string' && (
+                                                                            <img className="h-8 w-8 rounded-full mr-2" src={framework.img} alt="Option icon" />
+                                                                        )}
                                                                         {framework.label}
                                                                         <p className="hidden">{framework.value}</p>
                                                                     </CommandItem>

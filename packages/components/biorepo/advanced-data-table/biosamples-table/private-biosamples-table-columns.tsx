@@ -334,8 +334,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "donor.id",
-            accessorKey: "donor.id",
+            id: "donorId",
+            accessorKey: "donorId",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Donor Id"/>
             ),

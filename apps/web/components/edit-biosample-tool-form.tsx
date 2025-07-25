@@ -146,7 +146,11 @@ export function EditBiosampleToolForm({
 
             // donor properties
             donorId: toolData?.donorId || undefined,
-            donor: toolData?.donorId ? [{label: toolData.donorId, value: toolData.donorId}] : [],
+            donor: toolData?.donorId ? [{
+                img: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${toolData.donorId}`,
+                label: toolData.donorId, 
+                value: toolData.donorId
+            }] : [],
             age: toolData?.donor?.age?.toString() || undefined,
             sex: toolData?.donor?.sex || undefined,
             gender: toolData?.donor?.gender || undefined,
