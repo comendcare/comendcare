@@ -49,7 +49,7 @@ import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
 import { map } from "lodash"
-import { createOrUpdateAsset, createOrUpdateBiosample } from "@/packages/lib/actions"
+import { createBiosample, createOrUpdateAsset, createOrUpdateBiosample } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 import { Popover } from "@/packages/components/ui/popover"
@@ -143,6 +143,7 @@ export function EditBiosampleToolForm({
             ageAtExcision: toolData?.ageAtExcision?.toString() || undefined,
 
             // donor properties
+            donorId: toolData?.donorId || undefined,
             age: toolData?.donor?.age?.toString() || undefined,
             sex: toolData?.donor?.sex || undefined,
             gender: toolData?.donor?.gender || undefined,
@@ -200,7 +201,7 @@ export function EditBiosampleToolForm({
                 await revalidate("/app/tools/biosample")
                 router.refresh()
             } else {
-                const newAsset = await createOrUpdateBiosample(session.user.organizationId, values)
+                const newAsset = await createBiosample(session.user.organizationId, values)
                 mixpanelTrack("Biosample Created", {
                     "ID": newAsset.id,
                     "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),

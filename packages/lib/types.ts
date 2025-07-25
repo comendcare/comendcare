@@ -1753,6 +1753,7 @@ export const diagnosisSchema = z.object({
 })
 
 export const editBiosampleForm = z.object({
+    id: z.string().optional(),
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
@@ -1826,6 +1827,7 @@ export const editBiosampleForm = z.object({
     ageAtExcision: z.string().optional(),
 
     // donor properties
+    donorId: z.string().optional(),
     age: z.string().optional(),
     sex: z.string().optional(),
     gender: z.string().optional(),

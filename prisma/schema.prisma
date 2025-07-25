@@ -375,7 +375,9 @@ model Donor {
   medications String[]
   species     String?
 
-  biosamples Biosample[]
+  biosamples     Biosample[]
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model ToolToMilestone {
@@ -651,6 +653,7 @@ model Organization {
   savedByOrganizations          SavedOrganization[]            @relation("org_save_savedOrganization")
   tools                         Tool[]
   biosamples                    Biosample[]
+  donors                        Donor[]
   rfps                          RFP[]
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
