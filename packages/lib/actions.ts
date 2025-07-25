@@ -1958,6 +1958,7 @@ export const createBiosample = withOrganizationAuth(
                         connectOrCreate: {
                             where: {id: data.donorId || nanoid()},
                             create: {
+                                internalId: data.donorInternalId,
                                 age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,
                                 gender: data.gender,
@@ -2119,6 +2120,7 @@ export const updateBiosample = withOrganizationAuth(
                 const donor = await prisma.donor.update({
                     where: {id: data.donorId},
                     data: {
+                        internalId: data.donorInternalId,
                         age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,

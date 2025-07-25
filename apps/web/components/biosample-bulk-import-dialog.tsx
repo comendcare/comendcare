@@ -113,7 +113,7 @@ export function BiosampleBulkImportDialog() {
                     console.error("Error: imported biosamples are missing required fields", result.errors)
                 }
 
-                let pagIDtoInternalID: {[key: string]: string}= {}
+                let pagIDtoInternalID: {[key: string]: string} = {}
 
                 for (let i = 0; i < result.values.length; i++) {
                     const biosample = result.values[i]

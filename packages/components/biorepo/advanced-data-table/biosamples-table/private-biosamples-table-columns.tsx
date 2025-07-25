@@ -351,6 +351,17 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
+            id: "donor.internalId",
+            accessorKey: "donor.internalId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Internal Donor Id"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Donor Id"
+            }
+        },
+        {
             id: "age",
             accessorKey: "donor.age",
             header: ({column}) => (
