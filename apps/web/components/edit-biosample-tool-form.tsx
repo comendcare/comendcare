@@ -29,7 +29,7 @@ import {
 } from "@comend/components/ui/dialog"
 import {ANATOMICAL_SITE_OPTIONS, Asset, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
 import {Biosample, Donor, DonorDiagnosis, Institution, MilestoneType, Prisma} from "@prisma/client"
-import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
+import {getDonorData, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
@@ -56,6 +56,8 @@ import { PopoverContent, PopoverTrigger } from "@/packages/components/plate-ui/p
 import { cn } from "@/packages/lib/utils"
 import { format } from "date-fns"
 import { Calendar } from "@/packages/components/ui/calendar"
+import { Label } from "@/packages/components/ui/label"
+import { Switch } from "@/packages/components/ui/switch"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -144,6 +146,7 @@ export function EditBiosampleToolForm({
 
             // donor properties
             donorId: toolData?.donorId || undefined,
+            donor: toolData?.donorId ? [{label: toolData.donorId, value: toolData.donorId}] : [],
             age: toolData?.donor?.age?.toString() || undefined,
             sex: toolData?.donor?.sex || undefined,
             gender: toolData?.donor?.gender || undefined,
@@ -151,7 +154,7 @@ export function EditBiosampleToolForm({
             ethnicity: toolData?.donor?.ethnicity || undefined,
             treatments: toolData?.donor?.treatments || undefined,
             diagnoses: toolData?.donor?.diagnoses?.map((diagnosis: any) => ({
-                diagnosis: [{label: diagnosis.type.label, value: diagnosis.type.id}],
+                diagnosis: diagnosis.type ? [{label: diagnosis.type.label, value: diagnosis.type.id}] : [],
                 severity: diagnosis.severity || undefined
             })),
             height: toolData?.donor?.height?.toString() || undefined,
@@ -170,7 +173,9 @@ export function EditBiosampleToolForm({
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         milestones: form.watch("milestones"),
-        diagnoses: form.watch("diagnoses")
+        diagnoses: form.watch("diagnoses"),
+        donorId: form.watch("donorId"),
+        donor: form.watch("donor"),
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>) => {
@@ -227,6 +232,36 @@ export function EditBiosampleToolForm({
             )
         }
     }
+
+    useEffect(() => {
+        async function fetchDonorData() {
+            let donorData: any = undefined
+            if (formData.donor && formData.donor.length > 0) {            
+                const response = await getDonorData(formData.donor[0]?.value)
+                donorData = response.data
+            }
+
+            form.setValue("age", donorData?.age?.toString() ?? null, {shouldDirty: true})
+            form.setValue("sex", donorData?.sex ?? null, {shouldDirty: true})
+            form.setValue("gender", donorData?.gender ?? null, {shouldDirty: true})
+            form.setValue("race", donorData?.race ?? null, {shouldDirty: true})
+            form.setValue("ethnicity", donorData?.ethnicity ?? null, {shouldDirty: true})
+            form.setValue("treatments", donorData?.treatments || [], {shouldDirty: true})
+            form.setValue("diagnoses", donorData?.diagnoses?.map((diagnosis: any) => ({
+                    diagnosis: diagnosis.type ? [{label: diagnosis.type.label, value: diagnosis.type.id}] : [],
+                    severity: diagnosis.severity ?? null
+                })) || [], {shouldDirty: true})
+            form.setValue("height", donorData?.height?.toString() ?? "", {shouldDirty: true})
+            form.setValue("weight", donorData?.weight?.toString() ?? "", {shouldDirty: true})
+            form.setValue("bmi", donorData?.bmi?.toString() ?? "", {shouldDirty: true})
+            form.setValue("medications", donorData?.medications || [], {shouldDirty: true})
+
+            form.setValue("donorId", donorData?.id, {shouldDirty: true, shouldValidate: true})
+        }
+
+        console.log(`donor`, formData.donor)
+        fetchDonorData()
+    }, [formData.donor])
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -492,6 +527,18 @@ export function EditBiosampleToolForm({
 }
 
 export const AdditionalBiosampleFields = ({form}: {form: any}) => {
+    const handleGeneAsyncSearch = async (query: string) => {
+        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+        const genes = await res.json();
+        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+    };
+
+    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+        const response = await fetch(`/api/institutions?search=${query}`);
+        const data = await response.json();
+        return data;
+    };
+
     return (
         <>
         <h1 className="font-semibold text-md py-0 my-0">Biosample Information</h1>
@@ -811,45 +858,99 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                     </FormItem>
                 )}
             />
+
+            <FormField
+                control={form.control}
+                name="institutions"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Institutions</FormLabel>
+                        <FormControl>
+                            <MultipleSelector
+                                {...field}
+                                // creatable={true}
+                                maxSelected={1}
+                                triggerSearchOnFocus={true}
+                                onSearch={handleInstitutionAsyncSearch}
+                                placeholder="Search for institutions..."
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading institutions...</p>}
+                                emptyIndicator={<p>No institutions found.</p>}
+                                showHoverCard={false}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="genes"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Related Gene</FormLabel>
+                        <FormControl>
+                            <MultipleSelector
+                                {...field}
+                                onSearch={handleGeneAsyncSearch}
+                                placeholder="Search for genes..."
+                                triggerSearchOnFocus={true}
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={
+                                <p
+                                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                >
+                                    Loading genes...
+                                </p>}
+                                emptyIndicator={<p>No genes found.</p>}
+                                showHoverCard={false}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="variant"
+                render={({field}) => (
+                    <FormItem className="w-full gap-4 items-center">
+                        <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="-mt-2 w-full">
+                                <Input
+                                    id="variant"
+                                    className="w-full"
+                                    placeholder={`Enter a variant`}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
         </div>
         </>
     )
 }
 
 export const DonorFormFields = ({form}: {form: any}) => {
-    const [isLoading, setIsLoading] = useState(false)
+    const {data: session} = useSession()
+    const [createNewDonor, setCreateNewDonor] = useState(false)
 
-    const handleGeneAsyncSearch = async (query: string) => {
-        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
-        const genes = await res.json();
-
-        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
-    };
-
-    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-            const response = await fetch(`/api/institutions?search=${query}`);
-            const data = await response.json();
-
-            return data;
-    };
+    const handleDonorAsyncSearch = async (query: string): Promise<Option[]> => {
+        const response = await fetch(`/api/donors?search=${query}&organizationId=${session?.user.organizationId}`)
+        const data = await response.json();
+        return data
+    }
 
     const handleDiagnosisTypesAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        setIsLoading(true)
-
-        try {
-            const response = await fetch(`/api/diagnoses?search=${query}`)
-            const data = await response.json();
-
-            // Return the fetched options
-            return data
-        } catch (error) {
-            console.error("Failed to fetch conditions:", error)
-            return [];
-        } finally {
-            setIsLoading(false)
-        }
+        const response = await fetch(`/api/diagnoses?search=${query}`)
+        const data = await response.json();
+        return data
     }
 
     return (
@@ -865,6 +966,45 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 </TooltipContent>
             </Tooltip>
         </div>
+
+        <FormField
+            control={form.control}
+            name="donor"
+            render={({field}) => (
+                <FormItem>
+                    <div className="w-full flex items-center justify-between">
+                        <FormLabel>Donor</FormLabel>
+                        <div className="flex items-center space-x-2">
+                            <Switch 
+                                id="create-new-donor" 
+                                checked={createNewDonor} 
+                                onCheckedChange={(checked) => {
+                                    setCreateNewDonor(checked)
+                                    if (checked) form.setValue("donor", null)
+                                }}
+                            />
+                            <Label htmlFor="create-new-donor">Create New Donor</Label>
+                        </div>
+                    </div>
+                    {!createNewDonor && (
+                        <FormControl>
+                            <MultipleSelector
+                                {...field}
+                                onSearch={handleDonorAsyncSearch}
+                                placeholder="Search for donors..."
+                                triggerSearchOnFocus={true}
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading donors...</p>}
+                                emptyIndicator={<p>No donors found.</p>}
+                                showHoverCard={false}
+                            />
+                        </FormControl>
+                    )}
+                    <FormMessage/>
+                </FormItem>
+            )}
+        />
+
         <div className="flex-col space-y-4">
             <div className="grid gap-x-8 gap-y-2 grid-cols-2">
             <FormField
@@ -1049,80 +1189,6 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             />
             </div>
-
-            <FormField
-                control={form.control}
-                name="institutions"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Institutions</FormLabel>
-                        <FormControl>
-                            <MultipleSelector
-                                {...field}
-                                // creatable={true}
-                                maxSelected={1}
-                                triggerSearchOnFocus={true}
-                                onSearch={handleInstitutionAsyncSearch}
-                                placeholder="Search for institutions..."
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={<p>Loading institutions...</p>}
-                                emptyIndicator={<p>No institutions found.</p>}
-                                showHoverCard={false}
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="genes"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Related Gene</FormLabel>
-                        <FormControl>
-                            <MultipleSelector
-                                {...field}
-                                onSearch={handleGeneAsyncSearch}
-                                placeholder="Search for genes..."
-                                triggerSearchOnFocus={true}
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={
-                                <p
-                                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                >
-                                    Loading genes...
-                                </p>}
-                                emptyIndicator={<p>No genes found.</p>}
-                                showHoverCard={false}
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="variant"
-                render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
-                        <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
-                                <Input
-                                    id="variant"
-                                    className="w-full"
-                                    placeholder={`Enter a variant`}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </div>
-                    </FormItem>
-                )}
-            />
 
             <FormField
                 control={form.control}

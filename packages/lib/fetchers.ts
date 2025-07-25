@@ -1574,6 +1574,22 @@ export async function getBiosampleData() {
     }
 }
 
+export async function getDonorData(id: string) {
+    try {
+        const data = await prisma.donor.findUnique({
+            where: {id},
+            include: {
+                diagnoses: {include: {type: true}}
+            }
+        })
+
+        return {success: true, data}
+    } catch (error: any) {
+        logError("Error fetching donor data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getClinicalData() {
     try {
         const data = await fs.readFile(
