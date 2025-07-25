@@ -1997,6 +1997,171 @@ export const createBiosample = withOrganizationAuth(
     }
 )
 
+export const updateBiosample = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            if (!data.id) {
+                throw new Error("No biosample id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const biosampleData: any = {
+                id: data.id,
+                types: (data.types || []).map(type => type.value),
+                metadata: {
+                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
+                    otherTypeDetails: data.otherTypeDetails
+                } as JsonObject,
+                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id  || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                anatomicalSite: data.anatomicalSite,
+                preservationMethod: data.preservationMethod,
+                methodOfTransport: data.methodOfTransport,
+                currentCountry: data.currentCountry,
+                countryOfCollection: data.countryOfCollection,
+                collectionDate: data.collectionDate,
+                availability: data.availability,
+                ...(data.quantity !== undefined && data.quantity !== null ? {quantity: JSON.parse(data.quantity)} : undefined),
+                quantityUnit: data.quantityUnit,
+                ...(data.price !== undefined && data.price !== null ? {price: JSON.parse(data.price)} : undefined),
+                priceUnit: data.priceUnit,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                variant: data.variant,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
+            }
+
+            console.log(`biosample data`, biosampleData)
+
+            const response = await prisma.biosample.update({
+                where: {id: data.id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                data: {
+                    ...biosampleData,
+                    ...(biosampleData.attachments ? (
+                        {attachments: {
+                            deleteMany: {}, // clear all existing attachments
+                            createMany: {
+                                data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.contacts ? (
+                        {contacts: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.milestones ? (
+                        {milestones: {
+                            deleteMany: {},
+                            create: (biosampleData.milestones || []).map((milestone: any) => ({
+                                milestone: {
+                                    connect: {id: milestone.milestoneId}
+                                }
+                            }))
+                        },}
+                    ): undefined),
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene ? ({
+                        gene: {
+                            connect: {symbol: biosampleData.gene.value}
+                        }
+                    }): {gene: { disconnect: true }}),
+                    ...(biosampleData.institution ? ({
+                        institution: {connect: {id: biosampleData.institution.value}}
+                    }): {institution: {disconnect: true}}),
+                    // donor: {
+                    //     upsert: {
+                    //         update: {
+                    //             ...donorData,
+                    //             organization: {connect: {id: organization.id}},
+                    //             diagnoses: {
+                    //                 deleteMany: {},
+                    //                 create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                    //                     severity: diagnosis.severity,
+                    //                     type: {
+                    //                         connectOrCreate: {
+                    //                             where: { id: diagnosis.diagnosis[0].value },
+                    //                             create: { 
+                    //                                 id: diagnosis.diagnosis[0].value,
+                    //                                 label: diagnosis.diagnosis[0].label
+                    //                             }
+                    //                         }
+                    //                     }
+                    //                 }))
+                    //             }
+                    //         },
+                    //         create: {
+                    //             ...donorData,
+                    //             organization: {connect: {id: organization.id}},
+                    //             diagnoses: {
+                    //                 create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                    //                     severity: diagnosis.severity,
+                    //                     type: {
+                    //                         connectOrCreate: {
+                    //                             where: { id: diagnosis.diagnosis[0].value },
+                    //                             create: { 
+                    //                                 id: diagnosis.diagnosis[0].value,
+                    //                                 label: diagnosis.diagnosis[0].label
+                    //                             }
+                    //                         }
+                    //                     }
+                    //                 }))
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                }, 
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating biosample:", error.message);
+            throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
 export const createOrUpdateBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
