@@ -4542,16 +4542,31 @@ export const updateResearcher = withAuth(
                 where: { researcherId: researcher.id },
             });
 
-            // 2. Create new affiliations if provided
             if (Array.isArray(data.affiliations)) {
-                const newAffiliations = data.affiliations.map((a: any) => ({
-                    researcherId: researcher.id,
-                    institutionId: a.value, // `value` is institutionId
-                }));
+                const institutionIds = data.affiliations.map((a: any) => a.value);
 
-                await prisma.affiliation.createMany({
-                    data: newAffiliations,
+                // Validate institutionIds
+                const existingInstitutions = await prisma.institution.findMany({
+                    where: {
+                        id: { in: institutionIds },
+                    },
+                    select: { id: true },
                 });
+
+                const validInstitutionIds = new Set(existingInstitutions.map((i) => i.id));
+
+                const newAffiliations = data.affiliations
+                    .filter((a: any) => validInstitutionIds.has(a.value))
+                    .map((a: any) => ({
+                        researcherId: researcher.id,
+                        institutionId: a.value,
+                    }));
+
+                if (newAffiliations.length > 0) {
+                    await prisma.affiliation.createMany({
+                        data: newAffiliations,
+                    });
+                }
             }
 
             // 3. Update researcher fields

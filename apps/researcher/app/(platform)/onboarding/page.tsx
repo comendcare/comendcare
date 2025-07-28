@@ -49,8 +49,11 @@ const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => (
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().min(2, {message: "Your title must be at least 2 characters."}),
+    title: z.string(),
     affiliations: z.array(optionSchema).optional(),
+    orcid: z.string().regex(/^\\d{4}-\\d{4}-\\d{4}-\\d{4}$/, {
+        message: "ORCID must be in the format 0000-0000-0000-0000",
+    }),
     researchInterests: z.array(optionSchema).optional(),
     genesOfInterest: z.array(optionSchema).optional(),
     conditionsOfInterest: z.array(optionSchema).optional(),
@@ -140,6 +143,7 @@ export default function ResearcherOnboardingForm() {
                             label: affiliation.institution.name,
                             value: affiliation.id
                         })) || [],
+                        orcid: researcherData.orcid || "",
                         researchInterests: researcherData.researchInterests.map((interests: any) => ({
                             label: interests,
                             value: interests
@@ -204,9 +208,8 @@ export default function ResearcherOnboardingForm() {
                 return;
             }
 
-            const { name, notificationSettings, consentSettings, ...researcherOnlyValues } = values;
+            const {name, notificationSettings, consentSettings, ...researcherOnlyValues} = values;
 
-            console.log(researcherOnlyValues)
             const res: any = await updateResearcher(session?.user?.id, researcherOnlyValues);
             if (res?.error) {
                 toast.error(res.error);
@@ -281,12 +284,14 @@ export default function ResearcherOnboardingForm() {
 
     if (isInitializing) {
         return (
-            <div className="h-full w-full flex flex-col gap-2">
-                <Skeleton className="h-[20px] w-full"/>
-                <Skeleton className="h-[32px] w-full"/>
-                <Skeleton className="mt-4 h-[80px] w-full"/>
-                <Skeleton className="h-[80px] w-full"/>
-                <Skeleton className="mt-4 h-[40px] w-full"/>
+            <div className="w-screen h-screen overflow-auto p-8 flex flex-col items-center">
+                <div className="h-full w-full flex flex-col gap-2">
+                    <Skeleton className="h-[20px] w-full"/>
+                    <Skeleton className="h-[32px] w-full"/>
+                    <Skeleton className="mt-4 h-[80px] w-full"/>
+                    <Skeleton className="h-[80px] w-full"/>
+                    <Skeleton className="mt-4 h-[40px] w-full"/>
+                </div>
             </div>
         )
     }
@@ -384,6 +389,38 @@ export default function ResearcherOnboardingForm() {
                                         />
                                     </FormControl>
                                     <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="orcid"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Your ORCID</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            {...field}
+                                            onChange={(e) => {
+                                                // Remove non-digit characters
+                                                let raw = e.target.value.replace(/\D/g, "");
+
+                                                // Limit to 16 digits max
+                                                raw = raw.substring(0, 16);
+
+                                                // Add dash every 4 digits
+                                                const formatted = raw.match(/.{1,4}/g)?.join("-") || "";
+
+                                                field.onChange(formatted);
+                                            }}
+                                            value={field.value}
+                                            placeholder="0000-0000-0000-0000"
+                                            inputMode="numeric"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
