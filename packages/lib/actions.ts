@@ -4603,7 +4603,8 @@ export const updateResearcher = withAuth(
 );
 
 export const createMaterialAndDataAccessRequest = withResearcherAuth(
-    async (formData: FormData) => {
+    async (user: User, formData: FormData) => {
+        console.log("test", formData)
         const session = await getSession()
         if (!session?.user.id) {
             return {

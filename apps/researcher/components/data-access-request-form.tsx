@@ -239,7 +239,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
             <div className="text-center space-y-2">
                 <Button variant="secondary" onClick={() => router.push("/data")} className="w-min">
                     <ArrowLeft />
-                    Back to all tools
+                    Back to data samples
                 </Button>
                 <h1 className="text-3xl font-bold">Project 8p Data Access Request Form</h1>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
