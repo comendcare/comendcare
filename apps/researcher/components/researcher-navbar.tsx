@@ -8,9 +8,9 @@ import {Skeleton} from "@/packages/components/ui/skeleton";
 
 export function ResearcherNavbar() {
     return (
-        <div>
+        <div className="w-full sticky top-0 z-50 border-b p-4 bg-white">
             <Suspense fallback={
-                <nav className="w-full sticky top-0 z-50 border-b p-4 flex justify-between items-center bg-white">
+                <nav className="flex justify-between items-center">
                     <div className="flex items-center space-x-8">
                         <Skeleton className="w-8 h-8 rounded"/>
                         <div className="flex space-x-4">
@@ -22,7 +22,7 @@ export function ResearcherNavbar() {
                     <Skeleton className="w-8 h-8 rounded-full"/>
                 </nav>
             }>
-                <nav className="w-full sticky top-0 z-50 border-b p-4 flex justify-between items-center bg-white">
+                <nav className="flex justify-between items-center">
                     <div className="flex justify-start items-center space-x-8">
                         <Image
                             src={ComendLogo}
