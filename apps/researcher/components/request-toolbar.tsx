@@ -13,7 +13,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
 } from "@comend/components/ui/dropdown-menu"
-import {REQUEST_STATUS_TYPE_OPTIONS} from "@/packages/lib/types"
+import {REQUEST_TYPE_OPTIONS, REQUEST_STATUS_TYPE_OPTIONS} from "@/packages/lib/types"
 import {useRequestSearchStore} from "@/state/search/requestSearchStore"
 
 export default function RequestToolbar() {
@@ -25,6 +25,15 @@ export default function RequestToolbar() {
         sortBy,
         setSortBy
     } = useRequestSearchStore()
+
+    const toggleType = (typeValue: string) => {
+        const isActive = filters.types.some(t => t.value === typeValue)
+        const updatedTypes = isActive
+            ? filters.types.filter(t => t.value !== typeValue)
+            : [...filters.types, REQUEST_TYPE_OPTIONS.find(t => t.value === typeValue)!]
+
+        setFilters({types: updatedTypes})
+    }
 
     const toggleStatus = (statusValue: string) => {
         const isActive = filters.statuses.some(s => s.value === statusValue)
@@ -42,8 +51,8 @@ export default function RequestToolbar() {
     return (
         <div className="space-y-4 flex flex-row items-center justify-between">
             <Input
-                placeholder="Search data requests..."
-                className="h-8 w-[150px] lg:w-[250px]"
+                placeholder="Search requests..."
+                className="h-8 w-[250px] lg:w-[500px]"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
             />
@@ -59,6 +68,17 @@ export default function RequestToolbar() {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56">
+                        <DropdownMenuLabel>Types</DropdownMenuLabel>
+                        <DropdownMenuSeparator/>
+                        {REQUEST_TYPE_OPTIONS.map(option => (
+                            <DropdownMenuCheckboxItem
+                                key={option.id}
+                                checked={filters.types.some(t => t.value === option.value)}
+                                onCheckedChange={() => toggleType(option.value)}
+                            >
+                                {option.label}
+                            </DropdownMenuCheckboxItem>
+                        ))}
                         <DropdownMenuLabel>Statuses</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
                         {REQUEST_STATUS_TYPE_OPTIONS.map(option => (

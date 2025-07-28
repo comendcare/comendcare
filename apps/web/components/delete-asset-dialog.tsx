@@ -6,6 +6,8 @@ import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "@comend/components/ui/dialog"
+import { usePathname } from "next/navigation"
+import { revalidate } from "@/packages/lib/revalidate"
 
 const toolSelector = (state: ToolState) => ({
     createTool: state.createTool,
@@ -16,12 +18,14 @@ const toolSelector = (state: ToolState) => ({
 
 export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undefined, closeDialog?: () => void}) => {
     const {data: session} = useSession()
+    const pathname = usePathname()
     const { deleteTool, saveState } = useToolStore(useShallow(toolSelector))
     const { undo } = useToolStore.temporal.getState()
 
-    const handleUndo = () => {
+    const handleUndo = async () => {
         undo()
-        saveState(session?.user?.organizationId)
+        await saveState(session?.user?.organizationId)
+        await revalidate(pathname)
         toast.dismiss("undo-toast")
     }
 
@@ -44,6 +48,7 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
 
         try {
             await deleteTool(toolId, session.user.organizationId)
+            await revalidate(pathname)
             if (closeDialog) closeDialog()
             toast(
                 <div className="flex flex-col gap-2 w-full">

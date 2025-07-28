@@ -1,13 +1,11 @@
-import {ReactNode, Suspense} from "react";
+import {ReactNode} from "react";
 import {ResearcherNavbar} from "~researcher/components/researcher-navbar";
 
 export default async function ResearcherLayout({children}: { children: ReactNode }) {
     return (
         <div>
-            <Suspense fallback={<div>Loading...</div>}>
-                <ResearcherNavbar/>
-            </Suspense>
-            <div className="min-h-screen">
+            <ResearcherNavbar/>
+            <div className="min-h-screen container relative flex flex-col items-center mx-auto">
                 {children}
             </div>
         </div>

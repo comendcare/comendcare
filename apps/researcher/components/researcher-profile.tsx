@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import {formatNumberWithCommas} from "@/packages/lib/utils";
+import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 
 export default function ResearcherProfile({researcherData}: any) {
     const publications = researcherData?.publications ?? [];
@@ -88,14 +89,11 @@ export default function ResearcherProfile({researcherData}: any) {
                                 </div>
 
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm">
-                                        <Mail className="w-4 h-4 mr-2" />
-                                        Contact
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        <Download className="w-4 h-4 mr-2" />
-                                        CV
-                                    </Button>
+                                    {/*<Button variant="outline" size="sm">*/}
+                                    {/*    <Mail className="w-4 h-4 mr-2" />*/}
+                                    {/*    Contact*/}
+                                    {/*</Button>*/}
+                                    <EditResearcherProfileDialog />
                                 </div>
                             </div>
                         </div>

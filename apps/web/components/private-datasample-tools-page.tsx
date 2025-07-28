@@ -17,12 +17,15 @@ export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pag
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
-        <div className="flex gap-2 w-full justify-end">
-            <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"data"}/>
-            <AssetBulkImportDialog />
-        </div>
         <Shell className="gap-2">
-            <FeatureFlagsProvider>
+            <FeatureFlagsProvider
+                additionalButtons={(
+                    <>
+                        <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"data"}/>
+                        <AssetBulkImportDialog />
+                    </>
+                )}
+            >
                 <React.Suspense
                     fallback={
                         <DataTableSkeleton

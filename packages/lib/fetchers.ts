@@ -571,23 +571,6 @@ export async function getPublicUser(
     }
 }
 
-export async function getToolTypes(
-    select: Prisma.ToolTypeSelect<InternalArgs & {
-        result: {};
-        model: {};
-        query: {};
-        client: {};
-    }>,
-) {
-    try {
-        const types = await prisma.toolType.findMany({select})
-        return {success: true, data: types}
-    } catch (error: any) {
-        console.error("Database error finding tool types:", error)
-        return {success: false, error: "Database error. please try again later."}
-    }
-}
-
 export async function getMilestoneTypes(
     select: Prisma.MilestoneTypeSelect<InternalArgs & {
         result: {};
@@ -1587,6 +1570,22 @@ export async function getBiosampleData() {
         };
     } catch (error: any) {
         logError("Error fetching biosamples", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getDonorData(id: string) {
+    try {
+        const data = await prisma.donor.findUnique({
+            where: {id},
+            include: {
+                diagnoses: {include: {type: true}}
+            }
+        })
+
+        return {success: true, data}
+    } catch (error: any) {
+        logError("Error fetching donor data", error);
         return {success: false, error: "Internal server error"};
     }
 }

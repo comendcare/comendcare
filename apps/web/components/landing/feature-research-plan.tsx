@@ -4,6 +4,7 @@ import {CloudUpload, Users} from "lucide-react";
 import Image from "next/image"
 import researchPlanner from "@/public/screenshots/research-planner.png";
 import {motion} from "framer-motion"
+import {FeaturedImages} from "~web/components/landing/featured-images";
 
 const features = [
     {
@@ -55,6 +56,8 @@ export default function FeatureResearchPlan() {
                                 ))}
                             </dl>
                         </div>
+
+                        <FeaturedImages/>
                     </div>
                     <Image
                         src={researchPlanner}

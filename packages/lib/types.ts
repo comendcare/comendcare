@@ -17,7 +17,8 @@ import {
     Tool as DBAsset,
     User,
     MaterialAndDataAccessRequest,
-    Researcher
+    Researcher,
+    Institution
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -168,6 +169,7 @@ export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
     disable: z.boolean().optional(),
+    img: z.string().optional()
 })
 
 export type AssetTableData = Asset & {
@@ -244,6 +246,12 @@ export const DEFAULT_KANBAN_COLUMNS = [
     }
 ]
 
+export const BIOSAMPLE_AVAILABILTIY_OPTIONS: Option[] = [
+    {label: 'Available', value: 'AVAILABLE'},
+    {label: 'Reserved', value: 'RESERVED'},
+    {label: 'Depleted', value: 'DEPLETED'}
+]
+
 export const SAMPLE_PRESERVATION_METHOD_OPTIONS: Option[] = [
     {
         label: 'Fresh',
@@ -287,6 +295,32 @@ export const SAMPLE_PRESERVATION_METHOD_OPTIONS: Option[] = [
     }
 ];
 
+export const ANATOMICAL_SITE_OPTIONS: Option[] = [
+    {label: 'Anterior abdominal wall / Peritoneal cavity', value: 'ANTERIORABDOMINALWALL/PERITONEALCAVITY'},
+    { label: 'Blood vessels', value: 'BLOODVESSELS' },
+    { label: 'Bladder', value: 'BLADDER' },
+    { label: 'Bone marrow', value: 'BONEMARROW' },
+    { label: 'Brain', value: 'BRAIN' },
+    { label: 'Buccal mucosa (cheek)', value: 'BUCCALMUCOSA(CHEEK)' },
+    { label: 'Colon / Rectum', value: 'COLON/RECTUM' },
+    { label: 'Eye (anterior chamber)', value: 'EYE(ANTERIORCHAMBER)' },
+    { label: 'Eye (retro-orbital sinus)', value: 'EYE(RETRO-ORBITALSINUS' },
+    { label: 'Fingertip / Heel', value: 'FINGERTIP/HEEL' },
+    { label: 'Hair follicle / Nails', value: 'HAIRFOLLICLE/NAILS' },
+    { label: 'Heart', value: 'HEART' },
+    { label: 'Liver', value: 'LIVER' },
+    { label: 'Lung', value: 'LUNG' },
+    { label: 'Muscle', value: 'MUSCLE' },
+    { label: 'Oral cavity / Salivary', value: 'ORALCAVITY/SALIVARY' },
+    { label: 'Skin', value: 'SKIN' },
+    { label: 'Spinal cord / Cistern', value: 'SPINALCORD/CISTERN' },
+    { label: 'Tail (mouse)', value: 'TAIL' },
+    { label: 'Tissues / Organs (general)', value: 'TISSUES/ORGANS' },
+    { label: 'Urinary tract / Urethr', value: 'URINARYTRACT/URETHR' },
+    { label: 'Other', value: 'OTHER' },
+    { label: 'Unknown', value: 'UNKNOWN' }
+]
+
 export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
     {
         label: 'Ambient Temperature',
@@ -325,6 +359,20 @@ export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
         value: 'UNKNOWN'
     }
 ];
+
+export const DIAGNOSIS_SEVERITY_OPTIONS: Option[] = [
+    {label: 'Mild', value: 'MILD', badgeVariant: 'cyan'},
+    {label: 'Moderate', value: 'MODERATE', badgeVariant: 'emerald'},
+    {label: 'Severe', value: 'SEVERE', badgeVariant: 'lime'},
+    {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'yellow'},
+    {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'orange'},
+]
+
+export const AVAILABILITY_OPTIONS: Option[] = [
+    {label: 'Available', value: 'AVAILABLE', badgeVariant: 'green'},
+    {label: 'Reserved', value: 'RESERVED', badgeVariant: 'yellow'},
+    {label: 'Depleted', value: 'DEPLETED', badgeVariant: 'red'},
+]
 
 export const COUNTRY_OPTIONS: Option[] = [
   { label: 'United States of America', value: 'US' },
@@ -376,7 +424,6 @@ export const COUNTRY_OPTIONS: Option[] = [
   { label: 'Czechia', value: 'CZ' },
   { label: 'Denmark', value: 'DK' },
   { label: 'Djibouti', value: 'DJ' },
-  { label: 'Dominica', value: 'DM' },
   { label: 'Dominican Republic', value: 'DO' },
   { label: 'Ecuador', value: 'EC' },
   { label: 'Egypt', value: 'EG' },
@@ -654,127 +701,36 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // },
 ]
 
-export const TOOL_TYPE_OPTIONS: any[] = [
-    {
-        id: 'IPSCS',
-        label: 'Induced pluripotent stem cells (iPSCs)',
-        type: 'biosample'
-    },
-    {
-        id: 'FIBROBLAST',
-        label: 'Fibroblast',
-        type: 'biosample'
-    },
-    {
-        id: 'PBMC',
-        label: 'PBMC',
-        type: 'biosample'
-    },
-    {
-        id: 'PLASMA',
-        label: 'Plasma',
-        type: 'biosample'
-    },
-    {
-        id: 'SERUM',
-        label: 'Serum',
-        type: 'biosample'
-    },
-    {
-        id: 'WBC',
-        label: 'WBC — buffy coat',
-        type: 'biosample'
-    },
-    {
-        id: 'URINE',
-        label: 'Urine',
-        type: 'biosample'
-    },
-    {
-        id: 'BLOODSPOT',
-        label: 'Blood spot',
-        type: 'biosample'
-    },
-    {
-        id: 'WHOLEBLOOD',
-        label: 'Whole blood',
-        type: 'biosample'
-    },
-    {
-        id: 'TISSUE',
-        label: 'Tissue',
-        type: 'biosample'
-    },
-    {
-        id: 'AQUEOUSHUMOR',
-        label: 'Aqueous humor',
-        type: 'biosample'
-    },
-    {
-        id: 'CSF',
-        label: 'Cerebrospinal fluid (CSF)',
-        type: 'biosample'
-    },
-    {
-        id: 'DNA',
-        label: 'DNA',
-        type: 'biosample'
-    },
-    {
-        id: 'RNA',
-        label: 'RNA',
-        type: 'biosample'
-    },
-    {
-        id: 'SALIVA',
-        label: 'Saliva',
-        type: 'biosample'
-    },
-    {
-        id: 'STOOL',
-        label: 'Stool',
-        type: 'biosample'
-    },
-    {
-        id: 'FUNCTIONALSTUDY',
-        label: 'Functional study',
-        type: 'data'
-    },
-    {
-        id: 'NATURALHISTORYSTUDY',
-        label: 'Natural history study',
-        type: 'data'
-    },
-    {
-        id: 'PATIENTREGISTRY',
-        label: 'Patient registry',
-        type: 'data'
-    },
-    {
-        id: 'BIOMARKER',
-        label: 'Biomarker',
-        type: 'data'
-    },
-    {
-        id: 'DRUGSCREEN',
-        label: 'Drug screen',
-        type: 'data'
-    }, 
-    {
-        id: 'EFFICASYSTUDY',
-        label: 'Efficacy study',
-        type: 'data'
-    }, 
-    {
-        id: 'DOSEFINDINGSTUDY',
-        label: 'Dose finding study',
-        type: 'data'
-    }, 
-    {
-        id: 'TOXICOLOGYSTUDY',
-        label: 'Toxicology study',
-        type: 'data'
-    },
+export const BIOSAMPLE_TYPE_OPTIONS: Option[] = [
+    { value: 'IPSCS', label: 'Induced pluripotent stem cells (iPSCs)' },
+    { value: 'FIBROBLAST', label: 'Fibroblast' },
+    { value: 'PBMC', label: 'PBMC' },
+    { value: 'PLASMA', label: 'Plasma' },
+    { value: 'SERUM', label: 'Serum' },
+    { value: 'WBC', label: 'WBC — buffy coat' },
+    { value: 'URINE', label: 'Urine' },
+    { value: 'BLOODSPOT', label: 'Blood spot' },
+    { value: 'WHOLEBLOOD', label: 'Whole blood' },
+    { value: 'TISSUE', label: 'Tissue' },
+    { value: 'AQUEOUSHUMOR', label: 'Aqueous humor' },
+    { value: 'CSF', label: 'Cerebrospinal fluid (CSF)' },
+    { value: 'DNA', label: 'DNA' },
+    { value: 'RNA', label: 'RNA' },
+    { value: 'SALIVA', label: 'Saliva' },
+    { value: 'STOOL', label: 'Stool' },
+]
+
+export const TOOL_TYPE_OPTIONS: Option[] = [
+    { value: 'FUNCTIONALSTUDY', label: 'Functional study' },
+    { value: 'NATURALHISTORYSTUDY', label: 'Natural history study' },
+    { value: 'PATIENTREGISTRY', label: 'Patient registry' },
+    { value: 'BIOMARKER', label: 'Biomarker' },
+    { value: 'DRUGSCREEN', label: 'Drug screen' }, 
+    { value: 'EFFICASYSTUDY', label: 'Efficacy study' }, 
+    { value: 'DOSEFINDINGSTUDY', label: 'Dose finding study' }, 
+    { value: 'TOXICOLOGYSTUDY', label: 'Toxicology study' },
+    { value: 'EEG', label: 'EEG' },
+    { value: 'STRUCTURALMRI', label: 'Structural MRI' },
 ]
 
 export const REQUEST_STATUS_OPTIONS: any[] = [
@@ -1742,8 +1698,22 @@ export const companyTypeMap: Record<string, string> = {
 
 export interface MaterialAndDataAccessRequestWithResearcherAndComments extends MaterialAndDataAccessRequest {
     researcher: Researcher;
+    institutions: Institution[]
     comments: Comment[];
 }
+
+export const REQUEST_TYPE_OPTIONS: any[] = [
+    {
+        id: 'BIOSAMPLE',
+        label: 'Biosample',
+        value: 'BIOSAMPLE'
+    },
+    {
+        id: 'DATA',
+        label: 'Data',
+        value: 'DATA'
+    },
+];
 
 export const REQUEST_STATUS_TYPE_OPTIONS: any[] = [
     {
@@ -1772,3 +1742,113 @@ export const REQUEST_STATUS_TYPE_OPTIONS: any[] = [
         value: 'COMPLETED'
     },
 ];
+
+type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
+type ContactType = Prisma.ExternalContactGetPayload<{}>
+
+export const diagnosisSchema = z.object({
+    diagnosis: z.array(optionSchema)
+        .min(1, "A diagnosis type is required")
+        .max(1, "Only one diagnosis type is allowed"),
+    severity: z.string().optional(),
+})
+
+export const editBiosampleForm = z.object({
+    id: z.string().optional(),
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    types: z.array(optionSchema)
+        .min(1, "Type is required")
+        .max(1, "Max one type"),
+    otherTypeDetails: z.string().optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
+    isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
+
+    // biosmaple properties
+    genes: z.array(optionSchema).optional(),
+    variant: z.string().optional(),
+    institutions: z.array(optionSchema).optional(),
+    anatomicalSite: z.string().optional(),
+    preservationMethod: z.string().optional(),
+    preservation: z.string().optional(),
+    methodOfTransport: z.string().optional(),
+    currentCountry: z.string().optional(),
+    countryOfCollection: z.string().optional(),
+    collectionDate: z.date().optional(),
+    // volume: z.string().optional(),
+    // mass: z.string().optional(),
+    // area: z.string().optional(),
+    availability: z.string().optional(),
+    quantity: z.string().optional(),
+    quantityUnit: z.string(),
+    productCode: z.string().optional(),
+    // priceUSD: z.string().optional(),
+    // priceGBP: z.string().optional(),
+    // priceEUR: z.string().optional(),
+    price: z.string().optional(),
+    priceUnit: z.string(),
+    premiumGroup: z.string().optional(),
+    caseId: z.string().optional(),
+    specimenId: z.string().optional(),
+    format: z.string().optional(),
+    subFormat: z.string().optional(),
+    biosampleDiagnosis: z.string().optional(),
+    measurement: z.number().optional(),
+    significantVariantPositive: z.string().optional(),
+    significantVariantWildtype: z.string().optional(),
+    fusionPositive: z.string().optional(),
+    fusionWildtype: z.string().optional(),
+    cnvAbnormal: z.boolean().optional(),
+    cnvNormal: z.boolean().optional(),
+    hlaType: z.string().optional(),
+    icf: z.string().optional(),
+    irbLetter: z.string().optional(),
+    yearOfExcision: z.string().optional(),
+    classifier: z.string().optional(),
+    primaryTumorOrgan: z.string().optional(),
+    stage: z.string().optional(),
+    stageGroup: z.string().optional(),
+    serology: z.string().optional(),
+    clinicalTestResults: z.string().optional(),
+    serumAvailable: z.boolean().optional(),
+    plasmaAvailable: z.boolean().optional(),
+    wholeBloodAvailable: z.boolean().optional(),
+    ffpeTumorAvailable: z.boolean().optional(),
+    frozenTumorAvailable: z.boolean().optional(),
+    er: z.string().optional(),
+    pr: z.string().optional(),
+    hercepTest: z.string().optional(),
+    matchedPairId: z.string().optional(),
+    mirroredPairId: z.string().optional(),
+    ageAtExcision: z.string().optional(),
+
+    // donor properties
+    donorId: z.string().optional(),
+    donor: z.array(optionSchema).optional(),
+    donorInternalId: z.string().optional(),
+    age: z.string().optional(),
+    sex: z.string().optional(),
+    gender: z.string().optional(),
+    race: z.string().optional(),
+    ethnicity: z.string().optional(),
+    treatments: z.array(z.string()).optional(),
+    diagnoses: z.array(diagnosisSchema).optional(),
+    height: z.string().optional(),
+    weight: z.string().optional(),
+    bmi: z.string().optional(),
+    menopausalStatus: z.boolean().optional(),
+    ageAtLastMenstualPeriod: z.string().optional(),
+    numberOfPregnancies: z.string().optional(),
+    numberOfLiveBirths: z.string().optional(),
+    smokingStatus: z.boolean().optional(),
+    cigarettesPerDay: z.string().optional(),
+    alcoholStatus: z.boolean().optional(),
+    drinksPerDay: z.string().optional(),
+    alcoholDuration: z.string().optional(),
+    medications: z.array(z.string()).optional(),
+})

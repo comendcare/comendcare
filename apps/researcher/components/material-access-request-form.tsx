@@ -20,6 +20,7 @@ import type { Option } from "@comend/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card"
+import {ArrowLeft} from "lucide-react";
 
 const accessRequestSchema = z.object({
     // Basic Request Info
@@ -100,7 +101,7 @@ const agreementItems = [
     },
 ]
 
-export default function MaterialAndDataAccessRequestForm() {
+export default function MaterialAccessRequestForm({ materialIds = [] }: { materialIds: string[] }) {
     const { data: session } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
@@ -247,12 +248,35 @@ export default function MaterialAndDataAccessRequestForm() {
     return (
         <div className="w-full max-w-4xl mx-auto p-6 space-y-8">
             <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold">De Novo Sample Collection Request</h1>
+                <Button
+                    variant="secondary"
+                    onClick={() => router.push("/data")}
+                    className="w-min"
+                >
+                    <ArrowLeft/>
+                    Back to all tools
+                </Button>
+                <h1 className="text-3xl font-bold">New Material Access Request</h1>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                     This form is for researchers requesting de novo biosample collection from study participants. Requests will be
                     reviewed based on scientific merit, ethical considerations, participant burden, and logistical feasibility.
                 </p>
             </div>
+
+            {materialIds.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Requested Materials</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                            {materialIds.map(id => (
+                                <li key={id}>{id}</li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+            )}
 
             {selectedOrg && (
                 <Card className="border-blue-200 bg-blue-50">

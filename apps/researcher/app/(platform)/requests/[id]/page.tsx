@@ -30,7 +30,36 @@ export default async function ResearcherRequestsPage({
                 researcherId: true,
                 createdAt: true,
                 updatedAt: true,
-                comments: true
+                openToCollab: true,
+                studyTitle: true,
+                studyDescription: true,
+                justification: true,
+                hasIrbApproval: true,
+                irbStatus: true,
+                hasRisks: true,
+                riskDescription: true,
+                disseminationPlan: true,
+                patientSignificance: true,
+                otherSampleType: true,
+                processingRequirements: true,
+                timeline: true,
+                logisticsContact: true,
+                providesCollectionKit: true,
+                needsCollectionMaterials: true,
+                participantCompensation: true,
+                compensationDetails: true,
+                shippingAddress: true,
+                fedexAccount: true,
+                shippingMethod: true,
+                shippingContact: true,
+                shippingPhone: true,
+                comments: {
+                    select: {
+                        text: true,
+                        author: true,
+                        createdAt: true,
+                    }
+                }
             }
         });
         if (response.success) {
@@ -41,10 +70,6 @@ export default async function ResearcherRequestsPage({
     }
 
     return (
-        <div
-            className="bg-red"
-        >
-            <RequestPage requestData={requestData}/>
-        </div>
+        <RequestPage requestData={requestData}/>
     )
 }

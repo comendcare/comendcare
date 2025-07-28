@@ -9,6 +9,7 @@ import {
     Invitation,
     PlatformNotification,
     Review,
+    Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
@@ -34,9 +35,10 @@ import {
     sendMemberDeletedEmail,
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@comend/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, editBiosampleForm, MemberRequestWithUser, Milestone, Option, optionSchema, RFP} from "@comend/lib/types";
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
+import z from "zod"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -1824,11 +1826,636 @@ export const deleteAsset = withOrganizationAuth(
     }
 )
 
-export const createOrUpdateAsset = withOrganizationAuth(
-    async (organization: Organization, toolData: any, biosampleData?: any, donorData?: any) => {
+
+export const deleteBiosample = withOrganizationAuth(
+    async (_: Organization, id: string) => {
         try {
+            const response = await prisma.biosample.delete({
+                where: {id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    }
+                },
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error deleting tool:", error.message);
+            throw new Error(error.message || "Failed to delete tool.");
+        }
+    }
+)
+
+export const createBiosample = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const biosampleData: any = {
+                id: data.id,
+                types: (data.types || []).map(type => type.value),
+                metadata: {
+                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
+                    otherTypeDetails: data.otherTypeDetails
+                } as JsonObject,
+                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id  || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                anatomicalSite: data.anatomicalSite,
+                preservationMethod: data.preservationMethod,
+                methodOfTransport: data.methodOfTransport,
+                currentCountry: data.currentCountry,
+                countryOfCollection: data.countryOfCollection,
+                collectionDate: data.collectionDate,
+                availability: data.availability,
+                ...(data.quantity !== undefined && data.quantity !== null ? {quantity: JSON.parse(data.quantity)} : undefined),
+                quantityUnit: data.quantityUnit,
+                ...(data.price !== undefined && data.price !== null ? {price: JSON.parse(data.price)} : undefined),
+                priceUnit: data.priceUnit,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                variant: data.variant,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
+            }
+
+            console.log(`biosample data`, biosampleData)
+
+            const response = await prisma.biosample.create({
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                data: {
+                    ...biosampleData,
+                    // create with the given id if it's available. This is useful for situations like 'undo'
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
+                    milestones: {
+                        create: (biosampleData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene 
+                        ? ({gene: {connect: {symbol: biosampleData.gene.value}}})
+                        : undefined),
+                    ...(biosampleData.institution 
+                        ? ({institution: {connect: {id: biosampleData.institution.value}}})
+                        : undefined),
+                    donor: {
+                        connectOrCreate: {
+                            where: {id: data.donorId || nanoid()},
+                            create: {
+                                internalId: data.donorInternalId,
+                                age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
+                                sex: data.sex,
+                                gender: data.gender,
+                                race: data.race,
+                                ethnicity: data.ethnicity,
+                                treatments: data.treatments,
+                                height: typeof data.height === 'string' ? parseInt(data.height, 10) : data.height,
+                                weight: typeof data.weight === 'string' ? parseInt(data.weight, 10) : data.weight,
+                                bmi: typeof data.bmi === 'string' ? parseInt(data.bmi, 10) : data.bmi,
+                                medications: data.medications,
+                                organization: {connect: {id: organization.id}},
+                                diagnoses: {
+                                    create: (data.diagnoses || []).map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
+                                        severity: diagnosis.severity,
+                                        type: {
+                                            connectOrCreate: {
+                                                where: { id: diagnosis.diagnosis[0].value },
+                                                create: { 
+                                                    id: diagnosis.diagnosis[0].value,
+                                                    label: diagnosis.diagnosis[0].label
+                                                }
+                                            }
+                                        }
+                                    }))
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating biosample:", error.message);
+            throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
+export const updateBiosample = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            if (!data.id) {
+                throw new Error("No biosample id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const biosampleData: any = {
+                id: data.id,
+                types: (data.types || []).map(type => type.value),
+                metadata: {
+                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
+                    otherTypeDetails: data.otherTypeDetails
+                } as JsonObject,
+                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id  || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                anatomicalSite: data.anatomicalSite,
+                preservationMethod: data.preservationMethod,
+                methodOfTransport: data.methodOfTransport,
+                currentCountry: data.currentCountry,
+                countryOfCollection: data.countryOfCollection,
+                collectionDate: data.collectionDate,
+                availability: data.availability,
+                ...(data.quantity !== undefined && data.quantity !== null ? {quantity: JSON.parse(data.quantity)} : undefined),
+                quantityUnit: data.quantityUnit,
+                ...(data.price !== undefined && data.price !== null ? {price: JSON.parse(data.price)} : undefined),
+                priceUnit: data.priceUnit,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                variant: data.variant,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
+            }
+
+            const newBiosample = await prisma.biosample.update({
+                where: {id: data.id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                data: {
+                    ...biosampleData,
+                    ...(biosampleData.attachments ? (
+                        {attachments: {
+                            deleteMany: {}, // clear all existing attachments
+                            createMany: {
+                                data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.contacts ? (
+                        {contacts: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.milestones ? (
+                        {milestones: {
+                            deleteMany: {},
+                            create: (biosampleData.milestones || []).map((milestone: any) => ({
+                                milestone: {
+                                    connect: {id: milestone.milestoneId}
+                                }
+                            }))
+                        },}
+                    ): undefined),
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene ? ({
+                        gene: {
+                            connect: {symbol: biosampleData.gene.value}
+                        }
+                    }): {gene: { disconnect: true }}),
+                    ...(biosampleData.institution ? ({
+                        institution: {connect: {id: biosampleData.institution.value}}
+                    }): {institution: {disconnect: true}}),
+                    ...(data.donorId
+                        ? {donor: {connect: {id: data.donorId}}}
+                        : {donor: {disconnect: true}}
+                    )
+                }, 
+            })
+
+            if (data.donorId) {
+                const donor = await prisma.donor.update({
+                    where: {id: data.donorId},
+                    data: {
+                        age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
+                        sex: data.sex,
+                        gender: data.gender,
+                        race: data.race,
+                        ethnicity: data.ethnicity,
+                        treatments: data.treatments,
+                        height: typeof data.height === 'string' ? parseInt(data.height, 10) : data.height,
+                        weight: typeof data.weight === 'string' ? parseInt(data.weight, 10) : data.weight,
+                        bmi: typeof data.bmi === 'string' ? parseInt(data.bmi, 10) : data.bmi,
+                        medications: data.medications,
+                        // organization: {connect: {id: organization.id}},
+                        diagnoses: {
+                            deleteMany: {},
+                            create: data?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
+                                severity: diagnosis.severity,
+                                type: {
+                                    connectOrCreate: {
+                                        where: { id: diagnosis.diagnosis[0].value },
+                                        create: { 
+                                            id: diagnosis.diagnosis[0].value,
+                                            label: diagnosis.diagnosis[0].label
+                                        }
+                                    }
+                                }
+                            }))
+                        }
+                    }
+                })
+            }
+
+            const response = await prisma.biosample.findUnique({
+                where: {id: data.id}
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating biosample:", error.message);
+            throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
+export const createOrUpdateBiosample = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            // import
+            // for import will have to keep track of created donors and map their PAG id to their unique DB id
+            // pass in donor id
+            // if donor id exists, connect to existing donor
+
+            // create & update
+            // separate create & update
+            // create - if donor id exists, create with existing donor
+            // update - if donor id !== biosample.donorId, connect to new donor, then update newly connected donor
+
+            // might have to separate donor and biosample forms
+
+            const {
+                description,
+                types,
+                institutions,
+                otherTypeDetails,
+                attachments,
+                isPinned,
+                isPrivate,
+                contacts,
+                milestones,
+                anatomicalSite,
+                preservationMethod,
+                methodOfTransport,
+                currentCountry,
+                countryOfCollection,
+                collectionDate,
+                biosampleDiagnosis,
+                yearOfExcision,
+                ageAtExcision,
+                genes,
+                variant,
+                age,
+                sex,
+                gender,
+                race,
+                ethnicity,
+                treatments,
+                diagnoses,
+                height,
+                weight,
+                bmi,
+                medications,
+                availability,
+                quantity,
+                quantityUnit,
+                price,
+                priceUnit,
+            } = data;
+
+            console.log(`incoming data`, data)
+
+            const biosampleData: any = {
+                id: data.id,
+                types: (types || []).map(type => type.value),
+                metadata: {
+                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
+                    otherTypeDetails: otherTypeDetails
+                } as JsonObject,
+                pinned: (!isPrivate && isPinned) || false, // only save pinned if tool is public
+                private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+                milestones: (milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id  || '',
+                    })
+                }),
+                ...(description !== undefined && description !== null ? {description} : undefined),
+                ...(attachments ? {attachments} : undefined),
+                ...(contacts ? {contacts} : undefined),
+                anatomicalSite,
+                preservationMethod,
+                methodOfTransport,
+                currentCountry,
+                countryOfCollection,
+                collectionDate,
+                availability,
+                ...(quantity !== undefined && quantity !== null ? {quantity: JSON.parse(quantity)} : undefined),
+                quantityUnit,
+                ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
+                priceUnit,
+                gene: genes && genes.length > 0 ? genes[0] : undefined,
+                variant,
+                institution: institutions && institutions.length > 0 ? institutions[0] : undefined
+                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
+                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
+            }
+
+            const donorData: any = {
+                age: typeof age === 'string' ? parseInt(age, 10) : age,
+                sex,
+                gender,
+                race,
+                ethnicity,
+                treatments,
+                diagnoses,
+                height: typeof height === 'string' ? parseInt(height, 10) : height,
+                weight: typeof weight === 'string' ? parseInt(weight, 10) : weight,
+                bmi: typeof bmi === 'string' ? parseInt(bmi, 10) : bmi,
+                medications,
+            }
+
             console.log(`biosample data`, biosampleData)
             console.log(`donor data`, donorData)
+
+            const response = await prisma.biosample.upsert({
+                where: { id: biosampleData.id || nanoid() },
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                update: {
+                    ...biosampleData,
+                    ...(biosampleData.attachments ? (
+                        {attachments: {
+                            deleteMany: {}, // clear all existing attachments
+                            createMany: {
+                                data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.contacts ? (
+                        {contacts: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                }))
+                            }
+                        }}
+                    ): undefined),
+                    ...(biosampleData.milestones ? (
+                        {milestones: {
+                            deleteMany: {},
+                            create: (biosampleData.milestones || []).map((milestone: any) => ({
+                                milestone: {
+                                    connect: {id: milestone.milestoneId}
+                                }
+                            }))
+                        },}
+                    ): undefined),
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene ? ({
+                        gene: {
+                            connect: {symbol: biosampleData.gene.value}
+                        }
+                    }): {gene: { disconnect: true }}),
+                    ...(biosampleData.institution ? ({
+                        institution: {connect: {id: biosampleData.institution.value}}
+                    }): {institution: {disconnect: true}}),
+                    donor: {
+                        upsert: {
+                            update: {
+                                ...donorData,
+                                organization: {connect: {id: organization.id}},
+                                diagnoses: {
+                                    deleteMany: {},
+                                    create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                        severity: diagnosis.severity,
+                                        type: {
+                                            connectOrCreate: {
+                                                where: { id: diagnosis.diagnosis[0].value },
+                                                create: { 
+                                                    id: diagnosis.diagnosis[0].value,
+                                                    label: diagnosis.diagnosis[0].label
+                                                }
+                                            }
+                                        }
+                                    }))
+                                }
+                            },
+                            create: {
+                                ...donorData,
+                                organization: {connect: {id: organization.id}},
+                                diagnoses: {
+                                    create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                        severity: diagnosis.severity,
+                                        type: {
+                                            connectOrCreate: {
+                                                where: { id: diagnosis.diagnosis[0].value },
+                                                create: { 
+                                                    id: diagnosis.diagnosis[0].value,
+                                                    label: diagnosis.diagnosis[0].label
+                                                }
+                                            }
+                                        }
+                                    }))
+                                }
+                            }
+                        }
+                    }
+                }, 
+                create: {
+                    ...biosampleData,
+                    // create with the given id if it's available. This is useful for situations like 'undo'
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
+                    milestones: {
+                        create: (biosampleData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
+                    private: biosampleData.private || false,
+                    pinned: biosampleData.pinned || false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene ? ({
+                        gene: {
+                            connect: {symbol: biosampleData.gene.value}
+                        }
+                    }): undefined),
+                    ...(biosampleData.institution ? ({
+                        institution: {connect: {id: biosampleData.institution.value}}
+                    }): undefined),
+                    donor: { 
+                        create: { 
+                            ...donorData,
+                            organization: {connect: {id: organization.id}},
+                            diagnoses: {
+                                create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                    severity: diagnosis.severity,
+                                    type: {
+                                        connectOrCreate: {
+                                            where: { id: diagnosis.diagnosis[0].value },
+                                            create: { 
+                                                id: diagnosis.diagnosis[0].value,
+                                                label: diagnosis.diagnosis[0].label
+                                            }
+                                        }
+                                    }
+                                }))
+                            }
+                        } 
+                    }
+                }
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating or updating biosample:", error.message);
+            throw new Error(error.message || "Failed to create or update biosample.");
+        }
+    }
+)
+
+export const createOrUpdateAsset = withOrganizationAuth(
+    async (organization: Organization, toolData: any) => {
+        try {
+            console.log(`tool data`, toolData)
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -1847,7 +2474,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                             }
                         }
                     },
-                    biosample: true
                 },
                 update: {
                     title: toolData.title,
@@ -1890,25 +2516,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
                     metadata: toolData.metadata as InputJsonObject,
-                    biosample: {
-                        upsert: {
-                            update: {
-                                ...biosampleData,
-                                donor: {
-                                    upsert: {
-                                        update: {...donorData},
-                                        create: {...donorData}
-                                    }
-                                }
-                            },
-                            create: {
-                                ...biosampleData,
-                                donor: { 
-                                    create: { ...donorData } 
-                                }
-                            }
-                        }
-                    }
                 },
                 create: {
                     // create with the given id if it's available. This is useful for situations like 'undo'
@@ -1946,14 +2553,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     pinned: toolData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: toolData.metadata as InputJsonObject,
-                    biosample: {
-                        create: {
-                            ...biosampleData,
-                            donor: { 
-                                create: { ...donorData } 
-                            }
-                        }
-                    }
                 },
             })
 
@@ -3994,13 +4593,64 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
             }
         }
 
-        const name = formData.get("orgName") as string;
-        const description = formData.get("description") as string;
-        const organizationId = formData.get("organizationId") as string;
-        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
-        const metadata: JsonObject = metadataValue
-            ? JSON.parse(metadataValue.toString()) as JsonObject
-            : {}
+        const rawData = formData.get("data");
+        if (!rawData || typeof rawData !== "string") {
+            return { error: "Invalid form data." };
+        }
+
+        const parsed = JSON.parse(rawData);
+
+        const {
+            name,
+            description,
+            organizationId,
+            openToCollab,
+            projectDetails,
+            sampleDetails,
+            logistics,
+            commercial,
+            agreements,
+        } = parsed;
+
+        const {
+            studyTitle,
+            studyDescription,
+            justification,
+            hasIrbApproval,
+            irbStatus,
+            hasRisks,
+            riskDescription,
+            disseminationPlan,
+            patientSignificance,
+        } = projectDetails;
+
+        const {
+            sampleTypes,
+            otherSampleType,
+            participantCount,
+            processingRequirements,
+        } = sampleDetails;
+
+        const {
+            timeline,
+            logisticsContact,
+            providesCollectionKit,
+            needsCollectionMaterials,
+            participantCompensation,
+            compensationDetails,
+            shippingAddress,
+            fedexAccount,
+            shippingMethod,
+            shippingContact,
+            shippingPhone,
+        } = logistics;
+
+        const {
+            isCommercial,
+            fundingOrganization,
+        } = commercial;
+
+        const metadata: JsonObject = parsed.metadata ?? {};
 
         try {
             const request = await prisma.materialAndDataAccessRequest.create({
@@ -4008,18 +4658,45 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
                     title: name,
                     description,
                     submittedAt: new Date(),
-                    sampleCount: 0,
+                    sampleCount: participantCount,
+                    openToCollab,
+                    studyTitle,
+                    studyDescription,
+                    justification,
+                    hasIrbApproval,
+                    irbStatus,
+                    hasRisks,
+                    riskDescription,
+                    disseminationPlan,
+                    patientSignificance,
+                    sampleTypes,
+                    otherSampleType,
+                    processingRequirements,
+                    timeline,
+                    logisticsContact,
+                    providesCollectionKit,
+                    needsCollectionMaterials,
+                    participantCompensation,
+                    compensationDetails,
+                    shippingAddress,
+                    fedexAccount,
+                    shippingMethod,
+                    shippingContact,
+                    shippingPhone,
+                    isCommercial,
+                    fundingOrganization,
+                    metadata,
+
                     organization: {
                         connect: {
-                            id: organizationId
+                            id: organizationId,
                         },
                     },
                     researcher: {
                         connect: {
-                            userId: session.user.id
-                        }
+                            userId: session.user.id,
+                        },
                     },
-                    metadata
                 },
             });
 

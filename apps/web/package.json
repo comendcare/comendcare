@@ -9,7 +9,7 @@
   "scripts": {
     "prebuild": "node ../../write-certificates.js",
     "dev": "prisma generate && next dev",
-    "build": "prisma generate && prisma db push && next build",
+    "build": "prisma generate && prisma db push --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -188,6 +188,7 @@
     "react-textarea-autosize": "^8.5.3",
     "react-tweet": "^3.2.1",
     "react-use-measure": "^2.1.1",
+    "react-wrap-balancer": "^1.1.1",
     "recharts": "^2.12.7",
     "rehype-slug": "^6.0.0",
     "remark": "^14.0.3",

@@ -3,6 +3,8 @@ import {Bookmark, Star} from "lucide-react";
 import Image from "next/image";
 import marketplace from "@/public/screenshots/marketplace.png"
 import {motion} from "framer-motion"
+import {NumberTicker} from "@/packages/components/ui/number-ticker";
+import {cn} from "@/packages/lib/utils";
 
 const features = [
     {
@@ -44,13 +46,14 @@ export default function FeatureResearchMarketplace() {
                     </div>
 
                     {/* Text content */}
-                    <div className="lg:ml-auto lg:pl-4 lg:pt-4">
+                    <div className="lg:ml-auto lg:pl-4 lg:pt-4 space-y-16">
                         <div className="lg:max-w-lg">
                             <p className="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
                                 Discover partners
                             </p>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Find complementary patient groups and service providers in our marketplace based on your research plan.
+                                Find complementary patient groups and service providers in our marketplace based on your
+                                research plan.
                             </p>
                             <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
                                 {features.map((feature) => (
@@ -68,6 +71,22 @@ export default function FeatureResearchMarketplace() {
                                 ))}
                             </dl>
                         </div>
+
+                        <motion.div
+                            initial={{y: 20, opacity: 0, filter: "blur(4px)"}}
+                            animate={{y: 0, opacity: 1, filter: "blur(0px)"}}
+                            transition={{duration: 0.5, delay: 4 * 0.1}}
+                            className={cn("group/card relative overflow-hidden rounded-lg")}
+                        >
+                            <div className="flex items-center gap-2">
+                                <p className="text-3xl font-bold text-neutral-700 dark:text-neutral-200">
+                                    <NumberTicker value={2001}/>
+                                </p>
+                            </div>
+                            <p className="mt-4 text-balance text-base text-neutral-600 dark:text-neutral-300">
+                                {`Service providers and counting`}
+                            </p>
+                        </motion.div>
                     </div>
                 </div>
             </div>

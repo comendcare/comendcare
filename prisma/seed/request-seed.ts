@@ -24,13 +24,18 @@ async function main() {
     for (let i = 0; i < NUM_REQUESTS; i++) {
         const org = faker.helpers.arrayElement(organizations);
         const researcher = faker.helpers.arrayElement(researchers);
-
         const institutionIds = researcher.affiliations.map((a) => a.institutionId).filter(Boolean);
 
         if (institutionIds.length === 0) {
             console.warn(`Skipping researcher ${researcher.id} with no affiliated institutions`);
             continue;
         }
+
+        const hasIrbApproval = faker.datatype.boolean();
+        const hasRisks = faker.datatype.boolean();
+        const providesCollectionKit = faker.datatype.boolean();
+        const isCommercial = faker.datatype.boolean();
+        const participantCompensation = faker.datatype.boolean();
 
         try {
             const request = await prisma.materialAndDataAccessRequest.create({
@@ -54,6 +59,33 @@ async function main() {
                         purpose: faker.lorem.words(5),
                         filesRequested: faker.number.int({ min: 1, max: 10 }),
                     },
+
+                    // New fields
+                    openToCollab: faker.datatype.boolean(),
+                    studyTitle: faker.lorem.sentence(),
+                    studyDescription: faker.lorem.paragraphs(2),
+                    justification: faker.lorem.paragraph(),
+                    hasIrbApproval,
+                    irbStatus: hasIrbApproval ? null : faker.lorem.sentence(),
+                    hasRisks,
+                    riskDescription: hasRisks ? faker.lorem.sentence() : null,
+                    disseminationPlan: faker.lorem.sentences(2),
+                    patientSignificance: faker.lorem.sentences(2),
+                    otherSampleType: faker.helpers.arrayElement([null, "hair", "nail", "CSF"]),
+                    processingRequirements: faker.helpers.arrayElement([null, "ship on dry ice", "store at -80C"]),
+                    timeline: `Within ${faker.number.int({ min: 1, max: 6 })} months`,
+                    logisticsContact: faker.internet.email(),
+                    providesCollectionKit,
+                    needsCollectionMaterials: !providesCollectionKit,
+                    participantCompensation,
+                    compensationDetails: participantCompensation ? `$${faker.number.int({ min: 25, max: 100 })} gift card` : null,
+                    shippingAddress: faker.helpers.arrayElement([null, faker.location.streetAddress(true)]),
+                    fedexAccount: faker.helpers.arrayElement([null, faker.finance.accountNumber()]),
+                    shippingMethod: faker.helpers.arrayElement([null, "FedEx", "World Courier"]),
+                    shippingContact: faker.helpers.arrayElement([null, faker.person.fullName()]),
+                    shippingPhone: faker.helpers.arrayElement([null, faker.phone.number()]),
+                    isCommercial,
+                    fundingOrganization: isCommercial ? faker.company.name() : null,
                 },
             });
 

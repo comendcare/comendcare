@@ -13,21 +13,22 @@ import {
 } from "@comend/components/ui/dropdown-menu"
 import {Calendar, Download, Eye, MoreHorizontal, User} from "lucide-react"
 import {useRouter} from "next/navigation";
+import {formatDate} from "@/packages/lib/utils";
 
 const getStatusColor = (status: string) => {
     switch (status) {
         case "APPROVED":
-            return "bg-green-100 text-green-800 border-green-200"
+            return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
         case "PENDING":
-            return "bg-yellow-100 text-yellow-800 border-yellow-200"
+            return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
         case "IN-PROGRESS":
-            return "bg-blue-100 text-blue-800 border-blue-200"
+            return "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100"
         case "REJECTED":
-            return "bg-red-100 text-red-800 border-red-200"
+            return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100"
         case "COMPLETED":
-            return "bg-gray-100 text-gray-800 border-gray-200"
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
         default:
-            return "bg-gray-100 text-gray-800 border-gray-200"
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
     }
 }
 
@@ -69,18 +70,11 @@ export default function RequestCard({request}: any) {
                         <div
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
                             <div>
-                                <span className="font-medium">Request ID:</span> {request.id}
+                                <span className="font-medium">Request ID:</span>&nbsp;{request.id}
                             </div>
                             <div className="flex items-center">
                                 <Calendar className="h-4 w-4 mr-1"/>
-                                <span className="font-medium">Submitted:</span> {request.submittedDate}
-                            </div>
-                            <div className="flex items-center">
-                                <User className="h-4 w-4 mr-1"/>
-                                <span className="font-medium">PI:</span> {request.pi}
-                            </div>
-                            <div>
-                                <span className="font-medium">Institution:</span> {request.institution}
+                                <span className="font-medium">Submitted:</span>&nbsp;{formatDate(request.submittedAt)}
                             </div>
                         </div>
 

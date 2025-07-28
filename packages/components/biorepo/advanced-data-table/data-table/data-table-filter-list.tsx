@@ -127,8 +127,6 @@ export function DataTableFilterList<TData>({
 
     if (!column) return;
 
-    console.log(`filter added`, filters)
-
     debouncedSetFilters([
       ...filters,
       {
@@ -149,7 +147,6 @@ export function DataTableFilterList<TData>({
       updates: Partial<Omit<ExtendedColumnFilter<TData>, "filterId">>,
     ) => {
 
-      console.log(`filter updated`, updates)
       debouncedSetFilters((prevFilters) => {
         const updatedFilters = prevFilters.map((filter) => {
           if (filter.filterId === filterId) {
@@ -227,6 +224,11 @@ export function DataTableFilterList<TData>({
     [filters, onFilterRemove],
   );
 
+  React.useEffect(() => {
+    if (filters.length === 0) onFilterAdd()
+    setTimeout(() => setOpen(true), 300)
+  }, [])
+
   return (
     <Sortable
       value={filters}
@@ -235,7 +237,11 @@ export function DataTableFilterList<TData>({
     >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" onKeyDown={onTriggerKeyDown}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onKeyDown={onTriggerKeyDown} 
+          >
             <ListFilter />
             Filter
             {filters.length > 0 && (

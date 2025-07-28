@@ -1017,7 +1017,7 @@ export const PrivatePublicFormField = ({
             name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
-                <FormControl>
+                <FormControl className="-mt-2">
                         <RadioGroup
                             onValueChange={(value) => {
                                 if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")

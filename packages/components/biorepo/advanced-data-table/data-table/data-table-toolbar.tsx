@@ -11,6 +11,7 @@ import { DataTableViewOptions } from "@comend/components/biorepo/advanced-data-t
 import { Button } from "@comend/components/ui/button";
 import { Input } from "@comend/components/ui/input";
 import { cn } from "@comend/lib/utils";
+import { DataTableSortList } from "./data-table-sort-list";
 
 interface DataTableToolbarProps<TData> extends React.ComponentProps<"div"> {
   table: Table<TData>;
@@ -25,7 +26,7 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const columns = React.useMemo(
-    () => table.getAllColumns().filter((column) => column.getCanFilter()),
+    () => table.getAllColumns().filter((column) => column.columnDef.enableColumnFilter && !column.columnDef.meta?.showInAdvancedOnly),
     [table],
   );
 
@@ -62,6 +63,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         {children}
+        <DataTableSortList table={table} />
         <DataTableViewOptions table={table} />
       </div>
     </div>

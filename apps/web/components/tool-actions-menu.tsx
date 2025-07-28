@@ -16,6 +16,9 @@ import { useSession } from "next-auth/react"
 import { Dialog, DialogPortal } from "@comend/components/ui/dialog"
 import { DeleteAssetDialog } from "comend-pag-platform/components/delete-asset-dialog"
 import { EditAssetDialog } from "./edit-tool-dialog"
+import { revalidate } from "@/packages/lib/revalidate"
+import { usePathname } from "next/navigation"
+import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 
 const toolSelector = (state: ToolState) => ({
     tools: state.tools,
@@ -25,14 +28,18 @@ const toolSelector = (state: ToolState) => ({
 
 export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data'}) => {
     const {data: session} = useSession()
+    const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
     const { tools, createTool } = useToolStore(useShallow(toolSelector))
 
-    const handleDuplicate = () => {
-        if (session?.user?.organizationId) createTool({...tool, id: undefined}, session.user.organizationId)
+    const handleDuplicate = async () => {
+        if (session?.user?.organizationId) {
+            await createTool({...tool, id: undefined}, session.user.organizationId)
+            await revalidate(pathname)
+        }
     }
 
     const handleEdit = () => {
@@ -134,7 +141,11 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
             <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
-                        <DeleteAssetDialog toolId={tool.id} />
+                        {type === 'biosample' ? (
+                            <DeleteBiosampleDialog toolId={tool.id} />
+                        ): (
+                            <DeleteAssetDialog toolId={tool.id} />
+                        )}
                     </div>
                 </DialogPortal>
             </Dialog>

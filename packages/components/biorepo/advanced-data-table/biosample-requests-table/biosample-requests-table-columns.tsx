@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
-import { REQUEST_STATUS_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { REQUEST_STATUS_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 
