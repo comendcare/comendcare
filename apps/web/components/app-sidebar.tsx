@@ -69,17 +69,10 @@ const data = {
             match: (path: string) => path.startsWith('/app/tools'),
             subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
                 {
-                    title: "Biosample Requests",
+                    title: "Tool Requests",
                     icon: TestTube,
                     variant: "ghost",
-                    url: `/app/requests/biosample`,
-                    subPages: []
-                },
-                {
-                    title: "Data Requests",
-                    icon: Book,
-                    variant: "ghost",
-                    url: `/app/requests/data`,
+                    url: `/app/requests`,
                     subPages: []
                 }
             ] : []

@@ -107,8 +107,8 @@ export default function RequestToolbar() {
                     <DropdownMenuContent align="end" className="w-[200px]">
                         {[
                             {label: "Recently updated", value: "recently-updated"},
-                            {label: "Newest created", value: "newest-created"},
-                            {label: "Oldest created", value: "oldest-created"},
+                            {label: "Newest (creation date)", value: "newest-created"},
+                            {label: "Oldest (creation date)", value: "oldest-created"},
                         ].map(sort => (
                             <DropdownMenuItem
                                 key={sort.value}
