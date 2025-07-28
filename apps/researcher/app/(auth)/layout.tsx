@@ -2,7 +2,7 @@ import {Metadata} from "next";
 import {ReactNode} from "react";
 
 export const metadata: Metadata = {
-    title: "Admin Login | Comend",
+    title: "Researcher Login | Comend",
 };
 
 export default function AuthLayout({children}: { children: ReactNode }) {
