@@ -2120,7 +2120,6 @@ export const updateBiosample = withOrganizationAuth(
                 const donor = await prisma.donor.update({
                     where: {id: data.donorId},
                     data: {
-                        internalId: data.donorInternalId,
                         age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,
@@ -4594,13 +4593,64 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
             }
         }
 
-        const name = formData.get("orgName") as string;
-        const description = formData.get("description") as string;
-        const organizationId = formData.get("organizationId") as string;
-        const metadataValue: FormDataEntryValue | null = formData.get("metadata")
-        const metadata: JsonObject = metadataValue
-            ? JSON.parse(metadataValue.toString()) as JsonObject
-            : {}
+        const rawData = formData.get("data");
+        if (!rawData || typeof rawData !== "string") {
+            return { error: "Invalid form data." };
+        }
+
+        const parsed = JSON.parse(rawData);
+
+        const {
+            name,
+            description,
+            organizationId,
+            openToCollab,
+            projectDetails,
+            sampleDetails,
+            logistics,
+            commercial,
+            agreements,
+        } = parsed;
+
+        const {
+            studyTitle,
+            studyDescription,
+            justification,
+            hasIrbApproval,
+            irbStatus,
+            hasRisks,
+            riskDescription,
+            disseminationPlan,
+            patientSignificance,
+        } = projectDetails;
+
+        const {
+            sampleTypes,
+            otherSampleType,
+            participantCount,
+            processingRequirements,
+        } = sampleDetails;
+
+        const {
+            timeline,
+            logisticsContact,
+            providesCollectionKit,
+            needsCollectionMaterials,
+            participantCompensation,
+            compensationDetails,
+            shippingAddress,
+            fedexAccount,
+            shippingMethod,
+            shippingContact,
+            shippingPhone,
+        } = logistics;
+
+        const {
+            isCommercial,
+            fundingOrganization,
+        } = commercial;
+
+        const metadata: JsonObject = parsed.metadata ?? {};
 
         try {
             const request = await prisma.materialAndDataAccessRequest.create({
@@ -4608,18 +4658,45 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
                     title: name,
                     description,
                     submittedAt: new Date(),
-                    sampleCount: 0,
+                    sampleCount: participantCount,
+                    openToCollab,
+                    studyTitle,
+                    studyDescription,
+                    justification,
+                    hasIrbApproval,
+                    irbStatus,
+                    hasRisks,
+                    riskDescription,
+                    disseminationPlan,
+                    patientSignificance,
+                    sampleTypes,
+                    otherSampleType,
+                    processingRequirements,
+                    timeline,
+                    logisticsContact,
+                    providesCollectionKit,
+                    needsCollectionMaterials,
+                    participantCompensation,
+                    compensationDetails,
+                    shippingAddress,
+                    fedexAccount,
+                    shippingMethod,
+                    shippingContact,
+                    shippingPhone,
+                    isCommercial,
+                    fundingOrganization,
+                    metadata,
+
                     organization: {
                         connect: {
-                            id: organizationId
+                            id: organizationId,
                         },
                     },
                     researcher: {
                         connect: {
-                            userId: session.user.id
-                        }
+                            userId: session.user.id,
+                        },
                     },
-                    metadata
                 },
             });
 
