@@ -66,6 +66,23 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "donorId",
+            accessorKey: "donorId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="External Donor Id"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "External Donor Id"
+            }
+        },
+        {
             id: "types",
             accessorKey: "types",
             header: ({column}) => (
@@ -334,23 +351,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "donorId",
-            accessorKey: "donorId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="External Donor Id"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
-                    <p>{row.original.donorId}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "External Donor Id"
-            }
-        },
-        {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
             header: ({column}) => (
@@ -488,20 +488,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 showInAdvancedOnly: true,
             }
         },
-        {
-            id: "bmi",
-            accessorKey: "donor.bmi",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="BMI"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "BMI",
-                variant: "range",
-                range: [0, 500],
-                showInAdvancedOnly: true,
-            }
-        },
+        // {
+        //     id: "bmi",
+        //     accessorKey: "donor.bmi",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="BMI"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "BMI",
+        //         variant: "range",
+        //         range: [0, 500],
+        //         showInAdvancedOnly: true,
+        //     }
+        // },
         {
             id: "medications",
             accessorKey: "donor.medications",

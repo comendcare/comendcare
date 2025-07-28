@@ -26,19 +26,19 @@ export const NewToolDialog = ({iconOnly = false, numAssetsPinned, type}: {iconOn
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        Create a tool
+                        {type === 'biosample' ? 'Create Biosample Tool': 'Create Data Tool'}
                     </TooltipContent>
                 </Tooltip>
             ) : (
                 <Button variant={"cta"} onClick={() => setIsOpen(true)}>
                     <Plus />
-                    {`Create a tool`}
+                    {type === 'biosample' ? 'Create Biosample Tool': 'Create Data Tool'}
                 </Button>
             )}
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Create a Tool
+                        {type === 'biosample' ? 'Create Biosample Tool': 'Create Data Tool'}
                     </DialogTitle>
                     <DialogDescription>
                         {`Create your Tool here. Click save when you're done.`}
