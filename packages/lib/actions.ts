@@ -2013,12 +2013,13 @@ export const updateBiosample = withOrganizationAuth(
 
             const biosampleData: any = {
                 id: data.id,
-                types: (data.types || []).map(type => type.value),
+                types: data.types ? data.types.map(type => type.value) : undefined,
                 metadata: {
                     // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
                     otherTypeDetails: data.otherTypeDetails
                 } as JsonObject,
-                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                // pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
@@ -2098,8 +2099,8 @@ export const updateBiosample = withOrganizationAuth(
                             }))
                         },}
                     ): undefined),
-                    private: biosampleData.private || false,
-                    pinned: biosampleData.pinned || false,
+                    private: biosampleData.private !== undefined && biosampleData.private !== null ? biosampleData.private : false,
+                    pinned: biosampleData.pinned !== undefined && biosampleData.pinned !== null ? biosampleData.pinned : false,
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
@@ -2131,21 +2132,23 @@ export const updateBiosample = withOrganizationAuth(
                         bmi: typeof data.bmi === 'string' ? parseInt(data.bmi, 10) : data.bmi,
                         medications: data.medications,
                         // organization: {connect: {id: organization.id}},
-                        diagnoses: {
-                            deleteMany: {},
-                            create: data?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
-                                severity: diagnosis.severity,
-                                type: {
-                                    connectOrCreate: {
-                                        where: { id: diagnosis.diagnosis[0].value },
-                                        create: { 
-                                            id: diagnosis.diagnosis[0].value,
-                                            label: diagnosis.diagnosis[0].label
+                        ...(data.diagnoses ? {
+                            diagnoses: {
+                                deleteMany: {},
+                                create: data?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
+                                    severity: diagnosis.severity,
+                                    type: {
+                                        connectOrCreate: {
+                                            where: { id: diagnosis.diagnosis[0].value },
+                                            create: { 
+                                                id: diagnosis.diagnosis[0].value,
+                                                label: diagnosis.diagnosis[0].label
+                                            }
                                         }
                                     }
-                                }
-                            }))
-                        }
+                                }))
+                            }
+                        } : undefined)
                     }
                 })
             }
@@ -4542,16 +4545,31 @@ export const updateResearcher = withAuth(
                 where: { researcherId: researcher.id },
             });
 
-            // 2. Create new affiliations if provided
             if (Array.isArray(data.affiliations)) {
-                const newAffiliations = data.affiliations.map((a: any) => ({
-                    researcherId: researcher.id,
-                    institutionId: a.value, // `value` is institutionId
-                }));
+                const institutionIds = data.affiliations.map((a: any) => a.value);
 
-                await prisma.affiliation.createMany({
-                    data: newAffiliations,
+                // Validate institutionIds
+                const existingInstitutions = await prisma.institution.findMany({
+                    where: {
+                        id: { in: institutionIds },
+                    },
+                    select: { id: true },
                 });
+
+                const validInstitutionIds = new Set(existingInstitutions.map((i) => i.id));
+
+                const newAffiliations = data.affiliations
+                    .filter((a: any) => validInstitutionIds.has(a.value))
+                    .map((a: any) => ({
+                        researcherId: researcher.id,
+                        institutionId: a.value,
+                    }));
+
+                if (newAffiliations.length > 0) {
+                    await prisma.affiliation.createMany({
+                        data: newAffiliations,
+                    });
+                }
             }
 
             // 3. Update researcher fields
@@ -4585,7 +4603,8 @@ export const updateResearcher = withAuth(
 );
 
 export const createMaterialAndDataAccessRequest = withResearcherAuth(
-    async (formData: FormData) => {
+    async (user: User, formData: FormData) => {
+        console.log("test", formData)
         const session = await getSession()
         if (!session?.user.id) {
             return {

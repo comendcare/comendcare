@@ -254,7 +254,7 @@ export default function MaterialAccessRequestForm({ materialIds = [] }: { materi
                     className="w-min"
                 >
                     <ArrowLeft/>
-                    Back to all tools
+                    Back to biosamples
                 </Button>
                 <h1 className="text-3xl font-bold">New Material Access Request</h1>
                 <p className="text-muted-foreground max-w-2xl mx-auto">

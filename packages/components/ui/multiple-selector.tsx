@@ -448,7 +448,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     className={cn(
                         'min-h-10 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm',
                         {
-                            'px-3 py-2': selected.length !== 0,
+                            'px-2 py-1': selected.length !== 0,
                             'cursor-text': !disabled && selected.length !== 0,
                         },
                         className,
@@ -458,7 +458,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         inputRef?.current?.focus();
                     }}
                 >
-                    <div className="relative flex flex-wrap gap-1">
+                    <div className="relative flex flex-wrap gap-1 items-center">
                         {selected && selected.map((option) => {
                             return (
                                 <Badge

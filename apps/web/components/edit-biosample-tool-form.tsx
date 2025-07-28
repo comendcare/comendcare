@@ -559,7 +559,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("anatomicalSite", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -587,7 +587,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("preservationMethod", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -615,7 +615,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("methodOfTransport", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -643,7 +643,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("currentCountry", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -671,7 +671,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("countryOfCollection", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -691,31 +691,34 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="collectionDate"
                 render={({field}) => (
-                    <FormItem>
-                        <FormLabel>{`Collection Date`}</FormLabel>
-                        <div>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !field.value && "text-muted-foreground"
-                                        )}
-                                    >
-                                    <CalendarIcon className="mr-2" />
-                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                        mode="single"
-                                        selected={field.value || new Date()}
-                                        onSelect={field.onChange}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[100px]">{`Collection Date`}</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal -mt-2 w-full min-h-[40px]",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                        >
+                                        <CalendarIcon className="mr-2" />
+                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value || new Date()}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </FormControl>
+                            <FormMessage />
                         </div>
                     </FormItem>
                 )}
@@ -733,7 +736,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("availability", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -760,7 +763,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                 <div className="w-full"> 
                                 <Input
                                     id="quantity"
-                                    className="w-full"
+                                    className="w-full min-h-[40px]"
                                     placeholder={`Enter a number`}
                                     type="number"
                                     {...field}
@@ -779,7 +782,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
                                 >
-                                    <SelectTrigger className="-mt-2 w-[100px] h-[32px]">
+                                    <SelectTrigger className="-mt-2 w-[100px] min-h-[40px]">
                                         <SelectValue placeholder="Select a value" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -806,7 +809,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                 <div className="w-full">
                                     <Input
                                         id="price"
-                                        className="w-full"
+                                        className="w-full min-h-[40px]"
                                         placeholder={`Enter a number`}
                                         type="number"
                                         {...field}
@@ -825,7 +828,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("priceUnit", newVal)}
                                 >
-                                    <SelectTrigger className="-mt-2 w-[100px] h-[32px]">
+                                    <SelectTrigger className="-mt-2 w-[100px] min-h-[40px]">
                                         <SelectValue placeholder="Select a value" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -851,7 +854,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                             <FormControl className="-mt-2 w-full">
                                 <Input
                                     id="ageAtExcision"
-                                    className="w-full"
+                                    className="w-full min-h-[40px]"
                                     placeholder={`Enter a number`}
                                     type="number"
                                     {...field}
@@ -867,23 +870,26 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="institutions"
                 render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Institutions</FormLabel>
-                        <FormControl>
-                            <MultipleSelector
-                                {...field}
-                                // creatable={true}
-                                maxSelected={1}
-                                triggerSearchOnFocus={true}
-                                onSearch={handleInstitutionAsyncSearch}
-                                placeholder="Search for institutions..."
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={<p>Loading institutions...</p>}
-                                emptyIndicator={<p>No institutions found.</p>}
-                                showHoverCard={false}
-                            />
-                        </FormControl>
-                        <FormMessage/>
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[100px]">Institution</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <MultipleSelector
+                                    {...field}
+                                    // creatable={true}
+                                    maxSelected={1}
+                                    triggerSearchOnFocus={true}
+                                    onSearch={handleInstitutionAsyncSearch}
+                                    placeholder="Search for institutions..."
+                                    hidePlaceholderWhenSelected={true}
+                                    loadingIndicator={<p>Loading institutions...</p>}
+                                    emptyIndicator={<p>No institutions found.</p>}
+                                    showHoverCard={false}
+                                    className="-mt-2 w-full min-h-[40px]"
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </div>
                     </FormItem>
                 )}
             />
@@ -892,26 +898,24 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="genes"
                 render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Related Gene</FormLabel>
-                        <FormControl>
-                            <MultipleSelector
-                                {...field}
-                                onSearch={handleGeneAsyncSearch}
-                                placeholder="Search for genes..."
-                                triggerSearchOnFocus={true}
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={
-                                <p
-                                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                >
-                                    Loading genes...
-                                </p>}
-                                emptyIndicator={<p>No genes found.</p>}
-                                showHoverCard={false}
-                            />
-                        </FormControl>
-                        <FormMessage/>
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                        <div className="w-full">
+                            <FormControl className="w-full">
+                                <MultipleSelector
+                                    {...field}
+                                    onSearch={handleGeneAsyncSearch}
+                                    placeholder="Search for genes..."
+                                    triggerSearchOnFocus={true}
+                                    hidePlaceholderWhenSelected={true}
+                                    loadingIndicator={<p>Loading genes...</p>}
+                                    emptyIndicator={<p>No genes found.</p>}
+                                    showHoverCard={false}
+                                    className="-mt-2 w-full min-h-[40px]"
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </div>
                     </FormItem>
                 )}
             />
@@ -920,13 +924,13 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="variant"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    <FormItem className="w-full flex gap-4 items-center">
                         <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
                         <div className="w-full">
-                            <FormControl className="-mt-2 w-full">
+                            <FormControl className="w-full">
                                 <Input
                                     id="variant"
-                                    className="w-full"
+                                    className="-mt-2 w-full min-h-[40px]"
                                     placeholder={`Enter a variant`}
                                     {...field}
                                 />
@@ -976,8 +980,20 @@ export const DonorFormFields = ({form}: {form: any}) => {
             name="donor"
             render={({field}) => (
                 <FormItem>
-                    <div className="w-full flex items-center justify-between">
-                        <FormLabel>Donor</FormLabel>
+                    <div className="w-full flex items-center justify-end">
+                        {!createNewDonor && (
+                            <FormLabel className="flex items-center gap-1 grow"> 
+                                External Donor ID
+                                <Tooltip delayDuration={0}>
+                                    <TooltipTrigger>
+                                        <Info className="h-4 w-4"/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                        {`This is an encrypted ID automatically generated to protect the donor’s personal health information (PHI). It allows you to reference biosamples without exposing identifiable data. `}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </FormLabel>
+                        )}
                         <div className="flex items-center space-x-2">
                             <Switch 
                                 id="create-new-donor" 
@@ -1024,7 +1040,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("sex", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1052,7 +1068,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("gender", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1082,7 +1098,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("race", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1112,7 +1128,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("ethnicity", newVal)}
                                 >
-                                <SelectTrigger className="-mt-2 w-full h-[32px]">
+                                <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1133,12 +1149,12 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="height"
                 render={({field}) => (
                     <FormItem className="w-full gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Height`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Height (cm)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
                                     id="height"
-                                    className="w-full"
+                                    className="w-full min-h-[40px]"
                                     placeholder={`Enter a number`}
                                     type="number"
                                     {...field}
@@ -1155,12 +1171,12 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="weight"
                 render={({field}) => (
                     <FormItem className="w-full gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Weight`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Weight (kg)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
                                 <Input
                                     id="weight"
-                                    className="w-full"
+                                    className="w-full min-h-[40px]"
                                     placeholder={`Enter a number`}
                                     type="number"
                                     {...field}
@@ -1172,7 +1188,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             />
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="bmi"
                 render={({field}) => (
@@ -1182,7 +1198,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                             <FormControl className="-mt-2 w-full">
                                 <Input
                                     id="bmi"
-                                    className="w-full"
+                                    className="w-full min-h-[40px]"
                                     placeholder={`Enter a number`}
                                     type="number"
                                     {...field}
@@ -1192,7 +1208,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
             </div>
 
             <FormField
@@ -1206,7 +1222,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 <TooltipTrigger>
                                     <Button
                                         variant="secondary"
-                                        className="h-full w-[34px]"
+                                        className="h-[40px] w-[40px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
                                             form.setValue("diagnoses", [...(field.value || []), {diagnosis: undefined, severity: undefined}])
@@ -1224,7 +1240,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         {field?.value && field.value.length > 0 && (
                             <ol className="flex flex-col gap-2">
                                 {field.value.map((value: any, index: number) => (
-                                    <span className="flex gap-2 w-full">
+                                    <span className="flex gap-2 w-full items-center">
                                         <div className="w-full">
                                             <MultipleSelector
                                                 value={value.diagnosis}
@@ -1260,7 +1276,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                                 form.setValue("diagnoses", newValue)
                                             }}
                                         >
-                                        <SelectTrigger className="w-[200px] h-[32px]">
+                                        <SelectTrigger className="w-[200px] min-h-[40px]">
                                             <SelectValue placeholder="Select a value" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -1270,7 +1286,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                         </SelectContent>
                                         </Select>
                                         <Button 
-                                            className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                            className="row-start-1 col-start-3 lg:col-start-4 h-[40px] w-[40px]" 
                                             variant="ghost"
                                             onClick={(e) => {
                                                 e.preventDefault()
@@ -1304,7 +1320,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     <Button
                                         variant="secondary"
                                         // size={"icon"}
-                                        className="h-full w-[34px]"
+                                        className="h-[40px] w-[40px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
                                             form.setValue("treatments", [...(field.value || []),""])
@@ -1326,7 +1342,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                         <div className="w-full">
                                         <Input
                                             id={`treatment-${index}`}
-                                            className="w-full"
+                                            className="w-full min-h-[40px]"
                                             placeholder={`Enter a value`}
                                             value={value}
                                             onChange={(event: React.FormEvent<HTMLInputElement>) => {
@@ -1337,7 +1353,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                         />
                                         </div>
                                         <Button 
-                                            className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                            className="row-start-1 col-start-3 lg:col-start-4 h-[40px] w-[40px]" 
                                             variant="ghost"
                                             onClick={(e) => {
                                                 e.preventDefault()
@@ -1371,7 +1387,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 <TooltipTrigger>
                                     <Button
                                         variant="secondary"
-                                        className="h-full w-[34px]"
+                                        className="h-[40px] w-[40px]"
                                         // size={"icon"}
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
@@ -1390,11 +1406,11 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         {field?.value && field.value.length > 0 && (
                             <ol className="flex flex-col gap-2">
                                 {field.value.map((value: string, index: number) => (
-                                    <span className="flex gap-2 w-full">
+                                    <span className="flex gap-2 w-full items-center">
                                         <div className="w-full">
                                         <Input
                                             id={`medication-${index}`}
-                                            className="w-full"
+                                            className="w-full min-h-[40px]"
                                             placeholder={`Enter a value`}
                                             value={value}
                                             onChange={(event: React.FormEvent<HTMLInputElement>) => {
@@ -1405,7 +1421,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                         />
                                         </div>
                                         <Button 
-                                            className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                            className="row-start-1 col-start-3 lg:col-start-4 h-[40px] w-[40px]" 
                                             variant="ghost"
                                             onClick={(e) => {
                                                 e.preventDefault()

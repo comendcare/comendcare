@@ -19,6 +19,7 @@ import {
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
+import {mergeResearcherData} from "@/apps/researcher/lib/utils";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -1946,3 +1947,39 @@ export const getResearcherFromOrcidApi = withUserAuth(
         }
     }
 );
+
+export const getResearcherWithMergedData = withUserAuth(async () => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No session found" };
+
+    const dbResearcher = await prisma.researcher.findUnique({
+        where: { userId: session.user.id },
+        include: {
+            affiliations: {
+                include: { institution: true },
+            },
+        },
+    });
+
+    if (!dbResearcher) return { success: false, error: "Researcher not found" };
+
+    const hasOrcid = !!dbResearcher.orcid;
+    let openAlexAuthor = null;
+    let openAlexPublications = [];
+
+    if (hasOrcid) {
+        const res = await fetch(`https://api.openalex.org/authors?filter=orcid:${dbResearcher.orcid}`);
+        const openAlexJson = await res.json();
+        openAlexAuthor = openAlexJson.results?.[0] ?? null;
+
+        if (openAlexAuthor?.works_api_url) {
+            const worksRes = await fetch(`${openAlexAuthor.works_api_url}&per-page=25`);
+            const worksJson = await worksRes.json();
+            openAlexPublications = worksJson.results || [];
+        }
+    }
+
+    const merged = mergeResearcherData(dbResearcher, openAlexAuthor, openAlexPublications);
+
+    return { success: true, data: merged };
+});

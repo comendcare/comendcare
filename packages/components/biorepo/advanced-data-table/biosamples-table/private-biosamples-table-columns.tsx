@@ -32,6 +32,7 @@ import {usePathname} from "next/navigation";
 import { Badge } from "@comend/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
@@ -65,6 +66,23 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const pathname = usePathname()
 
     const columns: ColumnDef<any>[] = [
+        {
+            id: "donorId",
+            accessorKey: "donorId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="External Donor Id"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "External Donor Id"
+            }
+        },
         {
             id: "types",
             accessorKey: "types",
@@ -334,23 +352,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "donorId",
-            accessorKey: "donorId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="External Donor Id"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
-                    <p>{row.original.donorId}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "External Donor Id"
-            }
-        },
-        {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
             header: ({column}) => (
@@ -488,20 +489,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 showInAdvancedOnly: true,
             }
         },
-        {
-            id: "bmi",
-            accessorKey: "donor.bmi",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="BMI"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "BMI",
-                variant: "range",
-                range: [0, 500],
-                showInAdvancedOnly: true,
-            }
-        },
+        // {
+        //     id: "bmi",
+        //     accessorKey: "donor.bmi",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="BMI"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "BMI",
+        //         variant: "range",
+        //         range: [0, 500],
+        //         showInAdvancedOnly: true,
+        //     }
+        // },
         {
             id: "medications",
             accessorKey: "donor.medications",
@@ -637,23 +638,37 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Pinned"/>
             ),
             cell: ({row}) => (
-                <Button
-                    onClick={
-                        async () => {
-                            await updateBiosample(
-                                session?.user.organizationId,
-                                {
-                                    id: row.original.id,
-                                    pinned: !row.original.pinned
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            onClick={
+                                async () => {
+                                    await updateBiosample(
+                                        session?.user.organizationId,
+                                        {
+                                            id: row.original.id,
+                                            donorId: row.original.donorId,
+                                            // institution: row.original.institution,
+                                            // diagnoses: row.original.donor.diagnoses,
+                                            isPrivate: row.original.private,
+                                            isPinned: !row.original.pinned
+                                        }
+                                    )
+                                    revalidate(pathname)
                                 }
-                            )
-                            revalidate(pathname)
-                        }
-                    }
-                    variant={'ghost'}
-                >
-                    {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-                </Button>
+                            }
+                            variant={'ghost'}
+                            disabled={row.original.private}
+                        >
+                            {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
+                        </Button>
+                    </TooltipTrigger>
+                    {row.original.private && (
+                        <TooltipContent className="max-w-[200px]" side="left">
+                            <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
             ),
             enableHiding: true,
             enableColumnFilter: true,

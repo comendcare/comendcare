@@ -20,7 +20,7 @@ export default function PublicBiosampleToolsPage({data, pageCount}: { data: Tool
 
     const handleRequestClick = () => {
         const ids = selectedItems.map(item => item.id).join(",");
-        router.push(`/toolkit/new-request?ids=${ids}`);
+        router.push(`/toolkit/new-biosample-request?ids=${ids}`);
     }
 
     return (
