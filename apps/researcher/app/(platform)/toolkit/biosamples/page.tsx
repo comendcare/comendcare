@@ -5,7 +5,7 @@ import {SearchParams} from "@/packages/components/types"
 import {biosampleSearchParamsCache} from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import {getValidFilters} from "@/packages/lib/data-table"
 import PublicBiosampleToolsPage from "~researcher/components/public-biosamples-tools-page"
-import {getAllBiosamples} from "@comend/components/biorepo/advanced-data-table/lib/queries"
+import { getAllBiosamples } from "@/packages/lib/fetchers"
 
 export const dynamic = "force-dynamic";
 

@@ -1,8 +1,7 @@
 import React from "react";
 import {getSession} from "@comend/lib/auth";
 import {getResearcherRequest} from "@comend/lib/fetchers";
-import RequestPage from "~researcher/components/request-page";
-
+import RequestPage from "@comend/components/requests/request-page"
 
 export default async function ResearcherRequestsPage({
                                                          params
