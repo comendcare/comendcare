@@ -1,9 +1,9 @@
-import RequestStats from "~researcher/components/request-stats";
+import RequestStats from "@/packages/components/requests/request-stats";
 import * as React from "react"
-import RequestToolbar from "~researcher/components/request-toolbar";
+import RequestToolbar from "@/packages/components/requests/request-toolbar";
 import {getAllResearcherRequests} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
-import RequestHistory from "~researcher/components/request-history";
+import RequestHistory from "@/packages/components/requests/request-history"
 
 function calculateStats(requests: any[]) {
     const totalRequests = requests.length;

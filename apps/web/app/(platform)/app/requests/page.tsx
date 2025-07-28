@@ -31,12 +31,12 @@ import NoOrganization from "~web/components/no-organization"
 //     return <PrivateBiosampleRequestsPage promises={promises} />
 // }
 
-import RequestStats from "~web/components/request-stats";
+import RequestStats from "@comend/components/requests/request-stats";
 import * as React from "react"
-import RequestToolbar from "~web/components/request-toolbar";
+import RequestToolbar from "@comend/components/requests/request-toolbar";
 import {getAllOrganizationRequests, getAllResearcherRequests} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
-import RequestHistory from "~web/components/request-history";
+import RequestHistory from "@comend/components/requests/request-history";
 
 function calculateStats(requests: any[]) {
     const totalRequests = requests.length;
@@ -44,6 +44,7 @@ function calculateStats(requests: any[]) {
     const approvedRequests = requests.filter(req => req.status === 'APPROVED');
     const pendingRequests = requests.filter(req => req.status === 'PENDING');
     const completedRequests = requests.filter(req => req.status === 'COMPLETED');
+    const rejectedRequests = requests.filter(req => req.status === 'REJECTED')
     // const approvalRate = totalRequests
     //     ? ((approvedRequests.length / totalRequests) * 100).toFixed(0) + "%"
     //     : "0%";
@@ -54,6 +55,7 @@ function calculateStats(requests: any[]) {
         { name: 'Total Requests Recieved', value: totalRequests.toString() },
         { name: 'Pending Requests', value: pendingRequests.length.toString() },
         { name: 'Completed Requests', value: completedRequests.length.toString()},
+        { name: 'Rejected Requests', value: rejectedRequests.length.toString()}
         // { name: 'Samples Received', value: totalSamples.toString() },
         // { name: 'Approval Rate', value: approvalRate },
     ];
