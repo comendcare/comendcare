@@ -11,8 +11,6 @@ import {
 } from "@comend/components/ui/tooltip";
 import { type FlagConfig, flagConfig } from "@comend/lib/config/flag";
 import { Tabs, TabsList, TabsTrigger } from "@comend/components/ui/tabs";
-import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
-import { AssetBulkImportDialog } from "comend-pag-platform/components/asset-bulk-import-dialog";
 
 type FilterFlag = FlagConfig["featureFlags"][number]["value"];
 
