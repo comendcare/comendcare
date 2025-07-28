@@ -19,37 +19,37 @@ export const testimonials = [
         name: "The Rory Belle Foundation",
         image:
             "https://storage.googleapis.com/comend-app-public/1742928808690-Screenshot%202025-03-25%20at%2010.10.42%E2%80%AFAM.png",
-        url: "https://www.rorybelle.org",
+        url: "https://rbf.comend.io/",
     },
     {
         name: "United Leukodystrophy Foundation",
         image:
             "https://storage.googleapis.com/comend-app-public/1742916900035-Screenshot%202025-03-25%20at%2010.34.24%E2%80%AFAM.png",
-        url: "https://ulf.org",
+        url: "https://ulf.comend.io/",
     },
     {
         name: "Aicardi-Goutieres Syndrome Foundation",
         image:
             "https://storage.googleapis.com/comend-app-public/1737992929599-logo.png",
-        url: "https://www.ags-foundation.org",
+        url: "https://agsaa.comend.io/",
     },
-    {
-        name: "CTNNB1",
-        image:
-            "https://storage.googleapis.com/comend-app-public/1746723228258-CTNNB1.png",
-        url: "https://www.ctnnb1.org",
-    },
+    // {
+    //     name: "CTNNB1",
+    //     image:
+    //         "https://storage.googleapis.com/comend-app-public/1746723228258-CTNNB1.png",
+    //     url: "https://www.ctnnb1.org",
+    // },
     {
         name: "SMOC1 Foundation for Hope",
         image:
             "https://storage.googleapis.com/comend-app-public/1741885287779-Screenshot%202025-03-13%20at%201.00.16%E2%80%AFPM.png",
-        url: "https://www.smoc1foundation.org",
+        url: "https://smoc1.comend.io/",
     },
     {
         name: "Project 8p",
         image:
             "https://storage.googleapis.com/comend-app-public/1742234988826-Project%208p%20Logo.jpg",
-        url: "https://project8p.org",
+        url: "https://project8p.comend.io/",
     },
 ];
 
