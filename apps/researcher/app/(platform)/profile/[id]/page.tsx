@@ -1,7 +1,7 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@comend/lib/auth";
-import {getResearcher, getResearcherFromOrcidApi} from "@comend/lib/fetchers";
+import {getResearcher, getResearcherFromOrcidApi, getResearcherWithMergedData} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 
 export default async function CompanyHomePage({
@@ -38,7 +38,7 @@ export default async function CompanyHomePage({
 
     let researcherData
     if (session?.user?.id) {
-        const response = await getResearcherFromOrcidApi(session.user.id)
+        const response = await getResearcherWithMergedData(session.user.id)
         if (response.success) {
             researcherData = response.data
         } else {
@@ -47,8 +47,6 @@ export default async function CompanyHomePage({
     }
 
     return (
-        <div className="w-screen h-screen overflow-auto">
-            <ResearcherProfile researcherData={researcherData}/>
-        </div>
+        <ResearcherProfile researcherData={researcherData}/>
     )
 }

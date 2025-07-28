@@ -24,13 +24,15 @@ import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 
 export default function ResearcherProfile({researcherData}: any) {
-    const publications = researcherData?.publications ?? [];
+    const { openAlex, researcher, publications, mergedFields } = researcherData;
 
-    const openAlex = researcherData?.openAlex ?? {};
+    const institution =
+        researcher?.affiliations?.[0]?.institution?.name ??
+        openAlex?.last_known_institutions?.[0]?.display_name ??
+        "Institution not available";
 
     const displayName = openAlex.display_name || "Unknown Researcher";
     const email = researcherData?.researcher?.email || "Email not available";
-    const institution = openAlex.last_known_institutions?.[0]?.display_name || "Institution not available";
     const location = openAlex.last_known_institutions?.[0]?.country_code || "Country not available";
 
     const metrics = {
@@ -66,13 +68,16 @@ export default function ResearcherProfile({researcherData}: any) {
                                     <h1 className="text-3xl font-bold text-gray-900">
                                         {displayName}
                                     </h1>
-                                    <p className="text-xl text-gray-600 mt-1">Professor of Molecular Biology & Cancer
-                                        Research</p>
+                                    <p className="text-xl text-gray-600 mt-1">
+                                        {mergedFields.title || "Title not available"}
+                                    </p>
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
                                         <div className="flex items-center gap-1">
                                             <Building2 className="w-4 h-4"/>
-                                            <span>University of California, San Francisco</span>
+                                            <span>
+                                                {institution}
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <MapPin className="w-4 h-4"/>

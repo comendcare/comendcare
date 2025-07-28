@@ -1,5 +1,4 @@
 import React from "react";
-import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@comend/lib/auth";
 import {getResearcherRequest} from "@comend/lib/fetchers";
 import RequestPage from "~researcher/components/request-page";

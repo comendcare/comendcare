@@ -6,9 +6,12 @@ import {MaterialAndDataAccessRequest} from "@prisma/client";
 import {useEffect} from "react";
 import {getRequests} from "comend-researcher-hub/lib/fetchers";
 import { Skeleton } from "@comend/components/ui/skeleton";
+import {Button} from "@comend/components/ui/button";
+import { useRouter } from "next/navigation";
 
 
 export default function RequestHistory() {
+    const router = useRouter()
     const {
         searchResults,
         totalResults,
@@ -67,9 +70,17 @@ export default function RequestHistory() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center text-gray-500 mt-4">
-                    <p>No requests found.</p>
-                    <p>Try adjusting your filters or search terms.</p>
+                <div className="flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 mt-4">
+                    <div>
+                        <p>No requests found.</p>
+                        <p>Try adjusting your filters or search terms.</p>
+                    </div>
+                    <Button
+                        onClick={() => router.push("/toolkit/biosamples")}
+                        className="w-min"
+                    >
+                        Create a request
+                    </Button>
                 </div>
             )}
         </>
