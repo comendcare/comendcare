@@ -23,8 +23,8 @@ import {filterColumns} from "@comend/lib/filter-columns";
 // import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "@comend/components/biorepo/advanced-data-table";
 import {nanoid} from "nanoid";
 import { BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option } from "@comend/lib/types";
-import { GetBiosamplesSchema } from "./validations";
 import {mergeResearcherData} from "@/apps/researcher/lib/utils";
+import { GetBiosamplesSchema } from "@comend/components/biorepo/advanced-data-table/lib/validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
