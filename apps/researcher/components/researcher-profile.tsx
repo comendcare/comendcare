@@ -1,5 +1,6 @@
 "use client"
 
+import {useState} from "react"
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
 import {Badge} from "@comend/components/ui/badge"
 import {Button} from "@comend/components/ui/button"
@@ -19,12 +20,31 @@ import {
     TrendingUp,
     Users,
 } from "lucide-react"
-import Link from "next/link"
 import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationPrevious,
+    PaginationNext,
+} from "@comend/components/ui/pagination"
+
 
 export default function ResearcherProfile({researcherData}: any) {
     const {openAlex, researcher, publications, mergedFields} = researcherData;
+
+    const ITEMS_PER_PAGE = 5
+    const [currentPage, setCurrentPage] = useState(1)
+
+    const totalPages = Math.ceil(publications.length / ITEMS_PER_PAGE)
+
+    const paginatedPublications = publications.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    )
+
 
     const institution =
         researcher?.affiliations?.[0]?.institution?.name ??
@@ -248,7 +268,7 @@ export default function ResearcherProfile({researcherData}: any) {
 
                                 <div className="space-y-4">
                                     {publications.length > 0 ?
-                                        publications.map((pub: any, index: number) => (
+                                        paginatedPublications.map((pub: any, index: number) => (
                                             <Card key={index} className="hover:shadow-md transition-shadow">
                                                 <CardContent className="pt-4">
                                                     <div className="flex items-start justify-between gap-4">
@@ -313,6 +333,46 @@ export default function ResearcherProfile({researcherData}: any) {
                                         </div>
                                     }
                                 </div>
+                                {totalPages > 1 && (
+                                    <Pagination>
+                                        <PaginationContent>
+                                            <PaginationItem>
+                                                <PaginationPrevious
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                                                    }}
+                                                />
+                                            </PaginationItem>
+
+                                            {Array.from({ length: totalPages }, (_, i) => (
+                                                <PaginationItem key={i}>
+                                                    <PaginationLink
+                                                        href="#"
+                                                        isActive={currentPage === i + 1}
+                                                        onClick={(e) => {
+                                                            e.preventDefault()
+                                                            setCurrentPage(i + 1)
+                                                        }}
+                                                    >
+                                                        {i + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            ))}
+
+                                            <PaginationItem>
+                                                <PaginationNext
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                                                    }}
+                                                />
+                                            </PaginationItem>
+                                        </PaginationContent>
+                                    </Pagination>
+                                )}
                             </TabsContent>
 
                             <TabsContent value="about" className="space-y-6">

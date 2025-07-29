@@ -168,7 +168,7 @@ export const FeaturedImages = ({
 
             </div>
             <p className="mt-4 text-balance text-base text-neutral-600 dark:text-neutral-300">
-                Trusted by 27+ patient groups
+                Build with the support of rare disease groups.
             </p>
         </div>
     );
