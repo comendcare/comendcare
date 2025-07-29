@@ -3,8 +3,8 @@ import {temporal} from 'zundo';
 import {create} from 'zustand';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-import {getRequests} from "comend-researcher-hub/lib/fetchers";
 import { RequestFiltersType } from '@/packages/lib/types';
+import { getRequests } from '@/packages/lib/fetchers';
 
 export type ViewType = 'grid' | 'list'
 
