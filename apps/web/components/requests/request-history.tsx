@@ -26,7 +26,7 @@ export default function RequestHistory() {
     useEffect(() => {
         const loadInitial = async () => {
             if (!initialized) {
-                initState(filters); // Set initialized to true and filters to default
+                initState(filters, 'organization'); // Set initialized to true and filters to default
                 const response = await getOrganizationRequests(
                     session?.user?.organizationId,
                     {

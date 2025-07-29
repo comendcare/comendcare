@@ -2429,7 +2429,7 @@ export const getResearcherRequests = withResearcherAuth(
     }
 )
 
-export const getRequests = async (
+const getRequests = async (
     input: GetRequestsInput,
     additionalWhere?: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
 ) => {

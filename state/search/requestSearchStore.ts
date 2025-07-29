@@ -4,7 +4,8 @@ import {create} from 'zustand';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { RequestFiltersType } from '@/packages/lib/types';
-import { getRequests } from '@/packages/lib/fetchers';
+import { getOrganizationRequests, getResearcherRequests } from '@/packages/lib/fetchers';
+import { getSession } from 'next-auth/react';
 
 export type ViewType = 'grid' | 'list'
 
@@ -99,7 +100,8 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
 export interface OrganizationSearchState {
     initialized: boolean,
-    initState: (filters: RequestFiltersType) => void,
+    initState: (filters: RequestFiltersType, type: 'organization' | 'researcher') => void,
+    type: 'organization' | 'researcher' | undefined
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
@@ -121,21 +123,44 @@ export interface OrganizationSearchState {
 export const useRequestSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: RequestFiltersType) => {
-                set({initialized: true, filters})
+            initState: (filters: RequestFiltersType, type: 'organization' | 'researcher') => {
+                set({initialized: true, filters, type})
             },
+            type: undefined,
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const response = await getRequests({
-                    searchTerm: newSearch,
-                    filters: get().filters,
-                    sortBy: get().sortBy,
-                    page: 1,
-                })
+                const session = await getSession()
+                let response = undefined
+                switch (get().type) {
+                    case 'researcher': 
+                        response = await getResearcherRequests(
+                            session?.user?.id,
+                            {
+                                searchTerm: newSearch,
+                                filters: get().filters,
+                                sortBy: get().sortBy,
+                                page: 1,
+                            }
+                        )
+                        break;
+                    case 'organization':
+                        response = await getOrganizationRequests(
+                            session?.user?.organizationId,
+                            {
+                                searchTerm: newSearch,
+                                filters: get().filters,
+                                sortBy: get().sortBy,
+                                page: 1,
+                            }
+                        )
+                        break;
+                    default:
+                        break;
+                }
 
                 mixpanelTrack("Search Requests", {
                     "Search Term": newSearch,
-                    "Results": response.total,
+                    "Results": response?.total,
                     "Filters": {
                         "Statuses": get().filters.statuses.map(s => s.label),
                         "Types": get().filters.types.map(t => t.label),
@@ -144,24 +169,47 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
 
                 set({
                     searchTerm: newSearch,
-                    searchResults: response.data,
+                    searchResults: response?.data,
                     lastFetchedPage: 1,
-                    totalResults: response.total,
+                    totalResults: response?.total,
                 })
             },
             sortBy: "recently-updated",
             setSortBy: async (sortBy: string | undefined) => {
-                const response = await getRequests({
-                    searchTerm: get().searchTerm,
-                    filters: get().filters,
-                    sortBy,
-                    page: 1,
-                })
+                const session = await getSession()
+                let response = undefined
+                switch (get().type) {
+                    case 'researcher': 
+                        response = await getResearcherRequests(
+                            session?.user?.id,
+                            {
+                                searchTerm: get().searchTerm,
+                                filters: get().filters,
+                                sortBy,
+                                page: 1,
+                            }
+                        )
+                        break;
+                    case 'organization':
+                        response = await getOrganizationRequests(
+                            session?.user?.organizationId,
+                            {
+                                searchTerm: get().searchTerm,
+                                filters: get().filters,
+                                sortBy,
+                                page: 1,
+                            }
+                        )
+                        break;
+                    default:
+                        break;
+                }
+
                 set({
                     sortBy,
-                    searchResults: response.data,
+                    searchResults: response?.data,
                     lastFetchedPage: 1,
-                    totalResults: response.total,
+                    totalResults: response?.total,
                 })
             },
             lastFetchedPage: 1, // page numbers in TypeSense start at 1
@@ -185,12 +233,34 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
                     ...updatedFilters
                 }
 
-                const response = await getRequests({
-                    searchTerm: get().searchTerm,
-                    filters: newFilters,
-                    sortBy: get().sortBy,
-                    page: 1,
-                })
+                const session = await getSession()
+                let response = undefined
+                switch (get().type) {
+                    case 'researcher': 
+                        response = await getResearcherRequests(
+                            session?.user?.id,
+                            {
+                                searchTerm: get().searchTerm,
+                                filters: newFilters,
+                                sortBy: get().sortBy,
+                                page: 1,
+                            }
+                        )
+                        break;
+                    case 'organization':
+                        response = await getOrganizationRequests(
+                            session?.user?.organizationId,
+                            {
+                                searchTerm: get().searchTerm,
+                                filters: newFilters,
+                                sortBy: get().sortBy,
+                                page: 1,
+                            }
+                        )
+                        break;
+                    default:
+                        break;
+                }
 
                 const recentlySelected = {
                     statuses: getExclusiveToFirstGroup(newFilters, get().filters, 'statuses'),
@@ -227,8 +297,8 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
                 set({
                     filters: newFilters,
                     lastFetchedPage: 1,
-                    searchResults: response.data,
-                    totalResults: response.data.length,
+                    searchResults: response?.data,
+                    totalResults: response?.data?.length,
                 })
             },
             totalResults: undefined,
