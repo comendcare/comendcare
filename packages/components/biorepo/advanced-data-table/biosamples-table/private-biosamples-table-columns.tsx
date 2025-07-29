@@ -192,7 +192,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 variant: "range",
                 range: [0, 1000],
                 unit: 'ml',
-                showInAdvancedOnly: true,
             },
         },
         {
