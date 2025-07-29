@@ -1,17 +1,17 @@
 "use client"
 
-import RequestCard from "~researcher/components/request-card";
 import {useRequestSearchStore} from "@/state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
 import {useEffect} from "react";
-import {getRequests} from "comend-researcher-hub/lib/fetchers";
 import { Skeleton } from "@comend/components/ui/skeleton";
-import {Button} from "@comend/components/ui/button";
+import { getResearcherRequests } from "@/packages/lib/fetchers";
+import RequestCard from "@/packages/components/requests/request-card";
+import { useSession } from "next-auth/react";
+import { Button } from "@/packages/components/ui/button";
 import { useRouter } from "next/navigation";
 
 
 export default function RequestHistory() {
-    const router = useRouter()
     const {
         searchResults,
         totalResults,
@@ -22,18 +22,23 @@ export default function RequestHistory() {
         initialized,
         initState
     } = useRequestSearchStore();
+    const {data: session} = useSession()
+    const router = useRouter()
 
     // Load data on first mount
     useEffect(() => {
         const loadInitial = async () => {
             if (!initialized) {
-                initState(filters); // Set initialized to true and filters to default
-                const response = await getRequests({
-                    searchTerm: '',
-                    filters,
-                    sortBy,
-                    page: 1,
-                });
+                initState(filters, 'researcher'); // Set initialized to true and filters to default
+                const response = await getResearcherRequests(
+                    session?.user?.id,
+                    {
+                        searchTerm: '',
+                        filters,
+                        sortBy,
+                        page: 1,
+                    }
+                );
                 setSearchResults(response.data);
                 setTotalResults(response.total);
             }
@@ -66,15 +71,13 @@ export default function RequestHistory() {
             ) : searchResults.length > 0 ? (
                 <div className="space-y-4">
                     {searchResults.map((request: MaterialAndDataAccessRequest) => (
-                        <RequestCard request={request} key={request.id}/>
+                        <RequestCard request={request} key={request.id} link={`/requests/${request.id}`}/>
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 p-8">
-                    <div>
-                        <p>No requests found.</p>
-                        <p>Try adjusting your filters or search terms.</p>
-                    </div>
+                <div className="text-center text-gray-500 mt-4">
+                    <p>No requests found.</p>
+                    <p>Try adjusting your filters or search terms.</p>
                     <Button
                         onClick={() => router.push("/toolkit/biosamples")}
                         className="w-min"

@@ -1,16 +1,16 @@
 "use client"
 
 import {ArrowLeft, Paperclip} from "lucide-react";
-import RequestPageCommentSection from "~researcher/components/request-page-comment-section";
+import RequestPageCommentSection from "./request-page-comment-section";
 import {MaterialAndDataAccessRequestWithResearcherAndComments} from "@comend/lib/types";
 import {Button} from "@comend/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
 import {Badge} from "@comend/components/ui/badge"
-import RequestPageTermsAndConditionsCard from "~researcher/components/request-page-terms-and-conditions-card";
-import RequestPageRequestStatusCard from "~researcher/components/request-page-request-status-card";
+import RequestPageTermsAndConditionsCard from "./request-page-terms-and-conditions-card";
+import RequestPageRequestStatusCard from "./request-page-request-status-card";
 import {useRouter} from "next/navigation";
-import RequestPageDetailsCard from "~researcher/components/request-page-details-card";
-import RequestPageStudyCard from "~researcher/components/request-page-study-card";
+import RequestPageDetailsCard from "./request-page-details-card";
+import RequestPageStudyCard from "./request-page-study-card";
 
 
 const getStatusBadge = (status: string) => {
@@ -29,7 +29,8 @@ const getStatusBadge = (status: string) => {
     }
 }
 
-export default function RequestPage({requestData}: {
+export default function RequestPage({backLink, requestData}: {
+    backLink: string,
     requestData: MaterialAndDataAccessRequestWithResearcherAndComments
 }) {
     const router = useRouter()
@@ -40,7 +41,7 @@ export default function RequestPage({requestData}: {
                 <div className="col-span-2 flex flex-col space-y-4">
                     <Button
                         variant="secondary"
-                        onClick={() => router.push("/requests")}
+                        onClick={() => router.push(backLink)}
                         className="w-min"
                     >
                         <ArrowLeft/>
@@ -55,7 +56,7 @@ export default function RequestPage({requestData}: {
                                 {requestData?.description ?? "No description provided."}
                             </p>
                         </div>
-                        {getStatusBadge(requestData.status)}
+                        {getStatusBadge(requestData?.status)}
                     </div>
 
                     <RequestPageRequestStatusCard/>

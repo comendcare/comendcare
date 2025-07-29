@@ -6,13 +6,13 @@ import { SearchParams } from "@/packages/components/types"
 import { biosampleSearchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import { getValidFilters } from "@/packages/lib/data-table"
 import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
-import { getBiosamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
 import { NewToolDialog } from "~web/components/edit-tool-dialog"
+import { getBiosamples } from "@/packages/lib/fetchers"
 
 export const dynamic = "force-dynamic";
 
 interface IndexPageProps {
-    searchParams: Promise<SearchParams>;
+    searchParams: Promise<SearchParams>
 }
 
 export default async function BiosampleToolsPage(props: IndexPageProps) {

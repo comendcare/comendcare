@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from "react"
-import CommentReplyDropdown from "~researcher/components/comment-reply-dropdown"
 import {formatDate} from "@comend/lib/format";
+import CommentReplyDropdown from "./comment-reply-dropdown";
 
 export default function Comment(props: {
     requestId: string

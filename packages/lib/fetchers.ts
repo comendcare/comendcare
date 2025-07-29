@@ -2,10 +2,10 @@
 
 import {unstable_cache} from "next/cache"
 import prisma from "@comend/lib/prisma"
-import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {ApiResponse, milestoneCategories, RequestFiltersType, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import {getSession, withOrganizationAuth, withUserAuth} from "@comend/lib/auth";
-import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User} from "@prisma/client";
+import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@comend/lib/auth";
+import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User, Biosample} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
@@ -19,7 +19,12 @@ import {
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
+import {filterColumns} from "@comend/lib/filter-columns";
+// import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "@comend/components/biorepo/advanced-data-table";
+import {nanoid} from "nanoid";
+import { BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option } from "@comend/lib/types";
 import {mergeResearcherData} from "@/apps/researcher/lib/utils";
+import { GetBiosamplesSchema } from "@comend/components/biorepo/advanced-data-table/lib/validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getPublicAssetsForOrganization(
@@ -1842,6 +1847,38 @@ export const getResearcherRequest = withUserAuth(
     }
 );
 
+export const getAllOrganizationRequests = withOrganizationAuth(
+    async (
+        organization: Organization, 
+        request: MaterialAndDataAccessRequest,
+        select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try{
+            const fetchedRequests = await prisma.materialAndDataAccessRequest.findMany({
+                where: {organizationId: organization.id},
+                select
+            })
+
+            if (!fetchedRequests) {
+                return {success: false, error: "Requests not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedRequests
+            };
+        } catch (error: any) {
+            logError("Error fetching requests", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const getAllResearcherRequests = withUserAuth(
     async (
         request: MaterialAndDataAccessRequest,
@@ -1983,3 +2020,560 @@ export const getResearcherWithMergedData = withUserAuth(async () => {
 
     return { success: true, data: merged };
 });
+
+export const getBiosamples = withOrganizationAuth(
+    async (organization: Organization, input: GetBiosamplesSchema): Promise<{ data: Biosample[], pageCount: number }> => {
+        return unstable_cache(
+            async () => {
+                try {
+                    const offset = (input.page - 1) * input.perPage;
+                    const advancedTable =
+                        input.filterFlag === "advancedFilters"
+
+                    let where: any = {};
+                    console.log(`input`, input)
+
+                    if (advancedTable) {
+                        const preProcessedFilters: any = input.filters.map(filter => ({
+                            ...filter,
+                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                            // ...(filter.id === "biosample.volume" 
+                            //         && (
+                            //             (typeof filter.value === 'string' && {value: JSON.parse(filter.value)}) ||
+                            //             (Array.isArray(filter.value) && typeof filter.value[0] === 'string' && {value: filter.value.map(val => JSON.parse(val))})
+                            //         )
+                            //     )
+                        }))
+
+                        where = filterColumns({
+                            filters: preProcessedFilters,
+                            joinOperator: input.joinOperator,
+                        })
+                    } else {
+                        const filters: any[] = []
+                        if (input.title) {
+                            filters.push({
+                                id: 'title',
+                                value: input.title,
+                                variant: 'text',
+                                operator: 'iLike',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.private.length == 1) {
+                            // private only has two options, we only filter if ONE of them
+                            // is selected...
+                            filters.push({
+                                id: 'private',
+                                value: input.private[0],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.types.length > 0) {
+                            filters.push({
+                                id: 'types',
+                                value: input.types,
+                                variant: 'multiSelect',
+                                operator: 'inArray',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.currentCountry) {
+                            filters.push({
+                                id: 'currentCountry',
+                                value: input.currentCountry,
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.countryOfCollection) {
+                            filters.push({
+                                id: 'countryOfCollection',
+                                value: input.countryOfCollection,
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        // if (input.volume) {
+                        //     filters.push({
+                        //         id: 'volume',
+                        //         value: input.volume,
+                        //         variant: 'range',
+                        //         operator: 'isBetween',
+                        //         filterId: nanoid()
+                        //     })
+                        // }
+
+                        where = filterColumns({
+                            filters,
+                            joinOperator: "and"
+                        })
+                    }
+
+                    const orderBy = input.sort.length
+                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                        : [{createdAt: "asc"}];
+
+
+                    const [data, total] = await prisma.$transaction([
+                        prisma.biosample.findMany({
+                            skip: offset,
+                            take: input.perPage,
+                            where: {
+                                ...where,
+                                organizationId: organization.id
+                            },
+                            include: {
+                                milestones: {include: {milestone: true}},
+                                contacts: true,
+                                attachments: true,
+                                gene: true,
+                                donor: {
+                                    include: {diagnoses: {include: {type: true}}}
+                                },
+                                institution: true
+                            },
+                            orderBy,
+                        }),
+                        prisma.biosample.count({where}),
+                    ]);
+
+                    const pageCount = Math.ceil(total / input.perPage);
+                    return {data, pageCount};
+                } catch {
+                    return {data: [], pageCount: 0};
+                }
+            },
+            [JSON.stringify(input)],
+            {revalidate: 1, tags: ["biosamples"]},
+        )();
+    }
+)
+
+export const getAllBiosamples = withResearcherAuth(
+    async (
+        _organization: Organization, // still required by the auth wrapper
+        input: GetBiosamplesSchema
+    ): Promise<{ data: Biosample[]; pageCount: number }> => {
+        try {
+            const offset = (input.page - 1) * input.perPage;
+            const advancedTable = input.filterFlag === "advancedFilters";
+
+            let where: any = {};
+
+            if (advancedTable) {
+                const preProcessedFilters: any = input.filters.map((filter) => ({
+                    ...filter,
+                    ...(filter.id === "private"
+                        ? {value: filter.value === "true" ? true : false}
+                        : undefined),
+                }));
+
+                where = filterColumns({
+                    filters: preProcessedFilters,
+                    joinOperator: input.joinOperator,
+                });
+            } else {
+                const filters: any[] = [];
+
+                if (input.title) {
+                    filters.push({
+                        id: "title",
+                        value: input.title,
+                        variant: "text",
+                        operator: "iLike",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.private.length === 1) {
+                    filters.push({
+                        id: "private",
+                        value: input.private[0],
+                        variant: "select",
+                        operator: "eq",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.types.length > 0) {
+                    filters.push({
+                        id: "types",
+                        value: input.types,
+                        variant: "multiSelect",
+                        operator: "inArray",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.currentCountry) {
+                    filters.push({
+                        id: "currentCountry",
+                        value: input.currentCountry,
+                        variant: "select",
+                        operator: "eq",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.countryOfCollection) {
+                    filters.push({
+                        id: "countryOfCollection",
+                        value: input.countryOfCollection,
+                        variant: "select",
+                        operator: "eq",
+                        filterId: nanoid(),
+                    });
+                }
+
+                if (input.volume) {
+                    filters.push({
+                        id: "volume",
+                        value: input.volume,
+                        variant: "range",
+                        operator: "isBetween",
+                        filterId: nanoid(),
+                    });
+                }
+
+                where = filterColumns({
+                    filters,
+                    joinOperator: "and",
+                });
+            }
+
+            const orderBy = input.sort.length
+                ? input.sort.map((s) => ({
+                    [s.id]: s.desc ? "desc" : "asc",
+                }))
+                : [{createdAt: "asc"}];
+
+            const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
+
+            const [data, total] = await prisma.$transaction([
+                prisma.biosample.findMany({
+                    skip: offset,
+                    take: input.perPage,
+                    where: {
+                        ...where,
+                        // types: {hasSome: toolTypes.map((type) => type.id)},
+                        // OR: [
+                        //     { types: { hasSome: toolTypes.map((type) => type.id) } },
+                        //     { types: { isEmpty: true } },
+                        // ],
+                    },
+                    include: {
+                        milestones: {include: {milestone: true}},
+                        contacts: true,
+                        attachments: true,
+                        donor: true,
+                        institution: true,
+                    },
+                    orderBy,
+                }),
+                prisma.biosample.count({
+                    where: {
+                        ...where,
+                        types: {
+                            hasSome: biosampleTypes
+                                .map((type) => type?.id)
+                                .filter((id): id is string => typeof id === 'string'),
+                        },
+                    },
+                }),
+            ]);
+
+            const pageCount = Math.ceil(total / input.perPage);
+
+            return {data, pageCount};
+        } catch (error) {
+            console.log(error)
+            return {data: [], pageCount: 0};
+        }
+    }
+);
+
+export const getDatasamples = withOrganizationAuth(
+    async (organization: Organization, input: GetBiosamplesSchema) => {
+        return unstable_cache(
+            async () => {
+                try {
+                    const offset = (input.page - 1) * input.perPage;
+                    const advancedTable =
+                        input.filterFlag === "advancedFilters"
+
+                    let where: any = {};
+
+                    if (advancedTable) {
+                        const preProcessedFilters: any = input.filters.map(filter => ({
+                            ...filter,
+                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                        }))
+
+                        where = filterColumns({
+                            filters: preProcessedFilters,
+                            joinOperator: input.joinOperator,
+                        })
+                    } else {
+                        const filters: any[] = []
+                        if (input.title) {
+                            filters.push({
+                                id: 'title',
+                                value: input.title,
+                                variant: 'text',
+                                operator: 'iLike',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.private.length == 1) {
+                            // private only has two options, we only filter if ONE of them
+                            // is selected...
+                            filters.push({
+                                id: 'private',
+                                value: input.private[0],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        if (input.types.length > 0) {
+                            filters.push({
+                                id: 'types',
+                                value: input.types,
+                                variant: 'multiSelect',
+                                operator: 'inArray',
+                                filterId: nanoid()
+                            })
+                        }
+
+                        where = filterColumns({
+                            filters,
+                            joinOperator: "and"
+                        })
+                    }
+
+                    const orderBy = input.sort.length
+                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                        : [{createdAt: "asc"}];
+
+                    const [data, total] = await prisma.$transaction([
+                        prisma.tool.findMany({
+                            skip: offset,
+                            take: input.perPage,
+                            where: {
+                                ...where,
+                                organizationId: organization.id
+                            },
+                            include: {
+                                milestones: {include: {milestone: true}},
+                                contacts: true,
+                                attachments: true,
+                            },
+                            orderBy,
+                        }),
+                        prisma.tool.count({where}),
+                    ]);
+
+                    const pageCount = Math.ceil(total / input.perPage);
+                    return {data, pageCount};
+                } catch {
+                    return {data: [], pageCount: 0};
+                }
+            },
+            [JSON.stringify(input)],
+            {revalidate: 1, tags: ["datasamples"]},
+        )();
+    }
+)
+
+interface GetRequestsInput {
+    searchTerm: string
+    filters: RequestFiltersType
+    sortBy?: string
+    page?: number
+    perPage?: number
+}
+
+const sortByMap: Record<string, any> = {
+    "recently-updated": {updatedAt: "desc"},
+    "newest-created": {createdAt: "desc"},
+    "oldest-created": {createdAt: "asc"},
+}
+
+export const getOrganizationRequests = withOrganizationAuth(
+    async (
+        organization: Organization,
+        input: GetRequestsInput
+    ) => {
+        return await getRequests(input, {organizationId: organization.id})
+    }
+)
+
+export const getResearcherRequests = withResearcherAuth(
+    async (
+        researcher: Researcher,
+        input: GetRequestsInput
+    ) => {
+        return await getRequests(input, {researcherId: researcher.id})
+    }
+)
+
+const getRequests = async (
+    input: GetRequestsInput,
+    additionalWhere?: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
+) => {
+        return unstable_cache(
+            async () => {
+                try {
+                    const page = input.page ?? 1
+                    const perPage = input.perPage ?? 10
+                    const offset = (page - 1) * perPage
+
+                    const filters: any[] = []
+
+                    if (input.searchTerm) {
+                        filters.push({
+                            id: "title",
+                            value: input.searchTerm,
+                            operator: "iLike",
+                            variant: "text",
+                            filterId: nanoid(),
+                        })
+                    }
+
+                    if (input.filters.statuses.length > 0) {
+                        filters.push({
+                            id: "status",
+                            value: input.filters.statuses.map((s: Option) => s.value),
+                            operator: "inArray",
+                            variant: "multiSelect",
+                            filterId: nanoid(),
+                        })
+                    }
+
+                    if (input.filters.types.length > 0) {
+                        filters.push({
+                            id: "type",
+                            value: input.filters.types.map((t: Option) => t.value),
+                            operator: "inArray",
+                            variant: "multiSelect",
+                            filterId: nanoid(),
+                        })
+                    }
+
+                    const where = filterColumns({filters, joinOperator: "and"})
+
+                    const [data, total] = await prisma.$transaction([
+                        prisma.materialAndDataAccessRequest.findMany({
+                            where: {
+                                ...where,
+                                ...additionalWhere
+                            },
+                            skip: offset,
+                            take: perPage,
+                            orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+                        }),
+                        prisma.materialAndDataAccessRequest.count({where}),
+                    ])
+
+                    return {
+                        success: true,
+                        data,
+                        total,
+                    }
+                } catch (err) {
+                    console.error("getRequests error", err)
+                    return {success: false, data: [], total: 0}
+                }
+            },
+            [JSON.stringify(input)],
+            {revalidate: 1, tags: ["requests"]},
+        )()
+}
+
+// export const getRequests = withOrganizationAuth(
+//     async (
+//         // organization: Organization, 
+//         additionalWhere: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
+//         input: GetRequestsInput
+//     ) => {
+//         return unstable_cache(
+//             async () => {
+//                 try {
+//                     const page = input.page ?? 1
+//                     const perPage = input.perPage ?? 10
+//                     const offset = (page - 1) * perPage
+
+//                     const filters: any[] = []
+
+//                     if (input.searchTerm) {
+//                         filters.push({
+//                             id: "title",
+//                             value: input.searchTerm,
+//                             operator: "iLike",
+//                             variant: "text",
+//                             filterId: nanoid(),
+//                         })
+//                     }
+
+//                     if (input.filters.statuses.length > 0) {
+//                         filters.push({
+//                             id: "status",
+//                             value: input.filters.statuses.map(s => s.value),
+//                             operator: "inArray",
+//                             variant: "multiSelect",
+//                             filterId: nanoid(),
+//                         })
+//                     }
+
+//                     if (input.filters.types.length > 0) {
+//                         filters.push({
+//                             id: "type",
+//                             value: input.filters.types.map(t => t.value),
+//                             operator: "inArray",
+//                             variant: "multiSelect",
+//                             filterId: nanoid(),
+//                         })
+//                     }
+
+//                     const where = filterColumns({filters, joinOperator: "and"})
+
+//                     const [data, total] = await prisma.$transaction([
+//                         prisma.materialAndDataAccessRequest.findMany({
+//                             where: {
+//                                 ...where,
+//                                 // organizationId: organization.id
+//                                 ...additionalWhere
+//                             },
+//                             skip: offset,
+//                             take: perPage,
+//                             orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+//                         }),
+//                         prisma.materialAndDataAccessRequest.count({where}),
+//                     ])
+
+//                     return {
+//                         data,
+//                         total,
+//                     }
+//                 } catch (err) {
+//                     console.error("getRequests error", err)
+//                     return {data: [], total: 0}
+//                 }
+//             },
+//             [JSON.stringify(input)],
+//             {revalidate: 1, tags: ["requests"]},
+//         )()
+//     }
+// )

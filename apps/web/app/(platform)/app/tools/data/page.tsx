@@ -5,9 +5,9 @@ import NoOrganization from "~web/components/no-organization"
 import { SearchParams } from "@/packages/components/types"
 import { biosampleSearchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import { getValidFilters } from "@/packages/lib/data-table"
-import { getDatasamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries"
 import { PrivateDatasampleToolsPage } from "~web/components/private-datasample-tools-page"
 import { NewToolDialog } from "~web/components/edit-tool-dialog"
+import { getDatasamples } from "@/packages/lib/fetchers"
 
 export const dynamic = "force-dynamic";
 

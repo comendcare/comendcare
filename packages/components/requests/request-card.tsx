@@ -11,13 +11,45 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
+import { formatDate } from "@comend/lib/utils"
 import {Calendar, Download, Eye, MoreHorizontal, User} from "lucide-react"
 import {useRouter} from "next/navigation";
-import {formatDate} from "@/packages/lib/utils";
-import {getStatusText, getStatusColor} from "~researcher/lib/utils";
 
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case "APPROVED":
+            return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
+        case "PENDING":
+            return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
+        case "IN-PROGRESS":
+            return "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100"
+        case "REJECTED":
+            return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100"
+        case "COMPLETED":
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
+        default:
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
+    }
+}
 
-export default function RequestCard({request}: any) {
+const getStatusText = (status: string) => {
+    switch (status) {
+        case "APPROVED":
+            return "Approved"
+        case "PENDING":
+            return "Under Review"
+        case "IN-PROGRESS":
+            return "In Progress"
+        case "REJECTED":
+            return "Rejected"
+        case "COMPLETED":
+            return "Completed"
+        default:
+            return status
+    }
+}
+
+export default function RequestCard({request, link}: any) {
     const router = useRouter()
 
     return (
@@ -28,7 +60,7 @@ export default function RequestCard({request}: any) {
                         <div className="flex items-center space-x-3 mb-2">
                             <h3
                                 className="text-lg font-semibold text-gray-900 hover:cursor-pointer hover:underline"
-                                onClick={() => router.push(`/requests/${request.id}`)}
+                                onClick={() => router.push(link)}
                             >
                                 {request.title}
                             </h3>

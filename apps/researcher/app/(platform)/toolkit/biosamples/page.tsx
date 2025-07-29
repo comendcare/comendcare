@@ -2,10 +2,10 @@ import React from "react"
 import Image from "next/image"
 import {getSession} from "@comend/lib/auth"
 import {SearchParams} from "@/packages/components/types"
-import {biosampleSearchParamsCache} from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 import {getValidFilters} from "@/packages/lib/data-table"
 import PublicBiosampleToolsPage from "~researcher/components/public-biosamples-tools-page"
-import {getAllBiosamples} from "@comend/components/biorepo/advanced-data-table/lib/queries"
+import { getAllBiosamples } from "@/packages/lib/fetchers"
+import { biosampleSearchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     )
 
     // If there are somehow now biosamples returned, show a message
-    if (data.length === 0) {
+    if (data?.length === 0) {
         return (
             <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                 <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">

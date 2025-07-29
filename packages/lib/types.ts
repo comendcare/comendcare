@@ -22,6 +22,19 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export type RequestFiltersType = {
+    statuses: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    types: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+}
+
 export type MilestoneKey =
     | "Add website and description"
     | "Provide financial & incorporation details"
