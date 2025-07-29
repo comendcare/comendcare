@@ -2488,12 +2488,13 @@ const getRequests = async (
                     ])
 
                     return {
+                        success: true,
                         data,
                         total,
                     }
                 } catch (err) {
                     console.error("getRequests error", err)
-                    return {data: [], total: 0}
+                    return {success: false, data: [], total: 0}
                 }
             },
             [JSON.stringify(input)],

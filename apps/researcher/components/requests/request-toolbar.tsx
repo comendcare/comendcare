@@ -15,6 +15,8 @@ import {
 } from "@comend/components/ui/dropdown-menu"
 import {REQUEST_TYPE_OPTIONS, REQUEST_STATUS_TYPE_OPTIONS} from "@comend/lib/types"
 import {useRequestSearchStore} from "@/state/search/requestSearchStore"
+import { useCallback, useMemo, useState } from "react"
+import { debounce } from "lodash"
 
 export default function RequestToolbar() {
     const {
@@ -25,6 +27,7 @@ export default function RequestToolbar() {
         sortBy,
         setSortBy
     } = useRequestSearchStore()
+    const [query, setQuery] = useState("")
 
     const toggleType = (typeValue: string) => {
         const isActive = filters.types.some(t => t.value === typeValue)
@@ -48,13 +51,31 @@ export default function RequestToolbar() {
         setSortBy(value)
     }
 
+    const handleInputChangeCallback = useCallback(
+        (search: string) => {
+            setSearchTerm(search)
+        },
+        [setSearchTerm]
+    )
+
+    const debounceHandleInputChange = useMemo(
+        () => debounce(handleInputChangeCallback, 500), 
+        []
+    )
+
     return (
         <div className="space-y-4 flex flex-row items-center justify-between">
             <Input
                 placeholder="Search requests..."
                 className="h-8 w-[250px] lg:w-[500px]"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
+                value={query}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const search: string = e.target.value
+                    setQuery(search)
+                    debounceHandleInputChange(search)
+                }}
+                // onChange={e => setSearchTerm(e.target.value)}
+                
             />
             <div className="flex flex-row items-center space-x-2">
                 <DropdownMenu>
