@@ -70,7 +70,7 @@ export default function RequestHistory() {
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 mt-4">
+                <div className="flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 p-8">
                     <div>
                         <p>No requests found.</p>
                         <p>Try adjusting your filters or search terms.</p>

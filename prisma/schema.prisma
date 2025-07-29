@@ -1178,6 +1178,7 @@ model Researcher {
   email                         String?                        @unique /// @encrypted
   emailHash                     String?                        @unique /// @encryption:hash(email)
   title                         String?
+  role                          String?
   name                          String
   researchInterests             String[]
   conditionsOfInterest          String[]

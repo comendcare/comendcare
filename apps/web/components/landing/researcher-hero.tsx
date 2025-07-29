@@ -71,6 +71,7 @@ export const ResearcherHero = () => {
             >
                 <Button
                     className="flex space-x-2 items-center group"
+                    onClick={() => router.push("https://researcher.comend.io/login")}
                 >
                     <span>Sign up</span>
                     <ArrowRight

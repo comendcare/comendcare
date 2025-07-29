@@ -199,7 +199,11 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
             }
 
             toast.success("Data access request submitted successfully!")
-            router.push("/requests")
+            if (watchNeedsLinkedSamples) {
+                router.push("/new-biosample-request")
+            } else {
+                router.push("/requests")
+            }
         } catch (error) {
             console.error(error)
             toast.error("An error occurred during submission.")
@@ -384,6 +388,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="projectDescription"
@@ -397,6 +402,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="dataPurpose"
@@ -410,6 +416,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="fundingSource"
@@ -423,6 +430,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="hasIrbApproval"
@@ -451,6 +459,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             {watchHasIrbApproval === "yes" && (
                                 <FormField
                                     control={form.control}
@@ -466,6 +475,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     )}
                                 />
                             )}
+
                             {watchHasIrbApproval === "no" && (
                                 <FormField
                                     control={form.control}
@@ -481,6 +491,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     )}
                                 />
                             )}
+
                             <FormField
                                 control={form.control}
                                 name="disseminationPlan"
@@ -560,6 +571,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="additionalDataDetails"
@@ -573,6 +585,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="participantSelection"
@@ -599,6 +612,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             {watchParticipantSelection === "select" && (
                                 <FormField
                                     control={form.control}
@@ -640,6 +654,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     )}
                                 />
                             )}
+
                             <FormField
                                 control={form.control}
                                 name="dataCriteria"
@@ -653,6 +668,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="needsLinkedSamples"
@@ -679,6 +695,7 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                     </FormItem>
                                 )}
                             />
+
                             {watchNeedsLinkedSamples === "yes" && (
                                 <Card className="border-orange-200 bg-orange-50">
                                     <CardContent className="pt-4">
