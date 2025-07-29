@@ -6,7 +6,7 @@ import {Organization, Tool} from "@prisma/client";
 import {unstable_cache} from "@comend/lib/unstable-cache"
 import {filterColumns} from "@comend/lib/filter-columns"
 import {nanoid} from "nanoid"
-import type {FiltersType} from "@/state/search/requestSearchStore"
+import { RequestFiltersType } from "@/packages/lib/types";
 
 export const getAllBiosamples = withResearcherAuth(
     async (organization: Organization): Promise<{data: Tool[], pageCount: number}> => {
@@ -30,7 +30,7 @@ export const getAllBiosamples = withResearcherAuth(
 
 interface GetRequestsInput {
     searchTerm: string
-    filters: FiltersType
+    filters: RequestFiltersType
     sortBy?: string
     page?: number
     perPage?: number

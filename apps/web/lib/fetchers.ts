@@ -1,7 +1,6 @@
 "use server"
 import prisma from "@comend/lib/prisma"
 import { filterColumns } from "@/packages/lib/filter-columns"
-import { FiltersType } from "@/state/search/requestSearchStore"
 import {unstable_cache} from "@comend/lib/unstable-cache"
 import { nanoid } from "nanoid"
 import { Organization } from "@prisma/client"
@@ -9,7 +8,7 @@ import { withOrganizationAuth } from "@/packages/lib/auth"
 
 interface GetRequestsInput {
     searchTerm: string
-    filters: FiltersType
+    filters: RequestFiltersType
     sortBy?: string
     page?: number
     perPage?: number

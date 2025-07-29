@@ -68,6 +68,6 @@ export default async function ResearcherRequestsPage({
     }
 
     return (
-        <RequestPage requestData={requestData}/>
+        <RequestPage requestData={requestData} backLink="/requests" />
     )
 }

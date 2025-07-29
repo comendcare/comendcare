@@ -9,7 +9,6 @@ import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-dat
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { getDatasamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/datasamples-table/datasamples-table-columns";
 import { DatasamplesTable } from "@comend/components/biorepo/advanced-data-table/datasamples-table/datasamples-table"
-import { getDatasamples } from "@/packages/components/biorepo/advanced-data-table/lib/queries";
 import { Tool } from "@prisma/client";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {

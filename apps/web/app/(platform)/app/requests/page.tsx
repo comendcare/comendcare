@@ -33,10 +33,10 @@ import NoOrganization from "~web/components/no-organization"
 
 import RequestStats from "@comend/components/requests/request-stats";
 import * as React from "react"
-import RequestToolbar from "@comend/components/requests/request-toolbar";
 import {getAllOrganizationRequests, getAllResearcherRequests} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
-import RequestHistory from "@comend/components/requests/request-history";
+import RequestHistory from "~web/components/requests/request-history";
+import RequestToolbar from "~web/components/requests/request-toolbar";
 
 function calculateStats(requests: any[]) {
     const totalRequests = requests.length;
@@ -84,9 +84,7 @@ export default async function ResearcherAccessRequestsPage() {
     return (
         <div className="flex max-w-screen-xl flex-col mx-auto space-y-8 p-8">
             <RequestStats stats={stats} />
-
             <RequestToolbar />
-
             <RequestHistory />
         </div>
     )

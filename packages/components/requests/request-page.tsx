@@ -29,7 +29,8 @@ const getStatusBadge = (status: string) => {
     }
 }
 
-export default function RequestPage({requestData}: {
+export default function RequestPage({backLink, requestData}: {
+    backLink: string,
     requestData: MaterialAndDataAccessRequestWithResearcherAndComments
 }) {
     const router = useRouter()
@@ -40,7 +41,7 @@ export default function RequestPage({requestData}: {
                 <div className="col-span-2 flex flex-col space-y-4">
                     <Button
                         variant="secondary"
-                        onClick={() => router.push("/requests")}
+                        onClick={() => router.push(backLink)}
                         className="w-min"
                     >
                         <ArrowLeft/>

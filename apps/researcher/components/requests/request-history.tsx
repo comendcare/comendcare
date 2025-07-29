@@ -3,9 +3,10 @@
 import {useRequestSearchStore} from "@/state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
 import {useEffect} from "react";
-import {getRequests} from "comend-researcher-hub/lib/fetchers";
 import { Skeleton } from "@comend/components/ui/skeleton";
-import RequestCard from "./request-card";
+import { getResearcherRequests } from "@/packages/lib/fetchers";
+import RequestCard from "@/packages/components/requests/request-card";
+import { useSession } from "next-auth/react";
 
 
 export default function RequestHistory() {
@@ -19,18 +20,22 @@ export default function RequestHistory() {
         initialized,
         initState
     } = useRequestSearchStore();
+    const {data: session} = useSession()
 
     // Load data on first mount
     useEffect(() => {
         const loadInitial = async () => {
             if (!initialized) {
                 initState(filters); // Set initialized to true and filters to default
-                const response = await getRequests({
-                    searchTerm: '',
-                    filters,
-                    sortBy,
-                    page: 1,
-                });
+                const response = await getResearcherRequests(
+                    session?.user?.organizationId,
+                    {
+                        searchTerm: '',
+                        filters,
+                        sortBy,
+                        page: 1,
+                    }
+                );
                 setSearchResults(response.data);
                 setTotalResults(response.total);
             }

@@ -4,28 +4,16 @@ import {create} from 'zustand';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {getRequests} from "comend-researcher-hub/lib/fetchers";
+import { RequestFiltersType } from '@/packages/lib/types';
 
 export type ViewType = 'grid' | 'list'
-
-export type FiltersType = {
-    statuses: {
-        label: string,
-        value: string,
-        disable?: boolean,
-    }[],
-    types: {
-        label: string,
-        value: string,
-        disable?: boolean,
-    }[],
-}
 
 export const defaultFilters = {
     statuses: [],
     types: [],
 }
 
-function generateFiltersString(filters: FiltersType) {
+function generateFiltersString(filters: RequestFiltersType) {
     let filtersList: string[] = []
     let typesenseFilters = ""
 
@@ -111,7 +99,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
 export interface OrganizationSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => void,
+    initState: (filters: RequestFiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
@@ -124,8 +112,8 @@ export interface OrganizationSearchState {
     setAllResults: (results: any[]) => void,
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
-    filters: FiltersType,
-    setFilters: (updatedFilters: Partial<FiltersType>) => void,
+    filters: RequestFiltersType,
+    setFilters: (updatedFilters: Partial<RequestFiltersType>) => void,
     totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
@@ -133,7 +121,7 @@ export interface OrganizationSearchState {
 export const useRequestSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: FiltersType) => {
+            initState: (filters: RequestFiltersType) => {
                 set({initialized: true, filters})
             },
             searchTerm: '',
@@ -191,7 +179,7 @@ export const useRequestSearchStore = create<OrganizationSearchState>()(
             searchResults: undefined,
             setSearchResults: (results: any[]) => set({searchResults: results}),
             filters: defaultFilters,
-            setFilters: async (updatedFilters: Partial<FiltersType>) => {
+            setFilters: async (updatedFilters: Partial<RequestFiltersType>) => {
                 const newFilters = {
                     ...get().filters,
                     ...updatedFilters

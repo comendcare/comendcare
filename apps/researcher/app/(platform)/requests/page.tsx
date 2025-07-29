@@ -1,9 +1,9 @@
 import RequestStats from "@/packages/components/requests/request-stats";
 import * as React from "react"
-import RequestToolbar from "@/packages/components/requests/request-toolbar";
 import {getAllResearcherRequests} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
-import RequestHistory from "@/packages/components/requests/request-history"
+import RequestToolbar from "~researcher/components/requests/request-toolbar";
+import RequestHistory from "~researcher/components/requests/request-history";
 
 function calculateStats(requests: any[]) {
     const totalRequests = requests.length;
@@ -42,9 +42,7 @@ export default async function ResearcherAccessRequestsPage() {
     return (
         <div className="flex max-w-screen-xl flex-col mx-auto space-y-8 p-8">
             <RequestStats stats={stats} />
-
             <RequestToolbar />
-
             <RequestHistory />
         </div>
     )

@@ -2,7 +2,7 @@
 
 import {unstable_cache} from "next/cache"
 import prisma from "@comend/lib/prisma"
-import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {ApiResponse, milestoneCategories, RequestFiltersType, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
 import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@comend/lib/auth";
 import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User, Biosample} from "@prisma/client";
@@ -19,11 +19,11 @@ import {
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
-
 import {filterColumns} from "@comend/lib/filter-columns";
 // import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "@comend/components/biorepo/advanced-data-table";
 import {nanoid} from "nanoid";
-import { BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option } from "@comend/lib/types";
+import { GetBiosamplesSchema } from "./validations";
 import {mergeResearcherData} from "@/apps/researcher/lib/utils";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
@@ -2396,3 +2396,183 @@ export const getDatasamples = withOrganizationAuth(
         )();
     }
 )
+
+interface GetRequestsInput {
+    searchTerm: string
+    filters: RequestFiltersType
+    sortBy?: string
+    page?: number
+    perPage?: number
+}
+
+const sortByMap: Record<string, any> = {
+    "recently-updated": {updatedAt: "desc"},
+    "newest-created": {createdAt: "desc"},
+    "oldest-created": {createdAt: "asc"},
+}
+
+export const getOrganizationRequests = withOrganizationAuth(
+    async (
+        organization: Organization,
+        input: GetRequestsInput
+    ) => {
+        return await getRequests(input, {organizationId: organization.id})
+    }
+)
+
+export const getResearcherRequests = withResearcherAuth(
+    async (
+        researcher: Researcher,
+        input: GetRequestsInput
+    ) => {
+        return await getRequests(input, {researcherId: researcher.id})
+    }
+)
+
+const getRequests = async (
+    input: GetRequestsInput,
+    additionalWhere?: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
+) => {
+        return unstable_cache(
+            async () => {
+                try {
+                    const page = input.page ?? 1
+                    const perPage = input.perPage ?? 10
+                    const offset = (page - 1) * perPage
+
+                    const filters: any[] = []
+
+                    if (input.searchTerm) {
+                        filters.push({
+                            id: "title",
+                            value: input.searchTerm,
+                            operator: "iLike",
+                            variant: "text",
+                            filterId: nanoid(),
+                        })
+                    }
+
+                    if (input.filters.statuses.length > 0) {
+                        filters.push({
+                            id: "status",
+                            value: input.filters.statuses.map((s: Option) => s.value),
+                            operator: "inArray",
+                            variant: "multiSelect",
+                            filterId: nanoid(),
+                        })
+                    }
+
+                    if (input.filters.types.length > 0) {
+                        filters.push({
+                            id: "type",
+                            value: input.filters.types.map((t: Option) => t.value),
+                            operator: "inArray",
+                            variant: "multiSelect",
+                            filterId: nanoid(),
+                        })
+                    }
+
+                    const where = filterColumns({filters, joinOperator: "and"})
+
+                    const [data, total] = await prisma.$transaction([
+                        prisma.materialAndDataAccessRequest.findMany({
+                            where: {
+                                ...where,
+                                ...additionalWhere
+                            },
+                            skip: offset,
+                            take: perPage,
+                            orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+                        }),
+                        prisma.materialAndDataAccessRequest.count({where}),
+                    ])
+
+                    return {
+                        data,
+                        total,
+                    }
+                } catch (err) {
+                    console.error("getRequests error", err)
+                    return {data: [], total: 0}
+                }
+            },
+            [JSON.stringify(input)],
+            {revalidate: 1, tags: ["requests"]},
+        )()
+}
+
+// export const getRequests = withOrganizationAuth(
+//     async (
+//         // organization: Organization, 
+//         additionalWhere: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
+//         input: GetRequestsInput
+//     ) => {
+//         return unstable_cache(
+//             async () => {
+//                 try {
+//                     const page = input.page ?? 1
+//                     const perPage = input.perPage ?? 10
+//                     const offset = (page - 1) * perPage
+
+//                     const filters: any[] = []
+
+//                     if (input.searchTerm) {
+//                         filters.push({
+//                             id: "title",
+//                             value: input.searchTerm,
+//                             operator: "iLike",
+//                             variant: "text",
+//                             filterId: nanoid(),
+//                         })
+//                     }
+
+//                     if (input.filters.statuses.length > 0) {
+//                         filters.push({
+//                             id: "status",
+//                             value: input.filters.statuses.map(s => s.value),
+//                             operator: "inArray",
+//                             variant: "multiSelect",
+//                             filterId: nanoid(),
+//                         })
+//                     }
+
+//                     if (input.filters.types.length > 0) {
+//                         filters.push({
+//                             id: "type",
+//                             value: input.filters.types.map(t => t.value),
+//                             operator: "inArray",
+//                             variant: "multiSelect",
+//                             filterId: nanoid(),
+//                         })
+//                     }
+
+//                     const where = filterColumns({filters, joinOperator: "and"})
+
+//                     const [data, total] = await prisma.$transaction([
+//                         prisma.materialAndDataAccessRequest.findMany({
+//                             where: {
+//                                 ...where,
+//                                 // organizationId: organization.id
+//                                 ...additionalWhere
+//                             },
+//                             skip: offset,
+//                             take: perPage,
+//                             orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+//                         }),
+//                         prisma.materialAndDataAccessRequest.count({where}),
+//                     ])
+
+//                     return {
+//                         data,
+//                         total,
+//                     }
+//                 } catch (err) {
+//                     console.error("getRequests error", err)
+//                     return {data: [], total: 0}
+//                 }
+//             },
+//             [JSON.stringify(input)],
+//             {revalidate: 1, tags: ["requests"]},
+//         )()
+//     }
+// )
