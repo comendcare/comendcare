@@ -5,6 +5,7 @@ import {unstable_cache} from "@comend/lib/unstable-cache"
 import { nanoid } from "nanoid"
 import { Organization } from "@prisma/client"
 import { withOrganizationAuth } from "@/packages/lib/auth"
+import { RequestFiltersType } from "@/packages/lib/types"
 
 interface GetRequestsInput {
     searchTerm: string
