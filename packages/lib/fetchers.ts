@@ -2222,10 +2222,10 @@ export const getAllBiosamples = withResearcherAuth(
                     });
                 }
 
-                if (input.volume) {
+                if (input.quantity) {
                     filters.push({
-                        id: "volume",
-                        value: input.volume,
+                        id: "quantity",
+                        value: input.quantity,
                         variant: "range",
                         operator: "isBetween",
                         filterId: nanoid(),
