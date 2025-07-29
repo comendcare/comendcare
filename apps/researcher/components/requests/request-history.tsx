@@ -7,6 +7,8 @@ import { Skeleton } from "@comend/components/ui/skeleton";
 import { getResearcherRequests } from "@/packages/lib/fetchers";
 import RequestCard from "@/packages/components/requests/request-card";
 import { useSession } from "next-auth/react";
+import { Button } from "@/packages/components/ui/button";
+import { useRouter } from "next/navigation";
 
 
 export default function RequestHistory() {
@@ -21,6 +23,7 @@ export default function RequestHistory() {
         initState
     } = useRequestSearchStore();
     const {data: session} = useSession()
+    const router = useRouter()
 
     // Load data on first mount
     useEffect(() => {
@@ -75,6 +78,12 @@ export default function RequestHistory() {
                 <div className="text-center text-gray-500 mt-4">
                     <p>No requests found.</p>
                     <p>Try adjusting your filters or search terms.</p>
+                    <Button
+                        onClick={() => router.push("/toolkit/biosamples")}
+                        className="w-min"
+                    >
+                        Create a request
+                    </Button>
                 </div>
             )}
         </>
