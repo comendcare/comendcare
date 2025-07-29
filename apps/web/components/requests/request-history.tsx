@@ -68,7 +68,7 @@ export default function RequestHistory() {
             ) : searchResults.length > 0 ? (
                 <div className="space-y-4">
                     {searchResults.map((request: MaterialAndDataAccessRequest) => (
-                        <RequestCard request={request} key={request.id}/>
+                        <RequestCard request={request} key={request.id} link={`/app/requests/${request.id}`}/>
                     ))}
                 </div>
             ) : (

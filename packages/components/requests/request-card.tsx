@@ -49,7 +49,7 @@ const getStatusText = (status: string) => {
     }
 }
 
-export default function RequestCard({request}: any) {
+export default function RequestCard({request, link}: any) {
     const router = useRouter()
 
     return (
@@ -60,7 +60,7 @@ export default function RequestCard({request}: any) {
                         <div className="flex items-center space-x-3 mb-2">
                             <h3
                                 className="text-lg font-semibold text-gray-900 hover:cursor-pointer hover:underline"
-                                onClick={() => router.push(`/requests/${request.id}`)}
+                                onClick={() => router.push(link)}
                             >
                                 {request.title}
                             </h3>
