@@ -17,8 +17,8 @@ export const dataTableConfig = {
     { label: "Is greater than", value: "gt" as const },
     { label: "Is greater than or equal to", value: "gte" as const },
     { label: "Is between", value: "isBetween" as const },
-    { label: "Is empty", value: "isEmpty" as const },
-    { label: "Is not empty", value: "isNotEmpty" as const },
+    // { label: "Is empty", value: "isEmpty" as const },
+    // { label: "Is not empty", value: "isNotEmpty" as const },
   ],
   dateOperators: [
     { label: "Is", value: "eq" as const },
@@ -29,8 +29,8 @@ export const dataTableConfig = {
     { label: "Is on or after", value: "gte" as const },
     { label: "Is between", value: "isBetween" as const },
     { label: "Is relative to today", value: "isRelativeToToday" as const },
-    { label: "Is empty", value: "isEmpty" as const },
-    { label: "Is not empty", value: "isNotEmpty" as const },
+    // { label: "Is empty", value: "isEmpty" as const },
+    // { label: "Is not empty", value: "isNotEmpty" as const },
   ],
   selectOperators: [
     { label: "Is", value: "eq" as const },

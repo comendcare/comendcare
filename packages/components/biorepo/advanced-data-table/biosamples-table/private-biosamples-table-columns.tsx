@@ -158,8 +158,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Availability"
+                label: "Availability",
+                variant: "select",
+                options: AVAILABILITY_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true
             }
         },
         {
@@ -180,12 +185,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     }
                 </>
             ),
+            enableHiding: true,
             enableColumnFilter: true,
             meta: {
                 label: "Available Quantity",
                 variant: "range",
                 range: [0, 1000],
                 unit: 'ml',
+                showInAdvancedOnly: true,
             },
         },
         {
@@ -285,7 +292,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Preservation Method",
-                variant: "multiSelect",
+                variant: "select",
                 options: SAMPLE_PRESERVATION_METHOD_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true
@@ -306,7 +313,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Anatomical Site",
-                variant: "multiSelect",
+                variant: "select",
                 options: ANATOMICAL_SITE_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -327,7 +334,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Method of Transport",
-                variant: "multiSelect",
+                variant: "select",
                 options: SAMPLE_TRANSPORT_METHOD_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -343,12 +350,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.collectionDate && format(row.original.collectionDate, "MMMM dd, yyyy")}</>
             },
             enableHiding: true,
-            enableColumnFilter: true,
+            // enableColumnFilter: true,
             meta: {
                 label: "Collection Date",
-                variant: "dateRange",
-                icon: CircleDashed,
-                showInAdvancedOnly: true,
+                // variant: "dateRange",
+                // icon: CircleDashed,
+                // showInAdvancedOnly: true,
             }
         },
         {
@@ -363,7 +370,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "age",
+            id: "donor.age",
             accessorKey: "donor.age",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Age at Collection"/>
@@ -377,7 +384,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "sex",
+            id: "donor.sex",
             accessorKey: "donor.sex",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Sex"/>
@@ -391,14 +398,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Sex",
-                variant: "multiSelect",
+                variant: "select",
                 options: DONOR_SEX_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
             }
         },
         {
-            id: "gender",
+            id: "donor.gender",
             accessorKey: "donor.gender",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gender"/>
@@ -412,14 +419,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Gender",
-                variant: "multiSelect",
+                variant: "select",
                 options: DONOR_GENDER_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true
             }
         },
         {
-            id: "race",
+            id: "donor.race",
             accessorKey: "donor.race",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Race"/>
@@ -433,14 +440,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Race",
-                variant: "multiSelect",
+                variant: "select",
                 options: DONOR_RACE_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true
             }
         },
         {
-            id: "ethnicity",
+            id: "donor.ethnicity",
             accessorKey: "donor.ethnicity",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Ethnicity"/>
@@ -454,14 +461,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Ethnicity",
-                variant: "multiSelect",
+                variant: "select",
                 options: DONOR_ETHNICITY_OPTIONS,
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
             }
         },
         {
-            id: "height",
+            id: "donor.height",
             accessorKey: "donor.height",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Height"/>
@@ -476,12 +483,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "weight",
+            id: "donor.weight",
             accessorKey: "donor.weight",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Weight"/>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
                 label: "Weight",
                 variant: "range",
@@ -504,7 +512,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "medications",
+            id: "donor.medications",
             accessorKey: "donor.medications",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Medications"/>
@@ -524,7 +532,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "treatments",
+            id: "donor.treatments",
             accessorKey: "donor.treatments",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Medical Treatments"/>
@@ -672,6 +680,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             enableColumnFilter: true,
+            // meta: {
+            //     label: "Pinned",
+            //     variant: "select",
+            //     options: [
+            //         {
+            //             label: "Pinned",
+            //             value: "true",
+            //         }, {
+            //             label: "Not Pinned",
+            //             value: "false",
+            //         }
+            //     ],
+            //     icon: CircleDashed,
+            // },
             meta: {
                 label: "Pinned",
                 variant: "select",

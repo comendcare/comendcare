@@ -2037,12 +2037,7 @@ export const getBiosamples = withOrganizationAuth(
                         const preProcessedFilters: any = input.filters.map(filter => ({
                             ...filter,
                             ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                            // ...(filter.id === "biosample.volume" 
-                            //         && (
-                            //             (typeof filter.value === 'string' && {value: JSON.parse(filter.value)}) ||
-                            //             (Array.isArray(filter.value) && typeof filter.value[0] === 'string' && {value: filter.value.map(val => JSON.parse(val))})
-                            //         )
-                            //     )
+                            ...(filter.id === "pinned" ? {value: filter.value === "true" ? true : false} : undefined),
                         }))
 
                         where = filterColumns({
@@ -2073,6 +2068,18 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
+                        if (input.pinned.length === 1) {
+                            // pinned only has two options, we only filter if ONE of them
+                            // is selected...
+                            filters.push({
+                                id: 'pinned',
+                                value: input.pinned[0],
+                                variant: 'select',
+                                operator: 'eq',
+                                filterId: nanoid()
+                            })
+                        }
+
                         if (input.types.length > 0) {
                             filters.push({
                                 id: 'types',
@@ -2083,35 +2090,15 @@ export const getBiosamples = withOrganizationAuth(
                             })
                         }
 
-                        if (input.currentCountry) {
+                        if (input.volume) {
                             filters.push({
-                                id: 'currentCountry',
-                                value: input.currentCountry,
-                                variant: 'select',
-                                operator: 'eq',
+                                id: 'volume',
+                                value: input.volume,
+                                variant: 'range',
+                                operator: 'isBetween',
                                 filterId: nanoid()
                             })
                         }
-
-                        if (input.countryOfCollection) {
-                            filters.push({
-                                id: 'countryOfCollection',
-                                value: input.countryOfCollection,
-                                variant: 'select',
-                                operator: 'eq',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        // if (input.volume) {
-                        //     filters.push({
-                        //         id: 'volume',
-                        //         value: input.volume,
-                        //         variant: 'range',
-                        //         operator: 'isBetween',
-                        //         filterId: nanoid()
-                        //     })
-                        // }
 
                         where = filterColumns({
                             filters,
