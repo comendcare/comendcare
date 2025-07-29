@@ -56,7 +56,7 @@ export default function RequestPage({backLink, requestData}: {
                                 {requestData?.description ?? "No description provided."}
                             </p>
                         </div>
-                        {getStatusBadge(requestData.status)}
+                        {getStatusBadge(requestData?.status)}
                     </div>
 
                     <RequestPageRequestStatusCard/>

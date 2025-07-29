@@ -98,20 +98,20 @@ export default function RequestPageRequestStatusCard() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Request ID</p>
-                                <p className="text-lg font-semibold">{requestData.id}</p>
+                                <p className="text-lg font-semibold">{requestData?.id}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Submitted</p>
-                                <p className="text-lg font-semibold">{new Date(requestData.submittedDate).toLocaleDateString()}</p>
+                                <p className="text-lg font-semibold">{new Date(requestData?.submittedDate).toLocaleDateString()}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Principal Investigator</p>
-                                <p className="text-lg font-semibold">{requestData.principalInvestigator}</p>
+                                <p className="text-lg font-semibold">{requestData?.principalInvestigator}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Expected Decision</p>
                                 <p className="text-lg font-semibold">
-                                    {new Date(requestData.estimatedCompletion).toLocaleDateString()}
+                                    {new Date(requestData?.estimatedCompletion).toLocaleDateString()}
                                 </p>
                             </div>
                         </div>
@@ -126,13 +126,13 @@ export default function RequestPageRequestStatusCard() {
                         Review Progress
                     </CardTitle>
                     <CardDescription>
-                        Your request is currently in step {requestData.currentStep} of 5
+                        Your request is currently in step {requestData?.currentStep} of 5
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-6">
-                        <Progress value={(requestData.currentStep / 5) * 100} className="h-2"/>
-                        <p className="text-sm text-gray-600 mt-2">{requestData.currentStep} of 5 steps completed</p>
+                        <Progress value={(requestData?.currentStep / 5) * 100} className="h-2"/>
+                        <p className="text-sm text-gray-600 mt-2">{requestData?.currentStep} of 5 steps completed</p>
                     </div>
 
                     <div className="space-y-4">

@@ -9,14 +9,14 @@ export default function RequestPageCommentSection({requestData}: {
         <section className="bg-white antialiased">
             <div className="w-full mx-auto space-y-8">
                 <WriteAComment
-                    requestId={requestData.id}
+                    requestId={requestData?.id}
                 />
                 {
-                    requestData.comments.map(
+                    requestData?.comments.map(
                         (commentData: any, commentIndex: number) => (
                             <div key={commentIndex}>
                                 <Comment
-                                    requestId={requestData.id}
+                                    requestId={requestData?.id}
                                     commentData={commentData}
                                 />
                             </div>
