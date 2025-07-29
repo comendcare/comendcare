@@ -202,7 +202,7 @@ export const CloudHeroSection = () => {
             {/* Hero section with a ref to observe visibility */}
             <div
                 ref={heroRef}
-                className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto px-4 py-16 md:py-24 mt-16"
+                className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto px-4 py-8 md:py-24 mt-8"
                 aria-describedby="hero-description"
             >
                 {/* Decorative banner with attribution */}
@@ -253,7 +253,7 @@ export const CloudHeroSection = () => {
                         initial={{opacity: 0, y: 50}}
                         animate={{opacity: 1, y: [50, -10, 0]}}
                         transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                        className="max-w-screen-lg text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
+                        className="max-w-screen-lg text-3xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
                     >
                         The drug development platform
                         <Highlight className="text-black dark:text-white">
@@ -269,7 +269,7 @@ export const CloudHeroSection = () => {
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="flex flex-col justify-center items-center mx-auto space-y-4"
                 >
-                    <p className="max-w-screen-sm text-2xl">
+                    <p className="max-w-screen-sm text-xl">
                         {`Plan, partner, and showcase your progress with the rare disease ecosystem.`}
                     </p>
                     <PulsatingButton

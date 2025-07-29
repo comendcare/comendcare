@@ -69,11 +69,10 @@ export const ResearcherHero = () => {
                 }}
                 className="flex items-center gap-4 justify-center mt-6 relative z-10"
             >
-                <Button>Get started</Button>
                 <Button
                     className="flex space-x-2 items-center group"
                 >
-                    <span>Contact us</span>
+                    <span>Sign up</span>
                     <ArrowRight
                         className="text-muted group-hover:translate-x-1 stroke-[1px] h-3 w-3 transition-transform duration-200 dark:text-muted-dark"/>
                 </Button>
