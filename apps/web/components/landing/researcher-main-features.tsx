@@ -172,11 +172,11 @@ const Analytics: React.FC<{
                                 className="flex flex-row space-x-6"
                             >
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem/>
+                                    <RadioGroupItem value={""}/>
                                     <Label htmlFor="commercial-yes">Yes</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem/>
+                                    <RadioGroupItem value={""}/>
                                     <Label htmlFor="commercial-no">No</Label>
                                 </div>
                             </RadioGroup>
