@@ -2484,7 +2484,12 @@ const getRequests = async (
                             take: perPage,
                             orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
                         }),
-                        prisma.materialAndDataAccessRequest.count({where}),
+                        prisma.materialAndDataAccessRequest.count({
+                            where: {
+                                ...where,
+                                ...additionalWhere
+                            }
+                        })
                     ])
 
                     return {

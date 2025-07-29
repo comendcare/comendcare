@@ -393,6 +393,6 @@ export function withResearcherAuth(action: any) {
             return {error: "Not authorized: researcher doesn't exist"}
         }
 
-        return action(user, ...args)
+        return action(researcher, ...args)
     }
 }

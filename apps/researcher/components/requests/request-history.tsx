@@ -3,12 +3,12 @@
 import {useRequestSearchStore} from "@/state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
 import {useEffect} from "react";
-import { Skeleton } from "@comend/components/ui/skeleton";
-import { getResearcherRequests } from "@/packages/lib/fetchers";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import {getResearcherRequests} from "@/packages/lib/fetchers";
 import RequestCard from "@/packages/components/requests/request-card";
-import { useSession } from "next-auth/react";
-import { Button } from "@/packages/components/ui/button";
-import { useRouter } from "next/navigation";
+import {useSession} from "next-auth/react";
+import {Button} from "@/packages/components/ui/button";
+import {useRouter} from "next/navigation";
 
 
 export default function RequestHistory() {
@@ -28,7 +28,7 @@ export default function RequestHistory() {
     // Load data on first mount
     useEffect(() => {
         const loadInitial = async () => {
-            if (!initialized) {
+            if (session?.user?.id && !initialized) {
                 initState(filters, 'researcher'); // Set initialized to true and filters to default
                 const response = await getResearcherRequests(
                     session?.user?.id,
@@ -44,7 +44,7 @@ export default function RequestHistory() {
             }
         };
         loadInitial();
-    }, [initialized, filters, sortBy, setSearchResults, setTotalResults, initState]);
+    }, [session, initialized, filters, sortBy, setSearchResults, setTotalResults, initState]);
 
     const isLoading = !initialized || searchResults === undefined;
 
@@ -75,9 +75,11 @@ export default function RequestHistory() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center text-gray-500 mt-4">
-                    <p>No requests found.</p>
-                    <p>Try adjusting your filters or search terms.</p>
+                <div className="flex flex-col space-y-4 justify-center items-center text-center text-gray-500 mt-4">
+                    <div className="flex flex-col">
+                        <p>No requests found.</p>
+                        <p>Try adjusting your filters or search terms.</p>
+                    </div>
                     <Button
                         onClick={() => router.push("/toolkit/biosamples")}
                         className="w-min"
