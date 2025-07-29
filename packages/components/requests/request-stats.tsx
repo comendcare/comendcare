@@ -8,8 +8,8 @@ type Stat = {
 
 export default function RequestStats({stats}: {stats: Stat[]}) {
     return (
-        <div className="bg-white">
-            <div className="mx-auto max-w-7xl">
+        <div className="bg-white w-full">
+            <div className="mx-auto max-w-7xl w-full">
                 <div className="grid grid-cols-1 gap-px bg-gray-200 sm:grid-cols-2 lg:grid-cols-4">
                     {stats.map((stat: Stat) => (
                         <div key={stat.name} className="bg-white px-4 py-6 sm:px-6 lg:px-8">

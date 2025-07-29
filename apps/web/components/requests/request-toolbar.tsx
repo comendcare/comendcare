@@ -64,7 +64,7 @@ export default function RequestToolbar() {
     )
 
     return (
-        <div className="space-y-4 flex flex-row items-center justify-between">
+        <div className="w-full space-y-4 flex flex-row items-center justify-between">
             <Input
                 placeholder="Search requests..."
                 className="h-8 w-[250px] lg:w-[500px]"

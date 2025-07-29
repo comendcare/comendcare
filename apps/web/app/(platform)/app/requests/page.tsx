@@ -33,7 +33,7 @@ import NoOrganization from "~web/components/no-organization"
 
 import RequestStats from "@comend/components/requests/request-stats";
 import * as React from "react"
-import {getOrganizationRequests} from "@/packages/lib/fetchers";
+import {getAllOrganizationRequests} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
 import RequestHistory from "~web/components/requests/request-history";
 import RequestToolbar from "~web/components/requests/request-toolbar";
@@ -60,7 +60,7 @@ export default async function ResearcherAccessRequestsPage() {
 
     let requestsData = []
     if (session?.user?.id) {
-        const response = await getOrganizationRequests(session?.user?.organizationId)
+        const response = await getAllOrganizationRequests(session?.user?.organizationId)
         if (response.success) {
             requestsData = response.data
         } else {
@@ -73,7 +73,7 @@ export default async function ResearcherAccessRequestsPage() {
     if (!orgId) return <NoOrganization />
 
     return (
-        <div className="flex max-w-screen-xl flex-col mx-auto space-y-8 p-8">
+        <div className="w-full max-w-screen-xl flex flex-col mx-auto space-y-8 p-8">
             <RequestStats stats={stats} />
             <RequestToolbar />
             <RequestHistory />

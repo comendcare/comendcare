@@ -7,6 +7,7 @@ import { Skeleton } from "@comend/components/ui/skeleton";
 import { getOrganizationRequests } from "@/packages/lib/fetchers";
 import RequestCard from "@/packages/components/requests/request-card";
 import { useSession } from "next-auth/react";
+import { Card, CardContent } from "@/packages/components/ui/card";
 
 
 export default function RequestHistory() {
@@ -72,7 +73,7 @@ export default function RequestHistory() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center text-gray-500 mt-4">
+                <div className="w-full text-center text-gray-500 mt-4">
                     <p>No requests found.</p>
                     <p>Try adjusting your filters or search terms.</p>
                 </div>
