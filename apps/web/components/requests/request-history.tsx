@@ -2,12 +2,20 @@
 
 import {useRequestSearchStore} from "@/state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { getOrganizationRequests } from "@/packages/lib/fetchers";
 import RequestCard from "@/packages/components/requests/request-card";
 import { useSession } from "next-auth/react";
-import { Card, CardContent } from "@/packages/components/ui/card";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink, PaginationNext,
+    PaginationPrevious
+} from "@/packages/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 5;
 
 
 export default function RequestHistory() {
@@ -22,11 +30,13 @@ export default function RequestHistory() {
         initState
     } = useRequestSearchStore();
     const {data: session} = useSession()
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil((totalResults ?? 0) / ITEMS_PER_PAGE);
 
     // Load data on first mount
     useEffect(() => {
         const loadInitial = async () => {
-            if (!initialized) {
+            if (session?.user?.organizationId && initialized) {
                 initState(filters, 'organization'); // Set initialized to true and filters to default
                 const response = await getOrganizationRequests(
                     session?.user?.organizationId,
@@ -34,7 +44,8 @@ export default function RequestHistory() {
                         searchTerm: '',
                         filters,
                         sortBy,
-                        page: 1,
+                        perPage: ITEMS_PER_PAGE,
+                        page: currentPage,
                     }
                 );
                 setSearchResults(response.data);
@@ -42,7 +53,7 @@ export default function RequestHistory() {
             }
         };
         loadInitial();
-    }, [initialized, filters, sortBy, setSearchResults, setTotalResults, initState]);
+    }, [session, initialized, filters, sortBy, setSearchResults, setTotalResults, initState]);
 
     const isLoading = !initialized || searchResults === undefined;
 
@@ -71,6 +82,46 @@ export default function RequestHistory() {
                     {searchResults.map((request: MaterialAndDataAccessRequest) => (
                         <RequestCard request={request} key={request.id} link={`/app/requests/${request.id}`}/>
                     ))}
+                    {totalPages > 1 && (
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                                        }}
+                                    />
+                                </PaginationItem>
+
+                                {Array.from({ length: totalPages }, (_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={currentPage === i + 1}
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                setCurrentPage(i + 1)
+                                            }}
+                                        >
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+
+                                <PaginationItem>
+                                    <PaginationNext
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                                        }}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    )}
                 </div>
             ) : (
                 <div className="w-full text-center text-gray-500 mt-4">
