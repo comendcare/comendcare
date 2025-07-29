@@ -683,7 +683,10 @@ export default function DataAccessRequestForm({ datasetIds = [] }: { datasetIds:
                                 <Card className="border-orange-200 bg-orange-50">
                                     <CardContent className="pt-4">
                                         <p className="text-sm text-orange-700">
-                                            Please complete a sample request form to request the linked samples.
+                                            You will need to complete a sample request form to request the linked samples.
+                                        </p>
+                                        <p className="text-sm text-orange-700">
+                                            Following submission of this request, you will be forwarded to the corresponding linked request form.
                                         </p>
                                     </CardContent>
                                 </Card>

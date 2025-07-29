@@ -47,8 +47,8 @@ const formSchema = z.object({
     name: z.string().min(2),
     title: z.string().min(2),
     affiliations: z.array(optionSchema).optional(),
-    orcid: z.string().regex(/^\\d{4}-\\d{4}-\\d{4}-\\d{4}$/, {
-        message: "ORCID must be in the format 0000-0000-0000-0000",
+    orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
+        message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
     }),
     researchInterests: z.array(optionSchema).optional(),
     genesOfInterest: z.array(optionSchema).optional(),
@@ -301,20 +301,19 @@ export default function EditResearcherProfileDialog() {
                                             type="text"
                                             {...field}
                                             onChange={(e) => {
-                                                // Remove non-digit characters
-                                                let raw = e.target.value.replace(/\D/g, "");
+                                                // Remove all non-digit characters, EXCEPT allow X at the end
+                                                let raw = e.target.value.toUpperCase().replace(/[^0-9X]/g, "");
 
-                                                // Limit to 16 digits max
+                                                // Limit to 16 characters (15 digits + optional trailing X)
                                                 raw = raw.substring(0, 16);
 
-                                                // Add dash every 4 digits
+                                                // Add dash every 4 characters
                                                 const formatted = raw.match(/.{1,4}/g)?.join("-") || "";
 
                                                 field.onChange(formatted);
                                             }}
                                             value={field.value}
                                             placeholder="0000-0000-0000-0000"
-                                            inputMode="numeric"
                                         />
                                     </FormControl>
                                     <FormMessage />
