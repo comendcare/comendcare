@@ -22,9 +22,9 @@ import {
 } from "@comend/components/ui/sidebar";
 import {MembershipWithOrganization} from "@comend/lib/types";
 import {ProfilePhoto} from "@comend/components/profile-photo";
-import { revalidate } from "@/packages/lib/revalidate";
+import {revalidate} from "@/packages/lib/revalidate";
 
-export function OrganizationSwitcher({memberships}: {memberships: MembershipWithOrganization[]}) {
+export function OrganizationSwitcher({memberships}: { memberships: MembershipWithOrganization[] }) {
     const {isMobile} = useSidebar();
     const router = useRouter();
     const {data: session, update} = useSession();
@@ -55,7 +55,7 @@ export function OrganizationSwitcher({memberships}: {memberships: MembershipWith
             await revalidate("/app/tools/biosample")
             await revalidate("/app/tools/data")
             await revalidate("/app/requests")
-            window.location.reload() 
+            window.location.reload()
             router.push("/app/profile"); // Navigate if not already there
         }
     };
@@ -87,7 +87,7 @@ export function OrganizationSwitcher({memberships}: {memberships: MembershipWith
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                        className="w-[--radix-dropdown-menu-trigger-width] min-w-80 rounded-lg"
                         align="start"
                         side={isMobile ? "bottom" : "right"}
                         sideOffset={4}
@@ -95,25 +95,29 @@ export function OrganizationSwitcher({memberships}: {memberships: MembershipWith
                         <DropdownMenuLabel className="text-xs text-muted-foreground">
                             Organizations
                         </DropdownMenuLabel>
-                        {memberships.map((membership, index) => (
-                            <DropdownMenuItem
-                                key={membership.id}
-                                onClick={() => handleOrganizationChange(membership)}
-                                className="gap-2 p-2"
-                            >
-                                <div className="flex size-6 items-center justify-center">
-                                    <ProfilePhoto
-                                        img={membership?.organization?.image}
-                                        name={membership?.organization?.name}
-                                        className="size-4 shrink-0"
-                                    />
-                                </div>
-                                {membership?.organization?.name}
-                                {activeOrganization?.id === membership.id && (
-                                    <Check className="ml-auto opacity-100"/>
-                                )}
-                            </DropdownMenuItem>
-                        ))}
+                        <div
+                            className="max-h-80 h-min overflow-auto"
+                        >
+                            {memberships.map((membership, index) => (
+                                <DropdownMenuItem
+                                    key={membership.id}
+                                    onClick={() => handleOrganizationChange(membership)}
+                                    className="gap-2 p-2"
+                                >
+                                    <div className="flex size-6 items-center justify-center">
+                                        <ProfilePhoto
+                                            img={membership?.organization?.image}
+                                            name={membership?.organization?.name}
+                                            className="size-4 shrink-0"
+                                        />
+                                    </div>
+                                    {membership?.organization?.name}
+                                    {activeOrganization?.id === membership.id && (
+                                        <Check className="ml-auto opacity-100"/>
+                                    )}
+                                </DropdownMenuItem>
+                            ))}
+                        </div>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem
                             onClick={() => {
