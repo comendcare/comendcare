@@ -23,13 +23,12 @@ export default function WriteAComment({
 
     const handleCreateCommentSubmit = useCallback(async () => {
         setLoading(true)
-        const response = await createComment(requestId, comment)
+        const response = await createComment(comment, requestId)
         setLoading(false)
 
         if (response.success) {
             setComment("")
             toast.success("Comment posted!")
-            router.refresh()
         } else {
             console.error(response.error)
             toast.error("Something went wrong and we couldn't post your comment... Please try again later.")

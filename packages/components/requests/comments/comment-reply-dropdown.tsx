@@ -10,15 +10,28 @@ import {
 import {Ellipsis, CircleX} from "lucide-react";
 import { useSession } from "next-auth/react"
 import AreYouSure from "@comend/components/are-you-sure"
+import {toast} from "sonner"
+import { deleteComment } from "@comend/lib/actions"
 
 export default function CommentReplyDropdown(props: {
-    resourceId: string
+    requestId: string
     id: string
 }) {
     const { data: session } = useSession()
     const [isAreYouSureOpen, setIsAreYouSureOpen] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const deleteCommentReply = async () => {
+        setLoading(true)
+        const response = await deleteComment(props.id);
+        setLoading(false)
+
+        if (response.success) {
+            toast.success("Comment deleted!")
+        } else {
+            console.error(response.error)
+            toast.error("Something went wrong and we couldn't delete your comment... Please try again later.")
+        }
     }
 
     return (

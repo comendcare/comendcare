@@ -26,7 +26,7 @@ export function CommentForm({postId}: CommentFormProps) {
 
     let comment
     const onSubmit = React.useCallback(async () => {
-        const response = await createComment(postId, commentValue)
+        const response = await createComment(commentValue, postId)
         if (response.success) {
             comment = response.data
         } else {

@@ -1595,7 +1595,7 @@ export const deletePost = withAuth(
 )
 
 export const createComment = withAuth(
-    async (postId: string | null, text: string) => {
+    async (text: string, requestId: string) => {
         const session = await getSession()
 
         try {
@@ -1603,15 +1603,11 @@ export const createComment = withAuth(
                 return {success: false, error: "Session not found."};
             }
 
-            if (!postId) {
-                return {success: false, error: "Post ID not provided."};
-            }
-
             const comment = prisma.comment.create({
                 data: {
                     materialAndDataAccessRequest: {
                         connect: {
-                            id: ""
+                            id: requestId
                         }
                     },
                     author: {
@@ -1624,12 +1620,41 @@ export const createComment = withAuth(
             })
 
             if (!comment) {
-                return {success: false, error: "failed to create comment"};
+                return {success: false, error: "Failed to create comment."};
             }
 
+            revalidatePath("/requests")
             return {success: true, data: comment};
         } catch (error: any) {
             logError("Error creating comment", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const deleteComment = withAuth(
+    async (commentId: string) => {
+        const session = await getSession()
+
+        try {
+            if (!session) {
+                return {success: false, error: "Session not found."};
+            }
+
+            const comment = prisma.comment.delete({
+                where: {
+                    id: commentId
+                }
+            })
+
+            if (!comment) {
+                return {success: false, error: "Failed to delete comment."};
+            }
+
+            revalidatePath("/requests")
+            return {success: true, data: comment};
+        } catch (error: any) {
+            logError("Error deleting comment", error);
             return {success: false, error: "Internal server error"};
         }
     }

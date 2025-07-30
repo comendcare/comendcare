@@ -14,7 +14,6 @@ import RequestPageStudyCard from "./request-page-study-card";
 
 
 const getStatusBadge = (status: string) => {
-    console.log(status)
     switch (status) {
         case "UNDER-REVIEW":
             return <Badge className="bg-blue-100 text-blue-800">Under Review</Badge>

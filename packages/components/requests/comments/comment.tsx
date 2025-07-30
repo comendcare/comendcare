@@ -2,6 +2,7 @@
 import React, { useState } from "react"
 import {formatDate} from "@comend/lib/format";
 import CommentReplyDropdown from "./comment-reply-dropdown";
+import {ProfilePhoto} from "../../profile-photo";
 
 export default function Comment(props: {
     requestId: string
@@ -17,11 +18,10 @@ export default function Comment(props: {
         <article className="p-6 text-base bg-white rounded-lg">
             <footer className="flex justify-between items-center mb-2">
                 <div className="relative flex items-center">
-                    <img
-                        className="rounded-full mr-2 size-8"
-                        // src={session?.user?.image || defaultAvatar}
-                        src={props.commentData.author.image}
-                        alt="Your profile picture"
+                    <ProfilePhoto
+                        img={props.commentData.author.image}
+                        name={props.commentData.author.name}
+                        className="size-8 mr-2 rounded-full"
                     />
                     <p className="inline-flex items-center mr-3 text-sm text-gray-900 font-semibold">
                         {props.commentData.author.name}
@@ -33,7 +33,7 @@ export default function Comment(props: {
                     </p>
                 </div>
                 <CommentReplyDropdown
-                    resourceId={props.requestId}
+                    requestId={props.requestId}
                     id={props.commentData.id}
                 />
             </footer>
