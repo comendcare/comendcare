@@ -19,25 +19,23 @@ import { EditAssetDialog } from "./edit-tool-dialog"
 import { revalidate } from "@/packages/lib/revalidate"
 import { usePathname } from "next/navigation"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
+import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
+import { createBiosample, createDiseaseModel, createOrUpdateAsset } from "@/packages/lib/actions"
 
-const toolSelector = (state: ToolState) => ({
-    tools: state.tools,
-    createTool: state.createTool,
-    updateTool: state.updateTool
-})
-
-export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data'}) => {
+export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const {data: session} = useSession()
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
-    const { tools, createTool } = useToolStore(useShallow(toolSelector))
 
     const handleDuplicate = async () => {
         if (session?.user?.organizationId) {
-            await createTool({...tool, id: undefined}, session.user.organizationId)
+            if (type === 'biosample') await createBiosample(session.user.organizationId, {...tool, id: undefined})
+            if (type === 'diseaseModel') await createDiseaseModel(session.user.organizationId, {...tool, id: undefined})
+            if (type === 'data') await createOrUpdateAsset(session.user.organizationId, {...tool, id: undefined})
+            // await createTool({...tool, id: undefined}, session.user.organizationId)
             await revalidate(pathname)
         }
     }
@@ -131,7 +129,8 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                         <EditAssetDialog
                             key={tool.id}
                             data={tool} 
-                            numAssetsPinned={tools.filter(tool => tool.pinned).length}
+                            // numAssetsPinned={tools.filter(tool => tool.pinned).length}
+                            numAssetsPinned={0}
                             type={type}
                         />
                     </div>
@@ -141,11 +140,11 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
             <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
-                        {type === 'biosample' ? (
-                            <DeleteBiosampleDialog toolId={tool.id} />
-                        ): (
-                            <DeleteAssetDialog toolId={tool.id} />
-                        )}
+                        {(() => {
+                            if (type === 'biosample') return <DeleteBiosampleDialog toolId={tool.id} />
+                            if (type === 'diseaseModel') return <DeleteDiseaseModelDialog toolId={tool.id} />
+                            if (type === 'data') return <DeleteAssetDialog toolId={tool.id} />
+                        })()}
                     </div>
                 </DialogPortal>
             </Dialog>

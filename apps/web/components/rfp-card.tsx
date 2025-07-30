@@ -63,9 +63,14 @@ export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean
                         return (
                             <li key={index}>
                                 <PropertyBadge icon={User}>
-                                    <p className="w-[90%] text-wrap break-words">
+                                    <div className="w-[90%] text-wrap break-words">
+                                    {contact.name && <p>{contact.name}</p>}
+                                    {contact.email && <p>{contact.email}</p>}
+                                    {contact.affiliation && <p>{contact.affiliation}</p>}
+                                    </div>
+                                    {/* <p className="w-[90%] text-wrap break-words">
                                         {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
-                                    </p>
+                                    </p> */}
                                 </PropertyBadge>
                             </li>
                         )
