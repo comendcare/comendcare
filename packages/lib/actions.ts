@@ -35,7 +35,7 @@ import {
     sendMemberDeletedEmail,
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, editBiosampleForm, MemberRequestWithUser, Milestone, Option, optionSchema, RFP} from "@comend/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, editBiosampleForm, editDiseaseModelForm, MemberRequestWithUser, Milestone, Option, optionSchema, RFP} from "@comend/lib/types";
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
@@ -1874,6 +1874,106 @@ export const deleteBiosample = withOrganizationAuth(
         } catch (error: any) {
             console.error("Error deleting tool:", error.message);
             throw new Error(error.message || "Failed to delete tool.");
+        }
+    }
+)
+
+export const updateDiseaseModel = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editDiseaseModelForm>) => {
+        try {
+            if (!organization.id) throw new Error("No organization id provided.")
+            if (!data.id) throw new Error("No biosample id provided.")
+
+            const diseaseModelData: any = {
+                id: data.id,
+                types: data.types ? data.types.map(type => type.value) : undefined,
+                metadata: {
+                    otherTypeDetails: data.otherTypeDetails
+                } as JsonObject,
+                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                description: data.description,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+            }
+
+            const newDiseaseModel = await prisma.diseaseModel.update({
+                where: {id: data.id},
+                include: {
+                    gene: true,
+                    institution: true,
+                },
+                data: {
+                    ...diseaseModelData,
+                    private: diseaseModelData.private !== undefined && diseaseModelData.private !== null ? diseaseModelData.private : false,
+                    pinned: diseaseModelData.pinned !== undefined && diseaseModelData.pinned !== null ? diseaseModelData.pinned : false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: diseaseModelData.metadata as InputJsonObject,
+                    ...(diseaseModelData.gene 
+                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
+                        : {gene: { disconnect: true }}),
+                    ...(diseaseModelData.institution 
+                        ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
+                        : {institution: {disconnect: true}})
+                }, 
+            })
+
+            const response = await prisma.diseaseModel.findUnique({
+                where: {id: data.id}
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating disease model:", error.message);
+            throw new Error(error.message || "Failed to create disease model.");
+        }
+    }
+)
+
+export const createDiseaseModel = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editDiseaseModelForm>) => {
+        try {
+            if (!organization.id) throw new Error("No organization id provided.")
+
+            const diseaseModelData: any = {
+                id: data.id,
+                types: (data.types || []).map(type => type.value),
+                metadata: {
+                    otherTypeDetails: data.otherTypeDetails
+                } as JsonObject,
+                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                description: data.description,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+            }
+
+            const response = await prisma.diseaseModel.create({
+                include: {
+                    institution: true,
+                },
+                data: {
+                    ...diseaseModelData,
+                    // create with the given id if it's available. This is useful for situations like 'undo'
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(diseaseModelData.id ? {id: diseaseModelData.id} : undefined),
+                    private: diseaseModelData.private || false,
+                    pinned: diseaseModelData.pinned || false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: diseaseModelData.metadata as InputJsonObject,
+                    ...(diseaseModelData.gene 
+                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
+                        : undefined),
+                    ...(diseaseModelData.institution 
+                        ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
+                        : undefined)
+                }
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating disease model:", error.message);
+            throw new Error(error.message || "Failed to create diseaseModel.");
         }
     }
 )

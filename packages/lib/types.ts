@@ -714,6 +714,23 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // },
 ]
 
+export const DISEASE_MODEL_TYPE_OPTIONS: Option[] = [
+  { value: 'MOUSE', label: 'Mouse', group: 'Mammalian' },
+  { value: 'RAT', label: 'Rat', group: 'Mammalian' },
+  { value: 'NON_HUMAN_PRIMATES', label: 'Non-human primates', group: 'Mammalian' },
+
+  { value: 'ZEBRAFISH', label: 'Zebrafish', group: 'Non-mammalian' },
+  { value: 'FRUIT_FLY', label: 'Fruit fly', group: 'Non-mammalian' },
+  { value: 'ROUNDWORM', label: 'Roundworm', group: 'Non-mammalian' },
+  { value: 'YEAST', label: 'Yeast', group: 'Non-mammalian' },
+
+  { value: 'IPSCS', label: 'iPSCs', group: 'Cell-based' },
+  { value: 'STEM_CELLS', label: 'Stem cells', group: 'Cell-based' },
+  { value: 'ORGANOIDS', label: 'Organoids', group: 'Cell-based' },
+
+  { value: 'OTHER', label: 'Other', group: 'Other' },
+]
+
 export const BIOSAMPLE_TYPE_OPTIONS: Option[] = [
     { value: 'IPSCS', label: 'Induced pluripotent stem cells (iPSCs)' },
     { value: 'FIBROBLAST', label: 'Fibroblast' },
@@ -1864,4 +1881,22 @@ export const editBiosampleForm = z.object({
     drinksPerDay: z.string().optional(),
     alcoholDuration: z.string().optional(),
     medications: z.array(z.string()).optional(),
+})
+
+export const editDiseaseModelForm = z.object({
+    id: z.string().optional(),
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    types: z.array(optionSchema)
+        .min(1, "Type is required")
+        .max(1, "Max one type"),
+    otherTypeDetails: z.string().optional(),
+    isPinned: z.boolean(),
+    isPrivate: z.boolean(),
+
+    // disease model properties
+    genes: z.array(optionSchema).optional(),
+    institutions: z.array(optionSchema).optional(),
 })

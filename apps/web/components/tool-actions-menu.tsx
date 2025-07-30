@@ -26,7 +26,7 @@ const toolSelector = (state: ToolState) => ({
     updateTool: state.updateTool
 })
 
-export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data'}) => {
+export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const {data: session} = useSession()
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
@@ -141,6 +141,11 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
             <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
+                        {(() => {
+                            if (type === 'biosample') return <DeleteBiosampleDialog toolId={tool.id} />
+                            if (type === 'diseaseModel') return <DeleteBiosampleDialog toolId={tool.id} />
+                            if (type === 'data') return <DeleteAssetDialog toolId={tool.id} />
+                        })()}
                         {type === 'biosample' ? (
                             <DeleteBiosampleDialog toolId={tool.id} />
                         ): (
