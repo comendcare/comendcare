@@ -20,12 +20,7 @@ import { revalidate } from "@/packages/lib/revalidate"
 import { usePathname } from "next/navigation"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
-
-const toolSelector = (state: ToolState) => ({
-    tools: state.tools,
-    createTool: state.createTool,
-    updateTool: state.updateTool
-})
+import { createBiosample, createDiseaseModel, createOrUpdateAsset } from "@/packages/lib/actions"
 
 export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const {data: session} = useSession()
@@ -34,11 +29,13 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
-    const { tools, createTool } = useToolStore(useShallow(toolSelector))
 
     const handleDuplicate = async () => {
         if (session?.user?.organizationId) {
-            await createTool({...tool, id: undefined}, session.user.organizationId)
+            if (type === 'biosample') await createBiosample(session.user.organizationId, {...tool, id: undefined})
+            if (type === 'diseaseModel') await createDiseaseModel(session.user.organizationId, {...tool, id: undefined})
+            if (type === 'data') await createOrUpdateAsset(session.user.organizationId, {...tool, id: undefined})
+            // await createTool({...tool, id: undefined}, session.user.organizationId)
             await revalidate(pathname)
         }
     }
@@ -132,7 +129,8 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                         <EditAssetDialog
                             key={tool.id}
                             data={tool} 
-                            numAssetsPinned={tools.filter(tool => tool.pinned).length}
+                            // numAssetsPinned={tools.filter(tool => tool.pinned).length}
+                            numAssetsPinned={0}
                             type={type}
                         />
                     </div>
