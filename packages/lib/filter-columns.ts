@@ -39,49 +39,45 @@ export function filterColumns<TWhere extends object>({
 
     console.log(`COLUMNS`, columns)
 
+    console.log(`filter`, filter)
+
     switch (filter.operator) {
       case "eq":
         if (Array.isArray(filter.value)) {
-          // return { [column]: { in: filter.value } };
           return getColumn(columns, { in: filter.value })
         } else if (filter.variant === "boolean" && typeof filter.value === "string") {
-          // return { [column]: filter.value === "true" };
           return getColumn(columns, filter.value === "true")
         } else if (filter.variant === "date") {
           const date = new Date(filter.value);
           const start = startOfDay(date);
           const end = endOfDay(date);
-          // return { [column]: { gte: start, lte: end } };
           return getColumn(columns, { gte: start, lte: end })
+        } else if (filter.variant === "range" && typeof filter.value === "string") {
+          return getColumn(columns, JSON.parse(filter.value))
         } else {
-          // return { [column]: filter.value };
           return getColumn(columns, filter.value)
         }
       case "ne":
         if (Array.isArray(filter.value)) {
-          // return { [column]: { notIn: filter.value } };
           return getColumn(columns, { notIn: filter.value })
         } else if (filter.variant === "boolean") {
-          // return { [column]: { not: filter.value === "true" } };
           return getColumn(columns, { not: filter.value === "true" })
         } else if (filter.variant === "date") {
           const date = new Date(filter.value);
           const start = startOfDay(date);
           const end = endOfDay(date);
-          // return { OR: [{ [column]: { lt: start } }, { [column]: { gt: end } }] };
           return { OR: [getColumn(columns, { lt: start }), getColumn(columns, { gt: end })] }
+        } else if (filter.variant === "range" && typeof filter.value === "string") {
+          return getColumn(columns,{ not:  JSON.parse(filter.value) })
         } else {
-          // return { [column]: { not: filter.value } };
           return getColumn(columns, { not: filter.value })
         }
       case "iLike":
         return filter.variant === "text" && typeof filter.value === "string"
-            // ? { [column]: { contains: filter.value, mode: "insensitive" } }
             ? getColumn(columns, { contains: filter.value, mode: "insensitive" })
             : undefined;
       case "notILike":
         return filter.variant === "text" && typeof filter.value === "string"
-            // ? { NOT: { [column]: { contains: filter.value, mode: "insensitive" } } }
             ? { NOT: getColumn(columns, { contains: filter.value, mode: "insensitive" }) }
             : undefined;
 
@@ -98,41 +94,32 @@ export function filterColumns<TWhere extends object>({
 
       case "notInArray":
         if (Array.isArray(filter.value)) {
-          // return { NOT: { [column]: { hasSome: filter.value } }}
           return getColumn(columns, { hasSome: filter.value } )
         }
         return undefined;
 
       case "lt":
-        return filter.variant === "number"
-            // ? { [column]: { lt: filter.value } }
-            ? getColumn(columns, { lt: filter.value })
+        return (filter.variant === "number" || filter.variant === "range") && typeof filter.value === "string"
+            ? getColumn(columns, { lt: JSON.parse(filter.value) })
             : filter.variant === "date" && typeof filter.value === "string"
-                // ? { [column]: { lt: endOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { lt: endOfDay(new Date(filter.value)) })
                 : undefined;
       case "lte":
-        return filter.variant === "number"
-            // ? { [column]: { lte: filter.value } }
-            ? getColumn(columns, { lte: filter.value })
+        return (filter.variant === "number" || filter.variant === "range") && typeof filter.value === "string"
+            ? getColumn(columns, { lte: JSON.parse(filter.value) })
             : filter.variant === "date" && typeof filter.value === "string"
-                // ? { [column]: { lte: endOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { lte: endOfDay(new Date(filter.value)) })
                 : undefined;
       case "gt":
-        return filter.variant === "number"
-            // ? { [column]: { gt: filter.value } }
-            ? getColumn(columns, { gt: filter.value })
+        return (filter.variant === "number" || filter.variant === "range") && typeof filter.value === "string"
+            ? getColumn(columns, { gt: JSON.parse(filter.value) })
             : filter.variant === "date" && typeof filter.value === "string"
-                // ? { [column]: { gt: startOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { gt: startOfDay(new Date(filter.value)) })
                 : undefined;
       case "gte":
-        return filter.variant === "number"
-            // ? { [column]: { gte: filter.value } }
-            ? getColumn(columns, { gte: filter.value })
+        return (filter.variant === "number" || filter.variant === "range") && typeof filter.value === "string"
+            ? getColumn(columns, { gte: JSON.parse(filter.value) })
             : filter.variant === "date" && typeof filter.value === "string"
-                // ? { [column]: { gte: startOfDay(new Date(filter.value)) } }
                 ? getColumn(columns, { gte: startOfDay(new Date(filter.value)) })
                 : undefined;
       case "isBetween":
@@ -140,12 +127,6 @@ export function filterColumns<TWhere extends object>({
           return (
             Array.isArray(filter.value) &&
             filter.value.length === 2
-                // ? {
-                //   AND: [
-                //     filter.value[0] ? { [column]: { gte: startOfDay(new Date(filter.value[0])) } } : undefined,
-                //     filter.value[1] ? { [column]: { lte: endOfDay(new Date(filter.value[1])) } } : undefined,
-                //   ].filter(Boolean),
-                // }
                 ? {
                   AND: [
                     filter.value[0] ? getColumn(columns, { gte: startOfDay(new Date(filter.value[0])) }) : undefined,
@@ -197,15 +178,12 @@ export function filterColumns<TWhere extends object>({
               return undefined;
           }
 
-          // return { AND: [{ [column]: { gte: startDate } }, { [column]: { lte: endDate } }] };
           return { AND: [getColumn(columns, { gte: startDate }), getColumn(columns, { lte: endDate })] };
         }
         return undefined;
       case "isEmpty":
-        // return { [column]: {isEmpty: true} };
         return getColumn(columns, {isEmpty: true})
       case "isNotEmpty":
-        // return { NOT: { [column]: {isEmpty: true} } };
         return { NOT: getColumn(columns, {isEmpty: true}) };
       default:
         throw new Error(`Unsupported operator: ${filter.operator}`);

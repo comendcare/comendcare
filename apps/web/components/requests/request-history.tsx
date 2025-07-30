@@ -37,7 +37,6 @@ export default function RequestHistory() {
     useEffect(() => {
         const loadInitial = async () => {
             if (session?.user?.organizationId && initialized) {
-                initState(filters, 'organization'); // Set initialized to true and filters to default
                 const response = await getOrganizationRequests(
                     session?.user?.organizationId,
                     {
@@ -54,6 +53,16 @@ export default function RequestHistory() {
         };
         loadInitial();
     }, [session, initialized, filters, sortBy, setSearchResults, setTotalResults, initState]);
+
+    useEffect(() => {
+        const loadInitial = async () => {
+            if (session?.user?.id && !initialized) {
+                initState(filters, 'organization');
+                setCurrentPage(1); // Reset page
+            }
+        };
+        loadInitial();
+    }, [session, initialized, filters, initState]);
 
     const isLoading = !initialized || searchResults === undefined;
 
