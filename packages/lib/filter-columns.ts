@@ -39,8 +39,6 @@ export function filterColumns<TWhere extends object>({
 
     console.log(`COLUMNS`, columns)
 
-    console.log(`filter`, filter)
-
     switch (filter.operator) {
       case "eq":
         if (Array.isArray(filter.value)) {
@@ -85,9 +83,19 @@ export function filterColumns<TWhere extends object>({
         if (Array.isArray(filter.value)) {
           return getColumn(
               columns,
-              filter.id === "status"
-                  ? { in: filter.value }         // use `in` just for "status"
-                  : { hasSome: filter.value }   // use `hasSome` for everything else
+              (() => {
+                if (filter.id === "status") {
+                  return {in: filter.value}
+                } else if (typeof filter.value[0] === "string") {
+                  return {hasSome: filter.value}
+                } else if (typeof filter.value[0] === "object") {
+                  return {some: {OR: filter.value}}
+                }
+                return {}
+                // return filter.id === "status"
+                //   ? { in: filter.value }         // use `in` just for "status"
+                //   : { some: {OR: filter.value} }   // use `hasSome` for everything else
+              })()
           );
         }
         return undefined

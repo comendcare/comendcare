@@ -776,6 +776,20 @@ export async function getProjectRecommendations(
     }
 }
 
+export const getDiagnosisTypes = async () => {
+    try {
+        const diagnosesTypes = await prisma?.diagnosisType.findMany({})
+
+        return {
+            success: true,
+            data: diagnosesTypes
+        }
+    } catch (error: any) {
+        logError("Error fetching diagnoses", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 /* PRIVATE FUNCTION - these functions are only accessible to those that are part of the provided organization */
 export const getAssets = withOrganizationAuth(
     async (
@@ -2038,6 +2052,7 @@ export const getBiosamples = withOrganizationAuth(
                             ...filter,
                             ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
                             ...(filter.id === "pinned" ? {value: filter.value === "true" ? true : false} : undefined),
+                            ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
                         }))
 
                         where = filterColumns({
@@ -2109,7 +2124,6 @@ export const getBiosamples = withOrganizationAuth(
                     const orderBy = input.sort.length
                         ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
                         : [{createdAt: "asc"}];
-
 
                     const [data, total] = await prisma.$transaction([
                         prisma.biosample.findMany({
