@@ -119,7 +119,7 @@ export default function LoginPage() {
                         }
                     >
                         <ResearcherLoginForm
-                            callback="/onboarding/"
+                            callback="/profile"
                             isCaptchaVerified={isVerified}
                         />
                     </Suspense>
