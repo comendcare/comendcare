@@ -9,7 +9,6 @@ import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-dat
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-disease-models-table-columns";
 import { Tool } from "@prisma/client";
-import { BiosampleBulkImportDialog } from "./biosample-bulk-import-dialog";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {
     const columns = useDiseaseModelsTableColumns()

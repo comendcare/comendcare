@@ -1878,6 +1878,21 @@ export const deleteBiosample = withOrganizationAuth(
     }
 )
 
+export const deleteDiseaseModel = withOrganizationAuth(
+    async (_: Organization, id: string) => {
+        try {
+            const response = await prisma.diseaseModel.delete({
+                where: {id}
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error deleting tool:", error.message);
+            throw new Error(error.message || "Failed to delete tool.");
+        }
+    }
+)
+
 export const updateDiseaseModel = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editDiseaseModelForm>) => {
         try {

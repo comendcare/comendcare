@@ -19,6 +19,7 @@ import { EditAssetDialog } from "./edit-tool-dialog"
 import { revalidate } from "@/packages/lib/revalidate"
 import { usePathname } from "next/navigation"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
+import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
 
 const toolSelector = (state: ToolState) => ({
     tools: state.tools,
@@ -143,14 +144,9 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                     <div onClick={(e) => e.stopPropagation()}>
                         {(() => {
                             if (type === 'biosample') return <DeleteBiosampleDialog toolId={tool.id} />
-                            if (type === 'diseaseModel') return <DeleteBiosampleDialog toolId={tool.id} />
+                            if (type === 'diseaseModel') return <DeleteDiseaseModelDialog toolId={tool.id} />
                             if (type === 'data') return <DeleteAssetDialog toolId={tool.id} />
                         })()}
-                        {type === 'biosample' ? (
-                            <DeleteBiosampleDialog toolId={tool.id} />
-                        ): (
-                            <DeleteAssetDialog toolId={tool.id} />
-                        )}
                     </div>
                 </DialogPortal>
             </Dialog>
