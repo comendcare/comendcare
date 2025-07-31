@@ -34,12 +34,25 @@ export default function FeatureResearchMarketplace() {
                     className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
                     {/* Left-aligned image */}
                     <div className="flex items-start justify-end lg:order-first">
+                        <div className="block sm:hidden overflow-x-auto -mx-6 sm:mx-0">
+                            <div className="w-[48rem] sm:w-[57rem] md:ml-0">
+                                <Image
+                                    src={marketplace}
+                                    quality={100}
+                                    priority={true}
+                                    alt="preview image"
+                                    className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] px-4"
+                                    width={2432}
+                                    height={1442}
+                                />
+                            </div>
+                        </div>
                         <Image
                             src={marketplace}
                             quality={100}
                             priority={true}
                             alt="preview image"
-                            className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
+                            className="hidden sm:block w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
                             width={2432}
                             height={1442}
                         />
