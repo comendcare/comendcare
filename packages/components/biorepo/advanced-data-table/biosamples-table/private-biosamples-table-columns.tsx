@@ -19,6 +19,7 @@ import {
     DONOR_GENDER_OPTIONS,
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
+    Milestone,
     SAMPLE_PRESERVATION_METHOD_OPTIONS,
     SAMPLE_TRANSPORT_METHOD_OPTIONS,
 } from "@comend/lib/types";
@@ -33,7 +34,7 @@ import { Badge } from "@comend/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
-import { getDiagnosisTypes } from "@comend/lib/fetchers";
+import { getDiagnosisTypes, getMilestones } from "@comend/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "@comend/lib/types";
 
@@ -85,6 +86,45 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             return [];
         }
     };
+
+    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncMilestoneSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []
+
+        try {
+            // const response = await fetch(`/api/institutions?search=${query}`);
+            // const data = await response.json();
+            const response = await getMilestones(session?.user.organizationId)
+
+            if (response.success && response.data) {
+                return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
+            } else {
+                return []
+            }
+
+            // Return the fetched options
+            // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        }
+    }
 
     useEffect(() => {
         const init = async () => {
@@ -165,6 +205,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 label: "Diagnoses",
                 variant: "multiSelect",
                 options: diagnosesOptions,
+                showInAdvancedOnly: true,
                 icon: CircleDashed,
             }
         },
@@ -182,8 +223,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: {
                 label: "Gene",
                 variant: "select",
-                // options: diagnosesOptions,
                 icon: CircleDashed,
+                showInAdvancedOnly: true,
                 onAsyncSearch: handleAsyncGeneSearch
             }
         },
@@ -313,8 +354,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Institution"
+                label: "Institution",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncInstitutionSearch
             }
         },
         {
@@ -635,8 +681,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </ul>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Linked Projects"
+                label: "Linked Projects",
+                variant: "multiSelect",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncMilestoneSearch
             }
         },
         {

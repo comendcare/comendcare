@@ -2152,7 +2152,9 @@ export const getBiosamples = withOrganizationAuth(
                             ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
                             ...(filter.id === "pinned" ? {value: filter.value === "true" ? true : false} : undefined),
                             ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                            ...(filter.id === "gene" && {value: {symbol: filter.value}})
+                            ...(filter.id === "gene" && {value: {symbol: filter.value}}),
+                            ...(filter.id === "institution" && {value: {name: filter.value}}),
+                            ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
                         }))
 
                         where = filterColumns({
