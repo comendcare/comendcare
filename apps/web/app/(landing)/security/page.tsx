@@ -1,7 +1,15 @@
 "use client";
 import {format} from "date-fns";
+import Image from "next/image";
+import Link from "next/link";
+import React, {useState} from "react";
+import ReactMarkdown from "react-markdown";
+import {AnimatePresence, motion} from "framer-motion";
+import {IconMenu} from "@tabler/icons-react";
+import Flawnson from "@/public/profiles/Flawnson2.jpeg"
+import rehypeSlug from "rehype-slug";
 
-const dummyContentMarkdown = `
+const articleMarkdown = `
 
 At Comend, the security and privacy of your data is our highest priority. We take a proactive, multi-layered approach to ensure your information remains safe, your experience is smooth, and our systems remain resilient. Here's how we protect your data:
 
@@ -75,14 +83,7 @@ Security is not a one-time effort — it’s a continuous process. We’re commi
 
 Have questions? Contact us at **hello@comendcare.com**
 `;
-import Image from "next/image";
-import Link from "next/link";
-import React, {useState} from "react";
-import ReactMarkdown from "react-markdown";
-import {AnimatePresence, motion} from "framer-motion";
-import {IconMenu} from "@tabler/icons-react";
-import Flawnson from "@/public/profiles/Flawnson2.jpeg"
-import rehypeSlug from "rehype-slug";
+
 
 type Blog = {
     title: string;
@@ -102,7 +103,7 @@ const blog: Blog = {
     authorImage: Flawnson.src,
     thumbnail:
         "https://images.unsplash.com/photo-1713869782573-3a6eee95c834?q=80&w=3500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    content: dummyContentMarkdown,
+    content: articleMarkdown,
 };
 
 export default function BlogContentWithToc() {
@@ -134,13 +135,13 @@ export default function BlogContentWithToc() {
                     </div>
                 </div>
 
-                <Image
-                    src={blog.thumbnail}
-                    alt={blog.title}
-                    className="h-60 w-full rounded-3xl object-cover md:h-[30rem]"
-                    height={720}
-                    width={1024}
-                />
+                {/*<Image*/}
+                {/*    src={blog.thumbnail}*/}
+                {/*    alt={blog.title}*/}
+                {/*    className="h-60 w-full rounded-3xl object-cover md:h-[30rem]"*/}
+                {/*    height={720}*/}
+                {/*    width={1024}*/}
+                {/*/>*/}
 
                 <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white">
                     {blog.title}
