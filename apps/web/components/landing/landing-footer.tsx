@@ -70,11 +70,14 @@ export default function LandingFooter() {
                     aria-label="quick links"
                 >
                     <div className="-my-1 flex justify-center gap-x-6">
-                        <Link href="https://www.librarey.com/terms-of-service">
+                        <Link href="https://www.comend.io/terms-of-service">
                             Terms of Services
                         </Link>
-                        <Link href="https://comend.notion.site/Librarey-s-Policies-98d960fe48e34b97a5bb5b152266ecc2">
+                        <Link href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link">
                             Privacy Policy
+                        </Link>
+                        <Link href="https://comend.io/security">
+                            Security Promise
                         </Link>
                     </div>
                 </nav>
