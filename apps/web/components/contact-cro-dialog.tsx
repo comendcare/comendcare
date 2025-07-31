@@ -28,6 +28,7 @@ import {contactCRO} from "@comend/lib/actions";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Handshake} from "lucide-react";
 import {getRFPs} from "@comend/lib/fetchers";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/packages/components/ui/select";
 
 export interface CompanyWithServices extends Company {
     services: Service[]
@@ -42,6 +43,7 @@ export const optionSchema = z.object({
 const formSchema = z.object({
     services: z.array(optionSchema).optional(),
     rfps: z.array(optionSchema).optional(),
+    timeline: z.string().optional(),
     meetingObjective: z.string().min(10, "Please describe your objective for the meeting")
 });
 
@@ -176,7 +178,7 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
                                         Open RFPs
                                     </FormLabel>
                                     <FormDescription className="flex items-center">
-                                        {`Is there an RFP relating to your service request that you'd like to send to this service provider?`}
+                                        {`Is there an RFP you’d like to attach to this service provider?`}
                                     </FormDescription>
                                     <FormControl>
                                         <MultipleSelector
@@ -249,6 +251,36 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
 
                         <FormField
                             control={form.control}
+                            name="timeline"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Timeline</FormLabel>
+                                    <FormDescription>When would you like this meeting?</FormDescription>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select an approximate time" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="1-3">
+                                                1-3 months
+                                            </SelectItem>
+                                            <SelectItem value="4-6">
+                                                4-6 months
+                                            </SelectItem>
+                                            <SelectItem value="6+">
+                                                6+ months
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
                             name="meetingObjective"
                             render={({field}) => (
                                 <FormItem>
@@ -262,6 +294,7 @@ export default function ContactCroDialog({cro}: { cro: CompanyWithServices }) {
                                 </FormItem>
                             )}
                         />
+
                         <Button type="submit" className="w-full" disabled={isSubmitting}>
                             {isSubmitting ? "Submitting..." : "Submit Request"}
                         </Button>

@@ -949,6 +949,7 @@ model CompanyContactRequest {
   organization Organization @relation("cro_contact_request_organization", fields: [organizationId], references: [id], onDelete: Cascade)
   company      Company      @relation("cro_contact_request_company", fields: [companyId], references: [id], onDelete: Cascade)
 
+  timeline    String?
   services    CompanyContactRequestToService[]
   rfps        CompanyContactRequestToRFP[]
   description String?
