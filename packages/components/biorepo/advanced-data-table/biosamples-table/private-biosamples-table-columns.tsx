@@ -69,6 +69,23 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const pathname = usePathname()
     const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
 
+    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE GENE SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
     useEffect(() => {
         const init = async () => {
             const response = await getDiagnosisTypes()
@@ -161,8 +178,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Gene"
+                label: "Gene",
+                variant: "select",
+                // options: diagnosesOptions,
+                icon: CircleDashed,
+                onAsyncSearch: handleAsyncGeneSearch
             }
         },
         {

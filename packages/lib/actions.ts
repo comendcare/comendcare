@@ -4407,6 +4407,7 @@ export const saveCRO = withOrganizationAuth(
 export const contactCRO = withOrganizationAuth(
     async (organization: Organization, croId: string, formData: FormData) => {
         const description = formData.get("description") as string;
+        const timeline = formData.get("timeline") as string;
 
         const services = formData.get("services")
             ? (formData.get("services") as string).split(",")
@@ -4430,6 +4431,7 @@ export const contactCRO = withOrganizationAuth(
                         },
                     },
                     description,
+                    timeline,
                     services: {
                         create: services.map((serviceId) => ({
                             service: {

@@ -196,8 +196,8 @@ function FacetedBadgeList(props: FacetedBadgeListProps) {
   );
 }
 
-function FacetedContent(props: React.ComponentProps<typeof PopoverContent>) {
-  const { className, children, ...contentProps } = props;
+function FacetedContent(props: React.ComponentProps<typeof PopoverContent> & {shouldFilter?: boolean}) {
+  const { className, children, shouldFilter, ...contentProps } = props;
 
   return (
     <PopoverContent
@@ -208,7 +208,7 @@ function FacetedContent(props: React.ComponentProps<typeof PopoverContent>) {
         className,
       )}
     >
-      <Command>{children}</Command>
+      <Command shouldFilter={shouldFilter !== undefined ? shouldFilter : true}>{children}</Command>
     </PopoverContent>
   );
 }
