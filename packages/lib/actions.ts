@@ -35,7 +35,18 @@ import {
     sendMemberDeletedEmail,
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, editBiosampleForm, editDiseaseModelForm, MemberRequestWithUser, Milestone, Option, optionSchema, RFP} from "@comend/lib/types";
+import {
+    ApiResponse,
+    Asset,
+    DEFAULT_KANBAN_COLUMNS,
+    editBiosampleForm,
+    editDiseaseModelForm,
+    MemberRequestWithUser,
+    Milestone,
+    Option,
+    optionSchema,
+    RFP
+} from "@comend/lib/types";
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
@@ -1924,13 +1935,13 @@ export const updateDiseaseModel = withOrganizationAuth(
                     pinned: diseaseModelData.pinned !== undefined && diseaseModelData.pinned !== null ? diseaseModelData.pinned : false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
-                    ...(diseaseModelData.gene 
+                    ...(diseaseModelData.gene
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
-                        : {gene: { disconnect: true }}),
-                    ...(diseaseModelData.institution 
+                        : {gene: {disconnect: true}}),
+                    ...(diseaseModelData.institution
                         ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
                         : {institution: {disconnect: true}})
-                }, 
+                },
             })
 
             const response = await prisma.diseaseModel.findUnique({
@@ -1976,10 +1987,10 @@ export const createDiseaseModel = withOrganizationAuth(
                     pinned: diseaseModelData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
-                    ...(diseaseModelData.gene 
+                    ...(diseaseModelData.gene
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : undefined),
-                    ...(diseaseModelData.institution 
+                    ...(diseaseModelData.institution
                         ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
                         : undefined)
                 }
@@ -2014,7 +2025,7 @@ export const createBiosample = withOrganizationAuth(
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
                         milestoneId: milestone.id,
-                        biosampleId: data.id  || '',
+                        biosampleId: data.id || '',
                     })
                 }),
                 description: data.description,
@@ -2088,10 +2099,10 @@ export const createBiosample = withOrganizationAuth(
                     pinned: biosampleData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
-                    ...(biosampleData.gene 
+                    ...(biosampleData.gene
                         ? ({gene: {connect: {symbol: biosampleData.gene.value}}})
                         : undefined),
-                    ...(biosampleData.institution 
+                    ...(biosampleData.institution
                         ? ({institution: {connect: {id: biosampleData.institution.value}}})
                         : undefined),
                     donor: {
@@ -2111,12 +2122,15 @@ export const createBiosample = withOrganizationAuth(
                                 medications: data.medications,
                                 organization: {connect: {id: organization.id}},
                                 diagnoses: {
-                                    create: (data.diagnoses || []).map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
+                                    create: (data.diagnoses || []).map((diagnosis: {
+                                        diagnosis: Option[],
+                                        severity?: string
+                                    }) => ({
                                         severity: diagnosis.severity,
                                         type: {
                                             connectOrCreate: {
-                                                where: { id: diagnosis.diagnosis[0].value },
-                                                create: { 
+                                                where: {id: diagnosis.diagnosis[0].value},
+                                                create: {
                                                     id: diagnosis.diagnosis[0].value,
                                                     label: diagnosis.diagnosis[0].label
                                                 }
@@ -2164,7 +2178,7 @@ export const updateBiosample = withOrganizationAuth(
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
                         milestoneId: milestone.id,
-                        biosampleId: data.id  || '',
+                        biosampleId: data.id || '',
                     })
                 }),
                 description: data.description,
@@ -2206,39 +2220,45 @@ export const updateBiosample = withOrganizationAuth(
                 data: {
                     ...biosampleData,
                     ...(biosampleData.attachments ? (
-                        {attachments: {
-                            deleteMany: {}, // clear all existing attachments
-                            createMany: {
-                                data: (biosampleData?.attachments || []).map((attachment: any) => ({
-                                    link: attachment.link,
-                                    ...(attachment.name ? {name: attachment.name} : undefined)
-                                }))
-                            }
-                        }}
-                    ): undefined),
-                    ...(biosampleData.contacts ? (
-                        {contacts: {
-                            deleteMany: {},
-                            createMany: {
-                                data: (biosampleData?.contacts || []).map((contact: any) => ({
-                                    name: contact.name,
-                                    email: contact.email,
-                                    ...(contact.role ? {role: contact.role} : undefined),
-                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                }))
-                            }
-                        }}
-                    ): undefined),
-                    ...(biosampleData.milestones ? (
-                        {milestones: {
-                            deleteMany: {},
-                            create: (biosampleData.milestones || []).map((milestone: any) => ({
-                                milestone: {
-                                    connect: {id: milestone.milestoneId}
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
                                 }
-                            }))
-                        },}
-                    ): undefined),
+                            }
+                        }
+                    ) : undefined),
+                    ...(biosampleData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(biosampleData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (biosampleData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
                     private: biosampleData.private !== undefined && biosampleData.private !== null ? biosampleData.private : false,
                     pinned: biosampleData.pinned !== undefined && biosampleData.pinned !== null ? biosampleData.pinned : false,
                     metadata: biosampleData.metadata as InputJsonObject,
@@ -2246,15 +2266,15 @@ export const updateBiosample = withOrganizationAuth(
                         gene: {
                             connect: {symbol: biosampleData.gene.value}
                         }
-                    }): {gene: { disconnect: true }}),
+                    }) : {gene: {disconnect: true}}),
                     ...(biosampleData.institution ? ({
                         institution: {connect: {id: biosampleData.institution.value}}
-                    }): {institution: {disconnect: true}}),
+                    }) : {institution: {disconnect: true}}),
                     ...(data.donorId
-                        ? {donor: {connect: {id: data.donorId}}}
-                        : {donor: {disconnect: true}}
+                            ? {donor: {connect: {id: data.donorId}}}
+                            : {donor: {disconnect: true}}
                     )
-                }, 
+                },
             })
 
             if (data.donorId) {
@@ -2275,12 +2295,15 @@ export const updateBiosample = withOrganizationAuth(
                         ...(data.diagnoses ? {
                             diagnoses: {
                                 deleteMany: {},
-                                create: data?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity?: string}) => ({
+                                create: data?.diagnoses?.map((diagnosis: {
+                                    diagnosis: Option[],
+                                    severity?: string
+                                }) => ({
                                     severity: diagnosis.severity,
                                     type: {
                                         connectOrCreate: {
-                                            where: { id: diagnosis.diagnosis[0].value },
-                                            create: { 
+                                            where: {id: diagnosis.diagnosis[0].value},
+                                            create: {
                                                 id: diagnosis.diagnosis[0].value,
                                                 label: diagnosis.diagnosis[0].label
                                             }
@@ -2377,7 +2400,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 milestones: (milestones || []).map((milestone) => {
                     return ({
                         milestoneId: milestone.id,
-                        biosampleId: data.id  || '',
+                        biosampleId: data.id || '',
                     })
                 }),
                 ...(description !== undefined && description !== null ? {description} : undefined),
@@ -2419,7 +2442,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
             console.log(`donor data`, donorData)
 
             const response = await prisma.biosample.upsert({
-                where: { id: biosampleData.id || nanoid() },
+                where: {id: biosampleData.id || nanoid()},
                 include: {
                     contacts: true,
                     attachments: true,
@@ -2436,39 +2459,45 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 update: {
                     ...biosampleData,
                     ...(biosampleData.attachments ? (
-                        {attachments: {
-                            deleteMany: {}, // clear all existing attachments
-                            createMany: {
-                                data: (biosampleData?.attachments || []).map((attachment: any) => ({
-                                    link: attachment.link,
-                                    ...(attachment.name ? {name: attachment.name} : undefined)
-                                }))
-                            }
-                        }}
-                    ): undefined),
-                    ...(biosampleData.contacts ? (
-                        {contacts: {
-                            deleteMany: {},
-                            createMany: {
-                                data: (biosampleData?.contacts || []).map((contact: any) => ({
-                                    name: contact.name,
-                                    email: contact.email,
-                                    ...(contact.role ? {role: contact.role} : undefined),
-                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                }))
-                            }
-                        }}
-                    ): undefined),
-                    ...(biosampleData.milestones ? (
-                        {milestones: {
-                            deleteMany: {},
-                            create: (biosampleData.milestones || []).map((milestone: any) => ({
-                                milestone: {
-                                    connect: {id: milestone.milestoneId}
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (biosampleData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
                                 }
-                            }))
-                        },}
-                    ): undefined),
+                            }
+                        }
+                    ) : undefined),
+                    ...(biosampleData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (biosampleData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(biosampleData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (biosampleData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
                     private: biosampleData.private || false,
                     pinned: biosampleData.pinned || false,
                     metadata: biosampleData.metadata as InputJsonObject,
@@ -2476,10 +2505,10 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                         gene: {
                             connect: {symbol: biosampleData.gene.value}
                         }
-                    }): {gene: { disconnect: true }}),
+                    }) : {gene: {disconnect: true}}),
                     ...(biosampleData.institution ? ({
                         institution: {connect: {id: biosampleData.institution.value}}
-                    }): {institution: {disconnect: true}}),
+                    }) : {institution: {disconnect: true}}),
                     donor: {
                         upsert: {
                             update: {
@@ -2487,12 +2516,15 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                                 organization: {connect: {id: organization.id}},
                                 diagnoses: {
                                     deleteMany: {},
-                                    create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                    create: donorData?.diagnoses?.map((diagnosis: {
+                                        diagnosis: Option[],
+                                        severity: string | undefined
+                                    }) => ({
                                         severity: diagnosis.severity,
                                         type: {
                                             connectOrCreate: {
-                                                where: { id: diagnosis.diagnosis[0].value },
-                                                create: { 
+                                                where: {id: diagnosis.diagnosis[0].value},
+                                                create: {
                                                     id: diagnosis.diagnosis[0].value,
                                                     label: diagnosis.diagnosis[0].label
                                                 }
@@ -2505,12 +2537,15 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                                 ...donorData,
                                 organization: {connect: {id: organization.id}},
                                 diagnoses: {
-                                    create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                    create: donorData?.diagnoses?.map((diagnosis: {
+                                        diagnosis: Option[],
+                                        severity: string | undefined
+                                    }) => ({
                                         severity: diagnosis.severity,
                                         type: {
                                             connectOrCreate: {
-                                                where: { id: diagnosis.diagnosis[0].value },
-                                                create: { 
+                                                where: {id: diagnosis.diagnosis[0].value},
+                                                create: {
                                                     id: diagnosis.diagnosis[0].value,
                                                     label: diagnosis.diagnosis[0].label
                                                 }
@@ -2521,7 +2556,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                             }
                         }
                     }
-                }, 
+                },
                 create: {
                     ...biosampleData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
@@ -2560,21 +2595,24 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                         gene: {
                             connect: {symbol: biosampleData.gene.value}
                         }
-                    }): undefined),
+                    }) : undefined),
                     ...(biosampleData.institution ? ({
                         institution: {connect: {id: biosampleData.institution.value}}
-                    }): undefined),
-                    donor: { 
-                        create: { 
+                    }) : undefined),
+                    donor: {
+                        create: {
                             ...donorData,
                             organization: {connect: {id: organization.id}},
                             diagnoses: {
-                                create: donorData?.diagnoses?.map((diagnosis: {diagnosis: Option[], severity: string | undefined}) => ({
+                                create: donorData?.diagnoses?.map((diagnosis: {
+                                    diagnosis: Option[],
+                                    severity: string | undefined
+                                }) => ({
                                     severity: diagnosis.severity,
                                     type: {
                                         connectOrCreate: {
-                                            where: { id: diagnosis.diagnosis[0].value },
-                                            create: { 
+                                            where: {id: diagnosis.diagnosis[0].value},
+                                            create: {
                                                 id: diagnosis.diagnosis[0].value,
                                                 label: diagnosis.diagnosis[0].label
                                             }
@@ -2582,7 +2620,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                                     }
                                 }))
                             }
-                        } 
+                        }
                     }
                 }
             })
@@ -2623,39 +2661,45 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     description: toolData.description,
                     types: toolData.types,
                     ...(toolData.attachments ? (
-                        {attachments: {
-                            deleteMany: {}, // clear all existing attachments
-                            createMany: {
-                                data: (toolData?.attachments || []).map((attachment: any) => ({
-                                    link: attachment.link,
-                                    ...(attachment.name ? {name: attachment.name} : undefined)
-                                }))
-                            }
-                        }}
-                    ): undefined),
-                    ...(toolData.contacts ? (
-                        {contacts: {
-                            deleteMany: {},
-                            createMany: {
-                                data: (toolData?.contacts || []).map((contact: any) => ({
-                                    name: contact.name,
-                                    email: contact.email,
-                                    ...(contact.role ? {role: contact.role} : undefined),
-                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                }))
-                            }
-                        }}
-                    ): undefined),
-                    ...(toolData.milestones ? (
-                        {milestones: {
-                            deleteMany: {},
-                            create: (toolData.milestones || []).map((milestone: any) => ({
-                                milestone: {
-                                    connect: {id: milestone.milestoneId}
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (toolData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
                                 }
-                            }))
-                        },}
-                    ): undefined),
+                            }
+                        }
+                    ) : undefined),
+                    ...(toolData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (toolData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(toolData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (toolData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
                     private: toolData.private || false,
                     pinned: toolData.pinned || false,
                     metadata: toolData.metadata as InputJsonObject,
@@ -4671,20 +4715,20 @@ export const updateResearcher = withAuth(
     async (_id: unknown, data: { [key: string]: any }) => {
         const session = await getSession();
         if (!session?.user.id) {
-            return { error: "Not authenticated" };
+            return {error: "Not authenticated"};
         }
 
         try {
             const researcher = await prisma.researcher.findUnique({
-                where: { userId: session.user.id },
-                select: { id: true },
+                where: {userId: session.user.id},
+                select: {id: true},
             });
 
-            if (!researcher) return { error: "Researcher not found" };
+            if (!researcher) return {error: "Researcher not found"};
 
             // 1. Delete existing affiliations
             await prisma.affiliation.deleteMany({
-                where: { researcherId: researcher.id },
+                where: {researcherId: researcher.id},
             });
 
             if (Array.isArray(data.affiliations)) {
@@ -4693,9 +4737,9 @@ export const updateResearcher = withAuth(
                 // Validate institutionIds
                 const existingInstitutions = await prisma.institution.findMany({
                     where: {
-                        id: { in: institutionIds },
+                        id: {in: institutionIds},
                     },
-                    select: { id: true },
+                    select: {id: true},
                 });
 
                 const validInstitutionIds = new Set(existingInstitutions.map((i) => i.id));
@@ -4716,7 +4760,7 @@ export const updateResearcher = withAuth(
 
             // 3. Update researcher fields
             const response = await prisma.researcher.update({
-                where: { userId: session.user.id },
+                where: {userId: session.user.id},
                 data: {
                     title: data.title,
                     researchInterests: {
@@ -4735,174 +4779,61 @@ export const updateResearcher = withAuth(
         } catch (error: any) {
             if (error.code === "P2002") {
                 const field = Object.keys(data)[0];
-                return { error: `This ${field} is already in use` };
+                return {error: `This ${field} is already in use`};
             } else {
                 console.error(error);
-                return { error: error.message };
+                return {error: error.message};
             }
         }
     }
 );
 
-export const createMaterialAndDataAccessRequest = withResearcherAuth(
-    async (user: User, formData: FormData) => {
-        console.log("test", formData)
-        const session = await getSession()
-        if (!session?.user.id) {
-            return {
-                error: "Not authenticated"
-            }
-        }
-
-        const rawData = formData.get("data");
-        if (!rawData || typeof rawData !== "string") {
-            return { error: "Invalid form data." };
-        }
-
-        const parsed = JSON.parse(rawData);
-
-        const {
-            name,
-            description,
-            organizationId,
-            openToCollab,
-            projectDetails,
-            sampleDetails,
-            logistics,
-            commercial,
-            agreements,
-        } = parsed;
-
-        const {
-            studyTitle,
-            studyDescription,
-            justification,
-            hasIrbApproval,
-            irbStatus,
-            hasRisks,
-            riskDescription,
-            disseminationPlan,
-            patientSignificance,
-        } = projectDetails;
-
-        const {
-            sampleTypes,
-            otherSampleType,
-            participantCount,
-            processingRequirements,
-        } = sampleDetails;
-
-        const {
-            timeline,
-            logisticsContact,
-            providesCollectionKit,
-            needsCollectionMaterials,
-            participantCompensation,
-            compensationDetails,
-            shippingAddress,
-            fedexAccount,
-            shippingMethod,
-            shippingContact,
-            shippingPhone,
-        } = logistics;
-
-        const {
-            isCommercial,
-            fundingOrganization,
-        } = commercial;
-
-        const metadata: JsonObject = parsed.metadata ?? {};
-
+export const updateMaterialAndDataAccessRequestProperty = withAuth(
+    async (
+        requestId: string,
+        property: string,
+        value: any
+    ): Promise<{ success: boolean; error?: string; data?: any }> => {
         try {
-            const request = await prisma.materialAndDataAccessRequest.create({
-                data: {
-                    title: name,
-                    description,
-                    submittedAt: new Date(),
-                    sampleCount: participantCount,
-                    openToCollab,
-                    studyTitle,
-                    studyDescription,
-                    justification,
-                    hasIrbApproval,
-                    irbStatus,
-                    hasRisks,
-                    riskDescription,
-                    disseminationPlan,
-                    patientSignificance,
-                    sampleTypes,
-                    otherSampleType,
-                    processingRequirements,
-                    timeline,
-                    logisticsContact,
-                    providesCollectionKit,
-                    needsCollectionMaterials,
-                    participantCompensation,
-                    compensationDetails,
-                    shippingAddress,
-                    fedexAccount,
-                    shippingMethod,
-                    shippingContact,
-                    shippingPhone,
-                    isCommercial,
-                    fundingOrganization,
-                    metadata,
+            const session = await getSession();
+            if (!session?.user.id) {
+                return {success: false, error: "Not authenticated"};
+            }
 
-                    organization: {
-                        connect: {
-                            id: organizationId,
-                        },
-                    },
-                    researcher: {
-                        connect: {
-                            userId: session.user.id,
-                        },
-                    },
-                },
+            const allowedProps = [
+                "sampleCount", "about", "status", "submittedAt", "expiresAt",
+                "sampleTypes", "dataTypes"
+            ];
+
+            if (!allowedProps.includes(property)) {
+                return {success: false, error: "Unsupported property."};
+            }
+
+            let updateData: any = {};
+            updateData[property] = value;
+
+            const updatedRequest = await prisma.materialAndDataAccessRequest.update({
+                where: {id: requestId},
+                data: updateData
             });
 
-            await addTypeSenseDocument(
+            await updateTypeSenseDocument(
                 `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 (
                     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                         : process.env.TYPESENSE_ADMIN_API_KEY
                 )!,
-                request,
+                updatedRequest,
                 'requests'
             );
 
-            revalidatePath("/requests")
+            revalidatePath("/requests");
 
-            // await sendNewOrganizationEmail(
-            //     {
-            //         user: {
-            //             name: session.user.name,
-            //             email: session.user.email
-            //         },
-            //         organization: {
-            //             name: organization.name,
-            //             subdomain: organization.subdomain
-            //         }
-            //     }
-            // ).then(() => {
-            //     console.log("email sent")
-            // })
-
-            return {success: true, data: request}
+            return {success: true, data: updatedRequest};
         } catch (error: any) {
-            if (error.code === "P2002") {
-                const target = error.meta?.target?.[0];
-
-                switch (target) {
-                    default:
-                        return {error: `Unique constraint failed on ${target}`};
-                }
-            } else {
-                return {
-                    error: error.message
-                }
-            }
+            console.error("Error updating property:", error);
+            return {success: false, error: "Server error occurred."};
         }
     }
-)
+);

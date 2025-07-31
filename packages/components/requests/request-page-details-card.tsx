@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { Paperclip } from "lucide-react";
 import { MaterialAndDataAccessRequestWithResearcherAndComments } from "@comend/lib/types";
+import {RequestUpdatePropertyDialog} from "./request-update-property-dialog";
 
 export default function RequestPageDetailsCard({ requestData }: { requestData: MaterialAndDataAccessRequestWithResearcherAndComments }) {
+    console.log(requestData);
     return (
         <Card className="mb-6">
             <CardHeader>
@@ -18,9 +20,6 @@ export default function RequestPageDetailsCard({ requestData }: { requestData: M
                                 <div className="grow">
                                     {requestData?.researcher?.name} ({requestData?.researcher?.title})
                                 </div>
-                                <div className="ml-4 shrink-0">
-                                    <button type="button" className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">Update</button>
-                                </div>
                             </dd>
                         </div>
 
@@ -30,7 +29,12 @@ export default function RequestPageDetailsCard({ requestData }: { requestData: M
                             <dd className="mt-1 flex text-sm/6 text-gray-700 col-span-2 sm:mt-0">
                                 <div className="grow">{requestData?.sampleCount ?? "N/A"}</div>
                                 <div className="ml-4 shrink-0">
-                                    <button type="button" className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">Update</button>
+                                    {/*<button type="button" className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">Update</button>*/}
+                                    <RequestUpdatePropertyDialog
+                                        requestId={requestData.id}
+                                        property={"sampleCount"}
+                                        currentValue={requestData.sampleCount}
+                                    />
                                 </div>
                             </dd>
                         </div>
