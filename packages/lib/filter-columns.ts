@@ -89,7 +89,11 @@ export function filterColumns<TWhere extends object>({
                 } else if (typeof filter.value[0] === "string") {
                   return {hasSome: filter.value}
                 } else if (typeof filter.value[0] === "object") {
-                  return {some: {OR: filter.value}}
+                  if (filter.value.length === 1) {
+                    return {some: filter.value[0]}
+                  } else {
+                    return {some: {OR: filter.value}}
+                  }
                 }
                 return {}
                 // return filter.id === "status"

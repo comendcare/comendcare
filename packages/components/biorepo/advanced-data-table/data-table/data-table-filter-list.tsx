@@ -137,6 +137,7 @@ export function DataTableFilterList<TData>({
           column.columnDef.meta?.variant ?? "text",
         ),
         filterId: generateId({ length: 8 }),
+        onAsyncSearch: column.columnDef.meta?.onAsyncSearch
       },
     ]);
   }, [columns, filters, debouncedSetFilters]);
@@ -715,31 +716,41 @@ function onFilterInputRender<TData>({
               />
             </Button>
           </FacetedTrigger>
-          <FacetedContent
-            id={inputListboxId}
-            className="w-[200px] origin-[var(--radix-popover-content-transform-origin)]"
-          >
-            <FacetedInput
-              aria-label={`Search ${columnMeta?.label} options`}
-              placeholder={columnMeta?.placeholder ?? "Search options..."}
+          {columnMeta?.onAsyncSearch !== undefined ? (
+            <AsyncFacetedContent
+              columnMeta={{
+                label: `Search ${columnMeta?.label} options`,
+                placeholder: columnMeta?.placeholder ?? "Search options...",
+              }}
+              fetchOptions={columnMeta.onAsyncSearch}
             />
-            <FacetedList>
-              <FacetedEmpty>No options found.</FacetedEmpty>
-              <FacetedGroup>
-                {columnMeta?.options?.map((option) => (
-                  <FacetedItem key={option.value} value={option.value}>
-                    {option.icon && <option.icon />}
-                    <span>{option.label}</span>
-                    {option.count && (
-                      <span className="ml-auto font-mono text-xs">
-                        {option.count}
-                      </span>
-                    )}
-                  </FacetedItem>
-                ))}
-              </FacetedGroup>
-            </FacetedList>
-          </FacetedContent>
+          ): (
+            <FacetedContent
+              id={inputListboxId}
+              className="w-[200px] origin-[var(--radix-popover-content-transform-origin)]"
+            >
+              <FacetedInput
+                aria-label={`Search ${columnMeta?.label} options`}
+                placeholder={columnMeta?.placeholder ?? "Search options..."}
+              />
+              <FacetedList>
+                <FacetedEmpty>No options found.</FacetedEmpty>
+                <FacetedGroup>
+                  {columnMeta?.options?.map((option) => (
+                    <FacetedItem key={option.value} value={option.value}>
+                      {option.icon && <option.icon />}
+                      <span>{option.label}</span>
+                      {option.count && (
+                        <span className="ml-auto font-mono text-xs">
+                          {option.count}
+                        </span>
+                      )}
+                    </FacetedItem>
+                  ))}
+                </FacetedGroup>
+              </FacetedList>
+            </FacetedContent>
+          )}
         </Faceted>
       );
     }
@@ -834,4 +845,92 @@ function onFilterInputRender<TData>({
     default:
       return null;
   }
+}
+
+import { useEffect, useState } from "react"
+import { debounce } from "lodash" // or write your own debounce
+
+interface Option {
+  value: string
+  label: string
+  count?: number
+  icon?: React.ComponentType
+}
+
+interface AsyncFacetedProps {
+  columnMeta: {
+    label?: string
+    placeholder?: string
+  }
+  fetchOptions: (query?: string) => Promise<Option[]> // Your API accessor
+  inputListboxId?: string
+}
+
+export function AsyncFacetedContent({
+  columnMeta,
+  fetchOptions,
+  inputListboxId,
+}: AsyncFacetedProps) {
+  const [options, setOptions] = useState<Option[]>([])
+  const [loading, setLoading] = useState(false)
+
+  // Fetch initial 100 options on mount
+  useEffect(() => {
+    const fetchInitial = async () => {
+      setLoading(true)
+      const initial = await fetchOptions("")
+      setOptions(initial)
+      setLoading(false)
+    }
+    fetchInitial()
+  }, [fetchOptions])
+
+  // Debounced search
+  const handleSearch = debounce(async (query: string) => {
+    setLoading(true)
+    const newOptions = await fetchOptions(query)
+    console.log(`NEW OPTIONS`, newOptions)
+    setOptions(newOptions)
+    setLoading(false)
+  }, 300)
+
+  useEffect(() => {
+    console.log(`options changed`, options)
+  }, [options])
+
+  return (
+    <FacetedContent
+      id={inputListboxId}
+      className="w-[200px] origin-[var(--radix-popover-content-transform-origin)]"
+      shouldFilter={false}
+    >
+      <FacetedInput
+        aria-label={`Search ${columnMeta?.label} options`}
+        placeholder={columnMeta?.placeholder ?? "Search options..."}
+        onInput={(e) => handleSearch((e.target as HTMLInputElement).value)}
+      />
+      <FacetedList>
+        {loading ? (
+          <FacetedEmpty>Loading...</FacetedEmpty>
+        ) : options.length === 0 ? (
+          <FacetedEmpty>No options found.</FacetedEmpty>
+        ) : (
+          <FacetedGroup>
+            {options.map((option) => {
+              console.log(`OPTION`, option)
+              return (
+                <FacetedItem key={option.value} value={String(option.value)}>
+                  {option.icon && <option.icon />}
+                  <span>{option.label}</span>
+                  {option.count && (
+                    <span className="ml-auto font-mono text-xs">{option.count}</span>
+                  )}
+                </FacetedItem>
+              )
+            })}
+          </FacetedGroup>
+        )}
+      </FacetedList>
+    </FacetedContent>
+  )
 }
