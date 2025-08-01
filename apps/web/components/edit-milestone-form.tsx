@@ -715,17 +715,18 @@ export function EditMilestoneForm({
                                                                 }
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <CommandItem
+                                                                    <Button
                                                                         value={undefined}
-                                                                        className="cursor-pointer"
+                                                                        variant={'ghost'}
+                                                                        className="cursor-pointer w-full p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                         onMouseDown={(e) => {
                                                                             e.preventDefault();
                                                                             e.stopPropagation();
                                                                         }}
-                                                                        onSelect={(value: string) => setCreateRFPIsOpen(true)}
+                                                                        onClick={() => setCreateRFPIsOpen(true)}
                                                                     >
                                                                         {`+ Create RFP`}
-                                                                    </CommandItem>
+                                                                    </Button>
                                                                 )}
                                                             />
                                                         </FormControl>
