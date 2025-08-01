@@ -18,7 +18,8 @@ import {
     User,
     MaterialAndDataAccessRequest,
     Researcher,
-    Institution
+    Institution,
+    SavedOrganization
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -193,6 +194,11 @@ export type SavedCompanyData = SavedCompany & {
     company: Company;
     milestone: Milestone;
 };
+
+export type SavedOrganizationData = SavedOrganization & {
+    organization: Organization,
+    savedOrganization: Organization
+}
 
 export interface CompanyWithReviewsAndServices extends Company {
     reviews: ReviewWithAuthor[];

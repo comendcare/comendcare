@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Checkbox } from "@comend/components/ui/checkbox"
+import { SavedOrganizationData } from "@/packages/lib/types"
 
 interface CustomColumnMeta {
     name?: string;
@@ -13,7 +14,7 @@ declare module "@tanstack/react-table" {
     interface ColumnMeta<TData, TValue> extends CustomColumnMeta {}
 }
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<SavedOrganizationData>[] = [
     {
         id: "select",
         header: ({ table }) => (

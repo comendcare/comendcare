@@ -27,6 +27,42 @@ import {mergeResearcherData} from "@/apps/researcher/lib/utils";
 import { GetBiosamplesSchema, GetDiseaseModelSchema } from "@comend/components/biorepo/advanced-data-table/lib/validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
+export async function getServicesOfCompany(
+    companyId: string,
+    select: Prisma.ServiceSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
+    try {
+        const company = await prisma?.company.findUnique({
+            where: {id: companyId},
+            select: {
+                services: {select}
+            }
+        })
+
+        if (!company) {
+            return {success: false, error: `Services not found, could not find company with id: ${companyId}`}
+        }
+        
+        const fetchedServices = company.services
+        if (!fetchedServices) {
+            return {success: false, error:`Services not found` }
+        }
+
+        return {
+            success: true,
+            data: fetchedServices
+        }
+    } catch (error: any) {
+        logError("Error fetching RFPs", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getPublicAssetsForOrganization(
     domain: string,
     select: Prisma.ToolSelect<InternalArgs & {

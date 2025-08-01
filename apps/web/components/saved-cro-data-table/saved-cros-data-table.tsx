@@ -19,16 +19,18 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
+import { SavedCompanyData } from "@/packages/lib/types"
+import { useRouter } from "next/navigation"
 
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+interface DataTableProps<TValue> {
+    columns: ColumnDef<SavedCompanyData, TValue>[]
+    data: SavedCompanyData[]
 }
 
-export function SavedCROsDataTable<TData, TValue>({
+export function SavedCROsDataTable<TValue>({
                                              columns,
                                              data,
-                                         }: DataTableProps<TData, TValue>) {
+                                         }: DataTableProps<TValue>) {
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
@@ -36,7 +38,8 @@ export function SavedCROsDataTable<TData, TValue>({
         []
     )
     const [sorting, setSorting] = React.useState<SortingState>([])
-
+    const router = useRouter()
+    
     const table = useReactTable({
         data,
         columns,
@@ -88,6 +91,13 @@ export function SavedCROsDataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        const href =process.env.NEXT_PUBLIC_VERCEL_ENV
+                                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${row.original.companyId}`
+                                            : `http://localhost:3000/app/service-providers/${row.original.companyId}`
+                                        router.push(href)
+                                    }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
