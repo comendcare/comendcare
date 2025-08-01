@@ -96,7 +96,7 @@ export function DataTableRowActions<TData extends Prisma.SavedOrganizationGetPay
                                 e.stopPropagation()
                             }}
                         >
-                            Contact
+                            Contact Group
                         </DropdownMenuItem>
                     </Link>
                 )}
