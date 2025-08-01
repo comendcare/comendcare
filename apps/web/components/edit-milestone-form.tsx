@@ -715,18 +715,20 @@ export function EditMilestoneForm({
                                                                 }
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <Button
-                                                                        value={undefined}
-                                                                        variant={'ghost'}
-                                                                        className="cursor-pointer w-full p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                                                        onMouseDown={(e) => {
-                                                                            e.preventDefault();
-                                                                            e.stopPropagation();
-                                                                        }}
-                                                                        onClick={() => setCreateRFPIsOpen(true)}
-                                                                    >
-                                                                        {`+ Create RFP`}
-                                                                    </Button>
+                                                                    <div className="w-full px-1 pb-1">
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            onClick={() => setCreateRFPIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create RFP`}
+                                                                        </Button>
+                                                                    </div>
                                                                 )}
                                                             />
                                                         </FormControl>
