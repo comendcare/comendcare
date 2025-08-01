@@ -135,7 +135,7 @@ export function EditRFPForm({
 }: {
     rfpData: Partial<RFP>,
     numRFPsPinned: number,
-    closeDialog?: () => void
+    closeDialog?: (updatedOrNewRFP?: RFP | undefined) => void
 }) {
     const router = useRouter()
     const initializing = useRef(true)
@@ -232,20 +232,21 @@ export function EditRFPForm({
         }
 
         try {
+            let updatedOrNewRFP = undefined
             if (rfpData.id) {
-                await updateRFP(updateData, session.user.organizationId)
+                updatedOrNewRFP = await updateRFP(updateData, session.user.organizationId)
                 toast.success(
                     "RFP updated successfully!",
                     {position: "bottom-left"}
                 )
             } else {
-                await createRFP(updateData, session.user.organizationId)
+                updatedOrNewRFP = await createRFP(updateData, session.user.organizationId)
                 toast.success(
                     "RFP created successfully!",
                     {position: "bottom-left"}
                 )
             }
-            if (closeDialog) closeDialog()
+            if (closeDialog) closeDialog(updatedOrNewRFP)
         } catch (error) {
             console.error("Error updating or createing RFP:", error);
             toast.error(
