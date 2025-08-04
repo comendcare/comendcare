@@ -125,17 +125,17 @@ export default function PAGSettingsMembersTab() {
                                                 </div>
                                                 <div className="ml-4">
                                                     <div className="font-medium text-gray-900">
-                                                        {person?.user?.name}
+                                                        {person?.user?.name ?? "--"}
                                                     </div>
                                                     <div className="mt-1 text-gray-500">{person?.email}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {person?.title}
+                                            {person?.title ?? "--"}
                                         </td>
                                         <td className="capitalize whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {person?.role}
+                                            {person?.role ?? "--"}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {new Date(person?.createdAt).toDateString()}

@@ -1066,7 +1066,7 @@ export const inviteUser = withOrganizationAuth(
                         organizationImage: organization.image || undefined,
                         ip: ip,
                     },
-                    inviteLink: `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login?invitationId=${invitationId}`
+                    inviteLink: `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
                 }
             ).then(() => {
                 console.log("email sent")
