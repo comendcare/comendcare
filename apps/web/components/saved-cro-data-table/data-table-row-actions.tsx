@@ -32,6 +32,7 @@ import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@comend/lib/types";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import ProjectMultipleSelector from "../project-multiple-selector";
+import { CompanyWithServices, ContactCroDialogContent } from "../contact-cro-dialog";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -57,13 +58,15 @@ interface DataTableRowActionsProps<TData> {
 }
 
 export function DataTableRowActions<TData extends SavedCompanyData>({
-                                               row,
-                                           }: DataTableRowActionsProps<TData>) {
+    row,
+}: DataTableRowActionsProps<TData>) {
     const router = useRouter()
     const {data: session} = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
     const [isSaved, setIsSaved] = useState(false);
+    const [contactIsOpen, setContactIsOpen] = useState(false)
+    const [editIsOpen, setEditIsOpen] = useState(false)
     console.log(row)
 
     const form = useForm<SaveCROFormData>({
@@ -131,6 +134,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
             console.error("Error saving cro:", error);
         } finally {
             setIsSubmitting(false);
+            setEditIsOpen(false)
         }
     };
 
@@ -158,31 +162,42 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
     };
 
     return (
-        <Dialog>
-            <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-                    >
-                        <DotsHorizontalIcon className="h-4 w-4"/>
-                        <span className="sr-only">Open menu</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[160px]">
-                    <DialogTrigger asChild>
-                        <DropdownMenuItem>
-                            Edit
-                        </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem
-                        onClick={handleUnsaveCRO}
-                    >
-                        Unsave
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu><DialogContent>
+        <div onClick={(e) => e.stopPropagation()}> 
+        <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="ghost"
+                    className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                >
+                    <DotsHorizontalIcon className="h-4 w-4"/>
+                    <span className="sr-only">Open menu</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[160px]">
+                <DropdownMenuItem onClick={(e) => {
+                    setContactIsOpen(true)
+                }}>
+                    Request a meeting
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => {
+                    setEditIsOpen(true)
+                }}>
+                    Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => {
+                    handleUnsaveCRO()
+                }}>
+                    Unsave
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Dialog open={contactIsOpen} onOpenChange={(open) => setContactIsOpen(open)}>
+            <ContactCroDialogContent cro={row.original.company} setOpen={setContactIsOpen}/>
+        </Dialog>
+
+        <Dialog open={editIsOpen} onOpenChange={(open) => setEditIsOpen(open)}>
+            <DialogContent>
             <DialogHeader>
                 <DialogTitle>Save {row.original.company.title}</DialogTitle>
             </DialogHeader>
@@ -243,7 +258,8 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                     </Button>
                 </form>
             </Form>
-        </DialogContent>
+            </DialogContent>
         </Dialog>
+        </div>
     )
 }

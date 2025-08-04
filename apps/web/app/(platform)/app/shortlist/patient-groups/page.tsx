@@ -7,14 +7,14 @@ import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";
 import NoOrganization from "~web/components/no-organization";
 import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
-import { SavedOrganization } from "@prisma/client";
-import { SavedOrganizationsDataTable } from "~web/components/saved-organization-data-table/saved-cros-data-table";
-import { columns } from "~web/components/saved-organization-data-table/saved-cros-data-columns";
+import { SavedOrganizationsDataTable } from "~web/components/saved-organization-data-table/saved-organizations-data-table";
+import { columns } from "~web/components/saved-organization-data-table/saved-organizations-data-columns";
+import { SavedOrganizationData } from "@/packages/lib/types";
 
 export default function OrganizationSavesPage() {
     const router = useRouter()
     const { data: session } = useSession();
-    const [savedOrganizations, setSavedOrganizations] = useState<SavedOrganization[]>([]);
+    const [savedOrganizations, setSavedOrganizations] = useState<SavedOrganizationData[]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -29,7 +29,7 @@ export default function OrganizationSavesPage() {
                 metadata: true
             });
             if (savedOrganizationsResponse.success) {
-                const savedOrganizationsData = savedOrganizationsResponse.data as SavedOrganization[];
+                const savedOrganizationsData = savedOrganizationsResponse.data as SavedOrganizationData[];
                 setSavedOrganizations(savedOrganizationsData);
             } else {
                 console.error(savedOrganizationsResponse.error);

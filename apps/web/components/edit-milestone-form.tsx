@@ -30,6 +30,9 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
@@ -61,7 +64,7 @@ import Link from "next/link"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
-import {ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Ellipsis, Share} from "lucide-react"
+import {Globe, Lock, Plus, X, Store, Share} from "lucide-react"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
@@ -71,6 +74,10 @@ import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-
 import { Skeleton } from "@comend/components/ui/skeleton"
 import EditMilestoneDetailsProjectsTab from "./edit-milestone-details-projects-tab"
 import { useOnborda } from "./onborda/OnbordaContext"
+import { EditRFPForm } from "./edit-rfp-form"
+import { CommandItem } from "@/packages/components/ui/command"
+import { usePathname } from "next/navigation"
+import { nanoid } from "nanoid"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -150,6 +157,7 @@ export function EditMilestoneForm({
     } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
+    const pathname = usePathname()
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
@@ -157,8 +165,9 @@ export function EditMilestoneForm({
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
     const {step} = useOnbordaStore(useShallow(onbordaSelector))
-    const {currentTour, currentStep, isOnbordaVisible} = useOnborda()
+    const {isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
+    const [createRFPIsOpen, setCreateRFPIsOpen] = useState(false)
     const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -322,70 +331,71 @@ export function EditMilestoneForm({
         []
     )
 
+    const init = async () => {
+        if (session?.user.organizationId) {
+            // const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+            // if (response.success && response.data) {
+            //     setOrgIsPublished(response.data.published)
+            // }
+
+            const toolsResponse = await getAssets(session.user.organizationId, {
+                id: true,
+                title: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                private: true,
+                pinned: true,
+                milestones: true
+            })
+            if (toolsResponse.success && toolsResponse.data) {
+                setFetchedAssets(toolsResponse.data || [])
+            }
+
+            const rfpsResponse = await getRFPs(session.user.organizationId, {
+                id: true,
+                title: true,
+                description: true,
+                openTo: true,
+                startDate: true,
+                endDate: true,
+                contacts: true,
+                attachments: true,
+                budget: true,
+                private: true,
+                headerImage: true,
+                pinned: true,
+                milestones: true
+            })
+            if (rfpsResponse.success && rfpsResponse.data) {
+                setFetchedRFPs(rfpsResponse.data || [])
+            }
+        }
+
+        // get milestone types from database
+        const response = await getMilestoneTypes({
+            id: true,
+            label: true,
+            services: true,
+            categories: true,
+            description: true
+        })
+        if (response.success && response.data) {
+            setMilestoneTypes(response.data || [])
+        }
+
+        if (milestoneData) {
+            await setRecommendations([milestoneData as Milestone], {limit: 3})
+        }
+
+        // trigger a form validation, if the imported data is not valid, let the user know right away
+        form.trigger()
+
+        initializing.current = false
+    }
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
-        const init = async () => {
-            if (session?.user.organizationId) {
-                // const response = await getOrganizationFromOrganizationId(session.user.organizationId)
-                // if (response.success && response.data) {
-                //     setOrgIsPublished(response.data.published)
-                // }
-
-                const toolsResponse = await getAssets(session.user.organizationId, {
-                    id: true,
-                    title: true,
-                    description: true,
-                    contacts: true,
-                    attachments: true,
-                    private: true,
-                    pinned: true,
-                    milestones: true
-                })
-                if (toolsResponse.success && toolsResponse.data) {
-                    setFetchedAssets(toolsResponse.data || [])
-                }
-
-                const rfpsResponse = await getRFPs(session.user.organizationId, {
-                    id: true,
-                    title: true,
-                    description: true,
-                    openTo: true,
-                    startDate: true,
-                    endDate: true,
-                    contacts: true,
-                    attachments: true,
-                    budget: true,
-                    private: true,
-                    headerImage: true,
-                    pinned: true,
-                    milestones: true
-                })
-                if (rfpsResponse.success && rfpsResponse.data) {
-                    setFetchedRFPs(rfpsResponse.data || [])
-                }
-            }
-
-            // get milestone types from database
-            const response = await getMilestoneTypes({
-                id: true,
-                label: true,
-                services: true,
-                categories: true,
-                description: true
-            })
-            if (response.success && response.data) {
-                setMilestoneTypes(response.data || [])
-            }
-
-            if (milestoneData) {
-                await setRecommendations([milestoneData as Milestone], {limit: 3})
-            }
-
-            // trigger a form validation, if the imported data is not valid, let the user know right away
-            form.trigger()
-
-            initializing.current = false
-        }
 
         init()
 
@@ -703,6 +713,23 @@ export function EditMilestoneForm({
                                                                         no results found.
                                                                     </p>
                                                                 }
+                                                                creatable={true}
+                                                                creatableItemOverride={() => (
+                                                                    <div className="w-full px-1 pb-1">
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            onClick={() => setCreateRFPIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create RFP`}
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
                                                             />
                                                         </FormControl>
                                                         <FormMessage className="text-primary"/>
@@ -841,6 +868,42 @@ export function EditMilestoneForm({
                     </form>
                 </ScrollArea>
             </Form>
+
+            <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
+                <DialogContent>
+                    <DialogHeader className="pt-[80px]">
+                        <DialogTitle>
+                            Create an RFP
+                        </DialogTitle>
+                        <DialogDescription>
+                            {`Create your RFP here. Click save when you're done.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditRFPForm 
+                        rfpData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id, 
+                                    rfpId: nanoid(), 
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }} 
+                        closeDialog={(newRFP) => {
+                            setCreateRFPIsOpen(false)
+
+                            if (newRFP) {
+                                form.setValue("rfps", [
+                                    ...(form.getValues("rfps") || []),
+                                    newRFP as any
+                                ])
+                            }
+                        }} 
+                        numRFPsPinned={0}
+                    />
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">
                     {organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
