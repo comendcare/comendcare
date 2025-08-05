@@ -991,7 +991,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     <div className="w-full flex items-center justify-end">
                         {!createNewDonor && (
                             <FormLabel className="flex items-center gap-1 grow"> 
-                                External Donor ID
+                                Public Donor ID
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
