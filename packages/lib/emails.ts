@@ -12,6 +12,7 @@ import NewOrganizationEmail from "@/packages/transactional/emails/admins/new-org
 import memberRequestApprovedEmail from "@/packages/transactional/emails/invitations/member-request-approved-email";
 import memberRequestDeniedEmail from "@/packages/transactional/emails/invitations/member-request-denied-email";
 import MemberDeletedEmail from "@/packages/transactional/emails/invitations/member-deleted-email";
+import ContactRequestEmail from "@/packages/transactional/emails/providers/contact-request-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
@@ -349,3 +350,37 @@ export async function sendMemberRequestDeniedEmail(params: {
     }
 }
 
+export async function sendProviderContactRequestEmail(params: {
+    userName: string | null | undefined
+    providerName: string | null | undefined
+    email: string | null | undefined
+    organizationName: string | null | undefined
+    organizationImage: string | null | undefined
+}) {
+    const emailTemplate = await render(
+        ContactRequestEmail(
+            {
+                userName: params.userName,
+                userEmail: params.email,
+                providerName: params.providerName,
+                organizationName: params.organizationName,
+                organizationImage: params.organizationImage,
+            }
+        )
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.email) {
+        const msg = {
+            to: "corporate@comendcare.com",
+            from: {
+                name: "Comend Team",
+                email: "corporate@comendcare.com"
+            },
+            html: emailTemplate,
+            text: `A user has requested to contact ${params.providerName}.`,
+            subject: `${params.userName} has requested to contact a provider`
+        }
+        await sendEmail(msg)
+    }
+}

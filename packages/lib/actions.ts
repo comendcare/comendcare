@@ -32,7 +32,7 @@ import {
     sendMemberRequestApprovedEmail,
     sendNewOrganizationEmail,
     sendMemberRequestDeniedEmail,
-    sendMemberDeletedEmail,
+    sendMemberDeletedEmail, sendProviderContactRequestEmail,
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {
@@ -320,7 +320,6 @@ export const connectOrganizationToCondition = withAuth(
 )
 
 export const createOrganization = withAuth(
-
     async (formData: FormData) => {
         const session = await getSession()
         if (!session?.user.id) {
@@ -4455,6 +4454,7 @@ export const saveCRO = withOrganizationAuth(
 
 export const contactCRO = withOrganizationAuth(
     async (organization: Organization, croId: string, formData: FormData) => {
+        const session = await getSession();
         const description = formData.get("description") as string;
         const timeline = formData.get("timeline") as string;
 
@@ -4497,10 +4497,26 @@ export const contactCRO = withOrganizationAuth(
                     },
                 },
                 include: {
+                    company: true,
+                    organization: true,
                     services: true,
                     rfps: true,
                 },
             });
+
+            if (response && session) {
+                await sendProviderContactRequestEmail(
+                    {
+                        userName: session.user.name,
+                        email: session.user.email,
+                        providerName: response.company.title,
+                        organizationName: response.organization.name,
+                        organizationImage: response.organization.image,
+                    }
+                ).then(() => {
+                    console.log("email sent")
+                })
+            }
 
             return {success: true, data: response};
         } catch (error: any) {
