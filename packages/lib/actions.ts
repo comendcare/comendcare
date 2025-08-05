@@ -320,6 +320,7 @@ export const connectOrganizationToCondition = withAuth(
 )
 
 export const createOrganization = withAuth(
+
     async (formData: FormData) => {
         const session = await getSession()
         if (!session?.user.id) {
@@ -1027,7 +1028,6 @@ export const inviteUser = withOrganizationAuth(
                 return {success: false, error: "An invitation has already been sent to this email."}
             }
 
-            let invitationId: string | undefined
             const invitation = await prisma.invitation.create({
                 data: {
                     email: lowerCaseEmail,
@@ -1035,10 +1035,8 @@ export const inviteUser = withOrganizationAuth(
                     organizationId: organization.id
                 }
             }).then((res) => {
-
                 return res
             })
-            invitationId = invitation.id
 
             // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
             await prisma.whitelist.upsert({
