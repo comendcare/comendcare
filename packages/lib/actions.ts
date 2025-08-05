@@ -320,6 +320,7 @@ export const connectOrganizationToCondition = withAuth(
 )
 
 export const createOrganization = withAuth(
+
     async (formData: FormData) => {
         const session = await getSession()
         if (!session?.user.id) {
@@ -1027,7 +1028,6 @@ export const inviteUser = withOrganizationAuth(
                 return {success: false, error: "An invitation has already been sent to this email."}
             }
 
-            let invitationId: string | undefined
             const invitation = await prisma.invitation.create({
                 data: {
                     email: lowerCaseEmail,
@@ -1035,10 +1035,8 @@ export const inviteUser = withOrganizationAuth(
                     organizationId: organization.id
                 }
             }).then((res) => {
-
                 return res
             })
-            invitationId = invitation.id
 
             // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
             await prisma.whitelist.upsert({
@@ -1066,7 +1064,7 @@ export const inviteUser = withOrganizationAuth(
                         organizationImage: organization.image || undefined,
                         ip: ip,
                     },
-                    inviteLink: `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login?invitationId=${invitationId}`
+                    inviteLink: `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
                 }
             ).then(() => {
                 console.log("email sent")
@@ -2004,6 +2002,12 @@ export const createDiseaseModel = withOrganizationAuth(
     }
 )
 
+function generateDonorNanoid() {
+  const id = nanoid(8) // generate 8 char
+  console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
+  return (id.slice(0, 4) + '-' + id.slice(4))
+}
+
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
@@ -2109,6 +2113,7 @@ export const createBiosample = withOrganizationAuth(
                         connectOrCreate: {
                             where: {id: data.donorId || nanoid()},
                             create: {
+                                id: data.donorId || generateDonorNanoid(),
                                 internalId: data.donorInternalId,
                                 age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,

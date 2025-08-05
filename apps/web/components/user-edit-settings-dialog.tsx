@@ -1,4 +1,3 @@
-"use client"
 import {Button} from "@comend/components/ui/button";
 import {
     Dialog,

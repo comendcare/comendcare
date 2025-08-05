@@ -36,6 +36,7 @@ import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { createDiseaseModel, updateDiseaseModel } from "@/packages/lib/actions"
+import { cn } from "@/packages/lib/utils"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -408,7 +409,8 @@ export const AdditionalDiseaseModelFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="institutions"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">Institution</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
