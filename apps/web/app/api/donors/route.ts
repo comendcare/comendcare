@@ -28,7 +28,7 @@ export async function GET(req: Request) {
 
         // Format the results for the MultipleSelector
         const formattedResults = donors.map((donor) => ({
-            img: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${donor.id}`,
+            img: `https://api.dicebear.com/8.x/shapes/svg?seed=${donor.id}`,
             label: donor.id, // Use "symbol" for the label
             value: donor.id, // Use "symbol" for the value
         }));

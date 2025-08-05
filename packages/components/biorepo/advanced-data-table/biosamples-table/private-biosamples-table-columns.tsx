@@ -40,9 +40,11 @@ import { Option } from "@comend/lib/types";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
-    'diagnoses',
-    'gene',
+    'donor.diagnoses',
+    // 'gene',
     'variant',
+    'availability', 
+    'quantity',
     'volume',
     'currentCountry',
     'countryOfCollection',
@@ -51,18 +53,18 @@ const hiddenColumnIds = [
     'preservationMethod',
     'anatomicalSite',
     'methodOfTransport',
-    'collectionDate',
-    'donorId',
-    'age',
-    'sex',
-    'gender',
-    'race',
-    'ethnicity',
-    'height',
-    'weight',
-    'bmi',
-    'medications',
-    'treatments',
+    // 'collectionDate',
+    // 'donorId',
+    'donor.age',
+    'donor.sex',
+    'donor.gender',
+    'donor.race',
+    'donor.ethnicity',
+    'donor.height',
+    'donor.weight',
+    'donor.bmi',
+    'donor.medications',
+    'donor.treatments',
 ]
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
@@ -146,7 +148,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
                     <p>{row.original.donorId}</p>
                 </div>
             ),

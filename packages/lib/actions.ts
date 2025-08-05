@@ -2002,6 +2002,12 @@ export const createDiseaseModel = withOrganizationAuth(
     }
 )
 
+function generateDonorNanoid() {
+  const id = nanoid(8) // generate 8 char
+  console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
+  return (id.slice(0, 4) + '-' + id.slice(4))
+}
+
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
@@ -2107,6 +2113,7 @@ export const createBiosample = withOrganizationAuth(
                         connectOrCreate: {
                             where: {id: data.donorId || nanoid()},
                             create: {
+                                id: data.donorId || generateDonorNanoid(),
                                 internalId: data.donorInternalId,
                                 age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,
