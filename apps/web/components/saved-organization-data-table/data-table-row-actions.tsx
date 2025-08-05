@@ -19,6 +19,8 @@ import {unsaveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { revalidate } from "@/packages/lib/revalidate";
+import Link from "next/link";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -80,14 +82,29 @@ export function DataTableRowActions<TData extends Prisma.SavedOrganizationGetPay
                 <Button
                     variant="ghost"
                     className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                    onClick={(e) => e.stopPropagation()}
                 >
                     <DotsHorizontalIcon className="h-4 w-4"/>
                     <span className="sr-only">Open menu</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
+                {row.original.savedOrganization.contactEmail && (
+                    <Link href={`mailto:${row.original.savedOrganization.contactEmail}`}>
+                        <DropdownMenuItem
+                            onClick={(e) => {
+                                e.stopPropagation()
+                            }}
+                        >
+                            Contact Group
+                        </DropdownMenuItem>
+                    </Link>
+                )}
                 <DropdownMenuItem
-                    onClick={handleUnsaveOrganization}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        handleUnsaveOrganization()
+                    }}
                 >
                     Unsave
                 </DropdownMenuItem>

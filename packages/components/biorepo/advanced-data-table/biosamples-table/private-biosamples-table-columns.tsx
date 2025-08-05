@@ -19,6 +19,7 @@ import {
     DONOR_GENDER_OPTIONS,
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
+    Milestone,
     SAMPLE_PRESERVATION_METHOD_OPTIONS,
     SAMPLE_TRANSPORT_METHOD_OPTIONS,
 } from "@comend/lib/types";
@@ -33,12 +34,17 @@ import { Badge } from "@comend/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { getDiagnosisTypes, getMilestones } from "@comend/lib/fetchers";
+import { useEffect, useState } from "react";
+import { Option } from "@comend/lib/types";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
-    'diagnoses',
-    'gene',
+    'donor.diagnoses',
+    // 'gene',
     'variant',
+    'availability', 
+    'quantity',
     'volume',
     'currentCountry',
     'countryOfCollection',
@@ -47,40 +53,108 @@ const hiddenColumnIds = [
     'preservationMethod',
     'anatomicalSite',
     'methodOfTransport',
-    'collectionDate',
-    'donorId',
-    'age',
-    'sex',
-    'gender',
-    'race',
-    'ethnicity',
-    'height',
-    'weight',
-    'bmi',
-    'medications',
-    'treatments',
+    // 'collectionDate',
+    // 'donorId',
+    'donor.age',
+    'donor.sex',
+    'donor.gender',
+    'donor.race',
+    'donor.ethnicity',
+    'donor.height',
+    'donor.weight',
+    'donor.bmi',
+    'donor.medications',
+    'donor.treatments',
 ]
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
     const pathname = usePathname()
+    const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
+
+    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE GENE SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncMilestoneSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []
+
+        try {
+            // const response = await fetch(`/api/institutions?search=${query}`);
+            // const data = await response.json();
+            const response = await getMilestones(session?.user.organizationId)
+
+            if (response.success && response.data) {
+                return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
+            } else {
+                return []
+            }
+
+            // Return the fetched options
+            // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        }
+    }
+
+    useEffect(() => {
+        const init = async () => {
+            const response = await getDiagnosisTypes()
+            if (response.success && response.data) {
+                setDiagnosesOptions(response.data.map((diagnosisType: any) => ({label: diagnosisType.label, value: diagnosisType.id})))
+            }
+        }
+
+        init()
+    }, [])
 
     const columns: ColumnDef<any>[] = [
         {
             id: "donorId",
             accessorKey: "donorId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="External Donor Id"/>
+                <DataTableColumnHeader column={column} title="Public Donor Id"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
                     <p>{row.original.donorId}</p>
                 </div>
             ),
             enableHiding: true,
             meta: {
-                label: "External Donor Id"
+                label: "Public Donor Id"
             }
         },
         {
@@ -109,7 +183,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "diagnoses",
+            id: "donor.diagnoses",
             accessorKey: "donor.diagnoses",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Diagnoses"/>
@@ -128,8 +202,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </ul>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Diagnoses"
+                label: "Diagnoses",
+                variant: "multiSelect",
+                options: diagnosesOptions,
+                showInAdvancedOnly: true,
+                icon: CircleDashed,
             }
         },
         {
@@ -142,8 +221,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Gene"
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
             }
         },
         {
@@ -272,8 +356,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Institution"
+                label: "Institution",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncInstitutionSearch
             }
         },
         {
@@ -361,11 +450,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Internal Donor Id"/>
+                <DataTableColumnHeader column={column} title="Private Donor Id"/>
             ),
             enableHiding: true,
             meta: {
-                label: "internal Donor Id"
+                label: "Private Donor Id"
             }
         },
         {
@@ -594,8 +683,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </ul>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Linked Projects"
+                label: "Linked Projects",
+                variant: "multiSelect",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncMilestoneSearch
             }
         },
         {

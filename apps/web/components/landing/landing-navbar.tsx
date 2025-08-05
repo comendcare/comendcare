@@ -51,6 +51,11 @@ export const LandingNavbar: React.FC = () => {
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/faq` : `http://${rootDomain}/faq`
         },
+        {
+            name: "News",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/news` : `http://${rootDomain}/news`
+        },
     ] : [
         // {
         //     name: "Products",
@@ -285,7 +290,9 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                 )}
             >
                 <div className="flex flex-row justify-between items-center w-full">
-                    <Link href="/public">
+                    <Link href={process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                    >
                         <Image
                             className="w-24 inline"
                             src={logo}

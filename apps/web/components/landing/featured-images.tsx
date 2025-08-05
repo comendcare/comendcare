@@ -21,12 +21,12 @@ export const testimonials = [
             "https://storage.googleapis.com/comend-app-public/1742928808690-Screenshot%202025-03-25%20at%2010.10.42%E2%80%AFAM.png",
         url: "https://rbf.comend.io/",
     },
-    {
-        name: "United Leukodystrophy Foundation",
-        image:
-            "https://storage.googleapis.com/comend-app-public/1742916900035-Screenshot%202025-03-25%20at%2010.34.24%E2%80%AFAM.png",
-        url: "https://ulf.comend.io/",
-    },
+    // {
+    //     name: "United Leukodystrophy Foundation",
+    //     image:
+    //         "https://storage.googleapis.com/comend-app-public/1742916900035-Screenshot%202025-03-25%20at%2010.34.24%E2%80%AFAM.png",
+    //     url: "https://ulf.comend.io/",
+    // },
     {
         name: "Aicardi-Goutieres Syndrome Foundation",
         image:
@@ -40,17 +40,35 @@ export const testimonials = [
     //     url: "https://www.ctnnb1.org",
     // },
     {
-        name: "SMOC1 Foundation for Hope",
+        name: "The MED13L Foundation",
         image:
-            "https://storage.googleapis.com/comend-app-public/1741885287779-Screenshot%202025-03-13%20at%201.00.16%E2%80%AFPM.png",
-        url: "https://smoc1.comend.io/",
+            "https://storage.googleapis.com/comend-app-public/1745847743769-Screenshot%202025-04-28%20at%208.41.23%E2%80%AFAM.png",
+        url: "https://med13l.comend.io/",
     },
     {
-        name: "Project 8p",
+        name: "CurePDE",
         image:
-            "https://storage.googleapis.com/comend-app-public/1742234988826-Project%208p%20Logo.jpg",
-        url: "https://project8p.comend.io/",
+            "https://storage.googleapis.com/comend-app-public/1749575307892-Screenshot-2025-06-10-at-12.08.13-PM.png",
+        url: "https://curepde.comend.io/",
     },
+    {
+        name: "L-CMD Research Foundation",
+        image:
+            "https://pbs.twimg.com/profile_images/1357498726332383238/fiGwwQNM_400x400.jpg",
+        url: "https://lcmd.comend.io/",
+    },
+    {
+        name: "PBD Project",
+        image:
+            "https://storage.googleapis.com/comend-app-public/1746629308312-PBD%20Project%20Logo.png",
+        url: "https://pbdproject.comend.io/",
+    },
+    // {
+    //     name: "Project 8p",
+    //     image:
+    //         "https://storage.googleapis.com/comend-app-public/1742234988826-Project%208p%20Logo.jpg",
+    //     url: "https://project8p.comend.io/",
+    // },
 ];
 
 export const FeaturedImages = ({
@@ -168,7 +186,7 @@ export const FeaturedImages = ({
 
             </div>
             <p className="mt-4 text-balance text-base text-neutral-600 dark:text-neutral-300">
-                Build with the support of rare disease groups.
+                Built with the support of 20+ patient groups
             </p>
         </div>
     );

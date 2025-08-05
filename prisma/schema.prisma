@@ -302,6 +302,29 @@ model Tool {
   milestones     ToolToMilestone[]
 }
 
+model DiseaseModel {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  description String?
+  contacts    ExternalContact[]
+  attachments ExternalAttachment[]
+  private     Boolean              @default(true)
+  pinned      Boolean              @default(false)
+  metadata    Json?
+  types       String[] // values (DiseaseModelType ids)
+
+  institutionId  String?
+  institution    Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  geneId         Int?
+  gene           Gene?         @relation(fields: [geneId], references: [id])
+  conditionId    String?
+  condition      Condition?    @relation(fields: [conditionId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
 model Biosample {
   id        String   @id @unique @default(uuid())
   createdAt DateTime @default(now())
@@ -557,15 +580,17 @@ model ExternalAttachment {
   name String?
   link String
 
-  toolId      String?
-  tool        Tool?      @relation(fields: [toolId], references: [id])
-  biosampleId String?
-  biosample   Biosample? @relation(fields: [biosampleId], references: [id])
-  rfpId       String?
-  rfp         RFP?       @relation(fields: [rfpId], references: [id])
-  milestoneId String?
-  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
-  metadata    Json?
+  toolId         String?
+  tool           Tool?         @relation(fields: [toolId], references: [id])
+  biosampleId    String?
+  biosample      Biosample?    @relation(fields: [biosampleId], references: [id])
+  rfpId          String?
+  rfp            RFP?          @relation(fields: [rfpId], references: [id])
+  milestoneId    String?
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  metadata       Json?
+  DiseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModelId String?
 }
 
 model ExternalContact {
@@ -577,15 +602,17 @@ model ExternalContact {
   emailHash   String? /// @encryption:hash(email)
   affiliation String?
 
-  toolId      String?
-  tool        Tool?      @relation(fields: [toolId], references: [id])
-  biosampleId String?
-  biosample   Biosample? @relation(fields: [biosampleId], references: [id])
-  rfpId       String?
-  rfp         RFP?       @relation(fields: [rfpId], references: [id])
-  milestoneId String?
-  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
-  metadata    Json?
+  toolId         String?
+  tool           Tool?         @relation(fields: [toolId], references: [id])
+  biosampleId    String?
+  biosample      Biosample?    @relation(fields: [biosampleId], references: [id])
+  rfpId          String?
+  rfp            RFP?          @relation(fields: [rfpId], references: [id])
+  milestoneId    String?
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  metadata       Json?
+  DiseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModelId String?
 }
 
 model Edge {
@@ -658,6 +685,7 @@ model Organization {
   rfps                          RFP[]
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
+  DiseaseModel                  DiseaseModel[]
 
   @@index([userId])
 }
@@ -717,6 +745,7 @@ model Condition {
   prevalenceRatio             Float?
   organizations               ConditionToOrganization[]
   metadata                    Json?
+  DiseaseModel                DiseaseModel[]
 }
 
 model ConditionToOrganization {
@@ -820,9 +849,9 @@ model Mention {
 }
 
 model Gene {
-  id                   Int         @id @default(autoincrement()) // Auto-generated primary key
-  uuid                 String?     @unique // Unique identifier for the record
-  symbol               String?     @unique // Official gene symbol
+  id                   Int            @id @default(autoincrement()) // Auto-generated primary key
+  uuid                 String?        @unique // Unique identifier for the record
+  symbol               String?        @unique // Official gene symbol
   name                 String? // Full name of the gene or RNA
   hgncId               String? // HGNC identifier for the gene
   locusGroup           String? // Group classification (e.g., protein-coding gene, non-coding RNA)
@@ -830,7 +859,7 @@ model Gene {
   location             String? // Chromosomal location (e.g., 19q13.43)
   locationSortable     String? // Sortable location string
   entrezId             String? // NCBI Entrez Gene identifier
-  ensemblGeneId        String?     @unique // Ensembl gene identifier
+  ensemblGeneId        String?        @unique // Ensembl gene identifier
   ucscId               String? // UCSC Genome Browser identifier
   refseqAccessions     String[] // Array of RefSeq accession numbers
   vegaId               String? // Vega Genome Browser identifier
@@ -862,6 +891,7 @@ model Gene {
   lsdb                 String[] // Locus-Specific Database links
   metadata             Json?
   Biosample            Biosample[]
+  DiseaseModel         DiseaseModel[]
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
@@ -919,6 +949,7 @@ model CompanyContactRequest {
   organization Organization @relation("cro_contact_request_organization", fields: [organizationId], references: [id], onDelete: Cascade)
   company      Company      @relation("cro_contact_request_company", fields: [companyId], references: [id], onDelete: Cascade)
 
+  timeline    String?
   services    CompanyContactRequestToService[]
   rfps        CompanyContactRequestToRFP[]
   description String?
@@ -1138,6 +1169,7 @@ model Institution {
   updatedAt             DateTime                  @updatedAt
   metadata              Json?
   institutionToRequests InstitutionToRequest[]
+  DiseaseModel          DiseaseModel[]
 }
 
 model InstitutionRelationship {

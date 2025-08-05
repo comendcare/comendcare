@@ -4,9 +4,6 @@ import {AdminCompaniesNav} from "~admin/components/admin-companies-nav";
 import {AdminCompaniesAnalyticsCards} from "~admin/components/admin-companies-analytics-cards";
 import {AdminCompaniesAnalyticsChart} from "~admin/components/admin-companies-analytics-chart";
 import {
-    ProviderContactRequestDialog
-} from "~admin/components/provider-contact-request-data-table/provider-contact-request-dialog";
-import {
     ProviderContactRequestDataTable
 } from "~admin/components/provider-contact-request-data-table/provider-contact-request-data-table";
 
@@ -30,7 +27,6 @@ export default function ProviderContactRequestCompaniesPage() {
                             <h1 className="font-cal text-3xl font-bold dark:text-white">
                                 All Provider Contact Requests
                             </h1>
-                            <ProviderContactRequestDialog />
                         </div>
                         <Suspense
                             fallback={

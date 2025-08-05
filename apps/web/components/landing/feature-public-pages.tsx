@@ -112,12 +112,25 @@ export default function FeaturePublicPages() {
                             </p>
                         </div>
                     </div>
+                    <div className="block sm:hidden overflow-x-auto -mx-6 sm:mx-0">
+                        <div className="w-[48rem] sm:w-[57rem] md:ml-0">
+                            <Image
+                                src={publicProfile}
+                                quality={100}
+                                priority={true}
+                                alt="preview image"
+                                className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0 px-4"
+                                width={2432}
+                                height={1442}
+                            />
+                        </div>
+                    </div>
                     <Image
                         src={publicProfile}
                         quality={100}
                         priority={true}
                         alt="preview image"
-                        className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
+                        className="hidden sm:block w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
                         width={2432}
                         height={1442}
                     />

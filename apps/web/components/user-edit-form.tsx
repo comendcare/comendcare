@@ -24,10 +24,12 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview} from "@comend/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {getUser} from "@comend/lib/fetchers";
-import { acceptedFiletypes, getPublicFile } from "@comend/lib/utils";
-import { handleImageDelete, handleImageUpload } from "@comend/lib/upload";
-import { FormImageSelector } from "@comend/components/form-image-selector";
+import {acceptedFiletypes, getPublicFile} from "@comend/lib/utils";
+import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
+import {FormImageSelector} from "@comend/components/form-image-selector";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
+import {Skeleton} from "@/packages/components/ui/skeleton";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -52,6 +54,8 @@ export default function UserEditForm() {
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [isCropping, setIsCropping] = useState(false)
+    const [loadingUserData, setLoadingUserData] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -104,83 +108,91 @@ export default function UserEditForm() {
 
     useEffect(() => {
         async function fetchUserData() {
-            if (session?.user?.id) {
-                let userData
-                const response = await getUser(session.user.id, {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    notificationSettings: true,
-                    consentSettings: true,
-                    accounts: true,
-                    comments: true,
-                    follows: true,
-                    sentInvitations: true,
-                    memberships: true,
-                    membershipRequests: true,
-                    organizations: true,
-                    posts: true,
-                    reactions: true,
-                    roadmaps: true,
-                    sessions: true,
-                    stakeholders: true,
-                    platformNotifications: true,
-                    reviews: true,
-                    replies: true,
-                    reportOnReviews: true,
-                    reportOnReplies: true,
-                    reviewFeedbacks: true,
-                    metadata: true,
-                });
-                if (response.success) {
-                    userData = response.data
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
-
-                if (userData) {
-                    const fetchedValues = {
-                        name: userData.name || "",
-                        notificationSettings: userData.notificationSettings ?? true,
-                        consentSettings: userData.consentSettings ?? true,
-                        address1: userData.address1 || "",
-                        address2: userData.address2 || "",
-                        formattedAddress: userData.formattedAddress || "",
-                        city: userData.city || "",
-                        region: userData.region || "",
-                        postalCode: userData.postalCode || "",
-                        country: userData.country || "",
-                        lat: userData.lat?.toString() || "0",
-                        lng: userData.lng?.toString() || "0",
-                        image: userData.image || undefined,
-                    };
-
-                    if (userData.image) {
-                        try {
-                            const userPhoto: File = await getPublicFile(userData.image)
-                            if (userPhoto) {
-                                const fileWithPreview = Object.assign(userPhoto, {
-                                    preview: URL.createObjectURL(userPhoto),
-                                })
-                                setSelectedFile(fileWithPreview)
-                            }
-                        } catch (e) {
-                            console.error(e)
-                        }
+            setLoadingUserData(true);
+            try {
+                if (session?.user?.id) {
+                    let userData
+                    const response = await getUser(session.user.id, {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        notificationSettings: true,
+                        consentSettings: true,
+                        accounts: true,
+                        comments: true,
+                        follows: true,
+                        sentInvitations: true,
+                        memberships: true,
+                        membershipRequests: true,
+                        organizations: true,
+                        posts: true,
+                        reactions: true,
+                        roadmaps: true,
+                        sessions: true,
+                        stakeholders: true,
+                        platformNotifications: true,
+                        reviews: true,
+                        replies: true,
+                        reportOnReviews: true,
+                        reportOnReplies: true,
+                        reviewFeedbacks: true,
+                        metadata: true,
+                    });
+                    if (response.success) {
+                        userData = response.data
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
                     }
 
-                    setDefaultValues(fetchedValues);
-                    setAddress({
-                        ...fetchedValues,
-                        lat: parseFloat(fetchedValues.lat),
-                        lng: parseFloat(fetchedValues.lng)
-                    }); // Set address state as well
-                    form.reset(fetchedValues); // Reset form with fetched data
+                    if (userData) {
+                        const fetchedValues = {
+                            name: userData.name || "",
+                            notificationSettings: userData.notificationSettings ?? true,
+                            consentSettings: userData.consentSettings ?? true,
+                            address1: userData.address1 || "",
+                            address2: userData.address2 || "",
+                            formattedAddress: userData.formattedAddress || "",
+                            city: userData.city || "",
+                            region: userData.region || "",
+                            postalCode: userData.postalCode || "",
+                            country: userData.country || "",
+                            lat: userData.lat?.toString() || "0",
+                            lng: userData.lng?.toString() || "0",
+                            image: userData.image || undefined,
+                        };
+
+                        if (userData.image) {
+                            try {
+                                const userPhoto: File = await getPublicFile(userData.image)
+                                if (userPhoto) {
+                                    const fileWithPreview = Object.assign(userPhoto, {
+                                        preview: URL.createObjectURL(userPhoto),
+                                    })
+                                    setSelectedFile(fileWithPreview)
+                                }
+                            } catch (e) {
+                                console.error(e)
+                            }
+                        }
+
+                        setDefaultValues(fetchedValues);
+                        setAddress({
+                            ...fetchedValues,
+                            lat: parseFloat(fetchedValues.lat),
+                            lng: parseFloat(fetchedValues.lng)
+                        }); // Set address state as well
+                        form.reset(fetchedValues); // Reset form with fetched data
+                    }
                 }
+            } catch (error) {
+                console.error('Error:', error)
+                toast.error("An error occurred while loading your profile data.");
+            } finally {
+                setLoadingUserData(false);
             }
         }
 
@@ -200,6 +212,7 @@ export default function UserEditForm() {
     }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
+        setLoading(true)
         try {
             // handle mixpanel opt-in/opt-out
             if (values.consentSettings) {
@@ -235,7 +248,7 @@ export default function UserEditForm() {
                         toast.error(res.error);
                         return;
                     }
-                    
+
                 } else {
                     const res: any = await editUser(session?.user?.id as string, {[key]: value});
                     if (res?.error) {
@@ -251,121 +264,150 @@ export default function UserEditForm() {
         } catch (error) {
             console.error('Error:', error)
             toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
-        <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(
-                    onSubmit,
-                    (errors) => {
-                        console.log("Validation errors:", errors);
-                        if (Object.keys(errors).length > 0) {
-                            toast.error("Please correct the highlighted errors.");
-                        }
-                    }
-                )}
-                className="space-y-8"
-            >
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Your Full Name (required)</FormLabel>
-                            <FormControl>
-                                <Input type="text" {...field} />
-                            </FormControl>
-                            {/*<FormDescription>This is your public display name.</FormDescription>*/}
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+        <>
+            {loadingUserData ? (
+                <div className="space-y-8">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-[200px]"/>
+                        <Skeleton className="h-10 w-full"/>
+                    </div>
 
-                {/*<FormField*/}
-                {/*    control={form.control}*/}
-                {/*    name="formattedAddress"*/}
-                {/*    render={({field}) => (*/}
-                {/*        <FormItem>*/}
-                {/*            <FormLabel>Address</FormLabel>*/}
-                {/*            <FormControl>*/}
-                {/*                <AutocompleteComponent*/}
-                {/*                    address={address}*/}
-                {/*                    setAddress={setAddress}*/}
-                {/*                    searchInput={searchInput}*/}
-                {/*                    setSearchInput={setSearchInput}*/}
-                {/*                />*/}
-                {/*            </FormControl>*/}
-                {/*            <FormDescription>Your address.</FormDescription>*/}
-                {/*            <FormMessage/>*/}
-                {/*        </FormItem>*/}
-                {/*    )}*/}
-                {/*/>*/}
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-[200px]"/>
+                        <Skeleton className="h-[150px] w-[150px] rounded-full"/>
+                    </div>
 
-                <FormImageSelector 
-                    form={form}
-                    name="image"
-                    title="Profile Image"
-                    description=""
-                    aspect={1}
-                    img={defaultValues?.image}
-                    selectedFile={selectedFile}
-                    setSelectedFile={setSelectedFile}
-                    setIsCropping={setIsCropping}
-                />
+                    <div className="space-y-4">
+                        <Skeleton className="h-14 w-full"/>
+                        <Skeleton className="h-14 w-full"/>
+                    </div>
 
-                <div className="space-y-2">
-                    <FormField
-                        control={form.control}
-                        name="notificationSettings"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        {`Allow us to contact you regarding platform changes and notifications.`}
-                                    </FormLabel>
-                                    <FormDescription>
-                                        {`You can manage your notifications in your user settings page.`}
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="consentSettings"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        {`I consent for Comend to collect data to help improve the platform.`}
-                                    </FormLabel>
-                                    <FormDescription>
-                                        {`You can change these settings in your user settings page.`}
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
+                    <Skeleton className="h-10 w-[100px]"/>
                 </div>
+            ) : (
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(
+                            onSubmit,
+                            (errors) => {
+                                console.log("Validation errors:", errors);
+                                if (Object.keys(errors).length > 0) {
+                                    toast.error("Please correct the highlighted errors.");
+                                }
+                            }
+                        )}
+                        className="space-y-8"
+                    >
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Your Full Name (required)</FormLabel>
+                                    <FormControl>
+                                        <Input type="text" {...field} />
+                                    </FormControl>
+                                    {/*<FormDescription>This is your public display name.</FormDescription>*/}
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                <Button disabled={isCropping} type="submit">Save</Button>
-            </form>
-        </Form>
+                        {/*<FormField*/}
+                        {/*    control={form.control}*/}
+                        {/*    name="formattedAddress"*/}
+                        {/*    render={({field}) => (*/}
+                        {/*        <FormItem>*/}
+                        {/*            <FormLabel>Address</FormLabel>*/}
+                        {/*            <FormControl>*/}
+                        {/*                <AutocompleteComponent*/}
+                        {/*                    address={address}*/}
+                        {/*                    setAddress={setAddress}*/}
+                        {/*                    searchInput={searchInput}*/}
+                        {/*                    setSearchInput={setSearchInput}*/}
+                        {/*                />*/}
+                        {/*            </FormControl>*/}
+                        {/*            <FormDescription>Your address.</FormDescription>*/}
+                        {/*            <FormMessage/>*/}
+                        {/*        </FormItem>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
+
+                        <FormImageSelector
+                            form={form}
+                            name="image"
+                            title="Profile Image"
+                            description=""
+                            aspect={1}
+                            img={defaultValues?.image}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
+                            setIsCropping={setIsCropping}
+                        />
+
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="notificationSettings"
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                {`Allow us to contact you regarding platform changes and notifications.`}
+                                            </FormLabel>
+                                            <FormDescription>
+                                                {`You can manage your notifications in your user settings page.`}
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="consentSettings"
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                {`I consent for Comend to collect data to help improve the platform.`}
+                                            </FormLabel>
+                                            <FormDescription>
+                                                {`You can change these settings in your user settings page.`}
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <Button type="submit" disabled={isCropping || loading}>
+                            {loading ? <LoadingDots color="#808080"/> : "Save"}
+                        </Button>
+                    </form>
+                </Form>
+            )}
+        </>
     );
 }
 

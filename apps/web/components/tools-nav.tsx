@@ -3,12 +3,17 @@ import { TabNav } from "@comend/components/tab-nav";
 
 const links = [
     {
-        name: "Biosample Tools",
+        name: "Patient Biosamples",
         href: "/biosample",
         comingSoon: false,
     },
     {
-        name: "Data Tools",
+        name: "Disease Models",
+        href: "/disease-models",
+        comingSoon: false,
+    },
+    {
+        name: "Clinical Datasets",
         href: "/data",
         comingSoon: false,
     },

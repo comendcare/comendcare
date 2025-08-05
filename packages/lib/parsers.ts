@@ -1,5 +1,6 @@
 import { createParser } from "nuqs/server";
 import { z } from "zod";
+import { Option } from "@comend/components/types/data-table"
 
 import { dataTableConfig } from "@comend/lib/config/data-table";
 
@@ -55,6 +56,7 @@ const filterItemSchema = z.object({
   variant: z.enum(dataTableConfig.filterVariants),
   operator: z.enum(dataTableConfig.operators),
   filterId: z.string(),
+  onAsyncSearch: z.custom<(query?: string) => Promise<Option[]>>().optional() 
 });
 
 export type FilterItemSchema = z.infer<typeof filterItemSchema>;
@@ -93,7 +95,8 @@ export const getFiltersStateParser = <TData>(
           filter.id === b[index]?.id &&
           filter.value === b[index]?.value &&
           filter.variant === b[index]?.variant &&
-          filter.operator === b[index]?.operator,
+          filter.operator === b[index]?.operator &&
+          filter.onAsyncSearch === b[index]?.onAsyncSearch,
       ),
   });
 };

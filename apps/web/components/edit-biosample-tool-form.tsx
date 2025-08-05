@@ -147,7 +147,7 @@ export function EditBiosampleToolForm({
             // donor properties
             donorId: toolData?.donorId || undefined,
             donor: toolData?.donorId ? [{
-                img: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${toolData.donorId}`,
+                img: `https://api.dicebear.com/8.x/shapes/svg?seed=${toolData.donorId}`,
                 label: toolData.donorId, 
                 value: toolData.donorId
             }] : [],
@@ -484,7 +484,7 @@ export function EditBiosampleToolForm({
                     <AttachmentsFormField form={form} />
 
                     {/* temporarily hide additional tool form fields on production until this feature is ready... */}
-                    {process.env.NEXT_PUBLIC_NODE_ENV !== "production" && (
+                    {/* {process.env.NEXT_PUBLIC_NODE_ENV !== "production" && ( */}
                         <>
                         <Separator className="w-full"/>
                         <AdditionalBiosampleFields form={form} />
@@ -492,7 +492,7 @@ export function EditBiosampleToolForm({
                         <Separator className="w-full"/>
                         <DonorFormFields form={form} />
                         </>
-                    )}
+                    {/* )} */}
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>
@@ -551,7 +551,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="anatomicalSite"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Anatomical Site`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -579,7 +579,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="preservationMethod"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Preservation Method`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -607,7 +607,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="methodOfTransport"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Method of Transport`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -635,7 +635,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="currentCountry"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Current Location`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -663,7 +664,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="countryOfCollection"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Collection Location`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -728,7 +730,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="availability"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Availability`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -752,7 +755,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 )}
             />
 
-            <FormItem className="w-full flex gap-4 items-center">
+            {/* <FormItem className="w-full flex gap-4 items-center"> */}
+            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                 <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
                 <div className="w-full gap-2 flex">
                     <FormField
@@ -798,7 +802,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 <FormMessage />
             </FormItem>
 
-            <FormItem className="w-full flex gap-4 items-center">
+            {/* <FormItem className="w-full flex gap-4 items-center"> */}
+            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                 <FormLabel className="w-[100px]">{'Price Per Unit'}</FormLabel>
                 <div className="w-full gap-2 flex">
                     <FormField
@@ -848,7 +853,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="ageAtExcision"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Donor Age at Excision`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -870,7 +876,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="institutions"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">Institution</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -924,7 +931,8 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="variant"
                 render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
+                    // <FormItem className="w-full flex gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -983,7 +991,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     <div className="w-full flex items-center justify-end">
                         {!createNewDonor && (
                             <FormLabel className="flex items-center gap-1 grow"> 
-                                External Donor ID
+                                Public Donor ID
                                 <Tooltip delayDuration={0}>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
@@ -1032,7 +1040,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="sex"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    // <FormItem className="w-full gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel>{`Sex`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -1060,7 +1069,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="gender"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    // <FormItem className="w-full gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel>{`Gender`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -1090,7 +1100,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="race"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    // <FormItem className="w-full gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel>{`Race`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -1120,7 +1131,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="ethnicity"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    // <FormItem className="w-full gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel>{`Ethnicity`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
@@ -1148,7 +1160,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="height"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    // <FormItem className="w-full gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Height (cm)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -1170,7 +1183,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="weight"
                 render={({field}) => (
-                    <FormItem className="w-full gap-4 items-center">
+                    // <FormItem className="w-full gap-4 items-center">
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Weight (kg)`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="-mt-2 w-full">
@@ -1215,7 +1229,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="diagnoses"
                 render={({field}) => (
-                    <FormItem>
+                    // <FormItem>
+                    <FormItem className={cn("", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <div className="flex flex-row justify-between gap-2 items-center">
                             <FormLabel>{`Diagnoses`}</FormLabel>
                             <Tooltip>
@@ -1312,7 +1327,8 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 control={form.control}
                 name="treatments"
                 render={({field}) => (
-                    <FormItem>
+                    // <FormItem>
+                    <FormItem className={cn("", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <div className="flex flex-row justify-between gap-2 items-center">
                             <FormLabel>{`Treatments`}</FormLabel>
                             <Tooltip>
@@ -1375,12 +1391,12 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             /> 
 
-
             <FormField
                 control={form.control}
                 name="medications"
                 render={({field}) => (
-                    <FormItem>
+                    // <FormItem>
+                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <div className="flex flex-row justify-between gap-2 items-center">
                             <FormLabel>{`Medications`}</FormLabel>
                             <Tooltip>

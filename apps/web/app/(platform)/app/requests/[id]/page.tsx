@@ -39,6 +39,7 @@ export default async function ResearcherRequestsPage({
                 disseminationPlan: true,
                 patientSignificance: true,
                 otherSampleType: true,
+                sampleCount: true,
                 processingRequirements: true,
                 timeline: true,
                 logisticsContact: true,

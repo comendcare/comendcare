@@ -82,6 +82,7 @@ interface MultipleSelectorProps {
     /** hide the clear all button. */
     hideClearAllButton?: boolean;
     showHoverCard?: boolean;
+    creatableItemOverride?: () => React.JSX.Element
 }
 
 export interface MultipleSelectorRef {
@@ -198,6 +199,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             inputProps,
             hideClearAllButton = false,
             showHoverCard = true,
+            creatableItemOverride
         }: MultipleSelectorProps,
         ref: React.Ref<MultipleSelectorRef>,
     ) => {
@@ -639,7 +641,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             </CommandGroup>
                                         )}
                                     </ScrollArea>
-                                    {CreatableItem()}
+                                    {creatableItemOverride ? creatableItemOverride() : CreatableItem()}
                                 </div>
                             )}
                         </CommandList>

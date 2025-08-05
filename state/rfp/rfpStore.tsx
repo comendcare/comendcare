@@ -8,8 +8,8 @@ export interface RFPState {
     rfps: RFP[],
     initialized: boolean,
     initState: (rfps: RFP[]) => void,
-    createRFP: (rfp: Partial<RFP>, orgId: string) => Promise<void>,
-    updateRFP: (rfp: Partial<RFP>, orgId: string) => Promise<void>,
+    createRFP: (rfp: Partial<RFP>, orgId: string) => Promise<RFP | undefined>,
+    updateRFP: (rfp: Partial<RFP>, orgId: string) => Promise<RFP | undefined>,
     deleteRFP: (rfpId: string, orgId: string) => Promise<void>,
     saveState: (orgId: string | null | undefined) => void,
 }
@@ -39,6 +39,7 @@ export const useRFPStore = create<RFPState>()(
                 
                 // new RFP first, because RFPs are displayed in decending order by creation date
                 set({ rfps: [newRfp, ...get().rfps]})
+                return newRfp
             },
             updateRFP: async (rfp: Partial<RFP>, orgId: string) => {
                 const updatedRfp = await createOrUpdateRFP(orgId, rfp)
@@ -57,6 +58,7 @@ export const useRFPStore = create<RFPState>()(
                 })
 
                 set({ rfps: get().rfps.map(rfp => rfp.id === updatedRfp.id ? updatedRfp : rfp) })
+                return updatedRfp
             },
             deleteRFP: async (rfpId: string, orgId: string) => {
                 const deletedRfp = await deleteRFP(orgId, rfpId)

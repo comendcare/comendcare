@@ -46,7 +46,6 @@ const selector = (state: RoadmapState) => ({
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
-    const [isLoading, setIsLoading] = useState(true)
     // const searchParams = useSearchParams()
     const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const { startOnborda } = useOnborda()
@@ -61,37 +60,6 @@ export default function AppLayout({children}: AppLayoutProps) {
         return null
     }
 
-    async function handleSessionUpdate() {
-        if (session) {
-            try {
-                const response = await getAllMembershipsFromUserId(session.user.id, {
-                    id: true,
-                    role: true,
-                    title: true,
-                    email: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    invitedBy: true,
-                    organization: true,
-                    organizationId: true,
-                    user: true,
-                    metadata: true
-                });
-                if (response.success) {
-                    setMemberships(response.data ?? []);
-                } else {
-                    console.error(response.error);
-                    toast.error(response.error);
-                }
-            } catch (err) {
-                console.error(err);
-                toast.error("Unexpected error fetching organizations.");
-            }
-
-            setIsLoading(false)
-        }
-    }
-
     useEffect(() => {
         if (status === "unauthenticated") {
             redirect("/login");
@@ -99,20 +67,34 @@ export default function AppLayout({children}: AppLayoutProps) {
     }, [status])
 
     useEffect(() => {
-        // Only run if the session data has changed or the session has not yet been set up
-        // console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
-        if (
-            // !isLoading &&
-            status !== "authenticated" || 
-            !session || 
-            JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
-        ) {
-            handleSessionUpdate()
+        if (status === "authenticated" && session) {
+            getAllMembershipsFromUserId(session.user.id, {
+                id: true,
+                role: true,
+                title: true,
+                email: true,
+                createdAt: true,
+                updatedAt: true,
+                invitedBy: true,
+                organization: true,
+                organizationId: true,
+                user: true,
+                metadata: true
+            })
+                .then(response => {
+                    if (response.success) {
+                        setMemberships(response.data ?? []);
+                    } else {
+                        console.error(response.error);
+                        toast.error(response.error);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    toast.error("Unexpected error fetching organizations.");
+                });
         }
-
-        // Update the ref to the latest session
-        prevSessionRef.current = session
-    }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
+    }, [session, status]);
 
     useEffect(() => {
         setTourName(getTourName())
@@ -123,7 +105,7 @@ export default function AppLayout({children}: AppLayoutProps) {
         <MobileWarning />
     </>
 
-    if (status === "authenticated" && session && !isLoading) {
+    if (status === "authenticated" && session) {
         return (
             <SidebarProvider>
                 <AppSidebar memberships={memberships}/>
