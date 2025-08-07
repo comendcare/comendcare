@@ -4,7 +4,7 @@ import {formatMoney, truncate} from "@comend/lib/utils";
 import {Badge} from "@comend/components/ui/badge";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
-import {FileText, HandCoins, Megaphone, Star, Users} from "lucide-react";
+import {FileText, HandCoins, Megaphone, ToolCase, Users} from "lucide-react";
 import React from "react";
 import { PropertyBadge } from "./property-badge";
 import SaveOrganizationDialog from "./save-organization-dialog";
@@ -34,7 +34,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     // }
 
     const nodeTypeLabels = [
-        {key: "ASSET", icon: Star, label: "Tool"},
+        {key: "ASSET", icon: ToolCase, label: "Tool"},
         {key: "RFP", icon: Megaphone, label: "RFP"},
         {key: "PROJECT", icon: FileText, label: "Project"}
     ];

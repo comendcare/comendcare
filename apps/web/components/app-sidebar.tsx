@@ -5,7 +5,7 @@ import {
     Cog,
     Store, User, Workflow,
     Bookmark,
-    Star,
+    ToolCase,
     Megaphone,
     TestTube,
     Book, Wand2, BookOpen, Cookie
@@ -62,7 +62,7 @@ const data = {
             subPages: [
                 // {
                 //     title: "Assets",
-                //     icon: Star,
+                //     icon: ToolCase,
                 //     variant: "ghost",
                 //     url: `/app/tools`,
                 //     subPages: []
@@ -77,8 +77,8 @@ const data = {
             ]
         },
         {
-            title: "Tools",
-            icon: Star,
+            title: "Toolkit",
+            icon: ToolCase,
             variant: "ghost",
             url: `/app/tools/biosample`,
             match: (path: string) => path.startsWith('/app/tools'),
