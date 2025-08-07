@@ -3,7 +3,7 @@
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
 import { ScrollArea} from "@comend/components/ui/scroll-area";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { templateMilestones, templateResearchPlans } from '@comend/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
@@ -240,11 +240,16 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
 export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
     const [isHidden, setIsHidden] = useState(window.functionalConsentedLocalStorage?.get('isHidden') ? true : false)
 
+    useEffect(() => {
+        // after first visit, templates are hidden by default
+        window.functionalConsentedLocalStorage?.set('isHidden', true)
+    }, [])
+
     if (isHidden) {
         return (
             <div className="w-full flex justify-end">
                 <Button variant={"link"} onClick={() => {
-                    window.functionalConsentedLocalStorage?.remove('isHidden')
+                    // window.functionalConsentedLocalStorage?.remove('isHidden')
                     setIsHidden(false)
                 }}>Show Research Plan Templates</Button>
             </div>
