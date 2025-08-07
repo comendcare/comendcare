@@ -3245,6 +3245,8 @@ export const createMilestones = withOrganizationAuth(
                             attachments: true,
                             roadmap: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {include: {biosample: true}},
+                            diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
@@ -3654,6 +3656,7 @@ export const updateMilestones = withOrganizationAuth(
                             roadmap: true,
                             types: {include: {milestoneType: true}},
                             biosamples: {include: {biosample: true}},
+                            diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },

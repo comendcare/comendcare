@@ -149,7 +149,7 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         roadmap: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
-        biosamples: { include: {biosample: true, biosampleid: true, milestoneId: true}},
+        biosamples: { include: {biosample: true, biosampleId: true, milestoneId: true}},
         diseaseModels: {include: {diseaseModel: true, diseaseModelId: true, milestoneId: true}},
         tools: { include: { tool: true, toolId: true, milestoneId: true } },
         rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
