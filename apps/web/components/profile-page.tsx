@@ -279,10 +279,10 @@ export default function PAGProfilePage() {
                                     </div>
                                 </div>
                                 <div className="col-span-4 space-y-4">
-                                    <ProfileCompletionCard
-                                        organization={organization}
-                                        conditions={conditions}
-                                    />
+                                    {/*<ProfileCompletionCard*/}
+                                    {/*    organization={organization}*/}
+                                    {/*    conditions={conditions}*/}
+                                    {/*/>*/}
                                     <div className="flex flex-col gap-4 relative">
                                         <PAGProfileAssetsAndRFPsHoverableCard
                                             isPrivate={true}
