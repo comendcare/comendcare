@@ -3653,6 +3653,7 @@ export const updateMilestones = withOrganizationAuth(
                             attachments: true,
                             roadmap: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {include: {biosample: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
@@ -3663,6 +3664,22 @@ export const updateMilestones = withOrganizationAuth(
                                 create: (milestone.types || []).map((type: any) => ({
                                     milestoneType: {
                                         connect: {id: type.milestoneTypeId || type.milestoneType.id}
+                                    }
+                                }))
+                            },
+                            biosamples: {
+                                deleteMany: {},
+                                create: (milestone.biosamples || []).map((tool: any) => ({
+                                    biosample: {
+                                        connect: {id: tool.toolId || tool.biosample.id}
+                                    }
+                                }))
+                            },
+                            diseaseModels: {
+                                deleteMany: {},
+                                create: (milestone.diseaseModels || []).map((tool: any) => ({
+                                    diseaseModel: {
+                                        connect: {id: tool.toolId || tool.diseaseModel.id}
                                     }
                                 }))
                             },

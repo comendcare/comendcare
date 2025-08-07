@@ -196,7 +196,41 @@ export function EditMilestoneForm({
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || [],
-            tools: (milestoneData?.tools || []).map((tool: any) => tool.tool) || [],
+            tools: [
+                ...(milestoneData?.biosamples || []).map(({biosample}) => {
+                    const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                    return (
+                        {
+                            value: biosample.id, 
+                            type: 'Biosamples', 
+                            img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                            label: `${biosample.donorId} --- ${type?.label || ''}`,
+                            biosample
+                        }
+                    )
+                }),
+                ...(milestoneData?.diseaseModels || []).map(({diseaseModel}) => {
+                    const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                    return (
+                        {
+                            value: diseaseModel.id, 
+                            label: `${type?.label || ''}`,
+                            type: 'Disease Models',
+                            diseaseModel
+                        }
+                    )
+                }),
+                ...(milestoneData?.tools || []).map(({tool}) => {
+                    return (
+                        {
+                            value: tool?.id, 
+                            label: tool?.title || tool?.id, 
+                            type: 'Clinical Datasets',
+                            datasample: tool,
+                        }
+                    )
+                })
+            ],
             rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
@@ -245,7 +279,7 @@ export function EditMilestoneForm({
             notes
         } = values;
 
-        const updateData: Milestone = {
+        const updateData: any = {
             ...milestoneData,
             nodeType,
             title,
@@ -277,6 +311,27 @@ export function EditMilestoneForm({
             //         tool: tool
             //     })
             // }).filter((tool) => tool !== undefined),
+            biosamples: (tools || []).filter(tool => tool.type === "Biosamples").map((tool) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    biosampleId: tool.value,
+                    biosample: tool.biosample
+                })
+            }),
+            diseaseModels: (tools || []).filter(tool => tool.type === "Disease Models").map((tool) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    diseaseModelId: tool.value,
+                    diseaseModel: tool.diseaseModel
+                })
+            }),
+            tools: (tools || []).filter(tool => tool.type === "Clinical Datasets").map((tool) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    toolId: tool.value,
+                    tool: tool.datasample
+                })
+            }),
             rfps: (rfps || []).map((rfp) => {
                 return ({
                     milestoneId: milestoneData.id,
@@ -348,7 +403,8 @@ export function EditMilestoneForm({
                         value: biosample.id, 
                         type: 'Biosamples', 
                         img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                        label: `${biosample.donorId} --- ${type?.label || ''}`
+                        label: `${biosample.donorId} --- ${type?.label || ''}`,
+                        biosample
                     }
                 )
             })
@@ -359,7 +415,8 @@ export function EditMilestoneForm({
                     {
                         value: diseaseModel.id, 
                         label: `${type?.label || ''}`,
-                        type: 'Disease Models'
+                        type: 'Disease Models',
+                        diseaseModel
                     }
                 )
             })
@@ -369,7 +426,8 @@ export function EditMilestoneForm({
                     {
                         value: datasample.id, 
                         label: datasample.title || datasample.id, 
-                        type: 'Clinical Datasets'
+                        type: 'Clinical Datasets',
+                        datasample
                     }
                 )
             })
@@ -426,68 +484,9 @@ export function EditMilestoneForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // when switching to recommendations tab, set notifications as viewed
-    // useEffect(() => {
-    //     if (tab === "recommendations") {
-    //         const relevantNotifications = recommendations?.map(({content, milestone}) => (
-    //             notifications.find((notification: any) => (
-    //                 notification.type === "NEW_RECOMMENDATION" &&
-    //                 notification.metadata?.companyId === content.id &&
-    //                 notification.metadata?.milestoneId === milestone.id &&
-    //                 notification.lastViewed
-    //             ))
-    //         )).filter(n => n !== undefined) || []
-    //         if (relevantNotifications.length > 0) setNotificationsViewed(relevantNotifications)
-    //     }
-    // }, [tab, notifications, recommendations, setNotificationsViewed])
-
     useEffect(() => {
         if (tab === "recommendations") setRecommendationsViewed(true)
     }, [tab])
-
-    // useEffect(() => {
-    //     const setupNotifications = async () => {
-    //         if (!initializing.current && notificationsInitialized) {
-    //             // if is initialized, set up the notifications for new recommendations
-    //             // Copy the notifications to avoid mutating the original array
-    //             let localNotifications: Partial<PlatformNotification>[] = [...notifications]
-    //             for (const recommendation of (recommendations || [])) {
-
-    //                 const exists = localNotifications
-    //                     .filter((notification: any) => (
-    //                         notification.type === "NEW_RECOMMENDATION" &&
-    //                         notification.metadata?.milestoneId === recommendation.milestone.id &&
-    //                         notification.metadata?.companyId === recommendation.content.id
-    //                     )).length > 0
-
-    //                 console.log(`notifications exist`, exists)
-
-    //                 if (!exists) {
-    //                     console.log(`notifications`, localNotifications);
-    //                     console.log(
-    //                         `ADD NOTIFICATION`,
-    //                         `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
-    //                     );
-
-    //                     const notificationData = {
-    //                         type: "NEW_RECOMMENDATION",
-    //                         title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
-    //                         metadata: {
-    //                             milestoneId: recommendation.milestone.id,
-    //                             companyId: recommendation.content.id,
-    //                         },
-    //                     }
-    //                     await addNotification(notificationData)
-    //                     localNotifications = localNotifications.concat([notificationData])
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     setupNotifications()
-    //     // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [selectedNodeIds, recommendations, notificationsInitialized, addNotification])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
