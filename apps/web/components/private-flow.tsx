@@ -8,6 +8,8 @@ import {
     Controls,
     useReactFlow,
     applyNodeChanges,
+    BackgroundVariant,
+    Background,
 } from "@xyflow/react"
 import type { Edge, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
@@ -331,6 +333,7 @@ export const PrivateFlowView = ({
             proOptions={proOptions}
             minZoom={0.1}
         >
+            <Background variant={BackgroundVariant.Dots} />
             <MiniMap
                 nodeColor='#757575'
                 maskColor='rgb(200, 200, 200, 0.8)' 

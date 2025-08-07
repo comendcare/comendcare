@@ -5,6 +5,8 @@ import {
     ReactFlow,
     MiniMap,
     useReactFlow,
+    Background,
+    BackgroundVariant,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import {MemoPublicMilestoneNodeLink, MemoPublicMilestoneNodeButton} from "./public-milestone-node"
@@ -70,10 +72,11 @@ export const PublicFlowView = ({
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.1}
     >
-    <MiniMap
-        nodeColor='#757575'
-        maskColor='rgb(200, 200, 200, 0.8)' 
-    />
+        <Background variant={BackgroundVariant.Dots} />
+        <MiniMap
+            nodeColor='#757575'
+            maskColor='rgb(200, 200, 200, 0.8)' 
+        />
     </ReactFlow>
     )
 }
