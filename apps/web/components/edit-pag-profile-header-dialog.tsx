@@ -41,9 +41,18 @@ import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
 import {Tooltip} from "@comend/components/plate-ui/tooltip";
 import {TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {BiopharmaConsentSwitch} from "~web/components/biopharma-consent-switch";
+import {checkSubdomainAvailability} from "@/packages/lib/fetchers";
+import {useDebounce} from "use-debounce";
 
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
+    subdomain: z.string().min(2, {
+        message: "Your organization's nickname must be at least 2 characters."
+    }).max(60, {
+        message: "Your organization's nickname must be a maximum of 50 characters."
+    }),
+    contactEmail: z.string().email({ message: "Please enter a valid email address." }),
     founded: z.string().optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
     raised: z.number().optional(),
@@ -62,6 +71,8 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
         defaultValues: {
             name: organization.name || "",
             founded: organization.yearFounded || "",
+            contactEmail: organization.contactEmail || "",
+            subdomain: organization.subdomain || "",
             incorporationStatus: organization.incorporationStatus || undefined,
             raised: organization.moneyRaised || 0,
             deployed: organization.moneyDeployed || 0,
@@ -69,11 +80,15 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
         }
     });
 
+    const [debouncedNickname] = useDebounce(editOrgForm.watch("subdomain"), 500); // Extract just the debounced value
+
     useEffect(() => {
         console.log("Resetting form with organization data:", organization);
         editOrgForm.reset({
             name: organization.name || "",
             founded: organization.yearFounded || "",
+            contactEmail: organization.contactEmail || "",
+            subdomain: organization.subdomain || "",
             incorporationStatus: organization.incorporationStatus || undefined,
             raised: organization.moneyRaised || 0,
             deployed: organization.moneyDeployed || 0,
@@ -97,6 +112,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             subdomain: "subdomain",
             looking: "interestedModalities",
             founded: "yearFounded",
+            contactEmail: "contactEmail",
             incorporationStatus: "incorporationStatus",
             raised: "moneyRaised",
             budget: "researchBudget",
@@ -128,6 +144,31 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
         }
     }
 
+    useEffect(() => {
+        if (debouncedNickname) {
+            const currentSubdomain = organization?.subdomain; // The current subdomain of the organization
+
+            if (debouncedNickname === currentSubdomain) {
+                // Clear errors since it's the same subdomain as before
+                editOrgForm.clearErrors("subdomain");
+                return;
+            }
+
+            checkSubdomainAvailability(debouncedNickname).then((isAvailable) => {
+                if (!isAvailable) {
+                    editOrgForm.setError("subdomain", {
+                        type: "manual",
+                        message: "This nickname is already taken. Please choose another.",
+                    });
+                    console.log("Not available");
+                } else {
+                    editOrgForm.clearErrors("subdomain");
+                    console.log("Available");
+                }
+            });
+        }
+    }, [debouncedNickname, organization?.subdomain, editOrgForm])
+
     return (
         <Dialog
             open={open}
@@ -137,6 +178,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                     editOrgForm.reset({
                         name: organization.name || "",
                         founded: organization.yearFounded || "",
+                        subdomain: organization.subdomain || "",
                         incorporationStatus: organization.incorporationStatus || undefined,
                         raised: organization.moneyRaised || 0,
                         deployed: organization.moneyDeployed || 0,
@@ -180,13 +222,59 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                 {/*    <TabsContent value="organization">*/}
                 <Form {...editOrgForm}>
                     <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                        <FormField control={editOrgForm.control} name="name" render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Organization Name</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}/>
+                        <FormField
+                            control={editOrgForm.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Organization Name</FormLabel>
+                                    <FormControl><Input {...field} /></FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={editOrgForm.control}
+                            name="subdomain"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Public URL</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            id="name"
+                                            autoComplete="name"
+                                            {...field}
+                                            onChange={(e) => {
+                                                const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                field.onChange(value); // Update the form state with processed value
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={editOrgForm.control}
+                            name="contactEmail"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Contact Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
+                                            placeholder="name@example.com"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <FormField
                             control={editOrgForm.control}
                             name="founded"
@@ -217,6 +305,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={editOrgForm.control}
                             name="incorporationStatus"
@@ -270,6 +359,8 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                             description="The total amount of funding raised to date by your patient group."
                             name="raised"
                         />
+
+                        <BiopharmaConsentSwitch organization={organization}/>
 
                         <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>
                             Save

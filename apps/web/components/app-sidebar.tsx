@@ -154,19 +154,19 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
             </SidebarContent>
             <SidebarFooter>
                 <div className="w-full flex items-center justify-center space-x-2">
-                    <Button
-                        className={cn(tourName ? "" : "hidden")}
-                        disabled={!tourName}
-                        variant="ghost"
-                        onClick={() => {
-                            if (tourName) {
-                                setSelectedNodeIds([])
-                                startOnborda(tourName)
-                            }
-                        }}>
-                        <Wand2 aria-hidden={true}/>
-                        Take a tour
-                    </Button>
+                    {/*<Button*/}
+                    {/*    className={cn(tourName ? "" : "hidden")}*/}
+                    {/*    disabled={!tourName}*/}
+                    {/*    variant="ghost"*/}
+                    {/*    onClick={() => {*/}
+                    {/*        if (tourName) {*/}
+                    {/*            setSelectedNodeIds([])*/}
+                    {/*            startOnborda(tourName)*/}
+                    {/*        }*/}
+                    {/*    }}>*/}
+                    {/*    <Wand2 aria-hidden={true}/>*/}
+                    {/*    Take a tour*/}
+                    {/*</Button>*/}
                     <Link href={'/app/guides'} className="text-xs">
                         Guides
                     </Link>
