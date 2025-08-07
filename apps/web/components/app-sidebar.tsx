@@ -8,7 +8,7 @@ import {
     Star,
     Megaphone,
     TestTube,
-    Book
+    Book, Wand2, BookOpen, Cookie
 } from "lucide-react"
 import {NavMain} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -18,9 +18,24 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarRail,
+    SidebarRail, SidebarTrigger,
 } from "@comend/components/ui/sidebar"
 import {MembershipWithOrganization} from "@comend/lib/types";
+import Image from "next/image"
+import {Button, buttonVariants} from "@comend/components/ui/button";
+import logo from "@/public/logo-square.png"
+import {cn} from "@/packages/lib/utils";
+import Link from "next/link";
+import {FeedbackSheet} from "~web/components/feedback";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/packages/components/ui/tooltip";
+import {useEffect, useRef, useState} from "react";
+import {redirect, usePathname} from "next/navigation";
+import {getAllMembershipsFromUserId} from "@/packages/lib/fetchers";
+import {toast} from "sonner";
+import {useOnborda} from "~web/components/onborda/OnbordaContext";
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
+import {useShallow} from "zustand/react/shallow";
+import {useSession} from "next-auth/react";
 
 // This is sample data.
 const data = {
@@ -101,7 +116,34 @@ const data = {
     ]
 }
 
-export function AppSidebar({memberships}: {memberships: MembershipWithOrganization[]}) {
+const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
+    setSelectedNodeIds: state.setSelectedNodeIds
+})
+
+export function AppSidebar({memberships}: { memberships: MembershipWithOrganization[] }) {
+    const {data: session, status} = useSession()
+    const {startOnborda} = useOnborda()
+    const pathname = usePathname()
+    const {roadmapId, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const [tourName, setTourName] = useState(getTourName())
+
+    function getTourName() {
+        if (pathname === '/app/research-plan') return 'research-plans-page-tour'
+        if (pathname === `/app/research-plan/${roadmapId}`) return 'research-plan-tour'
+        return null
+    }
+
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            redirect("/login");
+        }
+    }, [status])
+
+    useEffect(() => {
+        setTourName(getTourName())
+    }, [pathname, roadmapId, getTourName])
+
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
@@ -111,7 +153,43 @@ export function AppSidebar({memberships}: {memberships: MembershipWithOrganizati
                 <NavMain items={data.navMain}/>
             </SidebarContent>
             <SidebarFooter>
-                <NavUser/>
+                <div className="w-full flex items-center justify-center space-x-2">
+                    <Button
+                        className={cn(tourName ? "" : "hidden")}
+                        disabled={!tourName}
+                        variant="ghost"
+                        onClick={() => {
+                            if (tourName) {
+                                setSelectedNodeIds([])
+                                startOnborda(tourName)
+                            }
+                        }}>
+                        <Wand2 aria-hidden={true}/>
+                        Take a tour
+                    </Button>
+                    <Link href={'/app/guides'} className="text-xs">
+                        Guides
+                    </Link>
+                    <FeedbackSheet/>
+                    <TooltipProvider delayDuration={50}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="text-xs">
+                                    Cookies
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-64">
+                                <p>{`Adjust cookie and consent settings`}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <Button
+                        variant="ghost"
+                        className="pointer-events-none p-0"
+                    >
+                        <Image className="h-4 w-4" priority src={logo} alt="Comend logo"/>
+                    </Button>
+                </div>
             </SidebarFooter>
             <SidebarRail/>
         </Sidebar>
