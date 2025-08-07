@@ -98,7 +98,7 @@ export function EditBiosampleToolForm({
 }: {
     toolData: any,
     numAssetsPinned: number,
-    closeDialog?: () => void
+    closeDialog?: (newBiosample?: any) => void
 }) {
     const initializing = useRef(true)
     const router = useRouter()
@@ -208,6 +208,7 @@ export function EditBiosampleToolForm({
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/biosample")
+                if (closeDialog) closeDialog(updatedAsset)
                 router.refresh()
             } else {
                 const newAsset = await createBiosample(session.user.organizationId, values)
@@ -225,9 +226,9 @@ export function EditBiosampleToolForm({
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/biosample")
+                if (closeDialog) closeDialog(newAsset)
                 router.refresh()
             }
-            if (closeDialog) closeDialog()
         } catch (error) {
             console.error("Error creating or updating tool:", error);
             toast.error(

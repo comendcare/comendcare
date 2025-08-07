@@ -267,9 +267,10 @@ model Milestone {
   timelineOrder    Int                        @default(0)
   nodeType         String                     @default("PROJECT")
 
-  tools      ToolToMilestone[]
-  biosamples BiosampleToMilestone[]
-  rfps       RFPToMilestone[]
+  tools         ToolToMilestone[]
+  biosamples    BiosampleToMilestone[]
+  diseaseModels DiseaseModelToMilestone[]
+  rfps          RFPToMilestone[]
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -316,13 +317,14 @@ model DiseaseModel {
   types       String[] // values (DiseaseModelType ids)
 
   institutionId  String?
-  institution    Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  institution    Institution?              @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   geneId         Int?
-  gene           Gene?         @relation(fields: [geneId], references: [id])
+  gene           Gene?                     @relation(fields: [geneId], references: [id])
   conditionId    String?
-  condition      Condition?    @relation(fields: [conditionId], references: [id])
+  condition      Condition?                @relation(fields: [conditionId], references: [id])
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization?             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones     DiseaseModelToMilestone[]
 }
 
 model Biosample {
@@ -426,6 +428,18 @@ model BiosampleToMilestone {
   metadata  Json?
 
   @@unique([biosampleId, milestoneId])
+}
+
+model DiseaseModelToMilestone {
+  id             String @id @default(uuid())
+  diseaseModelId String
+  milestoneId    String
+
+  diseaseModel DiseaseModel @relation(fields: [diseaseModelId], references: [id], onDelete: Cascade)
+  milestone    Milestone    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  metadata     Json?
+
+  @@unique([diseaseModelId, milestoneId])
 }
 
 model RFP {
