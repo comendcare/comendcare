@@ -39,7 +39,7 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@comend/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@comend/lib/types"
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
 import {Biosample, DiseaseModel, MilestoneType, Organization, PlatformNotification, Prisma, Tool} from "@prisma/client"
 import {getAssets, getBiosamples, getDatasamples, getDiseaseModels, getRFPs} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -81,6 +81,7 @@ import { nanoid } from "nanoid"
 import { EditBiosampleToolForm } from "./edit-biosample-tool-form"
 import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form"
 import { EditDataToolForm } from "./edit-data-tool-form"
+import { MilestoneTypeBadge } from "@/packages/components/milestone-type-badge"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -128,7 +129,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
-    tools: z.array(z.custom<Tool | Biosample | DiseaseModel>()).optional(),
+    tools: z.array(z.custom<Option>()).optional(),
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
 }).refine(
@@ -164,7 +165,7 @@ export function EditMilestoneForm({
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
-    const [fetchedAssets, setFetchedAssets] = useState<(Tool | Biosample | DiseaseModel)[]>([])
+    const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
     const {step} = useOnbordaStore(useShallow(onbordaSelector))
@@ -340,10 +341,39 @@ export function EditMilestoneForm({
     const init = async () => {
         if (session?.user.organizationId) {
             const biosamples = await getBiosamples(session.user.organizationId)
-            const formattedBiosamples = biosamples.data.map((biosample: Biosample) => ({...biosample, title: `${biosample.donorId?.slice(-4)} ${biosample.types[0]} ${biosample.collectionDate}`}))
+            const formattedBiosamples: Option[] = biosamples.data.map((biosample: Biosample, index: number) => {
+                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                return (
+                    {
+                        value: biosample.id, 
+                        type: 'Biosamples', 
+                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${biosample.donorId} --- ${type?.label || ''}`
+                    }
+                )
+            })
             const diseaseModels = await getDiseaseModels(session.user.organizationId)
+            const formattedDiseaseModels: Option[] = diseaseModels.data.map((diseaseModel: DiseaseModel) => {
+                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                return (
+                    {
+                        value: diseaseModel.id, 
+                        label: `${type?.label || ''}`,
+                        type: 'Disease Models'
+                    }
+                )
+            })
             const datasamples = await getDatasamples(session.user.organizationId)
-            setFetchedAssets([...formattedBiosamples, ...diseaseModels.data, ...datasamples.data])
+            const formattedDatasamples: Option[] = datasamples.data.map((datasample: Tool) => {
+                return (
+                    {
+                        value: datasample.id, 
+                        label: datasample.title || datasample.id, 
+                        type: 'Clinical Datasets'
+                    }
+                )
+            })
+            setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
 
             const rfpsResponse = await getRFPs(session.user.organizationId, {
                 id: true,
@@ -643,22 +673,10 @@ export function EditMilestoneForm({
                                                     <FormItem className="w-full">
                                                         <FormControl>
                                                             <MultipleSelector
-                                                                value={field.value?.map(tool => ({
-                                                                    ...tool,
-                                                                    value: tool.id,
-                                                                    label: "title" in tool ? tool.title : tool.id
-                                                                } as Option))}
+                                                                value={field.value}
                                                                 onChange={field.onChange}
-                                                                defaultOptions={fetchedAssets.map(tool => ({
-                                                                    ...tool,
-                                                                    value: tool.id,
-                                                                    label: "title" in tool ? tool.title : tool.id
-                                                                } as Option))}
-                                                                options={fetchedAssets.map(tool => ({
-                                                                    ...tool,
-                                                                    value: tool.id,
-                                                                    label: "title" in tool ? tool.title : tool.id
-                                                                } as Option))}
+                                                                defaultOptions={fetchedTools}
+                                                                options={fetchedTools}
                                                                 hidePlaceholderWhenSelected={true}
                                                                 showHoverCard={false}
                                                                 placeholder="Link tools"
@@ -667,6 +685,7 @@ export function EditMilestoneForm({
                                                                         no results found.
                                                                     </p>
                                                                 }
+                                                                groupBy={'type'}
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
                                                                     <div className="w-full px-1 pb-1">
