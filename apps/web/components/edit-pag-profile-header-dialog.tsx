@@ -39,8 +39,8 @@ import React, {useEffect, useState} from "react";
 import MoneyInput from "@comend/components/money-input";
 import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
-import { Tooltip } from "@comend/components/plate-ui/tooltip";
-import { TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import {Tooltip} from "@comend/components/plate-ui/tooltip";
+import {TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
@@ -161,7 +161,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                 </TooltipTrigger>
                 {session?.user?.membership?.role !== "owner" && (
                     <TooltipContent className="max-w-80">
-                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your
+                            organization. Owners are visible in the Organization Settings tab in the memberships
+                            section.</p>
                     </TooltipContent>
                 )}
             </Tooltip>
@@ -170,131 +172,139 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                     <DialogTitle>Edit Organization Profile</DialogTitle>
                     <DialogDescription>{`Update your organization's details.`}</DialogDescription>
                 </DialogHeader>
-                <Tabs defaultValue="organization">
-                    <TabsList>
-                        <TabsTrigger value="organization">Organization</TabsTrigger>
-                        <TabsTrigger value="finances">Finances</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="organization">
-                        <Form {...editOrgForm}>
-                            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                                <FormField control={editOrgForm.control} name="name" render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Organization Name</FormLabel>
-                                        <FormControl><Input {...field} /></FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}/>
-                                <FormField
-                                    control={editOrgForm.control}
-                                    name="founded"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Year Founded</FormLabel>
-                                            <Select
-                                                onValueChange={(value) => {
-                                                    console.log("Year selected:", value);
-                                                    field.onChange(`${value}-01-01`);
-                                                }}
-                                                defaultValue={field.value?.split("-")[0]}
-                                            >
+                {/*<Tabs defaultValue="organization">*/}
+                {/*    <TabsList>*/}
+                {/*        <TabsTrigger value="organization">Organization</TabsTrigger>*/}
+                {/*        <TabsTrigger value="finances">Finances</TabsTrigger>*/}
+                {/*    </TabsList>*/}
+                {/*    <TabsContent value="organization">*/}
+                <Form {...editOrgForm}>
+                    <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
+                        <FormField control={editOrgForm.control} name="name" render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Organization Name</FormLabel>
+                                <FormControl><Input {...field} /></FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}/>
+                        <FormField
+                            control={editOrgForm.control}
+                            name="founded"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Year Founded</FormLabel>
+                                    <Select
+                                        onValueChange={(value) => {
+                                            console.log("Year selected:", value);
+                                            field.onChange(`${value}-01-01`);
+                                        }}
+                                        defaultValue={field.value?.split("-")[0]}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a year"/>
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {years.map((year) => (
+                                                <SelectItem key={year} value={year.toString()}>
+                                                    {year}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={editOrgForm.control}
+                            name="incorporationStatus"
+                            render={({field}) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>What is your 501(c)(3) status?</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={(value) => {
+                                                console.log("Radio selected:", value);
+                                                field.onChange(value);
+                                            }}
+                                            defaultValue={field.value}
+                                            value={field.value}
+                                            className="flex flex-col space-y-1"
+                                        >
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a year"/>
-                                                    </SelectTrigger>
+                                                    <RadioGroupItem value="YES"/>
                                                 </FormControl>
-                                                <SelectContent>
-                                                    {years.map((year) => (
-                                                        <SelectItem key={year} value={year.toString()}>
-                                                            {year}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={editOrgForm.control}
-                                    name="incorporationStatus"
-                                    render={({field}) => (
-                                        <FormItem className="space-y-3">
-                                            <FormLabel>What is your 501(c)(3) status?</FormLabel>
-                                            <FormControl>
-                                                <RadioGroup
-                                                    onValueChange={(value) => {
-                                                        console.log("Radio selected:", value);
-                                                        field.onChange(value);
-                                                    }}
-                                                    defaultValue={field.value}
-                                                    value={field.value}
-                                                    className="flex flex-col space-y-1"
-                                                >
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                                        <FormControl>
-                                                            <RadioGroupItem value="YES"/>
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal">
-                                                            Yes, I have a 501(c)(3)
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                                        <FormControl>
-                                                            <RadioGroupItem value="INPROGRESS"/>
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal">
-                                                            {`No, but I'm working on it`}
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                                        <FormControl>
-                                                            <RadioGroupItem value="NO"/>
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal">
-                                                            {`No, I don't have a 501(c)(3)`}
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                </RadioGroup>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>
-                                    Save
-                                </Button>
-                            </form>
-                        </Form>
-                    </TabsContent>
-                    <TabsContent value="finances">
-                        <Form {...editOrgForm}>
-                            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                                <MoneyInput
-                                    form={editOrgForm}
-                                    label="Total funds raised to date"
-                                    description="The total amount of funding raised to date by your patient group."
-                                    name="raised"
-                                />
-                                <MoneyInput
-                                    form={editOrgForm}
-                                    label="Total funds deployed to research"
-                                    description="The total amount of money deployed to research to date."
-                                    name="deployed"
-                                />
-                                <MoneyInput
-                                    form={editOrgForm}
-                                    label="Annual research budget"
-                                    description="The amount of money allocated to advancing research this year."
-                                    name="budget"
-                                />
-                                <Button type="submit" onClick={() => console.log("Save (Finances tab) clicked")}>
-                                    Save
-                                </Button>
-                            </form>
-                        </Form>
-                    </TabsContent>
-                </Tabs>
+                                                <FormLabel className="font-normal">
+                                                    Yes, I have a 501(c)(3)
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="INPROGRESS"/>
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    {`No, but I'm working on it`}
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="NO"/>
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    {`No, I don't have a 501(c)(3)`}
+                                                </FormLabel>
+                                            </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <MoneyInput
+                            form={editOrgForm}
+                            label="Total funds raised to date"
+                            description="The total amount of funding raised to date by your patient group."
+                            name="raised"
+                        />
+
+                        <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>
+                            Save
+                        </Button>
+                    </form>
+                </Form>
+                {/*</TabsContent>*/}
+                {/*    <TabsContent value="finances">*/}
+                {/*        <Form {...editOrgForm}>*/}
+                {/*            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">*/}
+                {/*                <MoneyInput*/}
+                {/*                    form={editOrgForm}*/}
+                {/*                    label="Total funds raised to date"*/}
+                {/*                    description="The total amount of funding raised to date by your patient group."*/}
+                {/*                    name="raised"*/}
+                {/*                />*/}
+                {/*                <MoneyInput*/}
+                {/*                    form={editOrgForm}*/}
+                {/*                    label="Total funds deployed to research"*/}
+                {/*                    description="The total amount of money deployed to research to date."*/}
+                {/*                    name="deployed"*/}
+                {/*                />*/}
+                {/*                <MoneyInput*/}
+                {/*                    form={editOrgForm}*/}
+                {/*                    label="Annual research budget"*/}
+                {/*                    description="The amount of money allocated to advancing research this year."*/}
+                {/*                    name="budget"*/}
+                {/*                />*/}
+                {/*                <Button type="submit" onClick={() => console.log("Save (Finances tab) clicked")}>*/}
+                {/*                    Save*/}
+                {/*                </Button>*/}
+                {/*            </form>*/}
+                {/*        </Form>*/}
+                {/*    </TabsContent>*/}
+                {/*</Tabs>*/}
             </DialogContent>
         </Dialog>
     );
