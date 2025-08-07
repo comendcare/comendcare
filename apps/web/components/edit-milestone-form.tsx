@@ -931,7 +931,27 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditBiosampleToolForm toolData={{}} closeDialog={() => {}} numAssetsPinned={0}/>
+                    <EditBiosampleToolForm 
+                        toolData={{}} 
+                        closeDialog={(newBiosample) => {
+                            setCreateBiosampleIsOpen(false)
+
+                            if (newBiosample) {
+                                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === newBiosample.types[0])
+                                form.setValue("tools", [
+                                    ...(form.getValues("tools") || []),
+                                    {
+                                        value: newBiosample.id, 
+                                        type: 'Biosamples', 
+                                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                        label: `${newBiosample.donorId} --- ${type?.label || ''}`,
+                                        biosample: newBiosample
+                                    }
+                                ])
+                            }
+                        }} 
+                        numAssetsPinned={0}
+                    />
                 </DialogContent>
             </Dialog>
 
@@ -945,7 +965,26 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDiseaseModelToolForm toolData={{}} closeDialog={() => {}} numAssetsPinned={0}/>
+                    <EditDiseaseModelToolForm 
+                        toolData={{}} 
+                        closeDialog={(newDiseaseModel) => {
+                            setCreateDiseaseModelIsOpen(false)
+
+                            if (newDiseaseModel) {
+                                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === newDiseaseModel.types[0])
+                                form.setValue("tools", [
+                                    ...(form.getValues("tools") || []),
+                                    {
+                                        value: newDiseaseModel.id, 
+                                        label: `${type?.label || ''}`,
+                                        type: 'Disease Models',
+                                        diseaseModel: newDiseaseModel
+                                    }
+                                ])
+                            }
+                        }} 
+                        numAssetsPinned={0}
+                    />
                 </DialogContent>
             </Dialog>
 
@@ -959,7 +998,25 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDataToolForm toolData={{}} closeDialog={() => {}} numAssetsPinned={0}/>
+                    <EditDataToolForm 
+                        toolData={{}} 
+                        closeDialog={(newDatasample) => {
+                            setCreateClinicalDatasetIsOpen(false)
+
+                            if (newDatasample) {
+                                form.setValue("tools", [
+                                    ...(form.getValues("tools") || []),
+                                    {
+                                        value: newDatasample.id, 
+                                        label: newDatasample.title || newDatasample.id, 
+                                        type: 'Clinical Datasets',
+                                        datasample: newDatasample
+                                    }
+                                ])
+                            }
+                        }} 
+                        numAssetsPinned={0}
+                    />
                 </DialogContent>
             </Dialog>
 

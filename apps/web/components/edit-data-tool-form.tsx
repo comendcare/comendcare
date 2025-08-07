@@ -86,7 +86,7 @@ export function EditDataToolForm({
 }: {
     toolData: Partial<Asset>,
     numAssetsPinned: number,
-    closeDialog?: () => void
+    closeDialog?: (newAsset?: any) => void
 }) {
     const initializing = useRef(true)
     const router = useRouter()
@@ -172,23 +172,24 @@ export function EditDataToolForm({
 
         try {
             if (toolData.id) {
-                await updateTool(updateData, session.user.organizationId)
+                const updatedTool = await updateTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/data")
+                if (closeDialog) closeDialog(updatedTool)
                 router.refresh()
             } else {
-                await createTool(updateData, session.user.organizationId)
+                const newTool = await createTool(updateData, session.user.organizationId)
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/data")
+                if (closeDialog) closeDialog(newTool)
                 router.refresh()
             }
-            if (closeDialog) closeDialog()
         } catch (error) {
             console.error("Error creating or updating tool:", error);
             toast.error(

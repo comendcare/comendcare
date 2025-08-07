@@ -47,7 +47,7 @@ export function EditDiseaseModelToolForm({
 }: {
     toolData: any,
     numAssetsPinned: number,
-    closeDialog?: () => void
+    closeDialog?: (newDiseaseModel?: any) => void
 }) {
     const initializing = useRef(true)
     const router = useRouter()
@@ -108,6 +108,7 @@ export function EditDiseaseModelToolForm({
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/disease-model")
+                if (closeDialog) closeDialog(updatedAsset)
                 router.refresh()
             } else {
                 const newAsset = await createDiseaseModel(session.user.organizationId, values)
@@ -125,9 +126,9 @@ export function EditDiseaseModelToolForm({
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/disease-model")
+                if (closeDialog) closeDialog(newAsset)
                 router.refresh()
             }
-            if (closeDialog) closeDialog()
         } catch (error) {
             console.error("Error creating or updating tool:", error);
             toast.error(
