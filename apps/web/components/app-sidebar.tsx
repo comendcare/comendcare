@@ -10,7 +10,7 @@ import {
     Book, Wand2, BookOpen, Cookie,
     Microscope
 } from "lucide-react"
-import {NavMain} from "~web/components/nav-main"
+import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
 import {OrganizationSwitcher} from "~web/components/organization-switcher"
 import {
@@ -18,9 +18,11 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
+    SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail, SidebarTrigger,
+    useSidebar,
 } from "@comend/components/ui/sidebar"
 import {MembershipWithOrganization} from "@comend/lib/types";
 import Image from "next/image"
@@ -130,6 +132,7 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
     const pathname = usePathname()
     const {roadmapId, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
     const [tourName, setTourName] = useState(getTourName())
+    const {state} = useSidebar()
 
     function getTourName() {
         if (pathname === '/app/research-plan') return 'research-plans-page-tour'
@@ -158,38 +161,53 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
             <SidebarFooter className="bg-gray-50 p-2">
                 <Separator className="w-full"/>
                 <div className="flex flex-col gap-1">
-                <Button asChild variant="ghost" className={cn("flex justify-start p-2", pathname.startsWith('/app/guides') ? "bg-blue-light justify-start border border-blue-dark text-primary" : "")}>
-                    <Link className="flex p-0 h-8" href={'/app/guides'}>
-                        <Book className="mr-2 h-4 w-4"/>
-                        <p className="p-0">{'Guides'}</p>
+                <SidebarMenuButton
+                    asChild
+                    className={pathname.startsWith('/app/guides') ? "bg-blue-light border border-blue-dark text-primary" : ""}
+                >
+                    <Link href={'/app/guides'} className="flex">
+                        <div className="relative">
+                            <BookOpen className="mr-2 h-4 w-4"/>
+                            {state === "collapsed" &&
+                                <NavNotificationCollapsedIcon item={{title: 'Guides', url: '/app/guides'}}/>
+                            }
+                        </div>
+                        {'Guides'}
+                        {state === "expanded" &&
+                            <NavNotificationExpandedIcon item={{title: 'Guides', url: '/app/guides'}}/>
+                        }
                     </Link>
-                </Button>
+                </SidebarMenuButton>
                 <FeedbackSheet />
                 </div>
-                <Separator className="w-full"/>
-                <div className="w-full flex flex-wrap justify-start gap-1 p-2 items-center">
-                    <Button variant="ghost" className="text-sm cky-banner-element p-0 flex justify-start m-0 h-fit hover:underline hover:bg-transparent">
-                        Cookies
-                    </Button>
-                    <p className="text-md">{'\u00B7'}</p>
-                    <Link href="https://www.comend.io/terms-of-service" className="text-sm hover:underline hover:text-primary">
-                        Terms of Services
-                    </Link>
-                    <p className="text-md">{'\u00B7'}</p>
-                    <Link href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link" className="text-sm hover:underline hover:text-primary">
-                        Privacy Policy
-                    </Link>
-                    <p className="text-md">{'\u00B7'}</p>
-                    <Link href="https://comend.io/security" className="text-sm hover:underline hover:text-primary">
-                        Security Promise
-                    </Link>
-                    {/* <Button
-                        variant="ghost"
-                        className="pointer-events-none p-0"
-                    >
-                        <Image className="h-4 w-4" priority src={logo} alt="Comend logo"/>
-                    </Button> */}
-                </div>
+                {state === "expanded" && (
+                    <>
+                    <Separator className="w-full"/>
+                    <div className="w-full flex flex-wrap justify-start gap-1 p-2 items-center" >
+                        <Button variant="ghost" className="text-xs cky-banner-element p-0 flex justify-start m-0 h-fit hover:underline hover:bg-transparent">
+                            Cookies
+                        </Button>
+                        <p className="text-md">{'\u00B7'}</p>
+                        <Link href="https://www.comend.io/terms-of-service" className="text-xs hover:underline hover:text-primary">
+                            Terms of Services
+                        </Link>
+                        <p className="text-md">{'\u00B7'}</p>
+                        <Link href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link" className="text-xs hover:underline hover:text-primary">
+                            Privacy Policy
+                        </Link>
+                        {/* <p className="text-md">{'\u00B7'}</p> */}
+                        <Link href="https://comend.io/security" className="text-xs hover:underline hover:text-primary">
+                            Security Promise
+                        </Link>
+                        {/* <Button
+                            variant="ghost"
+                            className="pointer-events-none p-0"
+                        >
+                            <Image className="h-4 w-4" priority src={logo} alt="Comend logo"/>
+                        </Button> */}
+                    </div>
+                    </>
+                )}
             </SidebarFooter>
             <SidebarRail/>
         </Sidebar>

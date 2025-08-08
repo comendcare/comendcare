@@ -133,7 +133,7 @@ export function NavMain({items}: { items: Item[] }) {
     )
 }
 
-const NavNotificationCollapsedIcon = ({item}: { item: Item }) => {
+export const NavNotificationCollapsedIcon = ({item}: { item: Item }) => {
     const {
         notifications
     } = useNotificationsStore(useShallow(notificationsSelector))
@@ -154,7 +154,7 @@ const NavNotificationCollapsedIcon = ({item}: { item: Item }) => {
     }
 }
 
-const NavNotificationExpandedIcon = ({item}: { item: Item }) => {
+export const NavNotificationExpandedIcon = ({item}: { item: Item }) => {
     const {
         notifications
     } = useNotificationsStore(useShallow(notificationsSelector))
