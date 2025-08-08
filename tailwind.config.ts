@@ -128,8 +128,8 @@ const config: Config = {
                     border: 'hsl(var(--border-yellow))' // yellow-900
                 },
                 lime: {
-                    background: 'hsl(var(--background-lime))', // lime-100
-                    border: 'hsl(var(--border-lime))' // lime-900
+                    light: 'hsl(var(--background-lime))', // lime-100
+                    dark: 'hsl(var(--border-lime))' // lime-900
                 },
                 green: {
                     background: 'hsl(var(--background-green))', // green-100
