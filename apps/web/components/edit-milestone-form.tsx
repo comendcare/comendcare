@@ -687,11 +687,11 @@ export function EditMilestoneForm({
                                                                 groupBy={'type'}
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full px-1 pb-1 bg-white gap-2">
+                                                                    <div className="w-full p-1 bg-white flex flex-col">
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="bg-rose-100 cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="bg-rose-100 hover:bg-rose-200 cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
@@ -703,7 +703,7 @@ export function EditMilestoneForm({
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="bg-violet-100 cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="bg-violet-100 hover:bg-violet-200 cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
@@ -715,7 +715,7 @@ export function EditMilestoneForm({
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="bg-emerald-100 cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="bg-emerald-100 hover:bg-emerald-200 cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
