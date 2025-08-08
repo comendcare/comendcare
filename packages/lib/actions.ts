@@ -1839,6 +1839,7 @@ export const deleteAsset = withOrganizationAuth(
             const response = await prisma.tool.delete({
                 where: {id: toolId},
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     contacts: true,
                     attachments: true,
                     milestones: {
@@ -2653,6 +2654,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     id: toolData.id || nanoid()
                 },
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     contacts: true,
                     attachments: true,
                     milestones: {
@@ -3543,6 +3545,7 @@ export const syncDBAssets = withOrganizationAuth(
                     const previousAsset: Asset | null = await prisma.tool.findUnique({
                         where: {id: tool.id},
                         include: {
+                            organization: {include: {conditions: {include: {condition: true}}}},
                             contacts: true,
                             attachments: true,
                             milestones: {
