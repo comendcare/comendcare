@@ -21,10 +21,9 @@ export const FeedbackSheet: React.FC<FeedbackProps> = () => {
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="ghost">
-                    <MessageCircle aria-hidden={true} />
+                <div className="text-xs">
                     Submit feedback
-                </Button>
+                </div>
             </SheetTrigger>
             <SheetContent onOpenAutoFocus={event => event.preventDefault()}>
                 <SheetHeader>

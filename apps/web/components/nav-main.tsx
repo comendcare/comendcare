@@ -86,7 +86,7 @@ export function NavMain({items}: { items: Item[] }) {
                             ) : (
                                 <SidebarMenuButton
                                     asChild
-                                    className={isActive ? "bg-blue-light text-primary" : ""}
+                                    className={isActive ? "bg-blue-light border border-blue-dark text-primary" : ""}
                                 >
                                     <Link href={item.url} className="flex">
                                         <div className="relative">

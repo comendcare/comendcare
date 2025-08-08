@@ -39,9 +39,9 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@comend/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@comend/lib/types"
-import {MilestoneType, Organization, PlatformNotification, Prisma} from "@prisma/client"
-import {getAssets, getRFPs} from "@comend/lib/fetchers"
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
+import {Biosample, DiseaseModel, MilestoneType, Organization, PlatformNotification, Prisma, Tool} from "@prisma/client"
+import {getAssets, getBiosamples, getDatasamples, getDiseaseModels, getRFPs} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
@@ -78,6 +78,10 @@ import { EditRFPForm } from "./edit-rfp-form"
 import { CommandItem } from "@/packages/components/ui/command"
 import { usePathname } from "next/navigation"
 import { nanoid } from "nanoid"
+import { EditBiosampleToolForm } from "./edit-biosample-tool-form"
+import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form"
+import { EditDataToolForm } from "./edit-data-tool-form"
+import { MilestoneTypeBadge } from "@/packages/components/milestone-type-badge"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -125,7 +129,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
-    tools: z.array(z.custom<Asset>()).optional(),
+    tools: z.array(z.custom<Option>()).optional(),
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
 }).refine(
@@ -161,13 +165,16 @@ export function EditMilestoneForm({
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
-    const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
+    const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
     const {step} = useOnbordaStore(useShallow(onbordaSelector))
     const {isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const [createRFPIsOpen, setCreateRFPIsOpen] = useState(false)
+    const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
+    const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
+    const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
     const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -189,7 +196,41 @@ export function EditMilestoneForm({
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || [],
-            tools: (milestoneData?.tools || []).map((tool: any) => tool.tool) || [],
+            tools: [
+                ...(milestoneData?.biosamples || []).map(({biosample}) => {
+                    const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                    return (
+                        {
+                            value: biosample.id, 
+                            type: 'Biosamples', 
+                            img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                            label: `${biosample.donorId} --- ${type?.label || ''}`,
+                            biosample
+                        }
+                    )
+                }),
+                ...(milestoneData?.diseaseModels || []).map(({diseaseModel}) => {
+                    const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                    return (
+                        {
+                            value: diseaseModel.id, 
+                            label: `${type?.label || ''}`,
+                            type: 'Disease Models',
+                            diseaseModel
+                        }
+                    )
+                }),
+                ...(milestoneData?.tools || []).map(({tool}) => {
+                    return (
+                        {
+                            value: tool?.id, 
+                            label: tool?.title || tool?.id, 
+                            type: 'Clinical Datasets',
+                            datasample: tool,
+                        }
+                    )
+                })
+            ],
             rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
@@ -238,7 +279,7 @@ export function EditMilestoneForm({
             notes
         } = values;
 
-        const updateData: Milestone = {
+        const updateData: any = {
             ...milestoneData,
             nodeType,
             title,
@@ -263,13 +304,34 @@ export function EditMilestoneForm({
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
-            tools: (tools || []).map((tool) => {
+            // tools: (tools || []).map((tool) => {
+            //     return ({
+            //         milestoneId: milestoneData.id,
+            //         toolId: tool.id,
+            //         tool: tool
+            //     })
+            // }).filter((tool) => tool !== undefined),
+            biosamples: (tools || []).filter(tool => tool.type === "Biosamples").map((tool) => {
                 return ({
                     milestoneId: milestoneData.id,
-                    toolId: tool.id,
-                    tool: tool
+                    biosampleId: tool.value,
+                    biosample: tool.biosample
                 })
-            }).filter((tool) => tool !== undefined),
+            }),
+            diseaseModels: (tools || []).filter(tool => tool.type === "Disease Models").map((tool) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    diseaseModelId: tool.value,
+                    diseaseModel: tool.diseaseModel
+                })
+            }),
+            tools: (tools || []).filter(tool => tool.type === "Clinical Datasets").map((tool) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    toolId: tool.value,
+                    tool: tool.datasample
+                })
+            }),
             rfps: (rfps || []).map((rfp) => {
                 return ({
                     milestoneId: milestoneData.id,
@@ -333,24 +395,43 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            // const response = await getOrganizationFromOrganizationId(session.user.organizationId)
-            // if (response.success && response.data) {
-            //     setOrgIsPublished(response.data.published)
-            // }
-
-            const toolsResponse = await getAssets(session.user.organizationId, {
-                id: true,
-                title: true,
-                description: true,
-                contacts: true,
-                attachments: true,
-                private: true,
-                pinned: true,
-                milestones: true
+            const biosamples = await getBiosamples(session.user.organizationId)
+            const formattedBiosamples: Option[] = biosamples.data.map((biosample: Biosample, index: number) => {
+                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                return (
+                    {
+                        value: biosample.id, 
+                        type: 'Biosamples', 
+                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${biosample.donorId} --- ${type?.label || ''}`,
+                        biosample
+                    }
+                )
             })
-            if (toolsResponse.success && toolsResponse.data) {
-                setFetchedAssets(toolsResponse.data || [])
-            }
+            const diseaseModels = await getDiseaseModels(session.user.organizationId)
+            const formattedDiseaseModels: Option[] = diseaseModels.data.map((diseaseModel: DiseaseModel) => {
+                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                return (
+                    {
+                        value: diseaseModel.id, 
+                        label: `${type?.label || ''}`,
+                        type: 'Disease Models',
+                        diseaseModel
+                    }
+                )
+            })
+            const datasamples = await getDatasamples(session.user.organizationId)
+            const formattedDatasamples: Option[] = datasamples.data.map((datasample: Tool) => {
+                return (
+                    {
+                        value: datasample.id, 
+                        label: datasample.title || datasample.id, 
+                        type: 'Clinical Datasets',
+                        datasample
+                    }
+                )
+            })
+            setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
 
             const rfpsResponse = await getRFPs(session.user.organizationId, {
                 id: true,
@@ -403,68 +484,9 @@ export function EditMilestoneForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // when switching to recommendations tab, set notifications as viewed
-    // useEffect(() => {
-    //     if (tab === "recommendations") {
-    //         const relevantNotifications = recommendations?.map(({content, milestone}) => (
-    //             notifications.find((notification: any) => (
-    //                 notification.type === "NEW_RECOMMENDATION" &&
-    //                 notification.metadata?.companyId === content.id &&
-    //                 notification.metadata?.milestoneId === milestone.id &&
-    //                 notification.lastViewed
-    //             ))
-    //         )).filter(n => n !== undefined) || []
-    //         if (relevantNotifications.length > 0) setNotificationsViewed(relevantNotifications)
-    //     }
-    // }, [tab, notifications, recommendations, setNotificationsViewed])
-
     useEffect(() => {
         if (tab === "recommendations") setRecommendationsViewed(true)
     }, [tab])
-
-    // useEffect(() => {
-    //     const setupNotifications = async () => {
-    //         if (!initializing.current && notificationsInitialized) {
-    //             // if is initialized, set up the notifications for new recommendations
-    //             // Copy the notifications to avoid mutating the original array
-    //             let localNotifications: Partial<PlatformNotification>[] = [...notifications]
-    //             for (const recommendation of (recommendations || [])) {
-
-    //                 const exists = localNotifications
-    //                     .filter((notification: any) => (
-    //                         notification.type === "NEW_RECOMMENDATION" &&
-    //                         notification.metadata?.milestoneId === recommendation.milestone.id &&
-    //                         notification.metadata?.companyId === recommendation.content.id
-    //                     )).length > 0
-
-    //                 console.log(`notifications exist`, exists)
-
-    //                 if (!exists) {
-    //                     console.log(`notifications`, localNotifications);
-    //                     console.log(
-    //                         `ADD NOTIFICATION`,
-    //                         `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
-    //                     );
-
-    //                     const notificationData = {
-    //                         type: "NEW_RECOMMENDATION",
-    //                         title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
-    //                         metadata: {
-    //                             milestoneId: recommendation.milestone.id,
-    //                             companyId: recommendation.content.id,
-    //                         },
-    //                     }
-    //                     await addNotification(notificationData)
-    //                     localNotifications = localNotifications.concat([notificationData])
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     setupNotifications()
-    //     // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [selectedNodeIds, recommendations, notificationsInitialized, addNotification])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
@@ -650,22 +672,10 @@ export function EditMilestoneForm({
                                                     <FormItem className="w-full">
                                                         <FormControl>
                                                             <MultipleSelector
-                                                                value={field.value?.map(tool => ({
-                                                                    ...tool,
-                                                                    value: tool.id,
-                                                                    label: tool.title
-                                                                } as Option))}
+                                                                value={field.value}
                                                                 onChange={field.onChange}
-                                                                defaultOptions={fetchedAssets.map(tool => ({
-                                                                    ...tool,
-                                                                    value: tool.id,
-                                                                    label: tool.title
-                                                                } as Option))}
-                                                                options={fetchedAssets.map(tool => ({
-                                                                    ...tool,
-                                                                    value: tool.id,
-                                                                    label: tool.title
-                                                                } as Option))}
+                                                                defaultOptions={fetchedTools}
+                                                                options={fetchedTools}
                                                                 hidePlaceholderWhenSelected={true}
                                                                 showHoverCard={false}
                                                                 placeholder="Link tools"
@@ -674,6 +684,48 @@ export function EditMilestoneForm({
                                                                         no results found.
                                                                     </p>
                                                                 }
+                                                                groupBy={'type'}
+                                                                creatable={true}
+                                                                creatableItemOverride={() => (
+                                                                    <div className="w-full px-1 pb-1">
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            onClick={() => setCreateBiosampleIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create Biosample`}
+                                                                        </Button>
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            onClick={() => setCreateDiseaseModelIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create Disease Model`}
+                                                                        </Button>
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            onClick={() => setCreateClinicalDatasetIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create Clinical Dataset`}
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
                                                             />
                                                         </FormControl>
                                                         <FormMessage className="text-primary"/>
@@ -868,6 +920,105 @@ export function EditMilestoneForm({
                     </form>
                 </ScrollArea>
             </Form>
+
+            <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Create Biosample Tool
+                        </DialogTitle>
+                        <DialogDescription>
+                            {`Create your Tool here. Click save when you're done.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditBiosampleToolForm 
+                        toolData={{}} 
+                        closeDialog={(newBiosample) => {
+                            setCreateBiosampleIsOpen(false)
+
+                            if (newBiosample) {
+                                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === newBiosample.types[0])
+                                form.setValue("tools", [
+                                    ...(form.getValues("tools") || []),
+                                    {
+                                        value: newBiosample.id, 
+                                        type: 'Biosamples', 
+                                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                        label: `${newBiosample.donorId} --- ${type?.label || ''}`,
+                                        biosample: newBiosample
+                                    }
+                                ])
+                            }
+                        }} 
+                        numAssetsPinned={0}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Create Disease Model Tool
+                        </DialogTitle>
+                        <DialogDescription>
+                            {`Create your Tool here. Click save when you're done.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditDiseaseModelToolForm 
+                        toolData={{}} 
+                        closeDialog={(newDiseaseModel) => {
+                            setCreateDiseaseModelIsOpen(false)
+
+                            if (newDiseaseModel) {
+                                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === newDiseaseModel.types[0])
+                                form.setValue("tools", [
+                                    ...(form.getValues("tools") || []),
+                                    {
+                                        value: newDiseaseModel.id, 
+                                        label: `${type?.label || ''}`,
+                                        type: 'Disease Models',
+                                        diseaseModel: newDiseaseModel
+                                    }
+                                ])
+                            }
+                        }} 
+                        numAssetsPinned={0}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Create Data Tool
+                        </DialogTitle>
+                        <DialogDescription>
+                            {`Create your Tool here. Click save when you're done.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditDataToolForm 
+                        toolData={{}} 
+                        closeDialog={(newDatasample) => {
+                            setCreateClinicalDatasetIsOpen(false)
+
+                            if (newDatasample) {
+                                form.setValue("tools", [
+                                    ...(form.getValues("tools") || []),
+                                    {
+                                        value: newDatasample.id, 
+                                        label: newDatasample.title || newDatasample.id, 
+                                        type: 'Clinical Datasets',
+                                        datasample: newDatasample
+                                    }
+                                ])
+                            }
+                        }} 
+                        numAssetsPinned={0}
+                    />
+                </DialogContent>
+            </Dialog>
 
             <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
                 <DialogContent>

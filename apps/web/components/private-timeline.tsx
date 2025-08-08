@@ -28,7 +28,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical, Megaphone, Star, User} from "lucide-react"
+import {GripVertical, Megaphone, Microscope, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
@@ -383,7 +383,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
             })}
             {(milestoneData?.tools || []).map((tool, index) => (
                 <li key={index}>
-                    <PropertyBadge icon={Star}>
+                    <PropertyBadge icon={Microscope}>
                         <p>{tool.tool?.title}</p>
                     </PropertyBadge>
                 </li>

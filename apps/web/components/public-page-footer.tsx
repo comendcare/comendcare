@@ -8,7 +8,7 @@ import ContactSection from "./landing/contact";
 export default function PublicPageFooter() {
     return (
         <>
-            <ContactSection />
+            {/*<ContactSection />*/}
             <LandingFooter/>
         </>
     )

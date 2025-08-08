@@ -19,7 +19,9 @@ import {
     MaterialAndDataAccessRequest,
     Researcher,
     Institution,
-    SavedOrganization
+    SavedOrganization,
+    Biosample,
+    DiseaseModel
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -147,6 +149,8 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         roadmap: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
+        biosamples: { include: {biosample: true, biosampleId: true, milestoneId: true}},
+        diseaseModels: {include: {diseaseModel: true, diseaseModelId: true, milestoneId: true}},
         tools: { include: { tool: true, toolId: true, milestoneId: true } },
         rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
     }
@@ -155,6 +159,16 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         milestoneType?: MilestoneType; // Optional
         milestoneId?: string; // Optional
         milestoneTypeId: string; // Required
+    }>,
+    biosamples: Array<{
+        biosample?: Biosample,
+        milestoneId?: string,
+        biosampleId: string
+    }>,
+    diseaseModels: Array<{
+        diseaseModel?: DiseaseModel,
+        milestoneId?: string,
+        diseaseModelId: string
     }>,
     tools: Array<{
         tool?: DBAsset,

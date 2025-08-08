@@ -191,7 +191,6 @@ export default async function SiteLayout({
     return (
         <div>
             <TooltipProvider>
-                <PublicPageNavbar/>
                 <div>
                     {children}
                 </div>

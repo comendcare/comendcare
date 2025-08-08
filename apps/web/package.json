@@ -148,7 +148,7 @@
     "lodash": "^4.17.21",
     "lodash.concat": "^4.5.0",
     "lru-cache": "^11.0.2",
-    "lucide-react": "^0.439.0",
+    "lucide-react": "^0.537.0",
     "mini-svg-data-uri": "^1.4.4",
     "mixpanel": "^0.18.1",
     "mixpanel-browser": "^2.55.1",
