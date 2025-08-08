@@ -146,13 +146,13 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
 
     return (
         <Sidebar collapsible="icon">
-            <SidebarHeader>
+            <SidebarHeader className="bg-gray-50">
                 <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="bg-gray-50">
                 <NavMain items={data.navMain}/>
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="bg-gray-50">
                 <div className="w-full flex items-center justify-center space-x-2">
                     {/*<Button*/}
                     {/*    className={cn(tourName ? "" : "hidden")}*/}
