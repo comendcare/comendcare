@@ -5,10 +5,10 @@ import {
     Cog,
     Store, User, Workflow,
     Bookmark,
-    ToolCase,
     Megaphone,
     TestTube,
-    Book, Wand2, BookOpen, Cookie
+    Book, Wand2, BookOpen, Cookie,
+    Microscope
 } from "lucide-react"
 import {NavMain} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -62,7 +62,7 @@ const data = {
             subPages: [
                 // {
                 //     title: "Assets",
-                //     icon: ToolCase,
+                //     icon: Microscope,
                 //     variant: "ghost",
                 //     url: `/app/tools`,
                 //     subPages: []
@@ -78,7 +78,7 @@ const data = {
         },
         {
             title: "Toolkit",
-            icon: ToolCase,
+            icon: Microscope,
             variant: "ghost",
             url: `/app/tools/biosample`,
             match: (path: string) => path.startsWith('/app/tools'),

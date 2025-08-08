@@ -17,7 +17,7 @@ import {
     Workflow,
     Star,
     Megaphone,
-    ToolCase
+    Microscope
 } from "lucide-react"
 import {
     useParams,
@@ -138,7 +138,7 @@ export default function AdminNav({children}: { children: ReactNode }) {
                 name: "Toolkit",
                 href: "/admin/tools",
                 isActive: segments[0] === "tools",
-                icon: <ToolCase width={18}/>
+                icon: <Microscope width={18}/>
             },
             {
                 name: "RFPs",
