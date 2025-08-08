@@ -8,7 +8,7 @@ import {
     Megaphone,
     TestTube,
     Book, Wand2, BookOpen, Cookie,
-    Microscope
+    Microscope, LayoutDashboard
 } from "lucide-react"
 import {NavMain} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -40,6 +40,13 @@ import {useSession} from "next-auth/react";
 // This is sample data.
 const data = {
     navMain: [
+        {
+            title: "Dashboard",
+            icon: LayoutDashboard,
+            variant: "ghost",
+            url: "/app/dashboard",
+            subPages: []
+        },
         {
             title: "Marketplace",
             icon: Store,

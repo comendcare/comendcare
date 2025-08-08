@@ -7,6 +7,7 @@ import prisma from "@comend/lib/prisma"
 import {getSession} from "@comend/lib/auth";
 import Image from "next/image";
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button";
+import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
 
 export default async function PAGDashboardAnalyticsTab() {
     const session = await getSession()
@@ -55,7 +56,7 @@ export default async function PAGDashboardAnalyticsTab() {
         : []
 
     return (
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 w-full">
             <div className="space-y-2 sm:flex-auto">
                 <h2 className="text-xl font-semibold leading-6 text-gray-900">
                     Analytics
@@ -123,14 +124,16 @@ export default async function PAGDashboardAnalyticsTab() {
                 </Card>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                    <CardHeader>
-                        <CardTitle>Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pl-2">
-                        <PAGAnalyticsBarChart/>
-                    </CardContent>
-                </Card>
+                {/*<Card className="col-span-4">*/}
+                {/*    <CardHeader>*/}
+                {/*        <CardTitle>Overview</CardTitle>*/}
+                {/*    </CardHeader>*/}
+                {/*    <CardContent className="pl-2">*/}
+                {/*        <PAGAnalyticsBarChart/>*/}
+                {/*    </CardContent>*/}
+                {/*</Card>*/}
+                {/*<DonutChartCard organization={organization}/>*/}
+                <DashboardProjectsStatusCard organization={organization}/>
                 <Card className="col-span-3">
                     <CardHeader>
                         <CardTitle>Profile views</CardTitle>
@@ -147,9 +150,6 @@ export default async function PAGDashboardAnalyticsTab() {
                         <PAGAnalyticsLineChart/>
                     </CardContent>
                 </Card>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <DonutChartCard/>
             </div>
         </div>
     )
