@@ -1923,6 +1923,7 @@ export const updateDiseaseModel = withOrganizationAuth(
             const newDiseaseModel = await prisma.diseaseModel.update({
                 where: {id: data.id},
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
                 },
@@ -1973,6 +1974,8 @@ export const createDiseaseModel = withOrganizationAuth(
 
             const response = await prisma.diseaseModel.create({
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
+                    gene: true,
                     institution: true,
                 },
                 data: {

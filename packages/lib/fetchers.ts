@@ -2085,6 +2085,7 @@ export const getDiseaseModels = withOrganizationAuth(
                                     organizationId: organization.id
                                 },
                                 include: {
+                                    organization: {include: {conditions: {include: {condition: true}}}},
                                     gene: true,
                                     institution: true
                                 },
@@ -2170,6 +2171,7 @@ export const getDiseaseModels = withOrganizationAuth(
                                 organizationId: organization.id
                             },
                             include: {
+                                organization: {include: {conditions: {include: {condition: true}}}},
                                 gene: true,
                                 institution: true
                             },

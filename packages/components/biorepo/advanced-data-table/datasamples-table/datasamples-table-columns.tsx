@@ -17,6 +17,22 @@ import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-me
 export function getDatasamplesTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
     {
+        id: "id",
+        accessorKey: "id",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Sample ID"/>
+        ),
+        cell: ({row}) => (
+            <div className="flex gap-2 items-center">
+                <p>{row.original.id || 'No Sample ID'}</p>
+            </div>
+        ),
+        enableHiding: true,
+        meta: {
+            label: "Sample ID"
+        }
+    },
+    {
       id: "title",
       accessorKey: "title",
       header: ({ column }) => (
