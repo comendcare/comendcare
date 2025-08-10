@@ -1,8 +1,8 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import PAGAnalyticsBarChart from "~web/components/pag-analytics-bar-chart";
-import PAGAnalyticsLineChart from "~web/components/pag-analytics-line-chart";
+import PAGAnalyticsLineChartCard from "~web/components/pag-analytics-line-chart-card";
 import {DonutChartCard} from "~web/components/donut-chart-card";
-import {Eye, UserPlus, Users, Workflow} from "lucide-react";
+import {TestTube, Microscope, Users, Workflow} from "lucide-react";
 import prisma from "@comend/lib/prisma"
 import {getSession} from "@comend/lib/auth";
 import Image from "next/image";
@@ -41,7 +41,11 @@ export default async function PAGDashboardAnalyticsTab() {
         where: {id: session.user.organizationId},
         include: {
             roadmaps: true,
-            members: true
+            members: true,
+            tools: true,
+            biosamples: true,
+            rfps: true,
+            materialAndDataAccessRequests: true
         },
     });
 
@@ -49,11 +53,13 @@ export default async function PAGDashboardAnalyticsTab() {
         return <div>No organization data available.</div>;
     }
 
-    const milestones = organization.roadmaps[0]
-        ? await prisma.milestone.findMany({
-            where: {roadmapId: organization.roadmaps[0].id},
-        })
-        : []
+    const totalMilestones = await prisma.milestone.count({
+        where: {
+            roadmap: {
+                organizationId: organization.id
+            }
+        }
+    });
 
     return (
         <div className="p-4 space-y-4 w-full">
@@ -69,29 +75,33 @@ export default async function PAGDashboardAnalyticsTab() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Number of followers
+                            Biosample tools
                         </CardTitle>
-                        <UserPlus className="h-4 w-4 text-muted-foreground"/>
+                        <Microscope className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">123</div>
-                        <p className="text-xs text-muted-foreground">
-                            +19% from last month
-                        </p>
+                        <div className="text-2xl font-bold">
+                            {organization.biosamples.length}
+                        </div>
+                        {/*<p className="text-xs text-muted-foreground">*/}
+                        {/*    +19% from last month*/}
+                        {/*</p>*/}
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Profile views
+                            Access requests
                         </CardTitle>
-                        <Eye className="h-4 w-4 text-muted-foreground"/>
+                        <TestTube className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+573</div>
-                        <p className="text-xs text-muted-foreground">
-                            +201 since last hour
-                        </p>
+                        <div className="text-2xl font-bold">
+                            {organization.materialAndDataAccessRequests.length}
+                        </div>
+                        {/*<p className="text-xs text-muted-foreground">*/}
+                        {/*    +201 since last hour*/}
+                        {/*</p>*/}
                     </CardContent>
                 </Card>
                 <Card>
@@ -102,7 +112,7 @@ export default async function PAGDashboardAnalyticsTab() {
                         <Workflow className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{milestones.length}</div>
+                        <div className="text-2xl font-bold">{totalMilestones}</div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +20.1% from last month*/}
                         {/*</p>*/}
@@ -134,22 +144,7 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*</Card>*/}
                 {/*<DonutChartCard organization={organization}/>*/}
                 <DashboardProjectsStatusCard organization={organization}/>
-                <Card className="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Profile views</CardTitle>
-                        <CardDescription>
-                            <div className="text-2xl font-bold">
-                                27
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                +20% from last month
-                            </p>
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-80">
-                        <PAGAnalyticsLineChart/>
-                    </CardContent>
-                </Card>
+                <PAGAnalyticsLineChartCard/>
             </div>
         </div>
     )

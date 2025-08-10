@@ -99,7 +99,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
         <Card className="col-span-4 flex flex-col">
             <CardHeader className="items-start pb-0">
                 <CardTitle>Milestone Status Overview</CardTitle>
-                <CardDescription>Current milestone distribution</CardDescription>
+                <CardDescription>Current milestone distribution across all research plans.</CardDescription>
                 <div className="flex flex-row mb-4">
                     {data.map((item, index) => (
                         <span
