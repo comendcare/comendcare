@@ -2085,6 +2085,7 @@ export const getDiseaseModels = withOrganizationAuth(
                                     organizationId: organization.id
                                 },
                                 include: {
+                                    organization: {include: {conditions: {include: {condition: true}}}},
                                     gene: true,
                                     institution: true
                                 },
@@ -2170,6 +2171,7 @@ export const getDiseaseModels = withOrganizationAuth(
                                 organizationId: organization.id
                             },
                             include: {
+                                organization: {include: {conditions: {include: {condition: true}}}},
                                 gene: true,
                                 institution: true
                             },
@@ -2497,6 +2499,7 @@ export const getDatasamples = withOrganizationAuth(
                                     organizationId: organization.id
                                 },
                                 include: {
+                                    organization: {include: {conditions: {include: {condition: true}}}},
                                     milestones: {include: {milestone: true}},
                                     contacts: true,
                                     attachments: true,
@@ -2578,6 +2581,7 @@ export const getDatasamples = withOrganizationAuth(
                                 organizationId: organization.id
                             },
                             include: {
+                                organization: {include: {conditions: {include: {condition: true}}}},
                                 milestones: {include: {milestone: true}},
                                 contacts: true,
                                 attachments: true,

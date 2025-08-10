@@ -10,7 +10,7 @@ import {
     Book, Wand2, BookOpen, Cookie,
     Microscope, LayoutDashboard
 } from "lucide-react"
-import {NavMain} from "~web/components/nav-main"
+import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
 import {OrganizationSwitcher} from "~web/components/organization-switcher"
 import {
@@ -18,7 +18,11 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
     SidebarRail, SidebarTrigger,
+    useSidebar,
 } from "@comend/components/ui/sidebar"
 import {MembershipWithOrganization} from "@comend/lib/types";
 import Image from "next/image"
@@ -36,6 +40,7 @@ import {useOnborda} from "~web/components/onborda/OnbordaContext";
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import {useSession} from "next-auth/react";
+import { Separator } from "@/packages/components/ui/separator"
 
 // This is sample data.
 const data = {
@@ -134,6 +139,7 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
     const pathname = usePathname()
     const {roadmapId, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
     const [tourName, setTourName] = useState(getTourName())
+    const {state} = useSidebar()
 
     function getTourName() {
         if (pathname === '/app/research-plan') return 'research-plans-page-tour'
@@ -159,44 +165,56 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
             <SidebarContent className="bg-gray-50">
                 <NavMain items={data.navMain}/>
             </SidebarContent>
-            <SidebarFooter className="bg-gray-50">
-                <div className="w-full flex items-center justify-center space-x-2">
-                    {/*<Button*/}
-                    {/*    className={cn(tourName ? "" : "hidden")}*/}
-                    {/*    disabled={!tourName}*/}
-                    {/*    variant="ghost"*/}
-                    {/*    onClick={() => {*/}
-                    {/*        if (tourName) {*/}
-                    {/*            setSelectedNodeIds([])*/}
-                    {/*            startOnborda(tourName)*/}
-                    {/*        }*/}
-                    {/*    }}>*/}
-                    {/*    <Wand2 aria-hidden={true}/>*/}
-                    {/*    Take a tour*/}
-                    {/*</Button>*/}
-                    <Link href={'/app/guides'} className="text-xs">
-                        Guides
+            <SidebarFooter className="bg-gray-50 p-2">
+                <Separator className="w-full"/>
+                <div className="flex flex-col gap-1">
+                <SidebarMenuButton
+                    asChild
+                    className={pathname.startsWith('/app/guides') ? "bg-blue-light border border-blue-dark text-primary" : ""}
+                >
+                    <Link href={'/app/guides'} className="flex">
+                        <div className="relative">
+                            <BookOpen className="mr-2 h-4 w-4"/>
+                            {state === "collapsed" &&
+                                <NavNotificationCollapsedIcon item={{title: 'Guides', url: '/app/guides'}}/>
+                            }
+                        </div>
+                        {'Guides'}
+                        {state === "expanded" &&
+                            <NavNotificationExpandedIcon item={{title: 'Guides', url: '/app/guides'}}/>
+                        }
                     </Link>
-                    <FeedbackSheet/>
-                    <TooltipProvider delayDuration={50}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="text-xs">
-                                    Cookies
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-64">
-                                <p>{`Adjust cookie and consent settings`}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                    <Button
-                        variant="ghost"
-                        className="pointer-events-none p-0"
-                    >
-                        <Image className="h-4 w-4" priority src={logo} alt="Comend logo"/>
-                    </Button>
+                </SidebarMenuButton>
+                <FeedbackSheet />
                 </div>
+                {state === "expanded" && (
+                    <>
+                    <Separator className="w-full"/>
+                    <div className="w-full flex flex-wrap justify-start gap-1 p-2 items-center" >
+                        <Button variant="ghost" className="text-xs cky-banner-element p-0 flex justify-start m-0 h-fit hover:underline hover:bg-transparent">
+                            Cookies
+                        </Button>
+                        <p className="text-md">{'\u00B7'}</p>
+                        <Link href="https://www.comend.io/terms-of-service" className="text-xs hover:underline hover:text-primary">
+                            Terms of Services
+                        </Link>
+                        <p className="text-md">{'\u00B7'}</p>
+                        <Link href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link" className="text-xs hover:underline hover:text-primary">
+                            Privacy Policy
+                        </Link>
+                        {/* <p className="text-md">{'\u00B7'}</p> */}
+                        <Link href="https://comend.io/security" className="text-xs hover:underline hover:text-primary">
+                            Security Promise
+                        </Link>
+                        {/* <Button
+                            variant="ghost"
+                            className="pointer-events-none p-0"
+                        >
+                            <Image className="h-4 w-4" priority src={logo} alt="Comend logo"/>
+                        </Button> */}
+                    </div>
+                    </>
+                )}
             </SidebarFooter>
             <SidebarRail/>
         </Sidebar>
