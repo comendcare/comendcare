@@ -22,15 +22,16 @@ import StatusButton from "./milestone-status-button"
 import {truncate, cn, formatMoney} from "@comend/lib/utils"
 import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
-import {badgeVariants} from "@comend/components/ui/badge"
+import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {Milestone, StatusType} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {PublicMilestoneNode} from "./public-milestone-node"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User } from "lucide-react"
+import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User } from "lucide-react"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
+import { Separator } from "@/packages/components/ui/separator"
 
 export type PrivateMilestoneNode = Node<
     Milestone & {
@@ -92,25 +93,99 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     return (
         <Card 
             className={cn(
-                "w-[350px] text-wrap break-words",
-                props?.id && selectedNodeIds.includes(props?.id) ? "border-black border-2 click-project-step" : "",
+                "border-2 border-blue-300 bg-blue-50 w-[350px] text-wrap",
+                props?.id && selectedNodeIds.includes(props?.id) ? "border-blue-900 border-2 click-project-step" : "",
                 props.id === "preview" ? "opacity-50" : "",
             )}
         >
-            <CardHeader>
-                <div className="flex flex-row align-center items-center justify-end gap-4">
+            <CardHeader className="py-4">
+                <div className="absolute top-0 right-0 p-2">
                     <ProjectActionsMenu milestone={props.data as Milestone}/>
                 </div>
+                <CardTitle className="text-blue-900">
+                    {props.data?.title || "New Milestone"}
+                </CardTitle>
+                <CardDescription className="line-clamp-2">
+                    {truncate(props.data?.description || "", 200)}
+                </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                    <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                    <CardDescription className="line-clamp-2">
-                        {truncate(props.data?.description || "", 200)}
-                    </CardDescription>
-                </div>
+            <CardContent className="flex flex-col gap-2">
+                <StatusButton 
+                    status={props.data?.status as StatusType || undefined}
+                    minimal={true}
+                    disabled={true}
+                    onStatusChange={() => {}}
+                />
 
-                <CardContents props={props}/>
+                {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType, index) => (
+                    <Badge variant={"blue"} className="w-fit">
+                        {milestoneType?.milestoneType?.label || "No type"}
+                    </Badge>
+                ))}
+
+                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                    {(props.data?.contacts || []).map((contact, index) => {
+                        if (contact.affiliation) {
+                            return (
+                                <li key={index}>
+                                    <PropertyBadge icon={User} className="border-blue-300 text-blue-900">
+                                        <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                    </PropertyBadge>
+                                </li>
+                            )
+                        }
+                    })}
+
+                    {(props?.data?.startDate || props?.data?.endDate) && (
+                        <li>
+                            <PropertyBadge icon={Calendar} className="border-blue-300 text-blue-900">
+                                <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
+                            </PropertyBadge>
+                        </li>
+                    )}
+                </ul>
+
+                {(props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
+                    <>
+                    <Separator className="mt-4 bg-blue-300 h-[2px] rounded-full"/>
+                    <span className="text-blue-900 text-md flex gap-1">
+                        <Box />
+                        <p className="text-md font-semibold text-blue-900">Linked Items:</p>
+                    </span>
+                    <ul>
+                        {props.data?.tools.map(({tool}) => (
+                            <Card
+                                className={cn(
+                                    "border-2 border-emerald-200 bg-emerald-50 w-full text-wrap break-words rounded-sm",
+                                )}
+                            >
+                                <CardHeader className="p-4">
+                                    <CardTitle className="text-emerald-900 text-md">{tool?.title || "untitled tool"}</CardTitle>
+                                    <CardDescription className="line-clamp-2">
+                                        {truncate(tool?.description || "", 200)}
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                        ))}
+                    </ul>
+                    <ul>
+                        {props.data?.rfps.map(({rfp}) => (
+                            <Card
+                                className={cn(
+                                    "border-2 border-violet-200 bg-violet-50 w-full text-wrap break-words rounded-sm",
+                                )}
+                            >
+                                <CardHeader className="p-4">
+                                    <CardTitle className="text-violet-900 text-md">{rfp?.title || "untitled RFP"}</CardTitle>
+                                    <CardDescription className="line-clamp-2">
+                                        {truncate(rfp?.description || "", 200)}
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                        ))}
+                    </ul>
+                    </>
+                )}
             </CardContent>
             {props.data?.private && (
                 <CardFooter className="flex justify-end">
@@ -199,133 +274,6 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
                 </Button>
             )}
         </Handle>
-    )
-}
-
-export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode> }) => {
-    // if (props?.type === "ASSET") {
-    //     return (
-    //         <>
-    //             <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-    //                 {props.data?.contacts && props.data.contacts.length > 0 && (props.data?.contacts || []).map((contact, index) => {
-    //                     if (contact.name && contact.email) {
-    //                         return (
-    //                             <li key={index} className="flex gap-2 items-center">
-    //                                 <User />
-    //                                 <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
-    //                             </li>)
-    //                     } else if (contact.name) {
-    //                         return (
-    //                             <li key={index} className="flex gap-2 items-center w-full">
-    //                                 <User />
-    //                                 <p className="w-[90%] text-wrap break-words">{contact.name}</p>
-    //                             </li>)
-    //                     } else if (contact.email) {
-    //                         return (
-    //                             <li key={index} className="flex gap-2 items-center">
-    //                                 <User />
-    //                                 <p className="w-[90%] text-wrap break-words">{contact.email}</p>
-    //                             </li>)
-    //                     }
-    //                 })}
-    //             </ul>
-
-    //             <span className="w-full flex gap-2 flex-wrap text-wrap">
-    //                 {props?.data?.attachments && props.data?.attachments?.length > 0 && (
-    //                     <AttachmentsTag attachments={props.data.attachments}/>
-    //                 )}
-    //                 {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} key={index} />
-    //                 ))}
-    //             </span>
-    //         </>
-    //     )
-
-    //     return
-    // }
-
-    // if (props?.type === "PROJECT") {
-        return (
-            <>
-                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {(props.data?.contacts || []).map((contact, index) => {
-                        if (contact.affiliation) {
-                            return (
-                                <li key={index}>
-                                    <PropertyBadge icon={User}>
-                                        <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
-                                    </PropertyBadge>
-                                </li>
-                            )
-                        }
-                    })}
-
-                    {(props?.data?.startDate || props?.data?.endDate) && (
-                        <li>
-                            <PropertyBadge icon={Calendar}>
-                                <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
-                            </PropertyBadge>
-                        </li>
-                    )}
-                    {(props.data?.tools || []).map((tool, index) => (
-                        <li key={index}>
-                            <PropertyBadge icon={Microscope}>
-                                <p>{tool.tool?.title}</p>
-                            </PropertyBadge>
-                        </li>
-                    ))}
-                    {(props.data?.rfps || []).map((rfp, index) => (
-                        <li key={index}>
-                            <PropertyBadge icon={Megaphone}>
-                                <p>{rfp.rfp?.title}</p>
-                            </PropertyBadge>
-                        </li>
-                    ))}
-                </ul>
-                <span className="w-full flex gap-2 flex-wrap">
-                    <StatusButton
-                        disabled={true}
-                        status={props.data.status as StatusType || undefined}
-                        onStatusChange={() => {}}
-                    />
-                    {(props?.data?.types || []).sort((a, b) => (a?.milestoneType?.label?.length || 0) - (b?.milestoneType?.label?.length || 0)).map((milestoneType, index) => (
-                        <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
-                    ))}
-                </span>
-            </>
-
-        )
-    // }
-
-    // if (props?.type === "RFP") {
-    //     return (
-    //         <>
-    //             <ul className="flex flex-col gap-2 text-sm">
-    //                 {(props?.data?.startDate || props?.data?.endDate) && (
-    //                     <li>
-    //                         <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}
-    //                                   startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
-    //                     </li>
-    //                 )}
-    //                 {props?.data?.budget && (
-    //                     <li className="flex gap-2 items-center">
-    //                         <CircleDollarSign />
-    //                         {formatMoney(props?.data?.budget)} budget
-    //                     </li>
-    //                 )}
-    //             </ul>
-
-    //             <span className="w-full flex gap-2 flex-wrap text-wrap">
-    //                 {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-    //                     <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
-    //                 ))}
-    //         </span>
-    //         </>
-    //     )
-    // }
-
-    return (
-        <div>error</div>
     )
 }
 

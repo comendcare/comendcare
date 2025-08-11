@@ -206,71 +206,71 @@ h6 {
         /* Light Blue */
         --blue-light: 214, 95%, 93%; /* #dcebfe */
 
-        --background-red: hsl(0, 93%, 94%); /* red-100 */
-        --border-red: hsl(0, 62%, 30%); /* red-900 */
+        --background-red: 0, 93%, 94%; /* red-100 */
+        --border-red: 0, 62%, 30%; /* red-900 */
 
-        --background-orange: hsl(33, 100%, 94%); /* orange-100 */
-        --border-orange: hsl(24, 95%, 36%); /* orange-900 */
+        --background-orange: 33, 100%, 94%; /* orange-100 */
+        --border-orange: 24, 95%, 36%; /* orange-900 */
 
-        --background-amber: hsl(43, 96%, 90%); /* amber-100 */
-        --border-amber: hsl(26, 83%, 36%); /* amber-900 */
+        --background-amber: 43, 96%, 90%; /* amber-100 */
+        --border-amber: 26, 83%, 36%; /* amber-900 */
 
-        --background-yellow: hsl(50, 96%, 89%); /* yellow-100 */
-        --border-yellow: hsl(31, 92%, 35%); /* yellow-900 */
+        --background-yellow: 50, 96%, 89%; /* yellow-100 */
+        --border-yellow: 31, 92%, 35%; /* yellow-900 */
 
-        --background-lime: hsl(80, 81%, 90%); /* lime-100 */
-        --border-lime: hsl(85, 61%, 30%); /* lime-900 */
+        --background-lime: 80, 81%, 90%; /* lime-100 */
+        --border-lime: 85, 61%, 30%; /* lime-900 */
 
-        --background-green: hsl(138, 76%, 90%); /* green-100 */
-        --border-green: hsl(142, 71%, 29%); /* green-900 */
+        --background-green: 138, 76%, 90%; /* green-100 */
+        --border-green: 142, 71%, 29%; /* green-900 */
 
-        --background-emerald: hsl(152, 76%, 90%); /* emerald-100 */
-        --border-emerald: hsl(160, 84%, 27%); /* emerald-900 */
+        --background-emerald: 152, 76%, 90%; /* emerald-100 */
+        --border-emerald: 160, 84%, 27%; /* emerald-900 */
 
-        --background-teal: hsl(166, 76%, 90%); /* teal-100 */
-        --border-teal: hsl(167, 100%, 24%); /* teal-900 */
+        --background-teal: 166, 76%, 90%; /* teal-100 */
+        --border-teal: 167, 100%, 24%; /* teal-900 */
 
-        --background-cyan: hsl(186, 94%, 94%); /* cyan-100 */
-        --border-cyan: hsl(187, 85%, 24%); /* cyan-900 */
+        --background-cyan: 186, 94%, 94%; /* cyan-100 */
+        --border-cyan: 187, 85%, 24%; /* cyan-900 */
 
-        --background-sky: hsl(204, 100%, 94%); /* sky-100 */
-        --border-sky: hsl(206, 71%, 29%); /* sky-900 */
+        --background-sky: 204, 100%, 94%; /* sky-100 */
+        --border-sky: 206, 71%, 29%; /* sky-900 */
 
-        --background-blue: hsl(213, 100%, 94%); /* blue-100 */
-        --border-blue: hsl(215, 57%, 30%); /* blue-900 */
+        --background-blue: 213, 100%, 94%; /* blue-100 */
+        --border-blue: 215, 57%, 30%; /* blue-900 */
 
-        --background-indigo: hsl(226, 100%, 95%); /* indigo-100 */
-        --border-indigo: hsl(226, 57%, 30%); /* indigo-900 */
+        --background-indigo: 226, 100%, 95%; /* indigo-100 */
+        --border-indigo: 226, 57%, 30%; /* indigo-900 */
 
-        --background-violet: hsl(252, 91%, 96%); /* violet-100 */
-        --border-violet: hsl(255, 55%, 30%); /* violet-900 */
+        --background-violet: 252, 91%, 96%; /* violet-100 */
+        --border-violet: 255, 55%, 30%; /* violet-900 */
 
-        --background-purple: hsl(271, 91%, 96%); /* purple-100 */
-        --border-purple: hsl(272, 51%, 30%); /* purple-900 */
+        --background-purple: 271, 91%, 96%; /* purple-100 */
+        --border-purple: 272, 51%, 30%; /* purple-900 */
 
-        --background-fuchsia: hsl(289, 100%, 95%); /* fuchsia-100 */
-        --border-fuchsia: hsl(292, 64%, 28%); /* fuchsia-900 */
+        --background-fuchsia: 289, 100%, 95%; /* fuchsia-100 */
+        --border-fuchsia: 292, 64%, 28%; /* fuchsia-900 */
 
-        --background-pink: hsl(327, 72%, 96%); /* pink-100 */
-        --border-pink: hsl(327, 61%, 30%); /* pink-900 */
+        --background-pink: 327, 72%, 96%; /* pink-100 */
+        --border-pink: 327, 61%, 30%; /* pink-900 */
 
-        --background-rose: hsl(346, 100%, 96%); /* rose-100 */
-        --border-rose: hsl(345, 85%, 30%); /* rose-900 */
+        --background-rose: 346, 100%, 96%; /* rose-100 */
+        --border-rose: 345, 85%, 30%; /* rose-900 */
 
-        --background-slate: hsl(210, 40%, 96%); /* slate-100 */
-        --border-slate: hsl(215, 28%, 17%); /* slate-900 */
+        --background-slate: 210, 40%, 96%; /* slate-100 */
+        --border-slate: 215, 28%, 17%; /* slate-900 */
 
-        --background-gray: hsl(210, 20%, 96%); /* gray-100 */
-        --border-gray: hsl(216, 18%, 16%); /* gray-900 */
+        --background-gray: 210, 20%, 96%; /* gray-100 */
+        --border-gray: 216, 18%, 16%; /* gray-900 */
 
-        --background-zinc: hsl(240, 5%, 96%); /* zinc-100 */
-        --border-zinc: hsl(240, 5%, 16%); /* zinc-900 */
+        --background-zinc: 240, 5%, 96%; /* zinc-100 */
+        --border-zinc: 240, 5%, 16%; /* zinc-900 */
 
-        --background-neutral: hsl(0, 0%, 96%); /* neutral-100 */
-        --border-neutral: hsl(0, 0%, 15%); /* neutral-900 */
+        --background-neutral: 0, 0%, 96%; /* neutral-100 */
+        --border-neutral: 0, 0%, 15%; /* neutral-900 */
 
-        --background-stone: hsl(60, 5%, 96%); /* stone-100 */
-        --border-stone: hsl(33, 5%, 17%); /* stone-900 */
+        --background-stone: 60, 5%, 96%; /* stone-100 */
+        --border-stone: 33, 5%, 17%; /* stone-900 */
 
         /* Comend Blue */
         /* --blue-light: 198 65% 79%; */
