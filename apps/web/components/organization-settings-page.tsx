@@ -1,11 +1,76 @@
-"use client"
+"use client";
 
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import {DeleteOrganizationAlertDialog} from "@comend/components/delete-organization-alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@comend/components/ui/dropdown-menu"
+import {Button} from "@comend/components/ui/button";
+import {Table, Braces} from "lucide-react"
+import {useTransition} from "react";
+import {exportOrganizationAsCSV, exportOrganizationAsJSON} from "~web/lib/export";
+import {toast} from "sonner";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session} = useSession()
+    const [isPending, startTransition] = useTransition();
+
+    const handleExportJSON = () => {
+        startTransition(async () => {
+            try {
+                const data = await exportOrganizationAsJSON(organization.id);
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], {type: "application/json;charset=utf-8"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `organization-${organization.id}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                toast.error("An error occurred while updating your profile.");
+                console.log(error)
+            }
+        });
+    };
+
+    const handleExportCSV = () => {
+        startTransition(async () => {
+            try {
+                const result = await exportOrganizationAsCSV(organization.id);
+                const {files} = result;
+
+                // If there's just one file you care about, download that;
+                // otherwise, you can bundle with JSZip (optional).
+                // Here's a simple "multi-file" fallback that concatenates with headers:
+
+                const combined = Object.entries(files)
+                    .map(([name, csv]) => `### ${name}\n${csv}`)
+                    .join("\n\n");
+
+                const blob = new Blob([combined], {type: "text/plain;charset=utf-8"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `organization-${organization.id}-csv.txt`; // or use JSZip to create a .zip
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                toast.error("An error occurred while updating your profile.");
+                console.log(error)
+            }
+        });
+    };
+
+    const disabled = session?.user?.membership?.role !== "owner";
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-4 space-y-8">
@@ -19,26 +84,67 @@ export default function OrganizationSettingsPage({organization}: { organization:
                     </p>
                 </div>
 
-                <div className={`${session?.user?.membership?.role !== "owner" ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
+                <div className={`${disabled ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
                     <div
                         className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
-                        <span className="flex flex-grow flex-col">
-                            <span className="text-sm font-medium leading-6 text-gray-900">
+                        <div className="flex flex-grow flex-col">
+                            <div className="text-sm font-medium leading-6 text-gray-900">
                                 Delete Organization
-                            </span>
-                            <span className="text-sm text-gray-500">
+                            </div>
+                            <div className="text-sm text-gray-500">
                                 This will delete all memberships, roadmaps, and tasks from this organization.
                                 This organization will then be permanently deleted.
-                            </span>
-                        </span>
+                            </div>
+                        </div>
 
-                        <DeleteOrganizationAlertDialog organization={organization} />
-
+                        <DeleteOrganizationAlertDialog organization={organization}/>
                     </div>
                 </div>
 
-                {/*<DeleteOrganizationForm organization={organization}/>*/}
+                <div className={`${disabled ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
+                    <div
+                        className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
+                        <div className="flex flex-grow flex-col">
+                            <div className="text-sm font-medium leading-6 text-gray-900">
+                                Export Organization Data
+                            </div>
+                            <div className="text-sm text-gray-500">
+                                {`This will export all your organization's profile data, research plans, tools, RFPs, and all other content into a file format of your choice.`}
+                            </div>
+                        </div>
 
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="destructive" disabled={disabled || isPending}>
+                                    {isPending ? "Exporting..." : "Export Data"}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        if (disabled) return;
+                                        handleExportJSON();
+                                    }}
+                                >
+                                    <Braces className="h-4 w-4"/>
+                                    JSON
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        if (disabled) return;
+                                        handleExportCSV();
+                                    }}
+                                >
+                                    <Table className="h-4 w-4"/>
+                                    CSV
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
             </div>
         </main>
     )

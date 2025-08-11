@@ -2,70 +2,71 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
+import { Badge } from "@comend/components/ui/badge"
+import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 
-// Assuming your data shape looks like this:
-export type StrainData = {
+export type ServicesData = {
     name: string | null
     description: string | null
 }
 
-export const columns: ColumnDef<StrainData>[] = [
-    // {
-    //     id: "select",
-    //     header: ({ table }) => (
-    //         <Checkbox
-    //             checked={
-    //                 table.getIsAllPageRowsSelected() ||
-    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
-    //             }
-    //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-    //             aria-label="Select all"
-    //             className="translate-y-[2px]"
-    //         />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <Checkbox
-    //             checked={row.getIsSelected()}
-    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
-    //             aria-label="Select row"
-    //             className="translate-y-[2px]"
-    //         />
-    //     ),
-    //     enableSorting: false,
-    //     enableHiding: false,
-    // },
-    // {
-    //     accessorKey: "Strain ID",
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title="Strain ID" />
-    //     ),
-    //     cell: ({ row }) => <div className="w-[100px]">{row.getValue("Strain ID")}</div>,
-    //     enableSorting: true,
-    // },
+type Milestone = {
+    id: string
+    label: string
+    services: string[]
+    categories: string[]
+    description: string
+}
+
+const normalize = (s: string) => s.trim().toLowerCase()
+
+const SERVICE_TO_MILESTONES: Record<string, Milestone[]> = (() => {
+    const map: Record<string, Milestone[]> = {}
+    for (const m of MILESTONE_TYPE_OPTIONS) {
+        for (const svc of m.services) {
+            const key = normalize(svc)
+            if (!map[key]) map[key] = []
+            map[key].push(m)
+        }
+    }
+    return map
+})()
+
+const getMilestonesForService = (serviceName: string | null | undefined): Milestone[] => {
+    if (!serviceName) return []
+    return SERVICE_TO_MILESTONES[normalize(serviceName)] ?? []
+}
+
+export const columns: ColumnDef<ServicesData>[] = [
     {
         accessorKey: "name",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Name" />
-        ),
-        cell: ({ row }) => (
-            <div>
-                {row.getValue("name")}
-            </div>
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+        cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
     {
         accessorKey: "description",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
-        ),
-        cell: ({ row }) => (
-            <div>
-                {row.getValue("description")}
-            </div>
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Description" />,
+        cell: ({ row }) => <div>{row.getValue("description")}</div>,
     },
-    // {
-    //     id: "actions",
-    //     cell: ({ row }) => <DataTableRowActions row={row} />,
-    // },
+    {
+        id: "relatedProjectTypes",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Related project types" />
+        ),
+        cell: ({ row }) => {
+            const serviceName = row.original.name
+            const milestones = getMilestonesForService(serviceName)
+            if (!milestones.length) return <span className="text-muted-foreground">—</span>
+            return (
+                <div className="flex flex-wrap gap-1">
+                    {milestones.map((m) => (
+                        <Badge key={m.id} variant="secondary" className="px-2">
+                            {m.label}
+                        </Badge>
+                    ))}
+                </div>
+            )
+        },
+        enableSorting: false,
+    },
 ]

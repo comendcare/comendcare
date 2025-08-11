@@ -1920,3 +1920,30 @@ export const editDiseaseModelForm = z.object({
     genes: z.array(optionSchema).optional(),
     institutions: z.array(optionSchema).optional(),
 })
+
+export const editDataToolForm = z.object({
+    id: z.string().optional(),
+    title: z
+        .string({
+            required_error: "Please provide a title"
+        })
+        .min(1, "Title is required")
+        .max(200, "Title must be less than 200 characters"),
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    types: z.array(optionSchema)
+        .min(1, "Type is required")
+        .max(1, "Max one type"),
+    otherTypeDetails: z.string().optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
+    isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
+
+    genes: z.array(optionSchema).optional(),
+    cohortSize: z.string().optional(),
+    institutions: z.array(optionSchema).optional(),
+})

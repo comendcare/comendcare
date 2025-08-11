@@ -82,6 +82,7 @@ import { EditBiosampleToolForm } from "./edit-biosample-tool-form"
 import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form"
 import { EditDataToolForm } from "./edit-data-tool-form"
 import { MilestoneTypeBadge } from "@/packages/components/milestone-type-badge"
+import { Separator } from "@/packages/components/ui/separator"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -139,6 +140,19 @@ const editMilestoneForm = z.object({
         path: ["endDate"]
     }
 )
+
+type SimpleAttachment = { name: string; link: string };
+
+function addAttachmentToForm(form: any, att: SimpleAttachment) {
+    const prev = form.getValues("attachments") ?? [];
+    const norm = (s: string) => s.trim().toLowerCase();
+
+    const already = prev.some((a: any) => norm(a.link) === norm(att.link));
+    if (already) return false;
+
+    form.setValue("attachments", [...prev, att], { shouldValidate: true, shouldDirty: true });
+    return true;
+}
 
 export function EditMilestoneForm({
                                       organization,
@@ -214,7 +228,7 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: diseaseModel.id, 
-                            label: `${type?.label || ''}`,
+                            label: `${diseaseModel.id} --- ${type?.label}`,
                             type: 'Disease Models',
                             diseaseModel
                         }
@@ -414,7 +428,7 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: diseaseModel.id, 
-                        label: `${type?.label || ''}`,
+                        label: `${diseaseModel.id} --- ${type?.label}`,
                         type: 'Disease Models',
                         diseaseModel
                     }
@@ -687,11 +701,12 @@ export function EditMilestoneForm({
                                                                 groupBy={'type'}
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full px-1 pb-1">
+                                                                    <div className="w-full p-1 bg-white flex flex-col gap-1">
+                                                                        <Separator />
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
@@ -703,7 +718,7 @@ export function EditMilestoneForm({
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
@@ -715,7 +730,7 @@ export function EditMilestoneForm({
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
@@ -767,11 +782,12 @@ export function EditMilestoneForm({
                                                                 }
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full px-1 pb-1">
+                                                                    <div className="w-full px-1 pb-1 flex flex-col gap-1">
+                                                                        <Separator />
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
-                                                                            className="cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
                                                                             onMouseDown={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
@@ -909,7 +925,9 @@ export function EditMilestoneForm({
                                         </Link>
                                     </TabsContent>
                                     <TabsContent value="publications" className="space-y-4 w-full">
-                                        <EditMilestoneDetailsPublicationsTab/>
+                                        <EditMilestoneDetailsPublicationsTab
+                                            onAttach={(att) => addAttachmentToForm(form, att)}
+                                        />
                                     </TabsContent>
                                     <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>

@@ -290,6 +290,7 @@ model Tool {
   updatedAt DateTime @default(now()) @updatedAt
 
   title       String               @default("Untitled Tool")
+  cohortSize  Int?
   description String?
   contacts    ExternalContact[]
   attachments ExternalAttachment[]
@@ -298,6 +299,10 @@ model Tool {
   metadata    Json?
   types       String[] // values (ToolType ids)
 
+  institutionId  String?
+  institution    Institution?      @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  geneId         Int?
+  gene           Gene?             @relation(fields: [geneId], references: [id])
   organizationId String?
   organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     ToolToMilestone[]
@@ -699,7 +704,7 @@ model Organization {
   rfps                          RFP[]
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
-  DiseaseModel                  DiseaseModel[]
+  diseaseModel                  DiseaseModel[]
 
   @@index([userId])
 }
@@ -906,6 +911,7 @@ model Gene {
   metadata             Json?
   Biosample            Biosample[]
   DiseaseModel         DiseaseModel[]
+  Tool                 Tool[]
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
@@ -1184,6 +1190,7 @@ model Institution {
   metadata              Json?
   institutionToRequests InstitutionToRequest[]
   DiseaseModel          DiseaseModel[]
+  Tool                  Tool[]
 }
 
 model InstitutionRelationship {

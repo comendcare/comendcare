@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import {companyTypeMap, Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "./property-badge";
-import { TypeBadge } from "./type-badge";
+import {TypeBadge} from "./type-badge";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -195,24 +195,26 @@ export function CROCardContents({cro}: { cro: Company }) {
                                 const count = categoryCounts[key];
                                 const isReview = key === "reviews";
                                 return (
-                                    <PropertyBadge key={key} icon={Icon}>
-                                        {isReview ? (
-                                            count > 0 ? (
-                                                <div className="flex items-center gap-x-1">
-                                                    {cro.avgRating != null
-                                                        ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
-                                                        : 'N/A'}
-                                                </div>
+                                    count > 0 && (
+                                        <PropertyBadge key={key} icon={Icon}>
+                                            {isReview ? (
+                                                count > 0 ? (
+                                                    <div className="flex items-center gap-x-1">
+                                                        {cro.avgRating != null
+                                                            ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
+                                                            : 'N/A'}
+                                                    </div>
+                                                ) : (
+                                                    <div>No reviews yet</div>
+                                                )
                                             ) : (
-                                                <div>No reviews yet</div>
-                                            )
-                                        ) : (
-                                            <div className="flex flex-row">
-                                                {label}:&nbsp;
-                                                <div>{count}</div>
-                                            </div>
-                                        )}
-                                    </PropertyBadge>
+                                                <div className="flex flex-row">
+                                                    {label}:&nbsp;
+                                                    <div>{count}</div>
+                                                </div>
+                                            )}
+                                        </PropertyBadge>
+                                    )
                                 );
                             })}
                     </div>
