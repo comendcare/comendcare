@@ -59,11 +59,13 @@ export default function StatusButton({
     disabled = false,
     minimal = false,
     onStatusChange,
+    className
 }: {
     status?: StatusType
     disabled?: boolean | undefined
     minimal?: boolean | undefined,
     onStatusChange: (status: StatusType) => void
+    className?: string | undefined
 }) {
     const handleClick = () => {
         if (disabled) return
