@@ -357,14 +357,22 @@ const DraggableTimelineItem = ({
 
 export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData: Milestone, nodeType: string }) => {
     return (
+        <div className="flex flex-col gap-2">
+        <StatusButton
+            className="h-[16px]"
+            disabled={true}
+            showText={false}
+            status={milestoneData?.status as StatusType || undefined}
+            onStatusChange={() => {}}
+        />
         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-            <li>
+            {/* <li>
                 <StatusButton
                     disabled={true}
                     status={milestoneData?.status as StatusType || undefined}
                     onStatusChange={() => {}}
                 />
-            </li>
+            </li> */}
             {(milestoneData?.types || []).map((milestoneType, index) => (
                 <li key={index}>
                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
@@ -396,5 +404,6 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 </li>
             ))}
         </ul>
+        </div>
     )
 }
