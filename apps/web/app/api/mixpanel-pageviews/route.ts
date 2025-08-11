@@ -39,18 +39,40 @@ export async function GET(req: Request) {
     const from = url.searchParams.get("from") || fromDefault;
     const to   = url.searchParams.get("to")   || toDefault;
     const id   = url.searchParams.get("id")   || ""; // distinct_id
+    const host = (url.searchParams.get("host") || "").trim(); // e.g. agsaa.comend.io
+
+    // Tight validation: subdomain only under comend.io
+    const HOST_RE = /^[a-z0-9-]+\.comend\.io$/i;
+    if (host && !HOST_RE.test(host)) {
+        return NextResponse.json({ error: "Invalid host." }, { status: 400 });
+    }
 
     const jqlQuery = `
 function main() {
   var from = "${from}";
   var to   = "${to}";
   var id   = ${JSON.stringify(id)};
+  var wantHost = ${JSON.stringify(host.toLowerCase())};
+
+  function getHost(e) {
+    // Prefer $host; fall back to parsing $current_url
+    var h = e.properties && (e.properties.$host || e.properties.host || null);
+    if (h) return String(h).toLowerCase();
+    var url = e.properties && e.properties.$current_url;
+    if (!url) return "";
+    var m = String(url).match(/^https?:\\/\\/([^\\/]+)/i);
+    return m ? m[1].toLowerCase() : "";
+  }
 
   var stream = Events({ from_date: from, to_date: to })
     .filter(function(e){ return e.name === "$mp_web_page_view"; });
 
   if (id && id.length) {
     stream = stream.filter(function(e){ return e.distinct_id === id; });
+  }
+
+  if (wantHost && wantHost.length) {
+    stream = stream.filter(function(e){ return getHost(e) === wantHost; });
   }
 
   return stream.groupBy([function(e){

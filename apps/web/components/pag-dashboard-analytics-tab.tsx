@@ -144,7 +144,7 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*</Card>*/}
                 {/*<DonutChartCard organization={organization}/>*/}
                 <DashboardProjectsStatusCard organization={organization}/>
-                <PAGAnalyticsLineChartCard/>
+                <PAGAnalyticsLineChartCard organization={organization}/>
             </div>
         </div>
     )

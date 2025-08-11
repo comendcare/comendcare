@@ -3,10 +3,11 @@
 import {useState, useEffect} from "react";
 import {ResponsiveContainer, Line, LineChart, XAxis, YAxis, Tooltip, CartesianGrid} from "recharts";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
+import {Organization} from "@prisma/client";
 
 type Point = { date: string; pageViews: number };
 
-export default function PAGAnalyticsLineChartCard() {
+export default function PAGAnalyticsLineChartCard({organization}: { organization: Organization }) {
     const [data, setData] = useState<Point[]>([]);
     const [total, setTotal] = useState(0);
     const [percentChange, setPercentChange] = useState<number | null>(null);
@@ -25,16 +26,23 @@ export default function PAGAnalyticsLineChartCard() {
         const prevFromDate = new Date(prevToDate);
         prevFromDate.setUTCDate(prevFromDate.getUTCDate() - 6);
         const prevFrom = prevFromDate.toISOString().slice(0, 10);
+        const orgHost = `${organization.subdomain}.comend.io`;
 
         (async () => {
             try {
                 // current period
-                const resCurrent = await fetch(`/api/mixpanel-pageviews?from=${from}&to=${to}`, {cache: "no-store"});
+                const resCurrent = await fetch(
+                    `/api/mixpanel-pageviews?from=${from}&to=${to}&host=${encodeURIComponent(orgHost)}`,
+                    { cache: "no-store" }
+                );
                 const jsonCurrent = await resCurrent.json();
                 const currentData = Array.isArray(jsonCurrent) ? jsonCurrent : [];
 
                 // previous period
-                const resPrev = await fetch(`/api/mixpanel-pageviews?from=${prevFrom}&to=${prevTo}`, {cache: "no-store"});
+                const resPrev = await fetch(
+                    `/api/mixpanel-pageviews?from=${prevFrom}&to=${prevTo}&host=${encodeURIComponent(orgHost)}`,
+                    { cache: "no-store" }
+                );
                 const jsonPrev = await resPrev.json();
                 const prevData = Array.isArray(jsonPrev) ? jsonPrev : [];
 
