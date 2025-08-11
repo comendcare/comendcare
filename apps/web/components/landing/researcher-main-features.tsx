@@ -15,7 +15,7 @@ export default function ResearcherMainFeatures() {
     const words = "Biosamples galore".split(" ");
 
     return (
-        <div className="bg-[#FFFFFF] w-full flex flex-row items-center mx-auto p-8 space-x-8">
+        <div className="bg-[#FFFFFF] w-full flex max-w-7xl flex-row items-center mx-auto p-8 space-x-8">
             <div
                 className="bg-[#FFFFFF] h-[460px] lg:w-2/5 flex flex-col items-center rounded-[26px] p-5 border overflow-hidden"
             >

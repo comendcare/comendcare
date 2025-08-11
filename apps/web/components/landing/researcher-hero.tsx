@@ -13,7 +13,7 @@ import {ArrowRight} from "lucide-react";
 export const ResearcherHero = () => {
     const router = useRouter();
     return (
-        <div className="flex flex-col min-h-screen pt-20 md:pt-40 relative overflow-hidden">
+        <div className="flex flex-col max-w-7xl mx-auto min-h-screen pt-20 md:pt-40 relative overflow-hidden">
             <motion.h1
                 initial={{
                     y: 40,
