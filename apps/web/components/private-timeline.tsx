@@ -361,7 +361,6 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
         <StatusButton
             className="h-[16px]"
             disabled={true}
-            showText={false}
             status={milestoneData?.status as StatusType || undefined}
             onStatusChange={() => {}}
         />
