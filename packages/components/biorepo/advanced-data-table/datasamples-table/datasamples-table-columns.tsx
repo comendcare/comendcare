@@ -109,8 +109,7 @@ export function getDatasamplesTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Cohort Size"/>
         ),
         cell: ({row}) => (
-            // <>{row.original.gene?.symbol}</>
-            <></>
+            <>{row.original.cohortSize || ''}</>
         ),
         enableHiding: true,
         meta: {

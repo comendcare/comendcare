@@ -47,6 +47,7 @@ import { revalidate } from "@/packages/lib/revalidate"
 import { useRouter } from "next/navigation"
 import { createDataTool, updateDataTool } from "@/packages/lib/actions"
 import { Separator } from "@/packages/components/ui/separator"
+import { cn } from "@/packages/lib/utils"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -73,8 +74,8 @@ export function EditDataToolForm({
             title: toolData?.title || "",
             description: toolData?.description || "",
             types: TOOL_TYPE_OPTIONS
-                        .filter(toolType => (toolData?.types || [])
-                        .includes(toolType.id)),
+                .filter(toolType => (toolData?.types || [])
+                .includes(toolType.value)),
             otherTypeDetails: typeof toolData?.metadata === 'object' ? (toolData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -85,6 +86,8 @@ export function EditDataToolForm({
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
+            cohortSize: toolData?.cohortSize?.toString() || undefined,
+            institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
         }
     })
 
@@ -431,35 +434,6 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
         <h1 className="font-semibold text-md py-0 my-0">Clinical Dataset Information</h1>
         <div className="flex-col space-y-4">
 
-        {/* <FormField
-            control={form.control}
-            name="institutions"
-            render={({field}) => (
-                // <FormItem className="w-full flex gap-4 items-center">
-                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
-                    <FormLabel className="w-[100px]">Institution</FormLabel>
-                    <div className="w-full">
-                        <FormControl className="w-full">
-                            <MultipleSelector
-                                {...field}
-                                // creatable={true}
-                                maxSelected={1}
-                                triggerSearchOnFocus={true}
-                                onSearch={handleInstitutionAsyncSearch}
-                                placeholder="Search for institutions..."
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={<p>Loading institutions...</p>}
-                                emptyIndicator={<p>No institutions found.</p>}
-                                showHoverCard={false}
-                                className="-mt-2 w-full min-h-[40px]"
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </div>
-                </FormItem>
-            )}
-        /> */}
-
         <FormField
             control={form.control}
             name="genes"
@@ -507,6 +481,55 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                 </FormItem>
             )}
         /> */}
+
+        <FormField
+            control={form.control}
+            name="cohortSize"
+            render={({field}) => (
+                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                    <FormLabel className="w-[100px]">{`Cohort Size`}</FormLabel>
+                    <div className="w-full">
+                        <FormControl className="-mt-2 w-full">
+                            <Input
+                                id="cohortSize"
+                                className="w-full min-h-[40px]"
+                                placeholder={`Enter a number`}
+                                type="number"
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </div>
+                </FormItem>
+            )}
+        />
+
+        <FormField
+            control={form.control}
+            name="institutions"
+            render={({field}) => (
+                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                    <FormLabel className="w-[100px]">Institution</FormLabel>
+                    <div className="w-full">
+                        <FormControl className="w-full">
+                            <MultipleSelector
+                                {...field}
+                                maxSelected={1}
+                                triggerSearchOnFocus={true}
+                                onSearch={handleInstitutionAsyncSearch}
+                                placeholder="Search for institutions..."
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading institutions...</p>}
+                                emptyIndicator={<p>No institutions found.</p>}
+                                showHoverCard={false}
+                                className="-mt-2 w-full min-h-[40px]"
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </div>
+                </FormItem>
+            )}
+        />
         </div>
         </>
     )

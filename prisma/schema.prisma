@@ -704,7 +704,7 @@ model Organization {
   rfps                          RFP[]
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
-  DiseaseModel                  DiseaseModel[]
+  diseaseModel                  DiseaseModel[]
 
   @@index([userId])
 }

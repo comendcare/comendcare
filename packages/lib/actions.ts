@@ -2037,10 +2037,11 @@ export const createDataTool = withOrganizationAuth(
                 attachments: data.attachments,
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                // institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
 
-            console.log(`biosample data`, dataToolData)
+            console.log(`tool data`, dataToolData)
 
             const response = await prisma.biosample.create({
                 include: {
@@ -2093,9 +2094,9 @@ export const createDataTool = withOrganizationAuth(
                     ...(dataToolData.gene
                         ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
                         : undefined),
-                    // ...(dataToolData.institution
-                    //     ? ({institution: {connect: {id: dataToolData.institution.value}}})
-                    //     : undefined),
+                    ...(dataToolData.institution
+                        ? ({institution: {connect: {id: dataToolData.institution.value}}})
+                        : undefined),
                 }
             })
 
@@ -2136,8 +2137,11 @@ export const updateDataTool = withOrganizationAuth(
                 attachments: data.attachments,
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                // institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
+
+            console.log(`tool data`, dataToolData)
 
             const newDataTool = await prisma.tool.update({
                 where: {id: data.id},
@@ -2203,13 +2207,15 @@ export const updateDataTool = withOrganizationAuth(
                             connect: {symbol: dataToolData.gene.value}
                         }
                     }) : {gene: {disconnect: true}}),
-                    // ...(dataToolData.institution ? ({
-                    //     institution: {connect: {id: dataToolData.institution.value}}
-                    // }) : {institution: {disconnect: true}}),
+                    ...(dataToolData.institution ? ({
+                        institution: {connect: {id: dataToolData.institution.value}}
+                    }) : {institution: {disconnect: true}}),
                 },
             })
 
-            const response = await prisma.biosample.findUnique({
+            console.log(`updated tool`, newDataTool)
+
+            const response = await prisma.tool.findUnique({
                 where: {id: data.id}
             })
 
@@ -3763,6 +3769,7 @@ export const syncDBAssets = withOrganizationAuth(
                                     milestone: true
                                 }
                             },
+                            institution: true,
                             gene: true,
                         }
                     })

@@ -1944,4 +1944,6 @@ export const editDataToolForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional(),
 
     genes: z.array(optionSchema).optional(),
+    cohortSize: z.string().optional(),
+    institutions: z.array(optionSchema).optional(),
 })
