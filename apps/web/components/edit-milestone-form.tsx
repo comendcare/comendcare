@@ -141,6 +141,19 @@ const editMilestoneForm = z.object({
     }
 )
 
+type SimpleAttachment = { name: string; link: string };
+
+function addAttachmentToForm(form: any, att: SimpleAttachment) {
+    const prev = form.getValues("attachments") ?? [];
+    const norm = (s: string) => s.trim().toLowerCase();
+
+    const already = prev.some((a: any) => norm(a.link) === norm(att.link));
+    if (already) return false;
+
+    form.setValue("attachments", [...prev, att], { shouldValidate: true, shouldDirty: true });
+    return true;
+}
+
 export function EditMilestoneForm({
                                       organization,
                                       milestoneData,
@@ -912,7 +925,9 @@ export function EditMilestoneForm({
                                         </Link>
                                     </TabsContent>
                                     <TabsContent value="publications" className="space-y-4 w-full">
-                                        <EditMilestoneDetailsPublicationsTab/>
+                                        <EditMilestoneDetailsPublicationsTab
+                                            onAttach={(att) => addAttachmentToForm(form, att)}
+                                        />
                                     </TabsContent>
                                     <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
