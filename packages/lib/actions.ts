@@ -4835,6 +4835,168 @@ export const updateResearcher = withAuth(
     }
 );
 
+export const createMaterialAndDataAccessRequest = withResearcherAuth(
+    async (user: User, formData: FormData) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
+        }
+
+        const rawData = formData.get("data");
+        if (!rawData || typeof rawData !== "string") {
+            return { error: "Invalid form data." };
+        }
+
+        const parsed = JSON.parse(rawData);
+
+        const {
+            name,
+            description,
+            organizationId,
+            openToCollab,
+            projectDetails,
+            sampleDetails,
+            logistics,
+            commercial,
+            agreements,
+        } = parsed;
+
+        const {
+            studyTitle,
+            studyDescription,
+            justification,
+            hasIrbApproval,
+            irbStatus,
+            hasRisks,
+            riskDescription,
+            disseminationPlan,
+            patientSignificance,
+        } = projectDetails;
+
+        const {
+            sampleTypes,
+            otherSampleType,
+            participantCount,
+            processingRequirements,
+        } = sampleDetails;
+
+        const {
+            timeline,
+            logisticsContact,
+            providesCollectionKit,
+            needsCollectionMaterials,
+            participantCompensation,
+            compensationDetails,
+            shippingAddress,
+            fedexAccount,
+            shippingMethod,
+            shippingContact,
+            shippingPhone,
+        } = logistics;
+
+        const {
+            isCommercial,
+            fundingOrganization,
+        } = commercial;
+
+        const metadata: JsonObject = parsed.metadata ?? {};
+
+        try {
+            const request = await prisma.materialAndDataAccessRequest.create({
+                data: {
+                    title: name,
+                    description,
+                    submittedAt: new Date(),
+                    sampleCount: participantCount,
+                    openToCollab,
+                    studyTitle,
+                    studyDescription,
+                    justification,
+                    hasIrbApproval,
+                    irbStatus,
+                    hasRisks,
+                    riskDescription,
+                    disseminationPlan,
+                    patientSignificance,
+                    sampleTypes,
+                    otherSampleType,
+                    processingRequirements,
+                    timeline,
+                    logisticsContact,
+                    providesCollectionKit,
+                    needsCollectionMaterials,
+                    participantCompensation,
+                    compensationDetails,
+                    shippingAddress,
+                    fedexAccount,
+                    shippingMethod,
+                    shippingContact,
+                    shippingPhone,
+                    isCommercial,
+                    fundingOrganization,
+                    metadata,
+
+                    organization: {
+                        connect: {
+                            id: organizationId,
+                        },
+                    },
+                    researcher: {
+                        connect: {
+                            userId: session.user.id,
+                        },
+                    },
+                },
+            });
+
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                request,
+                'requests'
+            );
+
+            revalidatePath("/requests")
+
+            // await sendNewOrganizationEmail(
+            //     {
+            //         user: {
+            //             name: session.user.name,
+            //             email: session.user.email
+            //         },
+            //         organization: {
+            //             name: organization.name,
+            //             subdomain: organization.subdomain
+            //         }
+            //     }
+            // ).then(() => {
+            //     console.log("email sent")
+            // })
+
+            return {success: true, data: request}
+        } catch (error: any) {
+            if (error.code === "P2002") {
+                const target = error.meta?.target?.[0];
+
+                switch (target) {
+                    default:
+                        return {error: `Unique constraint failed on ${target}`};
+                }
+            } else {
+                return {
+                    error: error.message
+                }
+            }
+        }
+    }
+)
+
 export const updateMaterialAndDataAccessRequestProperty = withAuth(
     async (
         requestId: string,
@@ -4884,3 +5046,4 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
         }
     }
 );
+
