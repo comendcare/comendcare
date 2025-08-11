@@ -40,42 +40,13 @@ import { useShallow } from "zustand/react/shallow"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 import { badgeVariants } from "@comend/components/ui/badge"
-// import { DeleteAssetDialog } from "./delete-tool-dialog"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { JsonObject } from "@prisma/client/runtime/library"
-import type { Option } from "@comend/lib/types"
+import { editDataToolForm, Option } from "@comend/lib/types"
 import { revalidate } from "@/packages/lib/revalidate"
 import { useRouter } from "next/navigation"
-
-type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
-type ContactType = Prisma.ExternalContactGetPayload<{}>
-
-const editAssetForm = z.object({
-    title: z
-        .string({
-            required_error: "Please provide a title"
-        })
-        .min(1, "Title is required")
-        .max(200, "Title must be less than 200 characters"),
-    description: z
-        .string()
-        .max(1000, "Description must be less than 1000 characters")
-        .optional(),
-    types: z.array(optionSchema)
-        .min(1, "Type is required")
-        .max(1, "Max one type"),
-    otherTypeDetails: z.string().optional(),
-    attachments: z.array(z.custom<AttachmentType>()).optional(),
-    isPinned: z.boolean(),
-    isPrivate: z.boolean(),
-    contacts: z.array(z.custom<any>()).optional(),
-    milestones: z.array(z.custom<Milestone>()).optional()
-})
-
-const toolSelector = (state: ToolState) => ({
-    createTool: state.createTool,
-    updateTool: state.updateTool
-})
+import { createDataTool, updateDataTool } from "@/packages/lib/actions"
+import { Separator } from "@/packages/components/ui/separator"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -84,7 +55,7 @@ export function EditDataToolForm({
     numAssetsPinned,
     closeDialog
 }: {
-    toolData: Partial<Asset>,
+    toolData: any,
     numAssetsPinned: number,
     closeDialog?: (newAsset?: any) => void
 }) {
@@ -92,13 +63,13 @@ export function EditDataToolForm({
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { createTool, updateTool } = useToolStore(useShallow(toolSelector))
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
-    const form = useForm<z.infer<typeof editAssetForm>>({
+    const form = useForm<z.infer<typeof editDataToolForm>>({
         mode: "onChange",
-        resolver: zodResolver(editAssetForm),
+        resolver: zodResolver(editDataToolForm),
         defaultValues: {
+            id: toolData?.id || undefined,
             title: toolData?.title || "",
             description: toolData?.description || "",
             types: TOOL_TYPE_OPTIONS
@@ -112,6 +83,8 @@ export function EditDataToolForm({
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
             contacts: toolData?.contacts || undefined,
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+
+            genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
         }
     })
 
@@ -127,41 +100,7 @@ export function EditDataToolForm({
         milestones: form.watch("milestones")
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
-        // console.log(`handle form submit`, values)
-        const {
-            title,
-            description,
-            types,
-            otherTypeDetails,
-            attachments,
-            isPinned,
-            isPrivate,
-            contacts,
-            milestones,
-        } = values;
-
-        const updateData: Partial<Asset> = {
-            ...toolData,
-            title,
-            types: types.map(type => type.value),
-            metadata: {
-                ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
-                otherTypeDetails: otherTypeDetails
-            } as JsonObject,
-            pinned: (!isPrivate && isPinned) || false, // only save pinned if tool is public
-            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-            milestones: (milestones || []).map((milestone) => {
-                return ({
-                    milestoneId: milestone.id,
-                    toolId: toolData.id  || '',
-                })
-            }),
-            ...(description !== undefined && description !== null ? {description} : undefined),
-            ...(attachments ? {attachments} : undefined),
-            ...(contacts ? {contacts} : undefined),
-        }
-
+    const handleFormSubmit = async (values: z.infer<typeof editDataToolForm>) => {
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -172,18 +111,20 @@ export function EditDataToolForm({
 
         try {
             if (toolData.id) {
-                const updatedTool = await updateTool(updateData, session.user.organizationId)
+                // const updatedTool = await updateTool(updateData, session.user.organizationId)
+                const updatedTool = await updateDataTool(session.user.organizationId, values, toolData.id)
                 toast.success(
-                    "Tool updated successfully!",
+                    "Clinical Dataset updated successfully!",
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/data")
                 if (closeDialog) closeDialog(updatedTool)
                 router.refresh()
             } else {
-                const newTool = await createTool(updateData, session.user.organizationId)
+                // const newTool = await createTool(updateData, session.user.organizationId)
+                const newTool = await createDataTool(session.user.organizationId, values)
                 toast.success(
-                    "Tool created successfully!",
+                    "Clinical Dataset created successfully!",
                     {position: "bottom-left"}
                 )
                 await revalidate("/app/tools/data")
@@ -433,6 +374,9 @@ export function EditDataToolForm({
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
+                    <Separator className="w-full"/>
+                    <AdditionalBiosampleFields form={form} />
+
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>
                             <Button 
@@ -466,5 +410,104 @@ export function EditDataToolForm({
                 </form>
             </ScrollArea>
         </Form>
+    )
+}
+
+export const AdditionalBiosampleFields = ({form}: {form: any}) => {
+    const handleGeneAsyncSearch = async (query: string) => {
+        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+        const genes = await res.json();
+        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+    };
+
+    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+        const response = await fetch(`/api/institutions?search=${query}`);
+        const data = await response.json();
+        return data;
+    };
+
+    return (
+        <>
+        <h1 className="font-semibold text-md py-0 my-0">Clinical Dataset Information</h1>
+        <div className="flex-col space-y-4">
+
+        {/* <FormField
+            control={form.control}
+            name="institutions"
+            render={({field}) => (
+                // <FormItem className="w-full flex gap-4 items-center">
+                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                    <FormLabel className="w-[100px]">Institution</FormLabel>
+                    <div className="w-full">
+                        <FormControl className="w-full">
+                            <MultipleSelector
+                                {...field}
+                                // creatable={true}
+                                maxSelected={1}
+                                triggerSearchOnFocus={true}
+                                onSearch={handleInstitutionAsyncSearch}
+                                placeholder="Search for institutions..."
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading institutions...</p>}
+                                emptyIndicator={<p>No institutions found.</p>}
+                                showHoverCard={false}
+                                className="-mt-2 w-full min-h-[40px]"
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </div>
+                </FormItem>
+            )}
+        /> */}
+
+        <FormField
+            control={form.control}
+            name="genes"
+            render={({field}) => (
+                <FormItem className="w-full flex gap-4 items-center">
+                    <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                    <div className="w-full">
+                        <FormControl className="w-full">
+                            <MultipleSelector
+                                {...field}
+                                onSearch={handleGeneAsyncSearch}
+                                placeholder="Search for genes..."
+                                triggerSearchOnFocus={true}
+                                hidePlaceholderWhenSelected={true}
+                                loadingIndicator={<p>Loading genes...</p>}
+                                emptyIndicator={<p>No genes found.</p>}
+                                showHoverCard={false}
+                                className="-mt-2 w-full min-h-[40px]"
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </div>
+                </FormItem>
+            )}
+        />
+
+        {/* <FormField
+            control={form.control}
+            name="variant"
+            render={({field}) => (
+                // <FormItem className="w-full flex gap-4 items-center">
+                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                    <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
+                    <div className="w-full">
+                        <FormControl className="w-full">
+                            <Input
+                                id="variant"
+                                className="-mt-2 w-full min-h-[40px]"
+                                placeholder={`Enter a variant`}
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </div>
+                </FormItem>
+            )}
+        /> */}
+        </div>
+        </>
     )
 }

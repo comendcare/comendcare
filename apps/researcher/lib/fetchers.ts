@@ -17,6 +17,7 @@ export const getAllBiosamples = withResearcherAuth(
                     milestones: { include: { milestone: true } },
                     contacts: true,
                     attachments: true,
+                    gene: true,
                     // biosample: { include: { donor: true, institution: true } },
                 },
                 orderBy: { createdAt: 'asc' },

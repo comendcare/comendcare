@@ -40,6 +40,7 @@ import {
     Asset,
     DEFAULT_KANBAN_COLUMNS,
     editBiosampleForm,
+    editDataToolForm,
     editDiseaseModelForm,
     MemberRequestWithUser,
     Milestone,
@@ -2011,6 +2012,215 @@ function generateDonorNanoid() {
   return (id.slice(0, 4) + '-' + id.slice(4))
 }
 
+export const createDataTool = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const dataToolData: any = {
+                id: data.id,
+                types: (data.types || []).map(type => type.value),
+                metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
+                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+            }
+
+            console.log(`biosample data`, dataToolData)
+
+            const response = await prisma.biosample.create({
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                data: {
+                    ...dataToolData,
+                    // create with the given id if it's available. This is useful for situations like 'undo'
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(dataToolData.id ? {id: dataToolData.id} : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (dataToolData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (dataToolData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
+                    milestones: {
+                        create: (dataToolData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
+                    private: dataToolData.private || false,
+                    pinned: dataToolData.pinned || false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: dataToolData.metadata as InputJsonObject,
+                    ...(dataToolData.gene
+                        ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
+                        : undefined),
+                    // ...(dataToolData.institution
+                    //     ? ({institution: {connect: {id: dataToolData.institution.value}}})
+                    //     : undefined),
+                }
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating biosample:", error.message);
+            throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
+export const updateDataTool = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            if (!data.id) {
+                throw new Error("No data tool id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const dataToolData: any = {
+                id: data.id,
+                types: data.types ? data.types.map(type => type.value) : undefined,
+                metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
+                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+            }
+
+            const newDataTool = await prisma.tool.update({
+                where: {id: data.id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    institution: true,
+                },
+                data: {
+                    ...dataToolData,
+                    ...(dataToolData.attachments ? (
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (dataToolData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(dataToolData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (dataToolData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(dataToolData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (dataToolData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
+                    private: dataToolData.private !== undefined && dataToolData.private !== null ? dataToolData.private : false,
+                    pinned: dataToolData.pinned !== undefined && dataToolData.pinned !== null ? dataToolData.pinned : false,
+                    metadata: dataToolData.metadata as InputJsonObject,
+                    ...(dataToolData.gene ? ({
+                        gene: {
+                            connect: {symbol: dataToolData.gene.value}
+                        }
+                    }) : {gene: {disconnect: true}}),
+                    // ...(dataToolData.institution ? ({
+                    //     institution: {connect: {id: dataToolData.institution.value}}
+                    // }) : {institution: {disconnect: true}}),
+                },
+            })
+
+            const response = await prisma.biosample.findUnique({
+                where: {id: data.id}
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating clinical dataset:", error.message);
+            throw new Error(error.message || "Failed to create clinical dataset.");
+        }
+    }
+)
+
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
@@ -3552,7 +3762,8 @@ export const syncDBAssets = withOrganizationAuth(
                                 include: {
                                     milestone: true
                                 }
-                            }
+                            },
+                            gene: true,
                         }
                     })
 
