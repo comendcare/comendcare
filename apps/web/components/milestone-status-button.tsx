@@ -204,7 +204,7 @@ export default function StatusButton({
             {/* Planned Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-center relative z-10",
+                    "flex-1 flex items-center justify-end relative z-10 pr-2",
                     currentIndex >= 0 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
@@ -214,7 +214,7 @@ export default function StatusButton({
             {/* In Progress Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-center relative z-10 -ml-4",
+                    "flex-1 flex items-center justify-end relative z-10 pr-2",
                     currentIndex >= 1 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
@@ -224,7 +224,7 @@ export default function StatusButton({
             {/* Completed Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-center relative z-10 -ml-4",
+                    "flex-1 flex items-center justify-end relative z-10 pr-2",
                     currentIndex >= 2 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
