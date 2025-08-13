@@ -20,6 +20,8 @@ import {
 import {companyTypeMap, Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "./property-badge";
 import {TypeBadge} from "./type-badge";
+import Image from "next/image"
+import ImageWithFallback from "@/packages/components/image-with-fallback";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -96,17 +98,27 @@ export function CROCardHeaderContents({cro, milestone, location}: {
 }) {
     const {id, title, description, companyType, avgRating} = cro;
 
+    const favicon = <ImageWithFallback
+            src={`https://www.google.com/s2/favicons?domain=${cro.url}`}
+            alt="Resource favicon"
+            className="inline-block h-6 w-6 rounded-md ring-2 ring-gray-300"
+            fallback="/chrome favicon.png"
+        />
+
+
     return (
         <>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-2">
                 <Link
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
                             ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
                             : `http://localhost:3000/app/service-providers/${id}`
                     }
+                    className="flex flex-row gap-4 items-center"
                 >
-                    <CardTitle className="text-xl flex flex-row gap-2 items-center">
+                    {favicon}
+                    <CardTitle className="text-lg flex flex-row gap-2 items-center">
                         {title}
                     </CardTitle>
                 </Link>
