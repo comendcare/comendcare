@@ -16,7 +16,7 @@ import {
 import { Badge } from "@comend/components/ui/badge"
 import { Separator } from "@comend/components/ui/separator"
 import { Checkbox } from "@comend/components/ui/checkbox"
-import {useCROSearchStore, CROSearchState} from "../../state/search/croSearchStore";
+import {useCROSearchStore, CROSearchState} from "@/state/search/croSearchStore";
 import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS, MILESTONE_TYPE_OPTIONS, optionSchema} from "@comend/lib/types"
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
