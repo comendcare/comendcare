@@ -1,5 +1,5 @@
 "use client"
-import {Card, CardContent} from "@comend/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {
     Tabs,
     TabsContent,
@@ -41,119 +41,45 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }:
     if (tools && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
-                <CardContent className="mt-8">
-                    <Tabs defaultValue="rfps" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="rfps">Requests for Proposals</TabsTrigger>
-                            <TabsTrigger value="tools">Tools</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="rfps">
-                            {rfps.filter(rfp => rfp.pinned).length > 0 && (
-                                <div className="w-full px-8">
-                                    <Carousel className="w-full" opts={{loop: true, align: "start"}}>
-                                        <CarouselContent>
-                                            {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
-                                                <CarouselItem key={index} className="lg:basis-1/2">
-                                                    <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
-                                                        <DialogTrigger className="w-full h-full" onClick={() => {
-                                                            mixpanelTrack("RFP Details Viewed", {
-                                                                "ID": rfp.id,
-                                                                "Name": rfp.title,
-                                                                "Budget": rfp.budget,
-                                                                "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
-                                                                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                                                                // we flatten them into a single list that can be parsed
-                                                                "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
-                                                                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                                                                )
-                                                            })
-                                                        }}>
-                                                            <RFPCard rfp={rfp} />
-                                                        </DialogTrigger>
-                                                        <DialogContent className="overflow-hidden">
-                                                            <RFPDetails rfp={rfp} />
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                </CarouselItem>
-                                            ))}
-                                        </CarouselContent>
-                                        <CarouselPrevious />
-                                        <CarouselNext />
-                                    </Carousel>
-                                </div>
-                            )}
-                            {rfps.filter(rfp => rfp.pinned).length <= 0 && (
-                                isPrivate
-                                    ? <PrivateNoPinnedRFPs /> 
-                                    : <PublicNoPinnedRFPs />
-                            )}
-                        </TabsContent>
-                        <TabsContent value="tools">
-                            {tools.filter(tool => tool.pinned).length > 0 && (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                        <TableHead>Title</TableHead>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead>Contacts</TableHead>
-                                        <TableHead></TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {tools.filter(tool => tool.pinned).map((tool) => (
-                                            <Dialog key={tool.id}>
-                                                <DialogTrigger asChild onClick={() => {
-                                                    mixpanelTrack("Tool Details Viewed", {
-                                                        "ID": tool.id,
-                                                        "Tool Name": tool.title,
-                                                        "Linked Projects": tool.milestones.map(({ milestone }: any) => milestone),
-                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                                                        // we flatten them into a single list that can be parsed
-                                                        "Linked Project Types": tool.milestones.flatMap(({ milestone }: any) =>
-                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                                                        )
-                                                    })
-                                                }}>
-                                                    <TableRow key={tool.id} className="cursor-pointer">
-                                                        <TableCell>
-                                                            <div>
-                                                                {tool.title} {tool.private && <PrivateBadge iconOnly={true} />}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="line-clamp-3">
-                                                                {tool.description}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <ul className="flex flex-col gap-2">
-                                                                {tool.contacts.map((contact: any, index: number) => (
-                                                                    <li key={index}>
-                                                                        {contact.name || contact.email || contact.affiliation}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Pin fill="current-color" className="h-4 w-4"/>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                    <AssetDetails tool={tool} />
-                                                </DialogContent>
-                                            </Dialog>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            )}
-                            {tools.filter(tool => tool.pinned).length <= 0 && (
-                                isPrivate
-                                    ? <PrivateNoPinnedAssets /> 
-                                    : <PublicNoPinnedAssets />
-                            )}
-                        </TabsContent>
-                    </Tabs>
+                <CardHeader>
+                    <CardTitle>RFPs</CardTitle>
+                </CardHeader>
+                <CardContent className="w-full max-w-full">
+                    <div className="flex flex-col gap-4 w-full max-w-full">
+                        {rfps.filter(rfp => rfp.pinned).length > 0 && (
+                            <ul className="w-full max-w-full flex flex-col gap-4">
+                                {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
+                                    <li className="w-full max-w-full">
+                                        <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
+                                            <DialogTrigger className="w-full max-w-full h-full" onClick={() => {
+                                                mixpanelTrack("RFP Details Viewed", {
+                                                    "ID": rfp.id,
+                                                    "Name": rfp.title,
+                                                    "Budget": rfp.budget,
+                                                    "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
+                                                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                    // we flatten them into a single list that can be parsed
+                                                    "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
+                                                        (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                    )
+                                                })
+                                            }}>
+                                                <RFPCard rfp={rfp} />
+                                            </DialogTrigger>
+                                            <DialogContent className="overflow-hidden">
+                                                <RFPDetails rfp={rfp} />
+                                            </DialogContent>
+                                        </Dialog>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {rfps.filter(rfp => rfp.pinned).length <= 0 && (
+                            isPrivate
+                                ? <PrivateNoPinnedRFPs /> 
+                                : <PublicNoPinnedRFPs />
+                        )}
+                    </div>
                 </CardContent>
             </Card>
         );

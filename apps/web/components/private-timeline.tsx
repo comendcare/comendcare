@@ -47,7 +47,7 @@ const selector = (state: RoadmapState) => ({
     setMilestones: state.setMilestones,
 })
 
-export const PrivateTimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>}) => {
+export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>}) => {
     const {
         selectedNodeIds,
         milestones,
@@ -180,6 +180,8 @@ export const PrivateTimelineView = ({sortBy, contextMenuRef}: {sortBy: string, c
                                 selectedNodeIds={selectedNodeIds} 
                                 disabled={sortBy !== "custom"}
                                 contextMenuRef={contextMenuRef}
+                                isPrivate={true}
+                                isDraggable={true}
                             />
                         ))}
                     </SortableContext>
@@ -189,18 +191,22 @@ export const PrivateTimelineView = ({sortBy, contextMenuRef}: {sortBy: string, c
     )
 }
 
-const DraggableTimelineItem = ({
+export const DraggableTimelineItem = ({
     milestone, 
     index, 
     selectedNodeIds, 
     disabled,
     contextMenuRef,
+    isPrivate = false,
+    isDraggable = false,
 }: {
     milestone: Milestone, 
     index: number, 
     selectedNodeIds: string[], 
     disabled: boolean,
-    contextMenuRef: React.RefObject<HTMLDivElement>,
+    contextMenuRef?: React.RefObject<HTMLDivElement>,
+    isPrivate?: boolean,
+    isDraggable?: boolean
 }) => {
     const {
         attributes,
@@ -224,8 +230,8 @@ const DraggableTimelineItem = ({
         const target = event.target as any;
 
         // Check if click was inside context menu
-        if (contextMenuRef.current?.contains(target)) return
-        if (contextMenuRef.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
+        if (contextMenuRef?.current?.contains(target)) return
+        if (contextMenuRef?.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
             return
         }
         // Skip right clicks
@@ -307,195 +313,169 @@ const DraggableTimelineItem = ({
                     milestone.nodeId && selectedNodeIds.includes(milestone.nodeId) ? "border-primary border-2" : "border-gray-300 border-2"
                 )}
             >
-                <div className="flex flex-row items-start justify-start gap-4 mr-8">
-                    <span>
-                        {disabled ? (
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Button
-                                        disabled={true}
-                                        type="button"
-                                        variant={"ghost"}
-                                        {...attributes}
-                                        {...listeners}
-                                        className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
-                                    >
-                                        <span className="sr-only">Move timeline</span>
-                                        <GripVertical/>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>
-                                        {`Dragging is only available in custom mode.`}
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        ): (
-                            <Button
-                                type="button"
-                                variant={"ghost"}
-                                {...attributes}
-                                {...listeners}
-                                className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
-                            >
-                                <span className="sr-only">Move timeline</span>
-                                <GripVertical/>
-                            </Button>
-                        )}
-                        <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
-                        {milestone.private && (
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Lock size={20} className="inline m-1 mb-2"/>
-                                </TooltipTrigger>
-                                <TooltipContent className="font-normal">
-                                    {`Only visible to your team`}
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </span>
-                    {/* {milestone.private && <PrivateBadge iconOnly/>} */}
-                    <time
-                        className="mt-[12px] ml-auto min-w-fit block font-semibold leading-none dark:text-gray-500">
-                        {getDates(milestone)}
-                    </time>
-                    <div className="absolute top-[12px] right-0 p-2">
-                        <ProjectActionsMenu milestone={milestone as Milestone}/>
-                    </div>
-                </div>
-                <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
-                    {milestone.description}
-                </p>
-
-                <span className="flex flex-wrap gap-2 items-center">
-                    {(milestone?.types || []).map((milestoneType, index) => (
-                        <Badge className="min-w-fit w-fit m-1 font-normal">
-                            {milestoneType?.milestoneType?.label || "No type"}
-                        </Badge>
-                    ))}
-                    {(milestone.contacts || []).map((contact, index) => {
-                        if (contact.affiliation) {
-                            return (
-                                <Badge key={index} className="min-w-fit w-fit m-1 font-normal">
-                                    <User size={16}/>
-                                    <p>{contact.affiliation}</p>
-                                </Badge>
-                            )
-                        }
-                    })}
-
-                    {milestone?.tools?.length > 0 && (
-                        // <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
-                        //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                        //         <Microscope className="h-4 w-4 text-emerald-900" />
-                        //         <span className="text-emerald-900">Linked Tools</span>
-                        //         <div className="flex flex-wrap gap-2">
-                        //             {milestone.tools.map(({tool}) => (
-                        //                 <Badge variant="emerald" className="min-w-fit w-fit">
-                        //                     {tool?.title}
-                        //                 </Badge>
-                        //             ))}
-                        //         </div>
-                        //     </div>
-                        // </div>
-                        <>
-                            {milestone.tools.map(({tool}) => (
-                                <Badge variant="emerald" className="min-w-fit w-fit font-normal">
-                                    <Microscope size={16} />
-                                    {tool?.title}
-                                </Badge>
-                            ))}
-                        </>
-                    )}
-                    {milestone?.rfps?.length > 0 && (
-                        // <div className="border-l-4 border-orange-200 pl-4 space-y-3">
-                        //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                        //         <Megaphone className="h-4 w-4 text-orange-900" />
-                        //         <span className="text-orange-900">Linked RFPs</span>
-                        //         <div className="flex flex-wrap gap-2">
-                        //             {milestone.rfps.map(({rfp}) => (
-                        //                 <Badge variant="orange" className="min-w-fit w-fit">
-                        //                     {rfp?.title}
-                        //                 </Badge>
-                        //             ))}
-                        //         </div>
-                        //     </div>
-                        // </div>
-                        <>
-                            {milestone.rfps.map(({rfp}) => (
-                                <Badge variant="orange" className="min-w-fit w-fit font-normal">
-                                    <Megaphone size={16} />
-                                    {rfp?.title}
-                                </Badge>
-                            ))}
-                        </>
-                    )}
-                </span>
-
-                <li className="mt-4">
-                    <StatusButton
-                        disabled={true}
-                        minimal={true}
-                        className="h-[16px]"
-                        status={milestone.status as StatusType || undefined}
-                        onStatusChange={() => {}}
-                    />
-                </li>
-                {/* <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/> */}
+                <TimelineItemContent milestone={milestone} isDraggable={isDraggable} disabled={disabled} attributes={attributes} listeners={listeners} />
             </div>
         </li>
     )
 }
 
-export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData: Milestone, nodeType: string }) => {
+export const TimelineItemContent = ({
+    milestone,
+    disabled = true,
+    isDraggable = false,
+    isPrivate = false,
+    attributes,
+    listeners
+}: {
+    milestone: Milestone,
+    disabled?: boolean,
+    isDraggable?: boolean,
+    isPrivate?: boolean,
+    attributes?: any,
+    listeners?: any
+}) => {
+
     return (
-        <div className="flex flex-col gap-2">
-        <StatusButton
-            className="h-[16px]"
-            minimal={true}
-            disabled={true}
-            status={milestoneData?.status as StatusType || undefined}
-            onStatusChange={() => {}}
-        />
-        <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-            {/* <li>
-                <StatusButton
-                    disabled={true}
-                    status={milestoneData?.status as StatusType || undefined}
-                    onStatusChange={() => {}}
-                />
-            </li> */}
-            {(milestoneData?.types || []).map((milestoneType, index) => (
-                <li key={index}>
-                    <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-                </li>
+        <>
+        <div className="flex flex-row items-start justify-start gap-4 mr-8">
+            <span>
+                {isDraggable && (
+                    disabled ? (
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    disabled={true}
+                                    type="button"
+                                    variant={"ghost"}
+                                    {...attributes}
+                                    {...listeners}
+                                    className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
+                                >
+                                    <span className="sr-only">Move timeline</span>
+                                    <GripVertical/>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-80">
+                                <p>
+                                    {`Dragging is only available in custom mode.`}
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    ): (
+                        <Button
+                            type="button"
+                            variant={"ghost"}
+                            {...attributes}
+                            {...listeners}
+                            className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
+                        >
+                            <span className="sr-only">Move timeline</span>
+                            <GripVertical/>
+                        </Button>
+                    )
+                )}
+                <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
+                {milestone.private && (
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Lock size={20} className="inline m-1 mb-2"/>
+                        </TooltipTrigger>
+                        <TooltipContent className="font-normal">
+                            {`Only visible to your team`}
+                        </TooltipContent>
+                    </Tooltip>
+                )}
+            </span>
+            {/* {milestone.private && <PrivateBadge iconOnly/>} */}
+            <time
+                className="mt-[12px] ml-auto min-w-fit block font-semibold leading-none dark:text-gray-500">
+                {getDates(milestone)}
+            </time>
+            {isPrivate && (
+                <div className="absolute top-[12px] right-0 p-2">
+                    <ProjectActionsMenu milestone={milestone as Milestone}/>
+                </div>
+            )}
+        </div>
+        <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
+            {milestone.description}
+        </p>
+
+        <span className="flex flex-wrap gap-2 items-center">
+            {(milestone?.types || []).map((milestoneType, index) => (
+                <Badge className="min-w-fit w-fit m-1 font-normal">
+                    {milestoneType?.milestoneType?.label || "No type"}
+                </Badge>
             ))}
-            {(milestoneData?.contacts || []).map((contact, index) => {
+            {(milestone.contacts || []).map((contact, index) => {
                 if (contact.affiliation) {
                     return (
-                        <li key={index}>
-                            <PropertyBadge icon={User}>
-                                <p>{contact.affiliation}</p>
-                            </PropertyBadge>
-                        </li>
+                        <Badge key={index} className="min-w-fit w-fit m-1 font-normal">
+                            <User size={16}/>
+                            <p>{contact.affiliation}</p>
+                        </Badge>
                     )
                 }
             })}
-            {(milestoneData?.tools || []).map((tool, index) => (
-                <li key={index}>
-                    <PropertyBadge icon={Microscope}>
-                        <p>{tool.tool?.title}</p>
-                    </PropertyBadge>
-                </li>
-            ))}
-            {(milestoneData?.rfps || []).map((rfp, index) => (
-                <li key={index}>
-                    <PropertyBadge icon={Megaphone}>
-                        <p>{rfp.rfp?.title}</p>
-                    </PropertyBadge>
-                </li>
-            ))}
-        </ul>
-        </div>
+
+            {milestone?.tools?.length > 0 && (
+                // <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
+                //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                //         <Microscope className="h-4 w-4 text-emerald-900" />
+                //         <span className="text-emerald-900">Linked Tools</span>
+                //         <div className="flex flex-wrap gap-2">
+                //             {milestone.tools.map(({tool}) => (
+                //                 <Badge variant="emerald" className="min-w-fit w-fit">
+                //                     {tool?.title}
+                //                 </Badge>
+                //             ))}
+                //         </div>
+                //     </div>
+                // </div>
+                <>
+                    {milestone.tools.map(({tool}) => (
+                        <Badge variant="emerald" className="min-w-fit w-fit font-normal">
+                            <Microscope size={16} />
+                            {tool?.title}
+                        </Badge>
+                    ))}
+                </>
+            )}
+            {milestone?.rfps?.length > 0 && (
+                // <div className="border-l-4 border-orange-200 pl-4 space-y-3">
+                //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                //         <Megaphone className="h-4 w-4 text-orange-900" />
+                //         <span className="text-orange-900">Linked RFPs</span>
+                //         <div className="flex flex-wrap gap-2">
+                //             {milestone.rfps.map(({rfp}) => (
+                //                 <Badge variant="orange" className="min-w-fit w-fit">
+                //                     {rfp?.title}
+                //                 </Badge>
+                //             ))}
+                //         </div>
+                //     </div>
+                // </div>
+                <>
+                    {milestone.rfps.map(({rfp}) => (
+                        <Badge variant="orange" className="min-w-fit w-fit font-normal">
+                            <Megaphone size={16} />
+                            {rfp?.title}
+                        </Badge>
+                    ))}
+                </>
+            )}
+        </span>
+
+        <li className="mt-4">
+            <StatusButton
+                disabled={true}
+                minimal={true}
+                className="h-[16px]"
+                status={milestone.status as StatusType || undefined}
+                onStatusChange={() => {}}
+            />
+        </li>
+        {/* <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/> */}
+        </>
     )
 }

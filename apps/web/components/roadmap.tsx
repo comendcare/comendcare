@@ -16,7 +16,7 @@ import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { getMilestones, getMilestoneTypes, getOrganizationFromOrganizationId, getPublicMilestoneDetails } from "@comend/lib/fetchers"
-import { PrivateTimelineView } from "./private-timeline"
+import { TimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "@comend/components/ui/button"
 import { cn, parseCSV } from "@comend/lib/utils"
 import Link from "next/link"
@@ -411,7 +411,7 @@ export function Roadmap() {
                                 className="mt-0 h-[calc(100vh-12rem)]"
                             >
                                 {milestones.length > 0 ? (
-                                    <PrivateTimelineView 
+                                    <TimelineView 
                                         sortBy={sortBy} 
                                         contextMenuRef={contextMenuRef} 
                                     />

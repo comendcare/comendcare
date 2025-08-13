@@ -1,14 +1,10 @@
 "use client"
 
-import React, {ReactNode, useEffect, useRef, useState} from "react"
-import {getDates} from "@comend/lib/utils";
-import {PrivateBadge} from "./private-badge"
+import React, {useEffect, useRef, useState} from "react"
 import {cn} from "@comend/lib/utils"
-import {TimelineCardContents} from "./private-timeline"
+import {DraggableTimelineItem, TimelineItemContent} from "./private-timeline"
 import {ScrollArea} from "@comend/components/ui/scroll-area";
-import {ExternalLink} from "lucide-react"
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { TypeBadge } from "./type-badge";
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -73,7 +69,7 @@ const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {
     urlMilestone?: string | undefined
 }) => {
     return (
-        <li className={cn("ml-6 text-left hover:bg-secondary p-2 rounded-md", item.private ? "pointer-events-none" : "")}>
+        <li className={cn("ml-6 text-left w-full p-2 rounded-md", item.private ? "pointer-events-none" : "")}>
             <a
                 href={
                     subdomain ?
@@ -92,9 +88,17 @@ const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {
                 className={cn("group", item.private ? "pointer-events-none" : "")}
                 target="_blank"
             >
-                <TimelineElementContent
+                {/* <TimelineElementContent
                     item={item}
                     externalLinkIcon={true}
+                /> */}
+                <DraggableTimelineItem
+                    milestone={item}
+                    index={key}
+                    selectedNodeIds={[]}
+                    disabled={true}
+                    isPrivate={false}
+                    isDraggable={false}
                 />
             </a>
         </li>
@@ -108,9 +112,14 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
     urlMilestone?: string | undefined
 }) => {
     return (
-        <li className="ml-6">
+        <li className="flex items-start -ml-[10px] gap-2">
+            <span className="flex items-center justify-center rounded-full mt-6">
+                {/* <TypeBadge iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/> */}
+                <div className="bg-blue-light h-4 w-4 rounded-full"/>
+            </span>
+
             <button
-                className={cn("hover:cursor-pointer text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
+                className={cn("hover:cursor-pointer text-left w-full p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "border-gray-200 border-2")}
                 onClick={() => {
                     mixpanelTrack("Project Details Viewed", {
                         "ID": item?.id,
@@ -125,36 +134,12 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
                     }
                 }}
             >
-                <TimelineElementContent
+                {/* <TimelineElementContent
                     item={item}
                     externalLinkIcon={false}
-                />
+                /> */}
+                <TimelineItemContent milestone={item} isDraggable={false} isPrivate={false} />
             </button>
         </li>
-    )
-}
-
-const TimelineElementContent = ({item, externalLinkIcon}: { item: any, externalLinkIcon: boolean }) => {
-    return (
-        <>
-            <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.nodeType || item?.nodeType || "PROJECT"}/>
-            </span>
-            <div className="flex flex-row items-center justify-start gap-4">
-                <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white text-wrap">
-                    {item.title}
-                </h3>
-                {item.private && <PrivateBadge iconOnly={true}/>}
-                {!item.private && externalLinkIcon && <ExternalLink className="min-h-4 h-4 min-w-4 w-4"/>}
-                <time
-                    className="ml-auto block font-semibold leading-none dark:text-gray-500 text-wrap">
-                    {getDates(item)}
-                </time>
-            </div>
-            <p className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
-                {item.description}
-            </p>
-            <TimelineCardContents milestoneData={item} nodeType={item?.nodeType || item?.nodeType || "PROJECT"}/>
-        </>
     )
 }

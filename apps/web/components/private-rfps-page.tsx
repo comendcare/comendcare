@@ -17,7 +17,7 @@ export const PrivateRFPsPage = () => {
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
             <div className="flex gap-2 w-full justify-end">
-                <NewRFPDialog iconOnly={true} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
+                <NewRFPDialog numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
                 <RFPBulkImportDialog />
             </div>
 
@@ -37,7 +37,7 @@ export const PrivateRFPsPage = () => {
                 </div>
             )}
             {rfps.length > 0 && (
-                <div className={"w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"}>
+                <div className={"w-full gap-4 flex flex-col"}>
                     {rfps.map((rfp) => (
                         <EditRFPDialog key={rfp.id} data={rfp} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}>
                             <RFPCard rfp={rfp} isPrivate={true}/>

@@ -224,6 +224,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 pinned: true,
                 milestones: true,
                 organizationId: true,
+                organization: true
             })
             if (rfpResponse.success) {
                 initializeRFPStore(rfpResponse.data || [])
