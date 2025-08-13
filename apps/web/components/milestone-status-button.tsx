@@ -137,8 +137,8 @@ export default function StatusButton({
         return (  
             <div
                 className={cn(
-                    "relative flex w-full mx-auto rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
-                    getStatusBackgroundColor(status),
+                    "relative flex w-full mx-auto bg-secondary rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
+                    // getStatusBackgroundColor(status),
                     "h-[14px]"
                 )}
                 onClick={handleClick}
@@ -187,9 +187,9 @@ export default function StatusButton({
     return (  
         <div
             className={cn(
-                "relative flex w-full mx-auto bg-gray-200 rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
+                "relative flex w-full mx-auto bg-secondary rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
                 // !disabled && "hover:bg-gray-300",
-                getStatusBackgroundColor(status),
+                // getStatusBackgroundColor(status),
             )}
             onClick={handleClick}
         >

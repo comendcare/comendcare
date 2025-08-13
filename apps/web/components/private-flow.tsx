@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react"
 import type { Edge, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
-import PrivateMilestoneNode from "~web/components/private-milestone-node"
+import MilestoneNode from "~web/components/milestone-node"
 import { Button } from "@comend/components/ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
@@ -60,7 +60,7 @@ export const PrivateFlowView = ({
         onConnect,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
+    const nodeTypes = { PROJECT: MilestoneNode, ASSET: MilestoneNode, RFP: MilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
