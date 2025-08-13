@@ -88,7 +88,7 @@ export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean
                             </PropertyBadge>
                         </li>
                     )}
-                    {(rfp.openTo) && (
+                    {(rfp.openTo && rfp.openTo.length > 0) && (
                         <li>
                             <PropertyBadge icon={School}>
                                 {`Open to: ${rfp.openTo.map((option: string) => {
