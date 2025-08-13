@@ -35,7 +35,7 @@ export const NewRFPDialog = ({iconOnly = false, numRFPsPinned}: {iconOnly?: bool
                 </Button>
             )}
             <DialogContent>
-                <DialogHeader className="pt-[80px]">
+                <DialogHeader>
                     <DialogTitle>
                         Create an RFP
                     </DialogTitle>
@@ -63,7 +63,7 @@ export const EditRFPDialog = ({children, data, numRFPsPinned}: {children: ReactN
             </DialogTrigger>
 
             <DialogContent>
-                <DialogHeader className="pt-[80px]">
+                <DialogHeader>
                     <DialogTitle>
                         Edit an RFP
                     </DialogTitle>

@@ -1040,7 +1040,7 @@ export function EditMilestoneForm({
 
             <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
                 <DialogContent>
-                    <DialogHeader className="pt-[80px]">
+                    <DialogHeader>
                         <DialogTitle>
                             Create an RFP
                         </DialogTitle>
