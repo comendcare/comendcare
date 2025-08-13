@@ -1,6 +1,6 @@
 import React from "react"
 import Image from "next/image"
-import { getSession } from "@comend/lib/auth"
+import { getSession } from "~web/lib/auth"
 import NoOrganization from "~web/components/no-organization"
 import { SearchParams } from "@/packages/components/types"
 import { diseaseModelSearchParamsCache } from "@/packages/components/biorepo/advanced-data-table/lib/validations"

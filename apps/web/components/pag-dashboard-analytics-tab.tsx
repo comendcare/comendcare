@@ -4,7 +4,7 @@ import PAGAnalyticsLineChartCard from "~web/components/pag-analytics-line-chart-
 import {DonutChartCard} from "~web/components/donut-chart-card";
 import {TestTube, Microscope, Users, Workflow} from "lucide-react";
 import prisma from "@comend/lib/prisma"
-import {getSession} from "@comend/lib/auth";
+import {getSession} from "~web/lib/auth";
 import Image from "next/image";
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button";
 import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
