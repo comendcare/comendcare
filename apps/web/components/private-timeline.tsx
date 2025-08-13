@@ -310,10 +310,10 @@ export const DraggableTimelineItem = ({
                 ref={elementRef}
                 className={cn(
                     "bg-card w-full rounded-md relative p-4", 
-                    milestone.nodeId && selectedNodeIds.includes(milestone.nodeId) ? "border-primary border-2" : "border-gray-300 border-2"
+                    milestone.nodeId && selectedNodeIds.includes(milestone.nodeId) ? "border-primary border-2" : ""
                 )}
             >
-                <TimelineItemContent milestone={milestone} isDraggable={isDraggable} disabled={disabled} attributes={attributes} listeners={listeners} />
+                <TimelineItemContent isPrivate={true} milestone={milestone} isDraggable={isDraggable} disabled={disabled} attributes={attributes} listeners={listeners} />
             </div>
         </li>
     )

@@ -119,7 +119,7 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
             </span>
 
             <button
-                className={cn("hover:cursor-pointer text-left w-full p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "border-gray-200 border-2")}
+                className={cn("hover:cursor-pointer text-left w-full p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
                 onClick={() => {
                     mixpanelTrack("Project Details Viewed", {
                         "ID": item?.id,
