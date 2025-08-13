@@ -6,42 +6,6 @@ import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
-export const sampleCROs: any[] = [
-    {
-        content: {
-            id: nanoid(),
-            title: "Sample CRO 1",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            url: "comend.io",
-            scientistDotComURL: null,
-            yearEstablished: 2023,
-            website: "https://comend.io/",
-            headquarters: "Austin, Texas",
-            companyType: "startup",
-        },
-        milestone: {
-            nodeType: "RFP",
-            title: "Sample Milestone 1"
-        }
-    },
-    {
-        content: {
-            id: nanoid(),
-            title: "Sample CRO 2",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            url: "comend.io",
-            scientistDotComURL: null,
-            yearEstablished: 2023,
-            website: "https://comend.io/",
-            headquarters: "Toronto, Ontario",
-            companyType: "startup",
-        },
-        milestone: {
-            nodeType: "PROJECT",
-            title: "Sample Milestone 2"
-        }
-    }
-]
 
 export type ViewType = 'grid' | 'list'
 
@@ -192,7 +156,15 @@ const getUpdatedSearchResults = async (
     isNewSearch: boolean = true
 ): Promise<{results: any[], total: number}> => {
     try {
+        const TAG_PRIORITY_SORT = "_eval([ (tags:=[`Experienced in rare disease`]):2, (tags:=[`PAG friendly`]):1 ]):desc,avgRating:desc";
+
         const filtersString = generateFiltersString(state.filters)
+
+        // Merge tag-priority sort with user-chosen sort
+        let sortBy = TAG_PRIORITY_SORT;
+        if (state.sortBy && sortByFilters[state.sortBy]) {
+            sortBy += `,${sortByFilters[state.sortBy]}`;
+        }
 
         const searchParameters = {
             q: state.searchTerm,
@@ -200,7 +172,7 @@ const getUpdatedSearchResults = async (
             per_page: 10,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
-            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
+            sort_by: sortBy,
         };
 
         const results = await typesense
@@ -230,7 +202,7 @@ const getUpdatedSearchResults = async (
 
         const prismaResults = await prismaResponse.json();
 
-        const enrichedResults = ids.map(id => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
+        const enrichedResults = ids.map((id: string) => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
 
         return {
             results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],

@@ -297,6 +297,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 return;
             }
             const newOption = transToGroupOption(arrayOptions || [], groupBy);
+            console.log(`NEW OPTIONS`, newOption)
             if (JSON.stringify(newOption) !== JSON.stringify(options)) {
                 setOptions(newOption);
             }
@@ -460,7 +461,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         inputRef?.current?.focus();
                     }}
                 >
-                    <div className="relative flex flex-wrap gap-1 items-center">
+                    <div className="relative flex flex-wrap gap-1 items-center mr-8">
                         {selected && selected.map((option) => {
                             return (
                                 <Badge
@@ -554,7 +555,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 onChange?.(selected.filter((s) => s.fixed));
                             }}
                             className={cn(
-                                'absolute right-0 h-6 w-6 p-0',
+                                'absolute -mr-8 top-0 right-0 h-6 w-6 p-0 pt-[2px]',
                                 (hideClearAllButton ||
                                     disabled ||
                                     selected.length < 1 ||

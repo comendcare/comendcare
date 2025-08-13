@@ -7,7 +7,7 @@ import {
 import PAGDashboardAnalyticsTab from "~web/components/pag-dashboard-analytics-tab";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
-import {getSession} from "@comend/lib/auth";
+import {getSession} from "~web/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import React from "react";
 
@@ -83,16 +83,7 @@ export default async function AnalyticsPage() {
         }
         return (
             <main className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8">
-                <Tabs defaultValue="general" className="space-y-4 w-full">
-                    <TabsList>
-                        <TabsTrigger value="general">
-                            Analytics
-                        </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="analytics" className="space-y-4 w-full">
-                        <PAGDashboardAnalyticsTab/>
-                    </TabsContent>
-                </Tabs>
+                <PAGDashboardAnalyticsTab/>
             </main>
         )
     } else {

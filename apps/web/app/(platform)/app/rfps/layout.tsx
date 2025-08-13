@@ -36,6 +36,7 @@ export default function RFPsLayout({children}: {children: React.ReactNode}) {
                 pinned: true,
                 milestones: true,
                 organizationId: true,
+                organization: true,
             })
             if (rfpResponse.success) {
                 initializeRFPStore(rfpResponse.data || [])

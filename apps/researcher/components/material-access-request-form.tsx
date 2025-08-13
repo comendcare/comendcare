@@ -250,7 +250,7 @@ export default function MaterialAccessRequestForm({ materialIds = [] }: { materi
             <div className="text-center space-y-2">
                 <Button
                     variant="secondary"
-                    onClick={() => router.push("/data")}
+                    onClick={() => router.push("/toolkit/biosamples")}
                     className="w-min"
                 >
                     <ArrowLeft/>

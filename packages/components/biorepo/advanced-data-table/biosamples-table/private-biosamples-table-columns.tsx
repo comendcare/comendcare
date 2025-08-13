@@ -141,10 +141,26 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "id",
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Sample ID"
+            }
+        },
+        {
             id: "donorId",
             accessorKey: "donorId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Public Donor Id"/>
+                <DataTableColumnHeader column={column} title="Public Donor ID"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 min-w-[200px] items-center">
@@ -154,7 +170,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Public Donor Id"
+                label: "Public Donor ID"
             }
         },
         {

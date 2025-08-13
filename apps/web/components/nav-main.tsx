@@ -86,7 +86,7 @@ export function NavMain({items}: { items: Item[] }) {
                             ) : (
                                 <SidebarMenuButton
                                     asChild
-                                    className={isActive ? "bg-blue-light text-primary" : ""}
+                                    className={isActive ? "bg-blue-light border border-blue-dark text-primary" : ""}
                                 >
                                     <Link href={item.url} className="flex">
                                         <div className="relative">
@@ -133,7 +133,7 @@ export function NavMain({items}: { items: Item[] }) {
     )
 }
 
-const NavNotificationCollapsedIcon = ({item}: { item: Item }) => {
+export const NavNotificationCollapsedIcon = ({item}: { item: Item }) => {
     const {
         notifications
     } = useNotificationsStore(useShallow(notificationsSelector))
@@ -154,7 +154,7 @@ const NavNotificationCollapsedIcon = ({item}: { item: Item }) => {
     }
 }
 
-const NavNotificationExpandedIcon = ({item}: { item: Item }) => {
+export const NavNotificationExpandedIcon = ({item}: { item: Item }) => {
     const {
         notifications
     } = useNotificationsStore(useShallow(notificationsSelector))

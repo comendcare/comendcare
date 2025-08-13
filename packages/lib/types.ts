@@ -19,7 +19,9 @@ import {
     MaterialAndDataAccessRequest,
     Researcher,
     Institution,
-    SavedOrganization
+    SavedOrganization,
+    Biosample,
+    DiseaseModel
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -147,6 +149,8 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         roadmap: true,
         attachments: true,
         types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
+        biosamples: { include: {biosample: true, biosampleId: true, milestoneId: true}},
+        diseaseModels: {include: {diseaseModel: true, diseaseModelId: true, milestoneId: true}},
         tools: { include: { tool: true, toolId: true, milestoneId: true } },
         rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
     }
@@ -155,6 +159,16 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         milestoneType?: MilestoneType; // Optional
         milestoneId?: string; // Optional
         milestoneTypeId: string; // Required
+    }>,
+    biosamples: Array<{
+        biosample?: Biosample,
+        milestoneId?: string,
+        biosampleId: string
+    }>,
+    diseaseModels: Array<{
+        diseaseModel?: DiseaseModel,
+        milestoneId?: string,
+        diseaseModelId: string
     }>,
     tools: Array<{
         tool?: DBAsset,
@@ -1904,5 +1918,32 @@ export const editDiseaseModelForm = z.object({
 
     // disease model properties
     genes: z.array(optionSchema).optional(),
+    institutions: z.array(optionSchema).optional(),
+})
+
+export const editDataToolForm = z.object({
+    id: z.string().optional(),
+    title: z
+        .string({
+            required_error: "Please provide a title"
+        })
+        .min(1, "Title is required")
+        .max(200, "Title must be less than 200 characters"),
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    types: z.array(optionSchema)
+        .min(1, "Type is required")
+        .max(1, "Max one type"),
+    otherTypeDetails: z.string().optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPinned: z.boolean(),
+    isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
+
+    genes: z.array(optionSchema).optional(),
+    cohortSize: z.string().optional(),
     institutions: z.array(optionSchema).optional(),
 })

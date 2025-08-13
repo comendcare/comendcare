@@ -12,8 +12,8 @@ import {
     Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
-import {getSession} from "@comend/lib/auth"
+import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "comend-pag-platform/lib/auth"
+import {getSession} from "@/apps/web/lib/auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {
@@ -40,6 +40,7 @@ import {
     Asset,
     DEFAULT_KANBAN_COLUMNS,
     editBiosampleForm,
+    editDataToolForm,
     editDiseaseModelForm,
     MemberRequestWithUser,
     Milestone,
@@ -1839,6 +1840,7 @@ export const deleteAsset = withOrganizationAuth(
             const response = await prisma.tool.delete({
                 where: {id: toolId},
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     contacts: true,
                     attachments: true,
                     milestones: {
@@ -1923,6 +1925,7 @@ export const updateDiseaseModel = withOrganizationAuth(
             const newDiseaseModel = await prisma.diseaseModel.update({
                 where: {id: data.id},
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
                 },
@@ -1973,6 +1976,8 @@ export const createDiseaseModel = withOrganizationAuth(
 
             const response = await prisma.diseaseModel.create({
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
+                    gene: true,
                     institution: true,
                 },
                 data: {
@@ -2006,6 +2011,221 @@ function generateDonorNanoid() {
   console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
   return (id.slice(0, 4) + '-' + id.slice(4))
 }
+
+export const createDataTool = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const dataToolData: any = {
+                id: data.id,
+                types: (data.types || []).map(type => type.value),
+                metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
+                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+            }
+
+            console.log(`tool data`, dataToolData)
+
+            const response = await prisma.biosample.create({
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    donor: true,
+                    institution: true,
+                },
+                data: {
+                    ...dataToolData,
+                    // create with the given id if it's available. This is useful for situations like 'undo'
+                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+                    ...(dataToolData.id ? {id: dataToolData.id} : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (dataToolData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (dataToolData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
+                    milestones: {
+                        create: (dataToolData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
+                    private: dataToolData.private || false,
+                    pinned: dataToolData.pinned || false,
+                    organization: {connect: {id: organization.id}},
+                    metadata: dataToolData.metadata as InputJsonObject,
+                    ...(dataToolData.gene
+                        ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
+                        : undefined),
+                    ...(dataToolData.institution
+                        ? ({institution: {connect: {id: dataToolData.institution.value}}})
+                        : undefined),
+                }
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating biosample:", error.message);
+            throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
+export const updateDataTool = withOrganizationAuth(
+    async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.")
+            }
+
+            if (!data.id) {
+                throw new Error("No data tool id provided.")
+            }
+
+            console.log(`incoming data`, data)
+
+            const dataToolData: any = {
+                id: data.id,
+                types: data.types ? data.types.map(type => type.value) : undefined,
+                metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
+                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
+                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id || '',
+                    })
+                }),
+                description: data.description,
+                attachments: data.attachments,
+                contacts: data.contacts,
+                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+            }
+
+            console.log(`tool data`, dataToolData)
+
+            const newDataTool = await prisma.tool.update({
+                where: {id: data.id},
+                include: {
+                    contacts: true,
+                    attachments: true,
+                    milestones: {
+                        include: {
+                            milestone: {
+                                include: {types: {include: {milestoneType: true}}}
+                            }
+                        }
+                    },
+                    institution: true,
+                },
+                data: {
+                    ...dataToolData,
+                    ...(dataToolData.attachments ? (
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (dataToolData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(dataToolData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (dataToolData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(dataToolData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (dataToolData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
+                    private: dataToolData.private !== undefined && dataToolData.private !== null ? dataToolData.private : false,
+                    pinned: dataToolData.pinned !== undefined && dataToolData.pinned !== null ? dataToolData.pinned : false,
+                    metadata: dataToolData.metadata as InputJsonObject,
+                    ...(dataToolData.gene ? ({
+                        gene: {
+                            connect: {symbol: dataToolData.gene.value}
+                        }
+                    }) : {gene: {disconnect: true}}),
+                    ...(dataToolData.institution ? ({
+                        institution: {connect: {id: dataToolData.institution.value}}
+                    }) : {institution: {disconnect: true}}),
+                },
+            })
+
+            console.log(`updated tool`, newDataTool)
+
+            const response = await prisma.tool.findUnique({
+                where: {id: data.id}
+            })
+
+            return response
+        } catch (error: any) {
+            console.error("Error creating clinical dataset:", error.message);
+            throw new Error(error.message || "Failed to create clinical dataset.");
+        }
+    }
+)
 
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
@@ -2650,6 +2870,7 @@ export const createOrUpdateAsset = withOrganizationAuth(
                     id: toolData.id || nanoid()
                 },
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     contacts: true,
                     attachments: true,
                     milestones: {
@@ -3245,6 +3466,8 @@ export const createMilestones = withOrganizationAuth(
                             attachments: true,
                             roadmap: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {include: {biosample: true}},
+                            diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
@@ -3538,13 +3761,16 @@ export const syncDBAssets = withOrganizationAuth(
                     const previousAsset: Asset | null = await prisma.tool.findUnique({
                         where: {id: tool.id},
                         include: {
+                            organization: {include: {conditions: {include: {condition: true}}}},
                             contacts: true,
                             attachments: true,
                             milestones: {
                                 include: {
                                     milestone: true
                                 }
-                            }
+                            },
+                            institution: true,
+                            gene: true,
                         }
                     })
 
@@ -3653,6 +3879,8 @@ export const updateMilestones = withOrganizationAuth(
                             attachments: true,
                             roadmap: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {include: {biosample: true}},
+                            diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
@@ -3663,6 +3891,22 @@ export const updateMilestones = withOrganizationAuth(
                                 create: (milestone.types || []).map((type: any) => ({
                                     milestoneType: {
                                         connect: {id: type.milestoneTypeId || type.milestoneType.id}
+                                    }
+                                }))
+                            },
+                            biosamples: {
+                                deleteMany: {},
+                                create: (milestone.biosamples || []).map((tool: any) => ({
+                                    biosample: {
+                                        connect: {id: tool.toolId || tool.biosample.id}
+                                    }
+                                }))
+                            },
+                            diseaseModels: {
+                                deleteMany: {},
+                                create: (milestone.diseaseModels || []).map((tool: any) => ({
+                                    diseaseModel: {
+                                        connect: {id: tool.toolId || tool.diseaseModel.id}
                                     }
                                 }))
                             },
@@ -4809,6 +5053,168 @@ export const updateResearcher = withAuth(
     }
 );
 
+export const createMaterialAndDataAccessRequest = withResearcherAuth(
+    async (user: User, formData: FormData) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
+        }
+
+        const rawData = formData.get("data");
+        if (!rawData || typeof rawData !== "string") {
+            return { error: "Invalid form data." };
+        }
+
+        const parsed = JSON.parse(rawData);
+
+        const {
+            name,
+            description,
+            organizationId,
+            openToCollab,
+            projectDetails,
+            sampleDetails,
+            logistics,
+            commercial,
+            agreements,
+        } = parsed;
+
+        const {
+            studyTitle,
+            studyDescription,
+            justification,
+            hasIrbApproval,
+            irbStatus,
+            hasRisks,
+            riskDescription,
+            disseminationPlan,
+            patientSignificance,
+        } = projectDetails;
+
+        const {
+            sampleTypes,
+            otherSampleType,
+            participantCount,
+            processingRequirements,
+        } = sampleDetails;
+
+        const {
+            timeline,
+            logisticsContact,
+            providesCollectionKit,
+            needsCollectionMaterials,
+            participantCompensation,
+            compensationDetails,
+            shippingAddress,
+            fedexAccount,
+            shippingMethod,
+            shippingContact,
+            shippingPhone,
+        } = logistics;
+
+        const {
+            isCommercial,
+            fundingOrganization,
+        } = commercial;
+
+        const metadata: JsonObject = parsed.metadata ?? {};
+
+        try {
+            const request = await prisma.materialAndDataAccessRequest.create({
+                data: {
+                    title: name,
+                    description,
+                    submittedAt: new Date(),
+                    sampleCount: participantCount,
+                    openToCollab,
+                    studyTitle,
+                    studyDescription,
+                    justification,
+                    hasIrbApproval,
+                    irbStatus,
+                    hasRisks,
+                    riskDescription,
+                    disseminationPlan,
+                    patientSignificance,
+                    sampleTypes,
+                    otherSampleType,
+                    processingRequirements,
+                    timeline,
+                    logisticsContact,
+                    providesCollectionKit,
+                    needsCollectionMaterials,
+                    participantCompensation,
+                    compensationDetails,
+                    shippingAddress,
+                    fedexAccount,
+                    shippingMethod,
+                    shippingContact,
+                    shippingPhone,
+                    isCommercial,
+                    fundingOrganization,
+                    metadata,
+
+                    organization: {
+                        connect: {
+                            id: organizationId,
+                        },
+                    },
+                    researcher: {
+                        connect: {
+                            userId: session.user.id,
+                        },
+                    },
+                },
+            });
+
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                request,
+                'requests'
+            );
+
+            revalidatePath("/requests")
+
+            // await sendNewOrganizationEmail(
+            //     {
+            //         user: {
+            //             name: session.user.name,
+            //             email: session.user.email
+            //         },
+            //         organization: {
+            //             name: organization.name,
+            //             subdomain: organization.subdomain
+            //         }
+            //     }
+            // ).then(() => {
+            //     console.log("email sent")
+            // })
+
+            return {success: true, data: request}
+        } catch (error: any) {
+            if (error.code === "P2002") {
+                const target = error.meta?.target?.[0];
+
+                switch (target) {
+                    default:
+                        return {error: `Unique constraint failed on ${target}`};
+                }
+            } else {
+                return {
+                    error: error.message
+                }
+            }
+        }
+    }
+)
+
 export const updateMaterialAndDataAccessRequestProperty = withAuth(
     async (
         requestId: string,
@@ -4858,3 +5264,4 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
         }
     }
 );
+

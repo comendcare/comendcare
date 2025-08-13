@@ -111,10 +111,97 @@ const config: Config = {
                     DEFAULT: 'hsl(var(--completed))',
                     foreground: 'hsl(var(--completed-foreground))'
                 },
+                red: {
+                    backgroundcolor: 'hsl(var(--background-red))', // red-100
+                    bordercolor: 'hsl(var(--border-red))' // red-900
+                },
+                orange: {
+                    backgroundcolor: 'hsl(var(--background-orange))', // orange-100
+                    bordercolor: 'hsl(var(--border-orange))' // orange-900
+                },
+                amber: {
+                    backgroundcolor: 'hsl(var(--background-amber))', // amber-100
+                    bordercolor: 'hsl(var(--border-amber))' // amber-900
+                },
+                yellow: {
+                    backgroundcolor: 'hsl(var(--background-yellow))', // yellow-100
+                    bordercolor: 'hsl(var(--border-yellow))' // yellow-900
+                },
+                lime: {
+                    light: 'hsl(var(--background-lime))', // lime-100
+                    dark: 'hsl(var(--border-lime))' // lime-900
+                },
+                green: {
+                    backgroundcolor: 'hsl(var(--background-green))', // green-100
+                    bordercolor: 'hsl(var(--border-green))' // green-900
+                },
+                emerald: {
+                    backgroundcolor: 'hsl(var(--background-emerald))', // emerald-100
+                    bordercolor: 'hsl(var(--border-emerald))' // emerald-900
+                },
+                teal: {
+                    backgroundcolor: 'hsl(var(--background-teal))', // teal-100
+                    bordercolor: 'hsl(var(--border-teal))' // teal-900
+                },
+                cyan: {
+                    backgroundcolor: 'hsl(var(--background-cyan))', // cyan-100
+                    bordercolor: 'hsl(var(--border-cyan))' // cyan-900
+                },
+                sky: {
+                    backgroundcolor: 'hsl(var(--background-sky))', // sky-100
+                    bordercolor: 'hsl(var(--border-sky))' // sky-900
+                },
                 blue: {
+                    backgroundcolor: 'hsl(var(--background-blue))', // blue-100
+                    bordercolor: 'hsl(var(--border-blue))', // blue-900
                     dark: 'hsl(var(--blue-dark))',
                     light: 'hsl(var(--blue-light))'
-                }
+                },
+                indigo: {
+                    backgroundcolor: 'hsl(var(--background-indigo))', // indigo-100
+                    bordercolor: 'hsl(var(--border-indigo))' // indigo-900
+                },
+                violet: {
+                    backgroundcolor: 'hsl(var(--background-violet))', // violet-100
+                    bordercolor: 'hsl(var(--border-violet))' // violet-900
+                },
+                purple: {
+                    backgroundcolor: 'hsl(var(--background-purple))', // purple-100
+                    bordercolor: 'hsl(var(--border-purple))' // purple-900
+                },
+                fuchsia: {
+                    backgroundcolor: 'hsl(var(--background-fuchsia))', // fuchsia-100
+                    bordercolor: 'hsl(var(--border-fuchsia))' // fuchsia-900
+                },
+                pink: {
+                    backgroundcolor: 'hsl(var(--background-pink))', // pink-100
+                    bordercolor: 'hsl(var(--border-pink))' // pink-900
+                },
+                rose: {
+                    backgroundcolor: 'hsl(var(--background-rose))', // rose-100
+                    bordercolor: 'hsl(var(--border-rose))' // rose-900
+                },
+                slate: {
+                    backgroundcolor: 'hsl(var(--background-slate))', // slate-100
+                    bordercolor: 'hsl(var(--border-slate))' // slate-900
+                },
+                gray: {
+                    backgroundcolor: 'hsl(var(--background-gray))', // gray-100
+                    bordercolor: 'hsl(var(--border-gray))' // gray-900
+                },
+                zinc: {
+                    backgroundcolor: 'hsl(var(--background-zinc))', // zinc-100
+                    bordercolor: 'hsl(var(--border-zinc))' // zinc-900
+                },
+                neutral: {
+                    backgroundcolor: 'hsl(var(--background-neutral))', // neutral-100
+                    bordercolor: 'hsl(var(--border-neutral))' // neutral-900
+                },
+                stone: {
+                    backgroundcolor: 'hsl(var(--background-stone))', // stone-100
+                    bordercolor: 'hsl(var(--border-stone))' // stone-900
+                },
+
             },
             boxShadow: {
                 derek: `0px 0px 0px 1px rgb(0 0 0 / 0.06),

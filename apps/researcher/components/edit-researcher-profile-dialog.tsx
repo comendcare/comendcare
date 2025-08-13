@@ -49,7 +49,7 @@ const formSchema = z.object({
     affiliations: z.array(optionSchema).optional(),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
-    }),
+    }).optional(),
     researchInterests: z.array(optionSchema).optional(),
     genesOfInterest: z.array(optionSchema).optional(),
     conditionsOfInterest: z.array(optionSchema).optional(),

@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import { ReactFlow, useNodesState, useEdgesState, addEdge } from "@xyflow/react"
+import { ReactFlow, useNodesState, useEdgesState, addEdge, Background, BackgroundVariant } from "@xyflow/react"
 
 import "@xyflow/react/dist/base.css"
 
@@ -79,7 +79,9 @@ const HeroIllustration = () => {
             nodesFocusable={false}
             edgesFocusable={false}
             className="col-span-3 pointer-events-none"
-        ></ReactFlow>
+        >
+            <Background variant={BackgroundVariant.Dots} />
+        </ReactFlow>
     )
 }
 

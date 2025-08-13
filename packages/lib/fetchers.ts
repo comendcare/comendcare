@@ -4,7 +4,7 @@ import {unstable_cache} from "next/cache"
 import prisma from "@comend/lib/prisma"
 import {ApiResponse, milestoneCategories, RequestFiltersType, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@comend/lib/auth";
+import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@/apps/web/lib/auth";
 import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User, Biosample, DiseaseModel} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
@@ -1162,6 +1162,8 @@ export const getRoadmap = withOrganizationAuth(
                             contacts: true,
                             attachments: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {include: {biosample: true}},
+                            diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}}
                         },
@@ -2072,10 +2074,29 @@ export const getResearcherWithMergedData = withUserAuth(async () => {
 });
 
 export const getDiseaseModels = withOrganizationAuth(
-    async (organization: Organization, input: GetDiseaseModelSchema): Promise<{ data: DiseaseModel[], pageCount: number }> => {
+    async (organization: Organization, input?: GetDiseaseModelSchema): Promise<{ data: DiseaseModel[], pageCount: number }> => {
         return unstable_cache(
             async () => {
                 try {
+                    if (!input) {
+                        const [data, total] = await prisma.$transaction([
+                            prisma.diseaseModel.findMany({
+                                where: {
+                                    organizationId: organization.id
+                                },
+                                include: {
+                                    organization: {include: {conditions: {include: {condition: true}}}},
+                                    gene: true,
+                                    institution: true
+                                },
+                                orderBy: {createdAt: "asc"},
+                            }),
+                            prisma.diseaseModel.count({where: {organizationId: organization.id}}),
+                        ]);
+
+                        return {data, pageCount: 1};
+                    }
+
                     const offset = (input.page - 1) * input.perPage;
                     const advancedTable =
                         input.filterFlag === "advancedFilters"
@@ -2150,6 +2171,7 @@ export const getDiseaseModels = withOrganizationAuth(
                                 organizationId: organization.id
                             },
                             include: {
+                                organization: {include: {conditions: {include: {condition: true}}}},
                                 gene: true,
                                 institution: true
                             },
@@ -2171,10 +2193,34 @@ export const getDiseaseModels = withOrganizationAuth(
 )
 
 export const getBiosamples = withOrganizationAuth(
-    async (organization: Organization, input: GetBiosamplesSchema): Promise<{ data: Biosample[], pageCount: number }> => {
+    async (organization: Organization, input?: GetBiosamplesSchema): Promise<{ data: Biosample[], pageCount: number }> => {
         return unstable_cache(
             async () => {
                 try {
+                    if (!input) {
+                        const [data, total] = await prisma.$transaction([
+                            prisma.biosample.findMany({
+                                where: {
+                                    organizationId: organization.id
+                                },
+                                include: {
+                                    milestones: {include: {milestone: true}},
+                                    contacts: true,
+                                    attachments: true,
+                                    gene: true,
+                                    donor: {
+                                        include: {diagnoses: {include: {type: true}}}
+                                    },
+                                    institution: true
+                                },
+                                orderBy: {createdAt: "asc"},
+                            }),
+                            prisma.biosample.count({where: {organizationId: organization.id}}),
+                        ]);
+
+                        return {data, pageCount: 1};
+                    }
+
                     const offset = (input.page - 1) * input.perPage;
                     const advancedTable =
                         input.filterFlag === "advancedFilters"
@@ -2442,10 +2488,32 @@ export const getAllBiosamples = withResearcherAuth(
 );
 
 export const getDatasamples = withOrganizationAuth(
-    async (organization: Organization, input: GetBiosamplesSchema) => {
+    async (organization: Organization, input?: GetBiosamplesSchema) => {
         return unstable_cache(
             async () => {
                 try {
+                    if (!input) {
+                        const [data, total] = await prisma.$transaction([
+                            prisma.tool.findMany({
+                                where: {
+                                    organizationId: organization.id
+                                },
+                                include: {
+                                    organization: {include: {conditions: {include: {condition: true}}}},
+                                    milestones: {include: {milestone: true}},
+                                    contacts: true,
+                                    attachments: true,
+                                    institution: true,
+                                    gene: true,
+                                },
+                                orderBy: {createdAt: "asc"},
+                            }),
+                            prisma.tool.count({where: {organizationId: organization.id}}),
+                        ]);
+
+                        return {data, pageCount: 1};
+                    }
+
                     const offset = (input.page - 1) * input.perPage;
                     const advancedTable =
                         input.filterFlag === "advancedFilters"
@@ -2515,9 +2583,12 @@ export const getDatasamples = withOrganizationAuth(
                                 organizationId: organization.id
                             },
                             include: {
+                                organization: {include: {conditions: {include: {condition: true}}}},
                                 milestones: {include: {milestone: true}},
                                 contacts: true,
                                 attachments: true,
+                                institution: true,
+                                gene: true,
                             },
                             orderBy,
                         }),

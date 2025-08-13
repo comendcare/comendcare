@@ -60,7 +60,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/ta
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
-import { mixpanelReset, mixpanelTrack } from "@comend/lib/mixpanel";
+import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
 
 
 export function NavUser() {
@@ -168,17 +168,17 @@ export function NavUser() {
             if (session) {
                 try {
                     const response = await getAllMembershipsFromUserId(session.user.id, {
-                    id: true,
-                    role: true,
-                    title: true,
-                    email: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    invitedBy: true,
-                    organization: true,
-                    user: true,
-                    metadata: true
-                });
+                        id: true,
+                        role: true,
+                        title: true,
+                        email: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        invitedBy: true,
+                        organization: true,
+                        user: true,
+                        metadata: true
+                    });
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
@@ -395,7 +395,8 @@ export function NavUser() {
                             <AlertDialogTitle>Your member request
                                 to {memberRequests[0].organization?.name} has been approved</AlertDialogTitle>
                             <AlertDialogDescription>
-                                You can start viewing and making changes to {memberRequests[0].organization?.name} on Comend.
+                                You can start viewing and making changes to {memberRequests[0].organization?.name} on
+                                Comend.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -407,162 +408,150 @@ export function NavUser() {
                 </AlertDialog>
             )}
 
-                <Dialog>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <DropdownMenu modal={false}>
-                                <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton
-                                        size="lg"
-                                        className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ${
-                                            isMobile ? "justify-center" : ""
-                                        }`}
-                                    >
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarImage src={image} alt={name}/>
-                                            <AvatarFallback className="rounded-lg">
-                                                {name?.[0]}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        {!isMobile && (
-                                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                                <div className="inline">
-                                                    <span className="truncate font-semibold">{name}</span>
-                                                    {session?.user.membership?.role && (
-                                                        <> - <span
-                                                            className="capitalize">{session.user.membership.role}</span></>
-                                                    )}
+            <Dialog>
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger>
+                        <Avatar className="h-8 w-8 rounded-lg">
+                            <AvatarImage src={image} alt={name}/>
+                            <AvatarFallback className="rounded-lg">
+                                {name?.[0]}
+                            </AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        className="min-w-56 rounded-lg"
+                    >
+                        <DropdownMenuGroup>
+                            <DialogTrigger asChild>
+                                <DropdownMenuItem
+                                    // onClick={() => router.push(`/user/${session?.user?.id}`)}
+                                >
+                                    <Avatar className="h-8 w-8 rounded-lg">
+                                        <AvatarImage src={image} alt={name}/>
+                                        <AvatarFallback className="rounded-lg">
+                                            {name?.[0]}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <div className="inline">
+                                            <span className="truncate font-semibold">{name}</span>
+                                            {session?.user.membership?.role && (
+                                                <> - <span
+                                                    className="capitalize">{session.user.membership.role}</span></>
+                                            )}
+                                        </div>
+                                        <span className="truncate text-xs">{email}</span>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DialogTrigger>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuItem onClick={() => {
+                            mixpanelTrack('User Logout')
+                            mixpanelReset()
+                            signOut()
+                        }}>
+                            <LogOut/>
+                            Log out
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <DialogContent className="max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>
+                            User profile and settings
+                        </DialogTitle>
+                        <DialogDescription>
+                            {`You can edit your user profile's settings here.`}
+                        </DialogDescription>
+                        <Tabs defaultValue="account" className="w-full">
+                            <TabsList>
+                                <TabsTrigger value="organizations">
+                                    Organizations
+                                </TabsTrigger>
+                                <TabsTrigger value="settings">
+                                    Settings
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="organizations" className="flex flex-col gap-8">
+                                <div className="flex flex-col gap-2">
+                                    <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Organizations
+                                    </h2>
+                                    <div className="flex flex-col items-start gap-4">
+                                        {memberships && (
+                                            memberships.length > 0 ? memberships?.map((membership) =>
+                                                <div key={membership.id}
+                                                     className="flex items-center gap-4">
+                                                    <Avatar className="hidden h-9 w-9 sm:flex">
+                                                        <AvatarImage src="/avatars/01.png" alt="Avatar"/>
+                                                        <AvatarFallback>OM</AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="grid gap-1">
+                                                        <>
+                                                            <p className="text-sm font-medium leading-none">
+                                                                {membership.organization?.name}
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground capitalize">
+                                                                {membership.role}
+                                                            </p>
+                                                        </>
+                                                    </div>
                                                 </div>
-                                                <span className="truncate text-xs">{email}</span>
+                                            ) : <div className="flex flex-col space-y-2 text-left">
+                                                <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
+                                                    {`No Organizations Yet`}
+                                                </h3>
+                                                <p>
+                                                    {`You aren't part of any organizations yet.`}
+                                                </p>
                                             </div>
                                         )}
-                                    </SidebarMenuButton>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                    side={isMobile ? "bottom" : "right"}
-                                    align="end"
-                                    sideOffset={4}
-                                >
-                                    <DropdownMenuGroup>
-                                        <DialogTrigger asChild>
-                                            <DropdownMenuItem
-                                                // onClick={() => router.push(`/user/${session?.user?.id}`)}
-                                            >
-                                                <User/>
-                                                User profile
-                                            </DropdownMenuItem>
-                                        </DialogTrigger>
-                                    </DropdownMenuGroup>
-                                    <DropdownMenuSeparator/>
-                                    <DropdownMenuItem onClick={() => {
-                                        mixpanelTrack('User Logout')
-                                        mixpanelReset()
-                                        signOut()
-                                    }}>
-                                        <LogOut/>
-                                        Log out
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DialogContent className="max-h-[80vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        User profile and settings
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`You can edit your user profile's settings here.`}
-                                    </DialogDescription>
-                                    <Tabs defaultValue="account" className="w-full">
-                                        <TabsList>
-                                            <TabsTrigger value="organizations">
-                                                Organizations
-                                            </TabsTrigger>
-                                            <TabsTrigger value="settings">
-                                                Settings
-                                            </TabsTrigger>
-                                        </TabsList>
-                                        <TabsContent value="organizations" className="flex flex-col gap-8">
-                                            <div className="flex flex-col gap-2">
-                                                <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                                    Organizations
-                                                </h2>
-                                                <div className="flex flex-col items-start gap-4">
-                                                    {memberships && (
-                                                        memberships.length > 0 ? memberships?.map((membership) =>
-                                                            <div key={membership.id}
-                                                                 className="flex items-center gap-4">
-                                                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                                                    <AvatarImage src="/avatars/01.png" alt="Avatar"/>
-                                                                    <AvatarFallback>OM</AvatarFallback>
-                                                                </Avatar>
-                                                                <div className="grid gap-1">
-                                                                    <>
-                                                                        <p className="text-sm font-medium leading-none">
-                                                                            {membership.organization?.name}
-                                                                        </p>
-                                                                        <p className="text-sm text-muted-foreground capitalize">
-                                                                            {membership.role}
-                                                                        </p>
-                                                                    </>
-                                                                </div>
-                                                            </div>
-                                                        ) : <div className="flex flex-col space-y-2 text-left">
-                                                            <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
-                                                                {`No Organizations Yet`}
-                                                            </h3>
-                                                            <p>
-                                                                {`You aren't part of any organizations yet.`}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                    </div>
+                                </div>
 
-                                            <div className="flex flex-col gap-2">
-                                                <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                                    Invitations
-                                                </h2>
-                                                <div className="flex items-center gap-4">
-                                                    {invitations && (
-                                                        invitations.length > 0 ? invitations?.map((invitation) =>
-                                                            <>
-                                                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                                                    <AvatarImage src="/avatars/01.png" alt="Avatar"/>
-                                                                    <AvatarFallback>OM</AvatarFallback>
-                                                                </Avatar>
-                                                                <div className="grid gap-1">
-                                                                    <p className="text-sm font-medium leading-none">
-                                                                        {invitation.organization?.name || "Unknown Organization"}
-                                                                    </p>
-                                                                    <p className="text-sm text-muted-foreground">
-                                                                        {`${invitation.organization?.subdomain || "unknown"}.comend.io`}
-                                                                    </p>
-                                                                </div>
-                                                                <Button
-                                                                    variant="default"
-                                                                    onClick={() => handleAcceptInvitation(invitation.id)}
-                                                                >
-                                                                    Accept
-                                                                </Button>
-                                                            </>
-                                                        ) : <p className="text-muted-foreground text-sm">
-                                                            {`You don't have any pending invitations.`}
+                                <div className="flex flex-col gap-2">
+                                    <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Invitations
+                                    </h2>
+                                    <div className="flex items-center gap-4">
+                                        {invitations && (
+                                            invitations.length > 0 ? invitations?.map((invitation) =>
+                                                <>
+                                                    <Avatar className="hidden h-9 w-9 sm:flex">
+                                                        <AvatarImage src="/avatars/01.png" alt="Avatar"/>
+                                                        <AvatarFallback>OM</AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="grid gap-1">
+                                                        <p className="text-sm font-medium leading-none">
+                                                            {invitation.organization?.name || "Unknown Organization"}
                                                         </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </TabsContent>
-                                        <TabsContent value="settings" className="flex flex-col gap-8 w-full">
-                                            <UserEditForm/>
-                                            <UserSettings/>
-                                        </TabsContent>
-                                    </Tabs>
-                                </DialogHeader>
-                            </DialogContent>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </Dialog>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {`${invitation.organization?.subdomain || "unknown"}.comend.io`}
+                                                        </p>
+                                                    </div>
+                                                    <Button
+                                                        variant="default"
+                                                        onClick={() => handleAcceptInvitation(invitation.id)}
+                                                    >
+                                                        Accept
+                                                    </Button>
+                                                </>
+                                            ) : <p className="text-muted-foreground text-sm">
+                                                {`You don't have any pending invitations.`}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="settings" className="flex flex-col gap-8 w-full">
+                                <UserEditForm/>
+                                <UserSettings/>
+                            </TabsContent>
+                        </Tabs>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

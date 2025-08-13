@@ -8,10 +8,12 @@ import {
     Controls,
     useReactFlow,
     applyNodeChanges,
+    BackgroundVariant,
+    Background,
 } from "@xyflow/react"
 import type { Edge, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
-import PrivateMilestoneNode from "~web/components/private-milestone-node"
+import MilestoneNode from "~web/components/milestone-node"
 import { Button } from "@comend/components/ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
@@ -58,7 +60,7 @@ export const PrivateFlowView = ({
         onConnect,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
+    const nodeTypes = { PROJECT: MilestoneNode, ASSET: MilestoneNode, RFP: MilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
@@ -331,6 +333,7 @@ export const PrivateFlowView = ({
             proOptions={proOptions}
             minZoom={0.1}
         >
+            <Background variant={BackgroundVariant.Dots} />
             <MiniMap
                 nodeColor='#757575'
                 maskColor='rgb(200, 200, 200, 0.8)' 

@@ -1,4 +1,4 @@
-import {getSession} from "@comend/lib/auth"
+import {getSession} from "~web/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 

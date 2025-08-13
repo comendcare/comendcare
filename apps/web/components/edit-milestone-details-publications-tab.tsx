@@ -5,11 +5,15 @@ import {Separator} from "@comend/components/ui/separator"
 import {MatchCard} from "~web/components/match-card"
 import {toast} from "sonner"
 import {PubMedPublication} from "~web/types/types";
-import { Skeleton } from "@comend/components/ui/skeleton"
-import { getTopPubMedPublications } from "@comend/lib/fetchers"
+import {Skeleton} from "@comend/components/ui/skeleton"
+import {getTopPubMedPublications} from "@comend/lib/fetchers"
 
 
-export default function EditMilestoneDetailsPublicationsTab() {
+export default function EditMilestoneDetailsPublicationsTab({
+                                                                onAttach,
+                                                            }: {
+    onAttach?: (a: { name: string; link: string }) => void;
+}) {
     const [publications, setPublications] = useState<PubMedPublication[]>()
     const [loading, setLoading] = useState(true)
 
@@ -70,6 +74,7 @@ export default function EditMilestoneDetailsPublicationsTab() {
                                         id={""}
                                         description={""}
                                         saved={false}
+                                        onAttach={onAttach}
                                     />
                                 </div>
                                 <Separator className="my-2"/>
