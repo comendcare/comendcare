@@ -9,7 +9,7 @@ import {
     BackgroundVariant,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
-import {MemoPublicMilestoneNodeLink, MemoPublicMilestoneNodeButton} from "./public-milestone-node"
+import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink } from "./milestone-node"
 
 export const PublicFlowView = ({ 
     roadmap, 

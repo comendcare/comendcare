@@ -112,94 +112,94 @@ const config: Config = {
                     foreground: 'hsl(var(--completed-foreground))'
                 },
                 red: {
-                    background: 'hsl(var(--background-red))', // red-100
-                    border: 'hsl(var(--border-red))' // red-900
+                    backgroundcolor: 'hsl(var(--background-red))', // red-100
+                    bordercolor: 'hsl(var(--border-red))' // red-900
                 },
                 orange: {
-                    background: 'hsl(var(--background-orange))', // orange-100
-                    border: 'hsl(var(--border-orange))' // orange-900
+                    backgroundcolor: 'hsl(var(--background-orange))', // orange-100
+                    bordercolor: 'hsl(var(--border-orange))' // orange-900
                 },
                 amber: {
-                    background: 'hsl(var(--background-amber))', // amber-100
-                    border: 'hsl(var(--border-amber))' // amber-900
+                    backgroundcolor: 'hsl(var(--background-amber))', // amber-100
+                    bordercolor: 'hsl(var(--border-amber))' // amber-900
                 },
                 yellow: {
-                    background: 'hsl(var(--background-yellow))', // yellow-100
-                    border: 'hsl(var(--border-yellow))' // yellow-900
+                    backgroundcolor: 'hsl(var(--background-yellow))', // yellow-100
+                    bordercolor: 'hsl(var(--border-yellow))' // yellow-900
                 },
                 lime: {
                     light: 'hsl(var(--background-lime))', // lime-100
                     dark: 'hsl(var(--border-lime))' // lime-900
                 },
                 green: {
-                    background: 'hsl(var(--background-green))', // green-100
-                    border: 'hsl(var(--border-green))' // green-900
+                    backgroundcolor: 'hsl(var(--background-green))', // green-100
+                    bordercolor: 'hsl(var(--border-green))' // green-900
                 },
                 emerald: {
-                    background: 'hsl(var(--background-emerald))', // emerald-100
-                    border: 'hsl(var(--border-emerald))' // emerald-900
+                    backgroundcolor: 'hsl(var(--background-emerald))', // emerald-100
+                    bordercolor: 'hsl(var(--border-emerald))' // emerald-900
                 },
                 teal: {
-                    background: 'hsl(var(--background-teal))', // teal-100
-                    border: 'hsl(var(--border-teal))' // teal-900
+                    backgroundcolor: 'hsl(var(--background-teal))', // teal-100
+                    bordercolor: 'hsl(var(--border-teal))' // teal-900
                 },
                 cyan: {
-                    background: 'hsl(var(--background-cyan))', // cyan-100
-                    border: 'hsl(var(--border-cyan))' // cyan-900
+                    backgroundcolor: 'hsl(var(--background-cyan))', // cyan-100
+                    bordercolor: 'hsl(var(--border-cyan))' // cyan-900
                 },
                 sky: {
-                    background: 'hsl(var(--background-sky))', // sky-100
-                    border: 'hsl(var(--border-sky))' // sky-900
+                    backgroundcolor: 'hsl(var(--background-sky))', // sky-100
+                    bordercolor: 'hsl(var(--border-sky))' // sky-900
                 },
                 blue: {
-                    background: 'hsl(var(--background-blue))', // blue-100
-                    border: 'hsl(var(--border-blue))', // blue-900
+                    backgroundcolor: 'hsl(var(--background-blue))', // blue-100
+                    bordercolor: 'hsl(var(--border-blue))', // blue-900
                     dark: 'hsl(var(--blue-dark))',
                     light: 'hsl(var(--blue-light))'
                 },
                 indigo: {
-                    background: 'hsl(var(--background-indigo))', // indigo-100
-                    border: 'hsl(var(--border-indigo))' // indigo-900
+                    backgroundcolor: 'hsl(var(--background-indigo))', // indigo-100
+                    bordercolor: 'hsl(var(--border-indigo))' // indigo-900
                 },
                 violet: {
-                    background: 'hsl(var(--background-violet))', // violet-100
-                    border: 'hsl(var(--border-violet))' // violet-900
+                    backgroundcolor: 'hsl(var(--background-violet))', // violet-100
+                    bordercolor: 'hsl(var(--border-violet))' // violet-900
                 },
                 purple: {
-                    background: 'hsl(var(--background-purple))', // purple-100
-                    border: 'hsl(var(--border-purple))' // purple-900
+                    backgroundcolor: 'hsl(var(--background-purple))', // purple-100
+                    bordercolor: 'hsl(var(--border-purple))' // purple-900
                 },
                 fuchsia: {
-                    background: 'hsl(var(--background-fuchsia))', // fuchsia-100
-                    border: 'hsl(var(--border-fuchsia))' // fuchsia-900
+                    backgroundcolor: 'hsl(var(--background-fuchsia))', // fuchsia-100
+                    bordercolor: 'hsl(var(--border-fuchsia))' // fuchsia-900
                 },
                 pink: {
-                    background: 'hsl(var(--background-pink))', // pink-100
-                    border: 'hsl(var(--border-pink))' // pink-900
+                    backgroundcolor: 'hsl(var(--background-pink))', // pink-100
+                    bordercolor: 'hsl(var(--border-pink))' // pink-900
                 },
                 rose: {
-                    background: 'hsl(var(--background-rose))', // rose-100
-                    border: 'hsl(var(--border-rose))' // rose-900
+                    backgroundcolor: 'hsl(var(--background-rose))', // rose-100
+                    bordercolor: 'hsl(var(--border-rose))' // rose-900
                 },
                 slate: {
-                    background: 'hsl(var(--background-slate))', // slate-100
-                    border: 'hsl(var(--border-slate))' // slate-900
+                    backgroundcolor: 'hsl(var(--background-slate))', // slate-100
+                    bordercolor: 'hsl(var(--border-slate))' // slate-900
                 },
                 gray: {
-                    background: 'hsl(var(--background-gray))', // gray-100
-                    border: 'hsl(var(--border-gray))' // gray-900
+                    backgroundcolor: 'hsl(var(--background-gray))', // gray-100
+                    bordercolor: 'hsl(var(--border-gray))' // gray-900
                 },
                 zinc: {
-                    background: 'hsl(var(--background-zinc))', // zinc-100
-                    border: 'hsl(var(--border-zinc))' // zinc-900
+                    backgroundcolor: 'hsl(var(--background-zinc))', // zinc-100
+                    bordercolor: 'hsl(var(--border-zinc))' // zinc-900
                 },
                 neutral: {
-                    background: 'hsl(var(--background-neutral))', // neutral-100
-                    border: 'hsl(var(--border-neutral))' // neutral-900
+                    backgroundcolor: 'hsl(var(--background-neutral))', // neutral-100
+                    bordercolor: 'hsl(var(--border-neutral))' // neutral-900
                 },
                 stone: {
-                    background: 'hsl(var(--background-stone))', // stone-100
-                    border: 'hsl(var(--border-stone))' // stone-900
+                    backgroundcolor: 'hsl(var(--background-stone))', // stone-100
+                    bordercolor: 'hsl(var(--border-stone))' // stone-900
                 },
 
             },

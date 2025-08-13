@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import {withResearcherAuth} from "@/packages/lib/auth";
+import {withResearcherAuth} from "@/apps/web/lib/auth";
 import {Organization, Tool} from "@prisma/client";
 import {unstable_cache} from "@comend/lib/unstable-cache"
 import {filterColumns} from "@comend/lib/filter-columns"

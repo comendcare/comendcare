@@ -1,5 +1,5 @@
 import React from "react"
-import { getSession } from "@comend/lib/auth"
+import { getSession } from "~web/lib/auth"
 import NoOrganization from "~web/components/no-organization"
 import { redirect } from "next/navigation"
 

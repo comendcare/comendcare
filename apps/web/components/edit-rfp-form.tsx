@@ -378,7 +378,7 @@ export function EditRFPForm({
 
     return (
         <Form {...form}>
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="headerImage"
                 render={({field}) => (
@@ -423,7 +423,7 @@ export function EditRFPForm({
                         </DropdownMenu>
                     </div>
                 )}
-            />
+            /> */}
 
             <ScrollArea className={"max-h-[60vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />

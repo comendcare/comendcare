@@ -1,5 +1,5 @@
 import React from "react";
-import {getSession} from "@comend/lib/auth";
+import {getSession} from "@/apps/web/lib/auth";
 import {getResearcherRequest} from "@comend/lib/fetchers";
 import RequestPage from "@comend/components/requests/request-page"
 
