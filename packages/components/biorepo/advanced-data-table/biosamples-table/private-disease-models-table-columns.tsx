@@ -83,6 +83,22 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "id",
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Sample ID"
+            }
+        },
+        {
             id: "types",
             accessorKey: "types",
             header: ({column}) => (
@@ -106,6 +122,22 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 options: DISEASE_MODEL_TYPE_OPTIONS,
                 icon: CircleDashed,
             },
+        },
+        {
+            id: "condition",
+            accessorKey: "condition",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Condition"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Condition"
+            }
         },
         {
             id: "gene",

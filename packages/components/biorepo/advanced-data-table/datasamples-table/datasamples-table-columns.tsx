@@ -13,35 +13,40 @@ import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-
 import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
+import Link from "next/link";
 
 export function getDatasamplesTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
     {
-      id: "title",
-      accessorKey: "title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Title" />
-      ),
-      meta: {
-        label: "Title",
-        placeholder: "Search titles...",
-        variant: "text",
-        icon: Text,
-      },
-      enableColumnFilter: true,
-    },
-    {
-        accessorKey: "description",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
+        id: "id",
+        accessorKey: "id",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Sample ID"/>
         ),
-        cell: ({ row }) => (
-            <div className="line-clamp-3">
-                {row.original.description}
+        cell: ({row}) => (
+            <div className="flex gap-2 items-center">
+                <p>{row.original.id || 'No Sample ID'}</p>
             </div>
         ),
         enableHiding: true,
+        meta: {
+            label: "Sample ID"
+        }
     },
+    // {
+    //   id: "title",
+    //   accessorKey: "title",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Title" />
+    //   ),
+    //   meta: {
+    //     label: "Title",
+    //     placeholder: "Search titles...",
+    //     variant: "text",
+    //     icon: Text,
+    //   },
+    //   enableColumnFilter: true,
+    // },
     {
         id: "types",
         accessorKey: "types",
@@ -66,6 +71,84 @@ export function getDatasamplesTableColumns(): ColumnDef<any>[] {
           options: TOOL_TYPE_OPTIONS,
           icon: CircleDashed,
         },
+    },
+    {
+        id: "condition",
+        accessorKey: "condition",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Condition"/>
+        ),
+        cell: ({row}) => (
+            <div className="flex gap-2 items-center">
+                <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+            </div>
+        ),
+        enableHiding: true,
+        meta: {
+            label: "Condition"
+        }
+    },
+    {
+        id: "gene",
+        accessorKey: "gene",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Gene"/>
+        ),
+        cell: ({row}) => (
+            <>{row.original.gene?.symbol}</>
+        ),
+        enableHiding: true,
+        meta: {
+            label: "Gene"
+        }
+    },
+    {
+        id: "cohortSize",
+        accessorKey: "cohortSize",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Cohort Size"/>
+        ),
+        cell: ({row}) => (
+            <>{row.original.cohortSize || ''}</>
+        ),
+        enableHiding: true,
+        meta: {
+            label: "Cohort Size"
+        }
+    },
+    {
+        accessorKey: "description",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Description" />
+        ),
+        cell: ({ row }) => (
+            <div className="line-clamp-3">
+                {row.original.description}
+            </div>
+        ),
+        enableHiding: true,
+    },
+    {
+        id: "institution",
+        accessorKey: "institution",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Institution"/>
+        ),
+        cell: ({row}) => {
+            if (row.original.institution?.website && row.original.institution?.name) {
+                return (
+                    <Link className="underline" href={row.original.institution?.website}>
+                        {row.original.institution?.name}
+                    </Link>
+                )
+            }
+            if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
+            return <></>
+        },
+        enableHiding: true,
+        meta: {
+            label: "Institution"
+        }
     },
     {
         id: "private",

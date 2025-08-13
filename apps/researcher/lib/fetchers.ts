@@ -13,9 +13,12 @@ export const getAllBiosamples = withResearcherAuth(
         try {
             const data = await prisma.tool.findMany({
                 include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
                     milestones: { include: { milestone: true } },
                     contacts: true,
                     attachments: true,
+                    gene: true,
+                    institution: true,
                     // biosample: { include: { donor: true, institution: true } },
                 },
                 orderBy: { createdAt: 'asc' },

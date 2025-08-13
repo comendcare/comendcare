@@ -28,7 +28,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical, Megaphone, ToolCase, User} from "lucide-react"
+import {GripVertical, Megaphone, Microscope, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
@@ -357,14 +357,22 @@ const DraggableTimelineItem = ({
 
 export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData: Milestone, nodeType: string }) => {
     return (
+        <div className="flex flex-col gap-2">
+        <StatusButton
+            className="h-[16px]"
+            disabled={true}
+            showText={false}
+            status={milestoneData?.status as StatusType || undefined}
+            onStatusChange={() => {}}
+        />
         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-            <li>
+            {/* <li>
                 <StatusButton
                     disabled={true}
                     status={milestoneData?.status as StatusType || undefined}
                     onStatusChange={() => {}}
                 />
-            </li>
+            </li> */}
             {(milestoneData?.types || []).map((milestoneType, index) => (
                 <li key={index}>
                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
@@ -383,7 +391,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
             })}
             {(milestoneData?.tools || []).map((tool, index) => (
                 <li key={index}>
-                    <PropertyBadge icon={ToolCase}>
+                    <PropertyBadge icon={Microscope}>
                         <p>{tool.tool?.title}</p>
                     </PropertyBadge>
                 </li>
@@ -396,5 +404,6 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 </li>
             ))}
         </ul>
+        </div>
     )
 }

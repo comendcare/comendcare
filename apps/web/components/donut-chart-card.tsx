@@ -1,54 +1,74 @@
 "use client";
 
-import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
-import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
-import {cn} from "@comend/lib/utils";
-import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
-import {useShallow} from "zustand/react/shallow";
-import Image from "next/image"
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle
+} from "@comend/components/ui/card";
+import { ResponsiveContainer, PieChart, Pie, Label } from "recharts";
+import { cn } from "@comend/lib/utils";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import {buttonVariants} from "@comend/components/ui/button";
+import { buttonVariants } from "@comend/components/ui/button";
+import { Organization } from "@prisma/client";
+import { getMilestones } from "@/packages/lib/fetchers";
+import { StatusType } from "@comend/lib/types";
 
-const statusLabels: Record<string, string> = {
+const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
     INPROGRESS: "In Progress",
     COMPLETED: "Completed",
 };
 
-const selector = (state: RoadmapState) => ({
-    milestones: state.milestones,
-});
+const STATUS_COLORS: Record<StatusType, string> = {
+    PLANNED: "#9D82CA",
+    INPROGRESS: "#CA9D82",
+    COMPLETED: "#82CA9D",
+};
 
-export const DonutChartCard = () => {
-    const {milestones} = useRoadmapStore(useShallow(selector));
+export const DonutChartCard = ({ organization }: { organization: Organization }) => {
+    const [chartData, setChartData] = useState<
+        { name: StatusType; value: number; fill: string }[]
+    >([]);
+    const [total, setTotal] = useState(0);
 
-    // Group milestones by status and count them
-    const milestoneStatusData = milestones.reduce<Record<string, number>>(
-        (acc, milestone) => {
-            if (milestone.status) acc[milestone.status] = (acc[milestone.status] || 0) + 1;
-            return acc;
-        },
-        {}
-    );
+    useEffect(() => {
+        async function fetchData() {
+            if (!organization?.id) return;
 
-    // Define colors for known statuses
-    const colors: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", string> = {
-        PLANNED: "#9D82CA",
-        INPROGRESS: "#CA9D82",
-        COMPLETED: "#82CA9D",
-    };
+            const result = await getMilestones(organization.id, {
+                status: true,
+            });
 
-    // Prepare data for the chart
-    const chartData = Object.entries(milestoneStatusData).map(
-        ([status, count]) => {
-            const color = colors[status as keyof typeof colors] || "#CCCCCC"; // Use fallback color
-            return {
-                name: status,
-                value: count,
-                fill: color,
-            };
+            if (result.success && result.data) {
+                const counts: Record<StatusType, number> = {
+                    PLANNED: 0,
+                    INPROGRESS: 0,
+                    COMPLETED: 0,
+                };
+
+                for (const m of result.data) {
+                    const status = (m.status ?? "PLANNED") as StatusType;
+                    counts[status]++;
+                }
+
+                const data = (Object.entries(counts) as [StatusType, number][])
+                    .filter(([_, count]) => count > 0)
+                    .map(([status, count]) => ({
+                        name: status,
+                        value: count,
+                        fill: STATUS_COLORS[status],
+                    }));
+
+                setChartData(data);
+                setTotal(Object.values(counts).reduce((a, b) => a + b, 0));
+            }
         }
-    )
+
+        fetchData();
+    }, [organization]);
 
     return (
         <Card className="col-span-3">
@@ -59,20 +79,20 @@ export const DonutChartCard = () => {
             </CardHeader>
 
             <CardContent>
-                {chartData.length > 0 ?
+                {chartData.length > 0 ? (
                     <>
-                        <div className="flex flex-row">
+                        <div className="flex flex-row mb-4">
                             {chartData.map((data, index) => (
                                 <span
                                     key={index}
                                     className="flex items-center text-sm font-medium text-gray-900 dark:text-white me-3"
                                 >
-                                    <span
-                                        style={{backgroundColor: data.fill}}
-                                        className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
-                                    />
-                                    {statusLabels[data.name] || data.name}
-                                </span>
+                  <span
+                      style={{ backgroundColor: data.fill }}
+                      className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
+                  />
+                                    {STATUS_LABELS[data.name]}
+                </span>
                             ))}
                         </div>
 
@@ -90,43 +110,44 @@ export const DonutChartCard = () => {
                                         label
                                     >
                                         <Label
-                                            className="font-semibold"
-                                            value={`${chartData.reduce((acc, item) => acc + item.value, 0)} projects`}
+                                            value={`${total} projects`}
                                             position="center"
+                                            className="font-semibold"
                                         />
                                     </Pie>
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
                     </>
-                    : <div className="h-full flex flex-col items-center justify-center">
+                ) : (
+                    <div className="h-full flex flex-col items-center justify-center">
                         <Image
-                            alt="Organization not verified"
+                            alt="No milestones"
                             src="https://illustrations.popsy.co/gray/surreal-flying-bulbs.svg"
                             width={300}
                             height={300}
                             className="dark:hidden"
                         />
                         <Image
-                            alt="Organization not verified"
+                            alt="No milestones"
                             src="https://illustrations.popsy.co/white/surreal-flying-bulbs.svg"
                             width={300}
                             height={300}
                             className="hidden dark:block"
                         />
-                        <div className="flex flex-col space-y-4">
+                        <div className="flex flex-col space-y-4 mt-4 text-center">
                             <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
                                 {`You don't have any research plans yet.`}
                             </p>
                             <Link
-                                className={cn(buttonVariants({variant: "default"}))}
+                                className={cn(buttonVariants({ variant: "default" }))}
                                 href={`/app/research-plan`}
                             >
                                 Create research plan
                             </Link>
                         </div>
                     </div>
-                }
+                )}
             </CardContent>
         </Card>
     );

@@ -28,7 +28,7 @@ import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {PublicMilestoneNode} from "./public-milestone-node"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Calendar, ExternalLink, Megaphone, Plus, ToolCase, Trash, User } from "lucide-react"
+import { Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User } from "lucide-react"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
 
@@ -269,7 +269,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     )}
                     {(props.data?.tools || []).map((tool, index) => (
                         <li key={index}>
-                            <PropertyBadge icon={ToolCase}>
+                            <PropertyBadge icon={Microscope}>
                                 <p>{tool.tool?.title}</p>
                             </PropertyBadge>
                         </li>
