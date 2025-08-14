@@ -4,7 +4,7 @@ import {unstable_cache} from "next/cache"
 import prisma from "@comend/lib/prisma"
 import {ApiResponse, milestoneCategories, RequestFiltersType, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@/apps/web/lib/auth";
+import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@/packages/lib/auth";
 import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User, Biosample, DiseaseModel} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";

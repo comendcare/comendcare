@@ -1,7 +1,7 @@
 import RequestStats from "@/packages/components/requests/request-stats";
 import * as React from "react"
 import {getAllResearcherRequests} from "@/packages/lib/fetchers";
-import {getSession} from "@/apps/web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import RequestToolbar from "~researcher/components/requests/request-toolbar";
 import RequestHistory from "~researcher/components/requests/request-history";
 

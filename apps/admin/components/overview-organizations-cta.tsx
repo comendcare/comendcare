@@ -1,4 +1,4 @@
-import {getSession} from "@/apps/web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import prisma from "@comend/lib/prisma";
 import CreateOrganizationButton from "~admin/components/create-organization-button";
 import CreateOrganizationModal from "@comend/components/modal/create-organization";

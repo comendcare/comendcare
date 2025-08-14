@@ -1,6 +1,6 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
-import {getSession} from "@/apps/web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import {getResearcher, getResearcherFromOrcidApi, getResearcherWithMergedData} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 

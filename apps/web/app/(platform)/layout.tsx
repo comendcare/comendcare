@@ -1,4 +1,4 @@
-import {getSession} from "~web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import {redirect} from "next/navigation";
 import prisma from "@comend/lib/prisma";
 

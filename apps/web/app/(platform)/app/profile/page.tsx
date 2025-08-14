@@ -1,5 +1,5 @@
 import NoOrganization from "~web/components/no-organization";
-import { getSession } from "~web/lib/auth";
+import { getSession } from "@/packages/lib/auth";
 import PAGProfilePage from "~web/components/profile-page"
 
 export default async function ProfilePage() {

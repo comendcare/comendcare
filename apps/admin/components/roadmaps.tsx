@@ -1,4 +1,4 @@
-import { getSession } from "@/apps/web/lib/auth"
+import { getSession } from "@/packages/lib/auth"
 import { redirect } from "next/navigation"
 import prisma from "@comend/lib/prisma"
 import RoadmapCard from "comend-pag-platform/components/roadmap-card"

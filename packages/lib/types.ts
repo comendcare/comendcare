@@ -181,7 +181,7 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         milestoneId?: string,
         rfpId: string,
     }>
-    label?: string
+    label?: string // used for badges in the provider marketplace
 };
 
 export interface Option {

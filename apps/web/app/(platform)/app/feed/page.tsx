@@ -1,5 +1,5 @@
 import NewPostDialog from "~web/components/new-post-dialog";
-import {getSession} from "~web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import {getOrganizationFromOrganizationId, getPosts} from "@comend/lib/fetchers";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import NoOrganization from "~web/components/no-organization";

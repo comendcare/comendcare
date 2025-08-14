@@ -12,8 +12,8 @@ import {
     Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "comend-pag-platform/lib/auth"
-import {getSession} from "@/apps/web/lib/auth"
+import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "@/packages/lib/auth"
+import {getSession} from "@/packages/lib/auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {

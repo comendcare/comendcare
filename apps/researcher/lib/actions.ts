@@ -1,6 +1,6 @@
 "use server"
 
-import {getSession, withAuth, withResearcherAuth} from "@/apps/web/lib/auth";
+import {getSession, withAuth, withResearcherAuth} from "@/packages/lib/auth";
 import prisma from "@/packages/lib/prisma";
 import {logError} from "@/packages/lib/utils";
 

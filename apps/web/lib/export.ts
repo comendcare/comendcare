@@ -1,6 +1,6 @@
 "use server";
 
-import {getSession} from "~web/lib/auth"
+import {getSession} from "@/packages/lib/auth"
 import prisma from "@comend/lib/prisma";
 
 const orgDeepInclude = {

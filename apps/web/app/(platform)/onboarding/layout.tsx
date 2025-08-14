@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 import {ReactNode} from "react";
 import OnboardingSteps, {Step} from "~web/components/onboarding-steps";
-import {getSession} from "~web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import {redirect} from "next/navigation";
 
 export const metadata: Metadata = {
