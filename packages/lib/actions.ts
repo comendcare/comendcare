@@ -1605,7 +1605,7 @@ export const deletePost = withAuth(
     }
 )
 
-export const createComment = withAuth(
+export const createRequestComment = withAuth(
     async (text: string, requestId: string) => {
         const session = await getSession()
 
@@ -1614,7 +1614,7 @@ export const createComment = withAuth(
                 return {success: false, error: "Session not found."};
             }
 
-            const comment = prisma.comment.create({
+            const comment = prisma.requestComment.create({
                 data: {
                     materialAndDataAccessRequest: {
                         connect: {
@@ -1643,7 +1643,7 @@ export const createComment = withAuth(
     }
 )
 
-export const deleteComment = withAuth(
+export const deleteRequestComment = withAuth(
     async (commentId: string) => {
         const session = await getSession()
 
@@ -1652,7 +1652,7 @@ export const deleteComment = withAuth(
                 return {success: false, error: "Session not found."};
             }
 
-            const comment = prisma.comment.delete({
+            const comment = prisma.requestComment.delete({
                 where: {
                     id: commentId
                 }
