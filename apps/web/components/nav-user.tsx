@@ -414,7 +414,7 @@ export function NavUser() {
                         <Avatar className="h-8 w-8 rounded-lg">
                             <AvatarImage src={image} alt={name}/>
                             <AvatarFallback className="rounded-lg">
-                                {name?.[0]}
+                                {name?.[0] || "NA"}
                             </AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
@@ -429,12 +429,12 @@ export function NavUser() {
                                     <Avatar className="h-8 w-8 rounded-lg">
                                         <AvatarImage src={image} alt={name}/>
                                         <AvatarFallback className="rounded-lg">
-                                            {name?.[0]}
+                                            {name?.[0] || "NA"}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <div className="inline">
-                                            <span className="truncate font-semibold">{name}</span>
+                                            <span className="truncate font-semibold">{name || "Nameless"}</span>
                                             {session?.user.membership?.role && (
                                                 <> - <span
                                                     className="capitalize">{session.user.membership.role}</span></>
