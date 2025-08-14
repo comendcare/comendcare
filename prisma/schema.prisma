@@ -57,7 +57,8 @@ model User {
   notificationSettings  Boolean                @default(false)
   consentSettings       Boolean                @default(false)
   accounts              Account[]
-  comments              Comment[]
+  requestComments       RequestComment[]
+  postComments          PostComment[]
   follows               Follow[]
   sentInvitations       Member[]               @relation("invitedBy")
   memberships           Member[]
@@ -794,18 +795,29 @@ model Example {
 }
 
 model Post {
-  id        String    @id @default(cuid())
+  id        String        @id @default(cuid())
   content   Json?
   authorId  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
   text      String?
-  mentions  Mention[]
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  PostComment[]
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   metadata  Json?
 }
 
-model Comment {
+model PostComment {
+  id        String   @id @default(cuid())
+  text      String
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RequestComment {
   id                             String                       @id @default(cuid())
   text                           String
   userId                         String
@@ -815,7 +827,6 @@ model Comment {
   materialAndDataAccessRequest   MaterialAndDataAccessRequest @relation(fields: [materialAndDataAccessRequestId], references: [id], onDelete: Cascade)
   author                         User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports                        ReportOnComment[]
-  mentions                       Mention[]
   metadata                       Json?
 }
 
@@ -849,22 +860,6 @@ enum Goal {
   YES
   NO
   INPROGRESS
-}
-
-model Mention {
-  id     String  @id @default(cuid())
-  postId String? // For mentions in posts
-  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  commentId String? // For mentions in comments
-  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
-  mentionedType String
-  mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
-  metadata      Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Gene {
@@ -1118,7 +1113,7 @@ model ReportOnComment {
   reason      ReviewReplyReportReason
   description String?
   user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comment     Comment                 @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  comment     RequestComment          @relation(fields: [replyId], references: [id], onDelete: Cascade)
   createdAt   DateTime                @default(now())
   metadata    Json?
 }
@@ -1306,7 +1301,7 @@ model MaterialAndDataAccessRequest {
   isCommercial             Boolean
   fundingOrganization      String?
   institutions             InstitutionToRequest[]
-  comments                 Comment[]
+  comments                 RequestComment[]
 
   linkedRequests   MaterialAndDataAccessRequest[] @relation("RequestLinks")
   linkedByRequests MaterialAndDataAccessRequest[] @relation("RequestLinks")

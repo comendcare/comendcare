@@ -1568,6 +1568,8 @@ export const createPost = withAuth(
                 return {success: false, error: "failed to create post"};
             }
 
+            revalidatePath("/app/feed")
+
             return {success: true, data: post};
         } catch (error: any) {
             logError("Error creating post", error);
