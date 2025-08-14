@@ -258,7 +258,7 @@ export function RelatedProjectTypeBadges({
         .filter((n): n is string => Boolean(n && n.trim()))
 
     // 2) Gather + dedupe milestones
-    const map = new Map<string, { id: string; label: string }>()
+    const map = new Map<string, { id: string; label: string | undefined }>()
     for (const name of names) {
         for (const m of getMilestonesForService(name)) {
             if (!map.has(m.id)) map.set(m.id, { id: m.id, label: m.label })
