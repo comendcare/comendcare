@@ -702,7 +702,7 @@ export async function checkSubdomainAvailability(
 
 export async function getPostComments(
     postId: string,
-    select: Prisma.CommentSelect<InternalArgs & {
+    select: Prisma.PostCommentSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};

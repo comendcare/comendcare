@@ -35,7 +35,7 @@ export const columns: ColumnDef<ServicesData>[] = [
                 <div className="flex flex-wrap gap-1">
                     {milestones.map((m) => (
                         <Badge key={m.id} variant="secondary" className="px-2">
-                            {m.label}
+                            {m.title}
                         </Badge>
                     ))}
                 </div>

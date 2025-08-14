@@ -4,7 +4,7 @@ import va from "@vercel/analytics"
 import {useSession} from "next-auth/react"
 import {toast} from "sonner"
 import {usePathname, useRouter} from "next/navigation"
-import { createComment } from "@comend/lib/actions"
+import { createRequestComment } from "@comend/lib/actions"
 
 export default function WriteAComment({
                                           requestId
@@ -23,7 +23,7 @@ export default function WriteAComment({
 
     const handleCreateCommentSubmit = useCallback(async () => {
         setLoading(true)
-        const response = await createComment(comment, requestId)
+        const response = await createRequestComment(comment, requestId)
         setLoading(false)
 
         if (response.success) {

@@ -261,7 +261,7 @@ export function RelatedProjectTypeBadges({
     const map = new Map<string, { id: string; label: string }>()
     for (const name of names) {
         for (const m of getMilestonesForService(name)) {
-            if (!map.has(m.id)) map.set(m.id, { id: m.id, label: m.label })
+            if (!map.has(m.id)) map.set(m.id, { id: m.id, label: m.title })
         }
     }
     const milestones = Array.from(map.values())
