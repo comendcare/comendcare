@@ -7,7 +7,7 @@ import {ProfilePhoto} from "@comend/components/profile-photo"
 import {CommentInput} from "~web/components/comment-input";
 import {useState} from "react";
 import {useSession} from "next-auth/react";
-import {createComment} from "@comend/lib/actions";
+import {createRequestComment} from "@comend/lib/actions";
 import {toast} from "sonner";
 
 interface CommentFormProps {
@@ -26,7 +26,7 @@ export function CommentForm({postId}: CommentFormProps) {
 
     let comment
     const onSubmit = React.useCallback(async () => {
-        const response = await createComment(commentValue, postId)
+        const response = await createRequestComment(commentValue, postId)
         if (response.success) {
             comment = response.data
         } else {

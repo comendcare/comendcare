@@ -1,5 +1,5 @@
 import Form from "@comend/components/form"
-import { getSession } from "@/apps/web/lib/auth"
+import { getSession } from "@/packages/lib/auth"
 import { redirect } from "next/navigation"
 import { editUser } from "@comend/lib/actions"
 

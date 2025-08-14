@@ -1,6 +1,6 @@
 import React from "react"
 import Image from "next/image"
-import {getSession} from "@/apps/web/lib/auth"
+import {getSession} from "@/packages/lib/auth"
 import {SearchParams} from "@/packages/components/types"
 import {getValidFilters} from "@/packages/lib/data-table"
 import PublicBiosampleToolsPage from "~researcher/components/public-biosamples-tools-page"

@@ -11,7 +11,7 @@ import {Ellipsis, CircleX} from "lucide-react";
 import { useSession } from "next-auth/react"
 import AreYouSure from "@comend/components/are-you-sure"
 import {toast} from "sonner"
-import { deleteComment } from "@comend/lib/actions"
+import { deleteRequestComment } from "@comend/lib/actions"
 
 export default function CommentReplyDropdown(props: {
     requestId: string
@@ -23,7 +23,7 @@ export default function CommentReplyDropdown(props: {
 
     const deleteCommentReply = async () => {
         setLoading(true)
-        const response = await deleteComment(props.id);
+        const response = await deleteRequestComment(props.id);
         setLoading(false)
 
         if (response.success) {

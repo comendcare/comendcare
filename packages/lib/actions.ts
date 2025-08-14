@@ -12,8 +12,8 @@ import {
     Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "comend-pag-platform/lib/auth"
-import {getSession} from "@/apps/web/lib/auth"
+import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "@/packages/lib/auth"
+import {getSession} from "@/packages/lib/auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {
@@ -1568,6 +1568,8 @@ export const createPost = withAuth(
                 return {success: false, error: "failed to create post"};
             }
 
+            revalidatePath("/app/feed")
+
             return {success: true, data: post};
         } catch (error: any) {
             logError("Error creating post", error);
@@ -1603,7 +1605,7 @@ export const deletePost = withAuth(
     }
 )
 
-export const createComment = withAuth(
+export const createRequestComment = withAuth(
     async (text: string, requestId: string) => {
         const session = await getSession()
 
@@ -1612,7 +1614,7 @@ export const createComment = withAuth(
                 return {success: false, error: "Session not found."};
             }
 
-            const comment = prisma.comment.create({
+            const comment = prisma.requestComment.create({
                 data: {
                     materialAndDataAccessRequest: {
                         connect: {
@@ -1641,7 +1643,7 @@ export const createComment = withAuth(
     }
 )
 
-export const deleteComment = withAuth(
+export const deleteRequestComment = withAuth(
     async (commentId: string) => {
         const session = await getSession()
 
@@ -1650,7 +1652,7 @@ export const deleteComment = withAuth(
                 return {success: false, error: "Session not found."};
             }
 
-            const comment = prisma.comment.delete({
+            const comment = prisma.requestComment.delete({
                 where: {
                     id: commentId
                 }

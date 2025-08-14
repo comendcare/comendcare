@@ -1,4 +1,4 @@
-import {getSession} from "~web/lib/auth"
+import {getSession} from "@/packages/lib/auth"
 import {Roadmap} from "~web/components/roadmap"
 import NoOrganization from "~web/components/no-organization";
 

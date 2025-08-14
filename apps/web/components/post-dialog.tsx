@@ -19,7 +19,7 @@ import {
 import {useSession} from "next-auth/react";
 import Link from "next/link";
 import {formatDates} from "@comend/lib/utils";
-import {createComment, deletePost} from "@comend/lib/actions";
+import {createRequestComment, deletePost} from "@comend/lib/actions";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image"
 import {useState} from "react";
@@ -52,7 +52,7 @@ export function PostDialog(
 
     let comment
     const onSubmit = React.useCallback(async () => {
-        const response = await createComment(post.id, commentValue)
+        const response = await createRequestComment(post.id, commentValue)
         if (response.success) {
             comment = response.data
         } else {

@@ -1,6 +1,7 @@
 import {
     Column,
-    Comment,
+    RequestComment,
+    PostComment,
     Company,
     ConditionToOrganization,
     Member,
@@ -180,6 +181,7 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         milestoneId?: string,
         rfpId: string,
     }>
+    label?: string // used for badges in the provider marketplace
 };
 
 export interface Option {
@@ -243,13 +245,13 @@ export type MemberRequestWithUser = Prisma.MemberRequestGetPayload<{
     include: { user: true };
 }>;
 
-export type CommentWithUser = Prisma.CommentGetPayload<{
+export type CommentWithUser = Prisma.RequestCommentGetPayload<{
     include: { author: true };
 }>;
 
 export type PostWithAuthorAndComments = Post & {
     author: User
-    comments: Comment[]
+    comments: PostComment[]
 }
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
@@ -1749,7 +1751,7 @@ export const companyTypeMap: Record<string, string> = {
 export interface MaterialAndDataAccessRequestWithResearcherAndComments extends MaterialAndDataAccessRequest {
     researcher: Researcher;
     institutions: Institution[]
-    comments: Comment[];
+    comments: RequestComment[];
 }
 
 export const REQUEST_TYPE_OPTIONS: any[] = [

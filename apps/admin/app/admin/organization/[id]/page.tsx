@@ -1,4 +1,4 @@
-import { getSession } from "@/apps/web/lib/auth"
+import { getSession } from "@/packages/lib/auth"
 import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import {VerifyOrganizationSwitch} from "~admin/components/verify-organization-switch";

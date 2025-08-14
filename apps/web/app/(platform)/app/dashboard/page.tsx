@@ -7,7 +7,7 @@ import {
 import PAGDashboardAnalyticsTab from "~web/components/pag-dashboard-analytics-tab";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
-import {getSession} from "~web/lib/auth";
+import {getSession} from "@/packages/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import React from "react";
 
