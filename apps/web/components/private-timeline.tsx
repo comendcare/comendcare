@@ -8,7 +8,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import { Milestone, StatusType } from "@comend/lib/types"
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, Milestone, StatusType } from "@comend/lib/types"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
 import {
@@ -418,7 +418,7 @@ export const TimelineItemContent = ({
                 }
             })}
 
-            {milestone?.tools?.length > 0 && (
+            {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 // <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
                 //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                 //         <Microscope className="h-4 w-4 text-emerald-900" />
@@ -433,6 +433,24 @@ export const TimelineItemContent = ({
                 //     </div>
                 // </div>
                 <>
+                    {milestone.biosamples.map(({biosample}) => {
+                        const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                        return (
+                            <Badge variant="violet" className="min-w-fit w-fit font-normal">
+                                <Microscope size={16} />
+                                {`${biosample.donorId} --- ${type?.label || ''}`}
+                            </Badge>
+                        )
+                    })}
+                    {milestone.diseaseModels.map(({diseaseModel}) => {
+                        const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                        return (
+                            <Badge variant="yellow" className="min-w-fit w-fit font-normal">
+                                <Microscope size={16} />
+                                {`${diseaseModel.id} --- ${type?.label}`}
+                            </Badge>
+                        )
+                    })}
                     {milestone.tools.map(({tool}) => (
                         <Badge variant="emerald" className="min-w-fit w-fit font-normal">
                             <Microscope size={16} />

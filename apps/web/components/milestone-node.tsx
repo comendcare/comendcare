@@ -23,12 +23,12 @@ import {truncate, cn, formatMoney} from "@comend/lib/utils"
 import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
-import {Milestone, StatusType} from "@comend/lib/types"
+import {BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, Milestone, StatusType} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 // import {PublicMilestoneNode} from "./public-milestone-node"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock } from "lucide-react"
+import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock, BadgeAlert } from "lucide-react"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
 import { Separator } from "@/packages/components/ui/separator"
@@ -212,13 +212,29 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                 </CardHeader>
                             </Card>
                         ))} */}
-                        {props.data?.tools?.length > 0 && (
+                        {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
                             <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
                                 <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                                     <Microscope className="h-4 w-4 min-w-4 text-emerald-900" />
                                     <span className="text-emerald-900 text-nowrap">Linked Tools</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
+                                    {props.data?.biosamples.map(({biosample}) => {
+                                        const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                                        return (
+                                            <Badge variant="violet">
+                                                {`${biosample.donorId} --- ${type?.label || ''}`}
+                                            </Badge>
+                                        )
+                                    })}
+                                    {props.data?.diseaseModels.map(({diseaseModel}) => {
+                                        const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                                        return (
+                                            <Badge variant="yellow">
+                                                {`${diseaseModel.id} --- ${type?.label}`}
+                                            </Badge>
+                                        )
+                                    })}
                                     {props.data?.tools.map(({tool}) => (
                                         <Badge variant="emerald">
                                             {tool?.title}
