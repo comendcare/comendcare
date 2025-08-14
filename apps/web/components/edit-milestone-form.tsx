@@ -551,12 +551,15 @@ export function EditMilestoneForm({
                         <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")}
                               className="space-y-4 w-full h-full">
                             <div className="flex gap-4 items-center justify-between">
-                                <TabsList className="flex flex-wrap h-fit gap-2">
-                                    <TabsTrigger value="edit">
+                                <TabsList className="flex flex-wrap h-fit gap-2 bg-white">
+                                    <TabsTrigger value="edit" className="data-[state=active]:bg-secondary">
                                         Edit
                                     </TabsTrigger>
+                                    <TabsTrigger value="notes" className="data-[state=active]:bg-secondary">
+                                        Notes
+                                    </TabsTrigger>
                                     <TabsTrigger
-                                        className="relative"
+                                        className="relative data-[state=active]:bg-secondary"
                                         value="recommendations"
                                         style={
                                             (recommendations && recommendations.length > 0 && !recommendationsViewed ? (
@@ -585,10 +588,10 @@ export function EditMilestoneForm({
                                             <NotificationBubble/>
                                         } */}
                                     </TabsTrigger>
-                                    <TabsTrigger className="relative" value="publications">
+                                    <TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">
                                         Publications
                                     </TabsTrigger>
-                                    <TabsTrigger className="relative" value="projects">
+                                    <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
                                         Similar projects
                                     </TabsTrigger>
                                 </TabsList>
@@ -597,6 +600,7 @@ export function EditMilestoneForm({
                                 <Loading/>
                             ) : (
                                 <>
+                                    <Separator />
                                     <TabsContent value="edit" className="space-y-6 w-full h-full">
                                         <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                             <FormLabel>Visibility</FormLabel>
@@ -1043,32 +1047,6 @@ export function EditMilestoneForm({
                                             </>
                                         )}
 
-                                        <FormField
-                                            control={form.control}
-                                            name="notes"
-                                            render={({field}) => (
-                                                <FormItem className="w-full">
-                                                    <FormLabel className="flex gap-2 items-center">
-                                                        {`Notes`}
-                                                        <PrivateBadge className="font-normal text-gray-500"
-                                                                      iconOnly={true}/>
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <div className="w-full col-span-2" data-registry="plate">
-                                                            <PlateEditor
-                                                                value={field.value ?? []}
-                                                                onChange={field.onChange}
-                                                            />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-
                                         <span className="h-8"/>
 
                                         <span
@@ -1094,6 +1072,33 @@ export function EditMilestoneForm({
                                                 Save Changes
                                             </Button>
                                         </span>
+                                    </TabsContent>
+                                    <TabsContent value="notes" className="space-y-6 w-full h-full">
+                                        <FormField
+                                            control={form.control}
+                                            name="notes"
+                                            render={({field}) => (
+                                                <FormItem className="w-full">
+                                                    <FormLabel className="flex gap-2 items-center">
+                                                        {`Notes`}
+                                                        <PrivateBadge className="font-normal text-gray-500"
+                                                                      iconOnly={true}/>
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <div className="w-full col-span-2 z-10" data-registry="plate">
+                                                            <PlateEditor
+                                                                value={field.value ?? []}
+                                                                onChange={field.onChange}
+                                                            />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
                                     </TabsContent>
                                     <TabsContent value="recommendations" className="space-y-4 w-full">
                                         {!recommendations && (
