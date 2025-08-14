@@ -4,9 +4,6 @@ import React from "react"
 import { ScrollArea } from "@comend/components/ui/scroll-area";
 import {CROSearchResults} from "~web/components/cro-search-results";
 import CROSearchBar from "~web/components/cro-searchbar";
-import {
-    ProviderMarketplaceIntegratedSearchAndFilter
-} from "~web/components/provider-marketplace-integrated-search-and-filter";
 
 export default function CROPage() {
     return (
@@ -14,7 +11,6 @@ export default function CROPage() {
             <ScrollArea className="px-8 w-full">
                 <div className="flex flex-col gap-4 p-2 w-full">
                     <CROSearchBar />
-                    {/*<ProviderMarketplaceIntegratedSearchAndFilter />*/}
                     <CROSearchResults />
                 </div>
             </ScrollArea>
