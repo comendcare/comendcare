@@ -37,6 +37,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/t
 import { getDiagnosisTypes, getMilestones } from "@comend/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "@comend/lib/types";
+import { Biosample } from "@prisma/client";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
@@ -126,6 +127,15 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             console.error("Failed to fetch institutions:", error);
             return [];
         }
+    }
+
+    const handleGetAvailability = (sample: Biosample): {value: string, variant: 'green' | 'red'} | undefined => {
+        if (sample?.quantity !== null) {
+            if (sample.quantity > 0) return {value: 'Available', variant: 'green'}
+            if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
+        }
+
+        return undefined
     }
 
     useEffect(() => {
@@ -253,8 +263,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Availability"/>
             ),
             cell: ({row}) => {
-                const availabilityOption = AVAILABILITY_OPTIONS.find(option => option.value === row.original.availability)
-                if (availabilityOption) return <Badge className="h-[20px]" variant={availabilityOption.badgeVariant}>{availabilityOption.label}</Badge>
+                const availability = handleGetAvailability(row.original)
+                if (availability !== undefined) {
+                    return <Badge variant={availability.variant}>{availability.value}</Badge>
+                }
                 return <></>
             },
             enableHiding: true,
