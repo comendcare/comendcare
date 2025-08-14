@@ -5,8 +5,7 @@ import FacebookProvider from "next-auth/providers/facebook"
 import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
-import {IdempotentAdapter} from "~web/lib/idempotent-prisma-adapter";
-import prisma from "@/packages/lib/prisma"
+import prisma from "@comend/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
@@ -94,7 +93,7 @@ export const authOptions: NextAuthOptions = {
         error: "/error", // Error code passed in query string as ?error=
         newUser: "/onboarding/welcome"
     },
-    adapter: IdempotentAdapter(prisma as PrismaClient),
+    adapter: PrismaAdapter(prisma as PrismaClient),
     session: {strategy: "jwt"},
     cookies: {
         sessionToken: {
