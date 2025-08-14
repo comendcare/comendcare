@@ -64,7 +64,7 @@ import Link from "next/link"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
-import {Globe, Lock, Plus, X, Store, Share} from "lucide-react"
+import {Globe, Lock, Plus, X, Store, Share, Trash} from "lucide-react"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
@@ -83,6 +83,8 @@ import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form"
 import { EditDataToolForm } from "./edit-data-tool-form"
 import { MilestoneTypeBadge } from "@/packages/components/milestone-type-badge"
 import { Separator } from "@/packages/components/ui/separator"
+import { updateMilestones } from "@/packages/lib/actions"
+import { revalidate } from "@/packages/lib/revalidate"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -191,6 +193,11 @@ export function EditMilestoneForm({
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
     const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
 
+    // state for adding fields
+    const [hasBudget, setHasBudget] = useState(milestoneData?.budget || false)
+    const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
+    const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
+
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
@@ -298,9 +305,12 @@ export function EditMilestoneForm({
             nodeType,
             title,
             ...(description !== undefined && description !== null ? {description} : undefined),
-            ...(startDate ? {startDate} : undefined),
-            ...(endDate ? {endDate} : undefined),
-            ...(budget ? {budget} : undefined),
+            // ...(startDate ? {startDate} : undefined),
+            // ...(endDate ? {endDate} : undefined),
+            // ...(budget ? {budget} : undefined),
+            startDate: startDate || null,
+            endDate: endDate || null,
+            budget: budget || null,
             ...(attachments ? {attachments} : undefined),
             types: (types || []).map((type) => {
                 return ({
@@ -667,17 +677,6 @@ export function EditMilestoneForm({
                                                 }}
                                             />
 
-                                            <FormLabel>{`Budget`}</FormLabel>
-                                            <BudgetFormField
-                                                form={form}
-                                                mixpanelTrackCallback={(updatedBudget) =>
-                                                    debounceMixpanelTrackBudget(updatedBudget)
-                                                }
-                                            />
-
-                                            <TimelineFormField form={form} startLabel={"Start Date"}
-                                                               endLabel={"End Date"}/>
-
                                             <FormLabel>Linked Tools</FormLabel>
                                             <FormField
                                                 control={form.control}
@@ -804,11 +803,245 @@ export function EditMilestoneForm({
                                                     </FormItem>
                                                 )}
                                             />
+
+                                            {hasBudget && (
+                                                <>
+                                                    <FormLabel>{`Budget`}</FormLabel>
+                                                    <span className="w-full flex gap-2">
+                                                        <div className="w-full grow">
+                                                            <BudgetFormField
+                                                                form={form}
+                                                                mixpanelTrackCallback={(updatedBudget) =>
+                                                                    debounceMixpanelTrackBudget(updatedBudget)
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <Button
+                                                            variant="secondary"
+                                                            size={'icon'}
+                                                            className="h-[32px] min-w-[32px]"
+                                                            onClick={() => {
+                                                                form.setValue('budget', undefined, {shouldValidate: true})
+                                                                setHasBudget(false)
+                                                            }}
+                                                        >
+                                                            <Trash />
+                                                        </Button>
+                                                    </span>
+                                                </>
+                                            )}
+
+                                            {hasStartDate && (
+                                                <FormField
+                                                    control={form.control}
+                                                    name="startDate"
+                                                    render={({field}) => (
+                                                        <>
+                                                            <FormLabel>{'Start Date'}</FormLabel>
+                                                            <div className="flex gap-2">
+                                                                <Select
+                                                                    defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                                                    onValueChange={(value) => {
+                                                                        const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                        const monthIndex = monthsList.indexOf(value)
+                                                                        const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
+                                                                        form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                                                    }}
+                                                                >
+                                                                    <FormControl>
+                                                                        <SelectTrigger className="h-[32px]">
+                                                                            <SelectValue placeholder="Month"/>
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {monthsList.map(
+                                                                            (
+                                                                                month: string,
+                                                                                index: number
+                                                                            ) => (
+                                                                                <SelectItem
+                                                                                    value={month}
+                                                                                    key={index}
+                                                                                >
+                                                                                    {month}
+                                                                                </SelectItem>
+                                                                            )
+                                                                        )}
+                                                                    </SelectContent>
+                                                                </Select>
+
+                                                                <Input
+                                                                    placeholder="Year"
+                                                                    maxLength={4}
+                                                                    defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                                                    onChange={(event) => {
+                                                                        const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                        const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                                                        form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                                                    }}
+                                                                />
+
+                                                                <Button
+                                                                    variant={'secondary'}
+                                                                    size={'icon'}
+                                                                    className="h-[32px] min-w-[32px]"
+                                                                    onClick={() => {
+                                                                        form.setValue('startDate', undefined, {shouldValidate: true})
+                                                                        setHasStartDate(false)
+                                                                    }}
+                                                                >
+                                                                    <Trash />
+                                                                </Button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                />
+                                            )}
+
+                                            {hasEndDate && (
+                                                <FormField
+                                                    control={form.control}
+                                                    name="endDate"
+                                                    render={({field}) => (
+                                                        <>
+                                                            <FormLabel>{'End Date'}</FormLabel>
+                                                            <div className="flex flex-col gap-2">
+                                                                <div className="flex gap-2">
+                                                                    <Select
+                                                                        defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                                                        onValueChange={(value) => {
+                                                                            const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                            const monthIndex = monthsList.indexOf(value)
+                                                                            const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
+                                                                            form.setValue('endDate', newEndDate, {shouldValidate: true})
+                                                                        }}
+                                                                    >
+                                                                        <FormControl>
+                                                                            <SelectTrigger className="h-[32px]">
+                                                                                <SelectValue placeholder="Month"/>
+                                                                            </SelectTrigger>
+                                                                        </FormControl>
+                                                                        <SelectContent>
+                                                                            {monthsList.map(
+                                                                                (
+                                                                                    month: string,
+                                                                                    index: number
+                                                                                ) => (
+                                                                                    <SelectItem
+                                                                                        value={month}
+                                                                                        key={index}
+                                                                                    >
+                                                                                        {month}
+                                                                                    </SelectItem>
+                                                                                )
+                                                                            )}
+                                                                        </SelectContent>
+                                                                    </Select>
+
+                                                                    <Input
+                                                                        placeholder="Year"
+                                                                        maxLength={4}
+                                                                        defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                                                        onChange={(event) => {
+                                                                            const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                            const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                                                            form.setValue('endDate', newEndDate, {shouldValidate: true})
+                                                                        }}
+                                                                    />
+
+                                                                    <Button
+                                                                        variant={'secondary'}
+                                                                        size={'icon'}
+                                                                        className="h-[32px] min-w-[32px]"
+                                                                        onClick={() => {
+                                                                            form.setValue('endDate', undefined, {shouldValidate: true})
+                                                                            setHasEndDate(false)
+                                                                        }}
+                                                                    >
+                                                                        <Trash />
+                                                                    </Button>
+                                                                </div>
+                                                                <FormMessage/>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                />
+                                            )}
                                         </div>
+                                        {(formData?.contacts && formData?.contacts.length > 0) && (
+                                            <ContactsFormField form={form}/>
+                                        )}
 
-                                        <ContactsFormField form={form}/>
+                                        {(formData?.attachments && formData?.attachments.length > 0) && (
+                                            <AttachmentsFormField form={form}/>
+                                        )}
 
-                                        <AttachmentsFormField form={form}/>
+                                        {(
+                                            !hasBudget || 
+                                            !hasStartDate || 
+                                            !hasEndDate || 
+                                            !(formData?.contacts && formData?.contacts.length > 0) || 
+                                            !(formData?.attachments && formData?.attachments.length > 0)
+                                        ) && (
+                                            <>
+                                                {/* <FormLabel>Additional Properties</FormLabel> */}
+                                                <span className="flex flex-wrap gap-2">
+                                                    {!hasBudget && (
+                                                        <Button 
+                                                            onClick={() => setHasBudget(true)}
+                                                            variant={'secondary'}
+                                                            className="p-2 max-h-[28px]"
+                                                        >
+                                                            {'+ Add Budget'}
+                                                        </Button>
+                                                    )}
+                                                    {!hasStartDate && (
+                                                        <Button 
+                                                            onClick={() => setHasStartDate(true)}
+                                                            variant={'secondary'}
+                                                            className="p-2 max-h-[28px]"
+                                                        >
+                                                            {'+ Add Start Date'}
+                                                        </Button>
+                                                    )}
+                                                    {!hasEndDate && (
+                                                        <Button 
+                                                            onClick={() => setHasEndDate(true)}
+                                                            variant={'secondary'}
+                                                            className="p-2 max-h-[28px]"
+                                                        >
+                                                            {'+ Add End Date'}
+                                                        </Button>
+                                                    )}
+                                                    {!formData?.contacts || formData?.contacts.length <= 0 && (
+                                                        <Button 
+                                                            onClick={() => {
+                                                                form.setValue("contacts", [
+                                                                    {name: "", email: "", role: null}
+                                                                ])
+                                                            }}
+                                                            variant={'secondary'}
+                                                            className="p-2 max-h-[28px]"
+                                                        >
+                                                            {'+ Add Contacts'}
+                                                        </Button>
+                                                    )}
+                                                    {!formData?.attachments || formData?.attachments.length <= 0 && (
+                                                        <Button 
+                                                            onClick={() => {
+                                                                form.setValue("attachments", [
+                                                                    {name: '', link: ''} as any
+                                                                ])
+                                                            }}
+                                                            variant={'secondary'}
+                                                            className="p-2 max-h-[28px]"
+                                                        >
+                                                            {'+ Add Links'}
+                                                        </Button>
+                                                    )}
+                                                </span>
+                                            </>
+                                        )}
 
                                         <FormField
                                             control={form.control}
