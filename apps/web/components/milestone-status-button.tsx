@@ -57,15 +57,15 @@ import { Badge } from "@comend/components/ui/badge"
 export default function StatusButton({
     status = "PLANNED",
     disabled = false,
-    showText = true,
+    minimal = false,
     onStatusChange,
-    className,
+    className
 }: {
     status?: StatusType
     disabled?: boolean | undefined
-    showText?: boolean | undefined
+    minimal?: boolean | undefined,
     onStatusChange: (status: StatusType) => void
-    className?: string
+    className?: string | undefined
 }) {
     const handleClick = () => {
         if (disabled) return
@@ -118,14 +118,78 @@ export default function StatusButton({
         }
     }
 
+    const getStatusBackgroundColor = (currentStatus: StatusType) => {
+        switch (currentStatus) {
+            case "PLANNED":
+                return "bg-planned-foreground border-[1px] border-planned-foreground"
+            case "INPROGRESS":
+                return "bg-inprogress-foreground border-[1px] border-inprogress-foreground"
+            case "COMPLETED":
+                return "bg-completed-foreground border-[1px] border-completed-foreground"
+            default:
+                return "bg-planned-foreground border-[1px] border-planned-foreground"
+        }
+    }
+
     const currentIndex = getStatusIndex(status)
 
-    return (
+    if (minimal) {
+        return (  
+            <div
+                className={cn(
+                    "relative flex w-full mx-auto bg-secondary rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
+                    // getStatusBackgroundColor(status),
+                    "h-[14px]"
+                )}
+                onClick={handleClick}
+            >
+                <div
+                    className={cn("absolute inset-0 transition-all duration-700 ease-out rounded-full", getStatusColor(status))}
+                    style={{
+                        width: `${((currentIndex + 1) / 3) * 100}%`,
+                        transform: "translateX(0)",
+                    }}
+                />
+
+                {/* Planned Section */}
+                <div
+                    className={cn(
+                        "flex-1 flex items-center justify-center relative z-10",
+                        currentIndex >= 0 ? getStatusTextColor(status) : "text-gray-600",
+                    )}
+                >
+                    {/* {currentIndex === 0 && 'Planned'} */}
+                </div>
+
+                {/* In Progress Section */}
+                <div
+                    className={cn(
+                        "flex-1 flex items-center justify-center relative z-10 -ml-4",
+                        currentIndex >= 1 ? getStatusTextColor(status) : "text-gray-600",
+                    )}
+                >
+                    {/* {currentIndex === 1 && 'In Progress'} */}
+                </div>
+
+                {/* Completed Section */}
+                <div
+                    className={cn(
+                        "flex-1 flex items-center justify-center relative z-10 -ml-4",
+                        currentIndex >= 2 ? getStatusTextColor(status) : "text-gray-600",
+                    )}
+                >
+                    {/* {currentIndex === 2 && 'Completed'} */}
+                </div>
+            </div>
+        )
+    }
+
+    return (  
         <div
             className={cn(
-                "relative flex w-full mx-auto bg-gray-200 rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
-                !disabled && "hover:bg-gray-300",
-                className,
+                "relative flex w-full mx-auto bg-secondary rounded-full h-8 cursor-pointer transition-all duration-300 overflow-hidden",
+                // !disabled && "hover:bg-gray-300",
+                // getStatusBackgroundColor(status),
             )}
             onClick={handleClick}
         >
@@ -140,31 +204,31 @@ export default function StatusButton({
             {/* Planned Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-center relative z-10",
+                    "flex-1 flex items-center justify-end relative z-10 pr-2",
                     currentIndex >= 0 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
-                {showText && `Planned`}
+                {currentIndex === 0 && 'Planned'}
             </div>
 
             {/* In Progress Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-center relative z-10 -ml-4",
+                    "flex-1 flex items-center justify-end relative z-10 pr-2",
                     currentIndex >= 1 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
-                {showText && `In Progress`}
+                {currentIndex === 1 && 'In Progress'}
             </div>
 
             {/* Completed Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-center relative z-10 -ml-4",
+                    "flex-1 flex items-center justify-end relative z-10 pr-2",
                     currentIndex >= 2 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
-                {showText && `Completed`}
+                {currentIndex === 2 && 'Completed'}
             </div>
         </div>
     )

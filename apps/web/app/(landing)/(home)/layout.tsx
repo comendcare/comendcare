@@ -1,5 +1,5 @@
 import {redirect} from "next/navigation";
-import {getSession} from "@comend/lib/auth";
+import {getSession} from "~web/lib/auth";
 
 interface AppLayoutProps {
     children: React.ReactNode

@@ -6,9 +6,6 @@ import {cn, formatMoney, truncate} from "@comend/lib/utils";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
 import {Banknote, ExternalLink} from "lucide-react";
-import {CardContents} from "~web/components/private-milestone-node";
-import { PublicMilestoneNode } from "./public-milestone-node";
-import { NodeProps } from "@xyflow/react";
 import { TypeBadge } from "./type-badge";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
@@ -82,12 +79,12 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                         </CardDescription>
                     </div>
     
-                    <div className="flex flex-col gap-4 justify-end grow">
+                    {/* <div className="flex flex-col gap-4 justify-end grow">
                         <CardContents props={{
                             type: milestone.nodeType,
                             data: milestone
                         } as NodeProps<PublicMilestoneNode>}/>
-                    </div>
+                    </div> */}
                 </CardContent>
             </Card>
         </Link>

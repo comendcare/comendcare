@@ -71,8 +71,6 @@ export function CROSearchResults() {
         )
     }
 
-    console.log(searchResults)
-
     const ResultsView = () => {
         if (view === "list") {
             return (

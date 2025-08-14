@@ -17,6 +17,25 @@ import Papa from "papaparse";
 import type { Milestone, Option } from "@comend/lib/types";
 import {Task} from "./types";
 
+const normalize = (s: string) => s.trim().toLowerCase()
+
+const SERVICE_TO_MILESTONES: Record<string, Milestone[]> = (() => {
+    const map: Record<string, Milestone[]> = {}
+    for (const m of MILESTONE_TYPE_OPTIONS) {
+        for (const svc of m.services) {
+            const key = normalize(svc)
+            if (!map[key]) map[key] = []
+            map[key].push(m)
+        }
+    }
+    return map
+})()
+
+export const getMilestonesForService = (serviceName: string | null | undefined): Milestone[] => {
+    if (!serviceName) return []
+    return SERVICE_TO_MILESTONES[normalize(serviceName)] ?? []
+}
+
 export const getCookie = (name: string) => {
     const cookies = document.cookie.split('; ')
     const cookie = cookies.find(row => row.startsWith(`${name}=`))

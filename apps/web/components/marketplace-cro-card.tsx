@@ -4,6 +4,9 @@ import {truncate} from "@comend/lib/utils";
 import React from "react";
 import {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
+import {Badge} from "@comend/components/ui/badge";
+import { Popover, PopoverTrigger, PopoverContent } from "@comend/components/ui/popover"
+import { ScrollArea } from "@comend/components/ui/scroll-area"
 import SaveCRODialog from "~web/components/save-cro-dialog";
 import {
     Briefcase,
@@ -17,9 +20,12 @@ import {
     Star,
     University
 } from "lucide-react";
-import {companyTypeMap, Milestone} from "@comend/lib/types";
+import {companyTypeMap, CompanyWithReviewsAndServices, Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "./property-badge";
 import {TypeBadge} from "./type-badge";
+import Image from "next/image"
+import ImageWithFallback from "@/packages/components/image-with-fallback";
+import {getMilestonesForService} from "@comend/lib/utils";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -43,7 +49,7 @@ const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Consultant (<5 employees)": <Briefcase className="size-4 text-gray-500 dark:text-gray-400"/>,
 };
 
-export function CRORecommendationCard({cro, milestone, location}: { cro: Company, milestone: any, location?: string }) {
+export function CRORecommendationCard({cro, milestone, location}: { cro: CompanyWithReviewsAndServices, milestone: any, location?: string }) {
     const {id} = cro;
 
     return (
@@ -73,7 +79,7 @@ export function CRORecommendationCard({cro, milestone, location}: { cro: Company
 }
 
 export function CROMarketplaceCard({cro, milestone, location}: {
-    cro: Company,
+    cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
     location?: string
 }) {
@@ -90,23 +96,33 @@ export function CROMarketplaceCard({cro, milestone, location}: {
 }
 
 export function CROCardHeaderContents({cro, milestone, location}: {
-    cro: Company,
+    cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
     location?: string
 }) {
     const {id, title, description, companyType, avgRating} = cro;
 
+    const favicon = <ImageWithFallback
+            src={`https://www.google.com/s2/favicons?domain=${cro.url}`}
+            alt="Resource favicon"
+            className="inline-block h-6 w-6 rounded-md ring-2 ring-gray-300"
+            fallback="/chrome favicon.png"
+        />
+
+
     return (
         <>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-2">
                 <Link
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
                             ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
                             : `http://localhost:3000/app/service-providers/${id}`
                     }
+                    className="flex flex-row gap-4 items-center"
                 >
-                    <CardTitle className="text-xl flex flex-row gap-2 items-center">
+                    {favicon}
+                    <CardTitle className="text-lg flex flex-row gap-2 items-center">
                         {title}
                     </CardTitle>
                 </Link>
@@ -135,11 +151,14 @@ export function CROCardHeaderContents({cro, milestone, location}: {
                     {/*    </div>*/}
                     {/*)}*/}
                 </div>
-                {description && description.trim() && (
-                    <CardDescription className="text-wrap break-words line-clamp-2">
-                        {truncate(description, 200)}
-                    </CardDescription>
-                )}
+                {/*{description && description.trim() && (*/}
+                {/*    <CardDescription className="text-wrap break-words line-clamp-2">*/}
+                {/*        {truncate(description, 200)}*/}
+                {/*    </CardDescription>*/}
+                {/*)}*/}
+                <div className="mt-2">
+                    <RelatedProjectTypeBadges services={cro.services} />
+                </div>
             </Link>
         </>
     )
@@ -221,5 +240,74 @@ export function CROCardContents({cro}: { cro: Company }) {
                 </CardContent>
             )}
         </Link>
+    )
+}
+
+type ServiceLike = string | { name?: string | null }
+
+export function RelatedProjectTypeBadges({
+                                             services,
+                                             maxVisible = 3,
+                                         }: {
+    services?: ServiceLike[]
+    maxVisible?: number
+}) {
+    // 1) Extract service names
+    const names = (services ?? [])
+        .map((s) => (typeof s === "string" ? s : s?.name))
+        .filter((n): n is string => Boolean(n && n.trim()))
+
+    // 2) Gather + dedupe milestones
+    const map = new Map<string, { id: string; label: string }>()
+    for (const name of names) {
+        for (const m of getMilestonesForService(name)) {
+            if (!map.has(m.id)) map.set(m.id, { id: m.id, label: m.label })
+        }
+    }
+    const milestones = Array.from(map.values())
+
+    if (!milestones.length) return <span className="text-muted-foreground">—</span>
+
+    const visible = milestones.slice(0, Math.max(0, maxVisible))
+    const hidden = milestones.slice(Math.max(0, maxVisible))
+
+    return (
+        <div className="flex flex-wrap items-center gap-1">
+            {visible.map((m) => (
+                <Badge
+                    key={m.id}
+                    variant="secondary"
+                    className="px-2 py-1 whitespace-normal break-words text-left text-xs"
+                    title={m.label}
+                >
+                    {m.label}
+                </Badge>
+            ))}
+
+            {hidden.length > 0 && (
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Badge
+                            variant="secondary"
+                            className="px-2 cursor-pointer text-xs"
+                            title={hidden.map((h) => h.label).join(", ")}
+                        >
+                            +{hidden.length} more
+                        </Badge>
+                    </PopoverTrigger>
+                    <PopoverContent align="start" side="bottom" className="w-72 p-2">
+                        <ScrollArea className="max-h-48">
+                            <div className="flex flex-wrap gap-1">
+                                {hidden.map((m) => (
+                                    <Badge key={m.id} variant="secondary" className="px-2 max-w-[12rem] truncate text-xs" title={m.label}>
+                                        {m.label}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </PopoverContent>
+                </Popover>
+            )}
+        </div>
     )
 }
