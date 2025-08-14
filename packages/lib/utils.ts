@@ -17,9 +17,9 @@ import Papa from "papaparse";
 import type { Milestone, Option } from "@comend/lib/types";
 import {Task} from "./types";
 
-export const normalize = (s: string) => s.trim().toLowerCase()
+const normalize = (s: string) => s.trim().toLowerCase()
 
-export const SERVICE_TO_MILESTONES: Record<string, Milestone[]> = (() => {
+const SERVICE_TO_MILESTONES: Record<string, Milestone[]> = (() => {
     const map: Record<string, Milestone[]> = {}
     for (const m of MILESTONE_TYPE_OPTIONS) {
         for (const svc of m.services) {
