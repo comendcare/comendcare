@@ -14,6 +14,7 @@ import {
     PaginationLink, PaginationNext,
     PaginationPrevious
 } from "@/packages/components/ui/pagination";
+import Image from "next/image";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -24,6 +25,7 @@ export default function RequestHistory() {
         totalResults,
         setSearchResults,
         setTotalResults,
+        searchTerm,
         filters,
         sortBy,
         initialized,
@@ -133,10 +135,27 @@ export default function RequestHistory() {
                     )}
                 </div>
             ) : (
-                <div className="w-full text-center text-gray-500 mt-4">
-                    <p>No requests found.</p>
-                    <p>Try adjusting your filters or search terms.</p>
-                </div>
+                // !totalResults
+                //     ? (
+                //         <div className="min-w-full w-full text-center mt-4 flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                //             <h1 className="font-cal text-4xl">You do not have any Requests yet</h1>
+                //             <Image
+                //                 alt="No RFPs"
+                //                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                //                 width={300}
+                //                 height={300}
+                //             />
+                //             <p className="text-lg text-stone-500">
+                //                 Researchers can request access to the public data in your toolkit.
+                //             </p>
+                //         </div>
+                //     )
+                //     : (
+                    <div className="w-full text-center text-gray-500 mt-4">
+                        <p>No requests found.</p>
+                        <p>Try adjusting your filters or search terms.</p>
+                    </div>
+                // )
             )}
         </>
     )
