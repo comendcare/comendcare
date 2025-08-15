@@ -10,8 +10,9 @@ import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/she
 import { getDatasamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/datasamples-table/datasamples-table-columns";
 import { DatasamplesTable } from "@comend/components/biorepo/advanced-data-table/datasamples-table/datasamples-table"
 import { Tool } from "@prisma/client";
+import { SearchParams } from "@/packages/components/types";
 
-export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {
+export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = getDatasamplesTableColumns()
 
     return (
@@ -43,7 +44,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pag
                         />
                     }
                 >
-                    <DatasamplesTable data={data} pageCount={pageCount} columns={columns}/>
+                    <DatasamplesTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>
