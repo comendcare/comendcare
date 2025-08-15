@@ -200,6 +200,11 @@ const getUpdatedSearchResults = async (
             body: JSON.stringify({ ids }),
         });
 
+        if (!prismaResponse.ok) {
+            const text = await prismaResponse.text() // may be empty or HTML on 405
+            throw new Error(`POST /api/companies failed: ${prismaResponse.status} ${text}`)
+        }
+
         const prismaResults = await prismaResponse.json();
 
         const enrichedResults = ids.map((id: string) => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);

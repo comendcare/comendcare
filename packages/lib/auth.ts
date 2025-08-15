@@ -7,8 +7,11 @@ import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/packages/lib/prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
+import sgMail from "@sendgrid/mail";
+
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -21,7 +24,51 @@ export const authOptions: NextAuthOptions = {
                     pass: process.env.EMAIL_SERVER_PASSWORD
                 }
             },
-            from: process.env.EMAIL_FROM
+            from: process.env.EMAIL_FROM,
+            async sendVerificationRequest({ identifier, url, provider }) {
+                // Wrap NextAuth's callback URL with your preflight page
+                const preflightUrl = `${process.env.NEXTAUTH_URL}/email-preflight?target=${encodeURIComponent(
+                    url
+                )}`;
+
+                // Build both HTML and text (deliverability!)
+                const subject = "Sign in to Comend";
+                const text = `Complete signing in: ${preflightUrl}`;
+                const html = `
+                    <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;">
+                        <p>Click the button to complete signing in:</p>
+                        <p><a href="${preflightUrl}" 
+                              style="display:inline-block;padding:10px 16px;border-radius:8px;border:1px solid #ccc;text-decoration:none">
+                            Complete sign in
+                        </a></p>
+                        <p>If you didn’t request this, you can ignore this email.</p>
+                     </div>
+                `;
+
+                await sgMail.send({
+                    to: identifier,
+                    from: {
+                        email: provider.from!, // e.g. "no-reply@yourapp.com"
+                        name: "Comend",
+                    },
+                    trackingSettings: {
+                        clickTracking: { enable: false, enableText: false },
+                        openTracking: { enable: false },
+                        subscriptionTracking: { enable: false },
+                    },
+                    subject,
+                    text,
+                    html,
+                    // You can also use a category to filter in the dashboard
+                    categories: ["auth-email"],
+                    // If you use a dedicated IP pool:
+                    // ipPoolName: "transactional",
+                    headers: {
+                        // Helps some clients display the fallback correctly
+                        "X-Entity-Ref-ID": crypto.randomUUID(),
+                    },
+                });
+            },
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
