@@ -10,8 +10,9 @@ import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/she
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
 import { Tool } from "@prisma/client";
 import { BiosampleBulkImportDialog } from "./biosample-bulk-import-dialog";
+import { SearchParams } from "@/packages/components/types";
 
-export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {
+export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = useBiosamplesTableColumns()
 
     return (
@@ -43,7 +44,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: Tool[], page
                         />
                     }
                 >
-                    <BiosamplesTable data={data} pageCount={pageCount} columns={columns}/>
+                    {/* <div className="absolute h-full w-full bg-blue-dark opacity-50" /> */}
+                    <BiosamplesTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

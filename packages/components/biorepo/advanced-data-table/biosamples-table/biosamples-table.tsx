@@ -13,12 +13,17 @@ import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import {useFeatureFlags} from "../lib/feature-flags-provider";
 import {Tool} from "@prisma/client";
+import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
+import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-export function BiosamplesTable({data, pageCount, columns, onSelectionChange}: {
+export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams}: {
     data: Tool[],
     pageCount: number,
-    columns: ColumnDef<any>[]
-    onSelectionChange?: (selectedRows: Tool[]) => void;
+    columns: ColumnDef<any>[],
+    onSelectionChange?: (selectedRows: Tool[]) => void,
+    searchParams: SearchParams
 }) {
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
@@ -46,6 +51,27 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange}: {
         <>
             <DataTable
                 table={table}
+                noResults={
+                    (data.length === 0 && Object.keys(searchParams).length === 0) 
+                    ? (
+                        <div className="pt-6 h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                                <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
+                                <Image
+                                    alt="No Biosample Tools"
+                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                    width={300}
+                                    height={300}
+                                />
+                                <p className="text-lg text-stone-500">
+                                    A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                                </p>
+                                <NewToolDialog numAssetsPinned={0} type={"biosample"}/>
+                            </div>
+                        </div>
+                    )
+                    : undefined
+                }
             >
                 {enableAdvancedFilter ? (
                     <DataTableAdvancedToolbar table={table}>

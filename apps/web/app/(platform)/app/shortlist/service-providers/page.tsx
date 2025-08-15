@@ -45,8 +45,8 @@ export default function ServiceProviderSavesPage() {
     if (!session?.user?.organizationId) return <NoOrganization />
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
-            {savedCompanies.length === 0 ?
+        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
+            {/* {savedCompanies.length === 0 ?
                 <div className="h-full flex flex-col items-center justify-center py-20">
                     <Image
                         alt="No service providers shortlisted"
@@ -75,9 +75,9 @@ export default function ServiceProviderSavesPage() {
                         </PulsatingButton>
                     </div>
                 </div>
-                :
+                : */}
                 <SavedCROsDataTable data={savedCompanies} columns={columns}/>
-            }
+            {/* } */}
         </main>
     )
 }
