@@ -25,48 +25,39 @@ export const authOptions: NextAuthOptions = {
                 }
             },
             from: process.env.EMAIL_FROM,
-            async sendVerificationRequest({ identifier, url, provider }) {
-                // Wrap NextAuth's callback URL with your preflight page
-                const preflightUrl = `${process.env.NEXTAUTH_URL}/email-preflight?target=${encodeURIComponent(
-                    url
-                )}`;
+            async sendVerificationRequest({identifier, url, provider}) {
+                // Derive the correct origin from the callback NextAuth already generated.
+                // This works in prod (custom domain), Vercel preview, and local dev.
+                const origin = new URL(url).origin;
 
-                // Build both HTML and text (deliverability!)
+                const preflightUrl = `${origin}/email-preflight?target=${encodeURIComponent(url)}`;
+
                 const subject = "Sign in to Comend";
                 const text = `Complete signing in: ${preflightUrl}`;
                 const html = `
                     <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;">
                         <p>Click the button to complete signing in:</p>
-                        <p><a href="${preflightUrl}" 
-                              style="display:inline-block;padding:10px 16px;border-radius:8px;border:1px solid #ccc;text-decoration:none">
-                            Complete sign in
-                        </a></p>
-                        <p>If you didn’t request this, you can ignore this email.</p>
-                     </div>
-                `;
+                            <p><a href="${preflightUrl}" 
+                                    style="display:inline-block;padding:10px 16px;border-radius:8px;border:1px solid #ccc;text-decoration:none">
+                                Complete sign in
+                              </a></p>
+                            <p>If you didn’t request this, you can ignore this email.</p>
+                        </div>
+                  `;
 
                 await sgMail.send({
                     to: identifier,
-                    from: {
-                        email: provider.from!, // e.g. "no-reply@yourapp.com"
-                        name: "Comend",
-                    },
+                    from: {email: provider.from!, name: "Comend"},
                     trackingSettings: {
-                        clickTracking: { enable: false, enableText: false },
-                        openTracking: { enable: false },
-                        subscriptionTracking: { enable: false },
+                        clickTracking: {enable: false, enableText: false},
+                        openTracking: {enable: false},
+                        subscriptionTracking: {enable: false},
                     },
                     subject,
                     text,
                     html,
-                    // You can also use a category to filter in the dashboard
                     categories: ["auth-email"],
-                    // If you use a dedicated IP pool:
-                    // ipPoolName: "transactional",
-                    headers: {
-                        // Helps some clients display the fallback correctly
-                        "X-Entity-Ref-ID": crypto.randomUUID(),
-                    },
+                    headers: {"X-Entity-Ref-ID": crypto.randomUUID()},
                 });
             },
         }),
