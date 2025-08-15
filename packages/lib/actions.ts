@@ -2043,9 +2043,7 @@ export const createDataTool = withOrganizationAuth(
                 institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
 
-            console.log(`tool data`, dataToolData)
-
-            const response = await prisma.biosample.create({
+            const response = await prisma.tool.create({
                 include: {
                     contacts: true,
                     attachments: true,
@@ -2056,7 +2054,6 @@ export const createDataTool = withOrganizationAuth(
                             }
                         }
                     },
-                    donor: true,
                     institution: true,
                 },
                 data: {
@@ -2121,8 +2118,6 @@ export const updateDataTool = withOrganizationAuth(
                 throw new Error("No data tool id provided.")
             }
 
-            console.log(`incoming data`, data)
-
             const dataToolData: any = {
                 id: data.id,
                 types: data.types ? data.types.map(type => type.value) : undefined,
@@ -2142,8 +2137,6 @@ export const updateDataTool = withOrganizationAuth(
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
-
-            console.log(`tool data`, dataToolData)
 
             const newDataTool = await prisma.tool.update({
                 where: {id: data.id},
