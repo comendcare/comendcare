@@ -25,13 +25,13 @@ export const NewRFPDialog = ({iconOnly = false, numRFPsPinned}: {iconOnly?: bool
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        Create an RFP
+                        Create RFP
                     </TooltipContent>
                 </Tooltip>
             ) : (
                 <Button variant={"cta"} onClick={() => setIsOpen(true)}>
                     <Plus />
-                    {`Create an RFP`}
+                    {`Create RFP`}
                 </Button>
             )}
             <DialogContent>

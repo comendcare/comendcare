@@ -60,20 +60,13 @@ export function AssetBulkImportDialog() {
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
             <DialogTrigger asChild>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button 
-                            size={"icon"} 
-                            variant={"ghost"}
-                            onClick={() => setIsOpen(true)}
-                        >
-                            <Import />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`Import tools from .csv`}</p>
-                    </TooltipContent>
-                </Tooltip>
+                <Button 
+                    variant={"ghost"}
+                    onClick={() => setIsOpen(true)}
+                >
+                    <Import />
+                    <p>{`Import Clinical Datasets`}</p>
+                </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col justify-start">
         <DialogHeader>

@@ -20,8 +20,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount}: {data: Tool[], page
             <FeatureFlagsProvider
                 additionalButtons={(
                     <>
-                        <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"biosample"}/>
                         <BiosampleBulkImportDialog/>
+                        <NewToolDialog numAssetsPinned={0} type={"biosample"}/>
                     </>
                 )}
             >

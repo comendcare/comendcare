@@ -20,8 +20,8 @@ export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pag
             <FeatureFlagsProvider
                 additionalButtons={(
                     <>
-                        <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"data"}/>
                         <AssetBulkImportDialog />
+                        <NewToolDialog numAssetsPinned={0} type={"data"}/>
                     </>
                 )}
             >

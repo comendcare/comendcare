@@ -10,7 +10,7 @@ import { EditBiosampleToolForm } from "./edit-biosample-tool-form";
 import { EditDataToolForm } from "./edit-data-tool-form";
 import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form";
 
-export const NewToolDialog = ({iconOnly = false, numAssetsPinned, type}: {iconOnly?: boolean, numAssetsPinned: number, type: 'biosample' | 'data' | 'diseaseModel'}) => {
+export const NewToolDialog = ({numAssetsPinned, type}: {numAssetsPinned: number, type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -19,33 +19,18 @@ export const NewToolDialog = ({iconOnly = false, numAssetsPinned, type}: {iconOn
     
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            {iconOnly ? (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button variant={"cta"} size={"icon"} onClick={() => setIsOpen(true)}>
-                            <Plus />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        {type === 'biosample' && 'Create Biosample Tool'}
-                        {type === 'diseaseModel' && 'Create Disease Model Tool'}
-                        {type === 'data' && 'Create Data Tool'}
-                    </TooltipContent>
-                </Tooltip>
-            ) : (
-                <Button variant={"cta"} onClick={() => setIsOpen(true)}>
-                    <Plus />
-                    {type === 'biosample' && 'Create Biosample Tool'}
-                    {type === 'diseaseModel' && 'Create Disease Model Tool'}
-                    {type === 'data' && 'Create Data Tool'}
-                </Button>
-            )}
+            <Button variant={"cta"} onClick={() => setIsOpen(true)}>
+                <Plus />
+                {type === 'biosample' && 'Create Biosample'}
+                {type === 'diseaseModel' && 'Create Disease Model'}
+                {type === 'data' && 'Create Clinical Dataset'}
+            </Button>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        {type === 'biosample' && 'Create Biosample Tool'}
-                        {type === 'diseaseModel' && 'Create Disease Model Tool'}
-                        {type === 'data' && 'Create Data Tool'}
+                        {type === 'biosample' && 'Create Biosample'}
+                        {type === 'diseaseModel' && 'Create Disease Model'}
+                        {type === 'data' && 'Create Clinical Dataset'}
                     </DialogTitle>
                     <DialogDescription>
                         {`Create your Tool here. Click save when you're done.`}

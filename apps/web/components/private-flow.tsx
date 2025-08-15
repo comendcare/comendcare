@@ -328,7 +328,7 @@ export const PrivateFlowView = ({
             edgeTypes={edgeTypes}
             fitView
             fitViewOptions={{ padding: 0.2, duration: 500 }}
-            // snapToGrid={true}
+            snapToGrid={true}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
             minZoom={0.1}

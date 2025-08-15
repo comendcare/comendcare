@@ -19,8 +19,8 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount}: {data: Tool[], p
             <FeatureFlagsProvider
                 additionalButtons={(
                     <>
-                        <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"diseaseModel"}/>
                         {/* <BiosampleBulkImportDialog/> */}
+                        <NewToolDialog numAssetsPinned={0} type={"diseaseModel"}/>
                     </>
                 )}
             >
