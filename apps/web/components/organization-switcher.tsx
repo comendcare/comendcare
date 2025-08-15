@@ -52,15 +52,16 @@ export function OrganizationSwitcher({memberships}: { memberships: MembershipWit
             await revalidate("/app/tools/disease-models")
             await revalidate("/app/tools/data")
             await revalidate("/app/requests")
-            window.location.reload()
+            // window.location.reload()
+            router.refresh()
         } else {
             await revalidate("/")
             await revalidate("/app/tools/biosample")
             await revalidate("/app/tools/disease-models")
             await revalidate("/app/tools/data")
             await revalidate("/app/requests")
-            router.push("/app/profile"); // Navigate if not already there
-            window.location.reload()
+            router.push("/app/profile") // Navigate if not already there
+            // window.location.reload()
         }
     };
 
