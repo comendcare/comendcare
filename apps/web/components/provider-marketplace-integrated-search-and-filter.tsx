@@ -108,6 +108,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                                 found.</p>
                         }
                         showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
                     />
                 </div>
 
@@ -129,6 +130,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                                 found.</p>
                         }
                         showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
                     />
                 </div>
 
@@ -150,29 +152,31 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                                 found.</p>
                         }
                         showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
                     />
                 </div>
 
                 <Separator orientation="vertical" className="h-8"/>
 
-                {/* Specialties / Tags */}
-                <div className="flex-1 px-6 py-4 min-w-[100px]">
-                    <Label className="text-xs font-semibold text-gray-900">Specialties</Label>
-                    <MultipleSelector
-                        value={filters.tags}
-                        onChange={(vals) => setFilterKey("tags", vals)}
-                        defaultOptions={CRO_TAGS}
-                        placeholder="Any"
-                        hidePlaceholderWhenSelected
-                        className="mt-1 border-0 px-0 py-0"
-                        commandProps={{className: "bg-transparent"}}
-                        emptyIndicator={
-                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results
-                                found.</p>
-                        }
-                        showCountInsteadOfSelected={true}
-                    />
-                </div>
+                {/*/!* Specialties / Tags *!/*/}
+                {/*<div className="flex-1 px-6 py-4 min-w-[100px]">*/}
+                {/*    <Label className="text-xs font-semibold text-gray-900">Specialties</Label>*/}
+                {/*    <MultipleSelector*/}
+                {/*        value={filters.tags}*/}
+                {/*        onChange={(vals) => setFilterKey("tags", vals)}*/}
+                {/*        defaultOptions={CRO_TAGS}*/}
+                {/*        placeholder="Any"*/}
+                {/*        hidePlaceholderWhenSelected*/}
+                {/*        className="mt-1 border-0 px-0 py-0"*/}
+                {/*        commandProps={{className: "bg-transparent"}}*/}
+                {/*        emptyIndicator={*/}
+                {/*            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results*/}
+                {/*                found.</p>*/}
+                {/*        }*/}
+                {/*        showCountInsteadOfSelected={true}*/}
+                {/*        showBadgesInDropdown={true}*/}
+                {/*    />*/}
+                {/*</div>*/}
             </div>
 
             <div className="flex flex-row gap-2 items-center">
