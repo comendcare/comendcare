@@ -92,7 +92,7 @@ export function NavUser() {
                         notificationSettings: true,
                         consentSettings: true,
                         accounts: true,
-                        comments: true,
+                        // comments: true,
                         follows: true,
                         sentInvitations: true,
                         memberships: true,
@@ -111,6 +111,7 @@ export function NavUser() {
                         reviewFeedbacks: true,
                         metadata: true,
                     });
+
                     setUserData(userData);
 
                     const response = await getInvitations({
