@@ -17,8 +17,8 @@ export const PrivateRFPsPage = () => {
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
             <div className="flex gap-2 w-full justify-end">
-                <NewRFPDialog numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
                 <RFPBulkImportDialog />
+                <NewRFPDialog numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
             </div>
 
             {rfps.length <= 0 && (

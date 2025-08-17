@@ -43,8 +43,8 @@ export default function OrganizationSavesPage() {
     if (!session?.user?.organizationId) return <NoOrganization />
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
-            {savedOrganizations.length === 0 ?
+        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
+            {/* {savedOrganizations.length === 0 ?
                 <div className="h-full flex flex-col items-center justify-center py-20">
                     <Image
                         alt="No patient groups shortlisted"
@@ -73,9 +73,9 @@ export default function OrganizationSavesPage() {
                         </PulsatingButton>
                     </div>
                 </div>
-                :
+                : */}
                 <SavedOrganizationsDataTable data={savedOrganizations} columns={columns}/>
-            }
+            {/* } */}
         </main>
     )
 }

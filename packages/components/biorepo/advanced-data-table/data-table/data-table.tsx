@@ -12,26 +12,45 @@ import {
 } from "@comend/components/ui/table";
 import { getCommonPinningStyles } from "@comend/lib/data-table";
 import { cn } from "@comend/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
   table: TanstackTable<TData>;
+  noResults?: React.ReactNode;
   actionBar?: React.ReactNode;
 }
 
 export function DataTable<TData>({
   table,
+  noResults,
   actionBar,
   children,
   className,
   ...props
 }: DataTableProps<TData>) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [overlayStyle, setOverlayStyle] = useState({ width: 0 });
+
+  useEffect(() => {
+    const updateOverlay = () => {
+      if (scrollContainerRef.current) {
+        const widthRect = scrollContainerRef.current.getBoundingClientRect();
+        setOverlayStyle({width: widthRect.width});
+      }
+    };
+
+    updateOverlay();
+    window.addEventListener("resize", updateOverlay);
+    return () => window.removeEventListener("resize", updateOverlay);
+  }, []);
+
   return (
     <div
       className={cn("flex w-full flex-col gap-2.5 overflow-auto", className)}
       {...props}
     >
       {children}
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md border" ref={scrollContainerRef}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -56,6 +75,29 @@ export function DataTable<TData>({
             ))}
           </TableHeader>
           <TableBody>
+            {/* no results overlay */}
+            <div
+              className="fixed flex justify-center items-center"
+              style={{width: overlayStyle.width}}
+            >
+              {noResults
+                ? (
+                  <div>{noResults}</div>
+                )
+                : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={table.getAllColumns().length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )
+              }
+            </div>
+
+            {/* content */}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -78,14 +120,27 @@ export function DataTable<TData>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
+              noResults
+                ? (
+                  <TableRow className="invisible">
+                    <TableCell
+                      colSpan={table.getAllColumns().length}
+                      className="h-fit"
+                    >
+                      {noResults}
+                    </TableCell>
+                  </TableRow>
+                )
+                : (
+                  <TableRow className="invisible">
+                    <TableCell
+                      colSpan={table.getAllColumns().length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )
             )}
           </TableBody>
         </Table>

@@ -4,7 +4,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { PrivateBadge } from "~web/components/private-badge";
 import { DateView } from "~web/components/miletone-date-view";
-import { Calendar, CircleDollarSign, Clock, DollarSign, Pin, School, User } from "lucide-react";
+import { Calendar, CircleDollarSign, Clock, DollarSign, Megaphone, Pin, School, User } from "lucide-react";
 import { PropertyBadge } from "./property-badge";
 import { cn, formatMoney } from "@comend/lib/utils";
 import { RFPActionsMenu } from "./rfp-actions-menu";
@@ -73,6 +73,7 @@ export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean
                     </div>
                 )}
                 <span className="flex gap-2 items-center overflow-visible">
+                    <Megaphone className="w-6 min-w-6 h-6 min-h-6"/>
                     <CardTitle className="max-w-full truncate overflow-visible">{rfp.title} </CardTitle>
                     {rfp.private && <PrivateBadge iconOnly/>}
                     {status && <Badge variant={status.variant} className="text-sm">{status.status}</Badge>}

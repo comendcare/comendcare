@@ -10,9 +10,16 @@ import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/she
 import { getDatasamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/datasamples-table/datasamples-table-columns";
 import { DatasamplesTable } from "@comend/components/biorepo/advanced-data-table/datasamples-table/datasamples-table"
 import { Tool } from "@prisma/client";
+import { SearchParams } from "@/packages/components/types";
+import { revalidate } from "@/packages/lib/revalidate";
+import { useEffect } from "react";
 
-export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pageCount: number}) => {
+export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = getDatasamplesTableColumns()
+
+    useEffect(() => {
+        revalidate('/')
+    }, [])
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
@@ -20,8 +27,8 @@ export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pag
             <FeatureFlagsProvider
                 additionalButtons={(
                     <>
-                        <NewToolDialog iconOnly={true} numAssetsPinned={0} type={"data"}/>
                         <AssetBulkImportDialog />
+                        <NewToolDialog numAssetsPinned={0} type={"data"}/>
                     </>
                 )}
             >
@@ -43,7 +50,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount}: {data: Tool[], pag
                         />
                     }
                 >
-                    <DatasamplesTable data={data} pageCount={pageCount} columns={columns}/>
+                    <DatasamplesTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

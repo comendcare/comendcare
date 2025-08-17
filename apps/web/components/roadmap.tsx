@@ -870,31 +870,6 @@ const RoadmapHeader = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
-                            onClick={async () => {
-                                console.log("Add an empty project triggered")
-                                const newNodes = await addMilestones([{
-                                        nodeType: "PROJECT",
-                                        title: 'New Project',
-                                }], "Create Empty Button")
-
-                                if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
-                            }} 
-                            variant={"ghost"}
-                            size={isCollapsed ? "icon" : "default"}
-                        >
-                            <Plus />
-                            {/* If the header is < size MD, collapse the button to just the icon (hide text) */}
-                            {!isCollapsed && <p>{`Add an empty project`}</p>}
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
-                    </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button 
                             onClick={() => {
                                 console.log("Bulk import triggered")
                                 setBulkImportIsOpen(true)
@@ -913,7 +888,7 @@ const RoadmapHeader = ({
                 </Tooltip>
 
                 <Button 
-                    variant={"cta"}  
+                    variant={"ghost"}  
                     onClick={() => {
                         setTab('projects')
                         setNewMilestoneIsOpen(true)
@@ -921,6 +896,31 @@ const RoadmapHeader = ({
                 >
                     Templates
                 </Button>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            onClick={async () => {
+                                console.log("Add an empty project triggered")
+                                const newNodes = await addMilestones([{
+                                        nodeType: "PROJECT",
+                                        title: 'New Project',
+                                }], "Create Empty Button")
+
+                                if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
+                            }} 
+                            variant={"cta"}
+                            size={isCollapsed ? "icon" : "default"}
+                        >
+                            <Plus />
+                            {/* If the header is < size MD, collapse the button to just the icon (hide text) */}
+                            {!isCollapsed && <p>{`Add an empty project`}</p>}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
+                    </TooltipContent>
+                </Tooltip>
 
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
