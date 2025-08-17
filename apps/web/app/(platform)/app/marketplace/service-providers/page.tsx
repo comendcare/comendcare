@@ -13,7 +13,6 @@ export default function CROPage() {
         <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
             <ScrollArea className="px-8 w-full">
                 <div className="flex flex-col gap-4 p-2 w-full">
-                    {/*<CROSearchBar />*/}
                     <ProviderMarketplaceIntegratedSearchAndFilter />
                     <CROSearchResults />
                 </div>
