@@ -493,10 +493,20 @@ export const syncToTypesense = async (env: {
                 milestoneTypes: true,
             }
         });
+        const biosamples = await prisma.biosample.findMany({
+            where: {
+                private: false // only sync public biosamples
+            },
+            select: {
+                id: true,
+                gene: true,
+            }
+        })
 
         console.log('Raw organizations data:', organizations);
         console.log('Raw milestones data:', milestones);
         console.log('Raw companies data:', companies);
+        console.log('Raw biosamples data:', biosamples)
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
@@ -578,6 +588,16 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companies);
         } else {
             console.log('No companies to import.');
+        }
+
+        if (biosamples.length > 0) {
+            const uploadBiosamples = biosamples.map(biosample => ({
+                id: biosample.id,
+                gene: biosample.gene?.symbol
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
+        } else {
+            console.log('No biosamples to import.');
         }
 
         console.log('Sync job completed successfully.');

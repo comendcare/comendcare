@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
+import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
@@ -9,44 +9,16 @@ import {CROMarketplaceCard} from "~web/components/marketplace/marketplace-cro-ca
 import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
 import { Card, CardContent } from "@comend/components/ui/card";
 import { Skeleton } from "@comend/components/ui/skeleton";
+import { NoResultsView } from "../no-results";
+import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table";
+import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 
-const selector = (state: CROSearchState) => ({
+const selector = (state: BiosampleSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
     searchResults: state.searchResults
 })
-
-export const NoResultsView = () => {
-    return (
-        <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
-            <CardContent className="flex gap-4 p-4">
-                <div>
-                    <Image
-                        alt="No recommendations"
-                        src="https://illustrations.popsy.co/white/question-mark.svg"
-                        width={300}
-                        height={300}
-                        className="dark:hidden"
-                    />
-                    <Image
-                        alt="No recommendations"
-                        src="https://illustrations.popsy.co/white/question-mark.svg"
-                        width={300}
-                        height={300}
-                        className="hidden dark:block"
-                    />
-                </div>
-                <div className="flex flex-col justify-center gap-4 items-start">
-                    <h2 className="text-xl">{`Sorry, we don't have any results for that search`}</h2>
-                    <p className="text-md">
-                        {`Please try another search.`}
-                    </p>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
 
 export function BiosampleSearchResults() {
     const { 
@@ -54,7 +26,8 @@ export function BiosampleSearchResults() {
         setLastFetchedPage, 
         view, 
         searchResults 
-    } = useCROSearchStore(useShallow(selector))
+    } = useBiosampleSearchStore(useShallow(selector))
+    const columns = useBiosamplesTableColumns()
 
     if (!searchResults) {
         return (
@@ -72,26 +45,14 @@ export function BiosampleSearchResults() {
     }
 
     const ResultsView = () => {
-        if (view === "list") {
-            return (
-                <ol className="w-full flex flex-col gap-4">
-                    {searchResults.map((cro, index) => (
-                        <CROMarketplaceListElement cro={cro} key={index}/>
-                    ))}
-                </ol>
-            )
-        }
-
         // default to grid view
         return (
-            <div className="w-full flex flex-col gap-4">
+            <div className="w-full max-w-full flex flex-col gap-4">
                 {(!searchResults || searchResults.length === 0) ? (
                     <NoResultsView />
                 ): (
-                    <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                        {searchResults.map((cro, index) => (
-                            <CROMarketplaceCard cro={cro} key={index} location={"Marketplace"}/>
-                        ))}
+                    <div className="max-w-7xl w-full overflow-auto">
+                        <BiosamplesTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
                     </div>
                 )}
             </div>
@@ -101,10 +62,10 @@ export function BiosampleSearchResults() {
     return (
         <>
             <ResultsView />
-            <InfiniteScroll 
+            {/* <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 
                 setLastFetchedPage={setLastFetchedPage}
-            />
+            /> */}
         </>
     )
 }

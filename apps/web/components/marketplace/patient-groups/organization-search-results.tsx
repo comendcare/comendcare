@@ -6,8 +6,8 @@ import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/sea
 import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "../marketplace-pag-list-element";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
-import { NoResultsView } from "../service-providers/cro-search-results";
 import { Skeleton } from "@comend/components/ui/skeleton";
+import { NoResultsView } from "../no-results";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,

@@ -8,6 +8,7 @@ import { useMilestoneSearchStore } from "../../state/search/milestoneSearchStore
 import { useOrganizationSearchStore } from "../../state/search/organizationSearchStore";
 import { FiltersType as CROMarketplaceFiltersType } from "../../state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "../../state/search/organizationSearchStore";
+import { FiltersType as BiosampleMarketplaceFiltersType, useBiosampleSearchStore} from "../../state/search/biosampleSearchStore";
 import { Asset, RFP, Roadmap } from '@comend/lib/types';
 import { useToolStore } from "../../state/tool/toolStore";
 import { useRFPStore } from "../../state/rfp/rfpStore";
@@ -36,6 +37,15 @@ export function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType)
 
         // Call Zustand's initState directly
         initOrganizationSearchState(filters)
+    }
+}
+
+export function initializeBiosampleSearch(filters: BiosampleMarketplaceFiltersType) {
+    if (typeof window !== "undefined") {
+        const initBiosampleSearchState = useBiosampleSearchStore.getState().initState;
+
+        // Call Zustand's initState directly
+        initBiosampleSearchState(filters)
     }
 }
 
