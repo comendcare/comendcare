@@ -12,6 +12,21 @@ const links = [
         href: "/patient-groups",
         comingSoon: false
     },
+    {
+        name: "Biosamples",
+        href: "/biosamples",
+        comingSoon: false
+    },
+    {
+        name: "Disease Models",
+        href: "/disease-models",
+        comingSoon: false
+    },
+    {
+        name: "Clinical Datasets",
+        href: "/clinical-datasets",
+        comingSoon: false
+    },
     // {
     //     name: "Milestones",
     //     href: "/milestones",

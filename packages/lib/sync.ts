@@ -421,14 +421,46 @@ export const syncToTypesense = async (env: {
                 }
             ],
         };
+        const biosampleSchema = {
+            name: 'biosamples',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: "id",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "gene",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+            ]
+        }
 
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
         console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
         console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
+        console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
 
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
 
         const organizations = await prisma.organization.findMany({
             where: {

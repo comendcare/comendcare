@@ -8,7 +8,12 @@ import {
     Megaphone,
     TestTube,
     Book, Wand2, BookOpen, Cookie,
-    Microscope, LayoutDashboard, Newspaper
+    Microscope, LayoutDashboard,
+    Building2,
+    Users,
+    TestTubeDiagonal,
+    Rat,
+    FileText, Newspaper
 } from "lucide-react"
 import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -63,14 +68,52 @@ const data = {
             title: "Marketplace",
             icon: Store,
             variant: "ghost",
-            url: "/app/marketplace/service-providers",
-            match: (path: string) => path.startsWith('/app/marketplace'),
-            subPages: [{
-                title: "Shortlist",
-                icon: Bookmark,
-                variant: "ghost",
-                url: "/app/shortlist/service-providers"
-            }]
+            url: "/app/marketplace",
+            // match: (path: string) => path.startsWith('/app/marketplace'),
+            // subPages: [{
+            //     title: "Shortlist",
+            //     icon: Bookmark,
+            //     variant: "ghost",
+            //     url: "/app/shortlist/service-providers"
+            // }]
+            subPages: [
+                {
+                    title: "Service Providers",
+                    icon: Building2,
+                    variant: "ghost",
+                    url: "/app/marketplace/service-providers"
+                },
+                {
+                    title: "Patient Groups",
+                    icon: Users,
+                    variant: "ghost",
+                    url: "/app/marketplace/patient-groups"
+                },
+                {
+                    title: "Biosamples",
+                    icon: TestTubeDiagonal,
+                    variant: "ghost",
+                    url: "/app/marketplace/biosamples"
+                },
+                {
+                    title: "Disease Models",
+                    icon: Rat,
+                    variant: "ghost",
+                    url: "/app/marketplace/disease-models"
+                },
+                {
+                    title: "Clinical Datasets",
+                    icon: FileText,
+                    variant: "ghost",
+                    url: "/app/marketplace/clinical-datasets"
+                },
+            ]
+        },
+        {
+            title: "Shortlist",
+            icon: Bookmark,
+            variant: "ghost",
+            url: "/app/shortlist/service-providers"
         },
         {
             title: "Research Planner",
