@@ -118,7 +118,7 @@ export default function LoginPage() {
                         }
                     >
                         <LoginForm
-                            callback="/app/marketplace/service-providers"
+                            callback="/app/dashboard"
                             isCaptchaVerified={isVerified}
                         />
                     </Suspense>
