@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import prisma from "@comend/lib/prisma";
 import {getMapper} from "~web/app/(platform)/app/feed/registry";
 import { CanonicalFeed } from "@comend/lib/types";
+import "~web/app/(platform)/app/feed/mappers"
+
 
 export const dynamic = "force-dynamic";
 
