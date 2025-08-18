@@ -83,6 +83,8 @@ interface MultipleSelectorProps {
     hideClearAllButton?: boolean;
     showHoverCard?: boolean;
     creatableItemOverride?: () => React.JSX.Element
+    showCountInsteadOfSelected?: boolean
+    showBadgesInDropdown?: boolean
 }
 
 export interface MultipleSelectorRef {
@@ -199,7 +201,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             inputProps,
             hideClearAllButton = false,
             showHoverCard = true,
-            creatableItemOverride
+            creatableItemOverride,
+            showCountInsteadOfSelected = false,
+            showBadgesInDropdown = false
         }: MultipleSelectorProps,
         ref: React.Ref<MultipleSelectorRef>,
     ) => {
@@ -462,44 +466,60 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     }}
                 >
                     <div className="relative flex flex-wrap gap-1 items-center mr-8">
-                        {selected && selected.map((option) => {
-                            return (
-                                <Badge
-                                    key={option.value}
-                                    className={cn(
-                                        'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
-                                        'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
-                                        badgeClassName,
-                                    )}
-                                    data-fixed={option.fixed}
-                                    data-disabled={disabled || undefined}
-                                >
-                                    {typeof option.img === 'string' && (
-                                        <img className="h-8 w-8 rounded-full mr-2 my-1" src={option.img} alt="Option icon" />
-                                    )}
-                                    {option.label}
-                                    <button
-                                        type="button"
-                                        className={cn(
-                                            'ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                                            (disabled || option.fixed) && 'hidden',
-                                        )}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                handleUnselect(option);
-                                            }
-                                        }}
-                                        onMouseDown={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                        }}
-                                        onClick={() => handleUnselect(option)}
-                                    >
-                                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground"/>
-                                    </button>
-                                </Badge>
-                            );
-                        })}
+                        {showCountInsteadOfSelected ? (
+                            selected && selected.length > 0 &&
+                            <Badge
+                                className={cn(
+                                    'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
+                                    'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                                    badgeClassName,
+                                )}
+                                data-disabled={disabled || undefined}
+                            >
+                                {selected.length}
+                            </Badge>
+                        ) : (
+                            selected && selected.map((option) => {
+                                    return (
+                                        <Badge
+                                            key={option.value}
+                                            className={cn(
+                                                'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
+                                                'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                                                badgeClassName,
+                                            )}
+                                            data-fixed={option.fixed}
+                                            data-disabled={disabled || undefined}
+                                        >
+                                            {typeof option.img === 'string' && (
+                                                <img className="h-8 w-8 rounded-full mr-2 my-1" src={option.img}
+                                                     alt="Option icon"/>
+                                            )}
+                                            {option.label}
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    'ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                                                    (disabled || option.fixed) && 'hidden',
+                                                )}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handleUnselect(option);
+                                                    }
+                                                }}
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                }}
+                                                onClick={() => handleUnselect(option)}
+                                            >
+                                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground"/>
+                                            </button>
+                                        </Badge>
+                                    );
+                                }
+                            ))
+                        }
                         {/* Avoid having the "Search" Icon */}
                         <CommandPrimitive.Input
                             {...inputProps}
@@ -523,7 +543,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                     !selected.find((s) => s.value === trimmedValue) &&
                                     !Object.values(options).flat().some((opt) => opt.value === trimmedValue)
                                 ) {
-                                    const newOption = { value: trimmedValue, label: trimmedValue };
+                                    const newOption = {value: trimmedValue, label: trimmedValue};
                                     const newOptions = [...selected, newOption];
 
                                     setSelected(newOptions);
@@ -555,7 +575,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 onChange?.(selected.filter((s) => s.fixed));
                             }}
                             className={cn(
-                                'absolute -mr-8 top-0 right-0 h-6 w-6 p-0 pt-[2px]',
+                                'absolute -mr-8 top-0 right-0 h-6 w-6 p-0 pt-[2px] rounded-full bg-secondary',
                                 (hideClearAllButton ||
                                     disabled ||
                                     selected.length < 1 ||
@@ -563,7 +583,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 'hidden',
                             )}
                         >
-                            <X/>
+                            <X className="h-4 w-4 mx-auto"/>
                         </button>
                     </div>
                 </div>
@@ -577,12 +597,35 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                         className="max-h-[300px] overflow-auto"
                                         onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input
                                     >
+                                        {showBadgesInDropdown && selected.length > 0 && (
+                                            <TagTextarea
+                                                selected={selected}
+                                                value={inputValue}
+                                                onValueChange={(v) => {
+                                                    setInputValue(v);
+                                                    inputProps?.onValueChange?.(v);
+                                                }}
+                                                onBackspaceWhenEmpty={() => {
+                                                    const last = selected[selected.length - 1];
+                                                    if (last && !last.fixed) {
+                                                        handleUnselect(last);
+                                                    }
+                                                }}
+                                                onUnselect={(opt) => handleUnselect(opt)}
+                                                placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? "" : placeholder}
+                                                disabled={maxSelected ? disabled || selected.length >= maxSelected : disabled}
+                                                badgeClassName={badgeClassName}
+                                                className={className}
+                                                hidePlaceholderWhenSelected={hidePlaceholderWhenSelected}
+                                            />
+                                        )}
                                         {isLoading ? (
                                             <>{loadingIndicator}</>
                                         ) : Object.entries(selectables).flatMap(value => value[1]).length > 0 ? (
                                             <>
                                                 {Object.entries(selectables).map(([key, values]) => (
-                                                    <CommandGroup key={key} className="h-full" heading={groupBy ? key : undefined}>
+                                                    <CommandGroup key={key} className="h-full"
+                                                                  heading={groupBy ? key : undefined}>
                                                         {values.map((framework, index) => (
                                                             <HoverCard openDelay={0} closeDelay={0} key={index}>
                                                                 <HoverCardTrigger>
@@ -599,7 +642,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                                     await sleep(100) // sleep to delay setOpen, and avoid rendering errors
                                                                                     setOpen(false)
                                                                                 }
-        
+
                                                                                 if (selected.length + 1 >= maxSelected) closeDropdown()
                                                                                 onChange?.([...prev, framework]);
                                                                                 return [...prev, framework];
@@ -608,17 +651,20 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                         className={cn("cursor-pointer multiselect-item", groupBy ? "pl-4" : "")}
                                                                     >
                                                                         {typeof framework.img === 'string' && (
-                                                                            <img className="h-8 w-8 rounded-full mr-2" src={framework.img} alt="Option icon" />
+                                                                            <img className="h-8 w-8 rounded-full mr-2"
+                                                                                 src={framework.img} alt="Option icon"/>
                                                                         )}
                                                                         {framework.label}
                                                                         <p className="hidden">{framework.value}</p>
                                                                     </CommandItem>
                                                                 </HoverCardTrigger>
                                                                 {showHoverCard && (
-                                                                    <HoverCardContent side="left" align="start" className="h-min">
+                                                                    <HoverCardContent side="left" align="start"
+                                                                                      className="h-min">
                                                                         <div className="grid gap-2">
                                                                             <h4 className="font-medium leading-none">{framework.label}</h4>
-                                                                            <div className="text-sm text-muted-foreground">{framework.description}</div>
+                                                                            <div
+                                                                                className="text-sm text-muted-foreground">{framework.description}</div>
                                                                             {framework.strengths && (
                                                                                 <div className="mt-4 grid gap-2">
                                                                                     <h5 className="text-sm font-medium leading-none">Strengths</h5>
@@ -655,3 +701,163 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 
 MultipleSelector.displayName = 'MultipleSelector';
 export default MultipleSelector;
+
+export interface Option {
+    value: string;
+    label: string;
+    disable?: boolean;
+    fixed?: boolean;
+    // [key: string]: string | boolean | undefined | null;
+}
+
+
+interface TagTextareaProps {
+    /** The currently selected options (rendered as badges). */
+    selected: Option[];
+    /** Current free-text value inside the textarea. */
+    value: string;
+    /** Update the free-text value. */
+    onValueChange: (v: string) => void;
+    /** Called when user hits Backspace on an empty textarea. */
+    onBackspaceWhenEmpty?: () => void;
+    /** Called when a badge's X is clicked. */
+    onUnselect?: (opt: Option) => void;
+    placeholder?: string;
+    disabled?: boolean;
+    badgeClassName?: string;
+    className?: string;
+    textareaClassName?: string;
+    /** Hide the placeholder if there are selected options. */
+    hidePlaceholderWhenSelected?: boolean;
+    /** Optional autoFocus */
+    autoFocus?: boolean;
+}
+
+/**
+ * TagTextarea — a multi-line, autosizing text area that renders the provided
+ * `selected` options as shadcn/ui <Badge> elements inline above the caret area.
+ *
+ * This is designed as a drop-in replacement for an <input> in your MultipleSelector
+ * so you can support multi-line entry while keeping the same badges UX.
+ */
+export const TagTextarea = React.forwardRef<HTMLTextAreaElement, TagTextareaProps>(
+    (
+        {
+            selected,
+            value,
+            onValueChange,
+            onBackspaceWhenEmpty,
+            onUnselect,
+            placeholder,
+            disabled,
+            badgeClassName,
+            className,
+            textareaClassName,
+            hidePlaceholderWhenSelected,
+            autoFocus,
+        },
+        ref
+    ) => {
+        const taRef = React.useRef<HTMLTextAreaElement | null>(null);
+        React.useImperativeHandle(ref, () => taRef.current as HTMLTextAreaElement);
+
+        // Autosize height to content.
+        const autosize = React.useCallback(() => {
+            const el = taRef.current;
+            if (!el) return;
+            el.style.height = "0px"; // reset first so scrollHeight is accurate
+            el.style.height = Math.min(320, Math.max(40, el.scrollHeight)) + "px";
+        }, []);
+
+        React.useEffect(() => {
+            autosize();
+        }, [value, autosize, selected.length]);
+
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if ((e.key === "Backspace" || e.key === "Delete") && value.trim() === "") {
+                onBackspaceWhenEmpty?.();
+            }
+            if (e.key === "Escape") {
+                (e.currentTarget as HTMLTextAreaElement).blur();
+            }
+        };
+
+        const showPlaceholder = !hidePlaceholderWhenSelected || selected.length === 0;
+
+        return (
+            <div
+                className={cn(
+                    "min-h-10 rounded-md border border-input text-base ring-offset-background",
+                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm",
+                    disabled && "opacity-60 cursor-not-allowed",
+                    className
+                )}
+            >
+                <div className={cn("relative flex flex-wrap items-start gap-1 p-2")}
+                >
+                    {selected?.map((option) => (
+                        <Badge
+                            key={option.value}
+                            className={cn(
+                                "text-xs data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
+                                "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
+                                "shrink-0",
+                                badgeClassName
+                            )}
+                            data-fixed={option.fixed}
+                            data-disabled={disabled || undefined}
+                        >
+                            {typeof (option as any).img === "string" && (
+                                <img
+                                    className="h-6 w-6 rounded-full mr-1"
+                                    src={(option as any).img as string}
+                                    alt="Option icon"
+                                />
+                            )}
+                            {option.label}
+                            <button
+                                type="button"
+                                className={cn(
+                                    "ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                                    (disabled || option.fixed) && "hidden"
+                                )}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        onUnselect?.(option);
+                                    }
+                                }}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
+                                onClick={() => onUnselect?.(option)}
+                            >
+                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground"/>
+                            </button>
+                        </Badge>
+                    ))}
+
+                    {/* The textarea lives at the end so the caret appears after badges. */}
+                    <textarea
+                        ref={taRef}
+                        disabled={disabled}
+                        value={value}
+                        onChange={(e) => onValueChange(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={showPlaceholder ? placeholder : ""}
+                        rows={1}
+                        className={cn(
+                            "flex-1 resize-none bg-transparent outline-none placeholder:text-muted-foreground",
+                            "min-h-[40px] py-2 px-1 leading-5",
+                            // Ensure it wraps nicely under badges and expands vertically
+                            "w-full",
+                            textareaClassName
+                        )}
+                        autoFocus={autoFocus}
+                    />
+                </div>
+            </div>
+        );
+    }
+);
+TagTextarea.displayName = "TagTextarea";

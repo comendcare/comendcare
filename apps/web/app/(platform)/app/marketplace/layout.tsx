@@ -202,18 +202,18 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                 {children}
             </ResizablePanel>
 
-            <>
-                <ResizableHandle withHandle/>
+            {/*<>*/}
+            {/*    <ResizableHandle withHandle/>*/}
 
-                <ResizablePanel
-                    defaultSize={defaultLayout[1]}
-                    minSize={15}
-                    maxSize={30}
-                    className="bg-white p-8 flex flex-col gap-4"
-                >
-                    <FiltersPanel/>
-                </ResizablePanel>
-            </>
+            {/*    <ResizablePanel*/}
+            {/*        defaultSize={defaultLayout[1]}*/}
+            {/*        minSize={15}*/}
+            {/*        maxSize={30}*/}
+            {/*        className="bg-white p-8 flex flex-col gap-4"*/}
+            {/*    >*/}
+            {/*        <FiltersPanel/>*/}
+            {/*    </ResizablePanel>*/}
+            {/*</>*/}
         </ResizablePanelGroup>
     )
 }
@@ -225,7 +225,7 @@ const FiltersPanel = () => {
         return <MilestoneFilters/>
     } else if (pathname.endsWith('/service-providers')){
         return <CROFilters/>
-    } else {
+    } else if (pathname.endsWith('/organizations')) {
         return <PAGFilters/>
     }
 }
