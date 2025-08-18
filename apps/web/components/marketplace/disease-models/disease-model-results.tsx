@@ -5,7 +5,7 @@ import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
-import {CROMarketplaceCard} from "~web/components/marketplace-cro-card";
+import {CROMarketplaceCard} from "~web/components/marketplace/marketplace-cro-card";
 import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
 import { Card, CardContent } from "@comend/components/ui/card";
 import { Skeleton } from "@comend/components/ui/skeleton";
@@ -48,7 +48,7 @@ export const NoResultsView = () => {
     )
 }
 
-export function CROSearchResults() {
+export function DiseaseModelSearchResults() {
     const { 
         lastFetchedPage, 
         setLastFetchedPage, 

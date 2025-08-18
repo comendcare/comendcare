@@ -6,8 +6,8 @@ import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
 import {FileText, HandCoins, Megaphone, Microscope, Users} from "lucide-react";
 import React from "react";
-import { PropertyBadge } from "./property-badge";
-import SaveOrganizationDialog from "./save-organization-dialog";
+import { PropertyBadge } from "../property-badge";
+import SaveOrganizationDialog from "../save-organization-dialog";
 
 type NodeTypeCount = Record<string, number>;
 

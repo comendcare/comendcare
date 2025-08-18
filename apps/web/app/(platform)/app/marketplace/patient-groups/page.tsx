@@ -1,7 +1,7 @@
 import React from "react"
 import { ScrollArea } from "@comend/components/ui/scroll-area";
-import { OrganizationSearchResults } from "~web/components/organization-search-results";
-import OrganizationSearchBar from "~web/components/organization-searchbar";
+import { OrganizationSearchResults } from "~web/components/marketplace/patient-groups/organization-search-results";
+import OrganizationSearchBar from "~web/components/marketplace/patient-groups/organization-searchbar";
 import PAGMarketplaceIntegratedSearchAndFilter from "~web/components/pag-marketplace-integrated-search-and-filter";
 
 export default async function PatientGroupsPage() {

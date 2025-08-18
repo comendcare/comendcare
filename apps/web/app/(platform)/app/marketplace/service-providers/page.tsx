@@ -2,8 +2,8 @@
 
 import React from "react"
 import { ScrollArea } from "@comend/components/ui/scroll-area";
-import {CROSearchResults} from "~web/components/cro-search-results";
-import CROSearchBar from "~web/components/cro-searchbar";
+import {CROSearchResults} from "~web/components/marketplace/service-providers/cro-search-results";
+import CROSearchBar from "~web/components/marketplace/service-providers/cro-searchbar";
 import {
     ProviderMarketplaceIntegratedSearchAndFilter
 } from "~web/components/provider-marketplace-integrated-search-and-filter";

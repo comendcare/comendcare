@@ -8,7 +8,7 @@ import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-c
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
-import MarketplaceBreadcrumb from "~web/components/marketplace-breadcrumb";
+import MarketplaceBreadcrumb from "~web/components/marketplace/marketplace-breadcrumb";
 import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
 import ShareDialog from "~web/components/share-dialog";
 import {FloatingDock} from "~web/components/floating-dock";

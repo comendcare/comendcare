@@ -1,14 +1,14 @@
 "use client"
-import {MarketplaceNav} from "~web/components/marketplace-nav"
+import {MarketplaceNav} from "~web/components/marketplace/marketplace-nav"
 import {MilestoneFilters} from "~web/components/milestone-filters"
-import {PAGFilters} from "~web/components/pag-filters"
+import {PAGFilters} from "~web/components/marketplace/patient-groups/pag-filters"
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable"
 import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {CROFilters} from "~web/components/cro-filters";
+import {CROFilters} from "~web/components/marketplace/service-providers/cro-filters";
 import { useQueryState } from "nuqs"
 import { initializeCROSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"

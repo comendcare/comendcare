@@ -6,8 +6,8 @@ import {
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
 import { ArrowLeft, Store } from "lucide-react";
-import CROPageTabs from "~web/components/cro-page-tabs";
-import CROPageHeader from "~web/components/cro-page-header";
+import CROPageTabs from "~web/components/marketplace/cro-page-tabs";
+import CROPageHeader from "~web/components/marketplace/cro-page-header";
 
 export default function CompanyHomePage({
                                                   params

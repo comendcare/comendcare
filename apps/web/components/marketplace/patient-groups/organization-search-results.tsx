@@ -1,12 +1,12 @@
 "use client"
 
 import React from "react"
-import { OrganizationMarketplaceCard } from "~web/components/marketplace-pag-card";
+import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card";
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
+import { OrganizationMarketplaceListElement } from "../marketplace-pag-list-element";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
-import { NoResultsView } from "./cro-search-results";
+import { NoResultsView } from "../service-providers/cro-search-results";
 import { Skeleton } from "@comend/components/ui/skeleton";
 
 const selector = (state: OrganizationSearchState) => ({

@@ -3,8 +3,8 @@
 import React from "react"
 import { useShallow } from "zustand/react/shallow";
 import { MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
-import { MilestoneMarketplaceListElement } from "./marketplace-milestone-list-element";
-import { MilestoneMarketplaceCard } from "./marketplace-milestone-card";
+import { MilestoneMarketplaceListElement } from "./marketplace/marketplace-milestone-list-element";
+import { MilestoneMarketplaceCard } from "./marketplace/marketplace-milestone-card";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";

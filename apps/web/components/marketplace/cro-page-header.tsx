@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import {ServiceProviderWebsiteButton} from "./service-provider-website-button";
+import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
 import {companyTypeMap} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
 

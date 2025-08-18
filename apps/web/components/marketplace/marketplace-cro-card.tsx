@@ -21,8 +21,8 @@ import {
     University
 } from "lucide-react";
 import {companyTypeMap, CompanyWithReviewsAndServices, Milestone} from "@comend/lib/types";
-import {PropertyBadge} from "./property-badge";
-import {TypeBadge} from "./type-badge";
+import {PropertyBadge} from "../property-badge";
+import {TypeBadge} from "../type-badge";
 import Image from "next/image"
 import ImageWithFallback from "@/packages/components/image-with-fallback";
 import {getMilestonesForService} from "@comend/lib/utils";
