@@ -51,6 +51,7 @@ import {
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
+import {writeRawEvent} from "@/apps/web/lib/raw-events";
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -2009,9 +2010,9 @@ export const createDiseaseModel = withOrganizationAuth(
 )
 
 function generateDonorNanoid() {
-  const id = nanoid(8) // generate 8 char
-  console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
-  return (id.slice(0, 4) + '-' + id.slice(4))
+    const id = nanoid(8) // generate 8 char
+    console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
+    return (id.slice(0, 4) + '-' + id.slice(4))
 }
 
 export const createDataTool = withOrganizationAuth(
@@ -3099,6 +3100,19 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     budget: rfpData.budget
                 },
             })
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "rfp_created",
+                externalId: response.id,
+                occurredAt: new Date(),
+                payload: {
+                    rfpId: response.id,
+                    orgId: organization.id,
+                    title: response.title,
+                    deadline: response.endDate
+                },
+            });
 
             return response
         } catch (error: any) {
@@ -5059,7 +5073,7 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
 
         const rawData = formData.get("data");
         if (!rawData || typeof rawData !== "string") {
-            return { error: "Invalid form data." };
+            return {error: "Invalid form data."};
         }
 
         const parsed = JSON.parse(rawData);

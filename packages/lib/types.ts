@@ -26,6 +26,54 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export const FeedItemType = z.enum([
+    "ORG_UPDATED", "ORG_RESEARCH_PLAN_UPDATED", "ORG_CREATED_TOOL", "ORG_CREATED_RFP",
+    "RFP_CREATED", "RFP_DEADLINE_APPROACHING", "RFP_CLOSED",
+    "PAPER_PUBLISHED_AGNOSTIC", "PAPER_PUBLISHED_GROUP",
+    "SERVICE_PROVIDER_CREATED", "PAG_PROFILE_CREATED",
+    "TOOL_REQUEST_CREATED", "TOOL_REQUEST_COMMENT_CREATED", "FEED_POST_CREATED",
+    "COMEND_UPDATE", "SERVICE_PROVIDER_RECOMMENDED", "PAG_RECOMMENDED",
+    "PROJECTS_RECOMMENDED", "ANALYTICS_GOAL_REACHED",
+    "RESEARCHER_RECOMMENDED", "CTG_TRIAL_POSTED",
+    "FDA_MEDWATCH_ALERT", "FDA_WHATS_NEW_DRUGS", "FDA_WHATS_NEW_VBB", "FDA_PRESS_RELEASE",
+]);
+
+export const FeedSource = z.enum(["USER", "PLATFORM", "THIRD_PARTY"]);
+
+export const CanonicalFeed = z.object({
+    type: FeedItemType,
+    source: FeedSource,
+    title: z.string().min(1),
+    content: z.record(z.any()).optional(), // JSONB payload (typed per type below)
+    externalUrl: z.string().url().optional(),
+    orgId: z.string().optional(),
+    userId: z.string().optional(),
+    occurredAt: z.date(),
+    // must uniquely identify the logical item for idempotency (hashable)
+    idempotencyKey: z.string().min(8),
+});
+
+// Example typed content per type (extend as you go)
+export const ContentByType = {
+    CTG_TRIAL_POSTED: z.object({
+        nctId: z.string(),
+        briefTitle: z.string(),
+        status: z.string().optional(),
+        conditions: z.array(z.string()).optional(),
+        locations: z.array(z.string()).optional(),
+    }),
+    FDA_MEDWATCH_ALERT: z.object({
+        guid: z.string(),
+        productNames: z.array(z.string()).optional(),
+        summary: z.string().optional(),
+    }),
+    RFP_CREATED: z.object({
+        rfpId: z.string(),
+        deadline: z.string().optional(),
+    }),
+    // ...etc
+} as const;
+
 export type RequestFiltersType = {
     statuses: {
         label: string,

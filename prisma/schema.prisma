@@ -1326,3 +1326,91 @@ enum RequestStatus {
   REJECTED
   UNDER_REVIEW
 }
+
+enum FeedSource {
+  USER
+  PLATFORM
+  THIRD_PARTY
+}
+
+enum FeedItemType {
+  ORG_UPDATED
+  ORG_RESEARCH_PLAN_UPDATED
+  ORG_CREATED_TOOL
+  ORG_CREATED_RFP
+  RFP_CREATED
+  RFP_DEADLINE_APPROACHING
+  RFP_CLOSED
+  PAPER_PUBLISHED_AGNOSTIC
+  PAPER_PUBLISHED_GROUP
+  SERVICE_PROVIDER_CREATED
+  PAG_PROFILE_CREATED
+  TOOL_REQUEST_CREATED
+  TOOL_REQUEST_COMMENT_CREATED
+  FEED_POST_CREATED
+
+  COMEND_UPDATE
+  SERVICE_PROVIDER_RECOMMENDED
+  PAG_RECOMMENDED
+  PROJECTS_RECOMMENDED
+  ANALYTICS_GOAL_REACHED
+
+  RESEARCHER_RECOMMENDED
+  CTG_TRIAL_POSTED // clinicaltrials.gov
+  FDA_MEDWATCH_ALERT
+  FDA_WHATS_NEW_DRUGS
+  FDA_WHATS_NEW_VBB
+  FDA_PRESS_RELEASE
+}
+
+model FeedItem {
+  id          String       @id @default(cuid())
+  type        FeedItemType
+  title       String
+  content     Json?        @db.Json
+  source      FeedSource
+  externalUrl String?
+  createdAt   DateTime     @default(now())
+  orgId       String?
+  userId      String?
+
+  // idempotency / dedupe for external + internal emitters
+  idempotencyKey String          @unique
+  // optional back-reference to the raw event that produced this item
+  rawEventId     String?         @unique
+  rawEvent       RawIngestEvent? @relation(fields: [rawEventId], references: [id])
+
+  @@index([orgId, createdAt])
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([createdAt])
+}
+
+model RawIngestEvent {
+  id         String   @id @default(cuid())
+  // where it came from and what it is
+  provider   String // e.g. "mixpanel", "rss:fda:medwatch", "app", "ctgov"
+  eventType  String // provider-specific name
+  externalId String? // GUID, RSS <guid>, trial NCT, Mixpanel event id, etc.
+  occurredAt DateTime
+  payload    Json     @db.Json // the raw event payload
+  receivedAt DateTime @default(now())
+
+  // dedupe per provider + externalId (nullable-friendly)
+  dedupeKey String @unique
+
+  // processing
+  status IngestStatus @default(PENDING)
+  error  String?
+
+  feedItem FeedItem?
+
+  @@index([provider, occurredAt])
+}
+
+enum IngestStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  SKIPPED
+}
