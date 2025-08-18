@@ -11,7 +11,8 @@ export async function POST(req: Request) {
                 id: { in: ids },
             },
             include: {
-                gene: true
+                gene: true,
+                organization: true,
             },
         });
 
