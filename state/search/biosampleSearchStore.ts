@@ -15,11 +15,11 @@ export type FiltersType = {
     //     value: string,
     //     disable?: boolean,
     // }[],
-    // milestoneTypes: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
+    types: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // types: {
     //     label: string,
     //     value: string,
@@ -45,7 +45,7 @@ export type FiltersType = {
 
 export const defaultFilters = {
     // categories: [],
-    // milestoneTypes: [],
+    types: [],
     // types: [],
     // certifications: [],
     // tags: [],
@@ -71,13 +71,13 @@ function generateFiltersString(filters: FiltersType): string {
     //     filtersList.push(`(${categoryFilter})`);
     // }
 
-    // // Milestone Types (Array Field)
-    // if (filters?.milestoneTypes && filters.milestoneTypes.length > 0) {
-    //     const milestoneTypeFilter = filters.milestoneTypes
-    //         .map(milestoneType => `milestoneTypes:=[${escapeValue(milestoneType.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${milestoneTypeFilter})`);
-    // }
+    // Biosample Types (Array Field)
+    if (filters?.types && filters.types.length > 0) {
+        const typeFilter = filters.types
+            .map(type => `types:=[${escapeValue(type.value)}]`)
+            .join(" && ");
+        filtersList.push(`(${typeFilter})`);
+    }
 
     // // Company Types (Single String Field)
     // if (filters?.types && filters.types.length > 0) {
@@ -156,15 +156,17 @@ const getUpdatedSearchResults = async (
     isNewSearch: boolean = true
 ): Promise<{results: any[], total: number}> => {
     try {
-        const TAG_PRIORITY_SORT = "_eval([ (tags:=[`Experienced in rare disease`]):2, (tags:=[`PAG friendly`]):1 ]):desc,avgRating:desc";
+        // const TAG_PRIORITY_SORT = "_eval([ (tags:=[`Experienced in rare disease`]):2, (tags:=[`PAG friendly`]):1 ]):desc,avgRating:desc";
 
         const filtersString = generateFiltersString(state.filters)
 
+        console.log(`FILTERS STRING`, filtersString)
+
         // Merge tag-priority sort with user-chosen sort
-        let sortBy = TAG_PRIORITY_SORT;
-        if (state.sortBy && sortByFilters[state.sortBy]) {
-            sortBy += `,${sortByFilters[state.sortBy]}`;
-        }
+        // let sortBy = TAG_PRIORITY_SORT;
+        // if (state.sortBy && sortByFilters[state.sortBy]) {
+        //     sortBy += `,${sortByFilters[state.sortBy]}`;
+        // }
 
         const searchParameters = {
             q: state.searchTerm,
@@ -276,7 +278,7 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                         "Search Term": newSearch,
                         "Results": total,
                         "Filters": {
-                            // "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
+                            "Types": filters.types.map(filter => filter.label),
                             // "Business Types": filters.types.map(filter => filter.label),
                             // "Certifications": filters.certifications.map(filter => filter.label),
                             // "Tags": filters.tags.map(filter => filter.label),
@@ -328,19 +330,19 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                 }, true)
 
                 const recentlySelected = {
-                    categories: getExclusiveToFirstGroup(newFilters, get().filters, 'categories'),
-                    milestoneTypes: getExclusiveToFirstGroup(newFilters, get().filters, 'milestoneTypes'),
+                    // categories: getExclusiveToFirstGroup(newFilters, get().filters, 'categories'),
                     types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
-                    certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications'),
-                    tags: getExclusiveToFirstGroup(newFilters, get().filters, 'tags')
+                    // types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
+                    // certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications'),
+                    // tags: getExclusiveToFirstGroup(newFilters, get().filters, 'tags')
                 }
 
                 const recentlyRemoved = {
-                    categories: getExclusiveToFirstGroup(get().filters, newFilters, 'categories'),
-                    milestoneTypes: getExclusiveToFirstGroup(get().filters, newFilters, 'milestoneTypes'),
+                    // categories: getExclusiveToFirstGroup(get().filters, newFilters, 'categories'),
                     types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
-                    certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications'),
-                    tags: getExclusiveToFirstGroup(get().filters, newFilters, 'tags')
+                    // types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
+                    // certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications'),
+                    // tags: getExclusiveToFirstGroup(get().filters, newFilters, 'tags')
                 }
 
                 if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
@@ -348,21 +350,21 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                     mixpanelTrack("Marketplace Biosamples Filters Selected", {
                         "Results": total,
                         "Filters": {
-                            // "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
+                            "Types": newFilters.types.map(filter => filter.label),
                             // "Business Types": newFilters.types.map(filter => filter.label),
                             // "Certifications": newFilters.certifications.map(filter => filter.label),
                             // "Tags": newFilters.tags.map(filter => filter.label),
                             // "Categories": newFilters.categories.map(filter => filter.label)
                         },
                         "Added": {
-                            // "Milestone Types": recentlySelected.milestoneTypes.map(filter => filter.label),
+                            "Types": recentlySelected.types.map(filter => filter.label),
                             // "Business Types": recentlySelected.types.map(filter => filter.label),
                             // "Certifications": recentlySelected.certifications.map(filter => filter.label),
                             // "Categories": recentlySelected.categories.map(filter => filter.label),
                             // "Tags": recentlySelected.tags.map(filter => filter.label)
                         },
                         "Removed": {
-                            // "Milestone Types": recentlyRemoved.milestoneTypes.map(filter => filter.label),
+                            "Types": recentlyRemoved.types.map(filter => filter.label),
                             // "Business Types": recentlyRemoved.types.map(filter => filter.label),
                             // "Certifications": recentlyRemoved.certifications.map(filter => filter.label),
                             // "Categories": recentlyRemoved.categories.map(filter => filter.label),

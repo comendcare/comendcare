@@ -15,6 +15,7 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {useCROSearchStore, CROSearchState} from "@/state/search/croSearchStore"
 import {
+    BIOSAMPLE_TYPE_OPTIONS,
     BUSINESS_TYPES,
     CRO_CERTIFICATIONS,
     CRO_TAGS,
@@ -46,9 +47,9 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     // const clearAllFilters = () =>
     //     setFilters({...filters, milestoneTypes: [], types: [], certifications: [], tags: [], categories: []})
 
-    // // helper to update a single filter key from MultipleSelector
-    // const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
-    //     setFilters({...filters, [key]: value})
+    // helper to update a single filter key from MultipleSelector
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+        setFilters({...filters, [key]: value})
 
     // const removeFilterItem = (key: keyof typeof filters, value: string) =>
     //     setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
@@ -80,7 +81,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-xs font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Search CROs, services, locations..."
+                        placeholder="Search types, genes..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value
@@ -92,6 +93,26 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                 </div>
 
                 <Separator orientation="vertical" className="h-8"/>
+
+                {/* Biosample Types */}
+                <div className="flex-1 px-6 py-4 min-w-[100px]">
+                    <Label className="text-xs font-semibold text-gray-900">Biosample Types</Label>
+                    <MultipleSelector
+                        value={filters.types}
+                        onChange={(vals) => setFilterKey("types", vals)}
+                        defaultOptions={BIOSAMPLE_TYPE_OPTIONS}
+                        placeholder="Any"
+                        hidePlaceholderWhenSelected
+                        className="mt-1 border-0 px-0 py-0"
+                        commandProps={{className: "bg-transparent"}}
+                        emptyIndicator={
+                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results
+                                found.</p>
+                        }
+                        showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
+                    />
+                </div>
             </div>
 
             <div className="flex flex-row gap-2 items-center">

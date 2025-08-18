@@ -63,30 +63,30 @@ const hiddenColumnIds = [
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
-        // {
-        //     id: "select",
-        //     header: ({table}) => (
-        //         <Checkbox
-        //             checked={
-        //                 table.getIsAllPageRowsSelected() ||
-        //                 (table.getIsSomePageRowsSelected() && "indeterminate")
-        //             }
-        //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        //             aria-label="Select all"
-        //             className="translate-y-[2px] mr-4"
-        //         />
-        //     ),
-        //     cell: ({row}) => (
-        //         <Checkbox
-        //             checked={row.getIsSelected()}
-        //             onCheckedChange={(value) => row.toggleSelected(!!value)}
-        //             aria-label="Select row"
-        //             className="translate-y-[2px] mr-4"
-        //         />
-        //     ),
-        //     enableSorting: false,
-        //     enableHiding: false,
-        // },
+        {
+            id: "select",
+            header: ({table}) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                    className="translate-y-[2px] mr-4"
+                />
+            ),
+            cell: ({row}) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="translate-y-[2px] mr-4"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        },
         {
             id: "types",
             accessorKey: "types",
@@ -112,26 +112,26 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             },
         },
-        // {
-        //     id: "diagnoses",
-        //     accessorKey: "donor.diagnoses",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Diagnoses"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <ul className="flex flex-col gap-2">
-        //             {row.original.donor?.diagnoses?.map((diagnosis: string, index: number) => (
-        //                 <li key={index} className="line-clamp-2">
-        //                     {diagnosis}
-        //                 </li>
-        //             ))}
-        //         </ul>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Diagnoses"
-        //     }
-        // },
+        {
+            id: "diagnoses",
+            accessorKey: "donor.diagnoses",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Diagnoses"/>
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.donor?.diagnoses?.map((diagnosis: string, index: number) => (
+                        <li key={index} className="line-clamp-2">
+                            {diagnosis}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Diagnoses"
+            }
+        },
         {
             id: "gene",
             accessorKey: "gene",
@@ -143,42 +143,42 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 label: "Gene"
             }
         },
-        // {
-        //     id: "variant",
-        //     accessorKey: "variant",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Variant"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Variant"
-        //     }
-        // },
-        // {
-        //     // NOTE: in order for filters to access the proper nested database object the path to
-        //     // the nested object must be defined in BOTH the id & accessorKey
-        //     id: "quantity",
-        //     accessorKey: "quantity",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Available Quantity"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <>
-        //             {
-        //                 row.original.quantity >= 0 &&
-        //                 row.original.quantityUnit &&
-        //                 `${row.original.quantity}${row.original.quantityUnit}`
-        //             }
-        //         </>
-        //     ),
-        //     enableColumnFilter: true,
-        //     meta: {
-        //         label: "Available Quantity",
-        //         variant: "range",
-        //         range: [0, 1000],
-        //         unit: 'ml',
-        //     },
-        // },
+        {
+            id: "variant",
+            accessorKey: "variant",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Variant"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Variant"
+            }
+        },
+        {
+            // NOTE: in order for filters to access the proper nested database object the path to
+            // the nested object must be defined in BOTH the id & accessorKey
+            id: "quantity",
+            accessorKey: "quantity",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Available Quantity"/>
+            ),
+            cell: ({row}) => (
+                <>
+                    {
+                        row.original.quantity >= 0 &&
+                        row.original.quantityUnit &&
+                        `${row.original.quantity}${row.original.quantityUnit}`
+                    }
+                </>
+            ),
+            enableColumnFilter: true,
+            meta: {
+                label: "Available Quantity",
+                variant: "range",
+                range: [0, 1000],
+                unit: 'ml',
+            },
+        },
         {
             id: "description",
             accessorKey: "description",

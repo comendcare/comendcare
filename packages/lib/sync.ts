@@ -439,16 +439,20 @@ export const syncToTypesense = async (env: {
                 },
                 {
                     name: "gene",
-                    facet: false,
+                    type: "string",
                     index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
                     store: true,
-                    type: "string"
+                    facet: true,
+                    optional: true
                 },
+                {
+                    name: "types",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                }
             ]
         }
 
@@ -500,6 +504,7 @@ export const syncToTypesense = async (env: {
             select: {
                 id: true,
                 gene: true,
+                types: true,
             }
         })
 
@@ -593,7 +598,8 @@ export const syncToTypesense = async (env: {
         if (biosamples.length > 0) {
             const uploadBiosamples = biosamples.map(biosample => ({
                 id: biosample.id,
-                gene: biosample.gene?.symbol
+                gene: biosample.gene?.symbol,
+                types: biosample.types
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
