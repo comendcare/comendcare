@@ -189,32 +189,10 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // }
 
     return (
-        <ResizablePanelGroup
-            direction="horizontal"
-            onLayout={(sizes: number[]) => {
-                setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-            }}
-            className="h-full items-stretch"
-        >
-            <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}
-                            className="container relative flex flex-col items-center">
-                <MarketplaceNav />
-                {children}
-            </ResizablePanel>
-
-            {/*<>*/}
-            {/*    <ResizableHandle withHandle/>*/}
-
-            {/*    <ResizablePanel*/}
-            {/*        defaultSize={defaultLayout[1]}*/}
-            {/*        minSize={15}*/}
-            {/*        maxSize={30}*/}
-            {/*        className="bg-white p-8 flex flex-col gap-4"*/}
-            {/*    >*/}
-            {/*        <FiltersPanel/>*/}
-            {/*    </ResizablePanel>*/}
-            {/*</>*/}
-        </ResizablePanelGroup>
+        <div className="h-full w-full flex flex-col items-center">
+            <MarketplaceNav />
+            {children}
+        </div>
     )
 }
 

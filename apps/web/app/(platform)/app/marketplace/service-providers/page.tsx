@@ -4,9 +4,7 @@ import React from "react"
 import { ScrollArea } from "@comend/components/ui/scroll-area";
 import {CROSearchResults} from "~web/components/marketplace/service-providers/cro-search-results";
 import CROSearchBar from "~web/components/marketplace/service-providers/cro-searchbar";
-import {
-    ProviderMarketplaceIntegratedSearchAndFilter
-} from "~web/components/provider-marketplace-integrated-search-and-filter";
+import {ProviderMarketplaceIntegratedSearchAndFilter} from "~web/components/marketplace/service-providers/provider-marketplace-integrated-search-and-filter";
 
 export default function CROPage() {
     return (
