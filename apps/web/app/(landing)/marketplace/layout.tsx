@@ -12,6 +12,7 @@ import {CROFilters} from "~web/components/marketplace/service-providers/cro-filt
 import { useQueryState } from "nuqs"
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
+import { TooltipProvider } from "@/packages/components/ui/tooltip"
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -207,10 +208,12 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // }
 
     return (
+        <TooltipProvider>
         <div className="mt-24 h-full w-full flex flex-col items-center">
             <PublicMarketplaceNav />
             {children}
         </div>
+        </TooltipProvider>
     )
 }
 

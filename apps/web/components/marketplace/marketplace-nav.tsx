@@ -35,6 +35,34 @@ const links = [
     // },
 ]
 
+const publicLinks = [
+    {
+        name: "Patient Groups",
+        href: "/patient-groups",
+        comingSoon: false
+    },
+    {
+        name: "Biosamples",
+        href: "/biosamples",
+        comingSoon: false
+    },
+    {
+        name: "Disease Models",
+        href: "/disease-models",
+        comingSoon: false
+    },
+    {
+        name: "Clinical Datasets",
+        href: "/clinical-datasets",
+        comingSoon: false
+    },
+    // {
+    //     name: "Milestones",
+    //     href: "/milestones",
+    //     comingSoon: false
+    // },
+]
+
 export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>) {
 
     return (
@@ -51,7 +79,7 @@ export function PublicMarketplaceNav({className}: React.HTMLAttributes<HTMLDivEl
         <TabNav 
             className={className}
             baseLink={"/marketplace/"}
-            links={links}
+            links={publicLinks}
         />
     )
 }
