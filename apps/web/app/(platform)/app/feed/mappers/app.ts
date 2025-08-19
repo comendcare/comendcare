@@ -16,3 +16,19 @@ register("app", "rfp_created", async ({ payload, occurredAt }) => {
         idempotencyKey,
     };
 });
+
+register("app", "rfp_deadline_approaching", async ({ payload, occurredAt }) => {
+    const { rfpId, orgId, title, deadline } = payload as { rfpId: string; orgId?: string; title: string; deadline?: string };
+    // 7 days prior notification
+    const idempotencyKey = crypto.createHash("sha256").update(`app:rfp:${rfpId}:deadline:7`).digest("hex");
+
+    return {
+        type: "RFP_DEADLINE_APPROACHING",
+        source: "USER",
+        title,
+        content: { rfpId, deadline },
+        orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});

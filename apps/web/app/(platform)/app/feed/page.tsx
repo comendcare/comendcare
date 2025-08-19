@@ -1,11 +1,11 @@
-import NewPostDialog from "~web/components/new-post-dialog";
 import {getSession} from "@/packages/lib/auth";
-import {getOrganizationFromOrganizationId, getPosts} from "@comend/lib/fetchers";
+import {fetchFeedPage, getOrganizationFromOrganizationId, getPosts} from "@comend/lib/fetchers";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import NoOrganization from "~web/components/no-organization";
 import Image from "next/image";
-import {PostList} from "~web/components/post-list";
 import {toast} from "sonner";
+import {FeedList} from "~web/components/feed/feed-list";
+import {FeedPageDTO} from "@/packages/lib/types";
 
 export default async function FeedPage() {
     const session = await getSession()
@@ -83,6 +83,18 @@ export default async function FeedPage() {
         comments: true,
         author: true,
     })
+    const orgId: string | undefined = undefined;
+    const first = await fetchFeedPage({ orgId });
+
+    const initialPage = {
+        items: first.items.map((i) => ({
+            ...i,
+            createdAt: i.createdAt.toISOString(),
+        })),
+        nextCursor: first.nextCursor
+            ? { createdAt: first.nextCursor.createdAt.toISOString(), id: first.nextCursor.id }
+            : null,
+    };
 
     if (organization) {
         if (!organization.verified) {
@@ -117,8 +129,7 @@ export default async function FeedPage() {
         } else if (posts.data) {
             return (
                 <main className="flex flex-col items-center w-full max-w-2xl mx-auto p-4 space-y-4">
-                    <NewPostDialog/>
-                    <PostList posts={posts.data}/>
+                    <FeedList initialPage={initialPage as FeedPageDTO} orgId={orgId} />
                 </main>
             )
         }

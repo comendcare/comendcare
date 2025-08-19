@@ -26,6 +26,47 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export type FeedItemType =
+    | "RFP_CREATED"
+    | "RFP_DEADLINE_APPROACHING"
+    | "RFP_CLOSED"
+    | "FDA_MEDWATCH_ALERT"
+    | "CTG_TRIAL_POSTED"
+    | "ORG_UPDATED"
+    | "ORG_RESEARCH_PLAN_UPDATED"
+    | "ORG_CREATED_TOOL"
+    | "ORG_CREATED_RFP"
+    | "PAPER_PUBLISHED_AGNOSTIC"
+    | "PAPER_PUBLISHED_GROUP"
+    | "SERVICE_PROVIDER_CREATED"
+    | "PAG_PROFILE_CREATED"
+    | "TOOL_REQUEST_CREATED"
+    | "TOOL_REQUEST_COMMENT_CREATED"
+    | "FEED_POST_CREATED"
+    | "COMEND_UPDATE"
+    | "SERVICE_PROVIDER_RECOMMENDED"
+    | "PAG_RECOMMENDED"
+    | "PROJECTS_RECOMMENDED"
+    | "ANALYTICS_GOAL_REACHED"
+    | "RESEARCHER_RECOMMENDED";
+
+export interface FeedItemDTO {
+    id: string;
+    type: FeedItemType;
+    title: string;
+    content: Record<string, any> | null;
+    source: "USER" | "PLATFORM" | "THIRD_PARTY";
+    externalUrl?: string | null;
+    createdAt: string; // ISO from API
+    orgId?: string | null;
+    userId?: string | null;
+}
+
+export interface FeedPageDTO {
+    items: FeedItemDTO[];
+    nextCursor: { createdAt: string; id: string } | null;
+}
+
 export const FeedItemType = z.enum([
     "ORG_UPDATED", "ORG_RESEARCH_PLAN_UPDATED", "ORG_CREATED_TOOL", "ORG_CREATED_RFP",
     "RFP_CREATED", "RFP_DEADLINE_APPROACHING", "RFP_CLOSED",

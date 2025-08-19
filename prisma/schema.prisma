@@ -1380,6 +1380,7 @@ model FeedItem {
   rawEventId     String?         @unique
   rawEvent       RawIngestEvent? @relation(fields: [rawEventId], references: [id])
 
+  @@unique([createdAt, id], name: "createdAt_id")
   @@index([orgId, createdAt])
   @@index([userId, createdAt])
   @@index([type, createdAt])
