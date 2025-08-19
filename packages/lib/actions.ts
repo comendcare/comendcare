@@ -36,6 +36,7 @@ import {
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {
+    Actor,
     ApiResponse,
     Asset,
     DEFAULT_KANBAN_COLUMNS,
@@ -2999,15 +3000,33 @@ export const deleteRFP = withOrganizationAuth(
 )
 
 export const createOrUpdateRFP = withOrganizationAuth(
-    async (organization: Organization, rfpData: Partial<RFP>) => {
+    async (
+        organization: Organization,
+        rfpData: Partial<RFP>,
+        actor?: Actor
+    ) => {
         try {
             if (!organization.id) {
-                throw new Error("No organization id provided.")
+                throw new Error("No organization id provided.");
             }
+
+            // Pre-check: did it exist before?
+            // If there is no id in rfpData, this is definitely a create.
+            const existing =
+                rfpData.id
+                    ? await prisma.rFP.findUnique({
+                        where: { id: rfpData.id },
+                        select: { id: true, private: true, endDate: true, title: true },
+                    })
+                    : null;
+
+            const wasExisting = !!existing;
+            const wasPrivate = existing?.private ?? undefined;
+            const wasEndDate = existing?.endDate ?? undefined;
 
             const response = await prisma.rFP.upsert({
                 where: {
-                    id: rfpData.id || nanoid()
+                    id: rfpData.id || nanoid(),
                 },
                 include: {
                     contacts: true,
@@ -3015,10 +3034,11 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     milestones: {
                         include: {
                             milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
+                                include: { types: { include: { milestoneType: true } } },
+                            },
+                        },
+                    },
+                    organization: true,
                 },
                 update: {
                     headerImage: rfpData.headerImage,
@@ -3029,9 +3049,9 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
+                                ...(attachment.name ? { name: attachment.name } : undefined),
+                            })),
+                        },
                     },
                     contacts: {
                         deleteMany: {},
@@ -3039,30 +3059,26 @@ export const createOrUpdateRFP = withOrganizationAuth(
                             data: (rfpData?.contacts || []).map((contact: any) => ({
                                 name: contact.name,
                                 email: contact.email,
-                                ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
+                                ...(contact.role ? { role: contact.role } : undefined),
+                                ...(contact.affiliation ? { affiliation: contact.affiliation } : undefined),
+                            })),
+                        },
                     },
-                    private: rfpData.private || false,
-                    pinned: rfpData.pinned || false,
-                    openTo: rfpData.openTo || [],
+                    private: rfpData.private ?? false,
+                    pinned: rfpData.pinned ?? false,
+                    openTo: rfpData.openTo ?? [],
                     startDate: rfpData.startDate,
                     endDate: rfpData.endDate,
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
+                            milestone: { connect: { id: milestone.milestoneId } },
+                        })),
                     },
-                    budget: rfpData.budget
+                    budget: rfpData.budget,
                 },
                 create: {
-                    // create with the given id if it's available. This is useful for situations like 'undo'
-                    // where we're re-creating a pre-existing rfp, and the id should match the id in our zustand state
-                    ...(rfpData.id ? {id: rfpData.id} : undefined),
+                    ...(rfpData.id ? { id: rfpData.id } : undefined),
                     headerImage: rfpData.headerImage,
                     title: rfpData.title || "",
                     description: rfpData.description,
@@ -3070,102 +3086,202 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
+                                ...(attachment.name ? { name: attachment.name } : undefined),
+                            })),
+                        },
                     },
                     contacts: {
                         createMany: {
                             data: (rfpData?.contacts || []).map((contact: any) => ({
                                 name: contact.name,
                                 email: contact.email,
-                                ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
+                                ...(contact.role ? { role: contact.role } : undefined),
+                                ...(contact.affiliation ? { affiliation: contact.affiliation } : undefined),
+                            })),
+                        },
                     },
-                    private: rfpData.private || false,
-                    pinned: rfpData.pinned || false,
-                    openTo: rfpData.openTo || [],
+                    private: rfpData.private ?? false,
+                    pinned: rfpData.pinned ?? false,
+                    openTo: rfpData.openTo ?? [],
                     startDate: rfpData.startDate,
                     endDate: rfpData.endDate,
                     milestones: {
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
+                            milestone: { connect: { id: milestone.milestoneId } },
+                        })),
                     },
-                    organization: {connect: {id: organization.id}},
-                    budget: rfpData.budget
-                },
-            })
-
-            await writeRawEvent({
-                provider: "app",
-                eventType: "rfp_created",
-                externalId: response.id,
-                occurredAt: new Date(),
-                payload: {
-                    rfpId: response.id,
-                    orgId: organization.id,
-                    title: response.title,
-                    deadline: response.endDate
+                    organization: { connect: { id: organization.id } },
+                    budget: rfpData.budget,
                 },
             });
 
-            return response
+            // ---- Event emission logic ----------------------------------------
+
+            // Always have these available for payloads
+            const orgId = organization.id;
+            const orgName = organization.name ?? response.organization?.name;
+            const title = response.title;
+            const startDate = response.startDate ?? undefined;
+            const endDate = response.endDate ?? undefined;
+            const isPrivate = response.private ?? false;
+
+            // 1) ORG_CREATED_RFP — only when this was a new create
+            if (!wasExisting) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_rfp",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        rfpId: response.id,
+                        title,
+                        orgId,
+                        orgName,
+                        startDate,
+                        endDate,
+                        private: isPrivate,
+                        budget: response.budget ?? undefined,
+                        userId: actor?.userId,
+                        userName: actor?.userName,
+                    },
+                });
+            }
+
+            // 2) RFP_CREATED — when it becomes public for the first time
+            //    (i.e., previously private/undefined -> now public)
+            const justPublished =
+                (wasExisting && wasPrivate !== false && isPrivate === false) ||
+                (!wasExisting && isPrivate === false); // created already public
+
+            if (justPublished) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "rfp_created",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        rfpId: response.id,
+                        orgId,
+                        title,
+                        deadline: endDate ?? undefined,
+                        userId: actor?.userId,
+                        userName: actor?.userName,
+                    },
+                });
+            }
+
+            // 3) RFP_CLOSED — endDate exists AND is now in the past
+            if (endDate) {
+                const now = new Date();
+                const ended = new Date(endDate) <= now;
+
+                // Emit close if it *is* closed now and either:
+                //   - it was not closed before, or
+                //   - it was created already closed (idempotency key prevents dupes)
+                const wasEndedBefore = wasEndDate ? new Date(wasEndDate) <= now : false;
+
+                if (ended && !wasEndedBefore) {
+                    await writeRawEvent({
+                        provider: "app",
+                        eventType: "rfp_closed",
+                        externalId: response.id,
+                        occurredAt: new Date(),
+                        payload: {
+                            rfpId: response.id,
+                            orgId,
+                            title,
+                            deadline: endDate,
+                            userId: actor?.userId,
+                            userName: actor?.userName,
+                        },
+                    });
+                }
+            }
+
+            // (Optional) A separate scheduler/cron should emit rfp_deadline_approaching
+            // 7 days prior; don’t do it inline here to avoid race/timing issues.
+
+            return response;
         } catch (error: any) {
-            console.error("Error creating or updating RFP:", error.message);
-            throw new Error(error.message || "Failed to create or update RFP.");
+            console.error("Error creating or updating RFP:", error?.message ?? error);
+            throw new Error(error?.message || "Failed to create or update RFP.");
         }
     }
-)
+);
 
-/* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export const createRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {
-        metadata: JsonObject
-    } | undefined) => {
-        const roadmap = await prisma.roadmap.create({
-            data: {
-                title: roadmapTemplate?.title,
-                description: roadmapTemplate?.description,
-                organization: {
-                    connect: {id: organization.id}
-                },
-                modalities: roadmapTemplate?.modalities,
-                ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined)
+    async (
+        organization: Organization,
+        roadmapTemplate?: (typeof templateResearchPlans)[0] & { metadata: JsonObject },
+        actor?: Actor
+    ) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.");
             }
-        })
 
-        // if a roadmap template was provided, create the relevant nodes, milestones, and edges
-        if (roadmapTemplate?.milestones) {
-            await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate)
+            const roadmap = await prisma.roadmap.create({
+                data: {
+                    title: roadmapTemplate?.title,
+                    description: roadmapTemplate?.description,
+                    organization: { connect: { id: organization.id } },
+                    modalities: roadmapTemplate?.modalities,
+                    ...(roadmapTemplate?.metadata ? { metadata: roadmapTemplate.metadata } : undefined),
+                    // published defaults to true per your model; omit to use default
+                },
+            });
+
+            // If a template was provided, create nodes/edges/milestones first
+            if (roadmapTemplate?.milestones) {
+                await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate);
+            }
+
+            // Re-fetch with full graph
+            const finalRoadmap = await prisma.roadmap.findUnique({
+                where: { id: roadmap.id },
+                include: {
+                    milestones: {
+                        include: {
+                            node: true,
+                            contacts: true,
+                            attachments: true,
+                            types: { include: { milestoneType: true } },
+                            tools: { include: { tool: true } },
+                            rfps: { include: { rfp: true } },
+                        },
+                    },
+                    nodes: true,
+                    edges: true,
+                    organization: true,
+                },
+            });
+
+            // Emit feed event: ORG_RESEARCH_PLAN_CREATED
+            await writeRawEvent({
+                provider: "app",
+                eventType: "org_research_plan_created",
+                externalId: roadmap.id, // back-reference for idempotency
+                occurredAt: new Date(),
+                payload: {
+                    // mapper expects these:
+                    orgId: organization.id,
+                    orgName: organization.name ?? finalRoadmap?.organization?.name,
+                    roadmapId: roadmap.id,
+                    title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                    published: true, // Roadmap.published default in your model is true
+                    // actor
+                    userId: actor?.userId,
+                    userName: actor?.userName,
+                },
+            });
+
+            return finalRoadmap;
+        } catch (error: any) {
+            console.error("Error creating roadmap:", error?.message ?? error);
+            throw new Error(error?.message || "Failed to create roadmap.");
         }
-
-        const finalRoadmap = prisma.roadmap.findUnique({
-            where: {id: roadmap.id},
-            include: {
-                milestones: {
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: {include: {milestoneType: true}},
-                        tools: {include: {tool: true}},
-                        rfps: {include: {rfp: true}}
-                    }
-                },
-                nodes: true,
-                edges: true,
-                organization: true
-            }
-        })
-
-        return finalRoadmap
     }
-)
+);
 
 export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
     async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {

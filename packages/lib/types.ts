@@ -26,6 +26,8 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export type Actor = { userId: string; userName?: string };
+
 export type FeedItemType =
     | "RFP_CREATED"
     | "RFP_DEADLINE_APPROACHING"
