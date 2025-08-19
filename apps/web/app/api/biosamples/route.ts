@@ -20,9 +20,6 @@ export async function POST(req: Request) {
             },
         });
 
-        console.log(`GOT HERE`)
-        console.log(results)
-
         return NextResponse.json(results, { status: 200 });
     } catch (error) {
         console.error("Prisma fetch error:", error);

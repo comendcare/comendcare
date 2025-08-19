@@ -37,6 +37,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/t
 import { getDiagnosisTypes } from "@comend/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "@comend/lib/types";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 
 // columns temporarily hidden on production
 const hiddenColumnIds = [
@@ -83,20 +84,21 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
 
     const columns: ColumnDef<any>[] = [
         {
-            id: "id",
-            accessorKey: "id",
+            id: "organization",
+            accessorKey: "organization",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
+                <DataTableColumnHeader column={column} title="Organization"/>
             ),
             cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                <div className="flex gap-2 items-center w-[200px]">
+                    <ProfilePhoto
+                        img={row.original?.organization?.image}
+                        name={row.original?.organization?.name}
+                        className="size-8"
+                    />
+                    {row.original.organization?.name}
                 </div>
             ),
-            enableHiding: true,
-            meta: {
-                label: "Sample ID"
-            }
         },
         {
             id: "types",
@@ -131,7 +133,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition?.condition?.name) || 'No Condition'}</p>
                 </div>
             ),
             enableHiding: true,
@@ -190,95 +192,6 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             meta: {
                 label: "Institution"
             }
-        },
-        {
-            id: "private",
-            accessorKey: "private",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Visibility"/>
-            ),
-            cell: ({row}) => (
-                <div>
-                    {row.getValue("private") ? 'Private' : 'Public'}
-                </div>
-            ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Visibility",
-                variant: "select",
-                options: [
-                    {
-                        label: "Private",
-                        value: "true",
-                    }, {
-                        label: "Public",
-                        value: "false",
-                    }
-                ],
-                icon: CircleDashed,
-            },
-        },
-        {
-            id: "pinned",
-            accessorKey: "pinned",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Pinned"/>
-            ),
-            cell: ({row}) => (
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Button
-                            onClick={
-                                async () => {
-                                    await updateBiosample(
-                                        session?.user.organizationId,
-                                        {
-                                            id: row.original.id,
-                                            donorId: row.original.donorId,
-                                            // institution: row.original.institution,
-                                            // diagnoses: row.original.donor.diagnoses,
-                                            isPrivate: row.original.private,
-                                            isPinned: !row.original.pinned
-                                        }
-                                    )
-                                    revalidate(pathname)
-                                }
-                            }
-                            variant={'ghost'}
-                            disabled={row.original.private}
-                        >
-                            {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-                        </Button>
-                    </TooltipTrigger>
-                    {row.original.private && (
-                        <TooltipContent className="max-w-[200px]" side="left">
-                            <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
-                        </TooltipContent>
-                    )}
-                </Tooltip>
-            ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Pinned",
-                variant: "select",
-                options: [
-                    {
-                        label: "Pinned",
-                        value: "true",
-                    }, {
-                        label: "Not Pinned",
-                        value: "false",
-                    }
-                ],
-                icon: CircleDashed,
-            },
-        },
-        {
-            id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'diseaseModel'}/>,
-            enableHiding: false,
         },
     ]
 
