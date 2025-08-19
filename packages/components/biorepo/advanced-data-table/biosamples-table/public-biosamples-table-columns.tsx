@@ -293,17 +293,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "pathology",
-            accessorKey: "pathology",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Pathology"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Pathology"
-            }
-        },
-        {
             id: "preservationMethod",
             accessorKey: "preservationMethod",
             header: ({column}) => (

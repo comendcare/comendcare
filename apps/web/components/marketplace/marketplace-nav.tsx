@@ -1,5 +1,6 @@
 "use client"
 import { TabNav } from "@comend/components/tab-nav";
+import React from "react";
 
 const links = [
     {
@@ -40,6 +41,16 @@ export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>
         <TabNav 
             className={className}
             baseLink={"/app/marketplace/"}
+            links={links}
+        />
+    )
+}
+
+export function PublicMarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <TabNav 
+            className={className}
+            baseLink={"/marketplace/"}
             links={links}
         />
     )
