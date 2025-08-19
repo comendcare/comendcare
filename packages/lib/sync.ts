@@ -455,16 +455,88 @@ export const syncToTypesense = async (env: {
                 }
             ]
         }
+        const diseaseModelSchema = {
+            name: 'disease-models',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: "id",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "gene",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "types",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                }
+            ]
+        }
+        const clinicalDatasetSchema = {
+            name: 'clinical-datasets',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: "id",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "gene",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "types",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                }
+            ]
+        }
 
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
         console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
         console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
         console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
+        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
+        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
 
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
 
         const organizations = await prisma.organization.findMany({
             where: {
@@ -507,11 +579,33 @@ export const syncToTypesense = async (env: {
                 types: true,
             }
         })
+        const diseaseModels = await prisma.diseaseModel.findMany({
+            where: {
+                private: false
+            },
+            select: {
+                id: true,
+                gene: true,
+                types: true,
+            }
+        })
+        const clinicalDatasets = await prisma.tool.findMany({
+            where: {
+                private: false
+            },
+            select: {
+                id: true,
+                gene: true,
+                types: true,
+            }
+        })
 
         console.log('Raw organizations data:', organizations);
         console.log('Raw milestones data:', milestones);
         console.log('Raw companies data:', companies);
         console.log('Raw biosamples data:', biosamples)
+        console.log('Raw disease models data:', diseaseModels)
+        console.log('Raw clinical datasets data:', clinicalDatasets)
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
@@ -604,6 +698,28 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
             console.log('No biosamples to import.');
+        }
+
+        if (diseaseModels.length > 0) {
+            const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
+                id: diseaseModel.id,
+                gene: diseaseModel.gene?.symbol,
+                types: diseaseModel.types
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
+        } else {
+            console.log('No disease models to import.');
+        }
+
+        if (clinicalDatasets.length > 0) {
+            const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
+                id: dataset.id,
+                gene: dataset.gene?.symbol,
+                types: dataset.types
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
+        } else {
+            console.log('No clinical datasets to import.');
         }
 
         console.log('Sync job completed successfully.');
