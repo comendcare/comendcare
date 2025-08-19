@@ -15,7 +15,7 @@ import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import Link from "next/link";
 
-export function getDatasamplesTableColumns(): ColumnDef<any>[] {
+export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
     {
         id: "id",

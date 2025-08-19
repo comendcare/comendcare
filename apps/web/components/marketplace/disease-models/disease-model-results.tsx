@@ -39,20 +39,15 @@ export function DiseaseModelSearchResults() {
         )
     }
 
-    const ResultsView = () => {
-        // default to grid view
-        return (
-            <div className="w-full max-w-full flex flex-col gap-4">
-                {(!searchResults || searchResults.length === 0) ? (
-                    <NoResultsView />
-                ): (
-                    <div className="max-w-7xl w-full overflow-auto">
-                        <DiseaseModelsTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
-                    </div>
-                )}
-            </div>
-        )
-    }
-
-    return <ResultsView />
+    return (
+        <div className="w-full max-w-full flex flex-col gap-4">
+            {(!searchResults || searchResults.length === 0) ? (
+                <NoResultsView />
+            ): (
+                <div className="max-w-7xl w-full overflow-auto">
+                    <DiseaseModelsTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
+                </div>
+            )}
+        </div>
+    )
 }

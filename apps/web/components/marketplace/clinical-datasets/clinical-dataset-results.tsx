@@ -1,17 +1,14 @@
 "use client"
 
 import React from "react"
-import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import InfiniteScroll from "@comend/components/ui/infinite-scroll";
-import Image from "next/image";
-import {CROMarketplaceCard} from "~web/components/marketplace/marketplace-cro-card";
-import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
-import { Card, CardContent } from "@comend/components/ui/card";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
+import { getClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
+import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table";
+import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 
-const selector = (state: CROSearchState) => ({
+const selector = (state: ClinicalDatasetSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
@@ -24,7 +21,10 @@ export function ClinicalDatasetSearchResults() {
         setLastFetchedPage, 
         view, 
         searchResults 
-    } = useCROSearchStore(useShallow(selector))
+    } = useClinicalDatasetSearchStore(useShallow(selector))
+    const columns = getClinicalDatasetsTableColumns()
+
+    console.log(`search results`, searchResults)
 
     if (!searchResults) {
         return (
@@ -41,40 +41,15 @@ export function ClinicalDatasetSearchResults() {
         )
     }
 
-    const ResultsView = () => {
-        if (view === "list") {
-            return (
-                <ol className="w-full flex flex-col gap-4">
-                    {searchResults.map((cro, index) => (
-                        <CROMarketplaceListElement cro={cro} key={index}/>
-                    ))}
-                </ol>
-            )
-        }
-
-        // default to grid view
-        return (
-            <div className="w-full flex flex-col gap-4">
-                {(!searchResults || searchResults.length === 0) ? (
-                    <NoResultsView />
-                ): (
-                    <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                        {searchResults.map((cro, index) => (
-                            <CROMarketplaceCard cro={cro} key={index} location={"Marketplace"}/>
-                        ))}
-                    </div>
-                )}
-            </div>
-        )
-    }
-
     return (
-        <>
-            <ResultsView />
-            <InfiniteScroll 
-                lastFetchedPage={lastFetchedPage} 
-                setLastFetchedPage={setLastFetchedPage}
-            />
-        </>
+        <div className="w-full max-w-full flex flex-col gap-4">
+            {(!searchResults || searchResults.length === 0) ? (
+                <NoResultsView />
+            ): (
+                <div className="max-w-7xl w-full overflow-auto">
+                    <ClinicalDatasetsTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
+                </div>
+            )}
+        </div>
     )
 }

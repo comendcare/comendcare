@@ -10,7 +10,7 @@ import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers
 import {useSession} from "next-auth/react";
 import {CROFilters} from "~web/components/marketplace/service-providers/cro-filters";
 import { useQueryState } from "nuqs"
-import { initializeBiosampleSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
 
 // export const metadata: Metadata = {
@@ -130,12 +130,19 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
             types: parseQuery(queryTypes),
         }
         initializeBiosampleSearch(parsedBiosampleFilters)
+        console.log(`Biosample search initialized...`)
 
         const parsedDiseaseModelFilters = {
             types: parseQuery(queryTypes),
         }
         initializeDiseaseModelSearch(parsedDiseaseModelFilters)
-        console.log(`Biosample search initialized...`)
+        console.log(`Disease Model search initialized...`)
+
+        const parsedClinicalDatasetFilters = {
+            types: parseQuery(queryTypes),
+        }
+        initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
+        console.log(`Clinical Dataset search initialized...`)
     }
 
     useEffect(() => {

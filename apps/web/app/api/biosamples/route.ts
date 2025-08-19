@@ -12,7 +12,7 @@ export async function POST(req: Request) {
             },
             include: {
                 gene: true,
-                organization: true,
+                organization: {include: {conditions: {include: {condition: true}}}},
                 milestones: {
                     where: {milestone: {private: false}},
                     include: {milestone: true}
