@@ -19,41 +19,35 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {MOLECULAR_MECHANISMS, Option, optionSchema} from "@comend/lib/types";
 
+export const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
+    z.preprocess(
+        (v) => (v === "" || v === null ? undefined : v),
+        schema.optional()
+    );
+
 export const researchFormSchema = z.object({
-    disorder: z.array(optionSchema).optional(),
-    summary: z.string()
-        // .min(30, {
-        //     message: "The summary of your condition needs to be longer than 30 characters",
-        // })
-        .max(500, {
-            message: "The name of your condition needs to be shorter than 500 characters",
-        })
-        .optional(),
+    disorder: z.array(optionSchema).optional(),     // MultipleSelector; empty array = cleared
+    summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
-    otherCategories: z.string().optional(),
-    prevalenceNumerator: z.string().min(1, {
-        message: "Your prevalence numerator must be at least 1",
-    }).optional(),
-    prevalenceDenominator: z.string().min(1, {
-        message: "Your prevalence denominator must be at least 1",
-    }).optional(),
-    engaged: z.string().min(1, {  // These need to be strings because
-        message: "The number of patients your organization has engaged with must be at least 1.",
-    }).optional(),
-    national: z.string().optional(),
-    global: z.string().optional(),
-    // mechanisms: z.array(optionSchema).min(0),
-    mechanisms: z.array(z.string()).optional(),
-    otherMechanisms: z.string().optional(),
+    otherCategories: emptyToUndefined(z.string()),
+    engaged: emptyToUndefined(
+        z.string().regex(/^\d+$/, "Must be a positive integer")
+    ),
+    national: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+    global: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+    prevalenceNumerator: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+    prevalenceDenominator: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+    mechanisms: z.array(z.string()).optional(),     // treat [] as cleared
+    otherMechanisms: emptyToUndefined(z.string()),
     causal: z.array(optionSchema).optional(),
     genes: z.array(optionSchema).optional(),
     biomarkers: z.array(optionSchema).optional(),
     systems: z.array(optionSchema).optional(),
-    otherSystems: z.string().optional(),
+    otherSystems: emptyToUndefined(z.string()),
     symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     tools: z.array(optionSchema).optional(),
-})
+});
 
 export default function ResearchOnboardingForm(
     {

@@ -35,18 +35,27 @@ export default function MoneyInput(props: TextInputProps & {className?: string})
     const { form, name, cents = false } = props;
     const moneyFormatter = createMoneyFormatter(cents);
 
-    const initialValue = form.getValues()[name]
-        ? moneyFormatter.format(form.getValues()[name])
+    // Read initial numeric value (could be undefined)
+    const initialNumber = form.getValues()[name] as number | undefined;
+
+    // Initial display string: formatted if number, else empty
+    const initialDisplay = typeof initialNumber === "number"
+        ? moneyFormatter.format(initialNumber)
         : "";
 
-    const [value, setValue] = useReducer((_: any, next: string) => {
+    const [display, setDisplay] = useReducer((_: string, next: string) => {
         const digits = next.replace(/\D/g, "");
+        if (!digits) return ""; // allow truly empty
         const factor = cents ? 100 : 1;
         return moneyFormatter.format(Number(digits) / factor);
-    }, initialValue);
+    }, initialDisplay);
 
-    function handleChange(realChangeFn: Function, formattedValue: string) {
+    function handleChange(realChangeFn: (v: number | undefined) => void, formattedValue: string) {
         const digits = formattedValue.replace(/\D/g, "");
+        if (!digits) {
+            realChangeFn(undefined); // <-- cleared
+            return;
+        }
         const factor = cents ? 100 : 1;
         const realValue = Number(digits) / factor;
         realChangeFn(realValue);
@@ -56,38 +65,36 @@ export default function MoneyInput(props: TextInputProps & {className?: string})
         <FormField
             control={form.control}
             name={name}
-            render={({field}) => {
-                field.value = value;
-                const _change = (value: number) => {
-                    if (props.mixpanelTrackCallback) props.mixpanelTrackCallback(value)
-                    field.onChange(value)
+            render={({ field }) => {
+                const onRealChange = (v: number | undefined) => {
+                    if (props.mixpanelTrackCallback && typeof v === "number") props.mixpanelTrackCallback(v);
+                    field.onChange(v);
                 };
 
                 return (
                     <FormItem>
-                        {props.label &&
-                            <FormLabel>{props.label}</FormLabel>
-                        }
-                        {props.description &&
-                            <FormDescription className="flex items-center">
-                                {props.description}
-                            </FormDescription>
-                        }
+                        {props.label && <FormLabel>{props.label}</FormLabel>}
+                        {props.description && <FormDescription className="flex items-center">{props.description}</FormDescription>}
                         <FormControl>
                             <Input
                                 className={cn(props.className)}
-                                variant={"currency"}
+                                variant="currency"
                                 placeholder={props.placeholder || ""}
                                 type="text"
-                                {...field}
+                                // IMPORTANT: do not spread {...field} because field.value is a number/undefined,
+                                // but our input displays a formatted string.
                                 onChange={(ev) => {
-                                    setValue(ev.target.value);
-                                    handleChange(_change, ev.target.value);
+                                    const next = ev.target.value;
+                                    setDisplay(next);
+                                    handleChange(onRealChange, next);
                                 }}
-                                value={value}
+                                onBlur={field.onBlur}
+                                value={display}
+                                name={field.name}
+                                ref={field.ref}
                             />
                         </FormControl>
-                        <FormMessage/>
+                        <FormMessage />
                     </FormItem>
                 );
             }}

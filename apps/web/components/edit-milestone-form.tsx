@@ -110,6 +110,10 @@ const notificationsSelector = (state: NotificationsState) => ({
     setNotificationsViewed: state.setNotificationsViewed
 })
 
+const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
+    z.preprocess(v => (v === "" || v === null ? undefined : v), inner.optional());
+
+
 const editMilestoneForm = z.object({
     nodeType: z.string(),
     title: z
@@ -126,7 +130,7 @@ const editMilestoneForm = z.object({
     otherTypeDetails: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
-    budget: z.number().max(2147483647).min(0).optional(),
+    budget: nilOrEmptyToUndef(z.number().max(2147483647).min(0)),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     status: z.string(),
     isPrivate: z.boolean(),
