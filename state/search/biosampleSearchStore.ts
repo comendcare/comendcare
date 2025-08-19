@@ -278,7 +278,7 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                         "Search Term": newSearch,
                         "Results": total,
                         "Filters": {
-                            "Types": filters.types.map(filter => filter.label),
+                            "Types": filters.types?.map(filter => filter.label),
                             // "Business Types": filters.types.map(filter => filter.label),
                             // "Certifications": filters.certifications.map(filter => filter.label),
                             // "Tags": filters.tags.map(filter => filter.label),

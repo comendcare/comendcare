@@ -138,7 +138,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
             //         }
             //     })
             //     .filter(query => query !== undefined),
-            // types: parseQuery(queryTypes),
+            types: parseQuery(queryTypes),
             // certifications: parseQuery(queryCertifications),
             // tags: parseQuery(queryTags),
         }

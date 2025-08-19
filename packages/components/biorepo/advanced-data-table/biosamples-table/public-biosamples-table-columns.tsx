@@ -108,6 +108,23 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
         },
         {
+            id: "donorId",
+            accessorKey: "donorId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Public Donor ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Public Donor ID"
+            }
+        },
+        {
             id: "types",
             accessorKey: "types",
             header: ({column}) => (
@@ -174,31 +191,31 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //         label: "Variant"
         //     }
         // },
-        // {
-        //     // NOTE: in order for filters to access the proper nested database object the path to
-        //     // the nested object must be defined in BOTH the id & accessorKey
-        //     id: "quantity",
-        //     accessorKey: "quantity",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Available Quantity"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <>
-        //             {
-        //                 row.original.quantity >= 0 &&
-        //                 row.original.quantityUnit &&
-        //                 `${row.original.quantity}${row.original.quantityUnit}`
-        //             }
-        //         </>
-        //     ),
-        //     enableColumnFilter: true,
-        //     meta: {
-        //         label: "Available Quantity",
-        //         variant: "range",
-        //         range: [0, 1000],
-        //         unit: 'ml',
-        //     },
-        // },
+        {
+            // NOTE: in order for filters to access the proper nested database object the path to
+            // the nested object must be defined in BOTH the id & accessorKey
+            id: "quantity",
+            accessorKey: "quantity",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Available Quantity"/>
+            ),
+            cell: ({row}) => (
+                <>
+                    {
+                        row.original.quantity >= 0 &&
+                        row.original.quantityUnit &&
+                        `${row.original.quantity}${row.original.quantityUnit}`
+                    }
+                </>
+            ),
+            enableColumnFilter: true,
+            meta: {
+                label: "Available Quantity",
+                variant: "range",
+                range: [0, 1000],
+                unit: 'ml',
+            },
+        },
         {
             id: "description",
             accessorKey: "description",
@@ -215,28 +232,28 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
             enableHiding: true,
         },
-        // {
-        //     // NOTE: in order for filters to access the proper nested database object the path to
-        //     // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
-        //     id: "currentCountry",
-        //     accessorKey: "currentCountry",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Current Location"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <>
-        //             {COUNTRY_OPTIONS.find(t => t.value === row.original.currentCountry)?.label}
-        //         </>
-        //     ),
-        //     enableColumnFilter: true,
-        //     meta: {
-        //         label: "Current Location",
-        //         variant: "select",
-        //         options: COUNTRY_OPTIONS,
-        //         icon: CircleDashed,
-        //         showInAdvancedOnly: true
-        //     },
-        // },
+        {
+            // NOTE: in order for filters to access the proper nested database object the path to
+            // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
+            id: "currentCountry",
+            accessorKey: "currentCountry",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Current Location"/>
+            ),
+            cell: ({row}) => (
+                <>
+                    {COUNTRY_OPTIONS.find(t => t.value === row.original.currentCountry)?.label}
+                </>
+            ),
+            enableColumnFilter: true,
+            meta: {
+                label: "Current Location",
+                variant: "select",
+                options: COUNTRY_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true
+            },
+        },
         // {
         //     // NOTE: in order for filters to access the proper nested database object the path to
         //     // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.countryOfCollection)
@@ -259,54 +276,54 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //         showInAdvancedOnly: true,
         //     },
         // },
-        // {
-        //     id: "institution",
-        //     accessorKey: "institution.name",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Institution"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <a href={row.original.institution?.website}>
-        //             {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.institution?.name)?.label}
-        //         </a>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Institution"
-        //     }
-        // },
-        // {
-        //     id: "pathology",
-        //     accessorKey: "pathology",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Pathology"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Pathology"
-        //     }
-        // },
-        // {
-        //     id: "preservationMethod",
-        //     accessorKey: "preservationMethod",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Preservation Method"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <>
-        //             {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.preservationMethod)?.label}
-        //         </>
-        //     ),
-        //     enableHiding: true,
-        //     enableColumnFilter: true,
-        //     meta: {
-        //         label: "Preservation Method",
-        //         variant: "multiSelect",
-        //         options: SAMPLE_PRESERVATION_METHOD_OPTIONS,
-        //         icon: CircleDashed,
-        //         showInAdvancedOnly: true
-        //     },
-        // },
+        {
+            id: "institution",
+            accessorKey: "institution.name",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Institution"/>
+            ),
+            cell: ({row}) => (
+                <a href={row.original.institution?.website}>
+                    {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.institution?.name)?.label}
+                </a>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Institution"
+            }
+        },
+        {
+            id: "pathology",
+            accessorKey: "pathology",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Pathology"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Pathology"
+            }
+        },
+        {
+            id: "preservationMethod",
+            accessorKey: "preservationMethod",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Preservation Method"/>
+            ),
+            cell: ({row}) => (
+                <>
+                    {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.preservationMethod)?.label}
+                </>
+            ),
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Preservation Method",
+                variant: "multiSelect",
+                options: SAMPLE_PRESERVATION_METHOD_OPTIONS,
+                icon: CircleDashed,
+                showInAdvancedOnly: true
+            },
+        },
         // {
         //     id: "anatomicalSite",
         //     accessorKey: "anatomicalSite",
