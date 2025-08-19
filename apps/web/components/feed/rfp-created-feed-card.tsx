@@ -27,7 +27,7 @@ interface RfpCreatedProps {
     };
 }
 
-export default function RFpCreatedCard({ data }: RfpCreatedProps) {
+export default function RFPCreatedCard({ data }: RfpCreatedProps) {
     const createdAt = React.useMemo(() => {
         return formatDates(data.createdAt as Date);
     }, [data.createdAt]);
