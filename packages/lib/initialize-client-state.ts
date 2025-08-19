@@ -9,6 +9,7 @@ import { useOrganizationSearchStore } from "../../state/search/organizationSearc
 import { FiltersType as CROMarketplaceFiltersType } from "../../state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType} from "../../state/search/organizationSearchStore";
 import { FiltersType as BiosampleMarketplaceFiltersType, useBiosampleSearchStore} from "../../state/search/biosampleSearchStore";
+import { FiltersType as DiseaseModelMarketplaceFiltersType} from "../../state/search/diseaseModelSearchStore";
 import { Asset, RFP, Roadmap } from '@comend/lib/types';
 import { useToolStore } from "../../state/tool/toolStore";
 import { useRFPStore } from "../../state/rfp/rfpStore";
@@ -46,6 +47,15 @@ export function initializeBiosampleSearch(filters: BiosampleMarketplaceFiltersTy
 
         // Call Zustand's initState directly
         initBiosampleSearchState(filters)
+    }
+}
+
+export function initializeDiseaseModelSearch(filters: DiseaseModelMarketplaceFiltersType) {
+    if (typeof window !== "undefined") {
+        const initDiseaseModelSearchState = useBiosampleSearchStore.getState().initState;
+
+        // Call Zustand's initState directly
+        initDiseaseModelSearchState(filters)
     }
 }
 

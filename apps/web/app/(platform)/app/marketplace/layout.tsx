@@ -10,7 +10,7 @@ import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers
 import {useSession} from "next-auth/react";
 import {CROFilters} from "~web/components/marketplace/service-providers/cro-filters";
 import { useQueryState } from "nuqs"
-import { initializeBiosampleSearch, initializeCROSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
 
 // export const metadata: Metadata = {
@@ -127,22 +127,14 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
         console.log(`Organization search initialized...`)
 
         const parsedBiosampleFilters = {
-            // categories: parseQuery(queryCategories),
-            // milestoneTypes: parseQuery(queryMilestoneTypes)
-            //     .map(query => {
-            //         const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
-            //         if (!milestoneType) return undefined
-            //         return {
-            //             label: milestoneType.label,
-            //             value: milestoneType.id
-            //         }
-            //     })
-            //     .filter(query => query !== undefined),
             types: parseQuery(queryTypes),
-            // certifications: parseQuery(queryCertifications),
-            // tags: parseQuery(queryTags),
         }
         initializeBiosampleSearch(parsedBiosampleFilters)
+
+        const parsedDiseaseModelFilters = {
+            types: parseQuery(queryTypes),
+        }
+        initializeDiseaseModelSearch(parsedDiseaseModelFilters)
         console.log(`Biosample search initialized...`)
     }
 

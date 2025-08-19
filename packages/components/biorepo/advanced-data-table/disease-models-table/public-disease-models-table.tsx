@@ -25,12 +25,10 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
     onSelectionChange?: (selectedRows: Tool[]) => void,
     searchParams: SearchParams
 }) {
-    const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
         columns,
         pageCount,
-        enableAdvancedFilter,
         initialState: {
             sorting: [],
             columnPinning: {right: ["actions"], left: ["select"]},
@@ -54,7 +52,7 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
-                        <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                        <div className="pt-6 h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                             <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                                 <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
                                 <Image
@@ -66,28 +64,13 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                                 <p className="text-lg text-stone-500">
                                     A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                 </p>
-                                <NewToolDialog type={"diseaseModel"}/>
+                                <NewToolDialog numAssetsPinned={0} type={"diseaseModel"}/>
                             </div>
                         </div>
                     )
                     : undefined
                 }
-            >
-                {enableAdvancedFilter ? (
-                    <DataTableAdvancedToolbar table={table}>
-                        <DataTableFilterList
-                            table={table}
-                            shallow={shallow}
-                            debounceMs={debounceMs}
-                            throttleMs={throttleMs}
-                            align="start"
-                        />
-                    </DataTableAdvancedToolbar>
-                ) : (
-                    <DataTableToolbar table={table}>
-                    </DataTableToolbar>
-                )}
-            </DataTable>
+            />
         </>
     );
 }
