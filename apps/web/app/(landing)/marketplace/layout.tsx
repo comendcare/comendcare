@@ -209,7 +209,11 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
     return (
         <TooltipProvider>
-        <div className="mt-24 h-full w-full flex flex-col items-center">
+        <div className="mt-32 h-full w-full flex flex-col items-center">
+            <div className="max-w-7xl flex w-full flex-col gap-4 mb-8">
+                <h1 className="text-4xl font-semibold">Explore the Comend Marketplace</h1>
+                <p>Find an connect with patient groups in Comend's rare disease network. Find biosamples, disease models, and clinical datasets that help futher your research.</p>
+            </div>
             <PublicMarketplaceNav />
             {children}
         </div>

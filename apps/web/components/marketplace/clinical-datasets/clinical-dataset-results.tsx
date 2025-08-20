@@ -4,7 +4,7 @@ import React from "react"
 import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
-import { getClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
+import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 
@@ -22,7 +22,7 @@ export function ClinicalDatasetSearchResults() {
         view, 
         searchResults 
     } = useClinicalDatasetSearchStore(useShallow(selector))
-    const columns = getClinicalDatasetsTableColumns()
+    const columns = useClinicalDatasetsTableColumns()
 
     console.log(`search results`, searchResults)
 

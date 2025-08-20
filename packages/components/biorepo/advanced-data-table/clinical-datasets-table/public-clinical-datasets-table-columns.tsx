@@ -16,7 +16,7 @@ import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-me
 import Link from "next/link";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 
-export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
+export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
     {
         id: "organization",
