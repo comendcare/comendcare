@@ -122,7 +122,6 @@ export default function UserEditForm() {
                         notificationSettings: true,
                         consentSettings: true,
                         accounts: true,
-                        // comments: true,
                         follows: true,
                         sentInvitations: true,
                         memberships: true,
