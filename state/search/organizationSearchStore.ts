@@ -282,6 +282,10 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
             },
             totalResults: undefined,
             setTotalResults: (total: number) => set({totalResults: total}),
+            // resultsPerPage: 10,
+            // setResultsPerPage: (results: number) => {
+            //     set({resultsPerPage: results})
+            // }
         }),
         {
             limit: 100, // limit the stored history states to 100
