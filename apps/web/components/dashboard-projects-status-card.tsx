@@ -20,7 +20,11 @@ import {
 import {getMilestones} from "@/packages/lib/fetchers";
 import {useEffect, useState} from "react"
 import {StatusType} from "@comend/lib/types"
-import {Organization, Prisma} from "@prisma/client";
+import {Organization} from "@prisma/client";
+import {Button} from "@comend/components/ui/button";
+import {ExternalLink} from "lucide-react"
+import {useRouter} from "next/navigation";
+
 
 const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
@@ -40,27 +44,12 @@ const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
     COMPLETED: "--chart-3",
 }
 
-type OrganizationWithIncludes = Prisma.OrganizationGetPayload<{
-    include: {
-        conditions: {
-            include: {
-                condition: true
-            }
-        },
-        roadmaps: true;
-        members: true;
-        tools: true;
-        biosamples: true;
-        diseaseModel: true;
-        rfps: true;
-        materialAndDataAccessRequests: true;
-    };
-}>;
-
-export function DashboardProjectsStatusCard({organization}: { organization: OrganizationWithIncludes }) {
+export function DashboardProjectsStatusCard({organization}: { organization: Organization }) {
+    const router = useRouter();
     const [data, setData] = useState<
         { status: StatusType; count: number; fill: string; colorPreview: string }[]
     >([])
+    const [total, setTotal] = useState(0)
 
     useEffect(() => {
         async function fetchData() {
@@ -98,6 +87,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                 )
 
                 setData(chartData)
+                setTotal(Object.values(counts).reduce((a, b) => a + b, 0))
             }
         }
 
@@ -113,8 +103,17 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
     return (
         <Card className="col-span-3 flex flex-col">
             <CardHeader className="items-start pb-0">
-                <CardTitle>Milestone status overview</CardTitle>
-                <CardDescription>Current milestone distribution across all research plans.</CardDescription>
+                <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                    Project Status Overview
+                    <Button
+                        onClick={() => router.push("/app/research-plan")}
+                        variant="ghost"
+                        size="icon"
+                        className="p-0 h-auto w-auto"
+                    >
+                        <ExternalLink className="h-4 w-4 text-muted-foreground"/>
+                    </Button>
+                </CardTitle>
                 <div className="flex flex-row mb-4">
                     {data.map((item, index) => (
                         <span
@@ -122,7 +121,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                             className="flex items-center text-sm font-medium text-gray-900 dark:text-white me-3"
                         >
       <span
-          style={{ backgroundColor: item.colorPreview }}
+          style={{backgroundColor: item.colorPreview}}
           className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
       />
                             {STATUS_LABELS[item.status]}
@@ -159,24 +158,17 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                                             >
                                                 <tspan
                                                     x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) - 24}
-                                                    className="fill-muted-foreground"
-                                                >
-                                                    Across
-                                                </tspan>
-                                                <tspan
-                                                    x={viewBox.cx}
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold"
                                                 >
-                                                    {organization.roadmaps.length}
+                                                    {total.toLocaleString()}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
                                                     className="fill-muted-foreground"
                                                 >
-                                                    research plans
+                                                    total projects
                                                 </tspan>
                                             </text>
                                         )

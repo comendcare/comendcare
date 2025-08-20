@@ -2,7 +2,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend
 import PAGAnalyticsBarChart from "~web/components/pag-analytics-bar-chart";
 import PAGAnalyticsLineChartCard from "~web/components/pag-analytics-line-chart-card";
 import {DonutChartCard} from "~web/components/donut-chart-card";
-import {TestTube, Microscope, Users, Workflow} from "lucide-react";
+import {Workflow, ExternalLink, Database, FileCheck} from "lucide-react";
 import prisma from "@comend/lib/prisma"
 import {getSession} from "@/packages/lib/auth";
 import Image from "next/image";
@@ -10,6 +10,8 @@ import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organ
 import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
 import PAGAnalyticsToolsCard from "~web/components/pag-analytics-tools-card";
 import PAGAnalyticsProfileCard from "~web/components/pag-analytics-profile-card";
+import {Button} from "@comend/components/ui/button";
+import Link from "next/link"; // ✅ server-safe navigation
 
 export default async function PAGDashboardAnalyticsTab() {
     const session = await getSession()
@@ -17,14 +19,14 @@ export default async function PAGDashboardAnalyticsTab() {
     if (!session?.user.organizationId) {
         return <div className="h-full flex flex-col items-center justify-center py-20">
             <Image
-                alt="missing roadmap"
+                alt="No organization selected"
                 src="https://illustrations.popsy.co/gray/keynote-presentation.svg"
                 width={400}
                 height={400}
                 className="dark:hidden"
             />
             <Image
-                alt="missing roadmap"
+                alt="No organization selected"
                 src="https://illustrations.popsy.co/white/keynote-presentation.svg"
                 width={400}
                 height={400}
@@ -62,14 +64,6 @@ export default async function PAGDashboardAnalyticsTab() {
         return <div>No organization data available.</div>;
     }
 
-    const totalMilestones = await prisma.milestone.count({
-        where: {
-            roadmap: {
-                organizationId: organization.id
-            }
-        }
-    });
-
     return (
         <div className="p-4 space-y-4 w-full">
             <div className="space-y-2 sm:flex-auto">
@@ -89,7 +83,7 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*        <Microscope className="h-4 w-4 text-muted-foreground"/>*/}
                 {/*    </CardHeader>*/}
                 {/*    <CardContent>*/}
-                {/*        <div className="text-2xl font-bold">*/}
+                {/*        <div className="text-4xl font-bold">*/}
                 {/*            {organization.biosamples.length}*/}
                 {/*        </div>*/}
                 {/*        /!*<p className="text-xs text-muted-foreground">*!/*/}
@@ -99,13 +93,23 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*</Card>*/}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Milestones
+                        <CardTitle className="flex flex-row items-center justify-start gap-x-2 text-base font-medium">
+                            Research plans
+                            <Button
+                                asChild
+                                variant="ghost"
+                                size="icon"
+                                className="p-0 h-auto w-auto"
+                            >
+                                <Link href="/app/research-plan" aria-label="Research plans">
+                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                </Link>
+                            </Button>
                         </CardTitle>
                         <Workflow className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{totalMilestones}</div>
+                        <div className="text-4xl font-bold">{organization.roadmaps.length}</div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +20.1% from last month*/}
                         {/*</p>*/}
@@ -113,13 +117,23 @@ export default async function PAGDashboardAnalyticsTab() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
+                        <CardTitle className="flex flex-row items-center justify-start gap-x-2 text-base font-medium">
                             Active RFPs
+                            <Button
+                                asChild
+                                variant="ghost"
+                                size="icon"
+                                className="p-0 h-auto w-auto"
+                            >
+                                <Link href="/app/rfps" aria-label="Open RFPs">
+                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                </Link>
+                            </Button>
                         </CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground"/>
+                        <FileCheck className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{organization.rfps.length}</div>
+                        <div className="text-4xl font-bold">{organization.rfps.length}</div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +180.1% from last month*/}
                         {/*</p>*/}
@@ -127,14 +141,24 @@ export default async function PAGDashboardAnalyticsTab() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Saved providers
+                        <CardTitle className="flex flex-row items-center justify-start gap-x-2 text-base font-medium">
+                            Total tools
+                            <Button
+                                asChild
+                                variant="ghost"
+                                size="icon"
+                                className="p-0 h-auto w-auto"
+                            >
+                                <Link href="/app/tools/biosample" aria-label="Open tools">
+                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                </Link>
+                            </Button>
                         </CardTitle>
-                        <TestTube className="h-4 w-4 text-muted-foreground"/>
+                        <Database className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {organization.savedCompanies.length}
+                        <div className="text-4xl font-bold">
+                            {organization.tools.length}
                         </div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +201 since last hour*/}
