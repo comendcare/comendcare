@@ -12,6 +12,8 @@ import {CROFilters} from "~web/components/marketplace/service-providers/cro-filt
 import { useQueryState } from "nuqs"
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
+import { Button } from "@/packages/components/ui/button"
+import { Search } from "lucide-react"
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -29,6 +31,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // Zustand state management
     const {data: session} = useSession()
     const {defaultLayout, setLayout} = useFiltersStore()
+    const pathname = usePathname()
     // const [organization, setOrganization] = useState<Organization | null>();
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
@@ -207,8 +210,14 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // }
 
     return (
-        <div className="h-full w-full flex flex-col items-center">
-            <MarketplaceNav />
+        <div className="h-full w-full flex flex-col items-center p-4">
+            {pathname === '/app/marketplace' && (
+                <div className="max-w-7xl flex w-full flex-col gap-4 mb-8 bg-blue-light p-10 rounded-lg">
+                    <h1 className="text-4xl font-semibold">Explore the Comend Marketplace</h1>
+                    <p>Find an connect with patient groups in Comend's rare disease network. Find biosamples, disease models, and clinical datasets that help futher your research.</p>
+                </div>
+            )}
+            {pathname !== '/app/marketplace' && <MarketplaceNav />}
             {children}
         </div>
     )

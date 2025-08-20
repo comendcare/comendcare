@@ -1,5 +1,8 @@
 "use client"
+import { Button } from "@/packages/components/ui/button";
 import { TabNav } from "@comend/components/tab-nav";
+import { ArrowLeft, Search } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 const links = [
@@ -66,11 +69,22 @@ const publicLinks = [
 export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>) {
 
     return (
-        <TabNav 
-            className={className}
-            baseLink={"/app/marketplace/"}
-            links={links}
-        />
+        // <div className="flex flex-row items-center">
+        //     <Button asChild variant={"secondary"} className="absolute left-0">
+        //         <Link
+        //             href={'/app/marketplace'}
+        //         >
+        //             <ArrowLeft />
+        //             <Search/>
+        //             Return to explore
+        //         </Link>
+        //     </Button>
+            <TabNav 
+                className={className}
+                baseLink={"/app/marketplace/"}
+                links={links}
+            />
+        // </div>
     )
 }
 

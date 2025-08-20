@@ -13,6 +13,8 @@ import { useQueryState } from "nuqs"
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
 import { TooltipProvider } from "@/packages/components/ui/tooltip"
+import { Search } from "lucide-react"
+import { Button } from "@/packages/components/ui/button"
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -212,7 +214,17 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
         <TooltipProvider>
         <div className="mt-32 h-full w-full flex flex-col items-center">
             <div className="max-w-7xl flex w-full flex-col gap-4 mb-8">
-                <h1 className="text-4xl font-semibold">Explore the Comend Marketplace</h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-4xl font-semibold">Explore the Comend Marketplace</h1>
+                    {pathname !== '/marketplace' && (
+                        <Button asChild variant={"cta"}>
+                            <a href="/marketplace">
+                                <Search />
+                                Explore
+                            </a>
+                        </Button>
+                    )}
+                </div>
                 <p>Find an connect with patient groups in Comend's rare disease network. Find biosamples, disease models, and clinical datasets that help futher your research.</p>
             </div>
             {pathname !== '/marketplace' && <PublicMarketplaceNav />}
