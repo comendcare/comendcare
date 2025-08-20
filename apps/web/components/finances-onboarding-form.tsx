@@ -83,20 +83,6 @@ export default function FinancesOnboardingForm(
                     name="raised"
                 />
 
-                {/*<MoneyInput*/}
-                {/*    form={form}*/}
-                {/*    label="Total funds deployed to research"*/}
-                {/*    description="The total amount of money deployed to research to date."*/}
-                {/*    name="deployed"*/}
-                {/*/>*/}
-
-                {/*<MoneyInput*/}
-                {/*    form={form}*/}
-                {/*    label="Annual research budget"*/}
-                {/*    description="The amount of money allocated to advancing research this year."*/}
-                {/*    name="budget"*/}
-                {/*/>*/}
-
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-row space-x-2">
                         <Button type="button" onClick={() => router.push(previousLink)}>
