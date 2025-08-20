@@ -1326,3 +1326,8 @@ enum RequestStatus {
   REJECTED
   UNDER_REVIEW
 }
+
+model RoadmapIdempotency {
+  key         String   @id
+  processedAt DateTime
+}
