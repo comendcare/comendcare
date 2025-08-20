@@ -4,7 +4,7 @@ import * as fs from "fs/promises";
 async function main() {
     console.log("Starting institution seed script...");
 
-    const raw = await fs.readFile("data/v1.67-2025-06-24-ror-data.json", "utf-8");
+    const raw = await fs.readFile("packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
     const institutions = JSON.parse(raw);
 
     let processedCount = 0;
