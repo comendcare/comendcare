@@ -75,7 +75,7 @@ function generateFiltersString(filters: FiltersType): string {
     if (filters?.types && filters.types.length > 0) {
         const typeFilter = filters.types
             .map(type => `types:=[${escapeValue(type.value)}]`)
-            .join(" && ");
+            .join(" || ");
         filtersList.push(`(${typeFilter})`);
     }
 
@@ -114,41 +114,6 @@ const sortByFilters: { [key: string]: string } = {
     // "alphabetical": "title:asc",
     // "highest-rated": "avgRating:desc",
     // "most-reviewed": "moneyDeployed:desc",
-}
-
-const generateRecommendations = async (milestones: Milestone[]) => {
-    let recommendationResults: Recommendation[] = []
-
-    await Promise.all(
-        milestones.map(async (milestone) => {
-            const newFilters = {
-                categories: Array.from(
-                    new Set((milestone?.types || []).flatMap(type => type?.milestoneType?.categories || []))
-                )
-                    .map(categoryValue => (ASSOCIATED_CATEGORIES.find(c => c.value === categoryValue)))
-                    .filter(c => c !== undefined)
-                    .map(c => ({label: c?.label, value: c?.value})),
-                types: [],
-                certifications: [],
-                tags: []
-            }
-            const {results: newSearchResults} = await getUpdatedSearchResults({
-                searchTerm: '',
-                sortBy: "alphabetical",
-                filters: newFilters,
-                lastFetchedPage: 1,
-            }, true)
-
-            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
-                return ({
-                    content: result,
-                    milestone
-                } as Recommendation)
-            }))
-        })
-    )
-
-    return recommendationResults
 }
 
 const getUpdatedSearchResults = async (
@@ -255,6 +220,8 @@ export interface BiosampleSearchState {
     // setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
     totalResults: undefined | number,
     setTotalResults: (total: number) => void,
+    resultsPerPage: number,
+    setResultsPerPage: (num: number) => void
 }
 
 export const useBiosampleSearchStore = create<BiosampleSearchState>()(
@@ -403,6 +370,10 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
             // },
             totalResults: undefined,
             setTotalResults: (total: number) => set({ totalResults: total }),
+            resultsPerPage: 10,
+            setResultsPerPage: (num: number) => {
+                set({resultsPerPage: num})
+            }
         }),
         {
             limit: 100, // limit the stored history states to 100

@@ -13,7 +13,8 @@ import {
     Users,
     TestTubeDiagonal,
     Rat,
-    FileText, Newspaper
+    FileText,
+    Database, Newspaper
 } from "lucide-react"
 import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -103,7 +104,7 @@ const data = {
                 },
                 {
                     title: "Clinical Datasets",
-                    icon: FileText,
+                    icon: Database,
                     variant: "ghost",
                     url: "/app/marketplace/clinical-datasets"
                 },
