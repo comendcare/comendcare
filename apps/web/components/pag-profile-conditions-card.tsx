@@ -5,28 +5,30 @@ import {Badge} from "@comend/components/ui/badge";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
 import EditPAGProfileConditionCardDialog from "~web/components/edit-pag-profile-condition-card-dialog";
-import { Info } from "lucide-react";
+import {Info} from "lucide-react";
 import {formatNumberWithCommas} from "@/packages/lib/utils";
 
 export const PAGProfileConditionsCard = ({
-    conditions, 
-    organization, 
-    showEditDialog, 
-    isPrivate = false
-}: { 
-    conditions: Partial<Condition>[] | null, 
-    organization: Partial<Organization>, 
+                                             conditions,
+                                             organization,
+                                             showEditDialog,
+                                             isPrivate = false
+                                         }: {
+    conditions: Partial<Condition>[] | null,
+    organization: Partial<Organization>,
     showEditDialog: boolean,
     isPrivate?: boolean
 }) => {
 
     if (conditions) {
+        const condition = conditions[0]
+
         return (
             <TooltipProvider>
                 <Card className="organization-profile-tour-step2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                            Condition
+                            {condition?.name}
                         </CardTitle>
                         {showEditDialog &&
                             <EditPAGProfileConditionCardDialog organization={organization}/>
@@ -34,93 +36,92 @@ export const PAGProfileConditionsCard = ({
                     </CardHeader>
 
                     <CardContent>
-                        {conditions.length > 0 ? conditions.map((condition: Partial<Condition>) =>
-                            <div
-                                key={condition?.id}
-                                className="flex flex-col space-y-4"
-                            >
-                                <div className="space-y-2">
-                                    <div className="inline-flex flex-row justify-between items-center">
-                                        {/*<Link*/}
-                                        {/*    href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${condition.slug}`}*/}
-                                        {/*    className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"*/}
-                                        {/*>*/}
-                                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                                            {condition?.name}
-                                        </h3>
-                                        {/*    <ExternalLink />*/}
-                                        {/*</Link>*/}
-                                    </div>
-                                    <p>
-                                        {condition?.summary}
-                                    </p>
-                                </div>
+                        <div
+                            key={condition?.id}
+                            className="flex flex-col space-y-4"
+                        >
+                            {/*<div className="space-y-2">*/}
+                            {/*    <div className="inline-flex flex-row justify-between items-center">*/}
+                            {/*<Link*/}
+                            {/*    href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${condition.slug}`}*/}
+                            {/*    className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"*/}
+                            {/*>*/}
+                            {/*<h3 className="scroll-m-20 text-xl tracking-tight font-semibold">*/}
+                            {/*    {condition?.name}*/}
+                            {/*</h3>*/}
+                            {/*    <ExternalLink />*/}
+                            {/*</Link>*/}
+                            {/*    </div>*/}
+                            {/*    <p>*/}
+                            {/*        {condition?.summary}*/}
+                            {/*    </p>*/}
+                            {/*</div>*/}
 
-                                <div className="space-y-2">
-                                    <div className="flex flex-row items-center justify-start w-full gap-2">
-                                        <h4 className="scroll-m-20 text-base font-semibold">Epidemiology</h4>
-                                        <Tooltip delayDuration={0}>
-                                            {/*disabled to make the tooltip unclickable*/}
-                                            <TooltipTrigger disabled>
-                                                <Info 
-                                                    className="text-black h-4 w-4"/>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>
-                                                    {`The number presented here are all approximate.`}
-                                                </p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                    {condition.prevalenceNumerator || condition.prevalenceDenominator || condition.numberOfPatientsEngaged ? (
-                                        <ul className="flex flex-col list-disc list-inside">
-                                            {condition.prevalenceNumerator && condition.prevalenceDenominator && (
-                                                <li>
+                            <div className="space-y-2">
+                                <div className="flex flex-row items-center justify-start w-full gap-2">
+                                    <h4 className="scroll-m-20 text-base font-semibold">Epidemiology</h4>
+                                    <Tooltip delayDuration={0}>
+                                        {/*disabled to make the tooltip unclickable*/}
+                                        <TooltipTrigger disabled>
+                                            <Info
+                                                className="text-black h-4 w-4"/>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>
+                                                {`The number presented here are all approximate.`}
+                                            </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+                                {condition.prevalenceNumerator || condition.prevalenceDenominator || condition.numberOfPatientsEngaged ? (
+                                    <ul className="flex flex-col list-disc list-inside">
+                                        {condition.prevalenceNumerator && condition.prevalenceDenominator && (
+                                            <li>
                                                     <span
                                                         className="font-bold">{condition.prevalenceNumerator}</span> in{" "}
-                                                    <span
-                                                        className="font-bold">{condition.prevalenceDenominator}</span> prevalence
-                                                </li>
-                                            )}
-                                            {condition.numberOfPatientsEngaged && (
-                                                <li>
+                                                <span
+                                                    className="font-bold">{condition.prevalenceDenominator}</span> prevalence
+                                            </li>
+                                        )}
+                                        {condition.numberOfPatientsEngaged && (
+                                            <li>
                                                     <span
                                                         className="font-bold"
                                                     >
                                                         {formatNumberWithCommas(condition.numberOfPatientsEngaged.toString())}
                                                     </span> patients engaged
-                                                </li>
-                                            )}
-                                            {condition.nationalEstimatedPopulation && (
-                                                <li>
+                                            </li>
+                                        )}
+                                        {condition.nationalEstimatedPopulation && (
+                                            <li>
                                                     <span
                                                         className="font-bold"
                                                     >
                                                         {formatNumberWithCommas(condition.nationalEstimatedPopulation.toString())}
                                                     </span> patients
-                                                    in the US
-                                                </li>
-                                            )}
-                                            {condition.globalEstimatedPopulation && (
-                                                <li>
+                                                in the US
+                                            </li>
+                                        )}
+                                        {condition.globalEstimatedPopulation && (
+                                            <li>
                                                     <span
                                                         className="font-bold"
                                                     >
                                                         {formatNumberWithCommas(condition.globalEstimatedPopulation.toString())}
                                                     </span> patients
-                                                    globally
-                                                </li>
-                                            )}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-gray-400">No data available.</p>
-                                    )}
-                                </div>
+                                                globally
+                                            </li>
+                                        )}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-400">No data available.</p>
+                                )}
+                            </div>
 
 
-                                <div className="space-y-2">
-                                    {(isPrivate || (!isPrivate && condition?.diseaseCategories && condition.diseaseCategories.length > 0)) && (
-                                        <>
+                            <div className="space-y-2">
+                                {(isPrivate || (!isPrivate && condition?.diseaseCategories && condition.diseaseCategories.length > 0)) && (
+                                    <>
                                         <div className="flex flex-row items-center justify-between w-full">
                                             <h4 className="scroll-m-20 text-base font-semibold">
                                                 Disease categories
@@ -128,7 +129,7 @@ export const PAGProfileConditionsCard = ({
                                         </div>
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
-    
+
                                                 if (condition?.diseaseCategories?.length === 0) {
                                                     return (
                                                         <p className="text-gray-400">
@@ -136,7 +137,7 @@ export const PAGProfileConditionsCard = ({
                                                         </p>
                                                     );
                                                 }
-    
+
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
                                                         {condition?.diseaseCategories?.map((item, index) => (
@@ -150,11 +151,11 @@ export const PAGProfileConditionsCard = ({
                                                 );
                                             })()}
                                         </div>
-                                        </>
-                                    )}
+                                    </>
+                                )}
 
-                                    {(isPrivate || (!isPrivate && condition?.causalGenes && condition.causalGenes.length > 0)) && (
-                                        <>
+                                {(isPrivate || (!isPrivate && condition?.causalGenes && condition.causalGenes.length > 0)) && (
+                                    <>
                                         <div className="flex flex-row items-center justify-between w-full">
                                             <h4 className="scroll-m-20 text-base font-semibold">
                                                 Causal genes
@@ -184,11 +185,11 @@ export const PAGProfileConditionsCard = ({
                                                 );
                                             })()}
                                         </div>
-                                        </>
-                                    )}
+                                    </>
+                                )}
 
-                                    {(isPrivate || (!isPrivate && condition?.associatedGenes && condition.associatedGenes.length > 0)) && (
-                                        <>
+                                {(isPrivate || (!isPrivate && condition?.associatedGenes && condition.associatedGenes.length > 0)) && (
+                                    <>
                                         <div className="flex flex-row items-center justify-between w-full">
                                             <h4 className="scroll-m-20 text-base font-semibold">
                                                 Associated genes
@@ -218,20 +219,20 @@ export const PAGProfileConditionsCard = ({
                                                 );
                                             })()}
                                         </div>
-                                        </>
-                                    )}
-                                </div>
-
+                                    </>
+                                )}
                             </div>
-                        ) : <div className="flex flex-col space-y-2 text-left">
-                            <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
-                                No Conditions Yet
-                            </h3>
-                            <p>
-                                This organization is not associated with any conditions yet.
-                            </p>
+
+                            <div className="flex flex-col space-y-2 text-left">
+                                <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
+                                    No Conditions Yet
+                                </h3>
+                                <p>
+                                    This organization is not associated with any conditions yet.
+                                </p>
+                            </div>
+
                         </div>
-                        }
                     </CardContent>
                 </Card>
             </TooltipProvider>
