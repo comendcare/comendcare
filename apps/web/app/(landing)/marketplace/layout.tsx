@@ -30,6 +30,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // Zustand state management
     const {data: session} = useSession()
     const {defaultLayout, setLayout} = useFiltersStore()
+    const pathname = usePathname()
     // const [organization, setOrganization] = useState<Organization | null>();
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
@@ -214,7 +215,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                 <h1 className="text-4xl font-semibold">Explore the Comend Marketplace</h1>
                 <p>Find an connect with patient groups in Comend's rare disease network. Find biosamples, disease models, and clinical datasets that help futher your research.</p>
             </div>
-            <PublicMarketplaceNav />
+            {pathname !== '/marketplace' && <PublicMarketplaceNav />}
             {children}
         </div>
         </TooltipProvider>

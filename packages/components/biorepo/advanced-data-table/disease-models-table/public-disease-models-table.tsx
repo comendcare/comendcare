@@ -18,12 +18,13 @@ import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { useSearchParams } from "next/navigation";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange, searchParams}: {
+export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange, searchParams, showPagination = true}: {
     data: Tool[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
-    searchParams: SearchParams
+    searchParams: SearchParams,
+    showPagination?: boolean
 }) {
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
@@ -49,6 +50,7 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
         <>
             <DataTable
                 table={table}
+                showPagination={showPagination}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (

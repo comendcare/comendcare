@@ -16,7 +16,7 @@ import { useSearchParams } from "next/navigation";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-export function ClinicalDatasetsTable({data, pageCount, columns, searchParams}: {data: Tool[], pageCount: number, columns: ColumnDef<any>[], searchParams: SearchParams}) {
+export function ClinicalDatasetsTable({data, pageCount, columns, searchParams, showPagination = true}: {data: Tool[], pageCount: number, columns: ColumnDef<any>[], searchParams: SearchParams, showPagination?: boolean}) {
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
     columns,
@@ -34,6 +34,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, searchParams}: 
     <>
       <DataTable
         table={table}
+        showPagination={showPagination}
         noResults={
             (data.length === 0 && Object.keys(searchParams).length === 0) 
             ? (
