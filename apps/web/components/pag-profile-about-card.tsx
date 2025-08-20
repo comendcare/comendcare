@@ -131,7 +131,7 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                         <>
                             <div className="flex flex-row items-center justify-between w-full">
                                 <h4 className="scroll-m-20 text-base font-semibold">
-                                    Interested modalities
+                                    Therapeutics of interest
                                 </h4>
                             </div>
                             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
