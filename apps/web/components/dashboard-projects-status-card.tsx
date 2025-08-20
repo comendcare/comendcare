@@ -20,7 +20,7 @@ import {
 import {getMilestones} from "@/packages/lib/fetchers";
 import {useEffect, useState} from "react"
 import {StatusType} from "@comend/lib/types"
-import {Organization} from "@prisma/client";
+import {Organization, Prisma} from "@prisma/client";
 
 const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
@@ -40,11 +40,27 @@ const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
     COMPLETED: "--chart-3",
 }
 
-export function DashboardProjectsStatusCard({organization}: { organization: Organization }) {
+type OrganizationWithIncludes = Prisma.OrganizationGetPayload<{
+    include: {
+        conditions: {
+            include: {
+                condition: true
+            }
+        },
+        roadmaps: true;
+        members: true;
+        tools: true;
+        biosamples: true;
+        diseaseModel: true;
+        rfps: true;
+        materialAndDataAccessRequests: true;
+    };
+}>;
+
+export function DashboardProjectsStatusCard({organization}: { organization: OrganizationWithIncludes }) {
     const [data, setData] = useState<
         { status: StatusType; count: number; fill: string; colorPreview: string }[]
     >([])
-    const [total, setTotal] = useState(0)
 
     useEffect(() => {
         async function fetchData() {
@@ -82,7 +98,6 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                 )
 
                 setData(chartData)
-                setTotal(Object.values(counts).reduce((a, b) => a + b, 0))
             }
         }
 
@@ -96,9 +111,9 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
     }
 
     return (
-        <Card className="col-span-4 flex flex-col">
+        <Card className="col-span-3 flex flex-col">
             <CardHeader className="items-start pb-0">
-                <CardTitle>Milestone Status Overview</CardTitle>
+                <CardTitle>Milestone status overview</CardTitle>
                 <CardDescription>Current milestone distribution across all research plans.</CardDescription>
                 <div className="flex flex-row mb-4">
                     {data.map((item, index) => (
@@ -144,17 +159,24 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                                             >
                                                 <tspan
                                                     x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) - 24}
+                                                    className="fill-muted-foreground"
+                                                >
+                                                    Across
+                                                </tspan>
+                                                <tspan
+                                                    x={viewBox.cx}
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold"
                                                 >
-                                                    {total.toLocaleString()}
+                                                    {organization.roadmaps.length}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
                                                     className="fill-muted-foreground"
                                                 >
-                                                    Total
+                                                    research plans
                                                 </tspan>
                                             </text>
                                         )

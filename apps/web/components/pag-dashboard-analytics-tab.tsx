@@ -8,6 +8,8 @@ import {getSession} from "@/packages/lib/auth";
 import Image from "next/image";
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button";
 import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
+import PAGAnalyticsToolsCard from "~web/components/pag-analytics-tools-card";
+import PAGAnalyticsProfileCard from "~web/components/pag-analytics-profile-card";
 
 export default async function PAGDashboardAnalyticsTab() {
     const session = await getSession()
@@ -40,12 +42,19 @@ export default async function PAGDashboardAnalyticsTab() {
     const organization = await prisma.organization.findUnique({
         where: {id: session.user.organizationId},
         include: {
+            conditions: {
+                include: {
+                    condition: true
+                }
+            },
             roadmaps: true,
             members: true,
             tools: true,
             biosamples: true,
+            diseaseModel: true,
             rfps: true,
-            materialAndDataAccessRequests: true
+            materialAndDataAccessRequests: true,
+            savedCompanies: true
         },
     });
 
@@ -65,45 +74,29 @@ export default async function PAGDashboardAnalyticsTab() {
         <div className="p-4 space-y-4 w-full">
             <div className="space-y-2 sm:flex-auto">
                 <h2 className="text-xl font-semibold leading-6 text-gray-900">
-                    Analytics
+                    Hello, {session.user.name.split(" ")[0]}
                 </h2>
                 <p className="text-sm text-gray-700">
-                    Some stats and numbers around your organization.
+                    {`Here's ${organization.name} at a glance.`}
                 </p>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Biosample tools
-                        </CardTitle>
-                        <Microscope className="h-4 w-4 text-muted-foreground"/>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {organization.biosamples.length}
-                        </div>
-                        {/*<p className="text-xs text-muted-foreground">*/}
-                        {/*    +19% from last month*/}
-                        {/*</p>*/}
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Access requests
-                        </CardTitle>
-                        <TestTube className="h-4 w-4 text-muted-foreground"/>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {organization.materialAndDataAccessRequests.length}
-                        </div>
-                        {/*<p className="text-xs text-muted-foreground">*/}
-                        {/*    +201 since last hour*/}
-                        {/*</p>*/}
-                    </CardContent>
-                </Card>
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+                {/*<Card>*/}
+                {/*    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">*/}
+                {/*        <CardTitle className="text-sm font-medium">*/}
+                {/*            Biosample tools*/}
+                {/*        </CardTitle>*/}
+                {/*        <Microscope className="h-4 w-4 text-muted-foreground"/>*/}
+                {/*    </CardHeader>*/}
+                {/*    <CardContent>*/}
+                {/*        <div className="text-2xl font-bold">*/}
+                {/*            {organization.biosamples.length}*/}
+                {/*        </div>*/}
+                {/*        /!*<p className="text-xs text-muted-foreground">*!/*/}
+                {/*        /!*    +19% from last month*!/*/}
+                {/*        /!*</p>*!/*/}
+                {/*    </CardContent>*/}
+                {/*</Card>*/}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -121,14 +114,30 @@ export default async function PAGDashboardAnalyticsTab() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Members
+                            Active RFPs
                         </CardTitle>
                         <Users className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{organization.members.length}</div>
+                        <div className="text-2xl font-bold">{organization.rfps.length}</div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +180.1% from last month*/}
+                        {/*</p>*/}
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Saved providers
+                        </CardTitle>
+                        <TestTube className="h-4 w-4 text-muted-foreground"/>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {organization.savedCompanies.length}
+                        </div>
+                        {/*<p className="text-xs text-muted-foreground">*/}
+                        {/*    +201 since last hour*/}
                         {/*</p>*/}
                     </CardContent>
                 </Card>
@@ -143,8 +152,12 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*    </CardContent>*/}
                 {/*</Card>*/}
                 {/*<DonutChartCard organization={organization}/>*/}
-                <DashboardProjectsStatusCard organization={organization}/>
                 <PAGAnalyticsLineChartCard organization={organization}/>
+                <DashboardProjectsStatusCard organization={organization}/>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <PAGAnalyticsProfileCard organization={organization}/>
+                <PAGAnalyticsToolsCard organization={organization}/>
             </div>
         </div>
     )

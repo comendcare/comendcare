@@ -66,7 +66,7 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
     }, []);
 
     return (
-        <Card className="col-span-3">
+        <Card className="col-span-4">
             <CardHeader>
                 <CardTitle>Profile views</CardTitle>
                 <CardDescription>

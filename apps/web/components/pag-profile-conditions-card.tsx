@@ -6,6 +6,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/
 import React from "react";
 import EditPAGProfileConditionCardDialog from "~web/components/edit-pag-profile-condition-card-dialog";
 import { Info } from "lucide-react";
+import {formatNumberWithCommas} from "@/packages/lib/utils";
 
 export const PAGProfileConditionsCard = ({
     conditions, 
@@ -84,20 +85,29 @@ export const PAGProfileConditionsCard = ({
                                             {condition.numberOfPatientsEngaged && (
                                                 <li>
                                                     <span
-                                                        className="font-bold">{condition.numberOfPatientsEngaged}</span> patients engaged
+                                                        className="font-bold"
+                                                    >
+                                                        {formatNumberWithCommas(condition.numberOfPatientsEngaged.toString())}
+                                                    </span> patients engaged
                                                 </li>
                                             )}
                                             {condition.nationalEstimatedPopulation && (
                                                 <li>
                                                     <span
-                                                        className="font-bold">{condition.nationalEstimatedPopulation}</span> patients
+                                                        className="font-bold"
+                                                    >
+                                                        {formatNumberWithCommas(condition.nationalEstimatedPopulation.toString())}
+                                                    </span> patients
                                                     in the US
                                                 </li>
                                             )}
                                             {condition.globalEstimatedPopulation && (
                                                 <li>
                                                     <span
-                                                        className="font-bold">{condition.globalEstimatedPopulation}</span> patients
+                                                        className="font-bold"
+                                                    >
+                                                        {formatNumberWithCommas(condition.globalEstimatedPopulation.toString())}
+                                                    </span> patients
                                                     globally
                                                 </li>
                                             )}
