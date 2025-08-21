@@ -10,6 +10,9 @@ import Image from "next/image"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
 import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
+import Link from "next/link"
+import { Button } from "@/packages/components/ui/button"
+import { cn } from "@/packages/lib/utils"
 
 const bubbles = [
     { title: "Gap analysis", href: "#" },
@@ -272,7 +275,7 @@ export const CloudHeroSection = () => {
                     <p className="max-w-screen-sm text-xl">
                         {`Plan, partner, and showcase your progress with the rare disease ecosystem.`}
                     </p>
-                    <PulsatingButton
+                    {/* <PulsatingButton
                         className="w-fit"
                         onClick={() => {
                             window.scrollTo({
@@ -282,7 +285,22 @@ export const CloudHeroSection = () => {
                         }}
                     >
                         Schedule a demo
-                    </PulsatingButton>
+                    </PulsatingButton> */}
+                    <Link
+                        href="/marketplace"
+                        className={cn(
+                            "relative flex cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2 text-center text-primary-foreground",
+                        )}
+                        style={
+                            {
+                                "--pulse-color": "#0096ff",
+                                "--duration": "1.5s",
+                            } as React.CSSProperties
+                        }
+                    >
+                        <div className="relative z-10">Start Exploring</div>
+                        <div className="absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit" />
+                    </Link>
                 </motion.div>
             </div>
 

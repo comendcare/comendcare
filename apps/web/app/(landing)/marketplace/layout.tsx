@@ -214,14 +214,14 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     return (
         <TooltipProvider>
             <div className="w-full flex justify-center">
-            <div className="max-w-7xl mt-16 lg:mt-28 h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
-                <div className="flex w-full flex-col gap-4">
-                    <h1 className="text-3xl md:text-4xl font-semibold">Explore Comend</h1>
+                <div className="max-w-7xl mt-16 lg:mt-28 h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
+                    <div className="flex w-full flex-col gap-4">
+                        <h1 className="text-3xl md:text-4xl font-semibold">Explore Comend</h1>
+                    </div>
+                    <Separator />
+                    {pathname !== '/marketplace' && <PublicMarketplaceNav />}
+                    {children}
                 </div>
-                <Separator />
-                {pathname !== '/marketplace' && <PublicMarketplaceNav />}
-                {children}
-            </div>
             </div>
         </TooltipProvider>
     )

@@ -63,14 +63,8 @@ export default function MarketplacePage() {
     }, []);
     
     return (
-        <div className="flex flex-col w-full px-4 pb-20 h-full mx-auto gap-8">
-            
+        <div className="flex flex-col w-full px-4 h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
-                {/* <div className="p-10 flex flex-col gap-2 bg-blue-light rounded-lg mb-6">
-                    <h2 className="text-2xl font-semibold">Patient Groups</h2>
-                    <p>Find and connect with other patient groups in Comend's rare disease network. Create a profile to join the marketplace.</p>
-                </div> */}
-
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between">
                         <h2 className="text-2xl semibold">Service Providers</h2>

@@ -210,15 +210,11 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // }
 
     return (
-        <div className="h-full w-full max-w-7xl  flex flex-col items-center p-4">
-            {pathname === '/app/marketplace' && (
-                <div className="flex w-full flex-col gap-4 mb-8 bg-blue-light p-10 rounded-lg">
-                    <h1 className="text-4xl font-semibold">Explore the Comend Marketplace</h1>
-                    <p>Find an connect with patient groups in Comend's rare disease network. Find biosamples, disease models, and clinical datasets that help futher your research.</p>
-                </div>
-            )}
-            {pathname !== '/app/marketplace' && <MarketplaceNav />}
-            {children}
+        <div className="w-full flex justify-center">
+            <div className="max-w-7xl h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
+                {pathname !== '/app/marketplace' && <MarketplaceNav />}
+                {children}
+            </div>
         </div>
     )
 }
