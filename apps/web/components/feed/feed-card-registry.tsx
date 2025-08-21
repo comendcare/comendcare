@@ -8,6 +8,8 @@ import type { FeedItemDTO, FeedItemType } from "@comend/lib/types";
 import RFPCreatedCard from "~web/components/feed/rfp-created-feed-card";
 import ResearchPlanCreatedCard from "~web/components/feed/research-plan-created-feed-card";
 import ToolCreatedCard from "~web/components/feed/tool-created-feed-card";
+import PAGProfileCreatedCard from "~web/components/feed/pag-profile-created-feed-card";
+import ResearchPlanUpdatedCard from "~web/components/feed/research-plan-updated-feed-card";
 
 
 // Optional: code-split heavier/rare cards
@@ -22,7 +24,9 @@ export type CardProps<TContent = any> = { data: FeedItemDTO & { content: TConten
 const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = {
     ORG_CREATED_RFP: RFPCreatedCard as React.ComponentType<CardProps>,
     ORG_CREATED_TOOL: ToolCreatedCard as React.ComponentType<CardProps>,
-    ORG_RESEARCH_PLAN_CREATED : ResearchPlanCreatedCard as React.ComponentType<CardProps>,
+    ORG_RESEARCH_PLAN_CREATED: ResearchPlanCreatedCard as React.ComponentType<CardProps>,
+    PAG_PROFILE_CREATED: PAGProfileCreatedCard as React.ComponentType<CardProps>,
+    ORG_RESEARCH_PLAN_UPDATED: ResearchPlanUpdatedCard as React.ComponentType<CardProps>,
     // FDA_MEDWATCH_ALERT: FdaMedWatchCard as React.ComponentType<CardProps>,
     // CTG_TRIAL_POSTED: CtgovTrialCard as React.ComponentType<CardProps>,
 // ...add the rest as you build them

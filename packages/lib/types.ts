@@ -97,27 +97,6 @@ export const CanonicalFeed = z.object({
     idempotencyKey: z.string().min(8),
 });
 
-// Example typed content per type (extend as you go)
-export const ContentByType = {
-    CTG_TRIAL_POSTED: z.object({
-        nctId: z.string(),
-        briefTitle: z.string(),
-        status: z.string().optional(),
-        conditions: z.array(z.string()).optional(),
-        locations: z.array(z.string()).optional(),
-    }),
-    FDA_MEDWATCH_ALERT: z.object({
-        guid: z.string(),
-        productNames: z.array(z.string()).optional(),
-        summary: z.string().optional(),
-    }),
-    ORG_CREATED_RFP: z.object({
-        rfpId: z.string(),
-        deadline: z.string().optional(),
-    }),
-    // ...etc
-} as const;
-
 export type RequestFiltersType = {
     statuses: {
         label: string,

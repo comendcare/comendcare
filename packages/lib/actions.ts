@@ -460,6 +460,21 @@ export const createOrganization = withAuth(
                 console.log("email sent")
             })
 
+            if (organization.verified && organization.published) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "pag_profile_created",
+                    externalId: organization.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        orgId: organization.id,
+                        orgName: organization.name,
+                        userId: session.user.id,
+                        userName: session.user.name,
+                    },
+                });
+            }
+
             return {organization, membership};
         } catch (error: any) {
             if (error.code === "P2002") {
@@ -779,7 +794,6 @@ export const deleteOrganization = withOrganizationAuth(
     ['owner']
 )
 
-// creating a separate function for this because we're not using FormData
 export const updateRoadmap = withOrganizationAuth(
     async (organizationId: string, data: Partial<Roadmap>) => {
         const session = await getSession()
@@ -815,6 +829,31 @@ export const updateRoadmap = withOrganizationAuth(
 
         if (!roadmap) return {error: "Roadmap not found"}
 
+        // Utility to compare (handles objects/arrays by JSON stringifying)
+        const isEqual = (a: unknown, b: unknown) => {
+            const ja = typeof a === "object" ? JSON.stringify(a) : a;
+            const jb = typeof b === "object" ? JSON.stringify(b) : b;
+            return ja === jb;
+        };
+
+        // Only consider fields you allow to be updated here
+        const updatableKeys = ["title", "description", "content", "modalities", "metadata"] as const;
+
+        // Compute change set (based on incoming "data" vs current "roadmap")
+        const changedFields: string[] = [];
+        const changes: Record<string, { before: unknown; after: unknown }> = {};
+
+        for (const key of updatableKeys) {
+            if (typeof data[key] !== "undefined") {
+                const beforeVal = (roadmap as any)[key];
+                const afterVal = (data as any)[key];
+                if (!isEqual(beforeVal, afterVal)) {
+                    changedFields.push(key);
+                    changes[key] = {before: beforeVal, after: afterVal};
+                }
+            }
+        }
+
         try {
             const response = await prisma.roadmap.update({
                 where: {
@@ -845,6 +884,25 @@ export const updateRoadmap = withOrganizationAuth(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
 
+            await writeRawEvent({
+                provider: "app",
+                eventType: "org_research_plan_updated",
+                externalId: roadmap.id, // back-reference for idempotency
+                occurredAt: new Date(),
+                payload: {
+                    orgId: roadmap.organization?.id ?? organizationId,
+                    orgName: roadmap.organization?.name ?? undefined,
+                    roadmapId: roadmap.id,
+                    title: response.title ?? roadmap.title,
+                    published: response.published, // boolean
+                    // actor
+                    userId: session.user.id,
+                    userName: session.user.name,
+                    // change details
+                    changedFields: changedFields.length ? changedFields : undefined,
+                    changes: Object.keys(changes).length ? changes : undefined,
+                },
+            });
             return response
         } catch (error: any) {
             return {
@@ -3054,8 +3112,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
             const existing =
                 rfpData.id
                     ? await prisma.rFP.findUnique({
-                        where: { id: rfpData.id },
-                        select: { id: true, private: true, endDate: true, title: true },
+                        where: {id: rfpData.id},
+                        select: {id: true, private: true, endDate: true, title: true},
                     })
                     : null;
 
@@ -3073,7 +3131,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     milestones: {
                         include: {
                             milestone: {
-                                include: { types: { include: { milestoneType: true } } },
+                                include: {types: {include: {milestoneType: true}}},
                             },
                         },
                     },
@@ -3088,7 +3146,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
-                                ...(attachment.name ? { name: attachment.name } : undefined),
+                                ...(attachment.name ? {name: attachment.name} : undefined),
                             })),
                         },
                     },
@@ -3098,8 +3156,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
                             data: (rfpData?.contacts || []).map((contact: any) => ({
                                 name: contact.name,
                                 email: contact.email,
-                                ...(contact.role ? { role: contact.role } : undefined),
-                                ...(contact.affiliation ? { affiliation: contact.affiliation } : undefined),
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
                             })),
                         },
                     },
@@ -3111,13 +3169,13 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: { connect: { id: milestone.milestoneId } },
+                            milestone: {connect: {id: milestone.milestoneId}},
                         })),
                     },
                     budget: rfpData.budget,
                 },
                 create: {
-                    ...(rfpData.id ? { id: rfpData.id } : undefined),
+                    ...(rfpData.id ? {id: rfpData.id} : undefined),
                     headerImage: rfpData.headerImage,
                     title: rfpData.title || "",
                     description: rfpData.description,
@@ -3125,7 +3183,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
-                                ...(attachment.name ? { name: attachment.name } : undefined),
+                                ...(attachment.name ? {name: attachment.name} : undefined),
                             })),
                         },
                     },
@@ -3134,8 +3192,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
                             data: (rfpData?.contacts || []).map((contact: any) => ({
                                 name: contact.name,
                                 email: contact.email,
-                                ...(contact.role ? { role: contact.role } : undefined),
-                                ...(contact.affiliation ? { affiliation: contact.affiliation } : undefined),
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
                             })),
                         },
                     },
@@ -3146,10 +3204,10 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     endDate: rfpData.endDate,
                     milestones: {
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: { connect: { id: milestone.milestoneId } },
+                            milestone: {connect: {id: milestone.milestoneId}},
                         })),
                     },
-                    organization: { connect: { id: organization.id } },
+                    organization: {connect: {id: organization.id}},
                     budget: rfpData.budget,
                 },
             });
@@ -3263,9 +3321,9 @@ export const createRoadmap = withOrganizationAuth(
                 data: {
                     title: roadmapTemplate?.title,
                     description: roadmapTemplate?.description,
-                    organization: { connect: { id: organization.id } },
+                    organization: {connect: {id: organization.id}},
                     modalities: roadmapTemplate?.modalities,
-                    ...(roadmapTemplate?.metadata ? { metadata: roadmapTemplate.metadata } : undefined),
+                    ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined),
                     // published defaults to true per your model; omit to use default
                 },
             });
@@ -3277,16 +3335,16 @@ export const createRoadmap = withOrganizationAuth(
 
             // Re-fetch with full graph
             const finalRoadmap = await prisma.roadmap.findUnique({
-                where: { id: roadmap.id },
+                where: {id: roadmap.id},
                 include: {
                     milestones: {
                         include: {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: { include: { milestoneType: true } },
-                            tools: { include: { tool: true } },
-                            rfps: { include: { rfp: true } },
+                            types: {include: {milestoneType: true}},
+                            tools: {include: {tool: true}},
+                            rfps: {include: {rfp: true}},
                         },
                     },
                     nodes: true,
@@ -3295,7 +3353,6 @@ export const createRoadmap = withOrganizationAuth(
                 },
             });
 
-            // Emit feed event: ORG_RESEARCH_PLAN_CREATED
             await writeRawEvent({
                 provider: "app",
                 eventType: "org_research_plan_created",
