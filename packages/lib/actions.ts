@@ -2242,6 +2242,8 @@ export const updateDataTool = withOrganizationAuth(
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
+            const session = await getSession()
+
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -2379,6 +2381,28 @@ export const createBiosample = withOrganizationAuth(
                     }
                 }
             })
+
+            if (!response.private) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_tool",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        biosampleId: response.id,
+                        orgId: organization.id,
+                        orgName: organization.name,
+                        title: response.description || `Biosample ${response.id}`,
+                        private: false,
+                        availability: response.availability,
+                        types: response.types ?? [],
+                        geneId: response.geneId ?? undefined,
+                        institutionId: response.institutionId ?? undefined,
+                        userId: session?.user.id,
+                        userName: session?.user.name,
+                    },
+                });
+            }
 
             return response
         } catch (error: any) {
@@ -3171,7 +3195,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
             if (justPublished) {
                 await writeRawEvent({
                     provider: "app",
-                    eventType: "rfp_created",
+                    eventType: "org_created_rfp",
                     externalId: response.id,
                     occurredAt: new Date(),
                     payload: {

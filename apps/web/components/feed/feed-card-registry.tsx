@@ -7,6 +7,7 @@ import type { FeedItemDTO, FeedItemType } from "@comend/lib/types";
 // Import the card you already have
 import RFPCreatedCard from "~web/components/feed/rfp-created-feed-card";
 import ResearchPlanCreatedCard from "~web/components/feed/research-plan-created-feed-card";
+import ToolCreatedCard from "~web/components/feed/tool-created-feed-card";
 
 
 // Optional: code-split heavier/rare cards
@@ -19,7 +20,8 @@ export type CardProps<TContent = any> = { data: FeedItemDTO & { content: TConten
 
 // Registry mapping types to renderers
 const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = {
-    RFP_CREATED: RFPCreatedCard as React.ComponentType<CardProps>,
+    ORG_CREATED_RFP: RFPCreatedCard as React.ComponentType<CardProps>,
+    ORG_CREATED_TOOL: ToolCreatedCard as React.ComponentType<CardProps>,
     ORG_RESEARCH_PLAN_CREATED : ResearchPlanCreatedCard as React.ComponentType<CardProps>,
     // FDA_MEDWATCH_ALERT: FdaMedWatchCard as React.ComponentType<CardProps>,
     // CTG_TRIAL_POSTED: CtgovTrialCard as React.ComponentType<CardProps>,

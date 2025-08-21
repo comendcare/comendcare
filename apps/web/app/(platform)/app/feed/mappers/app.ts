@@ -18,7 +18,7 @@ import { register } from "../registry";
 // ---------------------------
 // RFP_CREATED
 // ---------------------------
-register("app", "rfp_created", async ({ payload, occurredAt }) => {
+register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
     const {
         rfpId,
         orgId,
@@ -41,7 +41,7 @@ register("app", "rfp_created", async ({ payload, occurredAt }) => {
         .digest("hex");
 
     return {
-        type: "RFP_CREATED",
+        type: "ORG_CREATED_RFP",
         source: "USER",
         title,
         content: {

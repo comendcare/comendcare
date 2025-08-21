@@ -29,7 +29,6 @@ import {z} from "zod";
 export type Actor = { userId: string; userName?: string };
 
 export type FeedItemType =
-    | "RFP_CREATED"
     | "RFP_DEADLINE_APPROACHING"
     | "RFP_CLOSED"
     | "FDA_MEDWATCH_ALERT"
@@ -73,7 +72,7 @@ export interface FeedPageDTO {
 
 export const FeedItemType = z.enum([
     "ORG_UPDATED", "ORG_RESEARCH_PLAN_CREATED", "ORG_RESEARCH_PLAN_UPDATED", "ORG_CREATED_TOOL", "ORG_CREATED_RFP",
-    "RFP_CREATED", "RFP_DEADLINE_APPROACHING", "RFP_CLOSED",
+    "RFP_DEADLINE_APPROACHING", "RFP_CLOSED",
     "PAPER_PUBLISHED_AGNOSTIC", "PAPER_PUBLISHED_GROUP",
     "SERVICE_PROVIDER_CREATED", "PAG_PROFILE_CREATED",
     "TOOL_REQUEST_CREATED", "TOOL_REQUEST_COMMENT_CREATED", "TOOL_REQUEST_APPROVED", "FEED_POST_CREATED",
@@ -112,7 +111,7 @@ export const ContentByType = {
         productNames: z.array(z.string()).optional(),
         summary: z.string().optional(),
     }),
-    RFP_CREATED: z.object({
+    ORG_CREATED_RFP: z.object({
         rfpId: z.string(),
         deadline: z.string().optional(),
     }),
