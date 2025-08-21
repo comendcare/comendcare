@@ -73,41 +73,41 @@ export const PAGProfileConditionsCard = ({
                                         </TooltipContent>
                                     </Tooltip>
                                 </div>
-                                {condition.prevalenceNumerator || condition.prevalenceDenominator || condition.numberOfPatientsEngaged ? (
+                                {condition?.prevalenceNumerator || condition?.prevalenceDenominator || condition?.numberOfPatientsEngaged ? (
                                     <ul className="flex flex-col list-disc list-inside">
-                                        {condition.prevalenceNumerator && condition.prevalenceDenominator && (
+                                        {condition?.prevalenceNumerator && condition?.prevalenceDenominator && (
                                             <li>
                                                     <span
-                                                        className="font-bold">{condition.prevalenceNumerator}</span> in{" "}
+                                                        className="font-bold">{condition?.prevalenceNumerator}</span> in{" "}
                                                 <span
-                                                    className="font-bold">{condition.prevalenceDenominator}</span> prevalence
+                                                    className="font-bold">{condition?.prevalenceDenominator}</span> prevalence
                                             </li>
                                         )}
-                                        {condition.numberOfPatientsEngaged && (
+                                        {condition?.numberOfPatientsEngaged && (
                                             <li>
                                                     <span
                                                         className="font-bold"
                                                     >
-                                                        {formatNumberWithCommas(condition.numberOfPatientsEngaged.toString())}
+                                                        {formatNumberWithCommas(condition?.numberOfPatientsEngaged.toString())}
                                                     </span> patients engaged
                                             </li>
                                         )}
-                                        {condition.nationalEstimatedPopulation && (
+                                        {condition?.nationalEstimatedPopulation && (
                                             <li>
                                                     <span
                                                         className="font-bold"
                                                     >
-                                                        {formatNumberWithCommas(condition.nationalEstimatedPopulation.toString())}
+                                                        {formatNumberWithCommas(condition?.nationalEstimatedPopulation.toString())}
                                                     </span> patients
                                                 in the US
                                             </li>
                                         )}
-                                        {condition.globalEstimatedPopulation && (
+                                        {condition?.globalEstimatedPopulation && (
                                             <li>
                                                     <span
                                                         className="font-bold"
                                                     >
-                                                        {formatNumberWithCommas(condition.globalEstimatedPopulation.toString())}
+                                                        {formatNumberWithCommas(condition?.globalEstimatedPopulation.toString())}
                                                     </span> patients
                                                 globally
                                             </li>
