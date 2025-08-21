@@ -88,6 +88,29 @@ export function DataTable<TData>({
             ))}
           </TableHeader>
           <TableBody>
+            {!table.getRowModel().rows?.length && (
+              <div
+                className="fixed flex justify-center items-center"
+                style={{width: overlayStyle.width}}
+              >
+                {noResults
+                  ? (
+                    <div>{noResults}</div>
+                  )
+                  : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={table.getAllColumns().length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )
+                }
+              </div>
+            )}
+
             {/* content */}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
