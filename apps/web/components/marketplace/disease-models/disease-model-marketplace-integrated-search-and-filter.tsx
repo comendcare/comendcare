@@ -1,7 +1,7 @@
 "use client"
 
 import {useCallback, useEffect, useMemo, useState} from "react"
-import {SearchIcon, X} from "lucide-react"
+import {Funnel, SearchIcon, X} from "lucide-react"
 import {cn} from "@comend/lib/utils"
 import {useShallow} from "zustand/react/shallow"
 
@@ -23,6 +23,7 @@ import {
 } from "@comend/lib/types"
 import {debounce} from "lodash";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
+import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
     ...option,
@@ -92,10 +93,10 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8"/>
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
                 {/* Disease Model Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px]">
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-xs font-semibold text-gray-900">Disease Model Types</Label>
                     <MultipleSelector
                         value={filters.types}
@@ -113,6 +114,20 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                         showBadgesInDropdown={true}
                     />
                 </div>
+
+                <Separator orientation="vertical" className="h-8" />
+
+                {/* Mobile and additional filters */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="m-4 rounded-full" size="icon" variant={'cta'}>
+                            <Funnel />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className="flex flex-row gap-2 items-center">

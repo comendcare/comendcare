@@ -1,7 +1,7 @@
 "use client"
 
 import {useCallback, useEffect, useMemo, useState} from "react"
-import {SearchIcon, X} from "lucide-react"
+import {Funnel, SearchIcon, X} from "lucide-react"
 import {cn} from "@comend/lib/utils"
 import {useShallow} from "zustand/react/shallow"
 
@@ -21,6 +21,7 @@ import {
     MILESTONE_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {debounce} from "lodash";
+import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
     ...option,
@@ -90,11 +91,11 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden md:block"/>
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
                 {/* Project Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden md:block">
-                    <Label className="text- font-semibold text-gray-900">Project Types</Label>
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                    <Label className="text-base font-semibold text-gray-900">Project Types</Label>
                     <MultipleSelector
                         value={filters.milestoneTypes}
                         onChange={(vals) => setFilterKey("milestoneTypes", vals)}
@@ -112,10 +113,10 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden md:block"/>
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
                 {/* Business Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden md:block">
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Business Types</Label>
                     <MultipleSelector
                         value={filters.types}
@@ -134,10 +135,10 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden md:block"/>
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
                 {/* Certifications */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden md:block">
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Certifications</Label>
                     <MultipleSelector
                         value={filters.certifications}
@@ -156,7 +157,19 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden md:block"/>
+                <Separator orientation="vertical" className="h-8" />
+
+                {/* Mobile and additional filters */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="m-4 rounded-full" size="icon" variant={'cta'}>
+                            <Funnel />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        
+                    </DialogContent>
+                </Dialog>
 
                 {/*/!* Specialties / Tags *!/*/}
                 {/*<div className="flex-1 px-6 py-4 min-w-[100px]">*/}
