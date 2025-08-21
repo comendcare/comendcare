@@ -6,13 +6,11 @@ import PAGMarketplaceIntegratedSearchAndFilter from "~web/components/marketplace
 
 export default async function PatientGroupsPage() {
     return (
-        <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
-            <ScrollArea className="px-8 w-full">
-                <div className="flex flex-col gap-4 p-2 w-full">
-                    <PAGMarketplaceIntegratedSearchAndFilter />
-                    <OrganizationSearchResults />
-                </div>
-            </ScrollArea>
+        <main className="flex flex-col w-full items-center h-full mx-auto">
+            <div className="flex flex-col gap-4 p-2 w-full">
+                <PAGMarketplaceIntegratedSearchAndFilter />
+                <OrganizationSearchResults />
+            </div>
         </main>
     )
 }

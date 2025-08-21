@@ -69,22 +69,11 @@ const publicLinks = [
 export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>) {
 
     return (
-        // <div className="flex flex-row items-center">
-        //     <Button asChild variant={"secondary"} className="absolute left-0">
-        //         <Link
-        //             href={'/app/marketplace'}
-        //         >
-        //             <ArrowLeft />
-        //             <Search/>
-        //             Return to explore
-        //         </Link>
-        //     </Button>
-            <TabNav 
-                className={className}
-                baseLink={"/app/marketplace/"}
-                links={links}
-            />
-        // </div>
+        <TabNav 
+            className={className}
+            baseLink={"/app/marketplace/"}
+            links={links}
+        />
     )
 }
 

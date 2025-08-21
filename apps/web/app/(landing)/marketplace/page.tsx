@@ -55,112 +55,99 @@ export default function MarketplacePage() {
     }, []);
     
     return (
-        <main className="max-w-7xl flex flex-col w-full px-4 pb-20 h-full mx-auto gap-8">
-            
-            <div className="flex flex-col gap-8">
-                {/* <div className="p-10 flex flex-col gap-2 bg-blue-light rounded-lg mb-6">
-                    <h2 className="text-2xl font-semibold">Patient Groups</h2>
-                    <p>Find and connect with other patient groups in Comend's rare disease network. Create a profile to join the marketplace.</p>
-                </div> */}
-
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
-                        <h2 className="text-2xl semibold">Patient Groups</h2>
-                        <a href="/marketplace/patient-groups" className="justify-self-end self-end underline">See all patient groups...</a>
-                    </div>
-                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(organizationStore.searchResults && organizationStore.searchResults.length > 0 )
-                            ? (
-                                <>
-                                    {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceListElement organization={organization} key={index}/>
-                                    ))}
-                                </>
-                            )
-                            : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
-                            )
-                        }
-                    </ol>
+        <main className="w-full h-full flex flex-col gap-10">
+            <div className="flex flex-col gap-2">
+                <div className="flex justify-between gap-4">
+                    <h2 className="text-xl md:text-2xl font-semibold">Patient Groups</h2>
+                    <a href="/marketplace/patient-groups" className="justify-self-end self-end underline text-right">See all patient groups</a>
                 </div>
-
-                {/* <div className="p-10 flex flex-col gap-2 bg-blue-light rounded-lg mb-6">
-                    <h2 className="text-2xl font-semibold">Toolkit</h2>
-                    <p>Find tools that belong to patient groups on the Comend platform. Sign up with a researcher profile to request access to public tools, like biosamples, disease models, and clinical datasets.</p>
-                </div> */}
-        
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
-                        <h2 className="text-2xl semibold">Biosamples</h2>
-                        <a href="/marketplace/biosamples" className="justify-self-end self-end underline">See all biosamples...</a>
-                    </div>
-                    <ol className="w-full">
-                        {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
-                            ? (
-                                <>
-                                    <div className="max-w-7xl w-full overflow-auto">
-                                        <BiosamplesTable showPagination={false} data={biosampleStore.searchResults?.slice(0, 3)} pageCount={1} columns={biosampleColumns} searchParams={{}}/>
-                                    </div>
-                                </>
-                            )
-                            : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
-                            )
-                        }
-                    </ol>
+                <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {(organizationStore.searchResults && organizationStore.searchResults.length > 0 )
+                        ? (
+                            <>
+                                {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
+                                    <OrganizationMarketplaceListElement organization={organization} key={index}/>
+                                ))}
+                            </>
+                        )
+                        : (
+                            <>
+                                <Skeleton className="h-[286px] w-full"/>
+                                <Skeleton className="h-[286px] w-full"/>
+                                <Skeleton className="h-[286px] w-full"/>
+                            </>
+                        )
+                    }
+                </ol>
+            </div>
+    
+            <div className="flex flex-col gap-2">
+                <div className="flex justify-between gap-4">
+                    <h2 className="text-xl md:text-2xl font-semibold">Biosamples</h2>
+                    <a href="/marketplace/biosamples" className="justify-self-end self-end underline text-right">See all biosamples</a>
                 </div>
+                <ol className="w-full">
+                    {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
+                        ? (
+                            <>
+                                <div className="max-w-7xl w-full overflow-auto">
+                                    <BiosamplesTable showPagination={false} data={biosampleStore.searchResults?.slice(0, 3)} pageCount={1} columns={biosampleColumns} searchParams={{}}/>
+                                </div>
+                            </>
+                        )
+                        : (
+                            <>
+                                <Skeleton className="h-[286px] w-full"/>
+                            </>
+                        )
+                    }
+                </ol>
+            </div>
 
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
-                        <h2 className="text-2xl semibold">Disease Models</h2>
-                        <a href="/marketplace/disease-models" className="justify-self-end self-end underline">See all disease models...</a>
-                    </div>
-                    <ol className="w-full">
-                        {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
-                            ? (
-                                <>
-                                    <div className="max-w-7xl w-full overflow-auto">
-                                        <DiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
-                                    </div>
-                                </>
-                            )
-                            : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
-                            )
-                        }
-                    </ol>
+            <div className="flex flex-col gap-2">
+                <div className="flex justify-between gap-4">
+                    <h2 className="text-xl md:text-2xl font-semibold">Disease Models</h2>
+                    <a href="/marketplace/disease-models" className="justify-self-end self-end underline text-right">See all disease models</a>
                 </div>
+                <ol className="w-full">
+                    {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
+                        ? (
+                            <>
+                                <div className="max-w-7xl w-full overflow-auto">
+                                    <DiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
+                                </div>
+                            </>
+                        )
+                        : (
+                            <>
+                                <Skeleton className="h-[286px] w-full"/>
+                            </>
+                        )
+                    }
+                </ol>
+            </div>
 
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
-                        <h2 className="text-2xl semibold">Clinical Datasets</h2>
-                        <a href="/marketplace/biosamples" className="justify-self-end self-end underline">See all clinical datasets...</a>
-                    </div>
-                    <ol className="w-full">
-                        {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
-                            ? (
-                                <>
-                                    <div className="max-w-7xl w-full overflow-auto">
-                                        <ClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
-                                    </div>
-                                </>
-                            )
-                            : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
-                            )
-                        }
-                    </ol>
+            <div className="flex flex-col gap-2">
+                <div className="flex justify-between gap-4">
+                    <h2 className="text-xl md:text-2xl font-semibold">Clinical Datasets</h2>
+                    <a href="/marketplace/biosamples" className="justify-self-end self-end underline text-right">See all clinical datasets</a>
                 </div>
+                <ol className="w-full">
+                    {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
+                        ? (
+                            <>
+                                <div className="max-w-7xl w-full overflow-auto">
+                                    <ClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
+                                </div>
+                            </>
+                        )
+                        : (
+                            <>
+                                <Skeleton className="h-[286px] w-full"/>
+                            </>
+                        )
+                    }
+                </ol>
             </div>
         </main>
     )

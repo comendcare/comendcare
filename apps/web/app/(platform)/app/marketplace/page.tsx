@@ -63,7 +63,7 @@ export default function MarketplacePage() {
     }, []);
     
     return (
-        <div className="max-w-7xl flex flex-col w-full px-4 pb-20 h-full mx-auto gap-8">
+        <div className="flex flex-col w-full px-4 pb-20 h-full mx-auto gap-8">
             
             <div className="flex flex-col gap-8">
                 {/* <div className="p-10 flex flex-col gap-2 bg-blue-light rounded-lg mb-6">
