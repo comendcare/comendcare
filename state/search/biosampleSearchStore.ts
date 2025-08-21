@@ -15,6 +15,16 @@ export type FiltersType = {
     //     value: string,
     //     disable?: boolean,
     // }[],
+    conditions: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    genes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     types: {
         label: string,
         value: string,
@@ -45,6 +55,8 @@ export type FiltersType = {
 
 export const defaultFilters = {
     // categories: [],
+    conditions: [],
+    genes: [],
     types: [],
     // types: [],
     // certifications: [],
@@ -70,6 +82,22 @@ function generateFiltersString(filters: FiltersType): string {
     //         .join(" && ");
     //     filtersList.push(`(${categoryFilter})`);
     // }
+
+    // conditions
+    if (filters?.conditions && filters.conditions.length > 0) {
+        const conditionFilter = filters.conditions
+            .map(condition => `conditions:=[${escapeValue(condition.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${conditionFilter})`);
+    }
+
+    // genes
+    if (filters?.genes && filters.genes.length > 0) {
+        const geneFilter = filters.genes
+            .map(gene => `gene:=[${escapeValue(gene.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${geneFilter})`);
+    }
 
     // Biosample Types (Array Field)
     if (filters?.types && filters.types.length > 0) {
@@ -135,7 +163,7 @@ const getUpdatedSearchResults = async (
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "gene",
+            query_by: "description,gene",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),

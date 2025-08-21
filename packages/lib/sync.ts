@@ -427,19 +427,31 @@ export const syncToTypesense = async (env: {
             fields: [
                 {
                     name: "id",
-                    facet: false,
+                    type: "string",
                     index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
                     store: true,
-                    type: "string"
+                    facet: true,
+                    optional: false
+                },
+                {
+                    name: "description",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 },
                 {
                     name: "gene",
                     type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "conditions",
+                    type: "string[]",
                     index: true,
                     store: true,
                     facet: true,
@@ -575,6 +587,8 @@ export const syncToTypesense = async (env: {
             },
             select: {
                 id: true,
+                description: true,
+                organization: {include: {conditions: {include: {condition: true}}}},
                 gene: true,
                 types: true,
             }
@@ -692,8 +706,10 @@ export const syncToTypesense = async (env: {
         if (biosamples.length > 0) {
             const uploadBiosamples = biosamples.map(biosample => ({
                 id: biosample.id,
+                description: biosample.description,
+                types: biosample.types,
                 gene: biosample.gene?.symbol,
-                types: biosample.types
+                conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || []
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {

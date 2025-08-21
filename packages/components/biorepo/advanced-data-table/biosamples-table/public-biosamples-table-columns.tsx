@@ -175,6 +175,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
+            cell: ({row}) => (
+                <>{row.original.gene?.symbol}</>
+            ),
             enableHiding: true,
             meta: {
                 label: "Gene"

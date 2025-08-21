@@ -133,6 +133,8 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
         const parsedBiosampleFilters = {
             types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
         }
         initializeBiosampleSearch(parsedBiosampleFilters)
         console.log(`Biosample search initialized...`)
