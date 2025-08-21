@@ -97,7 +97,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Organization"/>
             ),
             cell: ({row}) => (
-                <div className="flex gap-2 items-center w-[200px]">
+                <div className="flex gap-2 items-center w-[150px]">
                     <ProfilePhoto
                         img={row.original?.organization?.image}
                         name={row.original?.organization?.name}
@@ -106,23 +106,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {row.original.organization?.name}
                 </div>
             ),
-        },
-        {
-            id: "donorId",
-            accessorKey: "donorId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Public Donor ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
-                    <p>{row.original.donorId}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Public Donor ID"
-            }
         },
         {
             id: "types",
@@ -148,6 +131,23 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 options: BIOSAMPLE_TYPE_OPTIONS,
                 icon: CircleDashed,
             },
+        },
+        {
+            id: "donorId",
+            accessorKey: "donorId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Public Donor ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Public Donor ID"
+            }
         },
         // {
         //     id: "diagnoses",
@@ -223,7 +223,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Description"/>
             ),
             cell: ({row}) => (
-                <div className="line-clamp-3">
+                <div className="line-clamp-2 w-[200px]">
                     {row.original.description}
                 </div>
             ),
@@ -664,14 +664,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         },
     ]
 
-    const actionsColumn: ColumnDef<any>[] = [
-        {
-            id: "actions",
-            // cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
-            cell: ({row}) => <></>,
-            enableHiding: false,
-        },
-    ]
+    // const actionsColumn: ColumnDef<any>[] = [
+    //     {
+    //         id: "actions",
+    //         // cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+    //         cell: ({row}) => <></>,
+    //         enableHiding: false,
+    //     },
+    // ]
 
     // Temporarily hide additional biobank columns from users on production
     // This can be removed, and all columns enabled once our biobank feature is built out
@@ -679,5 +679,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         return columns.filter(column => column.id && !hiddenColumnIds.includes(column.id))
     }
 
-    return [...columns, ...actionsColumn]
+    // return [...columns, ...actionsColumn]
+    return columns
 }

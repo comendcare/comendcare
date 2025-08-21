@@ -90,7 +90,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Organization"/>
             ),
             cell: ({row}) => (
-                <div className="flex gap-2 items-center w-[200px]">
+                <div className="flex gap-2 items-center w-[150px]">
                     <ProfilePhoto
                         img={row.original?.organization?.image}
                         name={row.original?.organization?.name}
@@ -162,7 +162,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Description"/>
             ),
             cell: ({row}) => (
-                <div className="line-clamp-3">
+                <div className="line-clamp-2 w-[200px]">
                     {row.original.description}
                 </div>
             ),
