@@ -90,11 +90,11 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8"/>
+                <Separator orientation="vertical" className="h-8 hidden md:block"/>
 
                 {/* Project Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px]">
-                    <Label className="text-base font-semibold text-gray-900">Project Types</Label>
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden md:block">
+                    <Label className="text- font-semibold text-gray-900">Project Types</Label>
                     <MultipleSelector
                         value={filters.milestoneTypes}
                         onChange={(vals) => setFilterKey("milestoneTypes", vals)}
@@ -112,10 +112,10 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8"/>
+                <Separator orientation="vertical" className="h-8 hidden md:block"/>
 
                 {/* Business Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px]">
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden md:block">
                     <Label className="text-base font-semibold text-gray-900">Business Types</Label>
                     <MultipleSelector
                         value={filters.types}
@@ -134,10 +134,10 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8"/>
+                <Separator orientation="vertical" className="h-8 hidden md:block"/>
 
                 {/* Certifications */}
-                <div className="flex-1 px-6 py-4 min-w-[100px]">
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden md:block">
                     <Label className="text-base font-semibold text-gray-900">Certifications</Label>
                     <MultipleSelector
                         value={filters.certifications}
@@ -156,7 +156,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8"/>
+                <Separator orientation="vertical" className="h-8 hidden md:block"/>
 
                 {/*/!* Specialties / Tags *!/*/}
                 {/*<div className="flex-1 px-6 py-4 min-w-[100px]">*/}

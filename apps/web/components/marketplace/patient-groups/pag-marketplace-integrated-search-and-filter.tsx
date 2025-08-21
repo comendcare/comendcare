@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Funnel, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { debounce } from "lodash";
 
@@ -26,6 +26,7 @@ import { useOrganizationSearchStore } from "@/state/search/organizationSearchSto
 // Options
 import { mechanisms } from "comend-pag-platform/components/edit-condition-profile-dialog";
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
+import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -134,10 +135,10 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8" />
+                <Separator orientation="vertical" className="h-8 hidden lg:block" />
 
                 {/* Mechanisms of action */}
-                <div className="flex-1 px-6 py-4 min-w-[160px]">
+                <div className="flex-1 px-6 py-4 min-w-[160px] hidden lg:block">
                     <Label className="text-xs font-semibold text-gray-900">
                         Mechanisms of Action
                     </Label>
@@ -159,10 +160,10 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8" />
+                <Separator orientation="vertical" className="h-8 hidden lg:block" />
 
                 {/* Associated systems */}
-                <div className="flex-1 px-6 py-4 min-w-[160px]">
+                <div className="flex-1 px-6 py-4 min-w-[160px] hidden lg:block">
                     <Label className="text-xs font-semibold text-gray-900">
                         Associated Systems
                     </Label>
@@ -184,10 +185,10 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8" />
+                <Separator orientation="vertical" className="h-8 hidden lg:block" />
 
                 {/* Modalities */}
-                <div className="flex-1 px-6 py-4 min-w-[160px]">
+                <div className="flex-1 px-6 py-4 min-w-[160px] hidden lg:block">
                     <Label className="text-xs font-semibold text-gray-900">
                         Modalities of Interest
                     </Label>
@@ -208,6 +209,20 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         showBadgesInDropdown
                     />
                 </div>
+
+                <Separator orientation="vertical" className="h-8" />
+
+                {/* Mobile and additional filters */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="m-4 rounded-full" size="icon" variant={'cta'}>
+                            <Funnel />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Active filter badges */}
