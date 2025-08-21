@@ -283,15 +283,15 @@ export default function PAGProfilePage() {
                             <div className="grid grid-cols-6 gap-4 pb-8">
                                 <div className="relative col-span-2 space-y-4">
                                     <div className="sticky top-4 space-y-4">
-                                        <PagProfileAboutCard
-                                            organization={organization}
-                                            editable={true}
-                                            isPrivate={true}
-                                        />
                                         <PAGProfileConditionsCard
                                             conditions={conditions}
                                             organization={organization}
                                             showEditDialog={true}
+                                            isPrivate={true}
+                                        />
+                                        <PagProfileAboutCard
+                                            organization={organization}
+                                            editable={true}
                                             isPrivate={true}
                                         />
                                     </div>

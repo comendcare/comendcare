@@ -110,35 +110,6 @@ export default function UserOnboardingForm() {
         fetchUserData()
     }, [session, router]);
 
-    // const onDrop = useCallback(
-    //     (acceptedFiles: FileWithPath[]) => {
-    //         const file = acceptedFiles[0];
-    //         if (!file) {
-    //             toast.error("No file selected!");
-    //             return;
-    //         }
-
-    //         // Additional check to exclude SVG
-    //         if (file.type === "image/svg+xml") {
-    //             toast.error("SVG files are not allowed. Please select a valid image.");
-    //             return;
-    //         }
-
-    //         const fileWithPreview = Object.assign(file, {
-    //             preview: URL.createObjectURL(file),
-    //         });
-
-    //         setSelectedFile(fileWithPreview);
-    //         setDialogOpen(true);
-    //     },
-    //     []
-    // );
-
-    // const {getRootProps, getInputProps} = useDropzone({
-    //     onDrop,
-    //     accept,
-    // });
-
     const [address, setAddress] = useState<AddressType>({
         address1: "",
         address2: "",
@@ -173,7 +144,6 @@ export default function UserOnboardingForm() {
                     notificationSettings: true,
                     consentSettings: true,
                     accounts: true,
-                    comments: true,
                     follows: true,
                     sentInvitations: true,
                     memberships: true,
@@ -402,70 +372,6 @@ export default function UserOnboardingForm() {
                     </form>
                 </Form>
             </div>
-
-            {/*<div className="col-span-1 space-y-4 border-1 rounded-lg">*/}
-            {/*    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">*/}
-            {/*        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">*/}
-            {/*            User profile preview*/}
-            {/*        </h1>*/}
-
-            {/*        <div className="grid grid-cols-6 w-full space-y-8 my-8">*/}
-            {/*            <div className="col-span-2">*/}
-            {/*                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">*/}
-            {/*                    <div className="flex">*/}
-            {/*                        {selectedFile?.preview ?*/}
-            {/*                            <img className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"*/}
-            {/*                            src={selectedFile?.preview}*/}
-            {/*                                 alt=""/>*/}
-            {/*                            :*/}
-            {/*                            <p*/}
-            {/*                                className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}*/}
-            {/*                            >*/}
-            {/*                                {nameToInitials(form.watch("name"))}*/}
-            {/*                            </p>*/}
-            {/*                        }*/}
-            {/*                    </div>*/}
-
-            {/*                    <div*/}
-            {/*                        className="mt-4 min-w-0 flex-1 truncate text-xl font-bold text-gray-900 sm:hidden md:block">*/}
-            {/*                        {form.watch("name") || <Skeleton className="h-4 w-full"/>}*/}
-            {/*                    </div>*/}
-
-            {/*                    <div>*/}
-            {/*                        {form.watch("title") || <Skeleton className="h-4 w-full"/>}*/}
-            {/*                    </div>*/}
-
-            {/*                    <div*/}
-            {/*                        className="mt-4 min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:hidden md:block">*/}
-            {/*                        Organizations*/}
-            {/*                    </div>*/}
-            {/*                    <Skeleton className="h-4 w-full"/>*/}
-
-            {/*                    <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">*/}
-            {/*                        <h1 className="truncate text-2xl font-bold text-gray-900">*/}
-            {/*                            {form.watch("name")}*/}
-            {/*                        </h1>*/}
-            {/*                    </div>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-
-            {/*            <div className="col-span-4 flex flex-col space-y-4">*/}
-            {/*                <Card>*/}
-            {/*                    <CardHeader className="flex flex-row items-center justify-between space-y-0">*/}
-            {/*                        <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>*/}
-            {/*                            Activity*/}
-            {/*                        </CardTitle>*/}
-            {/*                    </CardHeader>*/}
-            {/*                    <CardContent className="space-y-4">*/}
-            {/*                        <Skeleton className="h-4 w-full"/>*/}
-            {/*                        <Skeleton className="h-4 w-[200px]"/>*/}
-            {/*                        <Skeleton className="h-4 w-[200px]"/>*/}
-            {/*                    </CardContent>*/}
-            {/*                </Card>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
         </div>
     )
 }

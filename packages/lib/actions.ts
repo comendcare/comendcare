@@ -1779,22 +1779,37 @@ export const updateCondition = withOrganizationAuth(
         try {
             const data: Record<string, any> = {};
             formData.forEach((value, key) => {
+                const str = value.toString();
+
                 if (key === "metadata") {
-                    data[key] = JSON.parse(value.toString()) as JsonValue;
+                    data[key] = JSON.parse(str) as JsonValue;
                     return;
                 }
 
-                if (!isNaN(Number(value)) && value !== "") {
-                    data[key] = Number(value);
-                } else if (typeof value === "string" && value.startsWith("[")) {
-                    try {
-                        data[key] = JSON.parse(value);
-                    } catch {
-                        data[key] = value;
-                    }
-                } else {
-                    data[key] = value;
+                // Treat empty string or "null" as a real null (clear field)
+                if (str === "" || str === "null") {
+                    data[key] = null;
+                    return;
                 }
+
+                // Numbers
+                if (!isNaN(Number(str))) {
+                    data[key] = Number(str);
+                    return;
+                }
+
+                // Arrays (JSON)
+                if (str.startsWith("[")) {
+                    try {
+                        data[key] = JSON.parse(str);
+                    } catch {
+                        data[key] = str;
+                    }
+                    return;
+                }
+
+                // Fallback for plain strings
+                data[key] = str;
             });
 
             const conditions = await prisma.conditionToOrganization.findMany({

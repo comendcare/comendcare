@@ -233,6 +233,11 @@ model Roadmap {
   @@index([userId])
 }
 
+model RoadmapIdempotency {
+  key         String   @id
+  processedAt DateTime
+}
+
 model Node {
   id        String     @id @unique @default(uuid())
   createdAt DateTime   @default(now())

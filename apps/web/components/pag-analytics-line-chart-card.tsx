@@ -4,10 +4,26 @@ import {useState, useEffect} from "react";
 import {ResponsiveContainer, Line, LineChart, XAxis, YAxis, Tooltip, CartesianGrid} from "recharts";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
 import {Organization} from "@prisma/client";
+import {Button} from "@comend/components/ui/button";
+import {useRouter} from "next/navigation";
+import {ExternalLink} from "lucide-react"
+import Link from "next/link";
 
 type Point = { date: string; pageViews: number };
 
+function formatISODate(label: string) {
+    const [y, m, d] = label.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return dt.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+    });
+}
+
+
 export default function PAGAnalyticsLineChartCard({organization}: { organization: Organization }) {
+    const router = useRouter();
     const [data, setData] = useState<Point[]>([]);
     const [total, setTotal] = useState(0);
     const [percentChange, setPercentChange] = useState<number | null>(null);
@@ -66,9 +82,26 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
     }, []);
 
     return (
-        <Card className="col-span-3">
+        <Card className="col-span-4">
             <CardHeader>
-                <CardTitle>Profile views</CardTitle>
+                <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                    Profile views
+
+                    <Button
+                        asChild
+                        variant="ghost"
+                        size="icon"
+                        className="p-0 h-auto w-auto"
+                    >
+                        <Link
+                            href={`https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                        </Link>
+                    </Button>
+                </CardTitle>
                 <CardDescription>
                     <div className="text-2xl font-bold inline-flex items-baseline">
                         {total}
@@ -84,18 +117,35 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
                     )}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="h-80">
+            <CardContent className="h-60">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                         data={data}
-                        margin={{top: 5, right: 10, left: 10, bottom: 5}}
+                        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
                     >
-                        <Tooltip/>
+                        <Tooltip
+                            formatter={(value: number) => [value.toLocaleString(), "Page Views"]}
+                            labelFormatter={(_, payload) => {
+                                const raw = payload?.[0]?.payload?.date as string | undefined;
+                                if (!raw) return "";
+                                // handle "YYYY-MM-DD" safely in UTC
+                                const [y, m, d] = raw.slice(0, 10).split("-").map(Number);
+                                const dt = new Date(Date.UTC(y, m - 1, d));
+                                return dt.toLocaleDateString(undefined, {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                });
+                            }}
+                        />
                         <Line
                             type="monotone"
                             strokeWidth={2}
                             dataKey="pageViews"
-                            activeDot={{r: 6, style: {fill: "var(--theme-primary)", opacity: 0.25}}}
+                            activeDot={{
+                                r: 6,
+                                style: { fill: "var(--theme-primary)", opacity: 0.25 },
+                            }}
                         />
                     </LineChart>
                 </ResponsiveContainer>

@@ -1,6 +1,14 @@
 "use client"
 
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -27,7 +35,7 @@ import {formatNumberWithCommas} from "@comend/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
-import { researchFormSchema } from "./research-onboarding-form";
+import {researchFormSchema} from "./research-onboarding-form";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session} = useSession()
@@ -60,7 +68,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
+                            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
                             causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
@@ -74,9 +82,15 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
                             national: condition.nationalEstimatedPopulation?.toString() || "",
                             global: condition.globalEstimatedPopulation?.toString() || "",
-                            otherCategories: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherCategories : undefined,
-                            otherMechanisms: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherMechanisms : undefined,
-                            otherSystems: typeof condition.metadata == 'object'? (condition.metadata as { [key: string]: any })?.otherSystems : undefined,
+                            otherCategories: typeof condition.metadata == 'object' ? (condition.metadata as {
+                                [key: string]: any
+                            })?.otherCategories : undefined,
+                            otherMechanisms: typeof condition.metadata == 'object' ? (condition.metadata as {
+                                [key: string]: any
+                            })?.otherMechanisms : undefined,
+                            otherSystems: typeof condition.metadata == 'object' ? (condition.metadata as {
+                                [key: string]: any
+                            })?.otherSystems : undefined,
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
@@ -109,41 +123,42 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
         setLoading(true); // Show loading state
 
         try {
-            // Create a new FormData object
-            const formData = new FormData();
+            const numOrNull = (s?: string | null) =>
+                s && String(s).trim() !== "" ? parseInt(String(s), 10) : null;
 
-            // Map the form values to match the Condition schema
             const mappedData: Record<string, any> = {
-                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
-                summary: values.summary || "",
-                diseaseCategories: values.categories?.map((item) => item.label) || [],
-                prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
-                prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
-                numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
-                nationalEstimatedPopulation: values.national ? parseInt(values.national, 10) || null : null,
-                globalEstimatedPopulation: values.global ? parseInt(values.global, 10) || null : null,
-                relevantDiseaseMechanisms: values.mechanisms || [],
-                causalGenes: values.causal?.map((item) => item.label) || [],
-                associatedGenes: values.genes?.map((item) => item.label) || [],
-                associatedSystems: values.systems?.map((item) => item.label) || [],
-                associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
-                existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
-                toolsUnderDevelopment: values.tools?.map((item) => item.label) || [],
-                metadata: JSON.stringify({
-                    otherCategories: values.otherCategories,
-                    otherMechanisms: values.otherMechanisms,
-                    otherSystems: values.otherSystems
-                })
+                name: values.disorder?.[0]?.label || "",
+                summary: values.summary ?? "",
+                diseaseCategories: (values.categories ?? []).map(i => i.label),
+                prevalenceNumerator: numOrNull(values.prevalenceNumerator),
+                prevalenceDenominator: numOrNull(values.prevalenceDenominator),
+                numberOfPatientsEngaged: numOrNull(values.engaged),
+                nationalEstimatedPopulation: numOrNull(values.national),
+                globalEstimatedPopulation: numOrNull(values.global),
+                relevantDiseaseMechanisms: values.mechanisms ?? [],
+                causalGenes: (values.causal ?? []).map(i => i.label),
+                associatedGenes: (values.genes ?? []).map(i => i.label),
+                associatedSystems: (values.systems ?? []).map(i => i.label),
+                associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
+                existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
+                toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
+                metadata: {
+                    otherCategories: values.otherCategories ?? null,
+                    otherMechanisms: values.otherMechanisms ?? null,
+                    otherSystems: values.otherSystems ?? null,
+                },
             };
 
-            // Add mapped data to FormData
+            const formData = new FormData();
             Object.entries(mappedData).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    if (Array.isArray(value)) {
-                        formData.append(key, JSON.stringify(value));
-                    } else {
-                        formData.append(key, value.toString());
-                    }
+                if (key === "metadata") {
+                    formData.append(key, JSON.stringify(value ?? {}));
+                } else if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (value === null) {
+                    formData.append(key, "null"); // tell the server to clear
+                } else {
+                    formData.append(key, String(value));
                 }
             });
 
@@ -230,7 +245,9 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 </TooltipTrigger>
                 {session?.user?.membership?.role !== "owner" && (
                     <TooltipContent className="max-w-80">
-                        <p>Condition editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                        <p>Condition editing is only enabled for organization owners. Please contact the owners of your
+                            organization. Owners are visible in the Organization Settings tab in the memberships
+                            section.</p>
                     </TooltipContent>
                 )}
             </Tooltip>
@@ -246,8 +263,19 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                             </DialogDescription>
                         </DialogHeader>
                         <Form {...editResearchForm}>
-                            <form onSubmit={editResearchForm.handleSubmit(onResearchFormSubmit)}
-                                  className="space-y-8">
+                            <form
+                                onSubmit={editResearchForm.handleSubmit(
+                                    onResearchFormSubmit,
+                                    (errors) => {
+                                        console.error("Form validation errors:", errors);
+                                        // surface the first error so it's visible
+                                        const first = Object.values(errors)[0] as any;
+                                        const msg = first?.message || first?.root?.message || "Please fix the highlighted fields.";
+                                        toast.error(msg);
+                                    }
+                                )}
+                                className="space-y-8"
+                            >
 
                                 <FormField
                                     control={editResearchForm.control}

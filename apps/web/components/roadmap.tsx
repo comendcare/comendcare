@@ -312,7 +312,7 @@ export function Roadmap() {
                                                 </div>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {"An interactive whiteboard that lets you easily view and organize research plans with visual elements."}
+                                                {"Interactive whiteboard to organize research plans. Changes here or in the timeline won’t sync across views."}
                                             </TooltipContent>
                                         </Tooltip>
                                         {newFlowProjects && <NotificationBubble />}

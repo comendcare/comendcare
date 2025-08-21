@@ -235,8 +235,8 @@ export function standardizeYear(dateString: string): string {
     return match ? match[1] : "";
 }
 
-export function formatNumberWithCommas(number: string | undefined) {
-    if (number === undefined) return "0"
+export function formatNumberWithCommas(number: string | undefined | null) {
+    if (number === undefined || number === null) return "0"
 
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -391,8 +391,8 @@ export function abbreviateNumber(num: number | null | undefined) {
     return `${parseFloat(num.toFixed(1))}${units[unitIndex]}`;
 }
 
-export const formatMoney = (moneyRaised: number | undefined) => {
-    if (moneyRaised === undefined) return "0";
+export const formatMoney = (moneyRaised: number | undefined | null) => {
+    if (moneyRaised === undefined || moneyRaised === null) return "0";
 
     const formatNumber = (num: number, divisor: number, suffix: string) => {
         const formatted = (num / divisor).toFixed(1);

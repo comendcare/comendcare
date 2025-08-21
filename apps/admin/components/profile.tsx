@@ -41,7 +41,6 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                         notificationSettings: true,
                         consentSettings: true,
                         accounts: true,
-                        comments: true,
                         follows: true,
                         sentInvitations: true,
                         memberships: true,

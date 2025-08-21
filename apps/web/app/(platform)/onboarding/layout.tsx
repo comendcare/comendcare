@@ -17,7 +17,7 @@ export default async function OnboardingLayout({children}: { children: ReactNode
 
     return (
         <div className="flex flex-row mx-auto w-full min-h-screen justify-center py-12 sm:px-6 lg:px-8 gap-x-4">
-            <OnboardingSteps/>
+            {/*<OnboardingSteps/>*/}
             {children}
         </div>
     );

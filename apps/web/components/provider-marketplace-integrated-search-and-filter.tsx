@@ -76,7 +76,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
                 {/* Search input */}
                 <div className="flex-1 px-6 py-4">
-                    <Label className="text-xs font-semibold text-gray-900">Search</Label>
+                    <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
                         placeholder="Search CROs, services, locations..."
@@ -94,7 +94,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Project Types */}
                 <div className="flex-1 px-6 py-4 min-w-[100px]">
-                    <Label className="text-xs font-semibold text-gray-900">Project Types</Label>
+                    <Label className="text-base font-semibold text-gray-900">Project Types</Label>
                     <MultipleSelector
                         value={filters.milestoneTypes}
                         onChange={(vals) => setFilterKey("milestoneTypes", vals)}
@@ -116,7 +116,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Business Types */}
                 <div className="flex-1 px-6 py-4 min-w-[100px]">
-                    <Label className="text-xs font-semibold text-gray-900">Business Types</Label>
+                    <Label className="text-base font-semibold text-gray-900">Business Types</Label>
                     <MultipleSelector
                         value={filters.types}
                         onChange={(vals) => setFilterKey("types", vals)}
@@ -138,7 +138,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Certifications */}
                 <div className="flex-1 px-6 py-4 min-w-[100px]">
-                    <Label className="text-xs font-semibold text-gray-900">Certifications</Label>
+                    <Label className="text-base font-semibold text-gray-900">Certifications</Label>
                     <MultipleSelector
                         value={filters.certifications}
                         onChange={(vals) => setFilterKey("certifications", vals)}
@@ -160,7 +160,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                 {/*/!* Specialties / Tags *!/*/}
                 {/*<div className="flex-1 px-6 py-4 min-w-[100px]">*/}
-                {/*    <Label className="text-xs font-semibold text-gray-900">Specialties</Label>*/}
+                {/*    <Label className="text-base font-semibold text-gray-900">Specialties</Label>*/}
                 {/*    <MultipleSelector*/}
                 {/*        value={filters.tags}*/}
                 {/*        onChange={(vals) => setFilterKey("tags", vals)}*/}
