@@ -713,25 +713,62 @@ export const updateOrganization = withOrganizationAuth(
         });
 
         try {
+            // Get previous org for diffing
+            const before = await prisma.organization.findUnique({
+                where: { id: organization.id },
+            });
+
             const response = await prisma.organization.update({
-                where: {
-                    id: organization.id,
-                },
+                where: { id: organization.id },
                 data,
             });
 
+            // update search index if needed
             if (response.verified && response.published) {
                 await updateTypeSenseDocument(
                     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                     (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+                        process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                             : process.env.TYPESENSE_ADMIN_API_KEY
                     )!,
                     response,
-                    'organizations'
+                    "organizations"
                 );
             }
+
+            // build diff
+            const changedFields: string[] = [];
+            const changes: Record<string, { before: unknown; after: unknown }> = {};
+
+            if (before) {
+                for (const key of Object.keys(data)) {
+                    const beforeVal = (before as any)[key];
+                    const afterVal = (response as any)[key];
+                    if (JSON.stringify(beforeVal) !== JSON.stringify(afterVal)) {
+                        changedFields.push(key);
+                        changes[key] = { before: beforeVal, after: afterVal };
+                    }
+                }
+            }
+
+            const session = await getSession();
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "org_updated",
+                externalId: response.id,
+                occurredAt: new Date(),
+                payload: {
+                    orgId: response.id,
+                    orgName: response.name ?? undefined,
+                    userId: session?.user.id,
+                    userName: session?.user.name,
+                    changedFields: changedFields.length ? changedFields : undefined,
+                    changes: Object.keys(changes).length ? changes : undefined,
+                },
+            });
 
             return response;
         } catch (error: any) {
@@ -903,6 +940,7 @@ export const updateRoadmap = withOrganizationAuth(
                     changes: Object.keys(changes).length ? changes : undefined,
                 },
             });
+
             return response
         } catch (error: any) {
             return {
