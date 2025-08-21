@@ -17,6 +17,7 @@ import Image from "next/image";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { useSearchParams } from "next/navigation";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { useDiseaseModelSearchStore } from "../../../../../state/search/diseaseModelSearchStore";
 
 export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange, searchParams, showPagination = true}: {
     data: Tool[],
@@ -51,6 +52,7 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
             <DataTable
                 table={table}
                 showPagination={showPagination}
+                useStore={useDiseaseModelSearchStore}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
