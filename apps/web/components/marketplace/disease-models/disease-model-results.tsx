@@ -9,17 +9,11 @@ import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/adva
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table";
 
 const selector = (state: DiseaseModelSearchState) => ({
-    lastFetchedPage: state.lastFetchedPage,
-    setLastFetchedPage: state.setLastFetchedPage,
-    view: state.view,
     searchResults: state.searchResults
 })
 
 export function DiseaseModelSearchResults() {
     const { 
-        lastFetchedPage, 
-        setLastFetchedPage, 
-        view, 
         searchResults 
     } = useDiseaseModelSearchStore(useShallow(selector))
     const columns = useDiseaseModelsTableColumns()

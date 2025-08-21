@@ -136,7 +136,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                 searchTerm: '',
                 sortBy: "alphabetical",
                 filters: newFilters,
-                lastFetchedPage: 1,
+                page: 1,
             }, true)
 
             recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
@@ -274,10 +274,10 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
-                    lastFetchedPage: 1,
+                    page: 1,
                 }, true)
 
                 if (newSearch.length > 0) {
@@ -301,16 +301,17 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                     searchResults: results,
                     page: 1,
                     totalResults: total,
+                    totalPages
                 })
             },
             sortBy: "alphabetical",
             setSortBy: async (sortBy: string | undefined) => {
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
                     page: 1,
                 }, true)
-                set({ sortBy, searchResults: results, page: 1, totalResults: total })
+                set({ sortBy, searchResults: results, page: 1, totalResults: total, totalPages })
             },
             resultsPerPage: 10,
             setResultsPerPage: async (numResults: number) => {
@@ -319,7 +320,7 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                     resultsPerPage: numResults,
                     page: 1
                 }, false)
-                set({ resultsPerPage: numResults, page: 1, totalPages, searchResults: updateSearchResults })
+                set({ resultsPerPage: numResults, page: 1, searchResults: updateSearchResults, totalPages })
             },
             totalPages: 1,
             page: 1, // page numbers in TypeSense start at 1
@@ -328,15 +329,7 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                     ...get(),
                     page,
                 }, false)
-                set({ page, totalPages, searchResults: updateSearchResults })
-            },
-            lastFetchedPage: 1, // page numbers in TypeSense start at 1
-            setLastFetchedPage: async (page: number) => {
-                const {results: updateSearchResults} = await getUpdatedSearchResults({
-                    ...get(),
-                    lastFetchedPage: page
-                }, false)
-                set({ page, searchResults: updateSearchResults })
+                set({ page, searchResults: updateSearchResults, totalPages })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -350,10 +343,10 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                     ...get().filters,
                     ...updatedFilters
                 }
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
-                    lastFetchedPage: 1,
+                    page: 1,
                 }, true)
 
                 const recentlySelected = {
@@ -405,6 +398,7 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                     page: 1,
                     searchResults: results,
                     totalResults: total,
+                    totalPages
                 })
             },
             recommendations: undefined,

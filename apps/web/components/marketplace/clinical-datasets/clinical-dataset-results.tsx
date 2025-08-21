@@ -9,17 +9,11 @@ import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-da
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 
 const selector = (state: ClinicalDatasetSearchState) => ({
-    lastFetchedPage: state.lastFetchedPage,
-    setLastFetchedPage: state.setLastFetchedPage,
-    view: state.view,
     searchResults: state.searchResults
 })
 
 export function ClinicalDatasetSearchResults() {
     const { 
-        lastFetchedPage, 
-        setLastFetchedPage, 
-        view, 
         searchResults 
     } = useClinicalDatasetSearchStore(useShallow(selector))
     const columns = useClinicalDatasetsTableColumns()

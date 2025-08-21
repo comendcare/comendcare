@@ -14,17 +14,11 @@ import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-tab
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 
 const selector = (state: BiosampleSearchState) => ({
-    lastFetchedPage: state.lastFetchedPage,
-    setLastFetchedPage: state.setLastFetchedPage,
-    view: state.view,
     searchResults: state.searchResults
 })
 
 export function BiosampleSearchResults() {
     const { 
-        lastFetchedPage, 
-        setLastFetchedPage, 
-        view, 
         searchResults 
     } = useBiosampleSearchStore(useShallow(selector))
     const columns = useBiosamplesTableColumns()
