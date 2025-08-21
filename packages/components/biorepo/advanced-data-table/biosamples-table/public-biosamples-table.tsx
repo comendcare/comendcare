@@ -15,6 +15,7 @@ import {Tool} from "@prisma/client";
 import Image from "next/image";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { useBiosampleSearchStore } from "../../../../../state/search/biosampleSearchStore";
 
 export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams, showPagination = true}: {
     data: Tool[],
@@ -49,6 +50,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
             <DataTable
                 table={table}
                 showPagination={showPagination}
+                useStore={useBiosampleSearchStore}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (

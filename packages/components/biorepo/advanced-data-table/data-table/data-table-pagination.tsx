@@ -21,9 +21,19 @@ interface DataTablePaginationProps<TData> extends React.ComponentProps<"div"> {
   pageSizeOptions?: number[];
 }
 
+interface TypesenseDataTablePaginationProps<TData> extends React.ComponentProps<"div"> {
+  // table: Table<TData>;
+  pageSizeOptions?: number[];
+  resultsPerPage: number;
+  setResultsPerPage: (numResults: number) => void,
+  totalPages: number;
+  page: number;
+  setPage: (page: number) => void
+}
+
 export function DataTablePagination<TData>({
   table,
-  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageSizeOptions = [1, 10, 20, 30, 40, 50],
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
@@ -102,6 +112,96 @@ export function DataTablePagination<TData>({
             className="hidden size-8 lg:flex"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
+          >
+            <ChevronsRight />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TypesenseDataTablePagination<TData>({
+  pageSizeOptions = [1, 10, 20, 30, 40, 50],
+  resultsPerPage,
+  setResultsPerPage,
+  totalPages,
+  page,
+  setPage,
+  className,
+  ...props
+}: TypesenseDataTablePaginationProps<TData>) {
+  return (
+    <div
+      className={cn(
+        "flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex flex-col-reverse items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
+        <div className="flex items-center space-x-2">
+          <p className="whitespace-nowrap font-medium text-sm">Rows per page</p>
+          <Select
+            value={resultsPerPage.toString()}
+            onValueChange={(value) => {
+              setResultsPerPage(Number(value))
+            }}
+          >
+            <SelectTrigger className="h-8 w-[4.5rem] [&[data-size]]:h-8">
+              <SelectValue placeholder={resultsPerPage.toString()} />
+            </SelectTrigger>
+            <SelectContent side="top">
+              {pageSizeOptions.map((pageSize) => (
+                <SelectItem key={pageSize} value={`${pageSize}`}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center justify-center font-medium text-sm">
+          Page {page} of{" "}
+          {totalPages}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            aria-label="Go to first page"
+            variant="outline"
+            size="icon"
+            className="hidden size-8 lg:flex"
+            onClick={() => setPage(1)}
+            disabled={page <= 1}
+          >
+            <ChevronsLeft />
+          </Button>
+          <Button
+            aria-label="Go to previous page"
+            variant="outline"
+            size="icon"
+            className="size-8"
+            onClick={() => setPage(page - 1)}
+            disabled={page <= 1}
+          >
+            <ChevronLeft />
+          </Button>
+          <Button
+            aria-label="Go to next page"
+            variant="outline"
+            size="icon"
+            className="size-8"
+            onClick={() => setPage(page + 1)}
+            disabled={page >= totalPages}
+          >
+            <ChevronRight />
+          </Button>
+          <Button
+            aria-label="Go to last page"
+            variant="outline"
+            size="icon"
+            className="hidden size-8 lg:flex"
+            onClick={() => setPage(totalPages)}
+            disabled={page >= totalPages}
           >
             <ChevronsRight />
           </Button>

@@ -1,7 +1,7 @@
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 import type * as React from "react";
 
-import { DataTablePagination } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-pagination";
+import { DataTablePagination, TypesenseDataTablePagination } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-pagination";
 import {
   Table,
   TableBody,
@@ -13,12 +13,16 @@ import {
 import { getCommonPinningStyles } from "@comend/lib/data-table";
 import { cn } from "@comend/lib/utils";
 import { useEffect, useRef, useState } from "react";
+import { StoreApi, UseBoundStore } from "zustand";
+import { TemporalState } from "zundo";
 
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
   table: TanstackTable<TData>;
   noResults?: React.ReactNode;
   actionBar?: React.ReactNode;
   showPagination?: boolean;
+  // useStore?: UseBoundStore<Write<StoreApi<any>, {temporal: StoreApi<TemporalState<any>>;}>>
+  useStore?: any;
 }
 
 export function DataTable<TData>({
@@ -26,6 +30,7 @@ export function DataTable<TData>({
   noResults,
   actionBar,
   showPagination = true,
+  useStore,
   children,
   className,
   ...props
@@ -148,7 +153,17 @@ export function DataTable<TData>({
         )}
       </div>
       <div className="flex flex-col gap-2.5">
-        {showPagination && <DataTablePagination table={table} />}
+        {showPagination && (
+          useStore
+            ? <TypesenseDataTablePagination 
+                resultsPerPage={useStore.getState().resultsPerPage} 
+                setResultsPerPage={useStore.getState().setResultsPerPage} 
+                totalPages={useStore.getState().totalPages} 
+                page={useStore.getState().page}
+                setPage={useStore.getState().setPage}
+              />
+            : <DataTablePagination table={table} />
+        )}
         {actionBar &&
           table.getFilteredSelectedRowModel().rows.length > 0 &&
           actionBar}
