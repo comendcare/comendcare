@@ -37,7 +37,7 @@ export const ContactRequestEmail = ({
                                         organizationName,
                                         organizationImage,
                                     }: ContactRequestEmailProps) => {
-    const previewText = `You've been removed from ${organizationName} on Comend`;
+    const previewText = `Someone from ${organizationName} wants to contact a service provider.`;
 
     return (
         <Html>

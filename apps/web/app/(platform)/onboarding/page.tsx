@@ -150,7 +150,7 @@ const unifiedSchema = z.object({
 /**************************************
  * Component
  **************************************/
-export default function AllInOneOnboarding() {
+export default function OnboardingPage() {
     const router = useRouter();
     const { data: session, status, update } = useSession();
 
