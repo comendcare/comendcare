@@ -15,6 +15,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { useClinicalDatasetSearchStore } from "../../../../../state/search/clinicalDatasetSearchStore";
 
 export function ClinicalDatasetsTable({data, pageCount, columns, searchParams, showPagination = true}: {data: Tool[], pageCount: number, columns: ColumnDef<any>[], searchParams: SearchParams, showPagination?: boolean}) {
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
@@ -35,6 +36,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, searchParams, s
       <DataTable
         table={table}
         showPagination={showPagination}
+        useStore={useClinicalDatasetSearchStore}
         noResults={
             (data.length === 0 && Object.keys(searchParams).length === 0) 
             ? (

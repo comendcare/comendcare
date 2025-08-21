@@ -252,8 +252,6 @@ export interface DiseaseModelSearchState {
     page: number,
     setPage: (page: number) => void,
     totalPages: number,
-    lastFetchedPage: number,
-    setLastFetchedPage: (page: number) => void,
     view: ViewType,
     setView: (view: ViewType) => void,
     allResults: any[],
@@ -301,7 +299,7 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                 set({
                     searchTerm: newSearch,
                     searchResults: results,
-                    lastFetchedPage: 1,
+                    page: 1,
                     totalResults: total,
                 })
             },
@@ -310,9 +308,9 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                 const { results, total } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
-                    lastFetchedPage: 1,
+                    page: 1,
                 }, true)
-                set({ sortBy, searchResults: results, lastFetchedPage: 1, totalResults: total })
+                set({ sortBy, searchResults: results, page: 1, totalResults: total })
             },
             resultsPerPage: 10,
             setResultsPerPage: async (numResults: number) => {
@@ -338,7 +336,7 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
                     ...get(),
                     lastFetchedPage: page
                 }, false)
-                set({ lastFetchedPage: page, searchResults: updateSearchResults })
+                set({ page, searchResults: updateSearchResults })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -404,7 +402,7 @@ export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
 
                 set({
                     filters: newFilters,
-                    lastFetchedPage: 1,
+                    page: 1,
                     searchResults: results,
                     totalResults: total,
                 })

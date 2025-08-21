@@ -121,7 +121,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
 const getUpdatedSearchResults = async (
     state: any,
     isNewSearch: boolean = true
-): Promise<{results: any[], total: number}> => {
+): Promise<{results: any[], total: number, totalPages: number}> => {
     try {
         // const TAG_PRIORITY_SORT = "_eval([ (tags:=[`Experienced in rare disease`]):2, (tags:=[`PAG friendly`]):1 ]):desc,avgRating:desc";
 
@@ -138,8 +138,8 @@ const getUpdatedSearchResults = async (
         const searchParameters = {
             q: state.searchTerm,
             query_by: "gene",
-            per_page: 10,
-            page: state.lastFetchedPage,
+            per_page: state.resultsPerPage,
+            page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),
             // sort_by: sortBy,
         };
@@ -157,11 +157,15 @@ const getUpdatedSearchResults = async (
         // @ts-ignore
         const ids = typeSenseHits.map(hit => hit.document.id);
 
+        const totalResults = results.found || 0;
+        const totalPages = Math.ceil(totalResults / state.resultsPerPage);
+
         if (ids.length === 0) {
             // return isNewSearch ? [] : state.searchResults;
             return {
                 results: isNewSearch ? [] : state.searchResults,
-                total: results.found || 0
+                total: results.found || 0,
+                totalPages: totalPages || 0
             }
         }
 
@@ -183,15 +187,17 @@ const getUpdatedSearchResults = async (
         const enrichedResults = ids.map((id: string) => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
 
         return {
-            results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
+            results: enrichedResults,
             total: results.found || 0,
+            totalPages: totalPages || 0
         };
 
     } catch (error) {
         console.error("Search error:", error);
         return {
             results: [],
-            total: 0
+            total: 0,
+            totalPages: 0
         };
     }
 };
@@ -208,8 +214,11 @@ export interface ClinicalDatasetSearchState {
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
     setSortBy: (sortBy: string | undefined) => void,
-    lastFetchedPage: number,
-    setLastFetchedPage: (page: number) => void,
+    resultsPerPage: number,
+    setResultsPerPage: (numResults: number) => void,
+    page: number,
+    setPage: (page: number) => void,
+    totalPages: number,
     view: ViewType,
     setView: (view: ViewType) => void,
     allResults: any[],
@@ -253,7 +262,7 @@ export const useClinicalDatasetSearchStore = create<ClinicalDatasetSearchState>(
                 set({
                     searchTerm: newSearch,
                     searchResults: results,
-                    lastFetchedPage: 1,
+                    page: 1,
                     totalResults: total,
                 })
             },
@@ -262,17 +271,27 @@ export const useClinicalDatasetSearchStore = create<ClinicalDatasetSearchState>(
                 const { results, total } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
-                    lastFetchedPage: 1,
+                    page: 1,
                 }, true)
-                set({ sortBy, searchResults: results, lastFetchedPage: 1, totalResults: total })
+                set({ sortBy, searchResults: results, page: 1, totalResults: total })
             },
-            lastFetchedPage: 1, // page numbers in TypeSense start at 1
-            setLastFetchedPage: async (page: number) => {
-                const {results: updateSearchResults} = await getUpdatedSearchResults({
+            resultsPerPage: 10,
+            setResultsPerPage: async (numResults: number) => {
+                const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
                     ...get(),
-                    lastFetchedPage: page
+                    resultsPerPage: numResults,
+                    page: 1
                 }, false)
-                set({ lastFetchedPage: page, searchResults: updateSearchResults })
+                set({ resultsPerPage: numResults, page: 1, totalPages, searchResults: updateSearchResults })
+            },
+            totalPages: 1,
+            page: 1, // page numbers in TypeSense start at 1
+            setPage: async (page: number) => {
+                const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
+                    ...get(),
+                    page,
+                }, false)
+                set({ page, totalPages, searchResults: updateSearchResults })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -318,7 +337,7 @@ export const useClinicalDatasetSearchStore = create<ClinicalDatasetSearchState>(
 
                 set({
                     filters: newFilters,
-                    lastFetchedPage: 1,
+                    page: 1,
                     searchResults: results,
                     totalResults: total,
                 })
