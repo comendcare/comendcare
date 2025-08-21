@@ -47,7 +47,7 @@ export default function LoginPage() {
     useEffect(() => {
         if (session) {
             // Redirect to /app/marketplace/cro if the user is signed in
-            router.push("/app/marketplace/service-providers")
+            router.push("/app/dashboard")
         }
 
         // Check cookie manually
