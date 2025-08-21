@@ -21,7 +21,7 @@ import {
     MILESTONE_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {debounce} from "lodash";
-import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
     ...option,
@@ -100,7 +100,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         value={filters.milestoneTypes}
                         onChange={(vals) => setFilterKey("milestoneTypes", vals)}
                         defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
-                        placeholder="Any"
+                        placeholder="Any project types"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
                         commandProps={{className: "bg-transparent"}}
@@ -122,7 +122,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         value={filters.types}
                         onChange={(vals) => setFilterKey("types", vals)}
                         defaultOptions={BUSINESS_TYPES}
-                        placeholder="Any"
+                        placeholder="Any business types"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
                         commandProps={{className: "bg-transparent"}}
@@ -144,7 +144,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         value={filters.certifications}
                         onChange={(vals) => setFilterKey("certifications", vals)}
                         defaultOptions={CRO_CERTIFICATIONS}
-                        placeholder="Any"
+                        placeholder="Any certifications"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
                         commandProps={{className: "bg-transparent"}}
@@ -167,7 +167,54 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
-                        
+                        <DialogTitle>Service Provider Filters</DialogTitle>
+                            {/* Project Types */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">Project Types</Label>
+                                <MultipleSelector
+                                    value={filters.milestoneTypes}
+                                    onChange={(vals) => setFilterKey("milestoneTypes", vals)}
+                                    defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                    placeholder="Select project types..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                />
+                            </div>
+
+                            {/* Business Types */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">Business Types</Label>
+                                <MultipleSelector
+                                    value={filters.types}
+                                    onChange={(vals) => setFilterKey("types", vals)}
+                                    defaultOptions={BUSINESS_TYPES}
+                                    placeholder="Select business types..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                />
+                            </div>
+
+                            {/* Certifications */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">Certifications</Label>
+                                <MultipleSelector
+                                    value={filters.certifications}
+                                    onChange={(vals) => setFilterKey("certifications", vals)}
+                                    defaultOptions={CRO_CERTIFICATIONS}
+                                    placeholder="Select certifications..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                />
+                            </div>
                     </DialogContent>
                 </Dialog>
 

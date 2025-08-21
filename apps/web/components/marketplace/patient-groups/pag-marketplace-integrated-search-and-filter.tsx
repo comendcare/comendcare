@@ -27,6 +27,7 @@ import { useOrganizationSearchStore } from "@/state/search/organizationSearchSto
 import { mechanisms } from "comend-pag-platform/components/edit-condition-profile-dialog";
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
 import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -220,7 +221,66 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
-                        
+                        <DialogTitle>Patient Group Filters</DialogTitle>
+                            {/* Mechanisms of action */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">
+                                    Mechanisms of Action
+                                </Label>
+                                <MultipleSelector
+                                    value={filters.mechanisms}
+                                    onChange={(vals) => setFilterKey("mechanisms", vals)}
+                                    defaultOptions={MECHANISM_OPTIONS}
+                                    placeholder="Any"
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{ className: "bg-transparent" }}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </div>
+
+                            {/* Associated systems */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">
+                                    Associated Systems
+                                </Label>
+                                <MultipleSelector
+                                    value={filters.systems}
+                                    onChange={(vals) => setFilterKey("systems", vals)}
+                                    defaultOptions={SYSTEM_OPTIONS}
+                                    placeholder="Any"
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{ className: "bg-transparent" }}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </div>
+
+                            {/* Modalities */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">
+                                    Modalities of Interest
+                                </Label>
+                                <MultipleSelector
+                                    value={filters.modalities}
+                                    onChange={(vals) => setFilterKey("modalities", vals)}
+                                    defaultOptions={MODALITY_OPTIONS}
+                                    placeholder="Any"
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{ className: "bg-transparent" }}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </div>
                     </DialogContent>
                 </Dialog>
             </div>
