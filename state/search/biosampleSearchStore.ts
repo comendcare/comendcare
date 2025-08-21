@@ -282,9 +282,10 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
             setResultsPerPage: async (numResults: number) => {
                 const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
                     ...get(),
-                    resultsPerPage: numResults
+                    resultsPerPage: numResults,
+                    page: 1
                 }, false)
-                set({ resultsPerPage: numResults, totalPages, searchResults: updateSearchResults })
+                set({ resultsPerPage: numResults, page: 1, totalPages, searchResults: updateSearchResults })
             },
             totalPages: 1,
             page: 1, // page numbers in TypeSense start at 1
