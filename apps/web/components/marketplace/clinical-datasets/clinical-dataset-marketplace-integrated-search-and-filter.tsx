@@ -23,7 +23,8 @@ import {
 } from "@comend/lib/types"
 import {debounce} from "lodash";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
-import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
+import type { Option } from "@comend/lib/types"
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
     ...option,
@@ -74,6 +75,36 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
         []
     )
 
+    const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncConditionSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
@@ -95,20 +126,42 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                 <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
-                {/* Clinical Dataset Types */}
+                {/* Conditions */}
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">Clinical Dataset Types</Label>
+                    <Label className="text-xs font-semibold text-gray-900">Condition</Label>
                     <MultipleSelector
-                        value={filters.types}
-                        onChange={(vals) => setFilterKey("types", vals)}
-                        defaultOptions={TOOL_TYPE_OPTIONS}
-                        placeholder="Any"
+                        value={filters.conditions}
+                        onChange={(vals) => setFilterKey("conditions", vals)}
+                        onSearch={handleAsyncConditionSearch}
+                        placeholder="Any condition"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
                         commandProps={{className: "bg-transparent"}}
+                        loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
                         emptyIndicator={
-                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results
-                                found.</p>
+                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                        }
+                        showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
+                    />
+                </div>
+
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
+
+                {/* Genes */}
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                    <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                    <MultipleSelector
+                        value={filters.genes}
+                        onChange={(vals) => setFilterKey("genes", vals)}
+                        onSearch={handleAsyncGeneSearch}
+                        placeholder="Any gene"
+                        hidePlaceholderWhenSelected
+                        className="mt-1 border-0 px-0 py-0"
+                        commandProps={{className: "bg-transparent"}}
+                        loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
+                        emptyIndicator={
+                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                         }
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
@@ -125,7 +178,56 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
-                        
+                        <DialogTitle>Clinical Dataset Filters</DialogTitle>
+                        {/* Conditions */}
+                        <div>
+                            <Label className="text-xs font-semibold text-gray-900">Condition</Label>
+                            <MultipleSelector
+                                value={filters.conditions}
+                                onChange={(vals) => setFilterKey("conditions", vals)}
+                                onSearch={handleAsyncConditionSearch}
+                                placeholder="Any condition"
+                                hidePlaceholderWhenSelected
+                                commandProps={{className: "bg-transparent"}}
+                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
+                                emptyIndicator={
+                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                }
+                            />
+                        </div>
+
+                        {/* Genes */}
+                        <div>
+                            <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                            <MultipleSelector
+                                value={filters.genes}
+                                onChange={(vals) => setFilterKey("genes", vals)}
+                                onSearch={handleAsyncGeneSearch}
+                                placeholder="Any gene"
+                                hidePlaceholderWhenSelected
+                                commandProps={{className: "bg-transparent"}}
+                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
+                                emptyIndicator={
+                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                }
+                            />
+                        </div>
+
+                        {/* Clinical Dataset Types */}
+                        <div>
+                            <Label className="text-xs font-semibold text-gray-900">Clinical Dataset Types</Label>
+                            <MultipleSelector
+                                value={filters.types}
+                                onChange={(vals) => setFilterKey("types", vals)}
+                                defaultOptions={TOOL_TYPE_OPTIONS}
+                                placeholder="Any"
+                                hidePlaceholderWhenSelected
+                                commandProps={{className: "bg-transparent"}}
+                                emptyIndicator={
+                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                }
+                            />
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>

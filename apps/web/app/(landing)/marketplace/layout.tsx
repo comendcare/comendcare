@@ -141,6 +141,8 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
         const parsedDiseaseModelFilters = {
             types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
         }
         initializeDiseaseModelSearch(parsedDiseaseModelFilters)
         console.log(`Disease Model search initialized...`)

@@ -10,47 +10,27 @@ import { mixpanelTrack } from "@comend/lib/mixpanel";
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    // categories: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
+    conditions: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    genes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     types: {
         label: string,
         value: string,
         disable?: boolean,
     }[],
-    // types: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // certifications: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // tags: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // moneyDeployed: number[],
-    // genes: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[]
 }
 
 export const defaultFilters = {
-    // categories: [],
+    conditions: [],
+    genes: [],
     types: [],
-    // types: [],
-    // certifications: [],
-    // tags: [],
-    // moneyDeployed: [0, 10000000],
-    // genes: []
 }
 
 export type Recommendation = {
@@ -63,13 +43,21 @@ function generateFiltersString(filters: FiltersType): string {
 
     const escapeValue = (value: string) => `\`${value}\``;
 
-    // // Categories (Array Field)
-    // if (filters?.categories && filters.categories.length > 0) {
-    //     const categoryFilter = filters.categories
-    //         .map(category => `categories:=[${escapeValue(category.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${categoryFilter})`);
-    // }
+    // conditions
+    if (filters?.conditions && filters.conditions.length > 0) {
+        const conditionFilter = filters.conditions
+            .map(condition => `conditions:=[${escapeValue(condition.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${conditionFilter})`);
+    }
+
+    // genes
+    if (filters?.genes && filters.genes.length > 0) {
+        const geneFilter = filters.genes
+            .map(gene => `gene:=[${escapeValue(gene.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${geneFilter})`);
+    }
 
     // Disease Model Types (Array Field)
     if (filters?.types && filters.types.length > 0) {
@@ -78,30 +66,6 @@ function generateFiltersString(filters: FiltersType): string {
             .join(" || ");
         filtersList.push(`(${typeFilter})`);
     }
-
-    // // Company Types (Single String Field)
-    // if (filters?.types && filters.types.length > 0) {
-    //     const typeFilter = filters.types
-    //         .map(type => `companyType:=${escapeValue(type.value)}`)
-    //         .join(" || ");
-    //     filtersList.push(`(${typeFilter})`);
-    // }
-
-    // // Certifications (Array Field)
-    // if (filters?.certifications && filters.certifications.length > 0) {
-    //     const certificationFilter = filters.certifications
-    //         .map(cert => `simplifiedCertifications:=[${escapeValue(cert.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${certificationFilter})`);
-    // }
-
-    // // Tags (Array Field)
-    // if (filters?.tags && filters.tags.length > 0) {
-    //     const tagsFilter = filters.tags
-    //         .map(tag => `tags:=[${escapeValue(tag.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${tagsFilter})`);
-    // }
 
     // Combine all filters with `&&`
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
@@ -170,7 +134,7 @@ const getUpdatedSearchResults = async (
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "gene",
+            query_by: "description,gene",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),

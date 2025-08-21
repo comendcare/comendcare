@@ -473,19 +473,31 @@ export const syncToTypesense = async (env: {
             fields: [
                 {
                     name: "id",
-                    facet: false,
+                    type: "string",
                     index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
                     store: true,
-                    type: "string"
+                    facet: true,
+                    optional: false
+                },
+                {
+                    name: "description",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 },
                 {
                     name: "gene",
                     type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "conditions",
+                    type: "string[]",
                     index: true,
                     store: true,
                     facet: true,
@@ -507,19 +519,31 @@ export const syncToTypesense = async (env: {
             fields: [
                 {
                     name: "id",
-                    facet: false,
+                    type: "string",
                     index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
                     store: true,
-                    type: "string"
+                    facet: true,
+                    optional: false
+                },
+                {
+                    name: "description",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 },
                 {
                     name: "gene",
                     type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "conditions",
+                    type: "string[]",
                     index: true,
                     store: true,
                     facet: true,
@@ -599,6 +623,8 @@ export const syncToTypesense = async (env: {
             },
             select: {
                 id: true,
+                description: true,
+                organization: {include: {conditions: {include: {condition: true}}}},
                 gene: true,
                 types: true,
             }
@@ -609,6 +635,8 @@ export const syncToTypesense = async (env: {
             },
             select: {
                 id: true,
+                description: true,
+                organization: {include: {conditions: {include: {condition: true}}}},
                 gene: true,
                 types: true,
             }
@@ -719,8 +747,10 @@ export const syncToTypesense = async (env: {
         if (diseaseModels.length > 0) {
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
                 id: diseaseModel.id,
+                description: diseaseModel.description,
+                types: diseaseModel.types,
                 gene: diseaseModel.gene?.symbol,
-                types: diseaseModel.types
+                conditions: diseaseModel.organization?.conditions?.map(condition => condition.condition?.name) || []
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
         } else {
@@ -730,8 +760,10 @@ export const syncToTypesense = async (env: {
         if (clinicalDatasets.length > 0) {
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
                 id: dataset.id,
+                description: dataset.description,
+                types: dataset.types,
                 gene: dataset.gene?.symbol,
-                types: dataset.types
+                conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || []
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
         } else {
