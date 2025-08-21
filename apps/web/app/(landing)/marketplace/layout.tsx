@@ -149,6 +149,8 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
         const parsedClinicalDatasetFilters = {
             types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
         }
         initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
         console.log(`Clinical Dataset search initialized...`)

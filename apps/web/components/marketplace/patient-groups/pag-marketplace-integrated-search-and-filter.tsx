@@ -121,7 +121,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             {/* Top search + three filters */}
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
                 {/* Search */}
-                <div className="flex-1 px-6 py-0 min-w-[160px]">
+                <div className="flex-1 px-6 py-4">
                     <Label className="text-xs font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"

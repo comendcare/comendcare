@@ -131,18 +131,24 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
         const parsedBiosampleFilters = {
             types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
         }
         initializeBiosampleSearch(parsedBiosampleFilters)
         console.log(`Biosample search initialized...`)
 
         const parsedDiseaseModelFilters = {
             types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
         }
         initializeDiseaseModelSearch(parsedDiseaseModelFilters)
         console.log(`Disease Model search initialized...`)
 
         const parsedClinicalDatasetFilters = {
             types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
         }
         initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
         console.log(`Clinical Dataset search initialized...`)
