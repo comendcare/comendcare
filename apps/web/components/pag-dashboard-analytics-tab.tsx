@@ -176,12 +176,12 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*    </CardContent>*/}
                 {/*</Card>*/}
                 {/*<DonutChartCard organization={organization}/>*/}
-                <PAGAnalyticsLineChartCard organization={organization}/>
                 <DashboardProjectsStatusCard organization={organization}/>
+                <PAGAnalyticsLineChartCard organization={organization}/>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <PAGAnalyticsProfileCard organization={organization}/>
                 <PAGAnalyticsToolsCard organization={organization}/>
+                <PAGAnalyticsProfileCard organization={organization}/>
             </div>
         </div>
     )
