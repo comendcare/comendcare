@@ -169,7 +169,6 @@ export function EditBiosampleToolForm({
         types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
         attachments: form.watch("attachments"),
-        isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         milestones: form.watch("milestones"),
