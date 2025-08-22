@@ -138,7 +138,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-xs font-semibold text-gray-900">Condition</Label>
                     <MultipleSelector
-                        value={filters.conditions}
+                        value={filters.conditions ?? []}
                         onChange={(vals) => setFilterKey("conditions", vals)}
                         onSearch={handleAsyncConditionSearch}
                         placeholder="Any condition"
@@ -160,7 +160,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-xs font-semibold text-gray-900">Gene</Label>
                     <MultipleSelector
-                        value={filters.genes}
+                        value={filters.genes ?? []}
                         onChange={(vals) => setFilterKey("genes", vals)}
                         onSearch={handleAsyncGeneSearch}
                         placeholder="Any gene"
@@ -191,7 +191,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         <div>
                             <Label className="text-xs font-semibold text-gray-900">Condition</Label>
                             <MultipleSelector
-                                value={filters.conditions}
+                                value={filters.conditions ?? []}
                                 onChange={(vals) => setFilterKey("conditions", vals)}
                                 onSearch={handleAsyncConditionSearch}
                                 placeholder="Select conditions..."
@@ -208,7 +208,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         <div>
                             <Label className="text-xs font-semibold text-gray-900">Gene</Label>
                             <MultipleSelector
-                                value={filters.genes}
+                                value={filters.genes ?? []}
                                 onChange={(vals) => setFilterKey("genes", vals)}
                                 onSearch={handleAsyncGeneSearch}
                                 placeholder="Select genes..."
@@ -225,7 +225,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         <div>
                             <Label className="text-xs font-semibold text-gray-900">Biosample Types</Label>
                             <MultipleSelector
-                                value={filters.types}
+                                value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}
                                 defaultOptions={BIOSAMPLE_TYPE_OPTIONS}
                                 placeholder="Select types..."
