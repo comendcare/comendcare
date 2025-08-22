@@ -2798,8 +2798,8 @@ export async function fetchFeedPage(params: {
     cursor?: { createdAt: Date; id: string } | null;
     limit?: number;
 }) {
-    // Get 20 feed items at a time
-    const { orgId, cursor, limit = 20 } = params;
+    const PAGE_SIZE = 20;
+    const { orgId, cursor, limit = PAGE_SIZE } = params;
 
     const where = orgId ? { orgId } : {};
 
