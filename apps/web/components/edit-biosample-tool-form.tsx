@@ -1367,7 +1367,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 name="medications"
                 render={({field}) => (
                     // <FormItem>
-                    <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                    <FormItem className={cn("", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <div className="flex flex-row justify-between gap-2 items-center">
                             <FormLabel>{`Medications`}</FormLabel>
                             <Tooltip>
