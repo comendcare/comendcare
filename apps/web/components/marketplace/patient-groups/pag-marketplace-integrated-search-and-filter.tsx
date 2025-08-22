@@ -28,6 +28,7 @@ import { mechanisms } from "comend-pag-platform/components/edit-condition-profil
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
 import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import type { Option } from "@comend/lib/types";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -92,29 +93,57 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
         [handleInputChangeCallback]
     );
 
-    // convenience helpers around the store's FiltersType
-    const setFilterKey = (
-        key: keyof typeof filters,
-        value: { label: string; value: string }[]
-    ) => setFilters({ ...filters, [key]: value });
+    // helper to update a single filter key from MultipleSelector
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+        setFilters({...filters, [key]: value})
 
     const removeFilterItem = (key: keyof typeof filters, value: string) =>
-        setFilters({
-            ...filters,
-            [key]: (filters[key] || []).filter((i: any) => i.value !== value),
-        });
+        setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
 
     const clearAll = () =>
-        setFilters({ ...filters, mechanisms: [], systems: [], modalities: [] });
+        setFilters({ ...filters, conditions: [], genes: [], mechanisms: [], systems: [], modalities: [] });
 
     // map to find labels for badges
     const SYSTEM_OPTIONS = ASSOCIATED_SYSTEMS;
     const MODALITY_OPTIONS = MODALITIES;
 
     const activeCount =
+        (filters.conditions?.length || 0) +
+        (filters.genes?.length || 0) + 
         (filters.mechanisms?.length || 0) +
         (filters.systems?.length || 0) +
         (filters.modalities?.length || 0);
+
+
+    const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncConditionSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -136,78 +165,47 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block" />
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
-                {/* Mechanisms of action */}
-                <div className="flex-1 px-6 py-4 min-w-[160px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">
-                        Mechanisms of Action
-                    </Label>
+                {/* Conditions */}
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                    <Label className="text-xs font-semibold text-gray-900">Condition</Label>
                     <MultipleSelector
-                        value={filters.mechanisms}
-                        onChange={(vals) => setFilterKey("mechanisms", vals)}
-                        defaultOptions={MECHANISM_OPTIONS}
-                        placeholder="Any"
+                        value={filters.conditions ?? []}
+                        onChange={(vals) => setFilterKey("conditions", vals)}
+                        onSearch={handleAsyncConditionSearch}
+                        placeholder="Any condition"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
-                        commandProps={{ className: "bg-transparent" }}
+                        commandProps={{className: "bg-transparent"}}
+                        loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
                         emptyIndicator={
-                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
-                                no results found.
-                            </p>
+                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                         }
-                        showCountInsteadOfSelected
-                        showBadgesInDropdown
+                        showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block" />
+                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
 
-                {/* Associated systems */}
-                <div className="flex-1 px-6 py-4 min-w-[160px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">
-                        Associated Systems
-                    </Label>
+                {/* Genes */}
+                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                    <Label className="text-xs font-semibold text-gray-900">Gene</Label>
                     <MultipleSelector
-                        value={filters.systems}
-                        onChange={(vals) => setFilterKey("systems", vals)}
-                        defaultOptions={SYSTEM_OPTIONS}
-                        placeholder="Any"
+                        value={filters.genes ?? []}
+                        onChange={(vals) => setFilterKey("genes", vals)}
+                        onSearch={handleAsyncGeneSearch}
+                        placeholder="Any gene"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
-                        commandProps={{ className: "bg-transparent" }}
+                        commandProps={{className: "bg-transparent"}}
+                        loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
                         emptyIndicator={
-                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
-                                no results found.
-                            </p>
+                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                         }
-                        showCountInsteadOfSelected
-                        showBadgesInDropdown
-                    />
-                </div>
-
-                <Separator orientation="vertical" className="h-8 hidden lg:block" />
-
-                {/* Modalities */}
-                <div className="flex-1 px-6 py-4 min-w-[160px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">
-                        Modalities of Interest
-                    </Label>
-                    <MultipleSelector
-                        value={filters.modalities}
-                        onChange={(vals) => setFilterKey("modalities", vals)}
-                        defaultOptions={MODALITY_OPTIONS}
-                        placeholder="Any"
-                        hidePlaceholderWhenSelected
-                        className="mt-1 border-0 px-0 py-0"
-                        commandProps={{ className: "bg-transparent" }}
-                        emptyIndicator={
-                            <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
-                                no results found.
-                            </p>
-                        }
-                        showCountInsteadOfSelected
-                        showBadgesInDropdown
+                        showCountInsteadOfSelected={true}
+                        showBadgesInDropdown={true}
                     />
                 </div>
 
@@ -222,13 +220,47 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     </DialogTrigger>
                     <DialogContent>
                         <DialogTitle>Patient Group Filters</DialogTitle>
+                            {/* Conditions */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">Condition</Label>
+                                <MultipleSelector
+                                    value={filters.conditions ?? []}
+                                    onChange={(vals) => setFilterKey("conditions", vals)}
+                                    onSearch={handleAsyncConditionSearch}
+                                    placeholder="Any condition"
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                />
+                            </div>
+
+                            {/* Genes */}
+                            <div>
+                                <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                                <MultipleSelector
+                                    value={filters.genes ?? []}
+                                    onChange={(vals) => setFilterKey("genes", vals)}
+                                    onSearch={handleAsyncGeneSearch}
+                                    placeholder="Any gene"
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                />
+                            </div>
+
                             {/* Mechanisms of action */}
                             <div>
                                 <Label className="text-xs font-semibold text-gray-900">
                                     Mechanisms of Action
                                 </Label>
                                 <MultipleSelector
-                                    value={filters.mechanisms}
+                                    value={filters.mechanisms ?? []}
                                     onChange={(vals) => setFilterKey("mechanisms", vals)}
                                     defaultOptions={MECHANISM_OPTIONS}
                                     placeholder="Any"
@@ -248,7 +280,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                                     Associated Systems
                                 </Label>
                                 <MultipleSelector
-                                    value={filters.systems}
+                                    value={filters.systems ?? []}
                                     onChange={(vals) => setFilterKey("systems", vals)}
                                     defaultOptions={SYSTEM_OPTIONS}
                                     placeholder="Any"
@@ -268,7 +300,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                                     Modalities of Interest
                                 </Label>
                                 <MultipleSelector
-                                    value={filters.modalities}
+                                    value={filters.modalities ?? []}
                                     onChange={(vals) => setFilterKey("modalities", vals)}
                                     defaultOptions={MODALITY_OPTIONS}
                                     placeholder="Any"
@@ -289,6 +321,34 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             <div className="flex flex-row gap-2 items-center">
                 {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
+                        {/* conditions */}
+                        {(filters.conditions || []).map((item) => (
+                            <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
+                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
+                                    item.value} */}
+                                {item.value}
+                                <button
+                                    onClick={() => removeFilterItem("conditions", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* genes */}
+                        {(filters.genes || []).map((item) => (
+                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                                {item.value}
+                                <button
+                                    onClick={() => removeFilterItem("genes", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
                         {/* mechanisms */}
                         {(filters.mechanisms || []).map((item) => (
                             <Badge key={`mechanisms-${item.value}`} variant="secondary" className="text-xs">

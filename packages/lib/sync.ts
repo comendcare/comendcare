@@ -220,7 +220,7 @@ export const syncToTypesense = async (env: {
                     optional: true,
                 },
                 {
-                    name: "condition",
+                    name: "conditions",
                     facet: false,
                     index: true,
                     infix: false,
@@ -230,6 +230,18 @@ export const syncToTypesense = async (env: {
                     stem: false,
                     store: true,
                     type: "object[]"
+                },
+                {
+                    name: "therapeuticsOfInterest",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string[]"
                 },
             ],
         };

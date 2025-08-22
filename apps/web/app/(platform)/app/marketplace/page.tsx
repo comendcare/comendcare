@@ -100,7 +100,7 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceCard organization={organization} key={index} />
+                                        <OrganizationMarketplaceCard organization={organization} key={index} isPublic={false} />
                                     ))}
                                 </>
                             )

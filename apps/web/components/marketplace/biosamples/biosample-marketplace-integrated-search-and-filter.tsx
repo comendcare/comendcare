@@ -46,22 +46,15 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
     const [query, setQuery] = useState(searchTerm)
 
-    // const clearAllFilters = () =>
-    //     setFilters({...filters, milestoneTypes: [], types: [], certifications: [], tags: [], categories: []})
+    // Keep local input in sync with store (e.g., external changes)
+    useEffect(() => setQuery(searchTerm), [searchTerm]);
 
-    // helper to update a single filter key from MultipleSelector
-    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
-        setFilters({...filters, [key]: value})
-
-    // const removeFilterItem = (key: keyof typeof filters, value: string) =>
-    //     setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
-
-    // keep searchTerm input in sync if the store changes elsewhere
-    useEffect(() => setQuery(searchTerm), [searchTerm])
-
+    // initial fetch on mount
     useEffect(() => {
-        setSearchTerm("") // initial fetch on page load
-    }, [])
+        // reset to trigger initial load using store's logic
+        setSearchTerm("");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {
@@ -72,8 +65,23 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
     const debounceHandleInputChange = useMemo(
         () => debounce(handleInputChangeCallback, 500),
-        []
-    )
+        [handleInputChangeCallback]
+    );
+
+    // helper to update a single filter key from MultipleSelector
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+        setFilters({...filters, [key]: value})
+
+    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
+
+    const clearAll = () =>
+        setFilters({ ...filters, conditions: [], genes: [], types: [] });
+
+    const activeCount =
+        (filters.conditions?.length || 0) +
+        (filters.genes?.length || 0) + 
+        (filters.types?.length || 0);
 
     const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -232,8 +240,57 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                 </Dialog>
             </div>
 
+            {/* Active filter badges */}
             <div className="flex flex-row gap-2 items-center">
-                {/* Active Filter Badges (kept the same) */}
+                {activeCount > 0 && (
+                    <div className="flex flex-wrap gap-2 items-center">
+                        {/* conditions */}
+                        {(filters.conditions || []).map((item) => (
+                            <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
+                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
+                                    item.value} */}
+                                {item.value}
+                                <button
+                                    onClick={() => removeFilterItem("conditions", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* genes */}
+                        {(filters.genes || []).map((item) => (
+                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                                {item.value}
+                                <button
+                                    onClick={() => removeFilterItem("genes", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+
+                        {/* biosample types */}
+                        {(filters.types || []).map((item) => (
+                            <Badge key={`types-${item.value}`} variant="secondary" className="text-xs">
+                                {BIOSAMPLE_TYPE_OPTIONS.find((o) => o.value === item.value)?.label || item.value}
+                                <button
+                                    onClick={() => removeFilterItem("types", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs">
+                            Clear all
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="w-full flex flex-row justify-between items-center">

@@ -9,7 +9,7 @@ export default async function PatientGroupsPage() {
         <main className="flex flex-col w-full items-center h-full mx-auto">
             <div className="flex flex-col gap-4 p-2 w-full">
                 <PAGMarketplaceIntegratedSearchAndFilter />
-                <OrganizationSearchResults />
+                <OrganizationSearchResults isPublic={true} />
             </div>
         </main>
     )

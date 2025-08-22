@@ -4,10 +4,21 @@ import {temporal} from 'zundo';
 import {create} from 'zustand';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { isEqual } from 'lodash';
 
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
+    conditions: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    genes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     mechanisms: {
         label: string,
         value: string,
@@ -23,57 +34,60 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
-    // moneyDeployed: number[],
-    // genes: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[]
 }
 
 export const defaultFilters = {
+    conditions: [],
+    genes: [],
     mechanisms: [],
     systems: [],
     modalities: [],
-    // moneyDeployed: [0, 10000000],
-    // genes: []
 }
 
 function generateFiltersString(filters: FiltersType) {
     let filtersList: string[] = []
-    let typesenseFilters = ""
 
-    // addative filters
-    if (filters.systems.length > 0) {
-        filters.systems.forEach(system => {
-            filtersList.push(`condition.condition.associatedSystems:=[${system.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
-        })
+    const escapeValue = (value: string) => `\`${value}\``;
+
+    if (filters?.conditions && filters.conditions.length > 0) {
+        const conditionFilter = filters.conditions
+            .map(condition => `conditions.condition.name:=${escapeValue(condition.value)}`)
+            .join(" || ");
+        filtersList.push(`(${conditionFilter})`);
     }
 
-    if (filters.mechanisms.length > 0) {
-        filters.mechanisms.forEach(mechanism => {
-            filtersList.push(`condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
-        })
+    if (filters?.genes && filters.genes.length > 0) {
+        const geneFilter = filters.genes
+            .map(gene => `conditions.condition.causalGenes:=${escapeValue(gene.value)} || conditions.condition.associatedGenes:=${escapeValue(gene.value)}`)
+            .join(" || ");
+        filtersList.push(`(${geneFilter})`);
     }
 
-    if (filters.modalities.length > 0) {
-        filters.modalities.forEach(modality => {
-            filtersList.push(`condition.condition.interestedModalities:=[${modality.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.interestedModalities:=[${modality.value}]`)
-        })
+    if (filters?.systems && filters.systems.length > 0) {
+        const systemFilters = filters.systems
+            .map(system => `conditions.condition.associatedSystems:="${escapeValue(system.value)}"`)
+            .join(" || ");
+
+        filtersList.push(`(${systemFilters})`);
     }
 
-    if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
+    if (filters?.mechanisms && filters.mechanisms.length > 0) {
+        const mechanismFilters = filters.mechanisms
+            .map(system => `conditions.condition.relevantDiseaseMechanisms:="${escapeValue(system.value)}"`)
+            .join(" || ");
 
-    // subtractive filters
-    // if (filters.moneyDeployed) {
-    //     filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
-    //     filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:>=${filters.moneyDeployed[0]}`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:<${filters.moneyDeployed[1]}`)
-    // }
+        filtersList.push(`(${mechanismFilters})`);
+    }
+
+    if (filters?.modalities && filters.modalities.length > 0) {
+        const modalityFilters = filters.modalities
+            .map(modality => `therapeuticsOfInterest:="${escapeValue(modality.label)}"`)
+            .join(" || ");
+
+        filtersList.push(`(${modalityFilters})`);
+    }
+
+    const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
 
     console.log(`typesense filters: `, typesenseFilters)
     return typesenseFilters
@@ -96,12 +110,32 @@ const sortByFilters: { [key: string]: string } = {
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
     try {
+        // const searchParameters = {
+        //     q: state.searchTerm,
+        //     query_by: "name,description",
+        //     per_page: 10,
+        //     page: state.lastFetchedPage,
+        //     ...(generateFiltersString(state.filters) ? {filter_by: generateFiltersString(state.filters)} : undefined),
+        //     ...(state.sortBy ? {sort_by: sortByFilters[state.sortBy]} : undefined),
+        // };
+        const TAG_PRIORITY_SORT = "";
+
+        const filtersString = generateFiltersString(state.filters)
+
+        console.log(`FILTERS STRING`, filtersString)
+
+        // Merge tag-priority sort with user-chosen sort
+        let sortBy = TAG_PRIORITY_SORT;
+        if (state.sortBy && sortByFilters[state.sortBy]) {
+            sortBy += `,${sortByFilters[state.sortBy]}`;
+        }
+
         const searchParameters = {
             q: state.searchTerm,
             query_by: "name,description",
             per_page: 10,
             page: state.lastFetchedPage,
-            ...(generateFiltersString(state.filters) ? {filter_by: generateFiltersString(state.filters)} : undefined),
+            ...(filtersString ? { filter_by: filtersString } : undefined),
             ...(state.sortBy ? {sort_by: sortByFilters[state.sortBy]} : undefined),
         };
 

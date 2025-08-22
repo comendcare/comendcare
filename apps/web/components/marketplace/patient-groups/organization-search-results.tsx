@@ -16,7 +16,7 @@ const selector = (state: OrganizationSearchState) => ({
     searchResults: state.searchResults
 })
 
-export function OrganizationSearchResults() {
+export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useOrganizationSearchStore(useShallow(selector))
 
     if (!searchResults) {
@@ -53,7 +53,7 @@ export function OrganizationSearchResults() {
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((organization, index) => (
-                            <OrganizationMarketplaceCard organization={organization} key={index} />
+                            <OrganizationMarketplaceCard organization={organization} key={index} isPublic={isPublic} />
                         ))}
                     </div>
                 )}

@@ -21,7 +21,7 @@ function countPublicNodeTypes(data: { nodeType: string; private: boolean }[]): N
         }, {});
 }
 
-export function OrganizationMarketplaceCard({organization}: { organization: any }) {
+export function OrganizationMarketplaceCard({organization, isPublic}: { organization: any, isPublic: boolean }) {
     const {subdomain, image, name, description, moneyDeployed, condition} = organization;
     const orgCondition = condition?.[0]?.condition || {};
     const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
@@ -62,7 +62,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                                 {name}
                             </CardTitle>
                         </Link>
-                        <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>
+                        {!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}
                     </div>
                     {(moneyDeployed || numberOfPatientsEngaged) && (
                         <div className="w-full grid gap-2 grid-cols-2">
