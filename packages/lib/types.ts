@@ -26,6 +26,80 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export type Actor = { userId: string; userName?: string };
+
+export type FeedItemType =
+    | "RFP_DEADLINE_APPROACHING"
+    | "RFP_CLOSED"
+    | "FDA_MEDWATCH_ALERT"
+    | "FDA_WHATS_NEW_DRUGS"
+    | "FDA_WHATS_NEW_VBB"
+    | "FDA_PRESS_RELEASE"
+    | "CTG_TRIAL_POSTED"
+    | "ORG_UPDATED"
+    | "ORG_RESEARCH_PLAN_CREATED"
+    | "ORG_RESEARCH_PLAN_UPDATED"
+    | "ORG_CREATED_TOOL"
+    | "ORG_CREATED_RFP"
+    | "PAPER_PUBLISHED_AGNOSTIC"
+    | "PAPER_PUBLISHED_GROUP"
+    | "SERVICE_PROVIDER_CREATED"
+    | "PAG_PROFILE_CREATED"
+    | "TOOL_REQUEST_CREATED"
+    | "TOOL_REQUEST_COMMENT_CREATED"
+    | "TOOL_REQUEST_APPROVED"
+    | "FEED_POST_CREATED"
+    | "COMEND_UPDATE"
+    | "SERVICE_PROVIDER_RECOMMENDED"
+    | "PAG_RECOMMENDED"
+    | "PROJECTS_RECOMMENDED"
+    | "ANALYTICS_GOAL_REACHED"
+    | "RESEARCHER_RECOMMENDED";
+
+export interface FeedItemDTO {
+    id: string;
+    type: FeedItemType;
+    title: string;
+    content: Record<string, any> | null;
+    source: "USER" | "PLATFORM" | "THIRD_PARTY";
+    externalUrl?: string | null;
+    createdAt: string; // ISO from API
+    orgId?: string | null;
+    userId?: string | null;
+}
+
+export interface FeedPageDTO {
+    items: FeedItemDTO[];
+    nextCursor: { createdAt: string; id: string } | null;
+}
+
+export const FeedItemType = z.enum([
+    "ORG_UPDATED", "ORG_RESEARCH_PLAN_CREATED", "ORG_RESEARCH_PLAN_UPDATED", "ORG_CREATED_TOOL", "ORG_CREATED_RFP",
+    "RFP_DEADLINE_APPROACHING", "RFP_CLOSED",
+    "PAPER_PUBLISHED_AGNOSTIC", "PAPER_PUBLISHED_GROUP",
+    "SERVICE_PROVIDER_CREATED", "PAG_PROFILE_CREATED",
+    "TOOL_REQUEST_CREATED", "TOOL_REQUEST_COMMENT_CREATED", "TOOL_REQUEST_APPROVED", "FEED_POST_CREATED",
+    "COMEND_UPDATE", "SERVICE_PROVIDER_RECOMMENDED", "PAG_RECOMMENDED",
+    "PROJECTS_RECOMMENDED", "ANALYTICS_GOAL_REACHED",
+    "RESEARCHER_RECOMMENDED", "CTG_TRIAL_POSTED",
+    "FDA_MEDWATCH_ALERT", "FDA_WHATS_NEW_DRUGS", "FDA_WHATS_NEW_VBB", "FDA_PRESS_RELEASE",
+]);
+
+export const FeedSource = z.enum(["USER", "PLATFORM", "THIRD_PARTY"]);
+
+export const CanonicalFeed = z.object({
+    type: FeedItemType,
+    source: FeedSource,
+    title: z.string().min(1),
+    content: z.record(z.any()).optional(), // JSONB payload (typed per type below)
+    externalUrl: z.string().url().optional(),
+    orgId: z.string().optional(),
+    userId: z.string().optional(),
+    occurredAt: z.date(),
+    // must uniquely identify the logical item for idempotency (hashable)
+    idempotencyKey: z.string().min(8),
+});
+
 export type RequestFiltersType = {
     statuses: {
         label: string,

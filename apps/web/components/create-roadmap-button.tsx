@@ -1,22 +1,28 @@
 "use client"
 
-import { useTransition } from "react"
-import { createRoadmap } from "@comend/lib/actions"
-import { cn } from "@comend/lib/utils"
-import { useParams, useRouter } from "next/navigation"
+import {useTransition} from "react"
+import {createRoadmap} from "@comend/lib/actions"
+import {cn} from "@comend/lib/utils"
+import {useParams, useRouter} from "next/navigation"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import va from "@vercel/analytics"
+import {useSession} from "next-auth/react";
 
 export default function CreateRoadmapButton() {
     const router = useRouter()
-    const { id } = useParams() as { id: string }
+    const {data: session} = useSession()
+    const {id} = useParams() as { id: string }
     const [isPending, startTransition] = useTransition()
 
     return (
         <button
             onClick={() =>
                 startTransition(async () => {
-                    const roadmap = await createRoadmap(id)
+                    const roadmap = await createRoadmap(
+                        id,
+                        undefined,
+                        {userId: session?.user.id, userName: session?.user.name}
+                    )
                     va.track("Created Roadmap")
                     router.refresh()
                     if (roadmap) router.push(`/admin/research-plan/${roadmap?.id}`)
@@ -31,7 +37,7 @@ export default function CreateRoadmapButton() {
             disabled={isPending}
         >
             {isPending ? (
-                <LoadingDots color="#808080" />
+                <LoadingDots color="#808080"/>
             ) : (
                 <p>Create New Roadmap</p>
             )}

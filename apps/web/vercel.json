@@ -3,6 +3,10 @@
     {
       "path": "/api/sync",
       "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/ingest/process",
+      "schedule": "*/1 * * * *"
     }
   ]
 }

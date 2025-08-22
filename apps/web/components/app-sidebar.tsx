@@ -8,7 +8,7 @@ import {
     Megaphone,
     TestTube,
     Book, Wand2, BookOpen, Cookie,
-    Microscope, LayoutDashboard
+    Microscope, LayoutDashboard, Newspaper
 } from "lucide-react"
 import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
 import {NavUser} from "~web/components/nav-user"
@@ -50,6 +50,13 @@ const data = {
             icon: LayoutDashboard,
             variant: "ghost",
             url: "/app/dashboard",
+            subPages: []
+        },
+        {
+            title: "Feed",
+            icon: Newspaper,
+            variant: "ghost",
+            url: "/app/feed",
             subPages: []
         },
         {

@@ -36,6 +36,7 @@ import {
 } from "@comend/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {
+    Actor,
     ApiResponse,
     Asset,
     DEFAULT_KANBAN_COLUMNS,
@@ -51,6 +52,7 @@ import {
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
+import {writeRawEvent} from "@/apps/web/lib/raw-events";
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -458,6 +460,21 @@ export const createOrganization = withAuth(
                 console.log("email sent")
             })
 
+            if (organization.verified && organization.published) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "pag_profile_created",
+                    externalId: organization.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        orgId: organization.id,
+                        orgName: organization.name,
+                        userId: session.user.id,
+                        userName: session.user.name,
+                    },
+                });
+            }
+
             return {organization, membership};
         } catch (error: any) {
             if (error.code === "P2002") {
@@ -696,25 +713,62 @@ export const updateOrganization = withOrganizationAuth(
         });
 
         try {
+            // Get previous org for diffing
+            const before = await prisma.organization.findUnique({
+                where: { id: organization.id },
+            });
+
             const response = await prisma.organization.update({
-                where: {
-                    id: organization.id,
-                },
+                where: { id: organization.id },
                 data,
             });
 
+            // update search index if needed
             if (response.verified && response.published) {
                 await updateTypeSenseDocument(
                     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                     (
-                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+                        process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                             : process.env.TYPESENSE_ADMIN_API_KEY
                     )!,
                     response,
-                    'organizations'
+                    "organizations"
                 );
             }
+
+            // build diff
+            const changedFields: string[] = [];
+            const changes: Record<string, { before: unknown; after: unknown }> = {};
+
+            if (before) {
+                for (const key of Object.keys(data)) {
+                    const beforeVal = (before as any)[key];
+                    const afterVal = (response as any)[key];
+                    if (JSON.stringify(beforeVal) !== JSON.stringify(afterVal)) {
+                        changedFields.push(key);
+                        changes[key] = { before: beforeVal, after: afterVal };
+                    }
+                }
+            }
+
+            const session = await getSession();
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "org_updated",
+                externalId: response.id,
+                occurredAt: new Date(),
+                payload: {
+                    orgId: response.id,
+                    orgName: response.name ?? undefined,
+                    userId: session?.user.id,
+                    userName: session?.user.name,
+                    changedFields: changedFields.length ? changedFields : undefined,
+                    changes: Object.keys(changes).length ? changes : undefined,
+                },
+            });
 
             return response;
         } catch (error: any) {
@@ -777,7 +831,6 @@ export const deleteOrganization = withOrganizationAuth(
     ['owner']
 )
 
-// creating a separate function for this because we're not using FormData
 export const updateRoadmap = withOrganizationAuth(
     async (organizationId: string, data: Partial<Roadmap>) => {
         const session = await getSession()
@@ -813,6 +866,31 @@ export const updateRoadmap = withOrganizationAuth(
 
         if (!roadmap) return {error: "Roadmap not found"}
 
+        // Utility to compare (handles objects/arrays by JSON stringifying)
+        const isEqual = (a: unknown, b: unknown) => {
+            const ja = typeof a === "object" ? JSON.stringify(a) : a;
+            const jb = typeof b === "object" ? JSON.stringify(b) : b;
+            return ja === jb;
+        };
+
+        // Only consider fields you allow to be updated here
+        const updatableKeys = ["title", "description", "content", "modalities", "metadata"] as const;
+
+        // Compute change set (based on incoming "data" vs current "roadmap")
+        const changedFields: string[] = [];
+        const changes: Record<string, { before: unknown; after: unknown }> = {};
+
+        for (const key of updatableKeys) {
+            if (typeof data[key] !== "undefined") {
+                const beforeVal = (roadmap as any)[key];
+                const afterVal = (data as any)[key];
+                if (!isEqual(beforeVal, afterVal)) {
+                    changedFields.push(key);
+                    changes[key] = {before: beforeVal, after: afterVal};
+                }
+            }
+        }
+
         try {
             const response = await prisma.roadmap.update({
                 where: {
@@ -842,6 +920,26 @@ export const updateRoadmap = withOrganizationAuth(
                 await revalidateTag(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "org_research_plan_updated",
+                externalId: roadmap.id, // back-reference for idempotency
+                occurredAt: new Date(),
+                payload: {
+                    orgId: roadmap.organization?.id ?? organizationId,
+                    orgName: roadmap.organization?.name ?? undefined,
+                    roadmapId: roadmap.id,
+                    title: response.title ?? roadmap.title,
+                    published: response.published, // boolean
+                    // actor
+                    userId: session.user.id,
+                    userName: session.user.name,
+                    // change details
+                    changedFields: changedFields.length ? changedFields : undefined,
+                    changes: Object.keys(changes).length ? changes : undefined,
+                },
+            });
 
             return response
         } catch (error: any) {
@@ -2024,9 +2122,9 @@ export const createDiseaseModel = withOrganizationAuth(
 )
 
 function generateDonorNanoid() {
-  const id = nanoid(8) // generate 8 char
-  console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
-  return (id.slice(0, 4) + '-' + id.slice(4))
+    const id = nanoid(8) // generate 8 char
+    console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
+    return (id.slice(0, 4) + '-' + id.slice(4))
 }
 
 export const createDataTool = withOrganizationAuth(
@@ -2240,6 +2338,8 @@ export const updateDataTool = withOrganizationAuth(
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
+            const session = await getSession()
+
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -2377,6 +2477,28 @@ export const createBiosample = withOrganizationAuth(
                     }
                 }
             })
+
+            if (!response.private) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_tool",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        biosampleId: response.id,
+                        orgId: organization.id,
+                        orgName: organization.name,
+                        title: response.description || `Biosample ${response.id}`,
+                        private: false,
+                        availability: response.availability,
+                        types: response.types ?? [],
+                        geneId: response.geneId ?? undefined,
+                        institutionId: response.institutionId ?? undefined,
+                        userId: session?.user.id,
+                        userName: session?.user.name,
+                    },
+                });
+            }
 
             return response
         } catch (error: any) {
@@ -3013,15 +3135,33 @@ export const deleteRFP = withOrganizationAuth(
 )
 
 export const createOrUpdateRFP = withOrganizationAuth(
-    async (organization: Organization, rfpData: Partial<RFP>) => {
+    async (
+        organization: Organization,
+        rfpData: Partial<RFP>,
+        actor?: Actor
+    ) => {
         try {
             if (!organization.id) {
-                throw new Error("No organization id provided.")
+                throw new Error("No organization id provided.");
             }
+
+            // Pre-check: did it exist before?
+            // If there is no id in rfpData, this is definitely a create.
+            const existing =
+                rfpData.id
+                    ? await prisma.rFP.findUnique({
+                        where: {id: rfpData.id},
+                        select: {id: true, private: true, endDate: true, title: true},
+                    })
+                    : null;
+
+            const wasExisting = !!existing;
+            const wasPrivate = existing?.private ?? undefined;
+            const wasEndDate = existing?.endDate ?? undefined;
 
             const response = await prisma.rFP.upsert({
                 where: {
-                    id: rfpData.id || nanoid()
+                    id: rfpData.id || nanoid(),
                 },
                 include: {
                     contacts: true,
@@ -3029,10 +3169,11 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     milestones: {
                         include: {
                             milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
+                                include: {types: {include: {milestoneType: true}}},
+                            },
+                        },
+                    },
+                    organization: true,
                 },
                 update: {
                     headerImage: rfpData.headerImage,
@@ -3043,9 +3184,9 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
+                                ...(attachment.name ? {name: attachment.name} : undefined),
+                            })),
+                        },
                     },
                     contacts: {
                         deleteMany: {},
@@ -3054,28 +3195,24 @@ export const createOrUpdateRFP = withOrganizationAuth(
                                 name: contact.name,
                                 email: contact.email,
                                 ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
+                            })),
+                        },
                     },
-                    private: rfpData.private || false,
-                    pinned: rfpData.pinned || false,
-                    openTo: rfpData.openTo || [],
+                    private: rfpData.private ?? false,
+                    pinned: rfpData.pinned ?? false,
+                    openTo: rfpData.openTo ?? [],
                     startDate: rfpData.startDate,
                     endDate: rfpData.endDate,
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
+                            milestone: {connect: {id: milestone.milestoneId}},
+                        })),
                     },
-                    budget: rfpData.budget
+                    budget: rfpData.budget,
                 },
                 create: {
-                    // create with the given id if it's available. This is useful for situations like 'undo'
-                    // where we're re-creating a pre-existing rfp, and the id should match the id in our zustand state
                     ...(rfpData.id ? {id: rfpData.id} : undefined),
                     headerImage: rfpData.headerImage,
                     title: rfpData.title || "",
@@ -3084,9 +3221,9 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
                                 link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
+                                ...(attachment.name ? {name: attachment.name} : undefined),
+                            })),
+                        },
                     },
                     contacts: {
                         createMany: {
@@ -3094,79 +3231,191 @@ export const createOrUpdateRFP = withOrganizationAuth(
                                 name: contact.name,
                                 email: contact.email,
                                 ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
+                            })),
+                        },
                     },
-                    private: rfpData.private || false,
-                    pinned: rfpData.pinned || false,
-                    openTo: rfpData.openTo || [],
+                    private: rfpData.private ?? false,
+                    pinned: rfpData.pinned ?? false,
+                    openTo: rfpData.openTo ?? [],
                     startDate: rfpData.startDate,
                     endDate: rfpData.endDate,
                     milestones: {
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
+                            milestone: {connect: {id: milestone.milestoneId}},
+                        })),
                     },
                     organization: {connect: {id: organization.id}},
-                    budget: rfpData.budget
+                    budget: rfpData.budget,
                 },
-            })
+            });
 
-            return response
+            // ---- Event emission logic ----------------------------------------
+
+            // Always have these available for payloads
+            const orgId = organization.id;
+            const orgName = organization.name ?? response.organization?.name;
+            const title = response.title;
+            const startDate = response.startDate ?? undefined;
+            const endDate = response.endDate ?? undefined;
+            const isPrivate = response.private ?? false;
+
+            // 1) ORG_CREATED_RFP — only when this was a new create
+            if (!wasExisting) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_rfp",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        rfpId: response.id,
+                        title,
+                        orgId,
+                        orgName,
+                        startDate,
+                        endDate,
+                        private: isPrivate,
+                        budget: response.budget ?? undefined,
+                        userId: actor?.userId,
+                        userName: actor?.userName,
+                    },
+                });
+            }
+
+            // 2) RFP_CREATED — when it becomes public for the first time
+            //    (i.e., previously private/undefined -> now public)
+            const justPublished =
+                (wasExisting && wasPrivate !== false && isPrivate === false) ||
+                (!wasExisting && isPrivate === false); // created already public
+
+            if (justPublished) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_rfp",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        rfpId: response.id,
+                        orgId,
+                        title,
+                        deadline: endDate ?? undefined,
+                        userId: actor?.userId,
+                        userName: actor?.userName,
+                    },
+                });
+            }
+
+            // 3) RFP_CLOSED — endDate exists AND is now in the past
+            if (endDate) {
+                const now = new Date();
+                const ended = new Date(endDate) <= now;
+
+                // Emit close if it *is* closed now and either:
+                //   - it was not closed before, or
+                //   - it was created already closed (idempotency key prevents dupes)
+                const wasEndedBefore = wasEndDate ? new Date(wasEndDate) <= now : false;
+
+                if (ended && !wasEndedBefore) {
+                    await writeRawEvent({
+                        provider: "app",
+                        eventType: "rfp_closed",
+                        externalId: response.id,
+                        occurredAt: new Date(),
+                        payload: {
+                            rfpId: response.id,
+                            orgId,
+                            title,
+                            deadline: endDate,
+                            userId: actor?.userId,
+                            userName: actor?.userName,
+                        },
+                    });
+                }
+            }
+
+            // (Optional) A separate scheduler/cron should emit rfp_deadline_approaching
+            // 7 days prior; don’t do it inline here to avoid race/timing issues.
+
+            return response;
         } catch (error: any) {
-            console.error("Error creating or updating RFP:", error.message);
-            throw new Error(error.message || "Failed to create or update RFP.");
+            console.error("Error creating or updating RFP:", error?.message ?? error);
+            throw new Error(error?.message || "Failed to create or update RFP.");
         }
     }
-)
+);
 
-/* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export const createRoadmap = withOrganizationAuth(
-    async (organization: Organization, roadmapTemplate?: typeof templateResearchPlans[0] & {
-        metadata: JsonObject
-    } | undefined) => {
-        const roadmap = await prisma.roadmap.create({
-            data: {
-                title: roadmapTemplate?.title,
-                description: roadmapTemplate?.description,
-                organization: {
-                    connect: {id: organization.id}
-                },
-                modalities: roadmapTemplate?.modalities,
-                ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined)
+    async (
+        organization: Organization,
+        roadmapTemplate?: (typeof templateResearchPlans)[0] & { metadata: JsonObject },
+        actor?: Actor
+    ) => {
+        try {
+            if (!organization.id) {
+                throw new Error("No organization id provided.");
             }
-        })
 
-        // if a roadmap template was provided, create the relevant nodes, milestones, and edges
-        if (roadmapTemplate?.milestones) {
-            await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate)
+            const roadmap = await prisma.roadmap.create({
+                data: {
+                    title: roadmapTemplate?.title,
+                    description: roadmapTemplate?.description,
+                    organization: {connect: {id: organization.id}},
+                    modalities: roadmapTemplate?.modalities,
+                    ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined),
+                    // published defaults to true per your model; omit to use default
+                },
+            });
+
+            // If a template was provided, create nodes/edges/milestones first
+            if (roadmapTemplate?.milestones) {
+                await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate);
+            }
+
+            // Re-fetch with full graph
+            const finalRoadmap = await prisma.roadmap.findUnique({
+                where: {id: roadmap.id},
+                include: {
+                    milestones: {
+                        include: {
+                            node: true,
+                            contacts: true,
+                            attachments: true,
+                            types: {include: {milestoneType: true}},
+                            tools: {include: {tool: true}},
+                            rfps: {include: {rfp: true}},
+                        },
+                    },
+                    nodes: true,
+                    edges: true,
+                    organization: true,
+                },
+            });
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "org_research_plan_created",
+                externalId: roadmap.id, // back-reference for idempotency
+                occurredAt: new Date(),
+                payload: {
+                    // mapper expects these:
+                    orgId: organization.id,
+                    orgName: organization.name ?? finalRoadmap?.organization?.name,
+                    roadmapId: roadmap.id,
+                    title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                    published: true, // Roadmap.published default in your model is true
+                    // actor
+                    userId: actor?.userId,
+                    userName: actor?.userName,
+                },
+            });
+
+            return finalRoadmap;
+        } catch (error: any) {
+            console.error("Error creating roadmap:", error?.message ?? error);
+            throw new Error(error?.message || "Failed to create roadmap.");
         }
-
-        const finalRoadmap = prisma.roadmap.findUnique({
-            where: {id: roadmap.id},
-            include: {
-                milestones: {
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: {include: {milestoneType: true}},
-                        tools: {include: {tool: true}},
-                        rfps: {include: {rfp: true}}
-                    }
-                },
-                nodes: true,
-                edges: true,
-                organization: true
-            }
-        })
-
-        return finalRoadmap
     }
-)
+);
 
 export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
     async (organization: Organization, roadmapId: string, roadmapTemplate: typeof templateResearchPlans[0] & {
@@ -5074,7 +5323,7 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
 
         const rawData = formData.get("data");
         if (!rawData || typeof rawData !== "string") {
-            return { error: "Invalid form data." };
+            return {error: "Invalid form data."};
         }
 
         const parsed = JSON.parse(rawData);

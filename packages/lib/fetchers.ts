@@ -2792,3 +2792,48 @@ const getRequests = async (
 //         )()
 //     }
 // )
+
+export async function fetchFeedPage(params: {
+    orgId?: string;
+    cursor?: { createdAt: Date; id: string } | null;
+    limit?: number;
+}) {
+    const PAGE_SIZE = 20;
+    const { orgId, cursor, limit = PAGE_SIZE } = params;
+
+    const where = orgId ? { orgId } : {};
+
+    const items = await prisma.feedItem.findMany({
+        where,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: limit + 1,
+        ...(cursor
+            ? {
+                cursor: { createdAt_id: { createdAt: cursor.createdAt, id: cursor.id } },
+                skip: 1, // exclude the cursor row
+            }
+            : {}),
+        select: {
+            id: true,
+            type: true,
+            title: true,
+            content: true,
+            source: true,
+            externalUrl: true,
+            createdAt: true,
+            orgId: true,
+            userId: true,
+        },
+    });
+
+    let nextCursor: { createdAt: Date; id: string } | null = null;
+    if (items.length > limit) {
+        const next = items.pop()!;
+        nextCursor = { createdAt: next.createdAt, id: next.id };
+    }
+
+    return {
+        items,
+        nextCursor,
+    };
+}
