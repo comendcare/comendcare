@@ -11,6 +11,7 @@ import PAGProfileCreatedCard from "~web/components/feed/pag-profile-created-feed
 import PAGProfileUpdatedCard from "~web/components/feed/pag-profile-updated-feed-card";
 import ResearchPlanUpdatedCard from "~web/components/feed/research-plan-updated-feed-card";
 import PubMedFeedCard from "~web/components/feed/pubmed-feed-card";
+import CtgovFeedCard from "~web/components/feed/ctgov-feed-card";
 
 // Lazy-load rare/heavier cards
 const FDAFeedCard = dynamic(
@@ -39,6 +40,9 @@ const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = 
 
     // PubMed
     PAPER_PUBLISHED_AGNOSTIC: PubMedFeedCard as React.ComponentType<CardProps>,
+
+    // PubMed
+    CTG_TRIAL_POSTED: CtgovFeedCard as React.ComponentType<CardProps>,
 
     // CTG_TRIAL_POSTED: CtgovTrialCard as React.ComponentType<CardProps>,
     // ...add more as you implement them

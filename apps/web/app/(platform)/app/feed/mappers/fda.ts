@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { register } from "../registry";
+import { register } from "~web/app/(platform)/app/feed/registry";
 
 type RssItem = {
     guid?: string;
