@@ -26,6 +26,11 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export const GLOBAL_FEED_TYPES = [
+    "SERVICE_PROVIDER_CREATED",
+    "PAG_PROFILE_CREATED",
+] as const
+
 export type Actor = { userId: string; userName?: string };
 
 export type FeedItemType =

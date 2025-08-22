@@ -580,7 +580,7 @@ register("app", "pag_profile_created", async ({ payload, occurredAt }) => {
             actor: { userId, name: userName },
             organization: { id: orgId, name: orgName },
         },
-        orgId,
+        orgId: undefined, // explicit undefined/null so that it appears in all feeds
         occurredAt,
         idempotencyKey,
     };
@@ -789,5 +789,6 @@ register("app", "service_provider_created", async ({ payload, occurredAt }) => {
         },
         occurredAt,
         idempotencyKey,
+        orgId: undefined, // explicit undefined/null so that it appears in all feeds
     };
 });

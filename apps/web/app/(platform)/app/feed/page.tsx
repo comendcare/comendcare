@@ -83,8 +83,13 @@ export default async function FeedPage() {
         comments: true,
         author: true,
     })
-    const orgId: string | undefined = undefined;
-    const first = await fetchFeedPage({ orgId });
+    const first = await fetchFeedPage(
+        {
+            orgId: session?.user.organizationId,
+            cursor: null,
+            limit: 10
+        }
+    );
 
     const initialPage = {
         items: first.items.map((i) => ({
@@ -92,7 +97,7 @@ export default async function FeedPage() {
             createdAt: i.createdAt.toISOString(),
         })),
         nextCursor: first.nextCursor
-            ? { createdAt: first.nextCursor.createdAt.toISOString(), id: first.nextCursor.id }
+            ? {createdAt: first.nextCursor.createdAt.toISOString(), id: first.nextCursor.id}
             : null,
     };
 
@@ -129,7 +134,7 @@ export default async function FeedPage() {
         } else if (posts.data) {
             return (
                 <main className="flex flex-col items-center w-full max-w-4xl mx-auto p-4 space-y-4">
-                    <FeedList initialPage={initialPage as FeedPageDTO} orgId={orgId} />
+                    <FeedList initialPage={initialPage as FeedPageDTO} orgId={session?.user.organizationId}/>
                 </main>
             )
         }

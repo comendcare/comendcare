@@ -18,7 +18,7 @@ register("eutils:pubmed", "pubmed_article", async ({ payload, occurredAt }) => {
 
     const idempotencyKey = crypto
         .createHash("sha256")
-        .update(`eutils:pubmed:${a.pmid}`)
+        .update(`pubmed:${a.orgId ?? "global"}:${a.pmid}`)
         .digest("hex");
 
     // Prefer the accepted/published date you parsed; fall back to event occurredAt

@@ -1380,6 +1380,7 @@ model FeedItem {
   source      FeedSource
   externalUrl String?
   createdAt   DateTime     @default(now())
+  occurredAt  DateTime
   orgId       String?
   userId      String?
 
@@ -1414,6 +1415,8 @@ model RawIngestEvent {
   error  String?
 
   feedItem FeedItem?
+
+  createdAt DateTime @default(now())
 
   @@index([provider, occurredAt])
 }

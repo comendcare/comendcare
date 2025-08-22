@@ -2,10 +2,25 @@
 
 import {unstable_cache} from "next/cache"
 import prisma from "@comend/lib/prisma"
-import {ApiResponse, milestoneCategories, RequestFiltersType, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {
+    ApiResponse,
+    GLOBAL_FEED_TYPES,
+    milestoneCategories,
+    RequestFiltersType,
+    RESEARCH_PLAN_TYPES
+} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
 import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@/packages/lib/auth";
-import {Condition, MaterialAndDataAccessRequest, Organization, Prisma, Researcher, User, Biosample, DiseaseModel} from "@prisma/client";
+import {
+    Condition,
+    MaterialAndDataAccessRequest,
+    Organization,
+    Prisma,
+    Researcher,
+    User,
+    Biosample,
+    DiseaseModel
+} from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
@@ -22,9 +37,12 @@ import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
 import {filterColumns} from "@comend/lib/filter-columns";
 // import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "@comend/components/biorepo/advanced-data-table";
 import {nanoid} from "nanoid";
-import { BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option } from "@comend/lib/types";
+import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "@comend/lib/types";
 import {mergeResearcherData} from "@/apps/researcher/lib/utils";
-import { GetBiosamplesSchema, GetDiseaseModelSchema } from "@comend/components/biorepo/advanced-data-table/lib/validations";
+import {
+    GetBiosamplesSchema,
+    GetDiseaseModelSchema
+} from "@comend/components/biorepo/advanced-data-table/lib/validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getServicesOfCompany(
@@ -47,10 +65,10 @@ export async function getServicesOfCompany(
         if (!company) {
             return {success: false, error: `Services not found, could not find company with id: ${companyId}`}
         }
-        
+
         const fetchedServices = company.services
         if (!fetchedServices) {
-            return {success: false, error:`Services not found` }
+            return {success: false, error: `Services not found`}
         }
 
         return {
@@ -1901,7 +1919,7 @@ export const getResearcherRequest = withUserAuth(
 
 export const getAllOrganizationRequests = withOrganizationAuth(
     async (
-        organization: Organization, 
+        organization: Organization,
         request: MaterialAndDataAccessRequest,
         select: Prisma.MaterialAndDataAccessRequestSelect<InternalArgs & {
             result: {};
@@ -1910,7 +1928,7 @@ export const getAllOrganizationRequests = withOrganizationAuth(
             client: {};
         }>
     ) => {
-        try{
+        try {
             const fetchedRequests = await prisma.materialAndDataAccessRequest.findMany({
                 where: {organizationId: organization.id},
                 select
@@ -2039,18 +2057,18 @@ export const getResearcherFromOrcidApi = withUserAuth(
 
 export const getResearcherWithMergedData = withUserAuth(async () => {
     const session = await getSession();
-    if (!session) return { success: false, error: "No session found" };
+    if (!session) return {success: false, error: "No session found"};
 
     const dbResearcher = await prisma.researcher.findUnique({
-        where: { userId: session.user.id },
+        where: {userId: session.user.id},
         include: {
             affiliations: {
-                include: { institution: true },
+                include: {institution: true},
             },
         },
     });
 
-    if (!dbResearcher) return { success: false, error: "Researcher not found" };
+    if (!dbResearcher) return {success: false, error: "Researcher not found"};
 
     const hasOrcid = !!dbResearcher.orcid;
     let openAlexAuthor = null;
@@ -2070,11 +2088,14 @@ export const getResearcherWithMergedData = withUserAuth(async () => {
 
     const merged = mergeResearcherData(dbResearcher, openAlexAuthor, openAlexPublications);
 
-    return { success: true, data: merged };
+    return {success: true, data: merged};
 });
 
 export const getDiseaseModels = withOrganizationAuth(
-    async (organization: Organization, input?: GetDiseaseModelSchema): Promise<{ data: DiseaseModel[], pageCount: number }> => {
+    async (organization: Organization, input?: GetDiseaseModelSchema): Promise<{
+        data: DiseaseModel[],
+        pageCount: number
+    }> => {
         return unstable_cache(
             async () => {
                 try {
@@ -2193,7 +2214,10 @@ export const getDiseaseModels = withOrganizationAuth(
 )
 
 export const getBiosamples = withOrganizationAuth(
-    async (organization: Organization, input?: GetBiosamplesSchema): Promise<{ data: Biosample[], pageCount: number }> => {
+    async (organization: Organization, input?: GetBiosamplesSchema): Promise<{
+        data: Biosample[],
+        pageCount: number
+    }> => {
         return unstable_cache(
             async () => {
                 try {
@@ -2643,78 +2667,78 @@ const getRequests = async (
     input: GetRequestsInput,
     additionalWhere?: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
 ) => {
-        return unstable_cache(
-            async () => {
-                try {
-                    const page = input.page ?? 1
-                    const perPage = input.perPage ?? 10
-                    const offset = (page - 1) * perPage
+    return unstable_cache(
+        async () => {
+            try {
+                const page = input.page ?? 1
+                const perPage = input.perPage ?? 10
+                const offset = (page - 1) * perPage
 
-                    const filters: any[] = []
+                const filters: any[] = []
 
-                    if (input.searchTerm) {
-                        filters.push({
-                            id: "title",
-                            value: input.searchTerm,
-                            operator: "iLike",
-                            variant: "text",
-                            filterId: nanoid(),
-                        })
-                    }
-
-                    if (input.filters.statuses.length > 0) {
-                        filters.push({
-                            id: "status",
-                            value: input.filters.statuses.map((s: Option) => s.value),
-                            operator: "inArray",
-                            variant: "multiSelect",
-                            filterId: nanoid(),
-                        })
-                    }
-
-                    if (input.filters.types.length > 0) {
-                        filters.push({
-                            id: "type",
-                            value: input.filters.types.map((t: Option) => t.value),
-                            operator: "inArray",
-                            variant: "multiSelect",
-                            filterId: nanoid(),
-                        })
-                    }
-
-                    const where = filterColumns({filters, joinOperator: "and"})
-
-                    const [data, total] = await prisma.$transaction([
-                        prisma.materialAndDataAccessRequest.findMany({
-                            where: {
-                                ...where,
-                                ...additionalWhere
-                            },
-                            skip: offset,
-                            take: perPage,
-                            orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
-                        }),
-                        prisma.materialAndDataAccessRequest.count({
-                            where: {
-                                ...where,
-                                ...additionalWhere
-                            }
-                        })
-                    ])
-
-                    return {
-                        success: true,
-                        data,
-                        total,
-                    }
-                } catch (err) {
-                    console.error("getRequests error", err)
-                    return {success: false, data: [], total: 0}
+                if (input.searchTerm) {
+                    filters.push({
+                        id: "title",
+                        value: input.searchTerm,
+                        operator: "iLike",
+                        variant: "text",
+                        filterId: nanoid(),
+                    })
                 }
-            },
-            [JSON.stringify(input)],
-            {revalidate: 1, tags: ["requests"]},
-        )()
+
+                if (input.filters.statuses.length > 0) {
+                    filters.push({
+                        id: "status",
+                        value: input.filters.statuses.map((s: Option) => s.value),
+                        operator: "inArray",
+                        variant: "multiSelect",
+                        filterId: nanoid(),
+                    })
+                }
+
+                if (input.filters.types.length > 0) {
+                    filters.push({
+                        id: "type",
+                        value: input.filters.types.map((t: Option) => t.value),
+                        operator: "inArray",
+                        variant: "multiSelect",
+                        filterId: nanoid(),
+                    })
+                }
+
+                const where = filterColumns({filters, joinOperator: "and"})
+
+                const [data, total] = await prisma.$transaction([
+                    prisma.materialAndDataAccessRequest.findMany({
+                        where: {
+                            ...where,
+                            ...additionalWhere
+                        },
+                        skip: offset,
+                        take: perPage,
+                        orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+                    }),
+                    prisma.materialAndDataAccessRequest.count({
+                        where: {
+                            ...where,
+                            ...additionalWhere
+                        }
+                    })
+                ])
+
+                return {
+                    success: true,
+                    data,
+                    total,
+                }
+            } catch (err) {
+                console.error("getRequests error", err)
+                return {success: false, data: [], total: 0}
+            }
+        },
+        [JSON.stringify(input)],
+        {revalidate: 1, tags: ["requests"]},
+    )()
 }
 
 // export const getRequests = withOrganizationAuth(
@@ -2793,47 +2817,44 @@ const getRequests = async (
 //     }
 // )
 
-export async function fetchFeedPage(params: {
-    orgId?: string;
-    cursor?: { createdAt: Date; id: string } | null;
-    limit?: number;
-}) {
-    const PAGE_SIZE = 20;
-    const { orgId, cursor, limit = PAGE_SIZE } = params;
+type Cursor = { createdAt: Date; id: string } | null;
 
-    const where = orgId ? { orgId } : {};
+export async function fetchFeedPage(opts: {
+    orgId?: string;
+    cursor?: Cursor;
+    limit: number;
+}) {
+    const {orgId, cursor, limit} = opts;
+
+    // If no orgId, only global items (e.g., a public landing feed)
+    const where: Prisma.FeedItemWhereInput = orgId
+        ? {
+            OR: [
+                {orgId}, // org-scoped
+                {orgId: null, type: {in: GLOBAL_FEED_TYPES as any}}, // global
+            ],
+        }
+        : {orgId: null, type: {in: GLOBAL_FEED_TYPES as any}};
+
+    const orderBy: Prisma.Enumerable<Prisma.FeedItemOrderByWithRelationInput> = [
+        {createdAt: "desc"},
+        {id: "desc"},
+    ];
 
     const items = await prisma.feedItem.findMany({
         where,
-        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        take: limit + 1,
-        ...(cursor
-            ? {
-                cursor: { createdAt_id: { createdAt: cursor.createdAt, id: cursor.id } },
-                skip: 1, // exclude the cursor row
-            }
-            : {}),
-        select: {
-            id: true,
-            type: true,
-            title: true,
-            content: true,
-            source: true,
-            externalUrl: true,
-            createdAt: true,
-            orgId: true,
-            userId: true,
-        },
+        orderBy,
+        take: limit,
+        ...(cursor && {
+            cursor: { createdAt_id: { createdAt: cursor.createdAt, id: cursor.id } },
+            skip: 1,
+        }),
     });
 
-    let nextCursor: { createdAt: Date; id: string } | null = null;
-    if (items.length > limit) {
-        const next = items.pop()!;
-        nextCursor = { createdAt: next.createdAt, id: next.id };
-    }
+    const next = items.length === limit ? items[items.length - 1] : null;
 
     return {
         items,
-        nextCursor,
+        nextCursor: next ? {createdAt: next.createdAt, id: next.id} : null,
     };
 }

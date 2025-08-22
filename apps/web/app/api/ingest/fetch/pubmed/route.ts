@@ -53,7 +53,7 @@ export async function POST() {
 
                     const dedupeKey = crypto
                         .createHash("sha256")
-                        .update(`${provider}:${eventType}:${article.pmid}`)
+                        .update(`${provider}:${eventType}:${cfg.orgId}:${article.pmid}`)
                         .digest("hex");
 
                     const occurredAt = article.publishedDate ? new Date(article.publishedDate) : new Date();

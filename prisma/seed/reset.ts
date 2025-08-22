@@ -4,7 +4,7 @@ async function deleteCompanies() {
     try {
         console.log("Deleting all companies...");
 
-        await prisma.company.deleteMany(); // Deletes all records from 'company' table
+        await prisma.rawIngestEvent.deleteMany(); // Deletes all records from 'company' table
 
         console.log("All companies deleted successfully.");
     } catch (error) {

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@comend/lib/prisma";
 import {getMapper} from "~web/app/(platform)/app/feed/registry";
-import { CanonicalFeed } from "@comend/lib/types";
+import {CanonicalFeed, GLOBAL_FEED_TYPES} from "@comend/lib/types";
 import "~web/app/(platform)/app/feed/mappers"
 
 
@@ -38,6 +38,14 @@ export async function POST() {
             // Validate (extra safety)
             const feed = CanonicalFeed.parse(canonical);
 
+            const isGlobalType = GLOBAL_FEED_TYPES.includes(feed.type as any);
+            if (isGlobalType && feed.orgId) {
+                throw new Error(`Global feed type ${feed.type} must not have orgId`);
+            }
+            if (!isGlobalType && !feed.orgId) {
+                throw new Error(`Org-scoped feed type ${feed.type} requires orgId`);
+            }
+
             // Upsert FeedItem by idempotencyKey
             const item = await prisma.feedItem.upsert({
                 where: { idempotencyKey: feed.idempotencyKey },
@@ -58,7 +66,7 @@ export async function POST() {
                     externalUrl: feed.externalUrl,
                     orgId: feed.orgId,
                     userId: feed.userId,
-                    createdAt: feed.occurredAt,  // key detail for “timeline as-it-happened”
+                    occurredAt: feed.occurredAt,  // key detail for “timeline as-it-happened”
                     rawEventId: raw.id,
                 },
             });
