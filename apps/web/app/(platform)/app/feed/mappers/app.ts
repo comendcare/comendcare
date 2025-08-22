@@ -288,60 +288,43 @@ register("app", "org_research_plan_updated", async ({ payload, occurredAt }) => 
 // Maps to Milestone (nodeType === "PROJECT") creation.
 register("app", "org_created_project", async ({ payload, occurredAt }) => {
     const {
-        projectId,         // Milestone.id
-        title,             // Milestone.title
-        orgId,             // Milestone.organizationId
+        orgId,
         orgName,
-        startDate,         // Milestone.startDate (ISO string)
-        endDate,           // Milestone.endDate (ISO string)
-        private: isPrivate,// Milestone.private
-        status,            // Milestone.status
-        budget,            // Milestone.budget
-        openTo,            // Milestone.openTo (string[])
-        otherTypeDetails,  // Milestone.otherTypeDetails
-        timelineOrder,     // Milestone.timelineOrder
-        types,             // optional: serialized type ids/labels if you pass them
-        userId,            // actor (User.id)
-        userName,          // actor display name
+        projects, // array of { projectId, title, ... }
+        userId,
+        userName,
     } = payload as {
-        projectId: string;
-        title: string;
         orgId: string;
         orgName?: string;
-        startDate?: string | null;
-        endDate?: string | null;
-        private?: boolean;
-        status?: string | null;
-        budget?: number | null;
-        openTo?: string[];
-        otherTypeDetails?: string | null;
-        timelineOrder?: number;
-        types?: Array<{ id: string; label: string }> | string[]; // flexible
+        projects: Array<{
+            projectId: string;
+            title?: string;
+            startDate?: Date | string | null;
+            endDate?: Date | string | null;
+            private?: boolean;
+            status?: string | null;
+            budget?: number | null;
+            timelineOrder?: number | null;
+        }>;
         userId?: string;
         userName?: string;
     };
 
-    const idempotencyKey = crypto
-        .createHash("sha256")
-        .update(`app:project:${projectId}:created`)
-        .digest("hex");
+    const idemSeed = `app:project:batch:${projects.map(p => p.projectId).sort().join(",")}`;
+    const idempotencyKey = crypto.createHash("sha256").update(idemSeed).digest("hex");
+
+    const count = projects.length;
+    const title =
+        count === 1
+            ? `New project: ${projects[0].title ?? projects[0].projectId}`
+            : `${count} new projects created`;
 
     return {
-        type: "ORG_CREATED_PROJECT",
+        type: "ORG_CREATED_PROJECT", // reuse, or add a dedicated BATCH type if you prefer
         source: "USER",
-        title: title ? `New project: ${title}` : "New project",
+        title,
         content: {
-            projectId,
-            title,
-            startDate,
-            endDate,
-            private: isPrivate,
-            status,
-            budget,
-            openTo,
-            otherTypeDetails,
-            timelineOrder,
-            types,
+            projects,
             actor: { userId, name: userName },
             organization: { id: orgId, name: orgName },
         },
@@ -351,7 +334,6 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
     };
 });
 
-
 // ------------------------------------
 // ORG_UPDATED_PROJECT
 // ------------------------------------
@@ -359,81 +341,49 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
 // Use either `updatedAt` for idempotency or a property/newValue pair if you emit per-field changes.
 register("app", "org_updated_project", async ({ payload, occurredAt }) => {
     const {
-        projectId,         // Milestone.id
-        title,             // Milestone.title (current)
         orgId,
         orgName,
-        // Option A: broad update snapshot (recommended)
-        startDate,         // Milestone.startDate (ISO string)
-        endDate,           // Milestone.endDate (ISO string)
-        private: isPrivate,// Milestone.private
-        status,            // Milestone.status
-        budget,            // Milestone.budget
-        openTo,            // Milestone.openTo
-        otherTypeDetails,  // Milestone.otherTypeDetails
-        timelineOrder,     // Milestone.timelineOrder
-        types,             // optional types snapshot
-        updatedAt,         // Milestone.updatedAt (ISO string) — preferred for idempotency
-        // Option B: granular diff (optional)
-        property,          // e.g. "status", "endDate"
-        oldValue,
-        newValue,
+        projects, // array of project snapshots (see emitter above)
         userId,
         userName,
     } = payload as {
-        projectId: string;
-        title?: string;
         orgId: string;
         orgName?: string;
-        startDate?: string | null;
-        endDate?: string | null;
-        private?: boolean;
-        status?: string | null;
-        budget?: number | null;
-        openTo?: string[];
-        otherTypeDetails?: string | null;
-        timelineOrder?: number;
-        types?: Array<{ id: string; label: string }> | string[];
-        updatedAt?: string; // ISO
-        property?: string;
-        oldValue?: unknown;
-        newValue?: unknown;
+        projects: Array<{
+            projectId: string;
+            title?: string | null;
+            startDate?: string | null;
+            endDate?: string | null;
+            private?: boolean;
+            status?: string | null;
+            budget?: number | null;
+            openTo?: string[];
+            otherTypeDetails?: string | null;
+            timelineOrder?: number | null;
+            updatedAt?: string;
+        }>;
         userId?: string;
         userName?: string;
     };
 
-    // Idempotency: prefer updatedAt; otherwise use property+newValue.
-    const idemSeed = updatedAt
-        ? `app:project:${projectId}:updated:${updatedAt}`
-        : `app:project:${projectId}:updated:${property}:${JSON.stringify(newValue)}`;
-
+    const idemSeed = `app:project:update-batch:${projects
+        .map((p) => `${p.projectId}@${p.updatedAt ?? ""}`)
+        .sort()
+        .join(",")}`;
     const idempotencyKey = crypto.createHash("sha256").update(idemSeed).digest("hex");
 
-    const humanTitle =
-        property && title
-            ? `Project updated: ${title} — ${property} changed`
-            : title
-                ? `Project updated: ${title}`
-                : "Project updated";
+    const count = projects.length;
+    const title =
+        count === 1
+            ? `Project updated: ${projects[0].title ?? projects[0].projectId}`
+            : `${count} projects updated`;
 
     return {
         type: "ORG_UPDATED_PROJECT",
         source: "USER",
-        title: humanTitle,
+        title,
         content: {
-            projectId,
-            title,
-            startDate,
-            endDate,
-            private: isPrivate,
-            status,
-            budget,
-            openTo,
-            otherTypeDetails,
-            timelineOrder,
-            types,
-            // include granular diff if present
-            ...(property ? { property, oldValue, newValue } : {}),
+            projects,
             actor: { userId, name: userName },
             organization: { id: orgId, name: orgName },
         },

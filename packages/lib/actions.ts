@@ -53,6 +53,7 @@ import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
 import {writeRawEvent} from "@comend/lib/raw-events";
+import crypto from "node:crypto";
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -3849,8 +3850,20 @@ export const createMilestones = withOrganizationAuth(
 
 export const createNodes = withOrganizationAuth(
     async (_: Organization, {roadmapId, nodes}: { roadmapId: string | null, nodes: any[] }) => {
+        const session = await getSession()
+
         try {
             const updatedNodes: any[] = []
+            const createdPublicProjects: Array<{
+                projectId: string;
+                title?: string;
+                startDate?: Date | string | null;
+                endDate?: Date | string | null;
+                private?: boolean;
+                status?: string | null;
+                budget?: number | null;
+                timelineOrder?: number | null;
+            }> = []
 
             if (!roadmapId) throw new Error('No roadmapId provided.')
 
@@ -3913,7 +3926,7 @@ export const createNodes = withOrganizationAuth(
                                         }
                                     },
                                     status: node.data?.status || "PLANNED",
-                                    private: node.data?.private || true,
+                                    private: node.data?.private ?? true,
                                     nodeType: node.data?.nodeType || "PROJECT"
                                 }
                             }
@@ -3921,6 +3934,20 @@ export const createNodes = withOrganizationAuth(
                     })
 
                     updatedNodes.push(n)
+
+                    const m = n.data; // Milestone
+                    if (m?.nodeType === "PROJECT" && m?.private === false) {
+                        createdPublicProjects.push({
+                            projectId: m.id,
+                            title: m.title,
+                            startDate: m.startDate ?? null,
+                            endDate: m.endDate ?? null,
+                            private: m.private,
+                            status: m.status ?? null,
+                            budget: m.budget ?? null,
+                            timelineOrder: m.timelineOrder ?? null,
+                        });
+                    }
                 })
             )
 
@@ -3960,6 +3987,25 @@ export const createNodes = withOrganizationAuth(
             //         )
             //     })
             // )
+
+            if (createdPublicProjects.length) {
+                const ids = createdPublicProjects.map(p => p.projectId).sort().join(",");
+                const externalId = crypto.createHash("sha256").update(`project-batch:${ids}`).digest("hex");
+
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_project", // batch payload handled by register below
+                    externalId,
+                    occurredAt: new Date(),
+                    payload: {
+                        orgId: organizationId,
+                        orgName: organization.name,
+                        projects: createdPublicProjects,
+                        userId: session?.user.id,
+                        userName: session?.user.name,
+                    },
+                });
+            }
 
             return {success: true, data: {nodes: updatedNodes, milestones: updatedMilestones}}
         } catch (error: any) {
@@ -4145,45 +4191,58 @@ export const syncDBRFPs = withOrganizationAuth(
 )
 
 export const updateMilestones = withOrganizationAuth(
-    async (_: Organization, {milestones}: { milestones: Milestone[] }) => {
+    async (_: Organization, { milestones }: { milestones: Milestone[] }) => {
         try {
-            let updatedMilestones: Milestone[] = []
+            const session = await getSession();
+            let updatedMilestones: Milestone[] = [];
 
-            console.log(`milestone types`, milestones.flatMap(milestone => milestone.types))
+            const publishedProjects: Array<{
+                projectId: string;
+                title?: string | null;
+                startDate?: string | null;
+                endDate?: string | null;
+                private?: boolean;
+                status?: string | null;
+                budget?: number | null;
+                openTo?: string[];
+                otherTypeDetails?: string | null;
+                timelineOrder?: number | null;
+                updatedAt?: string;
+                orgId?: string;
+            }> = []
 
             await Promise.all(
                 milestones.map(async (milestone: any) => {
                     const previousMilestone = await prisma.milestone.findUnique({
-                        where: {nodeId: milestone.nodeId},
-                        // where: {id: milestone.id},
+                        where: { nodeId: milestone.nodeId },
                         include: {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: {include: {milestoneType: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}}
-                        }
-                    })
+                            types: { include: { milestoneType: true } },
+                            tools: { include: { tool: true } },
+                            rfps: { include: { rfp: true } },
+                        },
+                    });
 
                     if (!previousMilestone) {
-                        // milestone doesn't exist, throw error
-                        throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`)
+                        throw new Error(
+                            `Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`,
+                        );
                     }
 
-                    let m: Milestone = await prisma.milestone.update({
-                        where: {nodeId: milestone.nodeId},
-                        // where: {id: milestone.id},
+                    const m = await prisma.milestone.update({
+                        where: { nodeId: milestone.nodeId },
                         include: {
                             node: true,
                             contacts: true,
                             attachments: true,
                             roadmap: true,
-                            types: {include: {milestoneType: true}},
-                            biosamples: {include: {biosample: true}},
-                            diseaseModels: {include: {diseaseModel: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}}
+                            types: { include: { milestoneType: true } },
+                            biosamples: { include: { biosample: true } },
+                            diseaseModels: { include: { diseaseModel: true } },
+                            tools: { include: { tool: true } },
+                            rfps: { include: { rfp: true } },
                         },
                         data: {
                             title: milestone.title,
@@ -4191,41 +4250,41 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.types || []).map((type: any) => ({
                                     milestoneType: {
-                                        connect: {id: type.milestoneTypeId || type.milestoneType.id}
-                                    }
-                                }))
+                                        connect: { id: type.milestoneTypeId || type.milestoneType.id },
+                                    },
+                                })),
                             },
                             biosamples: {
                                 deleteMany: {},
                                 create: (milestone.biosamples || []).map((tool: any) => ({
                                     biosample: {
-                                        connect: {id: tool.toolId || tool.biosample.id}
-                                    }
-                                }))
+                                        connect: { id: tool.toolId || tool.biosample.id },
+                                    },
+                                })),
                             },
                             diseaseModels: {
                                 deleteMany: {},
                                 create: (milestone.diseaseModels || []).map((tool: any) => ({
                                     diseaseModel: {
-                                        connect: {id: tool.toolId || tool.diseaseModel.id}
-                                    }
-                                }))
+                                        connect: { id: tool.toolId || tool.diseaseModel.id },
+                                    },
+                                })),
                             },
                             tools: {
                                 deleteMany: {},
                                 create: (milestone.tools || []).map((tool: any) => ({
                                     tool: {
-                                        connect: {id: tool.toolId || tool.tool.id}
-                                    }
-                                }))
+                                        connect: { id: tool.toolId || tool.tool.id },
+                                    },
+                                })),
                             },
                             rfps: {
                                 deleteMany: {},
                                 create: (milestone.rfps || []).map((rfp: any) => ({
                                     rfp: {
-                                        connect: {id: rfp.rfpId || rfp.rfp.id}
-                                    }
-                                }))
+                                        connect: { id: rfp.rfpId || rfp.rfp.id },
+                                    },
+                                })),
                             },
                             timelineOrder: milestone.timelineOrder,
                             otherTypeDetails: milestone.otherTypeDetails,
@@ -4234,13 +4293,13 @@ export const updateMilestones = withOrganizationAuth(
                             endDate: milestone.endDate,
                             budget: milestone.budget,
                             attachments: {
-                                deleteMany: {}, // clear all existing attachments
+                                deleteMany: {},
                                 createMany: {
                                     data: (milestone?.attachments || []).map((attachment: any) => ({
                                         link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined)
-                                    }))
-                                }
+                                        ...(attachment.name ? { name: attachment.name } : undefined),
+                                    })),
+                                },
                             },
                             contacts: {
                                 deleteMany: {},
@@ -4248,56 +4307,89 @@ export const updateMilestones = withOrganizationAuth(
                                     data: (milestone?.contacts || []).map((contact: any) => ({
                                         name: contact.name,
                                         email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                    }))
-                                }
+                                        ...(contact.role ? { role: contact.role } : undefined),
+                                        ...(contact.affiliation ? { affiliation: contact.affiliation } : undefined),
+                                    })),
+                                },
                             },
                             openTo: milestone.openTo || [],
                             status: milestone.status || "PLANNED",
-                            private: milestone.private || false,
+                            private: milestone.private ?? false, // <-- preserve explicit false
                             notes: milestone.notes,
                             nodeType: milestone.nodeType || "PROJECT",
-                            ...(milestone.metadata ? {metadata: milestone.metadata} : undefined)
-                        }
-                    })
+                            ...(milestone.metadata ? { metadata: milestone.metadata } : undefined),
+                        },
+                    });
 
-                    console.log(`updated milestone`, m)
+                    updatedMilestones = [...updatedMilestones, m];
 
-                    updatedMilestones = [...updatedMilestones, m]
-                })
-            )
+                    const justPublished =
+                        m.nodeType === "PROJECT" &&
+                        previousMilestone.private !== false &&
+                        m.private === false;
 
-            // Typesense - update milestone documents here...
-            // Promise.all(
-            //     updatedMilestones.map(async (response: any) => {
-            //         const document = response.map((r: any) => ({
-            //             ...r,
-            //             RFPId_exists: response.RFP ? true : false,
-            //             toolId_exists: response.tool ? true : false
-            //         }))
-            //         console.log(`Update typesense document`, document)
-            //         await updateTypeSenseDocument(
-            //             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
-            //             (
-            //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-            //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-            //                     : process.env.TYPESENSE_ADMIN_API_KEY
-            //             )!,
-            //             document, 
-            //             'milestones'
-            //         )
-            //     })
-            // )
+                    if (justPublished) {
+                        publishedProjects.push({
+                            projectId: m.id,
+                            title: m.title,
+                            startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
+                            endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
+                            private: m.private,
+                            status: m.status ?? null,
+                            budget: m.budget ?? null,
+                            openTo: m.openTo ?? [],
+                            otherTypeDetails: m.otherTypeDetails ?? null,
+                            timelineOrder: m.timelineOrder ?? null,
+                            updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
+                            orgId: (m as any).organizationId,
+                        });
+                    }
+                }),
+            );
 
-            console.log(`Successfully updated Milestone`)
-            return {success: true, data: updatedMilestones}
+            // --- One batched raw event for all updated public projects ---
+            if (publishedProjects.length) {
+                const idemSeed = publishedProjects
+                    .map((p) => `${p.projectId}@${p.updatedAt ?? ""}`)
+                    .sort()
+                    .join(",");
+                const externalId = crypto
+                    .createHash("sha256")
+                    .update(`project-batch-publish:${idemSeed}`)
+                    .digest("hex");
+
+                const orgId = publishedProjects[0].orgId!;
+                let orgName: string | undefined = undefined;
+                try {
+                    const org = await prisma.organization.findUnique({
+                        where: { id: orgId },
+                        select: { name: true },
+                    });
+                    orgName = org?.name ?? undefined;
+                } catch {}
+
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_updated_project", // batch payload handled by your register
+                    externalId,
+                    occurredAt: new Date(),
+                    payload: {
+                        orgId,
+                        orgName,
+                        projects: publishedProjects,
+                        userId: session?.user.id,
+                        userName: session?.user.name,
+                    },
+                });
+            }
+
+            return { success: true, data: updatedMilestones };
         } catch (error: any) {
-            logError(`Error updating Milestone: `, error)
-            return {success: false, error: "Internal server error"}
+            logError(`Error updating Milestone: `, error);
+            return { success: false, error: "Internal server error" };
         }
-    }
-)
+    },
+);
 
 /* HANDLE KANBAN - create ------------------------------------------------------------------------------------------------ */
 export const createKanban = withOrganizationAuth(

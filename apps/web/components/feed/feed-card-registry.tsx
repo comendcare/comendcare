@@ -13,12 +13,22 @@ import ResearchPlanUpdatedCard from "~web/components/feed/research-plan-updated-
 import PubMedFeedCard from "~web/components/feed/pubmed-feed-card";
 import CtgovFeedCard from "~web/components/feed/ctgov-feed-card";
 
+// NEW cards
+import ToolUpdatedCard from "~web/components/feed/tool-updated-feed-card";
+import ProjectCreatedCard from "~web/components/feed/project-created-feed-card";
+import ProjectUpdatedCard from "~web/components/feed/project-updated-feed-card";
+import RfpDeadlineApproachingCard from "~web/components/feed/rfp-deadline-approaching-feed-card";
+import RfpClosedCard from "~web/components/feed/rfp-closed-feed-card";
+import ToolRequestCreatedCard from "~web/components/feed/tool-request-created-feed-card";
+import ToolRequestCommentCard from "~web/components/feed/tool-request-comment-created-feed-card";
+import ToolRequestApprovedCard from "~web/components/feed/tool-request-approved-feed-card";
+import ServiceProviderCreatedCard from "~web/components/feed/service-provider-created-feed-card";
+
 // Lazy-load rare/heavier cards
 const FDAFeedCard = dynamic(
-    () => import("~web/components/feed/fda-rss-feed-card"), // <- the flexible FDA card we made
+    () => import("~web/components/feed/fda-rss-feed-card"),
     { ssr: false }
 );
-// const CtgovTrialCard = dynamic(() => import("~web/components/feed/CtgovTrialCard"), { ssr: false });
 
 export type CardProps<TContent = any> = { data: FeedItemDTO & { content: TContent } };
 
@@ -32,6 +42,17 @@ const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = 
     ORG_UPDATED: PAGProfileUpdatedCard as React.ComponentType<CardProps>,
     ORG_RESEARCH_PLAN_UPDATED: ResearchPlanUpdatedCard as React.ComponentType<CardProps>,
 
+    // NEW mappings
+    ORG_UPDATED_TOOL: ToolUpdatedCard as React.ComponentType<CardProps>,
+    ORG_CREATED_PROJECT: ProjectCreatedCard as React.ComponentType<CardProps>,
+    ORG_UPDATED_PROJECT: ProjectUpdatedCard as React.ComponentType<CardProps>,
+    RFP_DEADLINE_APPROACHING: RfpDeadlineApproachingCard as React.ComponentType<CardProps>,
+    RFP_CLOSED: RfpClosedCard as React.ComponentType<CardProps>,
+    TOOL_REQUEST_CREATED: ToolRequestCreatedCard as React.ComponentType<CardProps>,
+    TOOL_REQUEST_COMMENT_CREATED: ToolRequestCommentCard as React.ComponentType<CardProps>,
+    TOOL_REQUEST_APPROVED: ToolRequestApprovedCard as React.ComponentType<CardProps>,
+    SERVICE_PROVIDER_CREATED: ServiceProviderCreatedCard as React.ComponentType<CardProps>,
+
     // FDA (all four types go to the same flexible card)
     FDA_MEDWATCH_ALERT: FDAFeedCard as React.ComponentType<CardProps>,
     FDA_WHATS_NEW_DRUGS: FDAFeedCard as React.ComponentType<CardProps>,
@@ -41,11 +62,8 @@ const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = 
     // PubMed
     PAPER_PUBLISHED_AGNOSTIC: PubMedFeedCard as React.ComponentType<CardProps>,
 
-    // PubMed
+    // Trials
     CTG_TRIAL_POSTED: CtgovFeedCard as React.ComponentType<CardProps>,
-
-    // CTG_TRIAL_POSTED: CtgovTrialCard as React.ComponentType<CardProps>,
-    // ...add more as you implement them
 };
 
 export function FeedCard({ item }: { item: FeedItemDTO }) {
