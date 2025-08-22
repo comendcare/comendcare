@@ -282,6 +282,167 @@ register("app", "org_research_plan_updated", async ({ payload, occurredAt }) => 
     };
 });
 
+// ------------------------------------
+// ORG_CREATED_PROJECT
+// ------------------------------------
+// Maps to Milestone (nodeType === "PROJECT") creation.
+register("app", "org_created_project", async ({ payload, occurredAt }) => {
+    const {
+        projectId,         // Milestone.id
+        title,             // Milestone.title
+        orgId,             // Milestone.organizationId
+        orgName,
+        startDate,         // Milestone.startDate (ISO string)
+        endDate,           // Milestone.endDate (ISO string)
+        private: isPrivate,// Milestone.private
+        status,            // Milestone.status
+        budget,            // Milestone.budget
+        openTo,            // Milestone.openTo (string[])
+        otherTypeDetails,  // Milestone.otherTypeDetails
+        timelineOrder,     // Milestone.timelineOrder
+        types,             // optional: serialized type ids/labels if you pass them
+        userId,            // actor (User.id)
+        userName,          // actor display name
+    } = payload as {
+        projectId: string;
+        title: string;
+        orgId: string;
+        orgName?: string;
+        startDate?: string | null;
+        endDate?: string | null;
+        private?: boolean;
+        status?: string | null;
+        budget?: number | null;
+        openTo?: string[];
+        otherTypeDetails?: string | null;
+        timelineOrder?: number;
+        types?: Array<{ id: string; label: string }> | string[]; // flexible
+        userId?: string;
+        userName?: string;
+    };
+
+    const idempotencyKey = crypto
+        .createHash("sha256")
+        .update(`app:project:${projectId}:created`)
+        .digest("hex");
+
+    return {
+        type: "ORG_CREATED_PROJECT",
+        source: "USER",
+        title: title ? `New project: ${title}` : "New project",
+        content: {
+            projectId,
+            title,
+            startDate,
+            endDate,
+            private: isPrivate,
+            status,
+            budget,
+            openTo,
+            otherTypeDetails,
+            timelineOrder,
+            types,
+            actor: { userId, name: userName },
+            organization: { id: orgId, name: orgName },
+        },
+        orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});
+
+
+// ------------------------------------
+// ORG_UPDATED_PROJECT
+// ------------------------------------
+// Maps to Milestone (nodeType === "PROJECT") updates.
+// Use either `updatedAt` for idempotency or a property/newValue pair if you emit per-field changes.
+register("app", "org_updated_project", async ({ payload, occurredAt }) => {
+    const {
+        projectId,         // Milestone.id
+        title,             // Milestone.title (current)
+        orgId,
+        orgName,
+        // Option A: broad update snapshot (recommended)
+        startDate,         // Milestone.startDate (ISO string)
+        endDate,           // Milestone.endDate (ISO string)
+        private: isPrivate,// Milestone.private
+        status,            // Milestone.status
+        budget,            // Milestone.budget
+        openTo,            // Milestone.openTo
+        otherTypeDetails,  // Milestone.otherTypeDetails
+        timelineOrder,     // Milestone.timelineOrder
+        types,             // optional types snapshot
+        updatedAt,         // Milestone.updatedAt (ISO string) — preferred for idempotency
+        // Option B: granular diff (optional)
+        property,          // e.g. "status", "endDate"
+        oldValue,
+        newValue,
+        userId,
+        userName,
+    } = payload as {
+        projectId: string;
+        title?: string;
+        orgId: string;
+        orgName?: string;
+        startDate?: string | null;
+        endDate?: string | null;
+        private?: boolean;
+        status?: string | null;
+        budget?: number | null;
+        openTo?: string[];
+        otherTypeDetails?: string | null;
+        timelineOrder?: number;
+        types?: Array<{ id: string; label: string }> | string[];
+        updatedAt?: string; // ISO
+        property?: string;
+        oldValue?: unknown;
+        newValue?: unknown;
+        userId?: string;
+        userName?: string;
+    };
+
+    // Idempotency: prefer updatedAt; otherwise use property+newValue.
+    const idemSeed = updatedAt
+        ? `app:project:${projectId}:updated:${updatedAt}`
+        : `app:project:${projectId}:updated:${property}:${JSON.stringify(newValue)}`;
+
+    const idempotencyKey = crypto.createHash("sha256").update(idemSeed).digest("hex");
+
+    const humanTitle =
+        property && title
+            ? `Project updated: ${title} — ${property} changed`
+            : title
+                ? `Project updated: ${title}`
+                : "Project updated";
+
+    return {
+        type: "ORG_UPDATED_PROJECT",
+        source: "USER",
+        title: humanTitle,
+        content: {
+            projectId,
+            title,
+            startDate,
+            endDate,
+            private: isPrivate,
+            status,
+            budget,
+            openTo,
+            otherTypeDetails,
+            timelineOrder,
+            types,
+            // include granular diff if present
+            ...(property ? { property, oldValue, newValue } : {}),
+            actor: { userId, name: userName },
+            organization: { id: orgId, name: orgName },
+        },
+        orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});
+
 // ------------------
 // ORG_CREATED_TOOL
 // ------------------
@@ -319,6 +480,56 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
         type: "ORG_CREATED_TOOL",
         source: "USER",
         title: title ? `New tool: ${title}` : "New tool created",
+        content: {
+            toolId,
+            title,
+            private: isPrivate,
+            geneId,
+            institutionId,
+            types,
+            actor: { userId, name: userName },
+            organization: { id: orgId, name: orgName },
+        },
+        orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});
+
+register("app", "org_updated_tool", async ({ payload, occurredAt }) => {
+    const {
+        orgId,
+        orgName,
+        toolId,
+        title,
+        userId,
+        userName,
+        private: isPrivate,
+        geneId,
+        institutionId,
+        types,
+    } = payload as {
+        orgId?: string;
+        orgName?: string;
+        toolId: string;
+        title?: string;
+        userId?: string;
+        userName?: string;
+        private?: boolean;
+        geneId?: number;
+        institutionId?: string;
+        types?: string[];
+    };
+
+    const idempotencyKey = crypto
+        .createHash("sha256")
+        .update(`app:tool:${toolId}:updated`)
+        .digest("hex");
+
+    return {
+        type: "ORG_UPDATED_TOOL",
+        source: "USER",
+        title: title ? `Tool updated: ${title}` : "Tool updated",
         content: {
             toolId,
             title,
@@ -564,6 +775,68 @@ register("app", "tool_request_approved", async ({ payload, occurredAt }) => {
             organization: { id: orgId, name: orgName },
         },
         orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});
+
+// ------------------------------------
+// SERVICE_PROVIDER_CREATED
+// ------------------------------------
+register("app", "service_provider_created", async ({ payload, occurredAt }) => {
+    const {
+        companyId,
+        title,
+        url,
+        companyType,
+        categories,
+        milestoneTypes,
+        services,             // string[]
+        certifications,       // string[]
+        tags,                 // string[]
+        headquarters,
+        yearEstablished,
+        userId,
+        userName,
+    } = payload as {
+        companyId: string;
+        title: string;
+        url?: string;
+        companyType?: string;
+        categories?: string[];
+        milestoneTypes?: string[];
+        services?: string[];
+        certifications?: string[];
+        tags?: string[];
+        headquarters?: string;
+        yearEstablished?: number | null;
+        userId?: string;
+        userName?: string;
+    };
+
+    const idempotencyKey = crypto
+        .createHash("sha256")
+        .update(`app:service_provider:${companyId}:created`)
+        .digest("hex");
+
+    return {
+        type: "SERVICE_PROVIDER_CREATED",
+        source: "USER",
+        title: `New service provider: ${title}`,
+        content: {
+            companyId,
+            title,
+            url,
+            companyType,
+            categories,
+            milestoneTypes,
+            services,
+            certifications,
+            tags,
+            headquarters,
+            yearEstablished,
+            actor: { userId, name: userName },
+        },
         occurredAt,
         idempotencyKey,
     };

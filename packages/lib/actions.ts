@@ -52,7 +52,7 @@ import {
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
-import {writeRawEvent} from "@/apps/web/lib/raw-events";
+import {writeRawEvent} from "@comend/lib/raw-events";
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -755,20 +755,20 @@ export const updateOrganization = withOrganizationAuth(
 
             const session = await getSession();
 
-            await writeRawEvent({
-                provider: "app",
-                eventType: "org_updated",
-                externalId: response.id,
-                occurredAt: new Date(),
-                payload: {
-                    orgId: response.id,
-                    orgName: response.name ?? undefined,
-                    userId: session?.user.id,
-                    userName: session?.user.name,
-                    changedFields: changedFields.length ? changedFields : undefined,
-                    changes: Object.keys(changes).length ? changes : undefined,
-                },
-            });
+            // await writeRawEvent({
+            //     provider: "app",
+            //     eventType: "org_updated",
+            //     externalId: response.id,
+            //     occurredAt: new Date(),
+            //     payload: {
+            //         orgId: response.id,
+            //         orgName: response.name ?? undefined,
+            //         userId: session?.user.id,
+            //         userName: session?.user.name,
+            //         changedFields: changedFields.length ? changedFields : undefined,
+            //         changes: Object.keys(changes).length ? changes : undefined,
+            //     },
+            // });
 
             return response;
         } catch (error: any) {
@@ -921,25 +921,25 @@ export const updateRoadmap = withOrganizationAuth(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
 
-            await writeRawEvent({
-                provider: "app",
-                eventType: "org_research_plan_updated",
-                externalId: roadmap.id, // back-reference for idempotency
-                occurredAt: new Date(),
-                payload: {
-                    orgId: roadmap.organization?.id ?? organizationId,
-                    orgName: roadmap.organization?.name ?? undefined,
-                    roadmapId: roadmap.id,
-                    title: response.title ?? roadmap.title,
-                    published: response.published, // boolean
-                    // actor
-                    userId: session.user.id,
-                    userName: session.user.name,
-                    // change details
-                    changedFields: changedFields.length ? changedFields : undefined,
-                    changes: Object.keys(changes).length ? changes : undefined,
-                },
-            });
+            // await writeRawEvent({
+            //     provider: "app",
+            //     eventType: "org_research_plan_updated",
+            //     externalId: roadmap.id, // back-reference for idempotency
+            //     occurredAt: new Date(),
+            //     payload: {
+            //         orgId: roadmap.organization?.id ?? organizationId,
+            //         orgName: roadmap.organization?.name ?? undefined,
+            //         roadmapId: roadmap.id,
+            //         title: response.title ?? roadmap.title,
+            //         published: response.published, // boolean
+            //         // actor
+            //         userId: session.user.id,
+            //         userName: session.user.name,
+            //         // change details
+            //         changedFields: changedFields.length ? changedFields : undefined,
+            //         changes: Object.keys(changes).length ? changes : undefined,
+            //     },
+            // });
 
             return response
         } catch (error: any) {
@@ -1712,25 +1712,43 @@ export const createRequestComment = withAuth(
                 return {success: false, error: "Session not found."};
             }
 
-            const comment = prisma.requestComment.create({
-                data: {
+            const comment = await prisma.requestComment.create({
+                include: {
                     materialAndDataAccessRequest: {
-                        connect: {
-                            id: requestId
-                        }
+                        select: {
+                            id: true,
+                            title: true,
+                            organization: { select: { id: true, name: true } },
+                        },
                     },
-                    author: {
-                        connect: {
-                            id: session?.user.id
-                        }
-                    },
-                    text: text
-                }
-            })
+                    author: { select: { id: true, name: true } },
+                },
+                data: {
+                    materialAndDataAccessRequest: { connect: { id: requestId } },
+                    author: { connect: { id: session.user.id } },
+                    text,
+                },
+            });
 
             if (!comment) {
                 return {success: false, error: "Failed to create comment."};
             }
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "tool_request_comment_created",
+                externalId: comment.id,
+                occurredAt: new Date(),
+                payload: {
+                    requestId: comment.materialAndDataAccessRequest.id,
+                    commentId: comment.id,
+                    orgId: comment.materialAndDataAccessRequest.organization.id,
+                    orgName: comment.materialAndDataAccessRequest.organization.name,
+                    userId: comment.author.id,
+                    userName: comment.author.name ?? session.user.name,
+                    text, // full text; register trims to preview
+                },
+            });
 
             revalidatePath("/requests")
             return {success: true, data: comment};
@@ -2511,32 +2529,32 @@ export const createBiosample = withOrganizationAuth(
 export const updateBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
-            if (!organization.id) {
-                throw new Error("No organization id provided.")
-            }
+            if (!organization.id) throw new Error("No organization id provided.");
+            if (!data.id) throw new Error("No biosample id provided.");
 
-            if (!data.id) {
-                throw new Error("No biosample id provided.")
-            }
+            const session = await getSession();
 
-            console.log(`incoming data`, data)
+            // Fetch existing to capture previous privacy state (and avoid a second roundtrip for description if you like)
+            const existing = await prisma.biosample.findUnique({
+                where: { id: data.id },
+                select: { id: true, private: true },
+            });
+            if (!existing) throw new Error("Biosample not found.");
 
             const biosampleData: any = {
                 id: data.id,
-                types: data.types ? data.types.map(type => type.value) : undefined,
-                metadata: {
-                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
-                    otherTypeDetails: data.otherTypeDetails
-                } as JsonObject,
-                // pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
-                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
-                private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
-                milestones: (data.milestones || []).map((milestone) => {
-                    return ({
-                        milestoneId: milestone.id,
-                        biosampleId: data.id || '',
-                    })
-                }),
+                types: data.types ? data.types.map((t) => t.value) : undefined,
+                metadata: { otherTypeDetails: data.otherTypeDetails } as JsonObject,
+                pinned:
+                    !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null
+                        ? data.isPinned
+                        : false,
+                private:
+                    data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
+                milestones: (data.milestones || []).map((m) => ({
+                    milestoneId: m.id,
+                    biosampleId: data.id || "",
+                })),
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
@@ -2547,142 +2565,166 @@ export const updateBiosample = withOrganizationAuth(
                 countryOfCollection: data.countryOfCollection,
                 collectionDate: data.collectionDate,
                 availability: data.availability,
-                ...(data.quantity !== undefined && data.quantity !== null ? {quantity: JSON.parse(data.quantity)} : undefined),
+                ...(data.quantity !== undefined && data.quantity !== null
+                    ? { quantity: JSON.parse(data.quantity) }
+                    : undefined),
                 quantityUnit: data.quantityUnit,
-                ...(data.price !== undefined && data.price !== null ? {price: JSON.parse(data.price)} : undefined),
+                ...(data.price !== undefined && data.price !== null
+                    ? { price: JSON.parse(data.price) }
+                    : undefined),
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
-                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
-                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
-            }
+                institution:
+                    data.institutions && data.institutions.length > 0
+                        ? data.institutions[0]
+                        : undefined,
+            };
 
             const newBiosample = await prisma.biosample.update({
-                where: {id: data.id},
+                where: { id: data.id },
                 include: {
                     contacts: true,
                     attachments: true,
                     milestones: {
                         include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
+                            milestone: { include: { types: { include: { milestoneType: true } } } },
+                        },
                     },
                     donor: true,
                     institution: true,
                 },
                 data: {
                     ...biosampleData,
-                    ...(biosampleData.attachments ? (
-                        {
+                    ...(biosampleData.attachments
+                        ? {
                             attachments: {
-                                deleteMany: {}, // clear all existing attachments
+                                deleteMany: {},
                                 createMany: {
-                                    data: (biosampleData?.attachments || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined)
-                                    }))
-                                }
-                            }
+                                    data: (biosampleData?.attachments || []).map((a: any) => ({
+                                        link: a.link,
+                                        ...(a.name ? { name: a.name } : undefined),
+                                    })),
+                                },
+                            },
                         }
-                    ) : undefined),
-                    ...(biosampleData.contacts ? (
-                        {
+                        : undefined),
+                    ...(biosampleData.contacts
+                        ? {
                             contacts: {
                                 deleteMany: {},
                                 createMany: {
-                                    data: (biosampleData?.contacts || []).map((contact: any) => ({
-                                        name: contact.name,
-                                        email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(biosampleData.milestones ? (
-                        {
-                            milestones: {
-                                deleteMany: {},
-                                create: (biosampleData.milestones || []).map((milestone: any) => ({
-                                    milestone: {
-                                        connect: {id: milestone.milestoneId}
-                                    }
-                                }))
+                                    data: (biosampleData?.contacts || []).map((c: any) => ({
+                                        name: c.name,
+                                        email: c.email,
+                                        ...(c.role ? { role: c.role } : undefined),
+                                        ...(c.affiliation ? { affiliation: c.affiliation } : undefined),
+                                    })),
+                                },
                             },
                         }
-                    ) : undefined),
-                    private: biosampleData.private !== undefined && biosampleData.private !== null ? biosampleData.private : false,
-                    pinned: biosampleData.pinned !== undefined && biosampleData.pinned !== null ? biosampleData.pinned : false,
-                    metadata: biosampleData.metadata as InputJsonObject,
-                    ...(biosampleData.gene ? ({
-                        gene: {
-                            connect: {symbol: biosampleData.gene.value}
+                        : undefined),
+                    ...(biosampleData.milestones
+                        ? {
+                            milestones: {
+                                deleteMany: {},
+                                create: (biosampleData.milestones || []).map((m: any) => ({
+                                    milestone: { connect: { id: m.milestoneId } },
+                                })),
+                            },
                         }
-                    }) : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution ? ({
-                        institution: {connect: {id: biosampleData.institution.value}}
-                    }) : {institution: {disconnect: true}}),
+                        : undefined),
+                    private:
+                        biosampleData.private !== undefined && biosampleData.private !== null
+                            ? biosampleData.private
+                            : false,
+                    pinned:
+                        biosampleData.pinned !== undefined && biosampleData.pinned !== null
+                            ? biosampleData.pinned
+                            : false,
+                    metadata: biosampleData.metadata as InputJsonObject,
+                    ...(biosampleData.gene
+                        ? { gene: { connect: { symbol: biosampleData.gene.value } } }
+                        : { gene: { disconnect: true } }),
+                    ...(biosampleData.institution
+                        ? { institution: { connect: { id: biosampleData.institution.value } } }
+                        : { institution: { disconnect: true } }),
                     ...(data.donorId
-                            ? {donor: {connect: {id: data.donorId}}}
-                            : {donor: {disconnect: true}}
-                    )
+                        ? { donor: { connect: { id: data.donorId } } }
+                        : { donor: { disconnect: true } }),
                 },
-            })
+            });
 
             if (data.donorId) {
-                const donor = await prisma.donor.update({
-                    where: {id: data.donorId},
+                await prisma.donor.update({
+                    where: { id: data.donorId },
                     data: {
-                        age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
+                        age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,
                         race: data.race,
                         ethnicity: data.ethnicity,
                         treatments: data.treatments,
-                        height: typeof data.height === 'string' ? parseInt(data.height, 10) : data.height,
-                        weight: typeof data.weight === 'string' ? parseInt(data.weight, 10) : data.weight,
-                        bmi: typeof data.bmi === 'string' ? parseInt(data.bmi, 10) : data.bmi,
+                        height: typeof data.height === "string" ? parseInt(data.height, 10) : data.height,
+                        weight: typeof data.weight === "string" ? parseInt(data.weight, 10) : data.weight,
+                        bmi: typeof data.bmi === "string" ? parseInt(data.bmi, 10) : data.bmi,
                         medications: data.medications,
-                        // organization: {connect: {id: organization.id}},
-                        ...(data.diagnoses ? {
-                            diagnoses: {
-                                deleteMany: {},
-                                create: data?.diagnoses?.map((diagnosis: {
-                                    diagnosis: Option[],
-                                    severity?: string
-                                }) => ({
-                                    severity: diagnosis.severity,
-                                    type: {
-                                        connectOrCreate: {
-                                            where: {id: diagnosis.diagnosis[0].value},
-                                            create: {
-                                                id: diagnosis.diagnosis[0].value,
-                                                label: diagnosis.diagnosis[0].label
-                                            }
-                                        }
-                                    }
-                                }))
+                        ...(data.diagnoses
+                            ? {
+                                diagnoses: {
+                                    deleteMany: {},
+                                    create: data?.diagnoses?.map((d: { diagnosis: Option[]; severity?: string }) => ({
+                                        severity: d.severity,
+                                        type: {
+                                            connectOrCreate: {
+                                                where: { id: d.diagnosis[0].value },
+                                                create: { id: d.diagnosis[0].value, label: d.diagnosis[0].label },
+                                            },
+                                        },
+                                    })),
+                                },
                             }
-                        } : undefined)
-                    }
-                })
+                            : undefined),
+                    },
+                });
             }
 
-            const response = await prisma.biosample.findUnique({
-                where: {id: data.id}
-            })
+            const response = await prisma.biosample.findUnique({ where: { id: data.id } });
 
-            return response
+            // --- Event emission: private/undefined -> public (first publication)
+            const wasPrivate = existing?.private;            // prior state
+            const isPrivate = newBiosample.private === true; // current state as boolean
+            const justPublished = (wasPrivate !== false) && (newBiosample.private === false);
+
+            if (justPublished) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_updated_tool",
+                    externalId: newBiosample.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        toolId: newBiosample.id,
+                        orgId: organization.id,
+                        orgName: organization.name,
+                        title: newBiosample.description || `Biosample ${newBiosample.id}`,
+                        private: false,
+                        availability: newBiosample.availability,
+                        types: newBiosample.types ?? [],
+                        geneId: newBiosample.geneId ?? undefined,
+                        institutionId: newBiosample.institutionId ?? undefined,
+                        userId: session?.user.id,
+                        userName: session?.user.name,
+                    },
+                });
+            }
+
+            return response;
         } catch (error: any) {
             console.error("Error creating biosample:", error.message);
             throw new Error(error.message || "Failed to create biosample.");
         }
     }
-)
+);
 
 export const createOrUpdateBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
@@ -5382,6 +5424,10 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
 
         try {
             const request = await prisma.materialAndDataAccessRequest.create({
+                include: {
+                    organization: { select: { id: true, name: true } },
+                    researcher: { select: { id: true } },
+                },
                 data: {
                     title: name,
                     description,
@@ -5425,6 +5471,24 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
                             userId: session.user.id,
                         },
                     },
+                },
+            });
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "tool_request_created",
+                externalId: request.id,
+                occurredAt: new Date(),
+                payload: {
+                    requestId: request.id,
+                    title: request.title,
+                    orgId: request.organization?.id ?? organizationId,
+                    orgName: request.organization?.name,
+                    researcherId: request.researcher?.id!, // created via connect, should exist
+                    userId: session.user.id,
+                    userName: session.user.name,
+                    status: (request as any).status, // include if your model has it; else harmlessly undefined
+                    submittedAt: request.submittedAt?.toISOString(),
                 },
             });
 
@@ -5500,8 +5564,27 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
 
             const updatedRequest = await prisma.materialAndDataAccessRequest.update({
                 where: {id: requestId},
+                include: {organization: true},
                 data: updateData
             });
+
+            if (property === "status" && value === "APPROVED") {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "tool_request_approved",
+                    externalId: updatedRequest.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        requestId: updatedRequest.id,
+                        title: updatedRequest.title,
+                        orgId: updatedRequest.organizationId,
+                        orgName: updatedRequest.organization?.name,
+                        approverUserId: session.user.id,
+                        approverUserName: session.user.name,
+                        approvedAt: new Date().toISOString(),
+                    },
+                });
+            }
 
             await updateTypeSenseDocument(
                 `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,

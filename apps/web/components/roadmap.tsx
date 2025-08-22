@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useSidebarStore } from "@/state/nav/navStore"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
     ResizablePanel,

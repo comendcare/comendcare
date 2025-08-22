@@ -8,6 +8,7 @@ import {getSession} from "@/packages/lib/auth"
 import {addTypeSenseDocument, deleteTypeSenseDocument, updateTypeSenseDocument} from "@comend/lib/utils";
 import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import { JsonValue } from "@prisma/client/runtime/library"
+import {writeRawEvent} from "@comend/lib/raw-events";
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -92,6 +93,8 @@ export const removeEmailFromBlacklist = withAdminAuth(
 
 export const createCompany = withAdminAuth(
     async (formData: FormData) => {
+        const session = await getSession()
+
         const title = formData.get("orgName") as string
         const description = formData.get("description") as string
         const yearEstablished = parseInt(formData.get("founded") as string)
@@ -146,6 +149,28 @@ export const createCompany = withAdminAuth(
                 },
                 include: {services: true},
             })
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "service_provider_created",
+                externalId: company.id,
+                occurredAt: new Date(),
+                payload: {
+                    companyId: company.id,
+                    title: company.title,
+                    url: company.url ?? undefined,
+                    companyType: company.companyType ?? undefined,
+                    categories: company.categories ?? [],
+                    milestoneTypes: company.milestoneTypes ?? [],
+                    services: (company.services || []).map((s) => s.name),
+                    certifications: company.simplifiedCertifications ?? [],
+                    tags: company.tags ?? [],
+                    headquarters: company.headquarters ?? undefined,
+                    yearEstablished: company.yearEstablished ?? null,
+                    userId: session?.user.id,
+                    userName: session?.user.name,
+                },
+            });
 
             await addTypeSenseDocument(
                 `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,

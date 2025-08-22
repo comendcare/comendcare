@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import {getDates, truncate} from "@comend/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import { cn } from "@comend/lib/utils"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
 import { ScrollArea } from "@comend/components/ui/scroll-area"

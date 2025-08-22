@@ -1,6 +1,6 @@
 // lib/raw-events.ts
 import crypto from "node:crypto";
-import prisma from "@comend/lib/prisma"
+import prisma from "@/packages/lib/prisma"
 
 export async function writeRawEvent(input: {
     provider: string;        // "app" | "mixpanel" | "rss:fda:medwatch" | "ctgov"

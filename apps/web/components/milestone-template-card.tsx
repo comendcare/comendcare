@@ -10,7 +10,7 @@ import {
 } from "@comend/components/ui/card"
 import { CheckBubble } from "./check-bubble"
 import { cn } from "@comend/lib/utils";
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 

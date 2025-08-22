@@ -7,7 +7,7 @@ import confetti from "canvas-confetti"
 import { Button } from "@comend/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card"
 import { ReactFlowProvider, useReactFlow, useStoreApi } from "@xyflow/react"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 
 const selector = (state: RoadmapState) => ({
