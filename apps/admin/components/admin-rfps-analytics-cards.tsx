@@ -8,7 +8,6 @@ import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 interface AnalyticsData {
     totalRFPs: number,
-    totalPinnedRFPs: number,
     RFPsByOpenTo: {type: string, num: number}[],
     RFPsByBudget: {type: string, num: number}[]
 }
@@ -42,14 +41,6 @@ export function AdminRFPsAnalyticsCards({orgId}: {orgId?: string | undefined}) {
                     <CardDescription>Total RFPs</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
                         {data.totalRFPs.toLocaleString()}
-                    </CardTitle>
-                </CardHeader>
-            </Card>
-            <Card className="@container/card">
-                <CardHeader className="relative">
-                    <CardDescription>Total Pinned RFPs</CardDescription>
-                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalPinnedRFPs.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
             </Card>

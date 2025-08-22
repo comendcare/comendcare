@@ -197,7 +197,6 @@ export default function AppLayout({children}: AppLayoutProps) {
                 contacts: true,
                 attachments: true,
                 private: true,
-                pinned: true,
                 milestones: true,
             })
             if (toolResponse.success) {
@@ -221,7 +220,6 @@ export default function AppLayout({children}: AppLayoutProps) {
                 budget: true,
                 private: true,
                 headerImage: true,
-                pinned: true,
                 milestones: true,
                 organizationId: true,
                 organization: true

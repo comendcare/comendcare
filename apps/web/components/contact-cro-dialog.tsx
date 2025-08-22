@@ -152,7 +152,6 @@ export const ContactCroDialogContent = ({cro, setOpen}: {cro: Company, setOpen: 
                     budget: true,
                     private: true,
                     headerImage: true,
-                    pinned: true,
                     milestones: true
                 })
                 if (rfpsResponse.success && rfpsResponse.data) {

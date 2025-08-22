@@ -18,7 +18,7 @@ export const PrivateRFPsPage = () => {
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
             <div className="flex gap-2 w-full justify-end">
                 <RFPBulkImportDialog />
-                <NewRFPDialog numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
+                <NewRFPDialog />
             </div>
 
             {rfps.length <= 0 && (
@@ -33,13 +33,13 @@ export const PrivateRFPsPage = () => {
                     <p className="text-lg text-stone-500">
                         An RFP is a milestone you want to support through funding and/or other resources. 
                     </p>
-                    <NewRFPDialog numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}/>
+                    <NewRFPDialog />
                 </div>
             )}
             {rfps.length > 0 && (
                 <div className={"w-full gap-4 flex flex-col"}>
                     {rfps.map((rfp) => (
-                        <EditRFPDialog key={rfp.id} data={rfp} numRFPsPinned={rfps.filter(rfp => rfp.pinned).length}>
+                        <EditRFPDialog key={rfp.id} data={rfp}>
                             <RFPCard rfp={rfp} isPrivate={true}/>
                         </EditRFPDialog>
                     ))}

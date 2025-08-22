@@ -93,11 +93,9 @@ const PRICE_OPTIONS: Option[] = [
 
 export function EditBiosampleToolForm({
     toolData,
-    numAssetsPinned,
     closeDialog
 }: {
     toolData: any,
-    numAssetsPinned: number,
     closeDialog?: (newBiosample?: any) => void
 }) {
     const initializing = useRef(true)
@@ -119,7 +117,6 @@ export function EditBiosampleToolForm({
                 [key: string]: any
             })?.otherTypeDetails : undefined,
             attachments: toolData?.attachments || undefined,
-            isPinned: toolData?.pinned || false,
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
             contacts: toolData?.contacts || undefined,
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
@@ -430,40 +427,6 @@ export function EditBiosampleToolForm({
                             </Tooltip>
                         </FormLabel>
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                        <Tooltip>
-                            <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                                <FormField 
-                                    control={form.control}
-                                    name="isPinned"
-                                    render={({field}) => (
-                                        <FormControl className="-mt-2">
-                                            <Button 
-                                                disabled={formData?.isPrivate || (!toolData.pinned && numAssetsPinned >= 5)}
-                                                variant="ghost" 
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    form.setValue("isPinned", !field.value)
-                                                }}
-                                                className="p-2"
-                                            >
-                                                {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                                Pinned to profile
-                                            </Button>
-                                        </FormControl>
-                                    )}
-                                />
-                            </TooltipTrigger>
-                            {!toolData.pinned && numAssetsPinned >= 5 && (
-                                <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
-                                </TooltipContent>
-                            )}
-                            {formData?.isPrivate && (
-                                <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
                     </FormItem>
 
                     <FormField

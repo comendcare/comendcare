@@ -27,7 +27,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
                 additionalButtons={(
                     <>
                         {/* <BiosampleBulkImportDialog/> */}
-                        <NewToolDialog numAssetsPinned={0} type={"diseaseModel"}/>
+                        <NewToolDialog type={"diseaseModel"}/>
                     </>
                 )}
             >

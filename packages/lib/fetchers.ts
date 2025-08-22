@@ -2129,7 +2129,6 @@ export const getDiseaseModels = withOrganizationAuth(
                         const preProcessedFilters: any = input.filters.map(filter => ({
                             ...filter,
                             ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                            ...(filter.id === "pinned" ? {value: filter.value === "true" ? true : false} : undefined),
                         }))
 
                         where = filterColumns({
@@ -2145,18 +2144,6 @@ export const getDiseaseModels = withOrganizationAuth(
                             filters.push({
                                 id: 'private',
                                 value: input.private[0],
-                                variant: 'select',
-                                operator: 'eq',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.pinned.length === 1) {
-                            // pinned only has two options, we only filter if ONE of them
-                            // is selected...
-                            filters.push({
-                                id: 'pinned',
-                                value: input.pinned[0],
                                 variant: 'select',
                                 operator: 'eq',
                                 filterId: nanoid()
@@ -2256,7 +2243,6 @@ export const getBiosamples = withOrganizationAuth(
                         const preProcessedFilters: any = input.filters.map(filter => ({
                             ...filter,
                             ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                            ...(filter.id === "pinned" ? {value: filter.value === "true" ? true : false} : undefined),
                             ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
                             ...(filter.id === "gene" && {value: {symbol: filter.value}}),
                             ...(filter.id === "institution" && {value: {name: filter.value}}),
@@ -2285,18 +2271,6 @@ export const getBiosamples = withOrganizationAuth(
                             filters.push({
                                 id: 'private',
                                 value: input.private[0],
-                                variant: 'select',
-                                operator: 'eq',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.pinned.length === 1) {
-                            // pinned only has two options, we only filter if ONE of them
-                            // is selected...
-                            filters.push({
-                                id: 'pinned',
-                                value: input.pinned[0],
                                 variant: 'select',
                                 operator: 'eq',
                                 filterId: nanoid()

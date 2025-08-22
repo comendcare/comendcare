@@ -85,7 +85,6 @@ const createOrUpdateAsset = async (
                     }
                 ) : undefined),
                 private: toolData.private || false,
-                pinned: toolData.pinned || false,
                 metadata: toolData.metadata as InputJsonObject,
                 biosample: {
                     upsert: {
@@ -140,7 +139,6 @@ const createOrUpdateAsset = async (
                     }))
                 },
                 private: toolData.private || false,
-                pinned: toolData.pinned || false,
                 organization: {connect: {id: organization.id}},
                 metadata: toolData.metadata as InputJsonObject,
                 biosample: {
@@ -222,7 +220,6 @@ async function main() {
             contacts: [],
             milestones: [],
             private: false,
-            pinned: false,
             biosample,
         };
 

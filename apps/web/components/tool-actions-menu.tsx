@@ -129,8 +129,6 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                         <EditAssetDialog
                             key={tool.id}
                             data={tool} 
-                            // numAssetsPinned={tools.filter(tool => tool.pinned).length}
-                            numAssetsPinned={0}
                             type={type}
                         />
                     </div>

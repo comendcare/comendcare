@@ -1898,7 +1898,6 @@ export const editBiosampleForm = z.object({
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
-    isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
@@ -1997,7 +1996,6 @@ export const editDiseaseModelForm = z.object({
         .min(1, "Type is required")
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
-    isPinned: z.boolean(),
     isPrivate: z.boolean(),
 
     // disease model properties
@@ -2022,7 +2020,6 @@ export const editDataToolForm = z.object({
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
-    isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),

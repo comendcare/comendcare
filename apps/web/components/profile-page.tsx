@@ -154,7 +154,6 @@ export default function PAGProfilePage() {
                         description: true,
                         contacts: true,
                         attachments: true,
-                        pinned: true,
                         milestones: true
                     }),
                     getPublicRFPsForOrganization(subdomain, {
@@ -166,7 +165,6 @@ export default function PAGProfilePage() {
                         endDate: true,
                         budget: true,
                         headerImage: true,
-                        pinned: true,
                         contacts: true,
                         attachments: true,
                         milestones: true,

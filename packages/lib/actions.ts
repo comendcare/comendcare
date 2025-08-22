@@ -2049,7 +2049,6 @@ export const updateDiseaseModel = withOrganizationAuth(
                 metadata: {
                     otherTypeDetails: data.otherTypeDetails
                 } as JsonObject,
-                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
@@ -2066,7 +2065,6 @@ export const updateDiseaseModel = withOrganizationAuth(
                 data: {
                     ...diseaseModelData,
                     private: diseaseModelData.private !== undefined && diseaseModelData.private !== null ? diseaseModelData.private : false,
-                    pinned: diseaseModelData.pinned !== undefined && diseaseModelData.pinned !== null ? diseaseModelData.pinned : false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
                     ...(diseaseModelData.gene
@@ -2101,7 +2099,6 @@ export const createDiseaseModel = withOrganizationAuth(
                 metadata: {
                     otherTypeDetails: data.otherTypeDetails
                 } as JsonObject,
-                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
@@ -2120,7 +2117,6 @@ export const createDiseaseModel = withOrganizationAuth(
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
                     ...(diseaseModelData.id ? {id: diseaseModelData.id} : undefined),
                     private: diseaseModelData.private || false,
-                    pinned: diseaseModelData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
                     ...(diseaseModelData.gene
@@ -2159,7 +2155,6 @@ export const createDataTool = withOrganizationAuth(
                 id: data.id,
                 types: (data.types || []).map(type => type.value),
                 metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
-                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
@@ -2219,7 +2214,6 @@ export const createDataTool = withOrganizationAuth(
                         }))
                     },
                     private: dataToolData.private || false,
-                    pinned: dataToolData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: dataToolData.metadata as InputJsonObject,
                     ...(dataToolData.gene
@@ -2254,7 +2248,6 @@ export const updateDataTool = withOrganizationAuth(
                 id: data.id,
                 types: data.types ? data.types.map(type => type.value) : undefined,
                 metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
-                pinned: !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null ? data.isPinned : false,
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
@@ -2327,7 +2320,6 @@ export const updateDataTool = withOrganizationAuth(
                         }
                     ) : undefined),
                     private: dataToolData.private !== undefined && dataToolData.private !== null ? dataToolData.private : false,
-                    pinned: dataToolData.pinned !== undefined && dataToolData.pinned !== null ? dataToolData.pinned : false,
                     metadata: dataToolData.metadata as InputJsonObject,
                     ...(dataToolData.gene ? ({
                         gene: {
@@ -2372,7 +2364,6 @@ export const createBiosample = withOrganizationAuth(
                     // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
                     otherTypeDetails: data.otherTypeDetails
                 } as JsonObject,
-                pinned: (!data.isPrivate && data.isPinned) || false, // only save pinned if tool is public
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
@@ -2448,7 +2439,6 @@ export const createBiosample = withOrganizationAuth(
                         }))
                     },
                     private: biosampleData.private || false,
-                    pinned: biosampleData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
@@ -2546,10 +2536,6 @@ export const updateBiosample = withOrganizationAuth(
                 id: data.id,
                 types: data.types ? data.types.map((t) => t.value) : undefined,
                 metadata: { otherTypeDetails: data.otherTypeDetails } as JsonObject,
-                pinned:
-                    !data.isPrivate && data.isPinned !== undefined && data.isPinned !== null
-                        ? data.isPinned
-                        : false,
                 private:
                     data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 milestones: (data.milestones || []).map((m) => ({
@@ -2638,10 +2624,6 @@ export const updateBiosample = withOrganizationAuth(
                     private:
                         biosampleData.private !== undefined && biosampleData.private !== null
                             ? biosampleData.private
-                            : false,
-                    pinned:
-                        biosampleData.pinned !== undefined && biosampleData.pinned !== null
-                            ? biosampleData.pinned
                             : false,
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
@@ -2752,7 +2734,6 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 institutions,
                 otherTypeDetails,
                 attachments,
-                isPinned,
                 isPrivate,
                 contacts,
                 milestones,
@@ -2794,7 +2775,6 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
                     otherTypeDetails: otherTypeDetails
                 } as JsonObject,
-                pinned: (!isPrivate && isPinned) || false, // only save pinned if tool is public
                 private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
                 milestones: (milestones || []).map((milestone) => {
                     return ({
@@ -2898,7 +2878,6 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                         }
                     ) : undefined),
                     private: biosampleData.private || false,
-                    pinned: biosampleData.pinned || false,
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
@@ -2987,7 +2966,6 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                         }))
                     },
                     private: biosampleData.private || false,
-                    pinned: biosampleData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
@@ -3101,7 +3079,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                         }
                     ) : undefined),
                     private: toolData.private || false,
-                    pinned: toolData.pinned || false,
                     metadata: toolData.metadata as InputJsonObject,
                 },
                 create: {
@@ -3137,7 +3114,6 @@ export const createOrUpdateAsset = withOrganizationAuth(
                         }))
                     },
                     private: toolData.private || false,
-                    pinned: toolData.pinned || false,
                     organization: {connect: {id: organization.id}},
                     metadata: toolData.metadata as InputJsonObject,
                 },
@@ -3243,7 +3219,6 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         },
                     },
                     private: rfpData.private ?? false,
-                    pinned: rfpData.pinned ?? false,
                     openTo: rfpData.openTo ?? [],
                     startDate: rfpData.startDate,
                     endDate: rfpData.endDate,
@@ -3279,7 +3254,6 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         },
                     },
                     private: rfpData.private ?? false,
-                    pinned: rfpData.pinned ?? false,
                     openTo: rfpData.openTo ?? [],
                     startDate: rfpData.startDate,
                     endDate: rfpData.endDate,

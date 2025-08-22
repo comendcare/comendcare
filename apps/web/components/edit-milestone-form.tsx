@@ -473,7 +473,6 @@ export function EditMilestoneForm({
                 budget: true,
                 private: true,
                 headerImage: true,
-                pinned: true,
                 milestones: true
             })
             if (rfpsResponse.success && rfpsResponse.data) {
@@ -1210,7 +1209,6 @@ export function EditMilestoneForm({
                                 ])
                             }
                         }} 
-                        numAssetsPinned={0}
                     />
                 </DialogContent>
             </Dialog>
@@ -1243,7 +1241,6 @@ export function EditMilestoneForm({
                                 ])
                             }
                         }} 
-                        numAssetsPinned={0}
                     />
                 </DialogContent>
             </Dialog>
@@ -1275,7 +1272,6 @@ export function EditMilestoneForm({
                                 ])
                             }
                         }} 
-                        numAssetsPinned={0}
                     />
                 </DialogContent>
             </Dialog>
@@ -1310,7 +1306,6 @@ export function EditMilestoneForm({
                                 ])
                             }
                         }} 
-                        numRFPsPinned={0}
                     />
                 </DialogContent>
             </Dialog>

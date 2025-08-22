@@ -6,7 +6,6 @@ import {getToolsAnalytics} from "~admin/lib/fetchers"
 
 interface AnalyticsData {
     totalTools: number,
-    totalPinnedTools: number,
 }
 
 export function AdminToolsAnalyticsCards({orgId}: {orgId?: string | undefined}) {
@@ -31,14 +30,6 @@ export function AdminToolsAnalyticsCards({orgId}: {orgId?: string | undefined}) 
                     <CardDescription>Total Tools</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
                         {data.totalTools.toLocaleString()}
-                    </CardTitle>
-                </CardHeader>
-            </Card>
-            <Card className="@container/card">
-                <CardHeader className="relative">
-                    <CardDescription>Total Pinned Tools</CardDescription>
-                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.totalPinnedTools.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
             </Card>

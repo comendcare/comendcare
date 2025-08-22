@@ -42,11 +42,9 @@ export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditDiseaseModelToolForm({
     toolData,
-    numAssetsPinned,
     closeDialog
 }: {
     toolData: any,
-    numAssetsPinned: number,
     closeDialog?: (newDiseaseModel?: any) => void
 }) {
     const initializing = useRef(true)
@@ -67,7 +65,6 @@ export function EditDiseaseModelToolForm({
             otherTypeDetails: typeof toolData?.metadata === 'object' ? (toolData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
-            isPinned: toolData?.pinned || false,
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
             institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
@@ -78,7 +75,6 @@ export function EditDiseaseModelToolForm({
         description: form.watch("description"),
         types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
-        isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
     }
 
@@ -292,40 +288,6 @@ export function EditDiseaseModelToolForm({
                             </Tooltip>
                         </FormLabel>
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                        <Tooltip>
-                            <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                                <FormField 
-                                    control={form.control}
-                                    name="isPinned"
-                                    render={({field}) => (
-                                        <FormControl className="-mt-2">
-                                            <Button 
-                                                disabled={formData?.isPrivate || (!toolData.pinned && numAssetsPinned >= 5)}
-                                                variant="ghost" 
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    form.setValue("isPinned", !field.value)
-                                                }}
-                                                className="p-2"
-                                            >
-                                                {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                                Pinned to profile
-                                            </Button>
-                                        </FormControl>
-                                    )}
-                                />
-                            </TooltipTrigger>
-                            {!toolData.pinned && numAssetsPinned >= 5 && (
-                                <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is limited to 5 tools. You already have 5 tools pinned. Please unpin another tool before pinning this tool.`}</p>
-                                </TooltipContent>
-                            )}
-                            {formData?.isPrivate && (
-                                <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is only available on public tools. Make this tool public to pin it to your profile.`}</p>
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
                     </FormItem>
 
                     {/* <FormField

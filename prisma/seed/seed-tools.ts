@@ -21,7 +21,6 @@ async function main() {
                     title: tool.title,
                     description: tool.description,
                     private: tool.private,
-                    pinned: tool.pinned,
                     metadata: tool.metadata,
                     organization: {connect: {id: tool.organizationId}},
                     ...(tool.contacts.length > 0 ? {

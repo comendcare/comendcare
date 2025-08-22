@@ -1,39 +1,16 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@comend/components/ui/tabs"
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-  } from "@comend/components/ui/carousel"
-import { RFPCard } from "./rfp-card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@comend/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
-import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
 import { ScrollArea } from "@comend/components/ui/scroll-area";
 import { PropertyBadge } from "./property-badge";
-import { PrivateNoPinnedAssets, PublicNoPinnedAssets } from "./no-pinned-assets";
-import { PrivateNoPinnedRFPs, PublicNoPinnedRFPs } from "./no-pinned-rfps";
 import { formatMoney } from "@comend/lib/utils";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { useSearchParams } from "next/navigation";
+import { NoRFPs } from "./no-rfps";
+import { RFPCard } from "./rfp-card";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }: { tools: any[], rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
@@ -46,9 +23,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }:
                 </CardHeader>
                 <CardContent className="w-full max-w-full">
                     <div className="flex flex-col gap-4 w-full max-w-full">
-                        {rfps.filter(rfp => rfp.pinned).length > 0 && (
+                        {rfps.length > 0 && (
                             <ul className="w-full max-w-full flex flex-col gap-4">
-                                {rfps.filter(rfp => rfp.pinned).map((rfp, index) => (
+                                {rfps.map((rfp, index) => (
                                     <li className="w-full max-w-full">
                                         <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
                                             <DialogTrigger className="w-full max-w-full h-full" onClick={() => {
@@ -74,10 +51,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }:
                                 ))}
                             </ul>
                         )}
-                        {rfps.filter(rfp => rfp.pinned).length <= 0 && (
-                            isPrivate
-                                ? <PrivateNoPinnedRFPs /> 
-                                : <PublicNoPinnedRFPs />
+                        {rfps.length <= 0 && (
+                            <NoRFPs isPrivate={isPrivate} />
                         )}
                     </div>
                 </CardContent>

@@ -66,7 +66,7 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                                 <p className="text-lg text-stone-500">
                                     A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                 </p>
-                                <NewToolDialog numAssetsPinned={0} type={"diseaseModel"}/>
+                                <NewToolDialog type={"diseaseModel"}/>
                             </div>
                         </div>
                     )

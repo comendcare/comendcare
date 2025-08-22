@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react";
-import Image from "next/image"
 import { NewToolDialog } from "./edit-tool-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
@@ -28,7 +27,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {data
                 additionalButtons={(
                     <>
                         <BiosampleBulkImportDialog/>
-                        <NewToolDialog numAssetsPinned={0} type={"biosample"}/>
+                        <NewToolDialog type={"biosample"}/>
                     </>
                 )}
             >

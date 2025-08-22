@@ -147,16 +147,9 @@ export const getToolsAnalytics = withAdminAuth(
                 organizationId: orgId
             }
         })).length
-        const totalPinnedTools: number = (await prisma.tool.findMany({
-            where: {
-                organizationId: orgId,
-                pinned: true
-            }
-        })).length
 
         return {
             totalTools,
-            totalPinnedTools,
         };
     }
 )
@@ -169,12 +162,6 @@ export const getRFPsAnalytics = withAdminAuth(
             }
         })
         const totalRFPs: number = allRFPs.length
-        const totalPinnedRFPs: number = (await prisma.rFP.findMany({
-            where: {
-                organizationId: orgId,
-                pinned: true
-            }
-        })).length
 
         const RFPsByOpenTo = await Promise.all(["CRO", "ACADEMIC"].map(async (openToKey) => ({
             type: openToKey,
@@ -219,7 +206,6 @@ export const getRFPsAnalytics = withAdminAuth(
 
         return {
             totalRFPs,
-            totalPinnedRFPs,
             RFPsByOpenTo,
             RFPsByBudget
         };

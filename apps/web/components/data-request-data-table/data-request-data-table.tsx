@@ -131,19 +131,6 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Links" }
     },
     {
-        accessorKey: "tool.pinned",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Pinned"/>
-        ),
-        cell: ({ row }) => (
-            <>
-                {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-            </>
-        ),
-        enableHiding: true,
-        meta: { name: "Pinned" }
-    },
-    {
         id: "actions",
         cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'data'} />,
         enableHiding: false,
@@ -214,7 +201,6 @@ export function DataRequestDataTable<TData, TValue>({
                                 <EditAssetDialog
                                     key={row.id}
                                     data={{...row.original} as Partial<Asset>} 
-                                    numAssetsPinned={table.getRowModel().rows.filter(tool => ({...tool.original} as Partial<Asset>).pinned).length}
                                     type={'data'}
                                 >
                                     <TableRow

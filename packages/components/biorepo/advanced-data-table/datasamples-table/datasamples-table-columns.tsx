@@ -228,18 +228,6 @@ export function getDatasamplesTableColumns(): ColumnDef<any>[] {
         ),
         enableHiding: true,
     },
-    {
-        accessorKey: "pinned",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Pinned"/>
-        ),
-        cell: ({ row }) => (
-            <>
-                {row.original.pinned ? <Pin fill="currentColor" className="h-4 w-4"/> : <Pin className="h-4 w-4"/>}
-            </>
-        ),
-        enableHiding: true,
-    },
   ]
 
   const actionsColumn: ColumnDef<any>[] = [

@@ -33,7 +33,6 @@ export default function RFPsLayout({children}: {children: React.ReactNode}) {
                 budget: true,
                 private: true,
                 headerImage: true,
-                pinned: true,
                 milestones: true,
                 organizationId: true,
                 organization: true,

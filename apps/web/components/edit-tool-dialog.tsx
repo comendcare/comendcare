@@ -10,7 +10,7 @@ import { EditBiosampleToolForm } from "./edit-biosample-tool-form";
 import { EditDataToolForm } from "./edit-data-tool-form";
 import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form";
 
-export const NewToolDialog = ({numAssetsPinned, type}: {numAssetsPinned: number, type: 'biosample' | 'data' | 'diseaseModel'}) => {
+export const NewToolDialog = ({type}: {type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -37,20 +37,20 @@ export const NewToolDialog = ({numAssetsPinned, type}: {numAssetsPinned: number,
                     </DialogDescription>
                 </DialogHeader>
                 {type === 'biosample' && (
-                    <EditBiosampleToolForm toolData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                    <EditBiosampleToolForm toolData={{}} closeDialog={closeDialog}/>
                 )}
                 {type === 'diseaseModel' && (
-                    <EditDiseaseModelToolForm toolData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                    <EditDiseaseModelToolForm toolData={{}} closeDialog={closeDialog}/>
                 )}
                 {type === 'data' && (
-                    <EditDataToolForm toolData={{}} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                    <EditDataToolForm toolData={{}} closeDialog={closeDialog}/>
                 )}
             </DialogContent>
         </Dialog>
     )
 }
 
-export const EditAssetDialog = ({children, data, numAssetsPinned, type}: {children?: ReactNode, data: Partial<Asset>, numAssetsPinned: number, type: 'biosample' | 'data' | 'diseaseModel'}) => {
+export const EditAssetDialog = ({children, data, type}: {children?: ReactNode, data: Partial<Asset>, type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const closeDialog = () => {
@@ -68,13 +68,13 @@ export const EditAssetDialog = ({children, data, numAssetsPinned, type}: {childr
                 </DialogDescription>
             </DialogHeader>
             {type === 'biosample' && (
-                <EditBiosampleToolForm toolData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditBiosampleToolForm toolData={data} closeDialog={closeDialog}/>
             )}
             {type === 'diseaseModel' && (
-                <EditDiseaseModelToolForm toolData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditDiseaseModelToolForm toolData={data} closeDialog={closeDialog}/>
             )}
             {type === 'data' && (
-                <EditDataToolForm toolData={data} closeDialog={closeDialog} numAssetsPinned={numAssetsPinned}/>
+                <EditDataToolForm toolData={data} closeDialog={closeDialog}/>
             )}
         </DialogContent>
     )

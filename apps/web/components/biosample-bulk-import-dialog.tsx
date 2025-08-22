@@ -56,7 +56,6 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         bmi: biosample['Donor BMI'],
         medications: biosample['Donor Medications']?.split(",") || [],
         treatments: biosample['Donor Medical Treatments']?.split(",") || [],
-        isPinned: false,
         isPrivate: true,
         priceUnit: 'usd',
     }

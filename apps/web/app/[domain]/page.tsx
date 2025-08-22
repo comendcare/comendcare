@@ -118,7 +118,6 @@ export default async function OrganizationHomePage({
             description: true,
             contacts: true,
             attachments: true,
-            pinned: true,
             milestones: true
         }),
         getPublicRFPsForOrganization(domain, {
@@ -130,7 +129,6 @@ export default async function OrganizationHomePage({
             endDate: true,
             budget: true,
             headerImage: true,
-            pinned: true,
             contacts: true,
             attachments: true,
             milestones: true,
@@ -213,7 +211,7 @@ export default async function OrganizationHomePage({
                         </div>
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
-                            {(tools.filter(a => a.pinned).length > 0 || rfps.filter(r => r.pinned).length > 0) && (
+                            {(tools.length > 0 || rfps.length > 0) && (
                                 <PAGProfileAssetsAndRFPsHoverableCard
                                     isPrivate={false}
                                     tools={tools}

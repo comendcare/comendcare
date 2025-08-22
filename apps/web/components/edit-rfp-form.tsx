@@ -103,7 +103,6 @@ const editRFPForm = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
-    isPinned: z.boolean(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
@@ -130,11 +129,9 @@ export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditRFPForm({
     rfpData,
-    numRFPsPinned,
     closeDialog
 }: {
     rfpData: Partial<RFP>,
-    numRFPsPinned: number,
     closeDialog?: (updatedOrNewRFP?: RFP | undefined) => void
 }) {
     const router = useRouter()
@@ -159,7 +156,6 @@ export function EditRFPForm({
             title: rfpData?.title || "",
             description: rfpData?.description || "",
             attachments: rfpData?.attachments || undefined,
-            isPinned: rfpData?.pinned || false,
             isPrivate: rfpData?.private !== undefined ? rfpData?.private : true,
             contacts: rfpData?.contacts || undefined,
             openTo: rfpData?.openTo || [],
@@ -175,7 +171,6 @@ export function EditRFPForm({
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
-        isPinned: form.watch("isPinned"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo"),
@@ -192,7 +187,6 @@ export function EditRFPForm({
             title,
             description,
             attachments,
-            isPinned,
             isPrivate,
             contacts,
             openTo,
@@ -206,7 +200,6 @@ export function EditRFPForm({
             ...rfpData,
             headerImage,
             title,
-            pinned: (!isPrivate && isPinned) || false, // only save pinned if rfp is public
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
                 return ({
@@ -477,45 +470,6 @@ export function EditRFPForm({
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                         </div>
                     </FormItem>
-
-                    {formData.isPrivate === false && (
-                        <Tooltip>
-                            <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                                <FormField 
-                                    control={form.control}
-                                    name="isPinned"
-                                    render={({field}) => (
-                                        <FormItem className="flex gap-2 items-center text-left">
-                                            <div>
-                                            <FormLabel>{`Pinned to Profile`}</FormLabel>
-                                            <FormDescription>
-                                                {`Showcase this RFP at the top of your organization’s RFPs section so it's easy to find and stands out.`}
-                                            </FormDescription>
-                                            </div>
-                                            <FormControl className="justify-self-end">
-                                                <Button 
-                                                    disabled={!rfpData.pinned && numRFPsPinned >= 5}
-                                                    variant="ghost" 
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        form.setValue("isPinned", !field.value, {shouldValidate: true})
-                                                    }}
-                                                >
-                                                    {field.value ? <Pin fill="currentColor"/> : <Pin />}
-                                                </Button>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TooltipTrigger>
-                            {!rfpData.pinned && numRFPsPinned >= 5 && (
-                                <TooltipContent className="max-w-[200px]">
-                                    <p>{`Pinning is limited to 5 RFPs. You already have 5 RFPs pinned. Please unpin another RFP before pinning this RFP.`}</p>
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
-                    )}
 
                     <FormField
                         control={form.control}
