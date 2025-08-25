@@ -7,9 +7,11 @@ import "~web/app/(platform)/app/feed/mappers"
 
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-export async function POST() {
-    // Pull a small batch of PENDING events
+
+// Share the core logic so GET can call it too
+async function processBatch() {
     const batch = await prisma.rawIngestEvent.findMany({
         where: { status: "PENDING" },
         orderBy: { receivedAt: "asc" },
@@ -20,7 +22,10 @@ export async function POST() {
         try {
             const mapper = getMapper(raw.provider, raw.eventType);
             if (!mapper) {
-                await prisma.rawIngestEvent.update({ where: { id: raw.id }, data: { status: "SKIPPED", error: "No mapper" } });
+                await prisma.rawIngestEvent.update({
+                    where: { id: raw.id },
+                    data: { status: "SKIPPED", error: "No mapper" },
+                });
                 continue;
             }
 
@@ -31,11 +36,13 @@ export async function POST() {
                 payload: raw.payload,
             });
             if (!canonical) {
-                await prisma.rawIngestEvent.update({ where: { id: raw.id }, data: { status: "SKIPPED", error: "Mapper returned null" } });
+                await prisma.rawIngestEvent.update({
+                    where: { id: raw.id },
+                    data: { status: "SKIPPED", error: "Mapper returned null" },
+                });
                 continue;
             }
 
-            // Validate (extra safety)
             const feed = CanonicalFeed.parse(canonical);
 
             const isGlobalType = GLOBAL_FEED_TYPES.includes(feed.type as any);
@@ -46,8 +53,7 @@ export async function POST() {
                 throw new Error(`Org-scoped feed type ${feed.type} requires orgId`);
             }
 
-            // Upsert FeedItem by idempotencyKey
-            const item = await prisma.feedItem.upsert({
+            await prisma.feedItem.upsert({
                 where: { idempotencyKey: feed.idempotencyKey },
                 update: {
                     title: feed.title,
@@ -55,7 +61,6 @@ export async function POST() {
                     externalUrl: feed.externalUrl,
                     orgId: feed.orgId,
                     userId: feed.userId,
-                    // DO NOT change createdAt on update (preserve original)
                 },
                 create: {
                     idempotencyKey: feed.idempotencyKey,
@@ -66,16 +71,34 @@ export async function POST() {
                     externalUrl: feed.externalUrl,
                     orgId: feed.orgId,
                     userId: feed.userId,
-                    occurredAt: feed.occurredAt,  // key detail for “timeline as-it-happened”
+                    occurredAt: feed.occurredAt,
                     rawEventId: raw.id,
                 },
             });
 
-            await prisma.rawIngestEvent.update({ where: { id: raw.id }, data: { status: "PROCESSED" } });
+            await prisma.rawIngestEvent.update({
+                where: { id: raw.id },
+                data: { status: "PROCESSED" },
+            });
         } catch (err: any) {
-            await prisma.rawIngestEvent.update({ where: { id: raw.id }, data: { status: "FAILED", error: String(err?.message ?? err) } });
+            await prisma.rawIngestEvent.update({
+                where: { id: raw.id },
+                data: { status: "FAILED", error: String(err?.message ?? err) },
+            });
         }
     }
 
-    return NextResponse.json({ processed: batch.length });
+    return batch.length;
+}
+
+export async function POST(req: Request) {
+    assertCronAuth(req);
+    const processed = await processBatch();
+    return NextResponse.json({ processed });
+}
+
+export async function GET(req: Request) {
+    assertCronAuth(req);
+    const processed = await processBatch();
+    return NextResponse.json({ processed, note: "Invoked via GET" });
 }
