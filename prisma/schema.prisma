@@ -305,13 +305,14 @@ model Tool {
   metadata    Json?
   types       String[] // values (ToolType ids)
 
-  institutionId  String?
-  institution    Institution?      @relation(fields: [institutionId], references: [id], onDelete: SetNull)
-  geneId         Int?
-  gene           Gene?             @relation(fields: [geneId], references: [id])
-  organizationId String?
-  organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  milestones     ToolToMilestone[]
+  institutionId                 String?
+  institution                   Institution?                         @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  geneId                        Int?
+  gene                          Gene?                                @relation(fields: [geneId], references: [id])
+  organizationId                String?
+  organization                  Organization?                        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones                    ToolToMilestone[]
+  materialAndDataAccessRequests MaterialAndDataAccessRequestToTool[]
 }
 
 model DiseaseModel {
@@ -327,15 +328,16 @@ model DiseaseModel {
   metadata    Json?
   types       String[] // values (DiseaseModelType ids)
 
-  institutionId  String?
-  institution    Institution?              @relation(fields: [institutionId], references: [id], onDelete: SetNull)
-  geneId         Int?
-  gene           Gene?                     @relation(fields: [geneId], references: [id])
-  conditionId    String?
-  condition      Condition?                @relation(fields: [conditionId], references: [id])
-  organizationId String?
-  organization   Organization?             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  milestones     DiseaseModelToMilestone[]
+  institutionId                 String?
+  institution                   Institution?                                 @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  geneId                        Int?
+  gene                          Gene?                                        @relation(fields: [geneId], references: [id])
+  conditionId                   String?
+  condition                     Condition?                                   @relation(fields: [conditionId], references: [id])
+  organizationId                String?
+  organization                  Organization?                                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones                    DiseaseModelToMilestone[]
+  materialAndDataAccessRequests MaterialAndDataAccessRequestToDiseaseModel[]
 }
 
 model Biosample {
@@ -366,14 +368,15 @@ model Biosample {
   price               Float?
   priceUnit           String?
 
-  institutionId  String?
-  institution    Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
-  donor          Donor?                 @relation(fields: [donorId], references: [id])
-  donorId        String?
-  geneId         Int?
-  organizationId String?
-  organization   Organization?          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  milestones     BiosampleToMilestone[]
+  institutionId                 String?
+  institution                   Institution?                              @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  donor                         Donor?                                    @relation(fields: [donorId], references: [id])
+  donorId                       String?
+  geneId                        Int?
+  organizationId                String?
+  organization                  Organization?                             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones                    BiosampleToMilestone[]
+  materialAndDataAccessRequests MaterialAndDataAccessRequestToBiosample[]
 }
 
 model DonorDiagnosis {
@@ -1308,9 +1311,43 @@ model MaterialAndDataAccessRequest {
   institutions             InstitutionToRequest[]
   comments                 RequestComment[]
 
+  biosamples    MaterialAndDataAccessRequestToBiosample[]
+  diseaseModels MaterialAndDataAccessRequestToDiseaseModel[]
+  tools         MaterialAndDataAccessRequestToTool[]
+
   linkedRequests   MaterialAndDataAccessRequest[] @relation("RequestLinks")
   linkedByRequests MaterialAndDataAccessRequest[] @relation("RequestLinks")
   metadata         Json?
+}
+
+model MaterialAndDataAccessRequestToBiosample {
+  id                             String                       @id @default(cuid())
+  materialAndDataAccessRequestId String
+  materialAndDataAccessRequest   MaterialAndDataAccessRequest @relation(fields: [materialAndDataAccessRequestId], references: [id], onDelete: Cascade)
+  biosampleId                    String
+  biosample                      Biosample                    @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
+  createdAt                      DateTime                     @default(now())
+  updatedAt                      DateTime                     @updatedAt
+}
+
+model MaterialAndDataAccessRequestToDiseaseModel {
+  id                             String                       @id @default(cuid())
+  materialAndDataAccessRequestId String
+  materialAndDataAccessRequest   MaterialAndDataAccessRequest @relation(fields: [materialAndDataAccessRequestId], references: [id], onDelete: Cascade)
+  diseaseModelId                 String
+  diseaseModel                   DiseaseModel                 @relation(fields: [diseaseModelId], references: [id], onDelete: Cascade)
+  createdAt                      DateTime                     @default(now())
+  updatedAt                      DateTime                     @updatedAt
+}
+
+model MaterialAndDataAccessRequestToTool {
+  id                             String                       @id @default(cuid())
+  materialAndDataAccessRequestId String
+  materialAndDataAccessRequest   MaterialAndDataAccessRequest @relation(fields: [materialAndDataAccessRequestId], references: [id], onDelete: Cascade)
+  toolId                         String
+  tool                           Tool                         @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  createdAt                      DateTime                     @default(now())
+  updatedAt                      DateTime                     @updatedAt
 }
 
 model InstitutionToRequest {
