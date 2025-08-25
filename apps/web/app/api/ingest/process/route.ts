@@ -88,13 +88,11 @@ async function processBatch() {
 }
 
 export async function POST(req: Request) {
-    assertCronAuth(req);
     const processed = await processBatch();
     return NextResponse.json({ processed });
 }
 
 export async function GET(req: Request) {
-    assertCronAuth(req);
     const processed = await processBatch();
     return NextResponse.json({ processed, note: "Invoked via GET" });
 }
