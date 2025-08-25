@@ -33,7 +33,7 @@ interface TypesenseDataTablePaginationProps<TData> extends React.ComponentProps<
 
 export function DataTablePagination<TData>({
   table,
-  pageSizeOptions = [1, 10, 20, 30, 40, 50],
+  pageSizeOptions = [10, 20, 30, 40, 50],
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
@@ -122,7 +122,7 @@ export function DataTablePagination<TData>({
 }
 
 export function TypesenseDataTablePagination<TData>({
-  pageSizeOptions = [1, 10, 20, 30, 40, 50],
+  pageSizeOptions = [10, 20, 30, 40, 50],
   resultsPerPage,
   setResultsPerPage,
   totalPages,

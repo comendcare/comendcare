@@ -159,65 +159,8 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     }
 
     useEffect(() => {
-        // session?.user?.organizationId ? getPublicOrganizationData(session.user?.organizationId, {
-        //     id: true,
-        //     published: true,
-        //     verified: true,
-        //     public: true,
-        //     name: true,
-        //     description: true,
-        //     contactEmail: true,
-        //     image: true,
-        //     headerImage: true,
-        //     subdomain: true,
-        //     yearFounded: true,
-        //     incorporationStatus: true,
-        //     therapeuticsOfInterest: true,
-        //     therapeuticsInDevelopment: true,
-        //     website: true,
-        //     moneyRaised: true,
-        //     moneyDeployed: true,
-        //     researchBudget: true,
-        //     members: true,
-        //     conditions: true,
-        // }).then((response) => {
-        //     if (response.success) {
-        //         const organization = response.data
-        //         setOrganization(organization)
-        //     } else {
-        //         console.error(response.error)
-        //         toast.error(response.error)
-        //     }
-        // }) : toast.error("No organizationId provided")
-
         handleSessionUpdate()
-        
     }, [session?.user?.organizationId]);
-
-    // if (organization && !organization?.published) {
-    //     return <div className="h-full flex flex-col mx-auto items-center justify-center py-20">
-    //         <Image
-    //             alt="Organization not published"
-    //             src="https://illustrations.popsy.co/gray/meditation-girl.svg"
-    //             width={400}
-    //             height={400}
-    //             className="dark:hidden"
-    //         />
-    //         <Image
-    //             alt="Organization not published"
-    //             src="https://illustrations.popsy.co/white/meditation-girl.svg"
-    //             width={400}
-    //             height={400}
-    //             className="hidden dark:block"
-    //         />
-    //         <p className="text-center font-title text-2xl text-stone-600 dark:text-stone-400">
-    //             {`Your organization isn't published yet.`}
-    //         </p>
-    //         <p className="text-center mt-4 text-stone-500 dark:text-stone-300 max-w-xl">
-    //             {`To access the marketplace you need to publish your organization. Only published organizations can view and be shown in the marketplace.`}
-    //         </p>
-    //     </div>
-    // }
 
     return (
         <TooltipProvider>
