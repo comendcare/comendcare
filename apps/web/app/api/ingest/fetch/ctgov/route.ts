@@ -1,7 +1,7 @@
 import {NextResponse} from "next/server";
 import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
-import {buildCtgovParams, runSimpleFallback, CtgovOrgQueryConfig} from "~web/lib/ctgov-query";
+import {buildCtgovParams, CtgovOrgQueryConfig} from "~web/lib/ctgov-query";
 import {CtgovStudy, fetchCtgovPage, shapeForMapper} from "~web/lib/ctgov";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +28,50 @@ async function fetchAllPages(
         await handleStudies(studies);
         pageToken = page.nextPageToken;
     } while (pageToken);
+}
+
+// Super‑simple per‑keyword runner: one request per keyword, one field at a time.
+async function runSimpleFallback(
+    cfg: CtgovOrgQueryConfig,
+    fromISO: string,
+    toISO: string,
+    enqueueStudies: (s: CtgovStudy[]) => Promise<void>
+) {
+    const fields: Array<{ list?: string[]; field: "query.cond" | "query.titles" | "query.term" }> = [
+        { list: cfg.conditions, field: "query.cond" },
+        { list: cfg.titles, field: "query.titles" },
+        { list: cfg.terms, field: "query.term" },
+    ];
+
+    for (const { list, field } of fields) {
+        if (!list?.length) continue;
+        for (const kw of list) {
+            const singleCfg: CtgovOrgQueryConfig = {
+                ...cfg,
+                // single keyword in the chosen bucket; do NOT mix
+                conditions: field === "query.cond" ? [kw] : [],
+                titles:     field === "query.titles" ? [kw] : [],
+                terms:      field === "query.term" ? [kw] : [],
+            };
+
+            const p = buildCtgovParams(singleCfg, fromISO, toISO);
+
+            // Only date + status in postFilter — keep it super simple.
+            p.set(
+                "postFilter.advanced",
+                `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`
+            );
+            if (cfg.overallStatuses?.length) {
+                p.set("postFilter.overallStatus", cfg.overallStatuses.join(","));
+            }
+
+            try {
+                await fetchAllPages(p, enqueueStudies);
+            } catch (e) {
+                console.warn("ctgov simple query failed", { field, kw, orgId: cfg.orgId, e });
+            }
+        }
+    }
 }
 
 function isTooComplicatedError(e: unknown) {
