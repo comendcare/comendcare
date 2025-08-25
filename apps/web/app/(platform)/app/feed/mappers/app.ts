@@ -792,3 +792,43 @@ register("app", "service_provider_created", async ({ payload, occurredAt }) => {
         orgId: undefined, // explicit undefined/null so that it appears in all feeds
     };
 });
+
+// ----------------------------------------
+// ORG_PROFILE_VIEWS_MILESTONE (analytics)
+// ----------------------------------------
+register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
+    const {
+        orgId,
+        orgName,
+        host,          // e.g. "acme.comend.io"
+        totalViews,    // lifetime public profile views (number)
+        milestone,     // number crossed (e.g. 10, 100, 1000, 10000, ...)
+    } = payload as {
+        orgId: string;
+        orgName?: string;
+        host?: string;
+        totalViews: number;
+        milestone: number;
+    };
+
+    const idempotencyKey = crypto
+        .createHash("sha256")
+        .update(`app:org:${orgId}:views:${milestone}`)
+        .digest("hex");
+
+    const nice = milestone.toLocaleString();
+    return {
+        type: "ANALYTICS_GOAL_REACHED",
+        source: "PLATFORM",
+        title: `🎉 ${nice} public profile views!`,
+        content: {
+            milestone,
+            totalViews,
+            host,
+            organization: { id: orgId, name: orgName },
+        },
+        orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});
