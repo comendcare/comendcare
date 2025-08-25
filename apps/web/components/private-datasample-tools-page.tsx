@@ -6,15 +6,15 @@ import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import { getDatasamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/datasamples-table/datasamples-table-columns";
-import { DatasamplesTable } from "@comend/components/biorepo/advanced-data-table/datasamples-table/datasamples-table"
+import { getClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table-columns";
+import { ClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table"
 import { Tool } from "@prisma/client";
 import { SearchParams } from "@/packages/components/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import { useEffect } from "react";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
-    const columns = getDatasamplesTableColumns()
+    const columns = getClinicalDatasetsTableColumns()
 
     useEffect(() => {
         revalidate('/')
@@ -49,7 +49,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         />
                     }
                 >
-                    <DatasamplesTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
+                    <ClinicalDatasetsTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

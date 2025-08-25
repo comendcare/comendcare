@@ -167,6 +167,8 @@ export default function AppLayout({children}: AppLayoutProps) {
 
             // init organization/PAG search store
             const parsedPAGFilters = {
+                genes: parseQuery(queryTypes),
+                conditions: parseQuery(queryTypes),
                 systems: parseQuery(querySystems).map(query => {
                     const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
                     if (!system) return undefined

@@ -18,6 +18,7 @@ interface OrgUpdatedContent {
     organization?: {
         id?: string;
         name?: string;
+        image?: string;
     };
     changedFields?: string[];
     changes?: Record<string, { before: unknown; after: unknown }>;

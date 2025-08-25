@@ -138,13 +138,13 @@ export const columns: ColumnDef<Biosample>[] = [
     ),
     cell: ({ row }) => <div>{row.getValue("institution")}</div>,
   },
-  {
-    accessorKey: "pathology",
-    header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Pathology" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("pathology")}</div>,
-  },
+  // {
+  //   accessorKey: "pathology",
+  //   header: ({ column }) => (
+  //       <DataTableColumnHeader column={column} title="Pathology" />
+  //   ),
+  //   cell: ({ row }) => <div>{row.getValue("pathology")}</div>,
+  // },
   {
     accessorKey: "preservationMethod",
     header: ({ column }) => (

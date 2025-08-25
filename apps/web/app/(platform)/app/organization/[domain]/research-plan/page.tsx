@@ -6,7 +6,7 @@ import {getOrganizationData, getPublicRoadmapsForOrganization} from "@comend/lib
 import Image from "next/image"
 import {FloatingDock} from "~web/components/floating-dock";
 import ShareDialog from "~web/components/share-dialog";
-import MarketplaceBreadcrumb from "~web/components/marketplace-breadcrumb";
+import MarketplaceBreadcrumb from "~web/components/marketplace/marketplace-breadcrumb";
 import { Mail, Share } from "lucide-react";
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
 import { RoadmapsCard } from "~web/components/public-roadmap-card";
