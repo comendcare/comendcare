@@ -7,21 +7,70 @@ import { fetchCtgovPage, shapeForMapper } from "~web/lib/ctgov";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// app/api/ingest/fetch/ctgov/route.ts
-async function getOrgConfigs(): Promise<CtgovOrgQueryConfig[]> {
-    return [
-        {
-            orgId: "org_DEF",
-            conditions: ["BRCA1", "BRCA2"],
-            terms: ["PARP inhibitor"],
-            titles: ["BRCA1", "BRCA2"],
-
-            overallStatuses: ["RECRUITING", "NOT_YET_RECRUITING"],
-            windowDays: 14,                  // ← widen the window
-            dateField: "LastUpdatePostDate", // ← catch updates too
-            loosen: true,                    // ← don’t AND titles+terms strictly
+// Build CT.gov query configs for ALL published orgs from your DB
+async function getOrgConfigsFromDB(): Promise<CtgovOrgQueryConfig[]> {
+    const orgs = await prisma.organization.findMany({
+        where: { published: true },
+        select: {
+            id: true,
+            therapeuticsOfInterest: true,
+            // org ↔ conditions
+            conditions: {
+                include: {
+                    condition: {
+                        select: { name: true, synonyms: true },
+                    },
+                },
+            },
+            // org ↔ tools (for genes)
+            tools: {
+                include: {
+                    gene: { select: { symbol: true, aliasSymbols: true } },
+                },
+            },
+            // optional: milestone titles as loose hints
+            milestones: { select: { title: true } },
         },
-    ];
+    });
+
+    const uniq = <T,>(xs: T[]) => Array.from(new Set(xs));
+    const nonempty = (s: string | null | undefined): s is string => !!s && s.trim().length > 0;
+
+    return orgs
+        .map((o) => {
+            const condTerms = o.conditions
+                .flatMap((c) => [c.condition?.name, ...(c.condition?.synonyms ?? [])])
+                .filter(nonempty);
+
+            const geneTerms = o.tools
+                .flatMap((t) => [t.gene?.symbol, ...(t.gene?.aliasSymbols ?? [])])
+                .filter(nonempty);
+
+            const therapeuticTerms = (o.therapeuticsOfInterest ?? []).filter(nonempty);
+
+            const milestoneHints = o.milestones.map((m) => m.title).filter(nonempty);
+
+            // Keep queries reasonable in size
+            const conditions = uniq(condTerms).slice(0, 50);
+            const terms = uniq([...geneTerms, ...therapeuticTerms]).slice(0, 50);
+            const titles = uniq([...geneTerms, ...condTerms, ...milestoneHints]).slice(0, 20);
+
+            const hasAny = conditions.length || terms.length || titles.length;
+            if (!hasAny) return null;
+
+            const cfg: CtgovOrgQueryConfig = {
+                orgId: o.id,
+                conditions,
+                terms,
+                titles,
+                overallStatuses: ["RECRUITING", "NOT_YET_RECRUITING"], // sane default
+                windowDays: 14,
+                dateField: "LastUpdatePostDate",
+                loosen: true,
+            };
+            return cfg;
+        })
+        .filter((x): x is CtgovOrgQueryConfig => !!x);
 }
 
 function formatISODate(d: Date) {
@@ -33,7 +82,7 @@ export async function POST() {
     const eventType = "ctg_trial_posted";
     const results: Record<string, any> = {};
 
-    const cfgs = await getOrgConfigs();
+    const cfgs = await getOrgConfigsFromDB();
 
     for (const cfg of cfgs) {
         const stats = (results[cfg.orgId] = { found: 0, enqueued: 0, errors: 0 });
@@ -50,8 +99,16 @@ export async function POST() {
         try {
             let params = buildCtgovParams(cfg, fromISO, toISO);
 
-            // If you want a hard clamp for the upper bound, keep this.
-            params.set("postFilter.advanced", `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`);
+            // Hard clamp by date window
+            params.set(
+                "postFilter.advanced",
+                `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`
+            );
+
+            // Optional status filter
+            if (cfg.overallStatuses?.length) {
+                params.set("postFilter.overallStatus", cfg.overallStatuses.join(","));
+            }
 
             let pageToken: string | undefined;
             do {
@@ -67,9 +124,10 @@ export async function POST() {
                         const shaped = shapeForMapper(s);
                         if (!shaped.NCTId || !shaped.BriefTitle) continue;
 
+                        // IMPORTANT for multi‑org: include orgId in the dedupe key
                         const dedupeKey = crypto
                             .createHash("sha256")
-                            .update(`${provider}:${eventType}:${shaped.NCTId}`)
+                            .update(`${provider}:${eventType}:${cfg.orgId}:${shaped.NCTId}`)
                             .digest("hex");
 
                         const posted =
@@ -125,4 +183,8 @@ export async function POST() {
     }
 
     return NextResponse.json({ provider: "ctgov", results });
+}
+
+export async function GET() {
+    return POST();
 }

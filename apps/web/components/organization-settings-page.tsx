@@ -14,6 +14,8 @@ import {Table, Braces} from "lucide-react"
 import {useTransition} from "react";
 import {exportOrganizationAsCSV, exportOrganizationAsJSON} from "~web/lib/export";
 import {toast} from "sonner";
+import JSZip from "jszip";
+
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session} = useSession()
@@ -44,28 +46,31 @@ export default function OrganizationSettingsPage({organization}: { organization:
         startTransition(async () => {
             try {
                 const result = await exportOrganizationAsCSV(organization.id);
-                const {files} = result;
+                const { files } = result;
 
-                // If there's just one file you care about, download that;
-                // otherwise, you can bundle with JSZip (optional).
-                // Here's a simple "multi-file" fallback that concatenates with headers:
+                // Create a new zip archive
+                const zip = new JSZip();
 
-                const combined = Object.entries(files)
-                    .map(([name, csv]) => `### ${name}\n${csv}`)
-                    .join("\n\n");
+                // Add each CSV file into the archive
+                for (const [filename, csv] of Object.entries(files)) {
+                    zip.file(filename, csv);
+                }
 
-                const blob = new Blob([combined], {type: "text/plain;charset=utf-8"});
-                const url = URL.createObjectURL(blob);
+                // Generate the zip blob
+                const content = await zip.generateAsync({ type: "blob" });
+
+                // Trigger download
+                const url = URL.createObjectURL(content);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `organization-${organization.id}-csv.txt`; // or use JSZip to create a .zip
+                a.download = `organization-${organization.id}.zip`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
                 URL.revokeObjectURL(url);
             } catch (error) {
-                toast.error("An error occurred while updating your profile.");
-                console.log(error)
+                toast.error("An error occurred while exporting your organization data.");
+                console.error(error);
             }
         });
     };

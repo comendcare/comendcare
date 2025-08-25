@@ -8,11 +8,46 @@ import { getPubMedSearchResultIds, getPubMedSearchResultData } from "@comend/lib
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs"; // ensure Node runtime
 
-async function getOrgConfigs(): Promise<OrgQueryConfig[]> {
-    return [
-        // { orgId: "org_ABC", keywords: ["Duchenne muscular dystrophy", "DMD", "dystrophin"] },
-        { orgId: "org_DEF", keywords: ["BRCA1", "BRCA2", "PARP inhibitor"], mustInTitle: ["BRCA1", "BRCA2"] },
-    ];
+async function getOrgConfigsFromDB(prisma: PrismaClient): Promise<OrgQueryConfig[]> {
+    const orgs = await prisma.organization.findMany({
+        where: { published: true }, // or verified, etc.
+        include: {
+            conditions: {
+                include: { condition: { select: { name: true, synonyms: true } } },
+            },
+            tools: { include: { gene: { select: { symbol: true, aliasSymbols: true } } } },
+            milestones: { select: { title: true } },
+        },
+    });
+
+    return orgs.map((o) => {
+        const condTerms = o.conditions.flatMap(c => [
+            c.condition?.name,
+            ...(c.condition?.synonyms ?? []),
+        ]).filter(Boolean) as string[];
+
+        const geneTerms = o.tools.flatMap(t => [
+            t.gene?.symbol,
+            ...(t.gene?.aliasSymbols ?? []),
+        ]).filter(Boolean) as string[];
+
+        const therapeuticTerms = o.therapeuticsOfInterest ?? [];
+        const milestoneHints = o.milestones.map(m => m.title).filter(Boolean);
+
+        // Heuristic: prioritize genes + conditions
+        const keywords = Array.from(new Set([
+            ...geneTerms,
+            ...condTerms,
+            ...therapeuticTerms,
+        ])).slice(0, 40); // To keep short
+
+        // Example policy: require at least one canonical identifier in title
+        const mustInTitle = Array.from(new Set(
+            geneTerms.slice(0, 10) // keep short; PubMed queries can explode
+        )).slice(0, 10);
+
+        return { orgId: o.id, keywords, mustInTitle };
+    }).filter(cfg => cfg.keywords.length > 0);
 }
 
 export async function POST() {
@@ -20,9 +55,11 @@ export async function POST() {
     const eventType = "pubmed_article";
     const results: Record<string, any> = {};
 
-    const cfgs = await getOrgConfigs();
+    const cfgs = await getOrgConfigsFromDB(prisma);
 
     for (const cfg of cfgs) {
+        if (!cfg.keywords?.length && !cfg.mustInTitle?.length) continue;
+
         const query = buildPubmedQuery(cfg);
         const orgStats = (results[cfg.orgId] = { found: 0, enqueued: 0, errors: 0, query });
 

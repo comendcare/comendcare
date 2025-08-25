@@ -7,6 +7,14 @@
     {
       "path": "/api/ingest/process",
       "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/ingest/fetch/pubmed",
+      "schedule": "0 0,12 * * *"
+    },
+    {
+      "path": "/api/ingest/fetch/ctgov",
+      "schedule": "0 */12 * * *"
     }
   ]
 }
