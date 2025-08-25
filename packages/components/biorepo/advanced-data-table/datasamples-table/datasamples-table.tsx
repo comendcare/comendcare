@@ -39,7 +39,7 @@ export function DatasamplesTable({data, pageCount, columns, searchParams}: {data
         noResults={
             (data.length === 0 && Object.keys(searchParams).length === 0) 
             ? (
-              <div className="pt-6 h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+              <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                   <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                       <h1 className="font-cal text-4xl">You do not have any Data Tools</h1>
                       <Image
