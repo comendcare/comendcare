@@ -59,7 +59,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/ta
 import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
 import {Card, CardContent} from "@comend/components/ui/card"
 import Image from "next/image"
-import {CROMarketplaceCard} from "./marketplace-cro-card"
+import {CROMarketplaceCard} from "./marketplace/marketplace-cro-card"
 import Link from "next/link"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"

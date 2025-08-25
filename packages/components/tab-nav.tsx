@@ -15,7 +15,7 @@ export function TabNav({
 
     return (
         <TooltipProvider>
-            <div className={cn("mx-auto my-4 flex items-center", className)} {...props}>
+            <div className={cn("mx-auto flex items-center flex-wrap justify-center", className)} {...props}>
                 {links.map((link, index) => (
                     link.comingSoon ?
                         <Tooltip key={link.href} delayDuration={0}>
@@ -37,7 +37,7 @@ export function TabNav({
                             href={baseLink + link.href}
                             key={link.href}
                             className={cn(
-                                "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
                                 pathname?.endsWith(link.href) ||
                                 (index === 0 && pathname === "/")
                                     ? "bg-blue-light font-medium text-primary"

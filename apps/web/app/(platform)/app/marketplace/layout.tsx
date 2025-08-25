@@ -1,17 +1,19 @@
 "use client"
-import {MarketplaceNav} from "~web/components/marketplace-nav"
+import {MarketplaceNav} from "~web/components/marketplace/marketplace-nav"
 import {MilestoneFilters} from "~web/components/milestone-filters"
-import {PAGFilters} from "~web/components/pag-filters"
+import {PAGFilters} from "~web/components/marketplace/patient-groups/pag-filters"
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable"
 import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {CROFilters} from "~web/components/cro-filters";
+import {CROFilters} from "~web/components/marketplace/service-providers/cro-filters";
 import { useQueryState } from "nuqs"
-import { initializeCROSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
+import { Button } from "@/packages/components/ui/button"
+import { Search } from "lucide-react"
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -29,6 +31,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // Zustand state management
     const {data: session} = useSession()
     const {defaultLayout, setLayout} = useFiltersStore()
+    const pathname = usePathname()
     // const [organization, setOrganization] = useState<Organization | null>();
 
     const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
@@ -107,6 +110,8 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
         // init organization/PAG search store
         const parsedPAGFilters = {
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
             systems: parseQuery(querySystems).map(query => {
                 const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
                 if (!system) return undefined
@@ -125,6 +130,30 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
         }
         initializeOrganizationSearch(parsedPAGFilters)
         console.log(`Organization search initialized...`)
+
+        const parsedBiosampleFilters = {
+            types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
+        }
+        initializeBiosampleSearch(parsedBiosampleFilters)
+        console.log(`Biosample search initialized...`)
+
+        const parsedDiseaseModelFilters = {
+            types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
+        }
+        initializeDiseaseModelSearch(parsedDiseaseModelFilters)
+        console.log(`Disease Model search initialized...`)
+
+        const parsedClinicalDatasetFilters = {
+            types: parseQuery(queryTypes),
+            genes: parseQuery(queryTypes),
+            conditions: parseQuery(queryTypes),
+        }
+        initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
+        console.log(`Clinical Dataset search initialized...`)
     }
 
     useEffect(() => {
@@ -189,32 +218,12 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // }
 
     return (
-        <ResizablePanelGroup
-            direction="horizontal"
-            onLayout={(sizes: number[]) => {
-                setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-            }}
-            className="h-full items-stretch"
-        >
-            <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}
-                            className="container relative flex flex-col items-center">
-                <MarketplaceNav />
+        <div className="w-full flex justify-center">
+            <div className="max-w-7xl h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
+                {pathname !== '/app/marketplace' && <MarketplaceNav />}
                 {children}
-            </ResizablePanel>
-
-            {/*<>*/}
-            {/*    <ResizableHandle withHandle/>*/}
-
-            {/*    <ResizablePanel*/}
-            {/*        defaultSize={defaultLayout[1]}*/}
-            {/*        minSize={15}*/}
-            {/*        maxSize={30}*/}
-            {/*        className="bg-white p-8 flex flex-col gap-4"*/}
-            {/*    >*/}
-            {/*        <FiltersPanel/>*/}
-            {/*    </ResizablePanel>*/}
-            {/*</>*/}
-        </ResizablePanelGroup>
+            </div>
+        </div>
     )
 }
 
