@@ -30,6 +30,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/d
 import { DialogTitle } from "@radix-ui/react-dialog";
 import type { Option } from "@comend/lib/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
+import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
+import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -69,7 +71,40 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             totalResults: state.totalResults,
         }))
     );
-    const {setFilters: setBiosampleFitlers} = useBiosampleSearchStore(useShallow((state: BiosampleSearchState) => ({setFilters: state.setFilters})))
+    const {
+        setFilters: setBiosampleFilters, 
+        filters: biosampleFilters,
+        setSearchTerm: setBiosampleSearchTerm
+    } = useBiosampleSearchStore(
+        useShallow((state: BiosampleSearchState) => ({
+            setFilters: state.setFilters,
+            filters: state.filters,
+            setSearchTerm: state.setSearchTerm
+        }))
+    )
+    const {
+        setFilters: setDiseaseModelFilters,
+        filters: diseaseModelFilters,
+        setSearchTerm: setDiseaseModelSearchTerm
+    } = useDiseaseModelSearchStore(
+        useShallow((state: DiseaseModelSearchState) => ({
+            setFilters: state.setFilters,
+            filters: state.filters,
+            setSearchTerm: state.setSearchTerm
+        }))
+    )
+    const {
+        setFilters: setClinicalDatasetFilters,
+        filters: clinicalDatasetFilters,
+        setSearchTerm: setClinicalDatasetSearchTerm
+    } = useClinicalDatasetSearchStore(
+        useShallow((state: ClinicalDatasetSearchState) => ({
+            setFilters: state.setFilters,
+            filters: state.filters,
+            setSearchTerm: state.setSearchTerm
+        }))
+    )
+
 
     const [query, setQuery] = useState(searchTerm);
 
@@ -79,13 +114,18 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
     // initial fetch on mount
     useEffect(() => {
         // reset to trigger initial load using store's logic
-        setSearchTerm("");
+        setSearchTerm(searchTerm || "");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleInputChangeCallback = useCallback(
         (text: string) => {
             setSearchTerm(text);
+            
+            // Handle setting universal search in other marketplaces
+            setBiosampleSearchTerm(text);
+            setDiseaseModelSearchTerm(text);
+            setClinicalDatasetSearchTerm(text);
         },
         [setSearchTerm]
     );
@@ -96,14 +136,36 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
     );
 
     // helper to update a single filter key from MultipleSelector
-    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) => {
         setFilters({...filters, [key]: value})
 
-    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        // Handle setting universal filters in other marketplaces (if relevant)
+        if (key === 'conditions' || key === 'genes') {
+            setBiosampleFilters({...biosampleFilters, [key]: value})
+            setDiseaseModelFilters({...diseaseModelFilters, [key]: value})
+            setClinicalDatasetFilters({...clinicalDatasetFilters, [key]: value})
+        }
+    }
+
+    const removeFilterItem = (key: keyof typeof filters, value: string) => {
         setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
 
-    const clearAll = () =>
+        // Handle setting universal filters in other marketplaces (if relevant)
+        if (key === 'conditions' || key === 'genes') {
+            setBiosampleFilters({...biosampleFilters, [key]: (biosampleFilters[key] || []).filter((i) => i.value !== value)})
+            setDiseaseModelFilters({...diseaseModelFilters, [key]: (diseaseModelFilters[key] || []).filter((i) => i.value !== value)})
+            setClinicalDatasetFilters({...clinicalDatasetFilters, [key]: (clinicalDatasetFilters[key] || []).filter((i) => i.value !== value)})
+        }
+    }
+
+    const clearAll = () => {
         setFilters({ ...filters, conditions: [], genes: [], mechanisms: [], systems: [], modalities: [] });
+
+        // Handle setting universal filters in other marketplaces (if relevant)
+        setBiosampleFilters({...biosampleFilters, conditions: [], genes: []})
+        setDiseaseModelFilters({...diseaseModelFilters, conditions: [], genes: []})
+        setClinicalDatasetFilters({...clinicalDatasetFilters, conditions: [], genes: []})
+    }
 
     // map to find labels for badges
     const SYSTEM_OPTIONS = ASSOCIATED_SYSTEMS;

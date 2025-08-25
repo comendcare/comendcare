@@ -25,6 +25,9 @@ import {debounce} from "lodash";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
 import type { Option } from "@comend/lib/types"
+import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
+import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
+import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
     ...option,
@@ -43,6 +46,39 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
             totalResults: state.totalResults,
         }))
     )
+    const {
+        setFilters: setOrganizationFilters,
+        filters: organizationFilters,
+        setSearchTerm: setOrganizationSearchTerm
+    } = useOrganizationSearchStore(
+        useShallow((state: OrganizationSearchState) => ({
+            setFilters: state.setFilters,
+            filters: state.filters,
+            setSearchTerm: state.setSearchTerm
+        }))
+    )
+    const {
+        setFilters: setBiosampleFilters, 
+        filters: biosampleFilters,
+        setSearchTerm: setBiosampleSearchTerm
+    } = useBiosampleSearchStore(
+        useShallow((state: BiosampleSearchState) => ({
+            setFilters: state.setFilters,
+            filters: state.filters,
+            setSearchTerm: state.setSearchTerm
+        }))
+    )
+    const {
+        setFilters: setClinicalDatasetFilters,
+        filters: clinicalDatasetFilters,
+        setSearchTerm: setClinicalDatasetSearchTerm
+    } = useClinicalDatasetSearchStore(
+        useShallow((state: ClinicalDatasetSearchState) => ({
+            setFilters: state.setFilters,
+            filters: state.filters,
+            setSearchTerm: state.setSearchTerm
+        }))
+    )
 
     const [query, setQuery] = useState(searchTerm)
 
@@ -52,13 +88,18 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
     // initial fetch on mount
     useEffect(() => {
         // reset to trigger initial load using store's logic
-        setSearchTerm("");
+        setSearchTerm(searchTerm || "");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {
             setSearchTerm(search)
+
+            // Handle setting universal search in other marketplaces
+            setOrganizationSearchTerm(search);
+            setBiosampleSearchTerm(search);
+            setClinicalDatasetSearchTerm(search);
         },
         [setSearchTerm]
     )
@@ -69,14 +110,36 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
     );
 
     // helper to update a single filter key from MultipleSelector
-    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) => {
         setFilters({...filters, [key]: value})
 
-    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        // Handle setting universal filters in other marketplaces (if relevant)
+        if (key === 'conditions' || key === 'genes') {
+            setOrganizationFilters({...organizationFilters, [key]: value})
+            setBiosampleFilters({...biosampleFilters, [key]: value})
+            setClinicalDatasetFilters({...clinicalDatasetFilters, [key]: value})
+        }
+    }
+
+    const removeFilterItem = (key: keyof typeof filters, value: string) => {
         setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
 
-    const clearAll = () =>
+        // Handle setting universal filters in other marketplaces (if relevant)
+        if (key === 'conditions' || key === 'genes') {
+            setOrganizationFilters({...organizationFilters, [key]: (organizationFilters[key] || []).filter((i) => i.value !== value)})
+            setBiosampleFilters({...biosampleFilters, [key]: (biosampleFilters[key] || []).filter((i) => i.value !== value)})
+            setClinicalDatasetFilters({...clinicalDatasetFilters, [key]: (clinicalDatasetFilters[key] || []).filter((i) => i.value !== value)})
+        }
+    }
+
+    const clearAll = () => {
         setFilters({ ...filters, conditions: [], genes: [], types: [] });
+
+        // Handle setting universal filters in other marketplaces (if relevant)
+        setOrganizationFilters({...organizationFilters, conditions: [], genes: []})
+        setBiosampleFilters({...biosampleFilters, conditions: [], genes: []})
+        setClinicalDatasetFilters({...clinicalDatasetFilters, conditions: [], genes: []})
+    }
 
     const activeCount =
         (filters.conditions?.length || 0) +
