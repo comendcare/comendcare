@@ -94,7 +94,10 @@ export async function POST() {
                         .update(`${provider}:${eventType}:${cfg.orgId}:${article.pmid}`)
                         .digest("hex");
 
-                    const occurredAt = article.publishedDate ? new Date(article.publishedDate) : new Date();
+                    const occurredAt =
+                        article.publishedDateISO && !Number.isNaN(Date.parse(article.publishedDateISO))
+                            ? new Date(article.publishedDateISO)
+                            : new Date(); // fallback to "now" if missing/invalid
 
                     await prisma.rawIngestEvent.upsert({
                         where: { dedupeKey },
@@ -104,12 +107,12 @@ export async function POST() {
                             provider,
                             eventType,
                             externalId: article.pmid,
-                            occurredAt,
+                            occurredAt,                   // ✅ always a valid Date
                             receivedAt: new Date(),
                             payload: { ...article, orgId: cfg.orgId } as any,
                             status: "PENDING",
                         },
-                    });
+                    })
 
                     orgStats.enqueued++;
                 } catch (e) {

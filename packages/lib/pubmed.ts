@@ -15,90 +15,137 @@ function delay(milliseconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-function extractArticleData(xml: string): ArticleData {
-    // Create a JSDOM instance from the XML string
-    const dom = new JSDOM(xml, {
-        contentType: "application/xml"
-    })
+// utils for date parsing
+const MONTHS: Record<string, string> = {
+    jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+    jul: "07", aug: "08", sep: "09", sept: "09", oct: "10", nov: "11", dec: "12",
+};
 
-    // Use standard DOM query methods to find AbstractText elements
-    const pmidElement = dom.window.document.querySelector("PMID")
-    const abstractTextElements =
-        dom.window.document.querySelectorAll("AbstractText")
-    const articleTitleElements =
-        dom.window.document.querySelectorAll("ArticleTitle")
-    const keywordElements = dom.window.document.querySelectorAll("Keyword")
+function normMonth(m?: string | null): string | null {
+    if (!m) return null;
+    const s = m.trim().toLowerCase();
+    // handle ranges like "Nov-Dec" or "Aug-Sep" → pick first
+    const first = s.split(/[\s\-]/)[0];
+    if (/^\d+$/.test(first)) {
+        const n = parseInt(first, 10);
+        if (n >= 1 && n <= 12) return String(n).padStart(2, "0");
+        return null;
+    }
+    return MONTHS[first] ?? null;
+}
 
-    // Map over the NodeList to extract text content of each element
-    const pmid = pmidElement?.textContent || ""
-    const abstractTexts = Array.from(abstractTextElements).map(
-        element => element.textContent || ""
-    )
-    const articleTitle = Array.from(articleTitleElements).map(
-        element => element.textContent || ""
-    )
-    const keywords = Array.from(keywordElements).map(
-        element => element.textContent || ""
-    )
+// Parse strings like "2025 Aug 14", "2025 Aug", "2025 Winter", "2025 Nov-Dec", "2025"
+function parseMedlineDate(s: string): { iso?: string, pretty?: string } {
+    const t = s.trim();
+    const yearMatch = t.match(/^\s*(\d{4})/);
+    if (!yearMatch) return {};
+    const y = yearMatch[1];
 
-    const authorElements = dom.window.document.querySelectorAll("Author")
+    // try YYYY Mon DD
+    const ymd = t.match(/^\s*(\d{4})\s+([A-Za-z]{3,})\s+(\d{1,2})/);
+    if (ymd) {
+        const mm = normMonth(ymd[2]);
+        const dd = String(parseInt(ymd[3], 10)).padStart(2, "0");
+        if (mm) return { iso: `${y}-${mm}-${dd}`, pretty: `${ymd[2]} ${parseInt(dd,10)}, ${y}` };
+    }
 
-    // Map over the NodeList to extract details of each Author element
-    const authors = Array.from(authorElements).map(authorElement => {
-        const lastName =
-            authorElement.querySelector("LastName")?.textContent || ""
-        const foreName =
-            authorElement.querySelector("ForeName")?.textContent || ""
-        const affiliation =
-            authorElement.querySelector("Affiliation")?.textContent || ""
+    // try YYYY Mon or YYYY Mon-Mon or seasons
+    const ym = t.match(/^\s*(\d{4})\s+([A-Za-z][A-Za-z\-]+)/);
+    if (ym) {
+        const mm = normMonth(ym[2]);
+        if (mm) return { iso: `${y}-${mm}-01`, pretty: `${ym[2]} ${y}` };
+        // season or unparseable month → fallback to Jan 1
+        return { iso: `${y}-01-01`, pretty: y };
+    }
 
-        return {
-            name: `${foreName} ${lastName}`.trim(),
-            affiliation: affiliation
-        }
-    })
+    // bare year
+    return { iso: `${y}-01-01`, pretty: y };
+}
 
-    // Use standard DOM query methods to find the PubMedPubDate element with PubStatus="accepted"
-    const pubDateElement = dom.window.document.querySelector(
-        'PubMedPubDate[PubStatus="accepted"]'
-    )
-
-    // Extract the Year, Month, and Day elements
-    const year = pubDateElement?.querySelector("Year")?.textContent || ""
-    const month = pubDateElement?.querySelector("Month")?.textContent || ""
-    const day = pubDateElement?.querySelector("Day")?.textContent || ""
-
-    // Convert the month number to the month name
+function fmtPretty(y?: string|null, m?: string|null, d?: string|null): string {
     const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-    ]
-    const monthIndex = parseInt(month, 10) - 1 // Adjust month number to index (0-11)
-    const monthName = monthNames[monthIndex]
+        "January","February","March","April","May","June","July",
+        "August","September","October","November","December"
+    ];
+    const mm = normMonth(m ?? undefined);
+    if (!y) return "";
+    if (!mm) return y;
+    const name = monthNames[parseInt(mm,10)-1];
+    if (d && /^\d+$/.test(d)) return `${name} ${parseInt(d,10)}, ${y}`;
+    return `${name} ${y}`;
+}
 
-    // Format the date (If month is undefined, return empty string as date)
-    const formattedDate = monthName ? `${monthName} ${day}, ${year}` : ""
-    const date = `${year}/${month}/${day}`
+function toISO(y?: string|null, m?: string|null, d?: string|null): string | null {
+    if (!y) return null;
+    const mm = normMonth(m ?? undefined) ?? "01";
+    const dd = d && /^\d+$/.test(d) ? String(parseInt(d,10)).padStart(2, "0") : "01";
+    return `${y}-${mm}-${dd}`; // ISO
+}
+
+
+function extractArticleData(xml: string): ArticleData & { publishedDateISO: string | null } {
+    const dom = new JSDOM(xml, { contentType: "application/xml" });
+    const doc = dom.window.document;
+
+    const pmid = doc.querySelector("PMID")?.textContent ?? "";
+    const abstractTexts = Array.from(doc.querySelectorAll("AbstractText")).map(e => e.textContent ?? "");
+    const articleTitle = Array.from(doc.querySelectorAll("ArticleTitle")).map(e => e.textContent ?? "");
+    const keywords = Array.from(doc.querySelectorAll("Keyword")).map(e => e.textContent ?? "");
+
+    const authors = Array.from(doc.querySelectorAll("Author")).map(a => ({
+        name: `${a.querySelector("ForeName")?.textContent ?? ""} ${a.querySelector("LastName")?.textContent ?? ""}`.trim(),
+        affiliation: a.querySelector("Affiliation")?.textContent ?? "",
+    }));
+
+    // Candidate date nodes in priority order
+    const candidates: Element[] = [];
+    const adE = doc.querySelector('ArticleDate[DateType="Electronic"]');
+    const adP = doc.querySelector('ArticleDate[DateType="Print"]');
+    const pubDate = doc.querySelector("JournalIssue > PubDate"); // may have Year/Month/Day or MedlineDate
+    const pmPubmed = doc.querySelector('PubMedPubDate[PubStatus="pubmed"]');
+    const pmEntrez = doc.querySelector('PubMedPubDate[PubStatus="entrez"]');
+    const pmAccepted = doc.querySelector('PubMedPubDate[PubStatus="accepted"]');
+
+    [adE, adP, pubDate, pmPubmed, pmEntrez, pmAccepted].forEach(n => n && candidates.push(n));
+
+    let iso: string | null = null;
+    let pretty = "";
+
+    for (const node of candidates) {
+        const y = node.querySelector("Year")?.textContent ?? null;
+        const m = node.querySelector("Month")?.textContent ?? null;
+        const d = node.querySelector("Day")?.textContent ?? null;
+
+        if (node.tagName === "PubDate" && !y) {
+            const medline = node.querySelector("MedlineDate")?.textContent ?? "";
+            if (medline) {
+                const parsed = parseMedlineDate(medline);
+                iso = parsed.iso ?? null;
+                pretty = parsed.pretty ?? "";
+                if (iso) break;
+            }
+        }
+
+        const maybeISO = toISO(y, m, d);
+        if (maybeISO) {
+            iso = maybeISO;
+            pretty = fmtPretty(y, m, d);
+            break;
+        }
+    }
+
+    // As a last resort, leave iso = null and pretty = "".
 
     return {
-        pmid: pmid,
+        pmid,
         title: articleTitle.join(""),
-        authors: authors,
+        authors,
         abstract: abstractTexts.join("\n"),
-        formattedPublishedDate: formattedDate,
-        publishedDate: date,
-        keywords: keywords
-    }
+        formattedPublishedDate: pretty,
+        publishedDate: iso ?? "",
+        keywords,
+        publishedDateISO: iso ?? null,
+    };
 }
 
 export const getPubMedSearchResultIds = async (
