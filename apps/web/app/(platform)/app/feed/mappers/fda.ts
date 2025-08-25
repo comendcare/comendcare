@@ -18,6 +18,19 @@ type FdaFeedType =
     | "FDA_WHATS_NEW_VBB"
     | "FDA_PRESS_RELEASE";
 
+// Canonical shape (narrow, compatible with your CanonicalFeed)
+type CanonicalBase = {
+    type: FdaFeedType;
+    source: "THIRD_PARTY";
+    title: string;
+    content?: Record<string, any>;
+    externalUrl?: string;
+    orgId?: string;
+    userId?: string;
+    occurredAt: Date;
+    idempotencyKey: string;
+};
+
 // --- minimal helpers for RD + org targeting ---------------------------------
 
 let RD_TERMS: string[] | null = null;
@@ -32,12 +45,10 @@ const hit = (text: string, term: string) => new RegExp(`\\b${esc(term.toLowerCas
 async function loadRareDiseaseTerms() {
     if (RD_TERMS) return RD_TERMS;
     const rows = await prisma.condition.findMany({
-        select: { name: true, synonyms: true, orphanet: true, prevalenceRatio: true },
+        select: { name: true, synonyms: true },
     });
     const set = new Set<string>();
     for (const r of rows) {
-        const isRare = r.orphanet != null || (typeof r.prevalenceRatio === "number" && r.prevalenceRatio < 0.0005);
-        if (!isRare) continue;
         if (r.name) set.add(r.name);
         for (const s of r.synonyms ?? []) if (s) set.add(s);
     }
@@ -91,7 +102,7 @@ function makeFdaRssMapper(provider: string, type: FdaFeedType) {
 
         // 2) org targeting
         const cfgs = await loadOrgCfgs();
-        const orgItems = [];
+        const orgItems: (CanonicalBase & { orgId: string })[] = [];
         for (const cfg of cfgs) {
             const matched =
                 cfg.conditions.some((t) => hit(text, t)) ||
@@ -123,7 +134,7 @@ function makeFdaRssMapper(provider: string, type: FdaFeedType) {
 
         // 3) global RD item (shown to all feeds)
         const globalIdem = crypto.createHash("sha256").update(`fda:${type}:${idKey}:global`).digest("hex");
-        const globalItem = {
+        const globalItem: CanonicalBase = {
             type,
             source: "THIRD_PARTY",
             title: item.title!,

@@ -4,11 +4,12 @@ import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
 import { buildPubmedQuery, type OrgQueryConfig } from "~web/lib/pubmed-query";
 import { getPubMedSearchResultIds, getPubMedSearchResultData } from "@comend/lib/pubmed";
+import { PrismaClient } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs"; // ensure Node runtime
 
-async function getOrgConfigsFromDB(prisma: PrismaClient): Promise<OrgQueryConfig[]> {
+async function getOrgConfigsFromDB(): Promise<OrgQueryConfig[]> {
     const orgs = await prisma.organization.findMany({
         where: { published: true }, // or verified, etc.
         include: {
@@ -55,7 +56,7 @@ export async function POST() {
     const eventType = "pubmed_article";
     const results: Record<string, any> = {};
 
-    const cfgs = await getOrgConfigsFromDB(prisma);
+    const cfgs = await getOrgConfigsFromDB();
 
     for (const cfg of cfgs) {
         if (!cfg.keywords?.length && !cfg.mustInTitle?.length) continue;
