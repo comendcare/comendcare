@@ -29,6 +29,7 @@ import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
 import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import type { Option } from "@comend/lib/types";
+import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -68,6 +69,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             totalResults: state.totalResults,
         }))
     );
+    const {setFilters: setBiosampleFitlers} = useBiosampleSearchStore(useShallow((state: BiosampleSearchState) => ({setFilters: state.setFilters})))
 
     const [query, setQuery] = useState(searchTerm);
 

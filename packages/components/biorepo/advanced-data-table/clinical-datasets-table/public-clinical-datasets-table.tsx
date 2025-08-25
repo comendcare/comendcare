@@ -52,7 +52,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, searchParams, s
                       <p className="text-lg text-stone-500">
                           A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                       </p>
-                      <NewToolDialog numAssetsPinned={0} type={"data"}/>
+                      <NewToolDialog type={"data"}/>
                   </div>
               </div>
             )
