@@ -9,6 +9,11 @@ import { PrismaClient } from "@prisma/client";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs"; // ensure Node runtime
 
+const clean = (s?: string | null) =>
+    (s ?? "").replace(/"/g, "'").replace(/\s+/g, " ").trim();
+
+const uniq = <T,>(xs: T[]) => Array.from(new Set(xs));
+
 async function getOrgConfigsFromDB(): Promise<OrgQueryConfig[]> {
     const orgs = await prisma.organization.findMany({
         where: { published: true }, // or verified, etc.
@@ -22,30 +27,19 @@ async function getOrgConfigsFromDB(): Promise<OrgQueryConfig[]> {
     });
 
     return orgs.map((o) => {
-        const condTerms = o.conditions.flatMap(c => [
-            c.condition?.name,
-            ...(c.condition?.synonyms ?? []),
-        ]).filter(Boolean) as string[];
+        const condTerms = o.conditions
+            .flatMap(c => [c.condition?.name, ...(c.condition?.synonyms ?? [])])
+            .map(clean).filter(Boolean);
 
-        const geneTerms = o.tools.flatMap(t => [
-            t.gene?.symbol,
-            ...(t.gene?.aliasSymbols ?? []),
-        ]).filter(Boolean) as string[];
+        const geneTerms = o.tools
+            .flatMap(t => [t.gene?.symbol, ...(t.gene?.aliasSymbols ?? [])])
+            .map(clean).filter(Boolean);
 
-        const therapeuticTerms = o.therapeuticsOfInterest ?? [];
-        const milestoneHints = o.milestones.map(m => m.title).filter(Boolean);
+        const therapeuticTerms = (o.therapeuticsOfInterest ?? []).map(clean).filter(Boolean);
 
-        // Heuristic: prioritize genes + conditions
-        const keywords = Array.from(new Set([
-            ...geneTerms,
-            ...condTerms,
-            ...therapeuticTerms,
-        ])).slice(0, 40); // To keep short
-
-        // Example policy: require at least one canonical identifier in title
-        const mustInTitle = Array.from(new Set(
-            geneTerms.slice(0, 10) // keep short; PubMed queries can explode
-        )).slice(0, 10);
+// Heuristic: prioritize genes + conditions; cap sizes
+        const keywords = uniq([...geneTerms, ...condTerms, ...therapeuticTerms]).slice(0, 40);
+        const mustInTitle = uniq(geneTerms).slice(0, 10);
 
         return { orgId: o.id, keywords, mustInTitle };
     }).filter(cfg => cfg.keywords.length > 0);
@@ -73,18 +67,30 @@ export async function POST() {
             // format as YYYY/MM/DD (PubMed format)
             const fmt = (d: Date) => d.toISOString().split("T")[0].replace(/-/g, "/");
 
-            // Ask PubMed for IDs published between yesterday and today, max 10
-            const ids = await getPubMedSearchResultIds(
-                `${query} AND ("${fmt(yesterday)}"[dp] : "${fmt(today)}"[dp])`,
-                0,
-                10
-            );
+            // Build the raw term and a safe, URL-encoded version
+            const rawTerm = `${query} AND ("${fmt(yesterday)}"[dp] : "${fmt(today)}"[dp])`;
+            const encodedTerm = encodeURIComponent(rawTerm);
+
+            let ids: number[] = [];
+            try {
+                ids = await getPubMedSearchResultIds(encodedTerm, 0, 3); // bump to 20 if you like
+            } catch (e) {
+                orgStats.errors++;
+                console.error("esearch error", { orgId: cfg.orgId, e, rawTerm });
+                continue; // skip this org this run
+            }
 
             orgStats.found = ids.length;
             if (ids.length === 0) continue;
 
-            const articles = await getPubMedSearchResultData(ids);
-
+            let articles: any[] = [];
+            try {
+                articles = await getPubMedSearchResultData(ids);
+            } catch (e) {
+                orgStats.errors++;
+                console.error("efetch error", { orgId: cfg.orgId, e, idsSample: ids.slice(0,5) });
+                continue; // skip to next org
+            }
             for (const article of articles) {
                 try {
                     if (!article?.pmid || !article?.title) continue;

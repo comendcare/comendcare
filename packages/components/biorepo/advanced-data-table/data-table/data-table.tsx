@@ -29,13 +29,19 @@ export function DataTable<TData>({
   ...props
 }: DataTableProps<TData>) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [overlayStyle, setOverlayStyle] = useState({ width: 0 });
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [overlayStyle, setOverlayStyle] = useState({ width: 0, paddingTop: 0});
 
   useEffect(() => {
     const updateOverlay = () => {
-      if (scrollContainerRef.current) {
+      if (scrollContainerRef.current && headerRef.current) {
         const widthRect = scrollContainerRef.current.getBoundingClientRect();
-        setOverlayStyle({width: widthRect.width});
+        const paddingRect = headerRef.current.getBoundingClientRect();
+
+        setOverlayStyle({
+          width: widthRect.width, 
+          paddingTop: paddingRect.height,
+        });
       }
     };
 
@@ -50,9 +56,9 @@ export function DataTable<TData>({
       {...props}
     >
       {children}
-      <div className="overflow-hidden rounded-md border" ref={scrollContainerRef}>
+      <div className="relative overflow-hidden rounded-md border" ref={scrollContainerRef}>
         <Table>
-          <TableHeader>
+          <TableHeader ref={headerRef as React.LegacyRef<HTMLTableSectionElement>}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -75,28 +81,6 @@ export function DataTable<TData>({
             ))}
           </TableHeader>
           <TableBody>
-            {/* no results overlay */}
-            <div
-              className="fixed flex justify-center items-center"
-              style={{width: overlayStyle.width}}
-            >
-              {noResults
-                ? (
-                  <div>{noResults}</div>
-                )
-                : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={table.getAllColumns().length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )
-              }
-            </div>
-
             {/* content */}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -144,6 +128,22 @@ export function DataTable<TData>({
             )}
           </TableBody>
         </Table>
+        {/* no results overlay */}
+        {!table.getRowModel().rows?.length && (
+          <div
+            className="absolute left-0 top-0 h-[calc(100%-16px)] flex justify-center items-center"
+            style={{width: overlayStyle.width, paddingTop: overlayStyle.paddingTop}}
+          >
+            {noResults
+              ? (
+                <div className="h-full flex flex-col justify-center">{noResults}</div>
+              )
+              : (
+                <div className="h-full flex flex-col justify-center">No results.</div>
+              )
+            }
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-2.5">
         <DataTablePagination table={table} />

@@ -1,16 +1,44 @@
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
-import { buildCtgovParams, type CtgovOrgQueryConfig } from "~web/lib/ctgov-query";
-import { fetchCtgovPage, shapeForMapper } from "~web/lib/ctgov";
+import {buildCtgovParams, type CtgovOrgQueryConfig} from "~web/lib/ctgov-query";
+import {CtgovStudy, fetchCtgovPage, shapeForMapper} from "~web/lib/ctgov";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+
+function chunk<T>(arr: T[], size: number): T[][] {
+    if (size <= 0) return [arr.slice()];
+    const out: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+    return out;
+}
+
+async function fetchAllPages(
+    baseParams: URLSearchParams,
+    handleStudies: (studies: CtgovStudy[]) => Promise<void>
+) {
+    let pageToken: string | undefined;
+    do {
+        const p = new URLSearchParams(baseParams);
+        if (pageToken) p.set("pageToken", pageToken);
+        const page = await fetchCtgovPage(p);
+        const studies = page.studies ?? [];
+        await handleStudies(studies);
+        pageToken = page.nextPageToken;
+    } while (pageToken);
+}
+
+function isTooComplicatedError(e: unknown) {
+    const msg = String(e || "");
+    return msg.includes("400") && /Too complicated query/i.test(msg);
+}
+
 // Build CT.gov query configs for ALL published orgs from your DB
 async function getOrgConfigsFromDB(): Promise<CtgovOrgQueryConfig[]> {
     const orgs = await prisma.organization.findMany({
-        where: { published: true },
+        where: {published: true},
         select: {
             id: true,
             therapeuticsOfInterest: true,
@@ -18,22 +46,22 @@ async function getOrgConfigsFromDB(): Promise<CtgovOrgQueryConfig[]> {
             conditions: {
                 include: {
                     condition: {
-                        select: { name: true, synonyms: true },
+                        select: {name: true, synonyms: true},
                     },
                 },
             },
             // org ↔ tools (for genes)
             tools: {
                 include: {
-                    gene: { select: { symbol: true, aliasSymbols: true } },
+                    gene: {select: {symbol: true, aliasSymbols: true}},
                 },
             },
             // optional: milestone titles as loose hints
-            milestones: { select: { title: true } },
+            milestones: {select: {title: true}},
         },
     });
 
-    const uniq = <T,>(xs: T[]) => Array.from(new Set(xs));
+    const uniq = <T, >(xs: T[]) => Array.from(new Set(xs));
     const nonempty = (s: string | null | undefined): s is string => !!s && s.trim().length > 0;
 
     return orgs
@@ -85,7 +113,7 @@ export async function POST() {
     const cfgs = await getOrgConfigsFromDB();
 
     for (const cfg of cfgs) {
-        const stats = (results[cfg.orgId] = { found: 0, enqueued: 0, errors: 0 });
+        const stats = (results[cfg.orgId] = {found: 0, enqueued: 0, errors: 0});
 
         // Compute window per org
         const to = new Date();
@@ -97,26 +125,9 @@ export async function POST() {
         const toISO = formatISODate(to);
 
         try {
-            let params = buildCtgovParams(cfg, fromISO, toISO);
+            const seen = new Set<string>(); // in‑memory guard to reduce duplicate work within this run
 
-            // Hard clamp by date window
-            params.set(
-                "postFilter.advanced",
-                `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`
-            );
-
-            // Optional status filter
-            if (cfg.overallStatuses?.length) {
-                params.set("postFilter.overallStatus", cfg.overallStatuses.join(","));
-            }
-
-            let pageToken: string | undefined;
-            do {
-                const p = new URLSearchParams(params);
-                if (pageToken) p.set("pageToken", pageToken);
-
-                const page = await fetchCtgovPage(p);
-                const studies = page.studies ?? [];
+            const enqueueStudies = async (studies: CtgovStudy[]) => {
                 stats.found += studies.length;
 
                 for (const s of studies) {
@@ -124,20 +135,23 @@ export async function POST() {
                         const shaped = shapeForMapper(s);
                         if (!shaped.NCTId || !shaped.BriefTitle) continue;
 
-                        // IMPORTANT for multi‑org: include orgId in the dedupe key
-                        const dedupeKey = crypto
-                            .createHash("sha256")
-                            .update(`${provider}:${eventType}:${cfg.orgId}:${shaped.NCTId}`)
-                            .digest("hex");
+                        // avoid double work within this handler (prisma upsert also dedupes)
+                        const localKey = `${cfg.orgId}:${shaped.NCTId}`;
+                        if (seen.has(localKey)) continue;
+                        seen.add(localKey);
 
                         const posted =
                             s.protocolSection?.statusModule?.studyFirstPostDateStruct?.date ??
                             s.protocolSection?.statusModule?.lastUpdatePostDateStruct?.date;
-
                         const occurredAt = posted ? new Date(posted) : new Date();
 
+                        const dedupeKey = crypto
+                            .createHash("sha256")
+                            .update(`ctgov:ctg_trial_posted:${cfg.orgId}:${shaped.NCTId}`)
+                            .digest("hex");
+
                         await prisma.rawIngestEvent.upsert({
-                            where: { dedupeKey },
+                            where: {dedupeKey},
                             update: {
                                 payload: {
                                     NCTId: shaped.NCTId,
@@ -170,19 +184,82 @@ export async function POST() {
                         stats.enqueued++;
                     } catch (e) {
                         stats.errors++;
-                        console.error("ctgov enqueue error", { orgId: cfg.orgId, e });
+                        console.error("ctgov enqueue error", {orgId: cfg.orgId, e});
                     }
                 }
+            };
 
-                pageToken = page.nextPageToken;
-            } while (pageToken);
+            try {
+                // 1) Try the full query first (as you had it)
+                let params = buildCtgovParams(cfg, fromISO, toISO);
+                params.set(
+                    "postFilter.advanced",
+                    `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`
+                );
+                if (cfg.overallStatuses?.length) {
+                    params.set("postFilter.overallStatus", cfg.overallStatuses.join(","));
+                }
+
+                await fetchAllPages(params, enqueueStudies);
+            } catch (e) {
+                if (!isTooComplicatedError(e)) {
+                    stats.errors++;
+                    console.error("ctgov org ingest error", {orgId: cfg.orgId, e});
+                } else {
+                    // 2) Fallback: split into simpler batches to avoid "Too complicated query"
+                    console.warn("ctgov query too complex; falling back to chunked queries", {
+                        orgId: cfg.orgId,
+                    });
+
+                    const titles = cfg.titles ?? [];
+                    const terms = cfg.terms ?? [];
+                    const conditions = cfg.conditions ?? [];
+
+                    // tune these knobs if needed
+                    const TITLE_CHUNK = 5;
+                    const TERM_CHUNK = 8;
+                    const COND_CHUNK = 8;
+
+                    // helper to run a reduced query
+                    const runChunked = async (partial: Partial<CtgovOrgQueryConfig>) => {
+                        const reducedCfg: CtgovOrgQueryConfig = {
+                            ...cfg,
+                            titles: partial.titles ?? [],
+                            terms: partial.terms ?? [],
+                            conditions: partial.conditions ?? [],
+                        };
+                        let p = buildCtgovParams(reducedCfg, fromISO, toISO);
+                        p.set(
+                            "postFilter.advanced",
+                            `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`
+                        );
+                        if (cfg.overallStatuses?.length) {
+                            p.set("postFilter.overallStatus", cfg.overallStatuses.join(","));
+                        }
+                        await fetchAllPages(p, enqueueStudies);
+                    };
+
+                    // A) titles‑only batches
+                    for (const chunkArr of chunk(titles, TITLE_CHUNK)) {
+                        await runChunked({titles: chunkArr, terms: [], conditions: []});
+                    }
+                    // B) terms‑only batches
+                    for (const chunkArr of chunk(terms, TERM_CHUNK)) {
+                        await runChunked({titles: [], terms: chunkArr, conditions: []});
+                    }
+                    // C) conditions‑only batches
+                    for (const chunkArr of chunk(conditions, COND_CHUNK)) {
+                        await runChunked({titles: [], terms: [], conditions: chunkArr});
+                    }
+                }
+            }
         } catch (e) {
             stats.errors++;
-            console.error("ctgov org ingest error", { orgId: cfg.orgId, e });
+            console.error("ctgov org ingest error", {orgId: cfg.orgId, e});
         }
     }
 
-    return NextResponse.json({ provider: "ctgov", results });
+    return NextResponse.json({provider: "ctgov", results});
 }
 
 export async function GET() {
