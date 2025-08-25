@@ -27,11 +27,11 @@ const selector = (state: OrganizationSearchState) => ({
 })
 
 const filtersFormSchema = z.object({
+    genes: z.array(optionSchema),
+    conditions: z.array(optionSchema),
     mechanisms: z.array(optionSchema),
     systems: z.array(optionSchema),
     modalities: z.array(optionSchema),
-    // moneyDeployed: z.array(z.number()),
-    // genes: z.array(optionSchema)
 })
 
 export function PAGFilters() {
