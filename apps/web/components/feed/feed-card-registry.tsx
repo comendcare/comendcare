@@ -2,8 +2,6 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import type { FeedItemDTO, FeedItemType } from "@comend/lib/types";
-
-// Existing cards
 import RFPCreatedCard from "~web/components/feed/rfp-created-feed-card";
 import ResearchPlanCreatedCard from "~web/components/feed/research-plan-created-feed-card";
 import ToolCreatedCard from "~web/components/feed/tool-created-feed-card";
@@ -12,8 +10,6 @@ import PAGProfileUpdatedCard from "~web/components/feed/pag-profile-updated-feed
 import ResearchPlanUpdatedCard from "~web/components/feed/research-plan-updated-feed-card";
 import PubMedFeedCard from "~web/components/feed/pubmed-feed-card";
 import CtgovFeedCard from "~web/components/feed/ctgov-feed-card";
-
-// NEW cards
 import ToolUpdatedCard from "~web/components/feed/tool-updated-feed-card";
 import ProjectCreatedCard from "~web/components/feed/project-created-feed-card";
 import ProjectUpdatedCard from "~web/components/feed/project-updated-feed-card";
@@ -23,6 +19,7 @@ import ToolRequestCreatedCard from "~web/components/feed/tool-request-created-fe
 import ToolRequestCommentCard from "~web/components/feed/tool-request-comment-created-feed-card";
 import ToolRequestApprovedCard from "~web/components/feed/tool-request-approved-feed-card";
 import ServiceProviderCreatedCard from "~web/components/feed/service-provider-created-feed-card";
+import AnalyticsGoalReachedCard from "~web/components/feed/analaytics-goal-reached-feed-card";
 
 // Lazy-load rare/heavier cards
 const FDAFeedCard = dynamic(
@@ -41,8 +38,6 @@ const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = 
     PAG_PROFILE_CREATED: PAGProfileCreatedCard as React.ComponentType<CardProps>,
     ORG_UPDATED: PAGProfileUpdatedCard as React.ComponentType<CardProps>,
     ORG_RESEARCH_PLAN_UPDATED: ResearchPlanUpdatedCard as React.ComponentType<CardProps>,
-
-    // NEW mappings
     ORG_UPDATED_TOOL: ToolUpdatedCard as React.ComponentType<CardProps>,
     ORG_CREATED_PROJECT: ProjectCreatedCard as React.ComponentType<CardProps>,
     ORG_UPDATED_PROJECT: ProjectUpdatedCard as React.ComponentType<CardProps>,
@@ -52,6 +47,7 @@ const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = 
     TOOL_REQUEST_COMMENT_CREATED: ToolRequestCommentCard as React.ComponentType<CardProps>,
     TOOL_REQUEST_APPROVED: ToolRequestApprovedCard as React.ComponentType<CardProps>,
     SERVICE_PROVIDER_CREATED: ServiceProviderCreatedCard as React.ComponentType<CardProps>,
+    ANALYTICS_GOAL_REACHED: AnalyticsGoalReachedCard as React.ComponentType<CardProps>,
 
     // FDA (all four types go to the same flexible card)
     FDA_MEDWATCH_ALERT: FDAFeedCard as React.ComponentType<CardProps>,

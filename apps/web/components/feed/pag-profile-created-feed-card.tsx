@@ -24,6 +24,7 @@ interface PagProfileCreatedContent {
     organization?: {
         id?: string;
         name?: string;
+        image?: string;
     };
 }
 
@@ -45,31 +46,42 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
 
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName =
-        data.content.pagOrganizationName ?? data.content.organization?.name;
+        data.content.pagOrganizationName ?? data.content.organization?.name ?? "Organization";
     const orgId =
         data.content.organization?.id ??
         data.content.pagOrganizationId ??
         data.orgId;
+    const orgImage = data.content.organization?.image;
 
-    const displayTitle =
-        data.title ||
-        (orgName ? `PAG profile created: ${orgName}` : "PAG profile created");
+    // Display title is now the action title inside CardContent.
+    const actionTitle = "PAG Profile Created";
 
     return (
         <MotionConfig transition={{ duration: 0.3 }}>
             <Card className="rounded-sm w-full">
+                {/* Header now focuses on the SUBJECT: the Organization */}
                 <CardHeader className="space-y-1 md:space-y-1.5 p-4">
-                    <div className="flex justify-between items-center">
-                        <div className="flex gap-2 items-center">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            {/* Organization avatar */}
                             <ProfilePhoto
-                                img={undefined}
-                                name={actorName}
+                                img={orgImage}
+                                name={orgName}
                                 className="h-8 w-8 rounded-full"
                             />
+
+                            {/* Organization name to the right of the image */}
                             <div className="flex flex-col">
-                <span className="font-medium md:text-base">
-                  PAG Profile Created
-                </span>
+                                {orgId ? (
+                                    <Link
+                                        href={`/org/${orgId}`}
+                                        className="font-medium md:text-base underline-offset-2 hover:underline"
+                                    >
+                                        {orgName}
+                                    </Link>
+                                ) : (
+                                    <span className="font-medium md:text-base">{orgName}</span>
+                                )}
                                 <span className="font-light text-muted-foreground text-[0.6rem] md:text-xs leading-3">
                   {createdAt}
                                     {actorName && (
@@ -77,33 +89,22 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
                       • by <span className="font-normal">{actorName}</span>
                     </span>
                                     )}
-                                    {orgName && (
-                                        <>
-                                            {" "}
-                                            •{" "}
-                                            {orgId ? (
-                                                <Link
-                                                    href={`/org/${orgId}`}
-                                                    className="underline-offset-2 hover:underline"
-                                                >
-                                                    {orgName}
-                                                </Link>
-                                            ) : (
-                                                <span className="font-normal">{orgName}</span>
-                                            )}
-                                        </>
-                                    )}
                 </span>
                             </div>
                         </div>
                     </div>
                 </CardHeader>
 
+                {/* Card body becomes the notification feed-style content */}
                 <CardContent className="p-4 pt-0">
                     <div className="flex items-center gap-2 text-sm md:text-base font-semibold">
                         <Building2 className="h-4 w-4" />
-                        <span>{displayTitle}</span>
+                        <span>{actionTitle}</span>
                     </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {actorName} created a PAG profile for {orgName}. You can review the
+                        profile details, add team members, and configure integrations.
+                    </p>
                 </CardContent>
 
                 <CardFooter className="flex justify-end p-4 pt-0">
