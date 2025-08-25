@@ -21,8 +21,8 @@ interface OrgProfileViewsMilestoneContent {
     organization?: {
         id?: string;
         name?: string;
+        image?: string;           // <-- org avatar
     };
-    // (no actor for analytics, but keep shape flexible)
     actor?: {
         userId?: string;
         name?: string;
@@ -39,18 +39,15 @@ interface OrgProfileViewsMilestoneProps {
     };
 }
 
-export default function AnalyticsGoalReachedCard({
-                                                         data,
-                                                     }: OrgProfileViewsMilestoneProps) {
+export default function AnalyticsGoalReachedCard({ data }: OrgProfileViewsMilestoneProps) {
     const createdAt = React.useMemo(
         () => formatDates(data.createdAt as Date),
         [data.createdAt]
     );
 
-    const orgName =
-        data.content.organization?.name ?? undefined;
-    const orgId =
-        data.content.organization?.id ?? data.orgId ?? undefined;
+    const orgName = data.content.organization?.name ?? "Organization";
+    const orgId = data.content.organization?.id ?? data.orgId;
+    const orgImage = data.content.organization?.image;
 
     const milestone = Number(data.content.milestone || 0);
     const totalViews = Number(data.content.totalViews || 0);
@@ -65,43 +62,39 @@ export default function AnalyticsGoalReachedCard({
         [totalViews]
     );
 
-    const displayTitle =
-        data.title || `🎉 ${niceMilestone} public profile views!`;
-
+    // Action lives in the body; header focuses on org.
+    const actionTitle = "Profile Views Milestone Reached";
     const actorName = data.content.actor?.name ?? "Analytics";
 
     return (
-        <MotionConfig transition={{duration: 0.3}}>
+        <MotionConfig transition={{ duration: 0.3 }}>
             <Card className="rounded-sm w-full">
+                {/* Header: Organization as subject (image + name), with actor + timestamp meta */}
                 <CardHeader className="space-y-1 md:space-y-1.5 p-4">
-                    <div className="flex justify-between items-center">
-                        <div className="flex gap-2 items-center">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
                             <ProfilePhoto
-                                img={undefined}
-                                name={actorName}
+                                img={orgImage}
+                                name={orgName}
                                 className="h-8 w-8 rounded-full"
                             />
                             <div className="flex flex-col">
-                <span className="font-medium md:text-base">
-                  Profile Views Milestone
-                </span>
+                                {orgId ? (
+                                    <Link
+                                        href={`/org/${orgId}`}
+                                        className="font-medium md:text-base underline-offset-2 hover:underline"
+                                    >
+                                        {orgName}
+                                    </Link>
+                                ) : (
+                                    <span className="font-medium md:text-base">{orgName}</span>
+                                )}
                                 <span className="font-light text-muted-foreground text-[0.6rem] md:text-xs leading-3">
                   {createdAt}
-                                    {orgName && (
-                                        <>
-                                            {" "}
-                                            •{" "}
-                                            {orgId ? (
-                                                <Link
-                                                    href={`/org/${orgId}`}
-                                                    className="underline-offset-2 hover:underline"
-                                                >
-                                                    {orgName}
-                                                </Link>
-                                            ) : (
-                                                <span className="font-normal">{orgName}</span>
-                                            )}
-                                        </>
+                                    {actorName && (
+                                        <span className="ml-1">
+                      • by <span className="font-normal">{actorName}</span>
+                    </span>
                                     )}
                                     {host && (
                                         <>
@@ -114,7 +107,7 @@ export default function AnalyticsGoalReachedCard({
                                                 className="inline-flex items-center gap-1 underline-offset-2 hover:underline"
                                                 title={`Open ${host}`}
                                             >
-                                                <Globe className="h-3 w-3"/>
+                                                <Globe className="h-3 w-3" />
                                                 <span>{host}</span>
                                             </a>
                                         </>
@@ -125,21 +118,26 @@ export default function AnalyticsGoalReachedCard({
                     </div>
                 </CardHeader>
 
+                {/* Body: Action title + feed-style description + stats */}
                 <CardContent className="p-4 pt-0">
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2 text-sm md:text-base font-semibold">
-                            <Trophy className="h-4 md:h-5 w-4 md:w-5"/>
-                            <span>{displayTitle}</span>
+                            <Trophy className="h-4 md:h-5 w-4 md:w-5" />
+                            <span>{actionTitle}</span>
                         </div>
+
+                        <p className="text-sm text-muted-foreground">
+                            {actorName} reported that <span className="font-medium">{orgName}</span> crossed{" "}
+                            <span className="font-medium">{niceMilestone}</span> public profile views. Keep the
+                            momentum going by sharing your profile or adding more content.
+                        </p>
 
                         <div className="flex items-center gap-3 text-muted-foreground">
                             <div className="inline-flex items-center gap-1.5 text-sm md:text-base">
-                                <Eye className="h-4 w-4"/>
+                                <Eye className="h-4 w-4" />
                                 <span>
                   Total views:{" "}
-                                    <span className="font-medium text-foreground">
-                    {niceTotal}
-                  </span>
+                                    <span className="font-medium text-foreground">{niceTotal}</span>
                 </span>
                             </div>
                         </div>
@@ -155,16 +153,12 @@ export default function AnalyticsGoalReachedCard({
                             title="Open public profile"
                         >
                             <Button size="sm" variant="ghost" className="flex gap-1 items-center">
-                                <ExternalLink className="h-4 w-4"/>
+                                <ExternalLink className="h-4 w-4" />
                                 Open Site
                             </Button>
                         </a>
                     )}
-                    <Link
-                        href={orgId ? `/org/${orgId}` : "#"}
-                        aria-disabled={!orgId}
-                        passHref
-                    >
+                    <Link href={orgId ? `/org/${orgId}` : "#"} aria-disabled={!orgId} passHref>
                         <Button
                             size="sm"
                             variant="outline"
@@ -172,12 +166,12 @@ export default function AnalyticsGoalReachedCard({
                             disabled={!orgId}
                             title={orgId ? "View Profile" : "No profile link available"}
                         >
-                            <Eye className="h-4 w-4"/>
+                            <Eye className="h-4 w-4" />
                             View Profile
                         </Button>
                     </Link>
                 </CardFooter>
             </Card>
         </MotionConfig>
-    )
+    );
 }

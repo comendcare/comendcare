@@ -22,6 +22,8 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
     const {
         rfpId,
         orgId,
+        orgName,
+        orgImage,
         title,
         deadline,
         userId,
@@ -29,6 +31,8 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
     } = payload as {
         rfpId: string;
         orgId?: string;
+        orgName?: string;
+        orgImage?: string;
         title: string;
         deadline?: string;
         userId?: string;
@@ -49,7 +53,7 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
             title,
             deadline,
             actor: { userId, name: userName },
-            organization: { id: orgId },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -111,6 +115,8 @@ register("app", "rfp_closed", async ({ payload, occurredAt }) => {
     const {
         rfpId,
         orgId,
+        orgName,
+        orgImage,
         title,
         deadline, // RFP.endDate, if available
         userId,
@@ -118,6 +124,8 @@ register("app", "rfp_closed", async ({ payload, occurredAt }) => {
     } = payload as {
         rfpId: string;
         orgId?: string;
+        orgName?: string;
+        orgImage?: string;
         title: string;
         deadline?: string;
         userId?: string;
@@ -139,7 +147,7 @@ register("app", "rfp_closed", async ({ payload, occurredAt }) => {
             deadline,
             closedAt: occurredAt,
             actor: { userId, name: userName },
-            organization: { id: orgId },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -195,6 +203,7 @@ register("app", "org_research_plan_created", async ({ payload, occurredAt }) => 
     const {
         orgId,
         orgName,
+        orgImage,
         roadmapId, // Roadmap.id
         title, // Roadmap.title
         userId,
@@ -203,6 +212,7 @@ register("app", "org_research_plan_created", async ({ payload, occurredAt }) => 
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         roadmapId: string;
         title?: string;
         userId?: string;
@@ -224,7 +234,7 @@ register("app", "org_research_plan_created", async ({ payload, occurredAt }) => 
             title,
             published,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -290,12 +300,14 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgImage,
         projects, // array of { projectId, title, ... }
         userId,
         userName,
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         projects: Array<{
             projectId: string;
             title?: string;
@@ -326,7 +338,7 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
         content: {
             projects,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -343,12 +355,14 @@ register("app", "org_updated_project", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgImage,
         projects, // array of project snapshots (see emitter above)
         userId,
         userName,
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         projects: Array<{
             projectId: string;
             title?: string | null;
@@ -385,7 +399,7 @@ register("app", "org_updated_project", async ({ payload, occurredAt }) => {
         content: {
             projects,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -400,6 +414,7 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgImage,
         toolId, // Tool.id
         title,  // Tool.title
         userId,
@@ -411,6 +426,7 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId?: string;
         orgName?: string;
+        orgImage?: string;
         toolId: string;
         title?: string;
         userId?: string;
@@ -438,7 +454,7 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
             institutionId,
             types,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -450,6 +466,7 @@ register("app", "org_updated_tool", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgImage,
         toolId,
         title,
         userId,
@@ -461,6 +478,7 @@ register("app", "org_updated_tool", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId?: string;
         orgName?: string;
+        orgImage?: string;
         toolId: string;
         title?: string;
         userId?: string;
@@ -488,7 +506,7 @@ register("app", "org_updated_tool", async ({ payload, occurredAt }) => {
             institutionId,
             types,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -503,6 +521,7 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgImage,
         rfpId,
         title,
         userId,
@@ -514,6 +533,7 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId?: string;
         orgName?: string;
+        orgImage?: string;
         rfpId: string;
         title?: string;
         userId?: string;
@@ -541,7 +561,7 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
             private: isPrivate,
             budget,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -556,11 +576,13 @@ register("app", "pag_profile_created", async ({ payload, occurredAt }) => {
     const {
         orgId,      // PAG org id
         orgName,    // PAG org name
+        orgImage,
         userId,
         userName,
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         userId?: string;
         userName?: string;
     };
@@ -577,6 +599,7 @@ register("app", "pag_profile_created", async ({ payload, occurredAt }) => {
         content: {
             pagOrganizationId: orgId,
             pagOrganizationName: orgName,
+            pagOrganizationImage: orgImage,
             actor: { userId, name: userName },
             organization: { id: orgId, name: orgName },
         },
@@ -596,6 +619,7 @@ register("app", "tool_request_created", async ({ payload, occurredAt }) => {
         title,              // MaterialAndDataAccessRequest.title
         orgId,              // organizationId
         orgName,
+        orgImage,
         researcherId,       // requester (Researcher.id)
         userId,             // actor (User.id) – often the same as researcher.userId, but keep flexible
         userName,
@@ -606,6 +630,7 @@ register("app", "tool_request_created", async ({ payload, occurredAt }) => {
         title: string;
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         researcherId: string;
         userId?: string;
         userName?: string;
@@ -629,7 +654,7 @@ register("app", "tool_request_created", async ({ payload, occurredAt }) => {
             submittedAt,
             researcherId,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -647,6 +672,7 @@ register("app", "tool_request_comment_created", async ({ payload, occurredAt }) 
         commentId,      // RequestComment.id
         orgId,
         orgName,
+        orgImage,
         userId,         // commenter user id
         userName,       // commenter display name
         text,           // comment text
@@ -655,6 +681,7 @@ register("app", "tool_request_comment_created", async ({ payload, occurredAt }) 
         commentId: string;
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         userId: string;
         userName?: string;
         text: string;
@@ -677,7 +704,7 @@ register("app", "tool_request_comment_created", async ({ payload, occurredAt }) 
             commentId,
             preview,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,
@@ -695,6 +722,7 @@ register("app", "tool_request_approved", async ({ payload, occurredAt }) => {
         title,
         orgId,
         orgName,
+        orgImage,
         approverUserId,    // the user who approved
         approverUserName,
         approvedAt,        // optional (falls back to occurredAt)
@@ -703,6 +731,7 @@ register("app", "tool_request_approved", async ({ payload, occurredAt }) => {
         title?: string;
         orgId: string;
         orgName?: string;
+        orgImage?: string;
         approverUserId?: string;
         approverUserName?: string;
         approvedAt?: string;
@@ -722,7 +751,7 @@ register("app", "tool_request_approved", async ({ payload, occurredAt }) => {
             title,
             approvedAt: approvedAt ?? occurredAt,
             actor: { userId: approverUserId, name: approverUserName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
         occurredAt,

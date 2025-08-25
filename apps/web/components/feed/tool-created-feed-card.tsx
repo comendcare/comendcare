@@ -16,7 +16,7 @@ import { Wrench, FileText } from "lucide-react";
 
 interface ToolCreatedContent {
     toolId: string;
-    title?: string;
+    title?: string; // optional display name of the tool
     private?: boolean;
     geneId?: number;
     institutionId?: string;
@@ -28,13 +28,14 @@ interface ToolCreatedContent {
     organization?: {
         id?: string;
         name?: string;
+        image?: string; // <-- allow org image
     };
 }
 
 interface ToolCreatedProps {
     data: {
         id: string;
-        title: string;
+        title: string; // legacy/event title
         content: ToolCreatedContent;
         orgId?: string;
         createdAt: string | Date;
@@ -48,24 +49,46 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
     );
 
     const actorName = data.content.actor?.name ?? "Someone";
-    const orgName = data.content.organization?.name;
-    const orgId = data.content.organization?.id ?? data.orgId;
 
-    const displayTitle = data.content.title || data.title;
+    // Subject = organization (name, id, image)
+    const orgName =
+        data.content.organization?.name ?? "Organization";
+    const orgId =
+        data.content.organization?.id ?? data.orgId;
+    const orgImage = data.content.organization?.image;
+
+    // Action is a title in the Card body (feed-style)
+    const actionTitle = "Tool Created";
+
+    // Tool display name (if you want to surface it in the description)
+    const toolDisplayName = data.content.title || data.title;
+
+    const types = data.content.types ?? [];
+    const isPrivate = !!data.content.private;
 
     return (
         <MotionConfig transition={{ duration: 0.3 }}>
             <Card className="rounded-sm w-full">
+                {/* Header: Organization avatar + name (subject) */}
                 <CardHeader className="space-y-1 md:space-y-1.5 p-4">
-                    <div className="flex justify-between items-center">
-                        <div className="flex gap-2 items-center">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
                             <ProfilePhoto
-                                img={undefined}
-                                name={actorName}
+                                img={orgImage}
+                                name={orgName}
                                 className="h-8 w-8 rounded-full"
                             />
                             <div className="flex flex-col">
-                                <span className="font-medium md:text-base">New Tool Created</span>
+                                {orgId ? (
+                                    <Link
+                                        href={`/org/${orgId}`}
+                                        className="font-medium md:text-base underline-offset-2 hover:underline"
+                                    >
+                                        {orgName}
+                                    </Link>
+                                ) : (
+                                    <span className="font-medium md:text-base">{orgName}</span>
+                                )}
                                 <span className="font-light text-muted-foreground text-[0.6rem] md:text-xs leading-3">
                   {createdAt}
                                     {actorName && (
@@ -73,54 +96,80 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
                       • by <span className="font-normal">{actorName}</span>
                     </span>
                                     )}
-                                    {orgName && (
-                                        <>
-                                            {" "}
-                                            •{" "}
-                                            {orgId ? (
-                                                <Link
-                                                    href={`/org/${orgId}`}
-                                                    className="underline-offset-2 hover:underline"
-                                                >
-                                                    {orgName}
-                                                </Link>
-                                            ) : (
-                                                <span className="font-normal">{orgName}</span>
-                                            )}
-                                        </>
-                                    )}
                 </span>
                             </div>
                         </div>
                     </div>
                 </CardHeader>
 
+                {/* Body: Action title + feed-style description */}
                 <CardContent className="p-4 pt-0">
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-sm md:text-base font-semibold">{displayTitle}</h3>
-
-                        {data.content.types && data.content.types.length > 0 && (
-                            <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
-                                {data.content.types.map((type, idx) => (
-                                    <span
-                                        key={idx}
-                                        className="px-2 py-0.5 rounded bg-muted text-muted-foreground"
-                                    >
-                    {type}
-                  </span>
-                                ))}
-                            </div>
-                        )}
+                    <div className="flex items-center gap-2 text-sm md:text-base font-semibold">
+                        <Wrench className="h-4 w-4" />
+                        <span>{actionTitle}</span>
                     </div>
+
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {actorName} created
+                        {isPrivate ? " a private" : " a"}
+                        {" tool"}
+                        {toolDisplayName ? <> <span className="font-medium">“{toolDisplayName}”</span></> : null}
+                        {" for "}
+                        <span className="font-medium">{orgName}</span>.
+                        {types.length > 0 ? (
+                            <> Types: {types.join(", ")}.</>
+                        ) : null}
+                    </p>
+
+                    {types.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1 text-xs text-muted-foreground">
+                            {types.map((type, idx) => (
+                                <span
+                                    key={idx}
+                                    className="px-2 py-0.5 rounded bg-muted text-muted-foreground"
+                                >
+                  {type}
+                </span>
+                            ))}
+                        </div>
+                    )}
                 </CardContent>
 
                 <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={`/app/tool/${data.content.toolId}`} passHref>
-                        <Button size="sm" variant="outline" className="flex gap-1 items-center">
-                            <FileText className="h-4 w-4" />
-                            View Tool
-                        </Button>
-                    </Link>
+                    <div className="flex gap-2">
+                        <Link
+                            href={orgId ? `/org/${orgId}` : "#"}
+                            aria-disabled={!orgId}
+                            passHref
+                        >
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={!orgId}
+                                title={orgId ? "View Organization" : "No organization link available"}
+                            >
+                                <FileText className="h-4 w-4" />
+                                View Organization
+                            </Button>
+                        </Link>
+
+                        <Link
+                            href={data.content.toolId ? `/app/tool/${data.content.toolId}` : "#"}
+                            aria-disabled={!data.content.toolId}
+                            passHref
+                        >
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex gap-1 items-center"
+                                disabled={!data.content.toolId}
+                                title={data.content.toolId ? "View Tool" : "No tool link available"}
+                            >
+                                <FileText className="h-4 w-4" />
+                                View Tool
+                            </Button>
+                        </Link>
+                    </div>
                 </CardFooter>
             </Card>
         </MotionConfig>
