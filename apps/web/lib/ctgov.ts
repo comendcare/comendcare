@@ -1,5 +1,3 @@
-const CTG_BASE = "https://beta-ut.clinicaltrials.gov/api/v2";
-
 export type CtgovStudy = {
     protocolSection?: {
         identificationModule?: {
