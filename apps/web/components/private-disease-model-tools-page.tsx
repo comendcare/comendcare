@@ -4,7 +4,7 @@ import * as React from "react";
 import Image from "next/image"
 import { NewToolDialog } from "./edit-tool-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { DiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/disease-models-table"
+import { DiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table"
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns";

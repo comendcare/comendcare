@@ -116,6 +116,11 @@ export const LandingNavbar: React.FC = () => {
                 ? `https://${rootDomain}/about#news` : `http://${rootDomain}/about#news`
         },
         // {
+        //     name: "Marketplace",
+        //     link: process.env.NEXT_PUBLIC_VERCEL_ENV
+        //         ? `https://${rootDomain}/marketplace` : `http://${rootDomain}/marketplace`
+        // },
+        // {
         //     name: "Contact",
         //     link: process.env.NEXT_PUBLIC_VERCEL_ENV
         //         ? `https://${rootDomain}/contact` : `http://${rootDomain}/contact`

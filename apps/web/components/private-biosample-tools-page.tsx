@@ -3,7 +3,7 @@
 import * as React from "react";
 import { NewToolDialog } from "./edit-tool-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
+import { BiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table"
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
