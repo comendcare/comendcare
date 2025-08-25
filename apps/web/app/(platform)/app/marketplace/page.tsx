@@ -68,7 +68,7 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between">
                         <h2 className="text-2xl semibold">Service Providers</h2>
-                        <a href="/app/marketplace/patient-groups" className="justify-self-end self-end underline">See all service providers...</a>
+                        <a href="/app/marketplace/service-providers" className="justify-self-end self-end underline">See all service providers...</a>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(croStore.searchResults && croStore.searchResults.length > 0 )
