@@ -1,7 +1,7 @@
 import {NextResponse} from "next/server";
 import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
-import {buildCtgovParams, type CtgovOrgQueryConfig} from "~web/lib/ctgov-query";
+import {buildCtgovParams, runSimpleFallback, CtgovOrgQueryConfig} from "~web/lib/ctgov-query";
 import {CtgovStudy, fetchCtgovPage, shapeForMapper} from "~web/lib/ctgov";
 
 export const dynamic = "force-dynamic";
@@ -206,51 +206,7 @@ export async function POST() {
                     stats.errors++;
                     console.error("ctgov org ingest error", {orgId: cfg.orgId, e});
                 } else {
-                    // 2) Fallback: split into simpler batches to avoid "Too complicated query"
-                    console.warn("ctgov query too complex; falling back to chunked queries", {
-                        orgId: cfg.orgId,
-                    });
-
-                    const titles = cfg.titles ?? [];
-                    const terms = cfg.terms ?? [];
-                    const conditions = cfg.conditions ?? [];
-
-                    // tune these knobs if needed
-                    const TITLE_CHUNK = 5;
-                    const TERM_CHUNK = 8;
-                    const COND_CHUNK = 8;
-
-                    // helper to run a reduced query
-                    const runChunked = async (partial: Partial<CtgovOrgQueryConfig>) => {
-                        const reducedCfg: CtgovOrgQueryConfig = {
-                            ...cfg,
-                            titles: partial.titles ?? [],
-                            terms: partial.terms ?? [],
-                            conditions: partial.conditions ?? [],
-                        };
-                        let p = buildCtgovParams(reducedCfg, fromISO, toISO);
-                        p.set(
-                            "postFilter.advanced",
-                            `AREA[${cfg.dateField ?? "StudyFirstPostDate"}]RANGE[${fromISO},${toISO}]`
-                        );
-                        if (cfg.overallStatuses?.length) {
-                            p.set("postFilter.overallStatus", cfg.overallStatuses.join(","));
-                        }
-                        await fetchAllPages(p, enqueueStudies);
-                    };
-
-                    // A) titles‑only batches
-                    for (const chunkArr of chunk(titles, TITLE_CHUNK)) {
-                        await runChunked({titles: chunkArr, terms: [], conditions: []});
-                    }
-                    // B) terms‑only batches
-                    for (const chunkArr of chunk(terms, TERM_CHUNK)) {
-                        await runChunked({titles: [], terms: chunkArr, conditions: []});
-                    }
-                    // C) conditions‑only batches
-                    for (const chunkArr of chunk(conditions, COND_CHUNK)) {
-                        await runChunked({titles: [], terms: [], conditions: chunkArr});
-                    }
+                    await runSimpleFallback(cfg, fromISO, toISO, enqueueStudies);
                 }
             }
         } catch (e) {
