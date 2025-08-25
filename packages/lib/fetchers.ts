@@ -2222,7 +2222,8 @@ export const getBiosamples = withOrganizationAuth(
                                     donor: {
                                         include: {diagnoses: {include: {type: true}}}
                                     },
-                                    institution: true
+                                    institution: true,
+                                    materialAndDataAccessRequests: true
                                 },
                                 orderBy: {createdAt: "asc"},
                             }),
@@ -2323,7 +2324,8 @@ export const getBiosamples = withOrganizationAuth(
                                 donor: {
                                     include: {diagnoses: {include: {type: true}}}
                                 },
-                                institution: true
+                                institution: true,
+                                materialAndDataAccessRequests: true
                             },
                             orderBy,
                         }),
@@ -2460,6 +2462,7 @@ export const getAllBiosamples = withResearcherAuth(
                         attachments: true,
                         donor: true,
                         institution: true,
+                        materialAndDataAccessRequests: true
                     },
                     orderBy,
                 }),

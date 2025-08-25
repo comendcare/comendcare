@@ -129,9 +129,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         }
     }
 
-    const handleGetAvailability = (sample: Biosample): {value: string, variant: 'green' | 'red'} | undefined => {
+    const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
         if (sample?.quantity !== null) {
-            if (sample.quantity > 0) return {value: 'Available', variant: 'green'}
+            if (sample.quantity > 0) {
+                if (sample?.materialAndDataAccessRequests?.length > 0) {
+                    return {value: 'Reserved', variant: 'yellow'}
+                }
+                return {value: 'Available', variant: 'green'}
+            }
             if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
         }
 
