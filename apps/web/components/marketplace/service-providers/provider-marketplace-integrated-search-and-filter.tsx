@@ -170,7 +170,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         <DialogTitle>Service Provider Filters</DialogTitle>
                             {/* Project Types */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">Project Types</Label>
+                                <Label className="text-base font-semibold text-gray-900">Project Types</Label>
                                 <MultipleSelector
                                     value={filters.milestoneTypes}
                                     onChange={(vals) => setFilterKey("milestoneTypes", vals)}
@@ -186,7 +186,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Business Types */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">Business Types</Label>
+                                <Label className="text-base font-semibold text-gray-900">Business Types</Label>
                                 <MultipleSelector
                                     value={filters.types}
                                     onChange={(vals) => setFilterKey("types", vals)}
@@ -202,7 +202,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Certifications */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">Certifications</Label>
+                                <Label className="text-base font-semibold text-gray-900">Certifications</Label>
                                 <MultipleSelector
                                     value={filters.certifications}
                                     onChange={(vals) => setFilterKey("certifications", vals)}

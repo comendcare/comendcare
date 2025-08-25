@@ -118,7 +118,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
                 {/* Search input */}
                 <div className="flex-1 px-6 py-4">
-                    <Label className="text-xs font-semibold text-gray-900">Search</Label>
+                    <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
                         placeholder="Search types, genes..."
@@ -136,7 +136,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Conditions */}
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">Condition</Label>
+                    <Label className="text-base font-semibold text-gray-900">Condition</Label>
                     <MultipleSelector
                         value={filters.conditions ?? []}
                         onChange={(vals) => setFilterKey("conditions", vals)}
@@ -158,7 +158,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Genes */}
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                    <Label className="text-base font-semibold text-gray-900">Gene</Label>
                     <MultipleSelector
                         value={filters.genes ?? []}
                         onChange={(vals) => setFilterKey("genes", vals)}
@@ -189,7 +189,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                         <DialogTitle>Clinical Dataset Filters</DialogTitle>
                         {/* Conditions */}
                         <div>
-                            <Label className="text-xs font-semibold text-gray-900">Condition</Label>
+                            <Label className="text-base font-semibold text-gray-900">Condition</Label>
                             <MultipleSelector
                                 value={filters.conditions ?? []}
                                 onChange={(vals) => setFilterKey("conditions", vals)}
@@ -206,7 +206,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Genes */}
                         <div>
-                            <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                            <Label className="text-base font-semibold text-gray-900">Gene</Label>
                             <MultipleSelector
                                 value={filters.genes ?? []}
                                 onChange={(vals) => setFilterKey("genes", vals)}
@@ -223,7 +223,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Clinical Dataset Types */}
                         <div>
-                            <Label className="text-xs font-semibold text-gray-900">Clinical Dataset Types</Label>
+                            <Label className="text-base font-semibold text-gray-900">Clinical Dataset Types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}

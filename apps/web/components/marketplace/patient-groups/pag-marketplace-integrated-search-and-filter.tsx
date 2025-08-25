@@ -151,7 +151,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
                 {/* Search */}
                 <div className="flex-1 px-6 py-4">
-                    <Label className="text-xs font-semibold text-gray-900">Search</Label>
+                    <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
                         placeholder="Search organizations, descriptions..."
@@ -169,7 +169,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Conditions */}
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">Condition</Label>
+                    <Label className="text-base font-semibold text-gray-900">Condition</Label>
                     <MultipleSelector
                         value={filters.conditions ?? []}
                         onChange={(vals) => setFilterKey("conditions", vals)}
@@ -191,7 +191,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                 {/* Genes */}
                 <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
-                    <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                    <Label className="text-base font-semibold text-gray-900">Gene</Label>
                     <MultipleSelector
                         value={filters.genes ?? []}
                         onChange={(vals) => setFilterKey("genes", vals)}
@@ -222,7 +222,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         <DialogTitle>Patient Group Filters</DialogTitle>
                             {/* Conditions */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">Condition</Label>
+                                <Label className="text-base font-semibold text-gray-900">Condition</Label>
                                 <MultipleSelector
                                     value={filters.conditions ?? []}
                                     onChange={(vals) => setFilterKey("conditions", vals)}
@@ -239,7 +239,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Genes */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">Gene</Label>
+                                <Label className="text-base font-semibold text-gray-900">Gene</Label>
                                 <MultipleSelector
                                     value={filters.genes ?? []}
                                     onChange={(vals) => setFilterKey("genes", vals)}
@@ -256,7 +256,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Mechanisms of action */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">
+                                <Label className="text-base font-semibold text-gray-900">
                                     Mechanisms of Action
                                 </Label>
                                 <MultipleSelector
@@ -276,7 +276,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Associated systems */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">
+                                <Label className="text-base font-semibold text-gray-900">
                                     Associated Systems
                                 </Label>
                                 <MultipleSelector
@@ -296,7 +296,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Modalities */}
                             <div>
-                                <Label className="text-xs font-semibold text-gray-900">
+                                <Label className="text-base font-semibold text-gray-900">
                                     Modalities of Interest
                                 </Label>
                                 <MultipleSelector
