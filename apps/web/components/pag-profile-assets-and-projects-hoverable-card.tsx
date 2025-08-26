@@ -11,50 +11,73 @@ import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { useSearchParams } from "next/navigation";
 import { NoRFPs } from "./no-rfps";
 import { RFPCard } from "./rfp-card";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselApi } from "@/packages/components/ui/carousel";
+import { useEffect, useState } from "react";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }: { tools: any[], rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
 
+    const [api, setApi] = useState<CarouselApi>()
+    const [current, setCurrent] = useState(0)
+    const [count, setCount] = useState(0)
+
+    useEffect(() => {
+        if (!api) return
+        
+        setCount(api.scrollSnapList().length)
+        setCurrent(api.selectedScrollSnap() + 1)
+        api.on("select", () => {
+            setCurrent(api.selectedScrollSnap() + 1)
+        })
+    }, [api])
+
     if (tools && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
-                <CardHeader>
-                    <CardTitle>RFPs</CardTitle>
-                </CardHeader>
-                <CardContent className="w-full max-w-full">
-                    <div className="flex flex-col gap-4 w-full max-w-full">
-                        {rfps.length > 0 && (
-                            <ul className="w-full max-w-full flex flex-col gap-4">
-                                {rfps.map((rfp, index) => (
-                                    <li className="w-full max-w-full">
-                                        <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
-                                            <DialogTrigger className="w-full max-w-full h-full" onClick={() => {
-                                                mixpanelTrack("RFP Details Viewed", {
-                                                    "ID": rfp.id,
-                                                    "Name": rfp.title,
-                                                    "Budget": rfp.budget,
-                                                    "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
-                                                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                                                    // we flatten them into a single list that can be parsed
-                                                    "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
-                                                        (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                                                    )
-                                                })
-                                            }}>
-                                                <RFPCard rfp={rfp} />
-                                            </DialogTrigger>
-                                            <DialogContent className="overflow-hidden">
-                                                <RFPDetails rfp={rfp} />
-                                            </DialogContent>
-                                        </Dialog>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                        {rfps.length <= 0 && (
-                            <NoRFPs isPrivate={isPrivate} />
-                        )}
+                <CardHeader className="flex flex-row items-start justify-between">
+                    <CardTitle>Request for proposals (RFPs)</CardTitle>
+                    <div className="text-muted-foreground text-sm">
+                        {current} of {count}
                     </div>
+                </CardHeader>
+                <CardContent className="w-full max-w-full px-16">
+                    {rfps.length > 0 
+                        ? (
+                            <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
+                                <CarouselContent>
+                                    {rfps.map((rfp, index) => (
+                                    <CarouselItem key={index}>
+                                        <div className="h-full p-1">
+                                            <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
+                                                <DialogTrigger className="w-full max-w-full h-full" onClick={() => {
+                                                    mixpanelTrack("RFP Details Viewed", {
+                                                        "ID": rfp.id,
+                                                        "Name": rfp.title,
+                                                        "Budget": rfp.budget,
+                                                        "Linked Projects": rfp.milestones.map(({ milestone }: any) => milestone),
+                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                        // we flatten them into a single list that can be parsed
+                                                        "Linked Project Types": rfp.milestones.flatMap(({ milestone }: any) =>
+                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                        )
+                                                    })
+                                                }}>
+                                                    <RFPCard rfp={rfp} />
+                                                </DialogTrigger>
+                                                <DialogContent className="overflow-hidden">
+                                                    <RFPDetails rfp={rfp} />
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
+                                    </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                            </Carousel>
+                        )
+                        : (<NoRFPs isPrivate={isPrivate} />)
+                    }
                 </CardContent>
             </Card>
         );

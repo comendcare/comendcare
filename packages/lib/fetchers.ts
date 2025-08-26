@@ -146,10 +146,28 @@ export async function getPublicRFPsForOrganization(
                 where: {milestone: {private: {equals: false}}}
             }) : undefined
         },
-        orderBy: [{createdAt: "desc"}]
+        // orderBy: [{createdAt: "desc"}]
     })
 
-    const sanitizedRFPs = rfps.map(rfp => omit(rfp, []))
+    const sortedRFPs = rfps.sort((a, b) => {
+        const dateA = a.endDate ? new Date(a.endDate).getTime() : Infinity;
+        const dateB = b.endDate ? new Date(b.endDate).getTime() : Infinity;
+        const now = (new Date()).getTime()
+
+        // open RFPS first
+        if (dateA > now && dateB < now) return -1;
+        if (dateA < now && dateB > now) return 1;
+
+        if (dateA > now) {
+            // earliest dueDate first, no dueDate goes last (Infinity)
+            return dateA - dateB;
+        } else {
+            // closed: latest dueDate first, no dueDate goes last (Infinity)
+            return dateB - dateA;
+        }
+    });
+
+    const sanitizedRFPs = sortedRFPs.map(rfp => omit(rfp, []))
 
     return sanitizedRFPs
 }
