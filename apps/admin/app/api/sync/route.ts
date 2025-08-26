@@ -596,8 +596,6 @@ export async function POST(req: Request) {
             console.error('Unexpected error type:', error);
         }
         return NextResponse.json({ error: errorMessage }, { status: 500 });
-    } finally {
-        await prisma.$disconnect()
     }
 }
 
@@ -640,7 +638,5 @@ export async function GET() {
             console.error('Unexpected error type:', error);
         }
         return NextResponse.json({ error: errorMessage }, { status: 500 });
-    } finally {
-        await prisma.$disconnect()
     }
 }

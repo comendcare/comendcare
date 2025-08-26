@@ -62,8 +62,6 @@ export async function GET() {
         } catch {
             results[feed.provider].errors++;
             console.log("Error fetching RSS feed:", results[feed.provider].errors++);
-        } finally {
-            await prisma.$disconnect()
         }
     }
 
