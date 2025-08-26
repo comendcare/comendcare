@@ -202,9 +202,9 @@ export function EditBiosampleToolForm({
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
-                await revalidate("/app/tools/biosample")
+                // await revalidate("/app/tools/biosample")
                 if (closeDialog) closeDialog(updatedAsset)
-                router.refresh()
+                // router.refresh()
             } else {
                 const newAsset = await createBiosample(session.user.organizationId, values)
                 mixpanelTrack("Biosample Created", {
@@ -220,9 +220,9 @@ export function EditBiosampleToolForm({
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
-                await revalidate("/app/tools/biosample")
+                // await revalidate("/app/tools/biosample")
                 if (closeDialog) closeDialog(newAsset)
-                router.refresh()
+                // router.refresh()
             }
         } catch (error) {
             console.error("Error creating or updating tool:", error);
