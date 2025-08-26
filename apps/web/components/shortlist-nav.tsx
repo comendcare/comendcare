@@ -1,15 +1,18 @@
 "use client"
 import { TabNav } from "@comend/components/tab-nav";
+import { Building2, Users } from "lucide-react";
 
 const links = [
     {
         name: "Service Providers",
-        href: "/service-providers",
+        href: "/shortlist/service-providers",
+        icon: Building2,
         comingSoon: false
     },
     {
         name: "Patient Groups",
-        href: "/patient-groups",
+        href: "/shortlist/patient-groups",
+        icon: Users,
         comingSoon: false
     },
     // {
@@ -23,7 +26,7 @@ export function ShortlistNav({className}: React.HTMLAttributes<HTMLDivElement>) 
     return (
         <TabNav 
             className={className}
-            baseLink={"/app/shortlist/"}
+            baseLink={"/app"}
             links={links}
         />
     )

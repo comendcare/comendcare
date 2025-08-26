@@ -66,14 +66,20 @@ export function SavedOrganizationsDataTable<TValue>({
     })
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const [overlayStyle, setOverlayStyle] = useState({ width: 0 });
+    const headerRef = useRef<HTMLDivElement>(null);
+    const [overlayStyle, setOverlayStyle] = useState({ width: 0, paddingTop: 0 });
 
     useEffect(() => {
         const updateOverlay = () => {
-            if (scrollContainerRef.current) {
-                const widthRect = scrollContainerRef.current.getBoundingClientRect();
-                setOverlayStyle({width: widthRect.width});
-            }
+        if (scrollContainerRef.current && headerRef.current) {
+            const widthRect = scrollContainerRef.current.getBoundingClientRect();
+            const paddingRect = headerRef.current.getBoundingClientRect();
+
+            setOverlayStyle({
+                width: widthRect.width, 
+                paddingTop: paddingRect.height,
+            });
+        }
         };
 
         updateOverlay();
@@ -86,7 +92,7 @@ export function SavedOrganizationsDataTable<TValue>({
             <DataTableToolbar table={table} />
             <div className="rounded-md border" ref={scrollContainerRef}>
                 <Table>
-                    <TableHeader>
+                    <TableHeader ref={headerRef as React.LegacyRef<HTMLTableSectionElement>}>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
@@ -105,43 +111,6 @@ export function SavedOrganizationsDataTable<TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {/* no results overlay */}
-                        <div
-                            className="text-center fixed flex justify-center items-center"
-                            style={{width: overlayStyle.width}}
-                        >
-                            {!table.getRowModel().rows?.length &&
-                                <div className="h-full flex flex-col items-center justify-center py-20">
-                                    <Image
-                                        alt="No patient groups shortlisted"
-                                        src="https://illustrations.popsy.co/gray/digital-nomad.svg"
-                                        width={300}
-                                        height={300}
-                                        className="dark:hidden"
-                                    />
-                                    <Image
-                                        alt="No patient groups shortlisted"
-                                        src="https://illustrations.popsy.co/white/digital-nomad.svg"
-                                        width={300}
-                                        height={300}
-                                        className="hidden dark:block"
-                                    />
-                                    <div className="max-w-xl flex flex-col justify-center items-center space-y-8">
-                                        <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                                            {`You do not have any shortlisted patient groups yet. Visit the marketplace to save some patient groups.`}
-                                        </p>
-                                        <PulsatingButton
-                                            className="bg-blue-dark"
-                                            pulseColor={"#dcebfe"}
-                                            onClick={() => router.push("/app/marketplace/patient-groups")}
-                                        >
-                                            Visit marketplace
-                                        </PulsatingButton>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
@@ -174,9 +143,9 @@ export function SavedOrganizationsDataTable<TValue>({
                             //         No results.
                             //     </TableCell>
                             // </TableRow>
-                            <TableRow className="invisible">
+                            <TableRow>
                                 <TableCell colSpan={columns.length}>
-                                    <div className="h-full flex flex-col items-center justify-center py-20">
+                                    <div className="h-full flex flex-col items-center justify-center py-4">
                                         <Image
                                             alt="No patient groups shortlisted"
                                             src="https://illustrations.popsy.co/gray/digital-nomad.svg"
@@ -209,6 +178,45 @@ export function SavedOrganizationsDataTable<TValue>({
                         )}
                     </TableBody>
                 </Table>
+
+                {/* no results overlay */}
+                {/* {!table.getRowModel().rows?.length && (
+                    <div
+                        className="absolute left-0 top-0 h-[calc(100%-16px)] flex justify-center items-center"
+                        style={{width: overlayStyle.width, paddingTop: overlayStyle.paddingTop}}
+                    >
+                        <div className="h-full flex flex-col justify-center">
+                            <div className="h-full flex flex-col items-center justify-center">
+                                <Image
+                                    alt="No patient groups shortlisted"
+                                    src="https://illustrations.popsy.co/gray/digital-nomad.svg"
+                                    width={300}
+                                    height={300}
+                                    className="dark:hidden"
+                                />
+                                <Image
+                                    alt="No patient groups shortlisted"
+                                    src="https://illustrations.popsy.co/white/digital-nomad.svg"
+                                    width={300}
+                                    height={300}
+                                    className="hidden dark:block"
+                                />
+                                <div className="max-w-xl flex flex-col justify-center items-center space-y-8">
+                                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                                        {`You do not have any shortlisted patient groups yet. Visit the marketplace to save some patient groups.`}
+                                    </p>
+                                    <PulsatingButton
+                                        className="bg-black"
+                                        pulseColor={"#9ca3af"}
+                                        onClick={() => router.push("/app/marketplace/patient-groups")}
+                                    >
+                                        Visit marketplace
+                                    </PulsatingButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )} */}
             </div>
             <DataTablePagination table={table} />
         </div>

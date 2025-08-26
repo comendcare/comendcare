@@ -13,7 +13,7 @@ export function MobileWarning() {
                     Comend is not yet optimized for mobile or tablet. For the best experience, visit this platform on a desktop or laptop.
                 </p>
                 <Button onClick={() => signOut({ callbackUrl: "/" })}>
-                    Sign out and return to landing page
+                    Return to landing page
                 </Button>
             </div>
         </div>

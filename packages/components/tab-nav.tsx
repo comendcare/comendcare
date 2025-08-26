@@ -4,13 +4,14 @@ import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {cn} from "@comend/lib/utils"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
+import { LucideIcon } from "lucide-react";
 
 export function TabNav({
     className,
     baseLink,
     links,
     ...props
-}: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string, links: {name: string, href: string, comingSoon: boolean}[]})) {
+}: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string, links: {name: string, href: string, comingSoon: boolean, icon?: LucideIcon}[]})) {
     const pathname = usePathname()
 
     return (
@@ -23,6 +24,7 @@ export function TabNav({
                                 <div
                                     className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm text-muted-foreground transition-colors"
                                 >
+                                    {link.icon && <link.icon className="mr-2 h-4 w-4"/>}
                                     {link.name}
                                 </div>
                             </TooltipTrigger>
@@ -38,13 +40,13 @@ export function TabNav({
                             key={link.href}
                             className={cn(
                                 "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                pathname?.endsWith(link.href) ||
-                                (index === 0 && pathname === "/")
+                                pathname?.endsWith(link.href)
                                     ? "bg-blue-light font-medium text-primary"
                                     : "text-muted-foreground",
                                 link.comingSoon ? "pointer-events-none opacity-60" : "" // Disable click and add opacity
                             )}
                         >
+                            {link.icon && <link.icon className="mr-2 h-4 w-4"/>}
                             {link.name}
                         </Link>
                 ))}

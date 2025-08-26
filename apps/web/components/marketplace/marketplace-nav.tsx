@@ -1,62 +1,78 @@
 "use client"
 import { Button } from "@/packages/components/ui/button";
 import { TabNav } from "@comend/components/tab-nav";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Building2, Database, Rat, Search, SearchIcon, TestTubeDiagonal, Users } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 const links = [
     {
+        name: "Explore",
+        href: "/marketplace",
+        icon: SearchIcon,
+        comingSoon: false
+    },
+    {
         name: "Service Providers",
-        href: "/service-providers",
+        href: "/marketplace/service-providers",
+        icon: Building2,
         comingSoon: false
     },
     {
         name: "Patient Groups",
-        href: "/patient-groups",
+        href: "/marketplace/patient-groups",
+        icon: Users,
         comingSoon: false
     },
     {
         name: "Biosamples",
-        href: "/biosamples",
+        href: "/marketplace/biosamples",
+        icon: TestTubeDiagonal,
         comingSoon: false
     },
     {
         name: "Disease Models",
-        href: "/disease-models",
+        href: "/marketplace/disease-models",
+        icon: Rat,
         comingSoon: false
     },
     {
         name: "Clinical Datasets",
-        href: "/clinical-datasets",
+        href: "/marketplace/clinical-datasets",
+        icon: Database,
         comingSoon: false
     },
-    // {
-    //     name: "Milestones",
-    //     href: "/milestones",
-    //     comingSoon: false
-    // },
 ]
 
 const publicLinks = [
     {
+        name: "Explore",
+        href: "/marketplace",
+        icon: SearchIcon,
+        comingSoon: false
+    },
+    {
         name: "Patient Groups",
-        href: "/patient-groups",
+        href: "/marketplace/patient-groups",
+        icon: Users,
         comingSoon: false
     },
     {
         name: "Biosamples",
-        href: "/biosamples",
+        href: "/marketplace/biosamples",
+        icon: TestTubeDiagonal,
         comingSoon: false
     },
     {
         name: "Disease Models",
-        href: "/disease-models",
+        href: "/marketplace/disease-models",
+        icon: Rat,
         comingSoon: false
     },
     {
         name: "Clinical Datasets",
-        href: "/clinical-datasets",
+        href: "/marketplace/clinical-datasets",
+        icon: Database,
         comingSoon: false
     },
     // {
@@ -71,7 +87,7 @@ export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>
     return (
         <TabNav 
             className={className}
-            baseLink={"/app/marketplace/"}
+            baseLink={"/app"}
             links={links}
         />
     )
@@ -81,7 +97,7 @@ export function PublicMarketplaceNav({className}: React.HTMLAttributes<HTMLDivEl
     return (
         <TabNav 
             className={className}
-            baseLink={"/marketplace/"}
+            baseLink={""}
             links={publicLinks}
         />
     )
