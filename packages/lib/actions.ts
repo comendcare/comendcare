@@ -2082,7 +2082,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                 where: {id: data.id}
             })
 
-            revalidatePath("/app/tools/disease-model")
+            revalidatePath("/app/tools/disease-models")
 
             return response
         } catch (error: any) {
@@ -2132,7 +2132,7 @@ export const createDiseaseModel = withOrganizationAuth(
                 }
             })
 
-            revalidatePath("/app/tools/disease-model")
+            revalidatePath("/app/tools/disease-models")
 
             return response
         } catch (error: any) {
@@ -2346,7 +2346,7 @@ export const updateDataTool = withOrganizationAuth(
                 where: {id: data.id}
             })
 
-            revalidatePath('/app/tools/data')
+            revalidatePath("/app/tools/data")
 
             return response
         } catch (error: any) {
