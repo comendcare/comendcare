@@ -4,7 +4,7 @@ import { ToolsNav } from "~web/components/tools-nav";
 
 export default function ToolsLayout({children}: {children: React.ReactNode}) {
     return (
-        <div className="container relative flex flex-col items-center">
+        <div className="container relative flex flex-col items-center p-4">
             <ToolsNav />
             {children}
         </div>
