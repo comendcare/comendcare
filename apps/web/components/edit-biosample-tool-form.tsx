@@ -58,6 +58,7 @@ import { format } from "date-fns"
 import { Calendar } from "@/packages/components/ui/calendar"
 import { Label } from "@/packages/components/ui/label"
 import { Switch } from "@/packages/components/ui/switch"
+import LoadingDots from "@/packages/components/icons/loading-dots"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -96,13 +97,14 @@ export function EditBiosampleToolForm({
     closeDialog
 }: {
     toolData: any,
-    closeDialog?: (newBiosample?: any) => void
+    closeDialog: (newBiosample?: any) => void
 }) {
     const initializing = useRef(true)
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editBiosampleForm>>({
         mode: "onChange",
@@ -178,6 +180,7 @@ export function EditBiosampleToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>) => {
+        setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -189,6 +192,9 @@ export function EditBiosampleToolForm({
         try {
             if (toolData.id) {
                 const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
+                await revalidate("/app/tools/biosample")
+                router.refresh()
+                
                 mixpanelTrack("Biosample Updated", {
                     "ID": updatedAsset.id,
                     "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -198,15 +204,18 @@ export function EditBiosampleToolForm({
                         (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     )
                 })
+
+                if (closeDialog) closeDialog(updatedAsset)
+
                 toast.success(
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
-                // await revalidate("/app/tools/biosample")
-                if (closeDialog) closeDialog(updatedAsset)
-                // router.refresh()
             } else {
                 const newAsset = await createBiosample(session.user.organizationId, values)
+                await revalidate("/app/tools/biosample")
+                router.refresh()
+                
                 mixpanelTrack("Biosample Created", {
                     "ID": newAsset.id,
                     "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -216,13 +225,13 @@ export function EditBiosampleToolForm({
                         (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
                     )
                 })
+
+                if (closeDialog) closeDialog(newAsset)
+
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
-                // await revalidate("/app/tools/biosample")
-                if (closeDialog) closeDialog(newAsset)
-                // router.refresh()
             }
         } catch (error) {
             console.error("Error creating or updating tool:", error);
@@ -472,19 +481,23 @@ export function EditBiosampleToolForm({
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                             <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
-                        <DialogClose disabled={!form.formState.isValid}>
                             <Button
-                                // disabled={!form.formState.isValid}
+                                disabled={!form.formState.isValid || isSaving}
                                 variant={"cta"}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleFormSubmit(form.getValues())
-                                    if (closeDialog) closeDialog()
                                 }}
                             >
-                                Save Changes
+                                {isSaving 
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    ) 
+                                    : ("Save Changes")
+                                }
                             </Button>
-                        </DialogClose>
                     </span>
                 </form>
             </ScrollArea>

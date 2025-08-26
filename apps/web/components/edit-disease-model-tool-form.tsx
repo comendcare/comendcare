@@ -37,6 +37,7 @@ import { Separator } from "@/packages/components/ui/separator"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { createDiseaseModel, updateDiseaseModel } from "@/packages/lib/actions"
 import { cn } from "@/packages/lib/utils"
+import LoadingDots from "@/packages/components/icons/loading-dots"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -45,13 +46,14 @@ export function EditDiseaseModelToolForm({
     closeDialog
 }: {
     toolData: any,
-    closeDialog?: (newDiseaseModel?: any) => void
+    closeDialog: (newDiseaseModel?: any) => void
 }) {
     const initializing = useRef(true)
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editDiseaseModelForm>>({
         mode: "onChange",
@@ -79,6 +81,7 @@ export function EditDiseaseModelToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>) => {
+        setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -90,6 +93,9 @@ export function EditDiseaseModelToolForm({
         try {
             if (toolData.id) {
                 const updatedAsset = await updateDiseaseModel(session.user.organizationId, values, toolData.id)
+                await revalidate("/app/tools/disease-model")
+                router.refresh()
+
                 mixpanelTrack("Disease Model Updated", {
                     "ID": updatedAsset.id,
                     // "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -99,15 +105,17 @@ export function EditDiseaseModelToolForm({
                     //     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                     // )
                 })
+
+                if (closeDialog) closeDialog(updatedAsset)
                 toast.success(
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
-                // await revalidate("/app/tools/disease-model")
-                if (closeDialog) closeDialog(updatedAsset)
-                // router.refresh()
             } else {
                 const newAsset = await createDiseaseModel(session.user.organizationId, values)
+                await revalidate("/app/tools/disease-model")
+                router.refresh()
+
                 mixpanelTrack("Disease Model Created", {
                     "ID": newAsset.id,
                     // "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -117,13 +125,13 @@ export function EditDiseaseModelToolForm({
                     //     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
                     // )
                 })
+
+                if (closeDialog) closeDialog(newAsset)
+
                 toast.success(
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
-                // await revalidate("/app/tools/disease-model")
-                if (closeDialog) closeDialog(newAsset)
-                // router.refresh()
             }
         } catch (error) {
             console.error("Error creating or updating tool:", error);
@@ -331,19 +339,23 @@ export function EditDiseaseModelToolForm({
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                             {/* <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/> */}
                         </Dialog>
-                        <DialogClose disabled={!form.formState.isValid}>
                             <Button
-                                // disabled={!form.formState.isValid}
+                                disabled={!form.formState.isValid || isSaving}
                                 variant={"cta"}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleFormSubmit(form.getValues())
-                                    if (closeDialog) closeDialog()
                                 }}
                             >
-                                Save Changes
+                                {isSaving 
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    ) 
+                                    : ("Save Changes")
+                                }
                             </Button>
-                        </DialogClose>
                     </span>
                 </form>
             </ScrollArea>

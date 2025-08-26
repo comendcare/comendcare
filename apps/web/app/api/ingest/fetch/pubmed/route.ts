@@ -129,8 +129,6 @@ export async function POST() {
         } catch (e) {
             orgStats.errors++;
             console.error("org ingest error", { orgId: cfg.orgId, e, query });
-        } finally {
-            await prisma.$disconnect()
         }
     }
 

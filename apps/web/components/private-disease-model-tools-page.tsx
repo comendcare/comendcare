@@ -16,9 +16,9 @@ import { revalidate } from "@/packages/lib/revalidate";
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = useDiseaseModelsTableColumns()
 
-    useEffect(() => {
-        revalidate('/')
-    }, [])
+    // useEffect(() => {
+    //     revalidate('/')
+    // }, [])
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">

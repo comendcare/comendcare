@@ -2159,6 +2159,7 @@ export const createDataTool = withOrganizationAuth(
 
             const dataToolData: any = {
                 id: data.id,
+                title: data.title,
                 types: (data.types || []).map(type => type.value),
                 metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
@@ -2254,6 +2255,7 @@ export const updateDataTool = withOrganizationAuth(
 
             const dataToolData: any = {
                 id: data.id,
+                title: data.title,
                 types: data.types ? data.types.map(type => type.value) : undefined,
                 metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
