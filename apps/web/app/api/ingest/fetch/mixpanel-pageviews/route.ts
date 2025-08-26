@@ -156,6 +156,8 @@ async function runCheck() {
                     dedupeKey: stableDedupeKey(org.id, -1), // harmless unique key for failure row
                 },
             });
+        } finally {
+            await prisma.$disconnect()
         }
     }
 
