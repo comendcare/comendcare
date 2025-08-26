@@ -29,5 +29,5 @@ export default async function DataToolsPage(props: IndexPageProps) {
 
     // not part of an org
     if (!orgId) return <NoOrganization />
-    return <PrivateDatasampleToolsPage data={data} pageCount={pageCount} searchParams={searchParams} />
+    return <PrivateDatasampleToolsPage data={[...data]} pageCount={pageCount} searchParams={searchParams} />
 }

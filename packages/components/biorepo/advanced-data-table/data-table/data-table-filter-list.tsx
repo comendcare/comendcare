@@ -889,7 +889,6 @@ export function AsyncFacetedContent({
   const handleSearch = debounce(async (query: string) => {
     setLoading(true)
     const newOptions = await fetchOptions(query)
-    console.log(`NEW OPTIONS`, newOptions)
     setOptions(newOptions)
     setLoading(false)
   }, 300)
