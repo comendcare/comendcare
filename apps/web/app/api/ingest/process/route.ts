@@ -81,6 +81,8 @@ async function processBatch() {
             await prisma.rawIngestEvent.update({
                 where: { id: raw.id }, data: { status: "FAILED", error: String(err?.message ?? err) },
             });
+        } finally {
+            await prisma.$disconnect()
         }
     }
 
