@@ -47,6 +47,7 @@ import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import {useSession} from "next-auth/react";
 import { Separator } from "@/packages/components/ui/separator"
+import path from "path"
 
 // This is sample data.
 const data = {
@@ -70,52 +71,54 @@ const data = {
             icon: Store,
             variant: "ghost",
             url: "/app/marketplace",
-            // match: (path: string) => path.startsWith('/app/marketplace'),
-            // subPages: [{
-            //     title: "Shortlist",
-            //     icon: Bookmark,
-            //     variant: "ghost",
-            //     url: "/app/shortlist/service-providers"
-            // }]
-            subPages: [
-                {
-                    title: "Service Providers",
-                    icon: Building2,
-                    variant: "ghost",
-                    url: "/app/marketplace/service-providers"
-                },
-                {
-                    title: "Patient Groups",
-                    icon: Users,
-                    variant: "ghost",
-                    url: "/app/marketplace/patient-groups"
-                },
-                {
-                    title: "Biosamples",
-                    icon: TestTubeDiagonal,
-                    variant: "ghost",
-                    url: "/app/marketplace/biosamples"
-                },
-                {
-                    title: "Disease Models",
-                    icon: Rat,
-                    variant: "ghost",
-                    url: "/app/marketplace/disease-models"
-                },
-                {
-                    title: "Clinical Datasets",
-                    icon: Database,
-                    variant: "ghost",
-                    url: "/app/marketplace/clinical-datasets"
-                },
-            ]
+            match: (path: string) => path.startsWith('/app/marketplace'),
+            subPages: [{
+                title: "Shortlist",
+                icon: Bookmark,
+                variant: "ghost",
+                match: (path: string) => path.startsWith('/app/shortlist'),
+                url: "/app/shortlist/service-providers"
+            }]
+
+            // subPages: [
+            //     {
+            //         title: "Service Providers",
+            //         icon: Building2,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/service-providers"
+            //     },
+            //     {
+            //         title: "Patient Groups",
+            //         icon: Users,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/patient-groups"
+            //     },
+            //     {
+            //         title: "Biosamples",
+            //         icon: TestTubeDiagonal,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/biosamples"
+            //     },
+            //     {
+            //         title: "Disease Models",
+            //         icon: Rat,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/disease-models"
+            //     },
+            //     {
+            //         title: "Clinical Datasets",
+            //         icon: Database,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/clinical-datasets"
+            //     },
+            // ]
         },
-        {
-            title: "Shortlist",
-            icon: Bookmark,
-            variant: "ghost",
-            url: "/app/shortlist/service-providers"
-        },
+        // {
+        //     title: "Shortlist",
+        //     icon: Bookmark,
+        //     variant: "ghost",
+        //     url: "/app/shortlist/service-providers"
+        // },
         {
             title: "Research Planner",
             icon: Workflow,

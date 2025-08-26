@@ -220,7 +220,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     return (
         <div className="w-full flex justify-center">
             <div className="max-w-7xl h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
-                {pathname !== '/app/marketplace' && <MarketplaceNav />}
+                <MarketplaceNav />
                 {children}
             </div>
         </div>
