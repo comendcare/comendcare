@@ -2082,6 +2082,8 @@ export const updateDiseaseModel = withOrganizationAuth(
                 where: {id: data.id}
             })
 
+            revalidatePath("/app/tools/disease-model")
+
             return response
         } catch (error: any) {
             console.error("Error creating disease model:", error.message);
@@ -2129,6 +2131,8 @@ export const createDiseaseModel = withOrganizationAuth(
                         : undefined)
                 }
             })
+
+            revalidatePath("/app/tools/disease-model")
 
             return response
         } catch (error: any) {
@@ -2226,6 +2230,8 @@ export const createDataTool = withOrganizationAuth(
                         : undefined),
                 }
             })
+
+            revalidatePath("/app/tools/data")
 
             return response
         } catch (error: any) {
@@ -2339,6 +2345,8 @@ export const updateDataTool = withOrganizationAuth(
             const response = await prisma.tool.findUnique({
                 where: {id: data.id}
             })
+
+            revalidatePath('/app/tools/data')
 
             return response
         } catch (error: any) {
@@ -2511,6 +2519,8 @@ export const createBiosample = withOrganizationAuth(
                     },
                 });
             }
+
+            revalidatePath("/app/tools/biosample")
 
             return response
         } catch (error: any) {
@@ -2704,6 +2714,8 @@ export const updateBiosample = withOrganizationAuth(
                     },
                 });
             }
+
+            revalidatePath("/app/tools/biosample")
 
             return response;
         } catch (error: any) {

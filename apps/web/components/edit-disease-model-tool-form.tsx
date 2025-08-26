@@ -103,9 +103,9 @@ export function EditDiseaseModelToolForm({
                     "Tool updated successfully!",
                     {position: "bottom-left"}
                 )
-                await revalidate("/app/tools/disease-model")
+                // await revalidate("/app/tools/disease-model")
                 if (closeDialog) closeDialog(updatedAsset)
-                router.refresh()
+                // router.refresh()
             } else {
                 const newAsset = await createDiseaseModel(session.user.organizationId, values)
                 mixpanelTrack("Disease Model Created", {
@@ -121,9 +121,9 @@ export function EditDiseaseModelToolForm({
                     "Tool created successfully!",
                     {position: "bottom-left"}
                 )
-                await revalidate("/app/tools/disease-model")
+                // await revalidate("/app/tools/disease-model")
                 if (closeDialog) closeDialog(newAsset)
-                router.refresh()
+                // router.refresh()
             }
         } catch (error) {
             console.error("Error creating or updating tool:", error);

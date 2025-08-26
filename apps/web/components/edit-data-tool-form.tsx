@@ -116,9 +116,9 @@ export function EditDataToolForm({
                     "Clinical Dataset updated successfully!",
                     {position: "bottom-left"}
                 )
-                await revalidate("/app/tools/data")
+                // await revalidate("/app/tools/data")
                 if (closeDialog) closeDialog(updatedTool)
-                router.refresh()
+                // router.refresh()
             } else {
                 // const newTool = await createTool(updateData, session.user.organizationId)
                 const newTool = await createDataTool(session.user.organizationId, values)
@@ -126,9 +126,9 @@ export function EditDataToolForm({
                     "Clinical Dataset created successfully!",
                     {position: "bottom-left"}
                 )
-                await revalidate("/app/tools/data")
+                // await revalidate("/app/tools/data")
                 if (closeDialog) closeDialog(newTool)
-                router.refresh()
+                // router.refresh()
             }
         } catch (error) {
             console.error("Error creating or updating tool:", error);
