@@ -48,6 +48,8 @@ import { useRouter } from "next/navigation"
 import { createDataTool, updateDataTool } from "@/packages/lib/actions"
 import { Separator } from "@/packages/components/ui/separator"
 import { cn } from "@/packages/lib/utils"
+import LoadingDots from "@/packages/components/icons/loading-dots"
+import { mixpanelTrack } from "@/packages/lib/mixpanel"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -56,13 +58,14 @@ export function EditDataToolForm({
     closeDialog
 }: {
     toolData: any,
-    closeDialog?: (newAsset?: any) => void
+    closeDialog: (newAsset?: any) => void
 }) {
     const initializing = useRef(true)
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editDataToolForm>>({
         mode: "onChange",
@@ -100,6 +103,7 @@ export function EditDataToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDataToolForm>) => {
+        setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
                 "You're not signed into an organization right now.",
@@ -112,19 +116,47 @@ export function EditDataToolForm({
             if (toolData.id) {
                 // const updatedTool = await updateTool(updateData, session.user.organizationId)
                 const updatedTool = await updateDataTool(session.user.organizationId, values, toolData.id)
+                await revalidate('/app/tools/data')
+                router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
+
+                mixpanelTrack("Clinical Dataset Updated", {
+                    "ID": updatedTool.id,
+                    // "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    // "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                    //     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                    // )
+                })
+                
+                if (closeDialog) closeDialog(updatedTool)
+
                 toast.success(
                     "Clinical Dataset updated successfully!",
                     {position: "bottom-left"}
                 )
-                if (closeDialog) closeDialog(updatedTool)
             } else {
                 // const newTool = await createTool(updateData, session.user.organizationId)
                 const newTool = await createDataTool(session.user.organizationId, values)
+                await revalidate('/app/tools/data')
+                router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
+                
+                mixpanelTrack("Clinical Dataset Created", {
+                    "ID": newTool.id,
+                    // "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                    // we flatten them into a single list that can be parsed
+                    // "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                    //     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
+                    // )
+                })
+
+                if (closeDialog) closeDialog(newTool)
+
                 toast.success(
                     "Clinical Dataset created successfully!",
                     {position: "bottom-left"}
                 )
-                if (closeDialog) closeDialog(newTool)
             }
         } catch (error) {
             console.error("Error creating or updating tool:", error);
@@ -133,6 +165,7 @@ export function EditDataToolForm({
                 {position: "bottom-left"}
             )
         }
+
     }
 
     // Initialization - Allow update once form is initialized
@@ -355,15 +388,21 @@ export function EditDataToolForm({
                             <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
                         <Button
-                            disabled={!form.formState.isValid}
+                            disabled={!form.formState.isValid || isSaving}
                             variant={"cta"}
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleFormSubmit(form.getValues())
-                                if (closeDialog) closeDialog()
                             }}
                         >
-                            Save Changes
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save Changes")
+                            }
                         </Button>
                     </span>
                 </form>

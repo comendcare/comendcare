@@ -301,7 +301,6 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 return;
             }
             const newOption = transToGroupOption(arrayOptions || [], groupBy);
-            console.log(`NEW OPTIONS`, newOption)
             if (JSON.stringify(newOption) !== JSON.stringify(options)) {
                 setOptions(newOption);
             }

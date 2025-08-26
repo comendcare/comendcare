@@ -256,8 +256,6 @@ export async function POST() {
         } catch (e) {
             stats.errors++;
             console.error("ctgov org ingest error", {orgId: cfg.orgId, e});
-        } finally {
-            await prisma.$disconnect()
         }
     }
 

@@ -644,9 +644,9 @@ export default function OnboardingPage() {
                                             )}
                                         </div>
                                         <FormDescription className="text-xs">PNG/JPG only (no SVG).</FormDescription>
-                                        <FormControl>
-                                            <Input type="text" placeholder="Existing image path (optional)" {...field} />
-                                        </FormControl>
+                                        {/*<FormControl>*/}
+                                        {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
+                                        {/*</FormControl>*/}
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -664,7 +664,6 @@ export default function OnboardingPage() {
                                 name="isNewOrganization"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Setup mode</FormLabel>
                                         <FormControl>
                                             <ToggleGroup type="single" value={field.value ? "new" : "existing"} onValueChange={(v) => field.onChange(v === "new")}>
                                                 <ToggleGroupItem value="new" aria-label="Create a new organization" className={field.value ? "bg-gray-200" : ""}>Create a new organization</ToggleGroupItem>
@@ -738,7 +737,6 @@ export default function OnboardingPage() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Website</FormLabel>
-                                                    <FormDescription>Include http(s)://</FormDescription>
                                                     <FormControl><Input {...field} /></FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -873,11 +871,15 @@ export default function OnboardingPage() {
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl><RadioGroupItem value="INPROGRESS" /></FormControl>
-                                                            <FormLabel className="font-normal">No, but I'm working on it</FormLabel>
+                                                            <FormLabel className="font-normal">
+                                                                {`No, but I'm working on it`}
+                                                            </FormLabel>
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl><RadioGroupItem value="NO" /></FormControl>
-                                                            <FormLabel className="font-normal">No, I don't have a 501(c)(3)</FormLabel>
+                                                            <FormLabel className="font-normal">
+                                                                {`No, I don't have a 501(c)(3)`}
+                                                            </FormLabel>
                                                         </FormItem>
                                                     </RadioGroup>
                                                 </FormControl>
@@ -906,7 +908,9 @@ export default function OnboardingPage() {
                                                     )}
                                                 </div>
                                                 <FormDescription className="text-xs">PNG/JPG only (no SVG).</FormDescription>
-                                                <FormControl><Input type="text" placeholder="Existing image path (optional)" {...field} /></FormControl>
+                                                {/*<FormControl>*/}
+                                                {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
+                                                {/*</FormControl>*/}
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -966,20 +970,15 @@ export default function OnboardingPage() {
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="engaged"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Number of patients engaged</FormLabel>
-                                        <FormDescription>Estimated number of diagnosed patients engaged with your organization.</FormDescription>
-                                        <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <FormField control={form.control} name="engaged" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Number of patients engaged</FormLabel>
+                                            <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField control={form.control} name="national" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>National estimated population</FormLabel>
@@ -991,13 +990,6 @@ export default function OnboardingPage() {
                                     <FormItem>
                                         <FormLabel>Global estimated population</FormLabel>
                                         <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="summary" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Summary</FormLabel>
-                                        <FormControl><Input placeholder="Up to 500 characters" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )} />
@@ -1033,29 +1025,13 @@ export default function OnboardingPage() {
                         <section className="space-y-6">
                             <h2 className="text-xl font-semibold">Finances</h2>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <FormField control={form.control} name="raised" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Total funds raised to date</FormLabel>
-                                        <FormControl><Input type="number" min={0} step="0.01" {...field} onChange={(e) => field.onChange(Number(e.target.value))} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="budget" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Annual research budget</FormLabel>
-                                        <FormControl><Input type="number" min={0} step="0.01" {...field} onChange={(e) => field.onChange(Number(e.target.value))} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="deployed" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Total funds deployed</FormLabel>
-                                        <FormControl><Input type="number" min={0} step="0.01" {...field} onChange={(e) => field.onChange(Number(e.target.value))} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                            </div>
+                            <FormField control={form.control} name="raised" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Total funds raised to date</FormLabel>
+                                    <FormControl><Input type="number" min={0} step="0.01" {...field} onChange={(e) => field.onChange(Number(e.target.value))} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
                         </section>
 
                         <div className="flex justify-between">

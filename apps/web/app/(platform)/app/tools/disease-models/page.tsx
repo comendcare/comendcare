@@ -31,5 +31,5 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
 
     // not part of an org
     if (!orgId) return <NoOrganization />
-    return <PrivateDiseaseModelToolsPage data={data} pageCount={pageCount} searchParams={searchParams} />
+    return <PrivateDiseaseModelToolsPage data={[...data]} pageCount={pageCount} searchParams={searchParams} />
 }

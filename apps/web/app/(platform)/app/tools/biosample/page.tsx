@@ -29,5 +29,5 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
 
     // not part of an org
     if (!orgId) return <NoOrganization />
-    return <PrivateBiosampleToolsPage data={data} pageCount={pageCount} searchParams={searchParams} />
+    return <PrivateBiosampleToolsPage data={[...data]} pageCount={pageCount} searchParams={searchParams} />
 }
