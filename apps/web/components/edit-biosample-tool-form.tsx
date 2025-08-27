@@ -829,7 +829,7 @@ export const AdditionalBiosampleFields = ({form}: {form: any}) => {
                             <FormControl className="w-full">
                                 <MultipleSelector
                                     {...field}
-                                    // creatable={true}
+                                    creatable={true}
                                     maxSelected={1}
                                     triggerSearchOnFocus={true}
                                     onSearch={handleInstitutionAsyncSearch}
