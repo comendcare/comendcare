@@ -617,7 +617,7 @@ model ExternalAttachment {
   milestoneId    String?
   milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
   metadata       Json?
-  DiseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
   diseaseModelId String?
 }
 
@@ -639,7 +639,7 @@ model ExternalContact {
   milestoneId    String?
   milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
   metadata       Json?
-  DiseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
   diseaseModelId String?
 }
 
@@ -773,7 +773,7 @@ model Condition {
   prevalenceRatio             Float?
   organizations               ConditionToOrganization[]
   metadata                    Json?
-  DiseaseModel                DiseaseModel[]
+  diseaseModel                DiseaseModel[]
 }
 
 model ConditionToOrganization {
@@ -912,9 +912,9 @@ model Gene {
   orphanet             Int? // Orphanet ID for rare diseases
   lsdb                 String[] // Locus-Specific Database links
   metadata             Json?
-  Biosample            Biosample[]
-  DiseaseModel         DiseaseModel[]
-  Tool                 Tool[]
+  biosample            Biosample[]
+  diseaseModel         DiseaseModel[]
+  tool                 Tool[]
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
@@ -1164,13 +1164,13 @@ model PharmaProject {
 
 model Institution {
   id           String   @id @default(uuid())
-  rorId        String   @unique
+  rorId        String?   @unique
   name         String
   established  Int?
   types        String[]
   aliases      String[]
   acronyms     String[]
-  status       String
+  status       String?
   wikipediaUrl String?
   website      String?
   city         String?
@@ -1179,7 +1179,7 @@ model Institution {
 
   fundrefAll       String[]
   fundrefPreferred String?
-  gridAll          String
+  gridAll          String?
   gridPreferred    String?
   isniAll          String[]
   wikidataAll      String[]
@@ -1192,8 +1192,8 @@ model Institution {
   updatedAt             DateTime                  @updatedAt
   metadata              Json?
   institutionToRequests InstitutionToRequest[]
-  DiseaseModel          DiseaseModel[]
-  Tool                  Tool[]
+  diseaseModel          DiseaseModel[]
+  tool                  Tool[]
 }
 
 model InstitutionRelationship {
