@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
 import prisma from "@comend/lib/prisma"
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 
 
 const sendTypeSenseRequest = async (
@@ -471,7 +472,7 @@ export const syncToTypesense = async (env: {
                 },
                 {
                     name: "types",
-                    type: "string[]",
+                    type: "object[]",
                     index: true,
                     store: true,
                     facet: true,
@@ -517,7 +518,7 @@ export const syncToTypesense = async (env: {
                 },
                 {
                     name: "types",
-                    type: "string[]",
+                    type: "object[]",
                     index: true,
                     store: true,
                     facet: true,
@@ -563,7 +564,7 @@ export const syncToTypesense = async (env: {
                 },
                 {
                     name: "types",
-                    type: "string[]",
+                    type: "object[]",
                     index: true,
                     store: true,
                     facet: true,
@@ -747,9 +748,10 @@ export const syncToTypesense = async (env: {
             const uploadBiosamples = biosamples.map(biosample => ({
                 id: biosample.id,
                 description: biosample.description,
-                types: biosample.types,
+                // types: biosample.types,
+                types: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value)),
                 gene: biosample.gene?.symbol,
-                conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || []
+                conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || [],
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
@@ -760,7 +762,8 @@ export const syncToTypesense = async (env: {
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
                 id: diseaseModel.id,
                 description: diseaseModel.description,
-                types: diseaseModel.types,
+                // types: diseaseModel.types,
+                types: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value)),
                 gene: diseaseModel.gene?.symbol,
                 conditions: diseaseModel.organization?.conditions?.map(condition => condition.condition?.name) || []
             }))
@@ -773,7 +776,8 @@ export const syncToTypesense = async (env: {
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
                 id: dataset.id,
                 description: dataset.description,
-                types: dataset.types,
+                // types: dataset.types,
+                types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),
                 gene: dataset.gene?.symbol,
                 conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || []
             }))

@@ -62,7 +62,7 @@ function generateFiltersString(filters: FiltersType): string {
     // Disease Model Types (Array Field)
     if (filters?.types && filters.types.length > 0) {
         const typeFilter = filters.types
-            .map(type => `types:=[${escapeValue(type.value)}]`)
+            .map(type => `types.value:=[${escapeValue(type.value)}]`)
             .join(" || ");
         filtersList.push(`(${typeFilter})`);
     }
@@ -134,7 +134,7 @@ const getUpdatedSearchResults = async (
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "description,gene",
+            query_by: "description,gene,types,conditions",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),
