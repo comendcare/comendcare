@@ -16,6 +16,7 @@ export async function GET(req: Request) {
                 },
             },
             take: 50, // Limit results
+            orderBy: {name: 'asc'}
         });
 
         // Format for selector input (e.g., dropdown)
