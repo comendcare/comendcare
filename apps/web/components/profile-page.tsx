@@ -85,7 +85,10 @@ export default function PAGProfilePage() {
                     clients: true,
                     invitations: true,
                     membershipRequests: true,
-                    conditions: true,
+                    conditions: {
+                        associatedConditions: {select: {id: true, name: true, slug: true}},
+                        associatedWith: {select: {id: true, name: true, slug: true}},
+                    },
                     kanban: true,
                     milestones: true,
                     platformNotifications: true,
@@ -119,6 +122,8 @@ export default function PAGProfilePage() {
 
                     description: true,
                     associatedSystems: true,
+                    associatedConditions: true,
+                    associatedWith: true,
                     // associatedGenes: true,
                     // causalGenes: true,
                     // interestedModalities: string[];
@@ -202,7 +207,8 @@ export default function PAGProfilePage() {
                                     />
                                 )}
 
-                                <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
+                                <div
+                                    className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
                                     <div className="w-full flex flex-row gap-4 items-start">
                                         <div className="h-fit w-fit -mt-16">
                                             {session?.user?.membership?.role === "owner" ? (

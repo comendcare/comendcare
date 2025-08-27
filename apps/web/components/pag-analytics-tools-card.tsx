@@ -1,6 +1,6 @@
 "use client"
 
-import {Database, Microscope, Dna, FileSearch, ExternalLink, Info} from "lucide-react"
+import {Database, Microscope, TestTubeDiagonal, Rat, ExternalLink, Info} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
 import {Prisma} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
@@ -32,7 +32,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
         <Card className="col-span-4 flex flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Database className="h-5 w-5"/>
+                    <Microscope className="h-5 w-5"/>
                     Tools
                 </CardTitle>
             </CardHeader>
@@ -41,7 +41,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                     {/* Patient Biosamples */}
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <Microscope className="h-4 w-4 text-muted-foreground"/>
+                            <TestTubeDiagonal className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
                                 Patient Biosamples
                             </span>
@@ -62,7 +62,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                     {/* Disease Models */}
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <Dna className="h-4 w-4 text-muted-foreground"/>
+                            <Rat className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
                                 Disease Models
                             </span>
@@ -83,7 +83,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                     {/* Clinical Datasets */}
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <FileSearch className="h-4 w-4 text-muted-foreground"/>
+                            <Database className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
                                 Clinical Datasets
                             </span>

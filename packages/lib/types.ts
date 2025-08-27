@@ -1571,12 +1571,18 @@ export const MOLECULAR_MECHANISMS: Option[] = [
     },
     {
         id: '4',
+        label: 'Chromosomal aberration',
+        value: 'CHROMOSOMAL_ABERRATION',
+        description: 'A mechanism involving structural or numerical changes in chromosomes that can disrupt normal gene function or regulation.',
+    },
+    {
+        id: '5',
         label: 'Unknown',
         value: 'UNKNOWN',
         description: 'A molecular mechanism where the specific effect of the mutation on the protein\'s function is not yet determined.',
     },
     {
-        id: '5',
+        id: '6',
         label: 'Other',
         value: 'OTHER',
         description: 'None of the above',

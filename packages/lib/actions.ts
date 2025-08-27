@@ -270,6 +270,56 @@ export const createCondition = withAuth(
                 return {success: false, error: "Database error. Please try again later."};
             }
 
+            try {
+                // 1) Parse & normalize associated conditions from the incoming formData
+                const rawAssociated = (formData.get("associatedConditions") as string | null)?.split(",") ?? [];
+                const requestedSlugs = rawAssociated
+                    .map(s => toKebabCase((s || "").trim()))
+                    .filter(Boolean);
+
+                // 2) Compute this condition's slug the same way the record is made
+                //    (you already did above; re-use the same `slug` variable)
+                //    -> ensure no self-association and no duplicates
+                const targetSlugs = Array.from(
+                    new Set(requestedSlugs.filter(s => s !== slug))
+                );
+
+                if (targetSlugs.length) {
+                    // 3) Look up existing associated conditions by slug
+                    const assocTargets = await prisma.condition.findMany({
+                        where: { slug: { in: targetSlugs } },
+                        select: { id: true, slug: true }
+                    });
+
+                    // 4) (Optional) Warn on any slugs that didn't resolve to a Condition
+                    const foundSlugs = new Set(assocTargets.map(a => a.slug));
+                    const missing = targetSlugs.filter(s => !foundSlugs.has(s));
+                    if (missing.length) {
+                        console.warn("Associated conditions not found (skipped):", missing);
+                    }
+
+                    // 5) Replace associations atomically
+                    await prisma.condition.update({
+                        where: { id: condition.id },
+                        data: {
+                            associatedConditions: {
+                                set: [],                              // replace existing associations
+                                connect: assocTargets.map(a => ({ id: a.id }))
+                            }
+                        }
+                    });
+                } else {
+                    // If nothing valid was provided, ensure we clear previous associations
+                    await prisma.condition.update({
+                        where: { id: condition.id },
+                        data: { associatedConditions: { set: [] } }
+                    });
+                }
+            } catch (assocErr) {
+                console.error("Error syncing associated conditions:", assocErr);
+                // Non-fatal: keep creating/updating the condition even if association sync fails.
+            }
+
             return {success: true, data: condition};
         } catch (error: any) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {

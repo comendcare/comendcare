@@ -7,6 +7,46 @@ import React from "react";
 import EditPAGProfileConditionCardDialog from "~web/components/edit-pag-profile-condition-card-dialog";
 import {Info} from "lucide-react";
 import {formatNumberWithCommas} from "@/packages/lib/utils";
+import type {Prisma} from "@prisma/client"; // type-only; erased at build
+
+
+type AssocMini = { id: string; name: string; slug: string };
+
+type ConditionForCard = Prisma.ConditionGetPayload<{
+    select: {
+        id: true;
+        name: true;
+        slug: true;
+        prevalenceNumerator: true;
+        prevalenceDenominator: true;
+        numberOfPatientsEngaged: true;
+        nationalEstimatedPopulation: true;
+        globalEstimatedPopulation: true;
+        diseaseCategories: true;
+        causalGenes: true;
+        associatedGenes: true;
+        associatedConditions: { select: { id: true; name: true; slug: true } };
+        associatedWith: { select: { id: true; name: true; slug: true } };
+    };
+}>;
+
+function getAssociatedSet(c: Pick<ConditionForCard, "slug" | "associatedConditions" | "associatedWith">): AssocMini[] {
+    const all = [...(c.associatedConditions ?? []), ...(c.associatedWith ?? [])];
+    const seen = new Set<string>();
+    const selfSlug = c.slug;
+    const out: AssocMini[] = [];
+
+    for (const x of all) {
+        if (!x) continue;
+        if (x.slug === selfSlug) continue;         // safety: no self
+        if (seen.has(x.id)) continue;              // dedupe
+        seen.add(x.id);
+        out.push(x);
+    }
+    out.sort((a, b) => a.name.localeCompare(b.name));
+    return out;
+}
+
 
 export const PAGProfileConditionsCard = ({
                                              conditions,
@@ -40,6 +80,38 @@ export const PAGProfileConditionsCard = ({
                             key={condition?.id}
                             className="flex flex-col space-y-4"
                         >
+
+                            <div className="space-y-2">
+                                {(isPrivate || (!isPrivate && condition)) && (
+                                    <>
+                                        <div className="flex flex-row items-center justify-between w-full">
+                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                                Associated conditions
+                                            </h4>
+                                        </div>
+
+                                        {(() => {
+                                            const assoc = getAssociatedSet(condition as any);
+
+                                            if (!assoc.length) {
+                                                return <p className="text-gray-400">No associated conditions.</p>;
+                                            }
+
+                                            return (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {assoc.map((ac) => (
+                                                        <span key={ac.id}>
+                                                    <Badge className="text-sm inline">
+                                                        {ac.name}
+                                                    </Badge>
+                                                </span>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })()}
+                                    </>
+                                )}
+                            </div>
                             {/*<div className="space-y-2">*/}
                             {/*    <div className="inline-flex flex-row justify-between items-center">*/}
                             {/*<Link*/}
@@ -68,7 +140,7 @@ export const PAGProfileConditionsCard = ({
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             <p>
-                                                {`The number presented here are all approximate.`}
+                                                {`The numbers presented here are all approximate.`}
                                             </p>
                                         </TooltipContent>
                                     </Tooltip>
