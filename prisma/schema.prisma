@@ -639,7 +639,7 @@ model ExternalContact {
   milestoneId    String?
   milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
   metadata       Json?
-  DiseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
   diseaseModelId String?
 }
 
@@ -773,7 +773,7 @@ model Condition {
   prevalenceRatio             Float?
   organizations               ConditionToOrganization[]
   metadata                    Json?
-  DiseaseModel                DiseaseModel[]
+  diseaseModel                DiseaseModel[]
   associatedConditions        Condition[]               @relation("AssociatedConditions")
   associatedWith              Condition[]               @relation("AssociatedConditions")
 }
@@ -914,9 +914,9 @@ model Gene {
   orphanet             Int? // Orphanet ID for rare diseases
   lsdb                 String[] // Locus-Specific Database links
   metadata             Json?
-  Biosample            Biosample[]
-  DiseaseModel         DiseaseModel[]
-  Tool                 Tool[]
+  biosample            Biosample[]
+  diseaseModel         DiseaseModel[]
+  tool                 Tool[]
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
@@ -1194,8 +1194,8 @@ model Institution {
   updatedAt             DateTime                  @updatedAt
   metadata              Json?
   institutionToRequests InstitutionToRequest[]
-  DiseaseModel          DiseaseModel[]
-  Tool                  Tool[]
+  diseaseModel          DiseaseModel[]
+  tool                  Tool[]
 }
 
 model InstitutionRelationship {
