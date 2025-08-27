@@ -639,7 +639,7 @@ model ExternalContact {
   milestoneId    String?
   milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
   metadata       Json?
-  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  DiseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
   diseaseModelId String?
 }
 
@@ -748,7 +748,7 @@ model Follow {
 
 model Condition {
   id                          String                    @id @default(cuid())
-  name                        String
+  name                        String                    @unique
   slug                        String                    @unique
   synonyms                    String[]
   description                 String?
@@ -773,7 +773,9 @@ model Condition {
   prevalenceRatio             Float?
   organizations               ConditionToOrganization[]
   metadata                    Json?
-  diseaseModel                DiseaseModel[]
+  DiseaseModel                DiseaseModel[]
+  associatedConditions        Condition[]               @relation("AssociatedConditions")
+  associatedWith              Condition[]               @relation("AssociatedConditions")
 }
 
 model ConditionToOrganization {
@@ -912,9 +914,9 @@ model Gene {
   orphanet             Int? // Orphanet ID for rare diseases
   lsdb                 String[] // Locus-Specific Database links
   metadata             Json?
-  biosample            Biosample[]
-  diseaseModel         DiseaseModel[]
-  tool                 Tool[]
+  Biosample            Biosample[]
+  DiseaseModel         DiseaseModel[]
+  Tool                 Tool[]
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
@@ -1164,13 +1166,13 @@ model PharmaProject {
 
 model Institution {
   id           String   @id @default(uuid())
-  rorId        String?   @unique
+  rorId        String   @unique
   name         String
   established  Int?
   types        String[]
   aliases      String[]
   acronyms     String[]
-  status       String?
+  status       String
   wikipediaUrl String?
   website      String?
   city         String?
@@ -1179,7 +1181,7 @@ model Institution {
 
   fundrefAll       String[]
   fundrefPreferred String?
-  gridAll          String?
+  gridAll          String
   gridPreferred    String?
   isniAll          String[]
   wikidataAll      String[]
@@ -1192,8 +1194,8 @@ model Institution {
   updatedAt             DateTime                  @updatedAt
   metadata              Json?
   institutionToRequests InstitutionToRequest[]
-  diseaseModel          DiseaseModel[]
-  tool                  Tool[]
+  DiseaseModel          DiseaseModel[]
+  Tool                  Tool[]
 }
 
 model InstitutionRelationship {

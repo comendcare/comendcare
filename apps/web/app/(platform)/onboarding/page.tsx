@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
+import {useRouter} from "next/navigation";
+import {useSession} from "next-auth/react";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 
 // UI
 import {
@@ -17,28 +17,30 @@ import {
     FormLabel,
     FormMessage,
 } from "@comend/components/ui/form";
-import { Input } from "@comend/components/ui/input";
-import { Button } from "@comend/components/ui/button";
-import { Checkbox } from "@comend/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@comend/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
+import {Checkbox} from "@comend/components/ui/checkbox";
+import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
-import { ToggleGroup, ToggleGroupItem } from "@comend/components/ui/toggle-group";
-import { Separator } from "@comend/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip";
+import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
+import {Separator} from "@comend/components/ui/separator";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import { Skeleton } from "@comend/components/ui/skeleton";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import MoneyInput from "@comend/components/money-input";
+import {ScrollProgress} from "@comend/components/ui/scroll-progress";
 
 // Domain helpers / types
-import type { FileWithPreview } from "@comend/components/image-selector";
-import { acceptedFiletypes, years, getPublicFile } from "@comend/lib/utils";
-import { Option, optionSchema, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types";
+import type {FileWithPreview} from "@comend/components/image-selector";
+import {acceptedFiletypes, years, getPublicFile} from "@comend/lib/utils";
+import {Option, optionSchema, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 
 // Data
-import { useDebounce } from "use-debounce";
-import { useDropzone } from "react-dropzone";
+import {useDebounce} from "use-debounce";
+import {useDropzone} from "react-dropzone";
 import mixpanel from "mixpanel-browser";
-import { toast } from "sonner";
+import {toast} from "sonner";
 
 // Actions / API
 import {
@@ -57,8 +59,9 @@ import {
     getOrganizationFromOrganizationId,
     checkSubdomainAvailability,
 } from "@comend/lib/fetchers";
-import { handleImageUpload } from "@comend/lib/upload";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
+import {handleImageUpload} from "@comend/lib/upload";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
+import {Textarea} from "@/packages/components/ui/textarea";
 
 const safeMixpanel = {
     identify: (...args: any[]) => {
@@ -99,7 +102,7 @@ const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
 
 const unifiedSchema = z.object({
     // USER
-    name: z.string().min(2, { message: "Your name must be at least 2 characters." }),
+    name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     userImage: z.string().optional(),
@@ -110,6 +113,11 @@ const unifiedSchema = z.object({
     org: z.array(optionSchema).optional(), // id,label (max 1)
     // create new
     orgName: z.string().min(2).max(60).optional(),
+    description: z.string().min(2, {
+        message: "Your organization's description must be at least 2 characters long.",
+    }).max(500, {
+        message: "Your organization's description must less than 500 characters long.",
+    }).optional(),
     subdomain: z.string().min(2).max(60).optional(),
     website: z.string().optional(),
     contactEmail: z.string().email().optional(),
@@ -119,11 +127,12 @@ const unifiedSchema = z.object({
     otherTherapeuticsInDevelopment: z.string().optional(),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),
-    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
+    // incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
     orgImage: z.string().optional(),
 
     // RESEARCH / CONDITION
-    disorder: z.array(optionSchema).optional(), // max 1
+    disorder: z.array(optionSchema),
+    associatedConditions: z.array(optionSchema),
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),
@@ -147,12 +156,30 @@ const unifiedSchema = z.object({
     deployed: z.number().optional(),
 });
 
+const normalized = (s?: string) => (s || "").trim().toLowerCase();
+
+const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
+    const disorderLabel = normalized(vals.disorder?.[0]?.label);
+    if (!disorderLabel) return;
+
+    const hasSelf = (vals.associatedConditions || [])
+        .some(opt => normalized(opt?.label) === disorderLabel);
+
+    if (hasSelf) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["associatedConditions"],
+            message: "A condition cannot be associated with itself."
+        });
+    }
+});
+
 /**************************************
  * Component
  **************************************/
 export default function OnboardingPage() {
     const router = useRouter();
-    const { data: session, status, update } = useSession();
+    const {data: session, status, update} = useSession();
 
     // Loading/initial state
     const [isInitializing, setIsInitializing] = useState(true);
@@ -170,7 +197,7 @@ export default function OnboardingPage() {
     // Debounced subdomain check
     const form = useForm<z.infer<typeof unifiedSchema>>({
         mode: "onChange",
-        resolver: zodResolver(unifiedSchema),
+        resolver: zodResolver(refinedSchema),
         defaultValues: {
             name: "",
             notificationSettings: true,
@@ -194,7 +221,7 @@ export default function OnboardingPage() {
             toast.error("SVG files are not allowed. Please select a valid image.");
             return;
         }
-        const withPreview = Object.assign(file, { preview: URL.createObjectURL(file) });
+        const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
         setSelectedUserFile(withPreview);
     }, []);
 
@@ -205,12 +232,12 @@ export default function OnboardingPage() {
             toast.error("SVG files are not allowed. Please select a valid image.");
             return;
         }
-        const withPreview = Object.assign(file, { preview: URL.createObjectURL(file) });
+        const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
         setSelectedOrgFile(withPreview);
     }, []);
 
-    const userDropzone = useDropzone({ onDrop: onDropUser, accept: acceptedFiletypes });
-    const orgDropzone = useDropzone({ onDrop: onDropOrg, accept: acceptedFiletypes });
+    const userDropzone = useDropzone({onDrop: onDropUser, accept: acceptedFiletypes});
+    const orgDropzone = useDropzone({onDrop: onDropOrg, accept: acceptedFiletypes});
 
     /**************************************
      * Initialization: fetch user, orgs, invitations
@@ -238,14 +265,14 @@ export default function OnboardingPage() {
                                 image: true,
                                 subdomain: true,
                             });
-                            return { ...i, organization: orgRes.success ? orgRes.data : null };
+                            return {...i, organization: orgRes.success ? orgRes.data : null};
                         })
                     );
                     setInvitations(withDetails);
                 }
 
                 // Organizations (for joining)
-                const orgsRes = await getAllNonMemberOrganizations({ id: true, name: true, description: true });
+                const orgsRes = await getAllNonMemberOrganizations({id: true, name: true, description: true});
                 if (orgsRes.success && orgsRes.data) {
                     const opts: Option[] = orgsRes.data.map((org: any, idx: number) => ({
                         value: org.id || String(idx),
@@ -287,7 +314,7 @@ export default function OnboardingPage() {
                         if (u.image) {
                             try {
                                 const file: File = await getPublicFile(u.image);
-                                const withPreview = Object.assign(file, { preview: URL.createObjectURL(file) });
+                                const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
                                 setSelectedUserFile(withPreview);
                             } catch (e) {
                                 console.error(e);
@@ -301,13 +328,14 @@ export default function OnboardingPage() {
                     const oRes = await getOrganizationFromOrganizationId(session.user.organizationId, {
                         id: true,
                         name: true,
+                        description: true,
                         subdomain: true,
                         website: true,
                         contactEmail: true,
                         yearFounded: true,
                         therapeuticsInDevelopment: true,
                         therapeuticsOfInterest: true,
-                        incorporationStatus: true,
+                        // incorporationStatus: true,
                         image: true,
                         members: true,
                         metadata: true,
@@ -321,23 +349,30 @@ export default function OnboardingPage() {
                             ...form.getValues(),
                             isNewOrganization: false, // assume they may want to update existing
                             orgName: org.name || "",
+                            description: org.description || "",
                             subdomain: org.subdomain || "",
                             website: org.website || "",
                             contactEmail: org.contactEmail || "",
                             title: currentUserTitle,
                             founded: org.yearFounded ? `${org.yearFounded}-01-01` : undefined,
-                            therapeuticsInDevelopment: org.therapeuticsInDevelopment?.map((x: string) => ({ label: x, value: x })),
+                            therapeuticsInDevelopment: org.therapeuticsInDevelopment?.map((x: string) => ({
+                                label: x,
+                                value: x
+                            })),
                             otherTherapeuticsInDevelopment: typeof org?.metadata === "object" ? (org.metadata as any)?.otherTherapeuticsInDevelopment : undefined,
-                            therapeuticsOfInterest: org.therapeuticsOfInterest?.map((x: string) => ({ label: x, value: x })),
+                            therapeuticsOfInterest: org.therapeuticsOfInterest?.map((x: string) => ({
+                                label: x,
+                                value: x
+                            })),
                             otherTherapeuticsOfInterest: typeof org?.metadata === "object" ? (org.metadata as any)?.otherTherapeuticsOfInterest : undefined,
-                            incorporationStatus: org.incorporationStatus,
+                            // incorporationStatus: org.incorporationStatus,
                             orgImage: org.image || "",
                         });
 
                         if (org.image) {
                             try {
                                 const of: File = await getPublicFile(org.image);
-                                const withPreview = Object.assign(of, { preview: URL.createObjectURL(of) });
+                                const withPreview = Object.assign(of, {preview: URL.createObjectURL(of)});
                                 setSelectedOrgFile(withPreview);
                             } catch (e) {
                                 console.error(e);
@@ -364,7 +399,10 @@ export default function OnboardingPage() {
             try {
                 const ok = await checkSubdomainAvailability(sd);
                 if (!ok) {
-                    form.setError("subdomain", { type: "manual", message: "This nickname is already taken. Please choose another." });
+                    form.setError("subdomain", {
+                        type: "manual",
+                        message: "This nickname is already taken. Please choose another."
+                    });
                 } else {
                     form.clearErrors("subdomain");
                 }
@@ -408,7 +446,7 @@ export default function OnboardingPage() {
                     image: values.userImage,
                 };
                 for (const [key, value] of Object.entries(userPayload)) {
-                    const res: any = await editUser(session.user.id as string, { [key]: value });
+                    const res: any = await editUser(session.user.id as string, {[key]: value});
                     if (res?.error) {
                         toast.error(res.error);
                         return;
@@ -417,7 +455,7 @@ export default function OnboardingPage() {
             }
 
             // Track
-            mixpanelTrack("Onboarding: user saved", { name: values.name });
+            mixpanelTrack("Onboarding: user saved", {name: values.name});
 
             // 4) Organization: join or create (and possibly update existing)
             let orgId = session?.user?.organizationId as string | undefined;
@@ -438,12 +476,13 @@ export default function OnboardingPage() {
                 // Create/update org
                 const formData = new FormData();
                 if (values.orgName) formData.append("orgName", values.orgName);
+                if (values.description) formData.append("description", values.description);
                 if (values.subdomain) formData.append("subdomain", values.subdomain);
                 if (values.website) formData.append("website", values.website);
                 if (values.contactEmail) formData.append("contactEmail", values.contactEmail);
                 if (values.title) formData.append("title", values.title);
                 if (values.founded) formData.append("founded", values.founded);
-                if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
+                // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
 
                 // Upload org image only if changed
                 if (selectedOrgFile && values.orgImage) {
@@ -469,12 +508,15 @@ export default function OnboardingPage() {
                     return;
                 }
                 toast.success("Successfully created organization!");
-                mixpanelTrack("Created Organization", { orgName: values.orgName, looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",") });
+                mixpanelTrack("Created Organization", {
+                    orgName: values.orgName,
+                    looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
+                });
 
                 // Update session with new org
                 if (createRes?.organization?.id) {
                     orgId = createRes.organization.id as string;
-                    await update({ ...session, organizationId: orgId, membership: createRes.membership });
+                    await update({...session, organizationId: orgId, membership: createRes.membership});
                 }
             }
 
@@ -483,6 +525,7 @@ export default function OnboardingPage() {
                 const cfd = new FormData();
                 const conditionData = {
                     name: values.disorder?.[0]?.label || "",
+                    associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
                     summary: values.summary || "",
                     diseaseCategories: values.categories?.map((c) => c.label).join(",") || "",
                     prevalenceNumerator: values.prevalenceNumerator || "",
@@ -494,7 +537,10 @@ export default function OnboardingPage() {
                     causalGenes: values.causal?.map((g) => g.label).join(",") || "",
                     associatedGenes: values.genes?.map((g) => g.label).join(",") || "",
                     associatedSystems: values.systems?.map((s) => s.label).join(",") || "",
-                    metadata: JSON.stringify({ otherCategories: values.otherCategories, otherSystems: values.otherSystems }),
+                    metadata: JSON.stringify({
+                        otherCategories: values.otherCategories,
+                        otherSystems: values.otherSystems
+                    }),
                 };
                 Object.entries(conditionData).forEach(([k, v]) => v && cfd.append(k, v as string));
 
@@ -553,27 +599,37 @@ export default function OnboardingPage() {
 
     if (status === "loading" || isInitializing) {
         return (
-            <div className="h-full w-full flex flex-col gap-2">
-                <Skeleton className="h-[20px] w-full" />
-                <Skeleton className="h-[32px] w-full" />
-                <Skeleton className="mt-4 h-[80px] w-full" />
-                <Skeleton className="h-[80px] w-full" />
-                <Skeleton className="mt-4 h-[40px] w-full" />
+            <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto">
+                <Skeleton className="h-[20px] w-full"/>
+                <Skeleton className="h-[32px] w-full"/>
+                <Skeleton className="mt-4 h-[80px] w-full"/>
+                <Skeleton className="h-[80px] w-full"/>
+                <Skeleton className="mt-4 h-[40px] w-full"/>
+                <Skeleton className="h-[20px] w-full"/>
+                <Skeleton className="h-[32px] w-full"/>
+                <Skeleton className="mt-4 h-[80px] w-full"/>
+                <Skeleton className="h-[80px] w-full"/>
+                <Skeleton className="mt-4 h-[40px] w-full"/>
             </div>
         );
     }
 
     return (
         <TooltipProvider>
+            <ScrollProgress className="top-[0px] h-4"/>
             <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto">
                 <div>
                     <h1 className="text-2xl font-semibold">Welcome to Comend</h1>
-                    <p className="text-sm text-muted-foreground">One simple form. We’ll use your answers to set up your profile, organization, condition, and finances.</p>
+                    <p className="text-sm text-muted-foreground">One simple form. We’ll use your answers to set up your
+                        profile, organization, condition, and finances.</p>
                 </div>
-                <Separator />
+                <Separator/>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit, (e) => { console.log(e); toast.error("Please fix the highlighted errors."); })} className="space-y-10">
+                    <form onSubmit={form.handleSubmit(onSubmit, (e) => {
+                        console.log(e);
+                        toast.error("Please fix the highlighted errors.");
+                    })} className="space-y-10">
                         {/* USER */}
                         <section className="space-y-6">
                             <h2 className="text-xl font-semibold">Your profile</h2>
@@ -581,11 +637,11 @@ export default function OnboardingPage() {
                             <FormField
                                 control={form.control}
                                 name="name"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Your Full Name (required)</FormLabel>
+                                        <FormLabel>Your full name (required)</FormLabel>
                                         <FormControl><Input type="text" {...field} /></FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -594,14 +650,16 @@ export default function OnboardingPage() {
                                 <FormField
                                     control={form.control}
                                     name="notificationSettings"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                    render={({field}) => (
+                                        <FormItem
+                                            className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                             <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
                                                 <FormLabel>Allow platform updates & notifications</FormLabel>
-                                                <FormDescription>You can change this later in settings.</FormDescription>
+                                                <FormDescription>You can change this later in
+                                                    settings.</FormDescription>
                                             </div>
                                         </FormItem>
                                     )}
@@ -610,14 +668,16 @@ export default function OnboardingPage() {
                                 <FormField
                                     control={form.control}
                                     name="consentSettings"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                    render={({field}) => (
+                                        <FormItem
+                                            className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                             <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
                                                 <FormLabel>I consent to data collection to improve Comend</FormLabel>
-                                                <FormDescription>Analytics preferences can be updated anytime.</FormDescription>
+                                                <FormDescription>Analytics preferences can be updated
+                                                    anytime.</FormDescription>
                                             </div>
                                         </FormItem>
                                     )}
@@ -628,15 +688,16 @@ export default function OnboardingPage() {
                             <FormField
                                 control={form.control}
                                 name="userImage"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Profile photo</FormLabel>
-                                        <div {...userDropzone.getRootProps({ className: "border rounded-lg p-4 cursor-pointer" })}>
+                                        <div {...userDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
                                             <input {...userDropzone.getInputProps()} />
                                             {selectedUserFile ? (
                                                 <div className="flex items-center space-x-4">
                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                    <img src={(selectedUserFile as any).preview} alt="preview" className="h-16 w-16 rounded-full object-cover" />
+                                                    <img src={(selectedUserFile as any).preview} alt="preview"
+                                                         className="h-16 w-16 rounded-full object-cover"/>
                                                     <span>Click to replace</span>
                                                 </div>
                                             ) : (
@@ -647,13 +708,13 @@ export default function OnboardingPage() {
                                         {/*<FormControl>*/}
                                         {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
                                         {/*</FormControl>*/}
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
                         </section>
 
-                        <Separator />
+                        <Separator/>
 
                         {/* ORGANIZATION */}
                         <section className="space-y-6">
@@ -662,15 +723,27 @@ export default function OnboardingPage() {
                             <FormField
                                 control={form.control}
                                 name="isNewOrganization"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormControl>
-                                            <ToggleGroup type="single" value={field.value ? "new" : "existing"} onValueChange={(v) => field.onChange(v === "new")}>
-                                                <ToggleGroupItem value="new" aria-label="Create a new organization" className={field.value ? "bg-gray-200" : ""}>Create a new organization</ToggleGroupItem>
-                                                <ToggleGroupItem value="existing" aria-label="Join an existing organization" className={!field.value ? "bg-gray-200" : ""}>Join an existing organization</ToggleGroupItem>
+                                            <ToggleGroup
+                                                type="single"
+                                                value={field.value ? "new" : "existing"}
+                                                onValueChange={(v) => field.onChange(v === "new")}
+                                                className="items-start self-start justify-start"
+                                            >
+                                                <ToggleGroupItem value="new" aria-label="Create a new organization"
+                                                                 className={field.value ? "bg-gray-200" : ""}>
+                                                    Create a new organization
+                                                </ToggleGroupItem>
+                                                <ToggleGroupItem value="existing"
+                                                                 aria-label="Join an existing organization"
+                                                                 className={!field.value ? "bg-gray-200" : ""}>
+                                                    Join an existing organization
+                                                </ToggleGroupItem>
                                             </ToggleGroup>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -679,20 +752,24 @@ export default function OnboardingPage() {
                                 <FormField
                                     control={form.control}
                                     name="org"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Organization Name</FormLabel>
+                                            <FormLabel>Organization name</FormLabel>
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
                                                     maxSelected={1}
                                                     defaultOptions={organizations}
                                                     placeholder="Select your organization..."
-                                                    emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
+                                                    emptyIndicator={<p
+                                                        className="text-center text-sm text-muted-foreground">no results
+                                                        found.</p>}
+                                                    showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormDescription>Your request to join the organization will be sent.</FormDescription>
-                                            <FormMessage />
+                                            <FormDescription>Your request to join the organization will be
+                                                sent.</FormDescription>
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
@@ -701,11 +778,29 @@ export default function OnboardingPage() {
                                     <FormField
                                         control={form.control}
                                         name="orgName"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Organization Name (required)</FormLabel>
                                                 <FormControl><Input type="text" {...field} /></FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="description"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Describe your organization in a few sentences.</FormLabel>
+                                                <FormControl>
+                                                    <Textarea
+                                                        rows={4}
+                                                        placeholder="Up to 500 characters"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -713,19 +808,21 @@ export default function OnboardingPage() {
                                     <FormField
                                         control={form.control}
                                         name="subdomain"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Organization Abbreviation (required)</FormLabel>
                                                 <FormDescription>
                                                     Choose the URL for your custom profile site.
                                                     {form.watch("subdomain") && !form.formState.errors.subdomain && (
-                                                        <div className="font-semibold">Your site will be {form.watch("subdomain")?.toLowerCase()?.replace(/\s+/g, "-")}.comend.io</div>
+                                                        <div className="font-semibold">Your site will
+                                                            be {form.watch("subdomain")?.toLowerCase()?.replace(/\s+/g, "-")}.comend.io</div>
                                                     )}
                                                 </FormDescription>
                                                 <FormControl>
-                                                    <Input {...field} onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))} />
+                                                    <Input {...field}
+                                                           onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}/>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -734,11 +831,11 @@ export default function OnboardingPage() {
                                         <FormField
                                             control={form.control}
                                             name="website"
-                                            render={({ field }) => (
+                                            render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Website</FormLabel>
                                                     <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage />
+                                                    <FormMessage/>
                                                 </FormItem>
                                             )}
                                         />
@@ -746,11 +843,12 @@ export default function OnboardingPage() {
                                         <FormField
                                             control={form.control}
                                             name="contactEmail"
-                                            render={({ field }) => (
+                                            render={({field}) => (
                                                 <FormItem>
                                                     <FormLabel>Contact Email</FormLabel>
-                                                    <FormControl><Input type="email" placeholder="name@example.com" {...field} /></FormControl>
-                                                    <FormMessage />
+                                                    <FormControl><Input type="email"
+                                                                        placeholder="name@example.com" {...field} /></FormControl>
+                                                    <FormMessage/>
                                                 </FormItem>
                                             )}
                                         />
@@ -759,11 +857,11 @@ export default function OnboardingPage() {
                                     <FormField
                                         control={form.control}
                                         name="title"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Role</FormLabel>
+                                                <FormLabel>Title of your role</FormLabel>
                                                 <FormControl><Input type="text" {...field} /></FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -771,12 +869,14 @@ export default function OnboardingPage() {
                                     <FormField
                                         control={form.control}
                                         name="founded"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Year Founded</FormLabel>
-                                                <Select onValueChange={(v) => field.onChange(`${v}-01-01`)} defaultValue={field.value?.split("-")?.[0]}>
+                                                <Select onValueChange={(v) => field.onChange(`${v}-01-01`)}
+                                                        defaultValue={field.value?.split("-")?.[0]}>
                                                     <FormControl>
-                                                        <SelectTrigger><SelectValue placeholder="Select a year" /></SelectTrigger>
+                                                        <SelectTrigger><SelectValue
+                                                            placeholder="Select a year"/></SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
                                                         {years.map((y) => (
@@ -784,7 +884,7 @@ export default function OnboardingPage() {
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -792,7 +892,7 @@ export default function OnboardingPage() {
                                     <FormField
                                         control={form.control}
                                         name="therapeuticsInDevelopment"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Therapeutics under development</FormLabel>
                                                 <FormControl>
@@ -801,10 +901,13 @@ export default function OnboardingPage() {
                                                         defaultOptions={MODALITIES}
                                                         placeholder="Select modalities..."
                                                         hidePlaceholderWhenSelected
-                                                        emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
+                                                        emptyIndicator={<p
+                                                            className="text-center text-sm text-muted-foreground">no
+                                                            results found.</p>}
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -813,11 +916,12 @@ export default function OnboardingPage() {
                                         <FormField
                                             control={form.control}
                                             name="otherTherapeuticsInDevelopment"
-                                            render={({ field }) => (
+                                            render={({field}) => (
                                                 <FormItem>
-                                                    <FormDescription>(Optional) Other details for internal improvement only.</FormDescription>
+                                                    <FormDescription>(Optional) Other details for internal improvement
+                                                        only.</FormDescription>
                                                     <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage />
+                                                    <FormMessage/>
                                                 </FormItem>
                                             )}
                                         />
@@ -826,7 +930,7 @@ export default function OnboardingPage() {
                                     <FormField
                                         control={form.control}
                                         name="therapeuticsOfInterest"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Therapeutics of interest</FormLabel>
                                                 <FormControl>
@@ -835,10 +939,13 @@ export default function OnboardingPage() {
                                                         defaultOptions={MODALITIES}
                                                         placeholder="Select modalities..."
                                                         hidePlaceholderWhenSelected
-                                                        emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
+                                                        emptyIndicator={<p
+                                                            className="text-center text-sm text-muted-foreground">no
+                                                            results found.</p>}
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -847,71 +954,77 @@ export default function OnboardingPage() {
                                         <FormField
                                             control={form.control}
                                             name="otherTherapeuticsOfInterest"
-                                            render={({ field }) => (
+                                            render={({field}) => (
                                                 <FormItem>
-                                                    <FormDescription>(Optional) Other details for internal improvement only.</FormDescription>
+                                                    <FormDescription>(Optional) Other details for internal improvement
+                                                        only.</FormDescription>
                                                     <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage />
+                                                    <FormMessage/>
                                                 </FormItem>
                                             )}
                                         />
                                     )}
 
-                                    <FormField
-                                        control={form.control}
-                                        name="incorporationStatus"
-                                        render={({ field }) => (
-                                            <FormItem className="space-y-3">
-                                                <FormLabel>What is your 501(c)(3) status?</FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-1">
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl><RadioGroupItem value="YES" /></FormControl>
-                                                            <FormLabel className="font-normal">Yes, I have a 501(c)(3)</FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl><RadioGroupItem value="INPROGRESS" /></FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`No, but I'm working on it`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl><RadioGroupItem value="NO" /></FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`No, I don't have a 501(c)(3)`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {/*<FormField*/}
+                                    {/*    control={form.control}*/}
+                                    {/*    name="incorporationStatus"*/}
+                                    {/*    render={({field}) => (*/}
+                                    {/*        <FormItem className="space-y-3">*/}
+                                    {/*            <FormLabel>What is your 501(c)(3) status?</FormLabel>*/}
+                                    {/*            <FormControl>*/}
+                                    {/*                <RadioGroup onValueChange={field.onChange} value={field.value}*/}
+                                    {/*                            className="flex flex-col space-y-1">*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl><RadioGroupItem value="YES"/></FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">Yes, I have a*/}
+                                    {/*                            501(c)(3)</FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl><RadioGroupItem*/}
+                                    {/*                            value="INPROGRESS"/></FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`No, but I'm working on it`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl><RadioGroupItem value="NO"/></FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`No, I don't have a 501(c)(3)`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                </RadioGroup>*/}
+                                    {/*            </FormControl>*/}
+                                    {/*            <FormMessage/>*/}
+                                    {/*        </FormItem>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
 
                                     {/* Org image */}
                                     <FormField
                                         control={form.control}
                                         name="orgImage"
-                                        render={({ field }) => (
+                                        render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Organization image</FormLabel>
-                                                <div {...orgDropzone.getRootProps({ className: "border rounded-lg p-4 cursor-pointer" })}>
+                                                <FormLabel>Organization logo</FormLabel>
+                                                <div {...orgDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
                                                     <input {...orgDropzone.getInputProps()} />
                                                     {selectedOrgFile ? (
                                                         <div className="flex items-center space-x-4">
                                                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                            <img src={(selectedOrgFile as any).preview} alt="preview" className="h-16 w-16 rounded-md object-cover" />
+                                                            <img src={(selectedOrgFile as any).preview} alt="preview"
+                                                                 className="h-16 w-16 rounded-md object-cover"/>
                                                             <span>Click to replace</span>
                                                         </div>
                                                     ) : (
                                                         <p>Drag & drop or click to upload</p>
                                                     )}
                                                 </div>
-                                                <FormDescription className="text-xs">PNG/JPG only (no SVG).</FormDescription>
+                                                <FormDescription className="text-xs">PNG/JPG only (no
+                                                    SVG).</FormDescription>
                                                 {/*<FormControl>*/}
                                                 {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
                                                 {/*</FormControl>*/}
-                                                <FormMessage />
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
@@ -919,125 +1032,207 @@ export default function OnboardingPage() {
                             )}
                         </section>
 
-                        <Separator />
+                        {isNewOrg && (
+                            <>
+                                <Separator/>
 
-                        {/* RESEARCH / CONDITION */}
-                        <section className="space-y-6">
-                            <h2 className="text-xl font-semibold">Condition</h2>
+                                {/* RESEARCH / CONDITION */}
+                                <section className="space-y-6">
+                                    <h2 className="text-xl font-semibold">Condition</h2>
 
-                            <FormField
-                                control={form.control}
-                                name="disorder"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Name of condition (optional)</FormLabel>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                creatable
-                                                maxSelected={1}
-                                                onSearch={handleConditionSearch}
-                                                placeholder="Search for conditions..."
-                                                hidePlaceholderWhenSelected
-                                                loadingIndicator={<p>Loading conditions...</p>}
-                                                emptyIndicator={<p>No conditions found.</p>}
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                    <FormField
+                                        control={form.control}
+                                        name="disorder"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Name of condition</FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        creatable
+                                                        maxSelected={1}
+                                                        onSearch={handleConditionSearch}
+                                                        placeholder="Search for conditions..."
+                                                        hidePlaceholderWhenSelected
+                                                        loadingIndicator={<p>Loading conditions...</p>}
+                                                        emptyIndicator={<p>No conditions found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <FormField
-                                control={form.control}
-                                name="categories"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Mechanisms of action</FormLabel>
-                                        <FormDescription>What types of genetic effects are you investigating? Select all that apply.</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MOLECULAR_MECHANISMS}
-                                                placeholder="Select categories..."
-                                                hidePlaceholderWhenSelected
-                                                emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                    <FormField
+                                        control={form.control}
+                                        name="associatedConditions"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated Conditions</FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        creatable
+                                                        maxSelected={5}
+                                                        onSearch={handleConditionSearch}
+                                                        placeholder="Search for conditions..."
+                                                        hidePlaceholderWhenSelected
+                                                        loadingIndicator={<p>Loading conditions...</p>}
+                                                        emptyIndicator={<p>No conditions found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <FormField control={form.control} name="engaged" render={({ field }) => (
+                                    <FormField control={form.control} name="summary" render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Number of patients engaged</FormLabel>
-                                            <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                            <FormMessage />
+                                            <FormLabel>Describe your condition in a few sentences.</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    rows={4}
+                                                    placeholder="Up to 500 characters"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
                                         </FormItem>
+                                    )}/>
+
+                                    <FormField
+                                        control={form.control}
+                                        name="categories"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Mechanisms of action</FormLabel>
+                                                <FormDescription>What types of genetic effects are you investigating?
+                                                    Select all that apply.</FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MOLECULAR_MECHANISMS}
+                                                        placeholder="Select categories..."
+                                                        hidePlaceholderWhenSelected
+                                                        emptyIndicator={<p
+                                                            className="text-center text-sm text-muted-foreground">no
+                                                            results found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {form.watch("categories")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                                        <FormField
+                                            control={form.control}
+                                            name="otherCategories"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormDescription>(Optional) Other details for internal improvement
+                                                        only.</FormDescription>
+                                                    <FormControl><Input {...field} /></FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
                                     )}
-                                />
-                                <FormField control={form.control} name="national" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>National estimated population</FormLabel>
-                                        <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="global" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Global estimated population</FormLabel>
-                                        <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                            </div>
 
-                            <FormField
-                                control={form.control}
-                                name="causal"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Causal genes</FormLabel>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                onSearch={handleGeneSearch}
-                                                placeholder="Search for genes..."
-                                                triggerSearchOnFocus
-                                                hidePlaceholderWhenSelected
-                                                loadingIndicator={<p>Loading genes...</p>}
-                                                emptyIndicator={<p>No genes found.</p>}
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </section>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <FormField control={form.control} name="engaged" render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Number of patients engaged</FormLabel>
+                                                <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                        />
+                                        <FormField control={form.control} name="national" render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Estimated US patient population</FormLabel>
+                                                <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}/>
+                                        <FormField control={form.control} name="global" render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Estimated global patient population</FormLabel>
+                                                <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}/>
+                                    </div>
 
-                        <Separator />
+                                    <FormField
+                                        control={form.control}
+                                        name="causal"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Causal genes</FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleGeneSearch}
+                                                        placeholder="Search for genes..."
+                                                        triggerSearchOnFocus
+                                                        hidePlaceholderWhenSelected
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
 
-                        {/* FINANCES */}
-                        <section className="space-y-6">
-                            <h2 className="text-xl font-semibold">Finances</h2>
+                                    <FormField
+                                        control={form.control}
+                                        name="genes"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated genes</FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleGeneSearch}
+                                                        placeholder="Search for genes..."
+                                                        triggerSearchOnFocus
+                                                        hidePlaceholderWhenSelected
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </section>
 
-                            <FormField control={form.control} name="raised" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Total funds raised to date</FormLabel>
-                                    <FormControl><Input type="number" min={0} step="0.01" {...field} onChange={(e) => field.onChange(Number(e.target.value))} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                        </section>
+                                <Separator/>
 
+                                {/* FINANCES */}
+                                <section className="space-y-6">
+                                    <h2 className="text-xl font-semibold">Finances</h2>
+
+                                    <MoneyInput
+                                        form={form}
+                                        label="Total funds raised to date"
+                                        description="The total amount of funding raised to date by your patient group."
+                                        name="raised"
+                                    />
+                                </section>
+                            </>
+                        )}
                         <div className="flex justify-between">
-                            <div />
+                            <div/>
                             <Button type="submit" disabled={loading}>
-                                {loading ? <LoadingDots color="#808080" /> : "Save all & continue"}
+                                {loading ? <LoadingDots color="#808080"/> : "Complete sign-up"}
                             </Button>
                         </div>
                     </form>
