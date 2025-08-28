@@ -81,7 +81,44 @@ export async function getServicesOfCompany(
     }
 }
 
-export async function getPublicAssetsForOrganization(
+export async function getPublicToolCountsForOrganization(
+    domain: string
+) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const [biosampleCount, diseaseModelCount, clinicalDatasetCount] = await Promise.all([
+        prisma.biosample.count({
+            where: {
+                organization: {
+                    subdomain: subdomain
+                },
+                private: {equals: false}
+            }
+        }),
+        prisma.diseaseModel.count({
+            where: {
+                organization: {
+                    subdomain: subdomain
+                },
+                private: {equals: false}
+            }
+        }),
+        prisma.tool.count({
+            where: {
+                organization: {
+                    subdomain: subdomain
+                },
+                private: {equals: false}
+            }
+        }),
+    ])
+
+    return {biosampleCount, diseaseModelCount, clinicalDatasetCount}
+}
+
+export async function getPublicClinicalDatasetsForOrganization(
     domain: string,
     select: Prisma.ToolSelect<InternalArgs & {
         result: {};

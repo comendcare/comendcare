@@ -477,6 +477,14 @@ export const syncToTypesense = async (env: {
                     store: true,
                     facet: true,
                     optional: true
+                },
+                {
+                    name: "organization",
+                    type: "object",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 }
             ]
         }
@@ -523,6 +531,14 @@ export const syncToTypesense = async (env: {
                     store: true,
                     facet: true,
                     optional: true
+                },
+                {
+                    name: "organization",
+                    type: "object",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 }
             ]
         }
@@ -565,6 +581,14 @@ export const syncToTypesense = async (env: {
                 {
                     name: "types",
                     type: "object[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "organization",
+                    type: "object",
                     index: true,
                     store: true,
                     facet: true,
@@ -752,6 +776,7 @@ export const syncToTypesense = async (env: {
                 types: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value)),
                 gene: biosample.gene?.symbol,
                 conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || [],
+                organization: biosample.organization
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
@@ -765,7 +790,8 @@ export const syncToTypesense = async (env: {
                 // types: diseaseModel.types,
                 types: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value)),
                 gene: diseaseModel.gene?.symbol,
-                conditions: diseaseModel.organization?.conditions?.map(condition => condition.condition?.name) || []
+                conditions: diseaseModel.organization?.conditions?.map(condition => condition.condition?.name) || [],
+                organization: diseaseModel.organization
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
         } else {
@@ -779,7 +805,8 @@ export const syncToTypesense = async (env: {
                 // types: dataset.types,
                 types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),
                 gene: dataset.gene?.symbol,
-                conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || []
+                conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || [],
+                organization: dataset.organization
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
         } else {

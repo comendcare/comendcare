@@ -28,7 +28,7 @@ import {
     TableRow,
 } from "@comend/components/ui/table"
 import { PrivateBadge } from "./private-badge"
-import { AssetDetails, RFPDetails } from "./pag-profile-assets-and-projects-hoverable-card"
+import { AssetDetails, RFPDetails } from "./pag-profile-rfps-card"
 import { TypeBadge } from "./type-badge"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {

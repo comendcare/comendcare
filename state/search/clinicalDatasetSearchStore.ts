@@ -24,12 +24,18 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    organizations: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
 }
 
 export const defaultFilters = {
     conditions: [],
     genes: [],
     types: [],
+    organizations: []
 }
 
 export type Recommendation = {
@@ -64,6 +70,14 @@ function generateFiltersString(filters: FiltersType): string {
             .map(type => `types.value:=[${escapeValue(type.value)}]`)
             .join(" || ");
         filtersList.push(`(${typeFilter})`);
+    }
+
+    // Organizations
+    if (filters?.organizations && filters.organizations.length > 0) {
+        const organizationFilter = filters.organizations
+            .map(organization => `organization.id:=[${escapeValue(organization.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${organizationFilter})`);
     }
 
     // Combine all filters with `&&`

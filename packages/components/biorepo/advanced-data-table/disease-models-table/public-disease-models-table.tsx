@@ -53,27 +53,27 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                 table={table}
                 showPagination={showPagination}
                 useStore={useDiseaseModelSearchStore}
-                noResults={
-                    (data.length === 0 && Object.keys(searchParams).length === 0) 
-                    ? (
-                        <div className="pt-6 h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
-                                <Image
-                                    alt="No Disease Model Tools"
-                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                    width={300}
-                                    height={300}
-                                />
-                                <p className="text-lg text-stone-500">
-                                    A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                </p>
-                                <NewToolDialog type={"diseaseModel"}/>
-                            </div>
-                        </div>
-                    )
-                    : undefined
-                }
+                // noResults={
+                //     (data.length === 0 && Object.keys(searchParams).length === 0) 
+                //     ? (
+                //         <div className="pt-6 h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
+                //             <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                //                 <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
+                //                 <Image
+                //                     alt="No Disease Model Tools"
+                //                     src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                //                     width={300}
+                //                     height={300}
+                //                 />
+                //                 <p className="text-lg text-stone-500">
+                //                     A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                //                 </p>
+                //                 <NewToolDialog type={"diseaseModel"}/>
+                //             </div>
+                //         </div>
+                //     )
+                //     : undefined
+                // }
             />
         </>
     );

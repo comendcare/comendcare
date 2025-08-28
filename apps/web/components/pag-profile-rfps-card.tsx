@@ -14,7 +14,7 @@ import { RFPCard } from "./rfp-card";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselApi } from "@/packages/components/ui/carousel";
 import { useEffect, useState } from "react";
 
-export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }: { tools: any[], rfps: any[], isPrivate: boolean }) => {
+export const PAGProfileRFPsHoverableCard = ({ rfps, isPrivate }: { rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
 
     const [api, setApi] = useState<CarouselApi>()
@@ -31,7 +31,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ tools, rfps, isPrivate }:
         })
     }, [api])
 
-    if (tools && rfps) {
+    if (rfps) {
         return (
             <Card className="organization-profile-tour-step5">
                 <CardHeader className="flex flex-row items-start justify-between">
