@@ -360,6 +360,20 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                             name="raised"
                         />
 
+                        <MoneyInput
+                            form={editOrgForm}
+                            label="Total funds deployed to date"
+                            description="The total amount of funds deployed to research by your patient group."
+                            name="deployed"
+                        />
+
+                        <MoneyInput
+                            form={editOrgForm}
+                            label="Total annual research budget"
+                            description="The total amount of funding budgeted for research by your patient group."
+                            name="budget"
+                        />
+
                         <BiopharmaConsentSwitch organization={organization}/>
 
                         <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>

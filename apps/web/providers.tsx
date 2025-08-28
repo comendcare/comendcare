@@ -16,7 +16,7 @@ import {usePathname} from "next/navigation"
 
 
 export function Providers({children}: { children: React.ReactNode }) {
-    useDrainWriteQueue();
+    // useDrainWriteQueue();
     const pathname = usePathname();
 
     // route change → visibility often flickers; also drain now

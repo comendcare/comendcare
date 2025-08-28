@@ -218,7 +218,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Search organizations, descriptions..."
+                        placeholder="Organizations, descriptions..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const text = e.target.value;
@@ -248,6 +248,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         }
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
+                        showHoverCard={false}
                     />
                 </div>
 
@@ -270,6 +271,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         }
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
+                        showHoverCard={false}
                     />
                 </div>
 
@@ -298,6 +300,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                                     emptyIndicator={
                                         <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                     }
+                                    showHoverCard={false}
                                 />
                             </div>
 
@@ -315,6 +318,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                                     emptyIndicator={
                                         <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                     }
+                                    showHoverCard={false}
                                 />
                             </div>
 
@@ -335,6 +339,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                                             no results found.
                                         </p>
                                     }
+                                    showHoverCard={false}
                                 />
                             </div>
 

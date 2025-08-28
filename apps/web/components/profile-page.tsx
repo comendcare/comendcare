@@ -6,12 +6,13 @@ import Link from "next/link";
 import {
     getConditionsDataFromOrgId,
     getOrganizationFromOrganizationId,
-    getPublicAssetsForOrganization,
+    getPublicClinicalDatasetsForOrganization,
     getPublicRFPsForOrganization,
-    getPublicRoadmapsForOrganization
+    getPublicRoadmapsForOrganization,
+    getPublicToolCountsForOrganization
 } from "@comend/lib/fetchers";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
-import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
+import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -30,13 +31,14 @@ import {useEffect, useState} from "react";
 import Loading from "@/loading";
 import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
+import { PAGProfileToolsCard } from "./pag-profile-tools-card";
 
 export default function PAGProfilePage() {
     const {data: session} = useSession()
     const [organization, setOrganization] = useState<any | null>(null)
     const [conditions, setConditions] = useState<any[]>([])
     const [roadmaps, setRoadmaps] = useState<any[]>([])
-    const [tools, setTools] = useState<any[]>([])
+    const [toolCounts, setToolCounts] = useState<any>({})
     const [rfps, setRfps] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
 
@@ -85,7 +87,10 @@ export default function PAGProfilePage() {
                     clients: true,
                     invitations: true,
                     membershipRequests: true,
-                    conditions: true,
+                    conditions: {
+                        associatedConditions: {select: {id: true, name: true, slug: true}},
+                        associatedWith: {select: {id: true, name: true, slug: true}},
+                    },
                     kanban: true,
                     milestones: true,
                     platformNotifications: true,
@@ -119,6 +124,8 @@ export default function PAGProfilePage() {
 
                     description: true,
                     associatedSystems: true,
+                    associatedConditions: true,
+                    associatedWith: true,
                     // associatedGenes: true,
                     // causalGenes: true,
                     // interestedModalities: string[];
@@ -138,7 +145,7 @@ export default function PAGProfilePage() {
             }
 
             if (subdomain) {
-                const [roadmaps, tools, rfps] = await Promise.all([
+                const [roadmaps, counts, rfps] = await Promise.all([
                     getPublicRoadmapsForOrganization(subdomain, {
                         id: true,
                         title: true,
@@ -149,13 +156,7 @@ export default function PAGProfilePage() {
                         nodes: true,
                         modalities: true
                     }),
-                    getPublicAssetsForOrganization(subdomain, {
-                        title: true,
-                        description: true,
-                        contacts: true,
-                        attachments: true,
-                        milestones: true
-                    }),
+                    getPublicToolCountsForOrganization(subdomain),
                     getPublicRFPsForOrganization(subdomain, {
                         id: true,
                         title: true,
@@ -173,7 +174,7 @@ export default function PAGProfilePage() {
                 ])
 
                 setRoadmaps(roadmaps)
-                setTools(tools)
+                setToolCounts(counts)
                 setRfps(rfps)
             }
 
@@ -202,7 +203,8 @@ export default function PAGProfilePage() {
                                     />
                                 )}
 
-                                <div className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
+                                <div
+                                    className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
                                     <div className="w-full flex flex-row gap-4 items-start">
                                         <div className="h-fit w-fit -mt-16">
                                             {session?.user?.membership?.role === "owner" ? (
@@ -300,11 +302,12 @@ export default function PAGProfilePage() {
                                     {/*    conditions={conditions}*/}
                                     {/*/>*/}
                                     <div className="flex flex-col gap-4 relative">
-                                        <PAGProfileAssetsAndRFPsHoverableCard
+                                        <PAGProfileRFPsHoverableCard
                                             isPrivate={true}
-                                            tools={tools}
                                             rfps={rfps}
                                         />
+                                        {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
+                                        <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
                                         <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     </div>
                                 </div>

@@ -80,7 +80,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Search CROs, services, locations..."
+                        placeholder="CROs, services, locations..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value

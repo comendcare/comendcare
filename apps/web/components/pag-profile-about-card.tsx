@@ -218,12 +218,12 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                     <Avatar>
                                         <AvatarImage src={member.user.image || ""}/>
                                         <AvatarFallback>
-                                            {nameToInitials(member.user.name)}
+                                            {nameToInitials(member.user.name ?? member.user.email)}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="space-y-1">
                                         <h4 className="text-sm font-semibold">
-                                            {member.user.name}
+                                            {member.user.name ?? member.user.email}
                                         </h4>
                                         {member.title &&
                                             <div className="flex items-center">

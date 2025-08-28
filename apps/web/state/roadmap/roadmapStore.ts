@@ -103,33 +103,33 @@ export const useRoadmapStore = create<RoadmapState>()(
                     return
                 }
 
-                // const roadmap = await updateRoadmap(orgId, {
-                //     id,
-                //     title: details.title,
-                //     description: details.description || null,
-                //     modalities: details.modalities || [],
-                //     metadata: details.metadata || null
-                // })
-                //
-                // console.log(`roadmap data`, roadmap)
-                //
-                // if (roadmap) set({ details: roadmap as Roadmap })
+                const roadmap = await updateRoadmap(orgId, {
+                    id,
+                    title: details.title,
+                    description: details.description || null,
+                    modalities: details.modalities || [],
+                    metadata: details.metadata || null
+                })
+                
+                console.log(`roadmap data`, roadmap)
+                
+                if (roadmap) set({ details: roadmap as Roadmap })
 
                 // optimistic local
                 set({details: {...(get().details || {}), ...details} as any});
                 // durable op
-                const {enqueue} = useWriteQueue.getState();
-                enqueue({
-                    kind: "UPDATE_ROADMAP", payload: {
-                        orgId, data: {
-                            id,
-                            title: details.title,
-                            description: details.description ?? null,
-                            modalities: details.modalities ?? [],
-                            metadata: details.metadata ?? null
-                        }
-                    }
-                });
+                // const {enqueue} = useWriteQueue.getState();
+                // enqueue({
+                //     kind: "UPDATE_ROADMAP", payload: {
+                //         orgId, data: {
+                //             id,
+                //             title: details.title,
+                //             description: details.description ?? null,
+                //             modalities: details.modalities ?? [],
+                //             metadata: details.metadata ?? null
+                //         }
+                //     }
+                // });
             },
             onboardingActive: true,
             setOnboardingActive: (active: boolean) => {
@@ -161,18 +161,19 @@ export const useRoadmapStore = create<RoadmapState>()(
                 set({milestones})
 
                 // update DB milestones
-                // const response = await updateMilestones(get().details?.organizationId, {milestones})
-                // if (response?.success && response?.data) {
-                //     return response.data as Milestone[]
-                // } else {
-                //     toast.error("Could not update milestones", {position: "bottom-left"})
-                //     console.error(`Error updating milestones`, response?.error)
-                // }
-                const {enqueue} = useWriteQueue.getState();
-                enqueue({
-                    kind: "UPDATE_MILESTONES",
-                    payload: {orgId: get().details?.organizationId, milestones}
-                });
+                const response = await updateMilestones(get().details?.organizationId, {milestones: milestones.filter(milestone => milestone.nodeId === nodeId)})
+                if (response?.success && response?.data) {
+                    console.log(`successfully updated milestone`)
+                    return response.data as Milestone[]
+                } else {
+                    toast.error("Could not update milestones", {position: "bottom-left"})
+                    console.error(`Error updating milestones`, response?.error)
+                }
+                // const {enqueue} = useWriteQueue.getState();
+                // enqueue({
+                //     kind: "UPDATE_MILESTONES",
+                //     payload: {orgId: get().details?.organizationId, milestones}
+                // });
             },
             setMilestones: async (milestones: Milestone[]) => {
                 console.log(`set milestones`)
@@ -190,18 +191,18 @@ export const useRoadmapStore = create<RoadmapState>()(
                 set({milestones: updatedMilestones})
 
                 // update DB milestones
-                // const response = await updateMilestones(get().details?.organizationId, {milestones: updatedMilestones})
-                // if (response?.success && response?.data) {
-                //     return response.data as Milestone[]
-                // } else {
-                //     toast.error("Could not update milestones", {position: "bottom-left"})
-                //     console.error(`Error updating milestones`, response?.error)
-                // }
-                const {enqueue} = useWriteQueue.getState();
-                enqueue({
-                    kind: "UPDATE_MILESTONES",
-                    payload: {orgId: get().details?.organizationId, milestones: updatedMilestones}
-                });
+                const response = await updateMilestones(get().details?.organizationId, {milestones: updatedMilestones})
+                if (response?.success && response?.data) {
+                    return response.data as Milestone[]
+                } else {
+                    toast.error("Could not update milestones", {position: "bottom-left"})
+                    console.error(`Error updating milestones`, response?.error)
+                }
+                // const {enqueue} = useWriteQueue.getState();
+                // enqueue({
+                //     kind: "UPDATE_MILESTONES",
+                //     payload: {orgId: get().details?.organizationId, milestones: updatedMilestones}
+                // });
             },
             nodes: [],
             edges: [],
@@ -211,17 +212,17 @@ export const useRoadmapStore = create<RoadmapState>()(
                 set({edges})
 
                 // update DB edges
-                // const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
-                // if (response?.success && response?.data) {
-                //     return response.data as Edge[]
-                // } else {
-                //     toast.error("Could not update edges", {position: "bottom-left"})
-                //     console.error(`Error updating Flow Edges`, response?.error)
-                // }
-                useWriteQueue.getState().enqueue({
-                    kind: "UPDATE_EDGES",
-                    payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
-                });
+                const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
+                if (response?.success && response?.data) {
+                    return response.data as Edge[]
+                } else {
+                    toast.error("Could not update edges", {position: "bottom-left"})
+                    console.error(`Error updating Flow Edges`, response?.error)
+                }
+                // useWriteQueue.getState().enqueue({
+                //     kind: "UPDATE_EDGES",
+                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
+                // });
             },
             onConnect: async (connection: Connection) => {
                 console.log(`on connect`)
@@ -232,57 +233,57 @@ export const useRoadmapStore = create<RoadmapState>()(
                 set({edges})
 
                 // update DB edges
-                // const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
-                // if (response?.success && response?.data) {
-                //     return response.data as Edge[]
-                // } else {
-                //     toast.error("Could not update edges", {position: "bottom-left"})
-                //     console.error(`Error updating Flow Edges`, response?.error)
-                // }
-                useWriteQueue.getState().enqueue({
-                    kind: "UPDATE_EDGES",
-                    payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
-                });
+                const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
+                if (response?.success && response?.data) {
+                    return response.data as Edge[]
+                } else {
+                    toast.error("Could not update edges", {position: "bottom-left"})
+                    console.error(`Error updating Flow Edges`, response?.error)
+                }
+                // useWriteQueue.getState().enqueue({
+                //     kind: "UPDATE_EDGES",
+                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
+                // });
             },
             setNodes: async (nodes: Node[]) => {
                 console.log(`set nodes`)
                 set({nodes})
 
-                // const orgId = get().details?.organizationId
-                // const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
-                // if (response?.success && response?.data) {
-                //     const newNodes = response.data.nodes.map((n: any) => ({
-                //         id: n.id,
-                //         position: {x: n.positionX, y: n.positionY},
-                //         origin: n.origin
-                //     })) as Node[]
-                //
-                //     return newNodes as Node[]
-                // } else {
-                //     console.error(`Error updating database nodes`, response?.error)
-                //     toast.success("Error updating node state... your node may node's position may not have been saved")
-                // }
-                const orgId = get().details?.organizationId;
-                useWriteQueue.getState().enqueue({
-                    kind: "UPDATE_FLOW",
-                    payload: {orgId, roadmapId: get().roadmapId, nodes, edges: get().edges}
-                });
+                const orgId = get().details?.organizationId
+                const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
+                if (response?.success && response?.data) {
+                    const newNodes = response.data.nodes.map((n: any) => ({
+                        id: n.id,
+                        position: {x: n.positionX, y: n.positionY},
+                        origin: n.origin
+                    })) as Node[]
+                
+                    return newNodes as Node[]
+                } else {
+                    console.error(`Error updating database nodes`, response?.error)
+                    toast.success("Error updating node state... your node may node's position may not have been saved")
+                }
+                // const orgId = get().details?.organizationId;
+                // useWriteQueue.getState().enqueue({
+                //     kind: "UPDATE_FLOW",
+                //     payload: {orgId, roadmapId: get().roadmapId, nodes, edges: get().edges}
+                // });
             },
             setEdges: async (edges: Edge[]) => {
                 console.log(`set edges`)
                 set({edges})
 
                 // update DB edges
-                // const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
-                // if (response?.success && response?.data) {
-                //     return response.data as Edge[]
-                // } else {
-                //     console.error(`Error updating Flow Edges`, response?.error)
-                // }
-                useWriteQueue.getState().enqueue({
-                    kind: "UPDATE_EDGES",
-                    payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
-                });
+                const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
+                if (response?.success && response?.data) {
+                    return response.data as Edge[]
+                } else {
+                    console.error(`Error updating Flow Edges`, response?.error)
+                }
+                // useWriteQueue.getState().enqueue({
+                //     kind: "UPDATE_EDGES",
+                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
+                // });
             },
             addMilestones: async (milestones: Partial<Milestone>[], creationMethod?: string) => {
                 console.log(`add milestones`, milestones)
@@ -361,24 +362,24 @@ export const useRoadmapStore = create<RoadmapState>()(
                 })
 
                 // update DB Nodes
-                // const response = await createNodes(get().details?.organizationId, {roadmapId: get().roadmapId, nodes})
-                // if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
-                //     response.data.milestones.forEach((milestone: any) => {
-                //         mixpanelTrack("Project Created", {
-                //             "Creation Method": creationMethod,
-                //             "Title": milestone.title,
-                //             "Types": milestone.types.map((type: any) => type.milestoneType.label || type.miletoneType.id)
-                //         })
-                //     })
-                //     return response.data.nodes
-                // } else {
-                //     console.error(`Error adding nodes`, response?.error)
-                //     toast.error(`Error adding milestones: ${response?.error}`)
-                // }
-                useWriteQueue.getState().enqueue({
-                    kind: "CREATE_NODES",
-                    payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, nodes, creationMethod}
-                });
+                const response = await createNodes(get().details?.organizationId, {roadmapId: get().roadmapId, nodes})
+                if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
+                    response.data.milestones.forEach((milestone: any) => {
+                        mixpanelTrack("Project Created", {
+                            "Creation Method": creationMethod,
+                            "Title": milestone.title,
+                            "Types": milestone.types.map((type: any) => type.milestoneType.label || type.miletoneType.id)
+                        })
+                    })
+                    return response.data.nodes
+                } else {
+                    console.error(`Error adding nodes`, response?.error)
+                    toast.error(`Error adding milestones: ${response?.error}`)
+                }
+                // useWriteQueue.getState().enqueue({
+                //     kind: "CREATE_NODES",
+                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, nodes, creationMethod}
+                // });
             },
             addNodesFromTemplate: async (template: any) => {
                 const response = await createNodesAndEdgesFromTemplate(get().details?.organizationId, get().roadmapId, template)
@@ -407,33 +408,33 @@ export const useRoadmapStore = create<RoadmapState>()(
                 set({nodes, milestones, selectedNodeIds: []})
 
                 // update DB nodes
-                // const response = await deleteNode(get().details?.organizationId, nodeId)
-                // if (response?.success && response?.data) {
-                //     // don't return anything
-                // } else {
-                //     console.error(`Error deleting nodes`, response?.error)
-                //     toast.error(`Error deleting milestone: ${response?.error}`)
-                // }
-                useWriteQueue.getState().enqueue({
-                    kind: "DELETE_NODE",
-                    payload: {orgId: get().details?.organizationId, nodeId}
-                });
+                const response = await deleteNode(get().details?.organizationId, nodeId)
+                if (response?.success && response?.data) {
+                    // don't return anything
+                } else {
+                    console.error(`Error deleting nodes`, response?.error)
+                    toast.error(`Error deleting milestone: ${response?.error}`)
+                }
+                // useWriteQueue.getState().enqueue({
+                //     kind: "DELETE_NODE",
+                //     payload: {orgId: get().details?.organizationId, nodeId}
+                // });
             },
             saveState: () => {
                 console.log(`save state`)
                 const state = get()
-                // updateDBFlow(state.details?.organizationId, {
-                //     roadmapId: state.roadmapId,
-                //     nodes: state.nodes,
-                //     edges: state.edges
-                // })
-                // updateMilestones(state.details?.organizationId, {milestones: state.milestones})
-                const {enqueue} = useWriteQueue.getState();
-                enqueue({
-                    kind: "UPDATE_FLOW",
-                    payload: {orgId: state.details?.organizationId, roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges}
-                });
-                enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
+                updateDBFlow(state.details?.organizationId, {
+                    roadmapId: state.roadmapId,
+                    nodes: state.nodes,
+                    edges: state.edges
+                })
+                updateMilestones(state.details?.organizationId, {milestones: state.milestones})
+                // const {enqueue} = useWriteQueue.getState();
+                // enqueue({
+                //     kind: "UPDATE_FLOW",
+                //     payload: {orgId: state.details?.organizationId, roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges}
+                // });
+                // enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
             }
         }),
         {

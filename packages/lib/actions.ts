@@ -270,6 +270,56 @@ export const createCondition = withAuth(
                 return {success: false, error: "Database error. Please try again later."};
             }
 
+            try {
+                // 1) Parse & normalize associated conditions from the incoming formData
+                const rawAssociated = (formData.get("associatedConditions") as string | null)?.split(",") ?? [];
+                const requestedSlugs = rawAssociated
+                    .map(s => toKebabCase((s || "").trim()))
+                    .filter(Boolean);
+
+                // 2) Compute this condition's slug the same way the record is made
+                //    (you already did above; re-use the same `slug` variable)
+                //    -> ensure no self-association and no duplicates
+                const targetSlugs = Array.from(
+                    new Set(requestedSlugs.filter(s => s !== slug))
+                );
+
+                if (targetSlugs.length) {
+                    // 3) Look up existing associated conditions by slug
+                    const assocTargets = await prisma.condition.findMany({
+                        where: { slug: { in: targetSlugs } },
+                        select: { id: true, slug: true }
+                    });
+
+                    // 4) (Optional) Warn on any slugs that didn't resolve to a Condition
+                    const foundSlugs = new Set(assocTargets.map(a => a.slug));
+                    const missing = targetSlugs.filter(s => !foundSlugs.has(s));
+                    if (missing.length) {
+                        console.warn("Associated conditions not found (skipped):", missing);
+                    }
+
+                    // 5) Replace associations atomically
+                    await prisma.condition.update({
+                        where: { id: condition.id },
+                        data: {
+                            associatedConditions: {
+                                set: [],                              // replace existing associations
+                                connect: assocTargets.map(a => ({ id: a.id }))
+                            }
+                        }
+                    });
+                } else {
+                    // If nothing valid was provided, ensure we clear previous associations
+                    await prisma.condition.update({
+                        where: { id: condition.id },
+                        data: { associatedConditions: { set: [] } }
+                    });
+                }
+            } catch (assocErr) {
+                console.error("Error syncing associated conditions:", assocErr);
+                // Non-fatal: keep creating/updating the condition even if association sync fails.
+            }
+
             return {success: true, data: condition};
         } catch (error: any) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -2074,7 +2124,17 @@ export const updateDiseaseModel = withOrganizationAuth(
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
                         ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
-                        : {institution: {disconnect: true}})
+                        : {institution: {disconnect: true}}),
+                    ...(diseaseModelData.institution
+                        ? { institution: { 
+                            connectOrCreate: { 
+                                where: {id: diseaseModelData.institution.value},
+                                create: {
+                                    name: diseaseModelData.institution.value
+                                }
+                             } }
+                         }
+                        : { institution: { disconnect: true } }),
                 },
             })
 
@@ -2127,8 +2187,15 @@ export const createDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : undefined),
                     ...(diseaseModelData.institution
-                        ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
-                        : undefined)
+                        ? ({institution: {
+                            connectOrCreate: { 
+                                where: {id: diseaseModelData.institution.value},
+                                create: {
+                                    name: diseaseModelData.institution.value,
+                                }
+                             }
+                        }})
+                        : undefined),
                 }
             })
 
@@ -2227,7 +2294,14 @@ export const createDataTool = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
                         : undefined),
                     ...(dataToolData.institution
-                        ? ({institution: {connect: {id: dataToolData.institution.value}}})
+                        ? ({institution: {
+                            connectOrCreate: { 
+                                where: {id: dataToolData.institution.value},
+                                create: {
+                                    name: dataToolData.institution.value,
+                                }
+                             }
+                        }})
                         : undefined),
                 }
             })
@@ -2336,9 +2410,16 @@ export const updateDataTool = withOrganizationAuth(
                             connect: {symbol: dataToolData.gene.value}
                         }
                     }) : {gene: {disconnect: true}}),
-                    ...(dataToolData.institution ? ({
-                        institution: {connect: {id: dataToolData.institution.value}}
-                    }) : {institution: {disconnect: true}}),
+                    ...(dataToolData.institution
+                        ? { institution: { 
+                            connectOrCreate: { 
+                                where: {id: dataToolData.institution.value},
+                                create: {
+                                    name: dataToolData.institution.value
+                                }
+                             } }
+                         }
+                        : { institution: { disconnect: true } }),
                 },
             })
 
@@ -2457,7 +2538,14 @@ export const createBiosample = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: biosampleData.gene.value}}})
                         : undefined),
                     ...(biosampleData.institution
-                        ? ({institution: {connect: {id: biosampleData.institution.value}}})
+                        ? ({institution: {
+                            connectOrCreate: { 
+                                where: {id: biosampleData.institution.value},
+                                create: {
+                                    name: biosampleData.institution.value,
+                                }
+                             }
+                        }})
                         : undefined),
                     donor: {
                         connectOrCreate: {
@@ -2645,7 +2733,14 @@ export const updateBiosample = withOrganizationAuth(
                         ? { gene: { connect: { symbol: biosampleData.gene.value } } }
                         : { gene: { disconnect: true } }),
                     ...(biosampleData.institution
-                        ? { institution: { connect: { id: biosampleData.institution.value } } }
+                        ? { institution: { 
+                            connectOrCreate: { 
+                                where: {id: biosampleData.institution.value},
+                                create: {
+                                    name: biosampleData.institution.value
+                                }
+                             } }
+                         }
                         : { institution: { disconnect: true } }),
                     ...(data.donorId
                         ? { donor: { connect: { id: data.donorId } } }

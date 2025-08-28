@@ -135,6 +135,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
             types: parseQuery(queryTypes),
             genes: parseQuery(queryTypes),
             conditions: parseQuery(queryTypes),
+            organizations: parseQuery(queryTypes),
         }
         initializeBiosampleSearch(parsedBiosampleFilters)
         console.log(`Biosample search initialized...`)
@@ -143,6 +144,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
             types: parseQuery(queryTypes),
             genes: parseQuery(queryTypes),
             conditions: parseQuery(queryTypes),
+            organizations: parseQuery(queryTypes),
         }
         initializeDiseaseModelSearch(parsedDiseaseModelFilters)
         console.log(`Disease Model search initialized...`)
@@ -151,6 +153,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
             types: parseQuery(queryTypes),
             genes: parseQuery(queryTypes),
             conditions: parseQuery(queryTypes),
+            organizations: parseQuery(queryTypes),
         }
         initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
         console.log(`Clinical Dataset search initialized...`)

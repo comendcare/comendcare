@@ -184,7 +184,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Search types, genes..."
+                        placeholder="Organizations, biosample types, genes..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value
@@ -214,6 +214,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         }
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
+                        showHoverCard={false}
                     />
                 </div>
 
@@ -236,6 +237,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         }
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
+                        showHoverCard={false}
                     />
                 </div>
 
@@ -264,6 +266,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
+                                showHoverCard={false}
                             />
                         </div>
 
@@ -281,6 +284,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
+                                showHoverCard={false}
                             />
                         </div>
                         
@@ -297,6 +301,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
+                                showHoverCard={false}
                             />
                         </div>
                     </DialogContent>

@@ -5,8 +5,9 @@ import {
     getOrganizationData,
     getConditionsDataFromOrgId,
     getPublicRFPsForOrganization,
-    getPublicAssetsForOrganization,
-    getPublicRoadmapsForOrganization
+    getPublicClinicalDatasetsForOrganization,
+    getPublicRoadmapsForOrganization,
+    getPublicToolCountsForOrganization
 } from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -15,10 +16,11 @@ import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-c
 import {FloatingDock} from "~web/components/floating-dock";
 import ShareDialog from "~web/components/share-dialog";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
-import {PAGProfileAssetsAndRFPsHoverableCard} from "~web/components/pag-profile-assets-and-projects-hoverable-card";
+import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card";
 import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import {Mail, Share} from "lucide-react";
+import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -51,7 +53,7 @@ export default async function OrganizationHomePage({
     params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const [organization, roadmaps, tools, rfps] = await Promise.all([
+    const [organization, roadmaps, toolCounts, rfps] = await Promise.all([
         getOrganizationData(domain, {
             id: true,
             public: true,
@@ -113,13 +115,7 @@ export default async function OrganizationHomePage({
             nodes: true,
             modalities: true
         }),
-        getPublicAssetsForOrganization(domain, {
-            title: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            milestones: true
-        }),
+        getPublicToolCountsForOrganization(domain),
         getPublicRFPsForOrganization(domain, {
             id: true,
             title: true,
@@ -211,13 +207,20 @@ export default async function OrganizationHomePage({
                         </div>
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
-                            {(tools.length > 0 || rfps.length > 0) && (
-                                <PAGProfileAssetsAndRFPsHoverableCard
+                            {(rfps.length > 0) && (
+                                <PAGProfileRFPsHoverableCard
                                     isPrivate={false}
-                                    tools={tools}
                                     rfps={rfps}
                                 />
                             )}
+                            {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
+                            {(
+                                toolCounts.biosampleCount > 0 || 
+                                toolCounts.diseaseModelCount > 0 || 
+                                toolCounts.clinicalDatasetCount > 0
+                            ) && 
+                                <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
+                            }
                             <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
                     </div>
