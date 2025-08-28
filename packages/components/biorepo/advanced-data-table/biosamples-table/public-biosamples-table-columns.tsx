@@ -285,11 +285,18 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Institution"/>
             ),
-            cell: ({row}) => (
-                <a href={row.original.institution?.website}>
-                    {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.institution?.name)?.label}
-                </a>
-            ),
+            cell: ({row}) => {
+                // if (row.original.institution?.website && row.original.institution?.name) {
+                //     return (
+                //         <Link className="underline" href={row.original.institution?.website}>
+                //             {row.original.institution?.name}
+                //         </Link>
+                //     )
+                // }
+                // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
+                // return <></>
+                return <>{row.original.institution?.name}</>
+            },
             enableHiding: true,
             meta: {
                 label: "Institution"

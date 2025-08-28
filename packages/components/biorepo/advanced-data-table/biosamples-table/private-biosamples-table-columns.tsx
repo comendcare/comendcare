@@ -377,15 +377,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Institution"/>
             ),
             cell: ({row}) => {
-                if (row.original.institution?.website && row.original.institution?.name) {
-                    return (
-                        <Link className="underline" href={row.original.institution?.website}>
-                            {row.original.institution?.name}
-                        </Link>
-                    )
-                }
-                if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
-                return <></>
+                // if (row.original.institution?.website && row.original.institution?.name) {
+                //     return (
+                //         <Link className="underline" href={row.original.institution?.website}>
+                //             {row.original.institution?.name}
+                //         </Link>
+                //     )
+                // }
+                // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
+                // return <></>
+                return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
             enableColumnFilter: true,
