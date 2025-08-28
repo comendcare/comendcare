@@ -527,15 +527,14 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
 
             <FormField
                 control={form.control}
-                name="variant"
+                name="genotype"
                 render={({field}) => (
-                    // <FormItem className="w-full flex gap-4 items-center">
                     <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                         <FormLabel className="w-[100px]">{`Genotype`}</FormLabel>
                         <div className="w-full">
                             <FormControl className="w-full">
                                 <Input
-                                    id="variant"
+                                    id="genotype"
                                     className="-mt-2 w-full min-h-[40px]"
                                     placeholder={`Enter a genotype`}
                                     {...field}

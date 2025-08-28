@@ -101,6 +101,22 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
         },
         {
+            id: "id",
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Sample ID"
+            }
+        },
+        {
             id: "types",
             accessorKey: "types",
             header: ({column}) => (
@@ -120,25 +136,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableColumnFilter: true,
             meta: {
                 label: "Type",
-                variant: "multiSelect",
-                options: DISEASE_MODEL_TYPE_OPTIONS,
-                icon: CircleDashed,
             },
         },
         {
-            id: "condition",
-            accessorKey: "condition",
+            id: "strain",
+            accessorKey: "strain",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Condition"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition?.condition?.name) || 'No Condition'}</p>
-                </div>
+                <DataTableColumnHeader column={column} title="Strain"/>
             ),
             enableHiding: true,
             meta: {
-                label: "Condition"
+                label: "Strain"
             }
         },
         {
@@ -156,26 +164,55 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "description",
-            accessorKey: "description",
+            id: "genotype",
+            accessorKey: "genotype",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Description"/>
+                <DataTableColumnHeader column={column} title="Genotype"/>
             ),
-            cell: ({row}) => (
-                <div className="line-clamp-2 w-[200px]">
-                    {row.original.description}
-                </div>
-            ),
-            meta: {
-                label: "Description"
-            },
             enableHiding: true,
+            meta: {
+                label: "Genotype",
+            }
+        },
+        {
+            id: "phenotype",
+            accessorKey: "phenotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Phenotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Phenotype",
+            }
+        },
+        {
+            id: "patientId",
+            accessorKey: "patientId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Linked Patient ID"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Linked Patient ID",
+            }
+        },
+        {
+            id: "availability",
+            accessorKey: "availability",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Availability"/>
+            ),
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Availability",
+            }
         },
         {
             id: "institution",
             accessorKey: "institution",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Institution"/>
+                <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
             cell: ({row}) => {
                 // if (row.original.institution?.website && row.original.institution?.name) {
@@ -191,9 +228,42 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             },
             enableHiding: true,
             meta: {
-                label: "Institution"
+                label: "Storage Facility"
             }
         },
+
+        // {
+        //     id: "condition",
+        //     accessorKey: "condition",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Condition"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <div className="flex gap-2 items-center">
+        //             <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+        //         </div>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Condition"
+        //     }
+        // },
+        // {
+        //     id: "description",
+        //     accessorKey: "description",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Description"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <div className="line-clamp-3">
+        //             {row.original.description}
+        //         </div>
+        //     ),
+        //     meta: {
+        //         label: "Description"
+        //     },
+        //     enableHiding: true,
+        // },
     ]
 
     // Temporarily hide additional biobank columns from users on production
