@@ -15,6 +15,10 @@
     {
       "path": "/api/ingest/fetch/ctgov",
       "schedule": "0 */12 * * *"
+    },
+    {
+      "path": "/api/ingest/fetch/fda",
+      "schedule": "0 */12 * * *"
     }
   ]
 }
