@@ -200,7 +200,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <div>
-                    {row.getValue("private") ? 'Private' : 'Public'}
+                    {row.getValue("private") ? 'Private' : 'Published'}
                 </div>
             ),
             enableHiding: true,
@@ -213,7 +213,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                         label: "Private",
                         value: "true",
                     }, {
-                        label: "Public",
+                        label: "Published",
                         value: "false",
                     }
                 ],

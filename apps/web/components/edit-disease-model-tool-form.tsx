@@ -295,7 +295,11 @@ export function EditDiseaseModelToolForm({
                                 </TooltipContent>
                             </Tooltip>
                         </FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                        <PrivatePublicFormField 
+                            form={form} 
+                            formData={formData} 
+                            // disabled={!orgIsPublished}
+                        />
                     </FormItem>
 
                     {/* <FormField

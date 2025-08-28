@@ -159,7 +159,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         cell: ({ row }) => (
             <div>
-                {row.getValue("private") ? 'Private' : 'Public'}
+                {row.getValue("private") ? 'Private' : 'Published'}
             </div>
         ),
         enableHiding: true,
@@ -173,7 +173,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
               value: "true",
               // icon: Lock,
             }, {
-              label: "Public", 
+              label: "Published", 
               value: "false",
               // icon: Globe
             }

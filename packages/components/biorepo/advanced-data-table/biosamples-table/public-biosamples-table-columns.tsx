@@ -37,6 +37,7 @@ import { createOrUpdateBiosample } from "@comend/lib/actions";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import { nameToInitials } from "@comend/lib/utils";
 import { ProfilePhoto } from "@comend/components/profile-photo";
+import { Badge } from "@comend/components/ui/badge";
 
 const hiddenColumnIds = [
     'diagnoses',
@@ -65,31 +66,22 @@ const hiddenColumnIds = [
 ]
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
+
+    const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
+        if (sample?.quantity !== null) {
+            if (sample.quantity > 0) {
+                if (sample?.materialAndDataAccessRequests?.length > 0) {
+                    return {value: 'Reserved', variant: 'yellow'}
+                }
+                return {value: 'Available', variant: 'green'}
+            }
+            if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
+        }
+
+        return undefined
+    }
+
     const columns: ColumnDef<any>[] = [
-        // {
-        //     id: "select",
-        //     header: ({table}) => (
-        //         <Checkbox
-        //             checked={
-        //                 table.getIsAllPageRowsSelected() ||
-        //                 (table.getIsSomePageRowsSelected() && "indeterminate")
-        //             }
-        //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        //             aria-label="Select all"
-        //             className="translate-y-[2px] mr-4"
-        //         />
-        //     ),
-        //     cell: ({row}) => (
-        //         <Checkbox
-        //             checked={row.getIsSelected()}
-        //             onCheckedChange={(value) => row.toggleSelected(!!value)}
-        //             aria-label="Select row"
-        //             className="translate-y-[2px] mr-4"
-        //         />
-        //     ),
-        //     enableSorting: false,
-        //     enableHiding: false,
-        // },
         {
             id: "organization",
             accessorKey: "organization",
@@ -106,6 +98,39 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {row.original.organization?.name}
                 </div>
             ),
+        },
+        {
+            id: "id",
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Sample ID"
+            }
+        },
+        {
+            id: "donorId",
+            accessorKey: "donorId",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Public Donor ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 min-w-[200px] items-center">
+                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Public Donor ID"
+            }
         },
         {
             id: "types",
@@ -131,23 +156,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 options: BIOSAMPLE_TYPE_OPTIONS,
                 icon: CircleDashed,
             },
-        },
-        {
-            id: "donorId",
-            accessorKey: "donorId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Public Donor ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
-                    <p>{row.original.donorId}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Public Donor ID"
-            }
         },
         // {
         //     id: "diagnoses",
@@ -183,17 +191,36 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 label: "Gene"
             }
         },
-        // {
-        //     id: "variant",
-        //     accessorKey: "variant",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Variant"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Variant"
-        //     }
-        // },
+        {
+            id: "variant",
+            accessorKey: "variant",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype",
+            }
+        },
+        {
+            id: "availability",
+            accessorKey: "availability",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Availability"/>
+            ),
+            cell: ({row}) => {
+                const availability = handleGetAvailability(row.original)
+                if (availability !== undefined) {
+                    return <Badge variant={availability.variant}>{availability.value}</Badge>
+                }
+                return <></>
+            },
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Availability",
+            }
+        },
         {
             // NOTE: in order for filters to access the proper nested database object the path to
             // the nested object must be defined in BOTH the id & accessorKey
@@ -220,43 +247,91 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "description",
-            accessorKey: "description",
+            id: "institution",
+            accessorKey: "institution.name",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Description"/>
+                <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
-            cell: ({row}) => (
-                <div className="line-clamp-2 w-[200px]">
-                    {row.original.description}
-                </div>
-            ),
-            meta: {
-                label: "Description"
+            cell: ({row}) => {
+                // if (row.original.institution?.website && row.original.institution?.name) {
+                //     return (
+                //         <Link className="underline" href={row.original.institution?.website}>
+                //             {row.original.institution?.name}
+                //         </Link>
+                //     )
+                // }
+                // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
+                // return <></>
+                return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
+            meta: {
+                label: "Storage Facility"
+            }
         },
         {
-            // NOTE: in order for filters to access the proper nested database object the path to
-            // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
-            id: "currentCountry",
-            accessorKey: "currentCountry",
+            id: "links",
+            accessorKey: "links",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Current Location"/>
+                <DataTableColumnHeader column={column} title="Links"/>
             ),
             cell: ({row}) => (
-                <>
-                    {COUNTRY_OPTIONS.find(t => t.value === row.original.currentCountry)?.label}
-                </>
+                <ul className="flex flex-col gap-2">
+                    {row.original.attachments?.map((attachment: any, index: number) => (
+                        <li key={index} className="line-clamp-2">
+                            {attachment.name || attachment.link}
+                        </li>
+                    ))}
+                </ul>
             ),
-            enableColumnFilter: true,
+            enableHiding: true,
             meta: {
-                label: "Current Location",
-                variant: "select",
-                options: COUNTRY_OPTIONS,
-                icon: CircleDashed,
-                showInAdvancedOnly: true
-            },
+                label: "Links"
+            }
         },
+
+
+
+
+
+        // {
+        //     id: "description",
+        //     accessorKey: "description",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Description"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <div className="line-clamp-2 w-[200px]">
+        //             {row.original.description}
+        //         </div>
+        //     ),
+        //     meta: {
+        //         label: "Description"
+        //     },
+        //     enableHiding: true,
+        // },
+        // {
+        //     // NOTE: in order for filters to access the proper nested database object the path to
+        //     // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
+        //     id: "currentCountry",
+        //     accessorKey: "currentCountry",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Current Location"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <>
+        //             {COUNTRY_OPTIONS.find(t => t.value === row.original.currentCountry)?.label}
+        //         </>
+        //     ),
+        //     enableColumnFilter: true,
+        //     meta: {
+        //         label: "Current Location",
+        //         variant: "select",
+        //         options: COUNTRY_OPTIONS,
+        //         icon: CircleDashed,
+        //         showInAdvancedOnly: true
+        //     },
+        // },
         // {
         //     // NOTE: in order for filters to access the proper nested database object the path to
         //     // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.countryOfCollection)
@@ -279,50 +354,27 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //         showInAdvancedOnly: true,
         //     },
         // },
-        {
-            id: "institution",
-            accessorKey: "institution.name",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Institution"/>
-            ),
-            cell: ({row}) => {
-                // if (row.original.institution?.website && row.original.institution?.name) {
-                //     return (
-                //         <Link className="underline" href={row.original.institution?.website}>
-                //             {row.original.institution?.name}
-                //         </Link>
-                //     )
-                // }
-                // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
-                // return <></>
-                return <>{row.original.institution?.name}</>
-            },
-            enableHiding: true,
-            meta: {
-                label: "Institution"
-            }
-        },
-        {
-            id: "preservationMethod",
-            accessorKey: "preservationMethod",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Preservation Method"/>
-            ),
-            cell: ({row}) => (
-                <>
-                    {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.preservationMethod)?.label}
-                </>
-            ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Preservation Method",
-                variant: "multiSelect",
-                options: SAMPLE_PRESERVATION_METHOD_OPTIONS,
-                icon: CircleDashed,
-                showInAdvancedOnly: true
-            },
-        },
+        // {
+        //     id: "preservationMethod",
+        //     accessorKey: "preservationMethod",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Preservation Method"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <>
+        //             {SAMPLE_PRESERVATION_METHOD_OPTIONS.find(t => t.value === row.original.preservationMethod)?.label}
+        //         </>
+        //     ),
+        //     enableHiding: true,
+        //     enableColumnFilter: true,
+        //     meta: {
+        //         label: "Preservation Method",
+        //         variant: "multiSelect",
+        //         options: SAMPLE_PRESERVATION_METHOD_OPTIONS,
+        //         icon: CircleDashed,
+        //         showInAdvancedOnly: true
+        //     },
+        // },
         // {
         //     id: "anatomicalSite",
         //     accessorKey: "anatomicalSite",
@@ -592,7 +644,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //     ),
         //     cell: ({row}) => (
         //         <div>
-        //             {row.getValue("private") ? 'Private' : 'Public'}
+        //             {row.getValue("private") ? 'Private' : 'Published'}
         //         </div>
         //     ),
         //     enableHiding: true,
@@ -605,73 +657,53 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //                 label: "Private",
         //                 value: "true",
         //             }, {
-        //                 label: "Public",
+        //                 label: "Published",
         //                 value: "false",
         //             }
         //         ],
         //         icon: CircleDashed,
         //     },
         // },
-        {
-            id: "milestones",
-            accessorKey: "milestones",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Linked Projects"/>
-            ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.milestones?.map((milestone: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            {milestone.milestone?.title || undefined}
-                        </li>
-                    ))}
-                </ul>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Linked Projects"
-            }
-        },
-        {
-            id: "contacts",
-            accessorKey: "contacts",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Contacts"/>
-            ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.contacts?.map((contact: any, index: number) => (
-                        <li key={index}>
-                            {contact.name || contact.email || contact.affiliation}
-                        </li>
-                    ))}
-                </ul>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Contacts"
-            }
-        },
-        {
-            id: "links",
-            accessorKey: "links",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Links"/>
-            ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.attachments?.map((attachment: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            {attachment.name || attachment.link}
-                        </li>
-                    ))}
-                </ul>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Links"
-            }
-        },
+        // {
+        //     id: "milestones",
+        //     accessorKey: "milestones",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Linked Projects"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <ul className="flex flex-col gap-2">
+        //             {row.original.milestones?.map((milestone: any, index: number) => (
+        //                 <li key={index} className="line-clamp-2">
+        //                     {milestone.milestone?.title || undefined}
+        //                 </li>
+        //             ))}
+        //         </ul>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Linked Projects"
+        //     }
+        // },
+        // {
+        //     id: "contacts",
+        //     accessorKey: "contacts",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Contacts"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <ul className="flex flex-col gap-2">
+        //             {row.original.contacts?.map((contact: any, index: number) => (
+        //                 <li key={index}>
+        //                     {contact.name || contact.email || contact.affiliation}
+        //                 </li>
+        //             ))}
+        //         </ul>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Contacts"
+        //     }
+        // },
     ]
 
     // const actionsColumn: ColumnDef<any>[] = [
