@@ -47,8 +47,16 @@ const clinicalDatasetsSelector = (state: ClinicalDatasetSearchState) => ({
     setFilters: state.setFilters,
 })
 
-export const PAGProfileToolsCard = ({organizationId} : {organizationId: string}) => {
-    const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>('biosamples')
+const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}) => {
+    if (counts.biosampleCount > 0) return 'biosamples'
+    if (counts.diseaseModelCount > 0) return 'disease-models'
+    if (counts.clinicalDatasetCount > 0) return 'clinical-datasets'
+
+    return 'biosamples'
+}
+
+export const PAGProfileToolsCard = ({organizationId, toolCounts} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}}) => {
+    const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>(getInitState(toolCounts))
     const { 
         searchResults: biosamples,
         setFilters: setBiosampleFilters,
@@ -91,45 +99,51 @@ export const PAGProfileToolsCard = ({organizationId} : {organizationId: string})
             <CardHeader className="flex flex-row items-start justify-between gap-4">
                 <CardTitle>Tools</CardTitle>
                 <div className="text-muted-foreground text-sm flex flex-wrap gap-4 justify-end">
-                    <Button
-                        variant={"link"}
-                        onClick={() => setSection('biosamples')}
-                        className={cn(
-                            "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                            section === 'biosamples'
-                                ? "bg-blue-light font-medium text-primary"
-                                : "text-muted-foreground",
-                        )}
-                    >
-                        {<TestTubeDiagonal className="mr-2 h-4 w-4"/>}
-                        Biosamples
-                    </Button>
-                    <Button
-                        variant={"link"}
-                        onClick={() => setSection('disease-models')}
-                        className={cn(
-                            "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                            section === 'disease-models'
-                                ? "bg-blue-light font-medium text-primary"
-                                : "text-muted-foreground",
-                        )}
-                    >
-                        {<Rat className="mr-2 h-4 w-4"/>}
-                        Disease Models
-                    </Button>
-                    <Button
-                        variant={"link"}
-                        onClick={() => setSection('clinical-datasets')}
-                        className={cn(
-                            "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                            section === 'clinical-datasets'
-                                ? "bg-blue-light font-medium text-primary"
-                                : "text-muted-foreground",
-                        )}
-                    >
-                        {<Database className="mr-2 h-4 w-4"/>}
-                        Clinical Datasets
-                    </Button>
+                    {toolCounts.biosampleCount > 0 && (
+                        <Button
+                            variant={"link"}
+                            onClick={() => setSection('biosamples')}
+                            className={cn(
+                                "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                section === 'biosamples'
+                                    ? "bg-blue-light font-medium text-primary"
+                                    : "text-muted-foreground",
+                            )}
+                        >
+                            {<TestTubeDiagonal className="mr-2 h-4 w-4"/>}
+                            Biosamples
+                        </Button>
+                    )}
+                    {toolCounts.diseaseModelCount > 0 && (
+                        <Button
+                            variant={"link"}
+                            onClick={() => setSection('disease-models')}
+                            className={cn(
+                                "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                section === 'disease-models'
+                                    ? "bg-blue-light font-medium text-primary"
+                                    : "text-muted-foreground",
+                            )}
+                        >
+                            {<Rat className="mr-2 h-4 w-4"/>}
+                            Disease Models
+                        </Button>
+                    )}
+                    {toolCounts.clinicalDatasetCount > 0 && (
+                        <Button
+                            variant={"link"}
+                            onClick={() => setSection('clinical-datasets')}
+                            className={cn(
+                                "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                section === 'clinical-datasets'
+                                    ? "bg-blue-light font-medium text-primary"
+                                    : "text-muted-foreground",
+                            )}
+                        >
+                            {<Database className="mr-2 h-4 w-4"/>}
+                            Clinical Datasets
+                        </Button>
+                    )}
                 </div>
             </CardHeader>
             <CardContent className="w-full max-w-full">

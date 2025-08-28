@@ -31,9 +31,9 @@ type ConditionForCard = Prisma.ConditionGetPayload<{
 }>;
 
 function getAssociatedSet(c: Pick<ConditionForCard, "slug" | "associatedConditions" | "associatedWith">): AssocMini[] {
-    const all = [...(c.associatedConditions ?? []), ...(c.associatedWith ?? [])];
+    const all = [...(c?.associatedConditions ?? []), ...(c?.associatedWith ?? [])];
     const seen = new Set<string>();
-    const selfSlug = c.slug;
+    const selfSlug = c?.slug;
     const out: AssocMini[] = [];
 
     for (const x of all) {

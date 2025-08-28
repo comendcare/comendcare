@@ -307,7 +307,7 @@ export default function PAGProfilePage() {
                                             rfps={rfps}
                                         />
                                         {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
-                                        <PAGProfileToolsCard organizationId={organization.id} />
+                                        <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
                                         <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     </div>
                                 </div>

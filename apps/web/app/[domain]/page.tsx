@@ -219,7 +219,7 @@ export default async function OrganizationHomePage({
                                 toolCounts.diseaseModelCount > 0 || 
                                 toolCounts.clinicalDatasetCount > 0
                             ) && 
-                                <PAGProfileToolsCard organizationId={organization.id} />
+                                <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
                             }
                             <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
