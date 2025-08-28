@@ -184,7 +184,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Search types, genes..."
+                        placeholder="Organizations, dataset types, genes..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value

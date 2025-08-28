@@ -218,7 +218,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Search organizations, descriptions..."
+                        placeholder="Organizations, descriptions..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const text = e.target.value;
