@@ -3558,6 +3558,10 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
         // maps the original node id (from the template) to the new node ID that's stored in the DB
         const nodeIDMap: { [originalNodeId: string]: string } = {}
 
+        const existingMilestonesCount = await prisma.milestone.count({
+            where: {roadmapId}
+        })
+
         // if a roadmap template was provided, create the relevant nodes, milestones, and edges
         if (roadmapTemplate?.milestones) {
             const milestones = roadmapTemplate.milestones
@@ -3591,6 +3595,7 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
                                             }
                                         }))
                                     },
+                                    timelineOrder: existingMilestonesCount + index
                                 }
                             }
                         }
