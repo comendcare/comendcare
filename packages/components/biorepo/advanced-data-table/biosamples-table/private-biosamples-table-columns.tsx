@@ -340,6 +340,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
+            id: "donor.age",
+            accessorKey: "donor.age",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Age at Collection"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Age at Collection",
+                variant: "range",
+                range: [0, 150],
+                showInAdvancedOnly: true,
+            }
+        },
+        {
             id: "donor.diagnoses",
             accessorKey: "donor.diagnoses",
             header: ({column}) => (
@@ -368,7 +382,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             }
         },
-
         {
             id: "availability",
             accessorKey: "availability",
@@ -630,20 +643,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         // {
-        //     id: "donor.age",
-        //     accessorKey: "donor.age",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Age at Collection"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Age at Collection",
-        //         variant: "range",
-        //         range: [0, 150],
-        //         showInAdvancedOnly: true,
-        //     }
-        // },
-        // {
         //     id: "donor.gender",
         //     accessorKey: "donor.gender",
         //     header: ({column}) => (
@@ -769,31 +768,31 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //         label: "Medical Treatments"
         //     }
         // },
-        // {
-        //     id: "milestones",
-        //     accessorKey: "milestones",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Linked Projects"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <ul className="flex flex-col gap-2">
-        //             {row.original.milestones?.map((milestone: any, index: number) => (
-        //                 <li key={index} className="line-clamp-2">
-        //                     {milestone.milestone?.title || undefined}
-        //                 </li>
-        //             ))}
-        //         </ul>
-        //     ),
-        //     enableHiding: true,
-        //     enableColumnFilter: true,
-        //     meta: {
-        //         label: "Linked Projects",
-        //         variant: "multiSelect",
-        //         icon: CircleDashed,
-        //         showInAdvancedOnly: true,
-        //         onAsyncSearch: handleAsyncMilestoneSearch
-        //     }
-        // },
+        {
+            id: "milestones",
+            accessorKey: "milestones",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Linked Projects"/>
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.milestones?.map((milestone: any, index: number) => (
+                        <li key={index} className="line-clamp-2">
+                            {milestone.milestone?.title || undefined}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Linked Projects",
+                variant: "multiSelect",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncMilestoneSearch
+            }
+        },
         {
             id: "actions",
             cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
