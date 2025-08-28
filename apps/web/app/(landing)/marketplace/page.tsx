@@ -6,6 +6,7 @@ import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-da
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
+import { Button } from "@/packages/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
 import { Separator } from "@/packages/components/ui/separator"
 import { Skeleton } from "@/packages/components/ui/skeleton"
@@ -13,6 +14,8 @@ import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/bi
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
+import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 import { useEffect } from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
@@ -57,9 +60,16 @@ export default function MarketplacePage() {
     return (
         <main className="w-full h-full flex flex-col gap-10">
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Patient Groups</h2>
-                    <a href="/marketplace/patient-groups" className="justify-self-end self-end underline text-right">See all patient groups</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/patient-groups"}
+                        >
+                            Browse all patient groups
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {(organizationStore.searchResults && organizationStore.searchResults.length > 0 )
@@ -82,9 +92,16 @@ export default function MarketplacePage() {
             </div>
     
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Biosamples</h2>
-                    <a href="/marketplace/biosamples" className="justify-self-end self-end underline text-right">See all biosamples</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/biosamples"}
+                        >
+                            Browse all biosamples
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full">
                     {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
@@ -105,9 +122,16 @@ export default function MarketplacePage() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Disease Models</h2>
-                    <a href="/marketplace/disease-models" className="justify-self-end self-end underline text-right">See all disease models</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/disease-models"}
+                        >
+                            Browse all disease models
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full">
                     {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
@@ -128,9 +152,16 @@ export default function MarketplacePage() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Clinical Datasets</h2>
-                    <a href="/marketplace/biosamples" className="justify-self-end self-end underline text-right">See all clinical datasets</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/clinical-datasets"}
+                        >
+                            Browse all clinical datasets
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full">
                     {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
