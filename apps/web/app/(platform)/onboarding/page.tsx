@@ -1220,12 +1220,25 @@ export default function OnboardingPage() {
                                 <section className="space-y-6">
                                     <h2 className="text-xl font-semibold">Finances</h2>
 
-                                    <MoneyInput
-                                        form={form}
-                                        label="Total funds raised to date"
-                                        description="The total amount of funding raised to date by your patient group."
-                                        name="raised"
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <MoneyInput
+                                            form={form}
+                                            label="Total funds raised to date"
+                                            name="raised"
+                                        />
+
+                                        <MoneyInput
+                                            form={form}
+                                            label="Total funds deployed to date"
+                                            name="deployed"
+                                        />
+
+                                        <MoneyInput
+                                            form={form}
+                                            label="Total annual research budget"
+                                            name="budget"
+                                        />
+                                    </div>
                                 </section>
                             </>
                         )}
