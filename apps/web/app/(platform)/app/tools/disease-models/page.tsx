@@ -27,8 +27,6 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
         {...search, filters: validFilters}
     )
 
-    console.log(`disease model data`, data)
-
     // not part of an org
     if (!orgId) return <NoOrganization />
     return <PrivateDiseaseModelToolsPage data={[...data]} pageCount={pageCount} searchParams={searchParams} />
