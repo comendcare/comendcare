@@ -128,7 +128,7 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: `/login`,
         verifyRequest: `/login/verify-request`,
-        error: "/error", // Error code passed in query string as ?error=
+        error: "/login/error", // Error code passed in query string as ?error=
         newUser: "/onboarding"
     },
     adapter: PrismaAdapter(prisma as PrismaClient),
