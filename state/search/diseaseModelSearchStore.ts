@@ -148,7 +148,7 @@ const getUpdatedSearchResults = async (
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "description,gene,types,conditions",
+            query_by: "description,gene,types,conditions,organization",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),

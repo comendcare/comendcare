@@ -30,3 +30,41 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
     }
 }
+
+export async function GET(req: Request) {
+    try {
+        // Parse the incoming URL and extract query parameters
+        const url = new URL(req.url);
+        const searchQuery = url.searchParams.get("search")?.toLowerCase() || "";
+
+        // Query the Prisma database
+        const organizations = await prisma.organization.findMany({
+            where: {
+                // symbol: {
+                //     contains: searchQuery,
+                //     mode: 'insensitive', // Case-insensitive search
+                // },
+                name: {
+                    contains: searchQuery,
+                    mode: 'insensitive' // Case-insensitive search
+                }
+            },
+            take: 50, // Limit the number of results
+            select: {
+                id: true,
+                name: true,
+            },
+        });
+
+        // Format the results for the MultipleSelector
+        const formattedResults = organizations.map((organization) => ({
+            label: organization.name, // Use "name" for the label
+            value: organization.id, // Use "id" for the value
+        }));
+
+        return NextResponse.json(formattedResults);
+    } catch (error) {
+        console.error("Error fetching organizations:", error);
+        return NextResponse.json({error: "Failed to fetch organizations."}, {status: 500});
+    }
+}
