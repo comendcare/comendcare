@@ -68,7 +68,9 @@ export function EditDiseaseModelToolForm({
             otherTypeDetails: typeof toolData?.metadata === 'object' ? (toolData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
+            attachments: toolData?.attachments || undefined,
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
+            contacts: toolData?.contacts || undefined,
             institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
@@ -79,7 +81,9 @@ export function EditDiseaseModelToolForm({
         description: form.watch("description"),
         types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
+        attachments: form.watch("attachments"),
         isPrivate: form.watch("isPrivate"),
+        contacts: form.watch("contacts"),
         milestones: form.watch("milestones"),
     }
 

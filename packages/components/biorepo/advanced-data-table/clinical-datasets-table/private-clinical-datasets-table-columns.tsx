@@ -118,7 +118,11 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Cohort Size"/>
         ),
         cell: ({row}) => (
-            <>{row.original.cohortSize || ''}</>
+            <>{
+                (row.original.cohortSize !== null && row.original.cohortSize !== undefined)
+                    ? row.original.cohortSize
+                    : ''
+            }</>
         ),
         enableHiding: true,
         meta: {

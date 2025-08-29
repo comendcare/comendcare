@@ -2109,11 +2109,15 @@ export const updateDiseaseModel = withOrganizationAuth(
                     milestoneId: m.id,
                     biosampleId: data.id || "",
                 })),
+                attachments: data.attachments,
+                contacts: data.contacts,
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
                 where: {id: data.id},
                 include: {
+                    contacts: true,
+                    attachments: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
@@ -2136,6 +2140,34 @@ export const updateDiseaseModel = withOrganizationAuth(
                              } }
                          }
                         : { institution: { disconnect: true } }),
+                    ...(diseaseModelData.attachments ? (
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(diseaseModelData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (diseaseModelData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
                     ...(diseaseModelData.milestones ? (
                         {
                             milestones: {
@@ -2186,10 +2218,14 @@ export const createDiseaseModel = withOrganizationAuth(
                         biosampleId: data.id || '',
                     })
                 }),
+                attachments: data.attachments,
+                contacts: data.contacts,
             }
 
             const response = await prisma.diseaseModel.create({
                 include: {
+                    attachments: true,
+                    contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
@@ -2215,6 +2251,24 @@ export const createDiseaseModel = withOrganizationAuth(
                              }
                         }})
                         : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (diseaseModelData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
                     milestones: {
                         create: (diseaseModelData.milestones || []).map((milestone: any) => ({
                             milestone: {
@@ -2375,7 +2429,12 @@ export const updateDataTool = withOrganizationAuth(
                 attachments: data.attachments,
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
+                ...((
+                    data.cohortSize !== undefined && 
+                    data.cohortSize !== null
+                    ) 
+                        ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null} 
+                        : undefined),
                 institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
 
