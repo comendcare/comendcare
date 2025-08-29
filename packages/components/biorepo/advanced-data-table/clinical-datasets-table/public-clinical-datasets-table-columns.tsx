@@ -3,17 +3,12 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   CircleDashed,
-  Globe,
-  Lock,
-  Pin,
   Text,
 } from "lucide-react";
 import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
-import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
-import Link from "next/link";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 
 export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
@@ -119,29 +114,6 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "patientId",
-        accessorKey: "patientId",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Linked Patient ID"/>
-        ),
-        enableHiding: true,
-        meta: {
-            label: "Linked Patient ID",
-        }
-    },
-    {
-        id: "availability",
-        accessorKey: "availability",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Availability"/>
-        ),
-        enableHiding: true,
-        enableColumnFilter: true,
-        meta: {
-            label: "Availability",
-        }
-    },
-    {
         id: "institution",
         accessorKey: "institution",
         header: ({column}) => (
@@ -165,22 +137,6 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        accessorKey: "contacts",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Point of Contact" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.contacts?.map((contact: any, index: number) => (
-                    <li key={index}>
-                        {contact.name || contact.email || contact.affiliation}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
-    },
-    {
         accessorKey: "links",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Links" />
@@ -196,48 +152,15 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         enableHiding: true,
     },
-
-    // {
-    //     id: "condition",
-    //     accessorKey: "condition",
-    //     header: ({column}) => (
-    //         <DataTableColumnHeader column={column} title="Condition"/>
-    //     ),
-    //     cell: ({row}) => (
-    //         <div className="flex gap-2 items-center">
-    //             <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
-    //         </div>
-    //     ),
-    //     enableHiding: true,
-    //     meta: {
-    //         label: "Condition"
-    //     }
-    // },
-    // {
-    //     accessorKey: "description",
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title="Description" />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <div className="line-clamp-3">
-    //             {row.original.description}
-    //         </div>
-    //     ),
-    //     enableHiding: true,
-    // },
     {
-        accessorKey: "milestones",
+        accessorKey: "description",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
+            <DataTableColumnHeader column={column} title="Description" />
         ),
         cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.milestones?.map((milestone: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
-                        {milestone.milestone?.title || undefined}
-                    </li>
-                ))}
-            </ul>
+            <div className="line-clamp-3">
+                {row.original.description}
+            </div>
         ),
         enableHiding: true,
     },

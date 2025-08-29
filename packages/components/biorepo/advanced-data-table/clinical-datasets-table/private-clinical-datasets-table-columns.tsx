@@ -5,7 +5,6 @@ import {
   CircleDashed,
   Globe,
   Lock,
-  Pin,
   Text,
 } from "lucide-react";
 import * as React from "react";
@@ -13,10 +12,9 @@ import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-
 import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
-import Link from "next/link";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
-  const comendColumns: ColumnDef<any>[] = [
+  const columns: ColumnDef<any>[] = [
     {
         id: "private",
         accessorKey: "private",
@@ -264,9 +262,6 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         enableHiding: true,
     },
-  ]
-
-  const actionsColumn: ColumnDef<any>[] = [
     {
         id: "actions",
         cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'data'}/>,
@@ -274,5 +269,5 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     },
   ]
 
-  return [...comendColumns, ...actionsColumn]
+  return columns
 }
