@@ -382,11 +382,6 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         },
         {
             id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
-            enableHiding: false,
-        },
-        {
-            id: "actions",
             cell: ({row}) => <AssetActionsMenu tool={row.original} type={'diseaseModel'}/>,
             enableHiding: false,
         },

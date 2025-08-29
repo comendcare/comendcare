@@ -71,6 +71,7 @@ export function EditDiseaseModelToolForm({
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
             institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
+            milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
         }
     })
 
@@ -79,6 +80,7 @@ export function EditDiseaseModelToolForm({
         types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
         isPrivate: form.watch("isPrivate"),
+        milestones: form.watch("milestones"),
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>) => {

@@ -2003,6 +2003,7 @@ export const editDiseaseModelForm = z.object({
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
     isPrivate: z.boolean(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
 
     // disease model properties
     genes: z.array(optionSchema).optional(),

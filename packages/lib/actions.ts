@@ -2104,7 +2104,11 @@ export const updateDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                milestones: (data.milestones || []).map((m) => ({
+                    milestoneId: m.id,
+                    biosampleId: data.id || "",
+                })),
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
@@ -2123,9 +2127,6 @@ export const updateDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
-                        ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
-                        : {institution: {disconnect: true}}),
-                    ...(diseaseModelData.institution
                         ? { institution: { 
                             connectOrCreate: { 
                                 where: {id: diseaseModelData.institution.value},
@@ -2135,6 +2136,18 @@ export const updateDiseaseModel = withOrganizationAuth(
                              } }
                          }
                         : { institution: { disconnect: true } }),
+                    ...(diseaseModelData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (diseaseModelData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
                 },
             })
 
@@ -2166,7 +2179,13 @@ export const createDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id || '',
+                    })
+                }),
             }
 
             const response = await prisma.diseaseModel.create({
@@ -2196,6 +2215,13 @@ export const createDiseaseModel = withOrganizationAuth(
                              }
                         }})
                         : undefined),
+                    milestones: {
+                        create: (diseaseModelData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
                 }
             })
 
