@@ -11,16 +11,20 @@ export async function POST(req: Request) {
                 id: { in: ids }, // Ensure we fetch all organizations
             },
             include: {
-                conditions: {
-                    include: {
-                        condition: true
+                conditions: {include: {condition: true}},
+                milestones: {
+                    where: {private: false},
+                    include: {node: true}
+                },
+                roadmaps: {
+                    where: {
+                        milestones: {some: {private: false}} // Only include roadmaps with at least one public milestone
                     }
                 },
-                milestones: {
-                    include: {
-                        node: true
-                    }
-                }
+                biosamples: {where: {private: false}},
+                diseaseModel: {where: {private: false}},
+                tools: {where: {private: false}},
+                rfps: {where: {private: false}}
             }
         });
 
