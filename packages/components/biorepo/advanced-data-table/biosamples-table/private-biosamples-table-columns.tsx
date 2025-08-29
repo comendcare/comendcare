@@ -218,11 +218,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Private Donor Id"/>
+                <DataTableColumnHeader column={column} title="Private Donor ID"/>
             ),
             enableHiding: true,
             meta: {
-                label: "Private Donor Id"
+                label: "Private Donor ID"
             }
         },
         {
@@ -297,17 +297,17 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //         label: "Variant",
         //     }
         // },
-        {
-            id: "genotype",
-            accessorKey: "genotype",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Genotype"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Genotype",
-            }
-        },
+        // {
+        //     id: "genotype",
+        //     accessorKey: "genotype",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Genotype"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Genotype",
+        //     }
+        // },
         {
             id: "donor.sex",
             accessorKey: "donor.sex",
@@ -350,20 +350,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 showInAdvancedOnly: true
             }
         },
-        {
-            id: "donor.age",
-            accessorKey: "donor.age",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Age at Collection"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Age at Collection",
-                variant: "range",
-                range: [0, 150],
-                showInAdvancedOnly: true,
-            }
-        },
+        // {
+        //     id: "donor.age",
+        //     accessorKey: "donor.age",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Age at Collection"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Age at Collection",
+        //         variant: "range",
+        //         range: [0, 150],
+        //         showInAdvancedOnly: true,
+        //     }
+        // },
         {
             id: "donor.diagnoses",
             accessorKey: "donor.diagnoses",
@@ -511,23 +511,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
 
-
-        // {
-        //     id: "description",
-        //     accessorKey: "description",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Description"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <div className="line-clamp-3">
-        //             {row.original.description}
-        //         </div>
-        //     ),
-        //     meta: {
-        //         label: "Description"
-        //     },
-        //     enableHiding: true,
-        // },
         // {
         //     // NOTE: in order for filters to access the proper nested database object the path to
         //     // the nested object must be defined in BOTH the id & accessorKey (e.g. biosample.currentCountry)
@@ -803,6 +786,22 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 showInAdvancedOnly: true,
                 onAsyncSearch: handleAsyncMilestoneSearch
             }
+        },
+        {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Other Notes"/>
+            ),
+            cell: ({row}) => (
+                <div className="line-clamp-3">
+                    {row.original.description}
+                </div>
+            ),
+            meta: {
+                label: "Other Notes"
+            },
+            enableHiding: true,
         },
         {
             id: "actions",

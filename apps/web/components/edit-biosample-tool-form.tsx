@@ -431,24 +431,6 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
 
             <FormField
                 control={form.control}
-                name="description"
-                render={({field}) => (
-                    <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Description`}</FormLabel>
-                        <FormControl>
-                            <Textarea
-                                id="description"
-                                placeholder={`Enter a description...`}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
                 name="types"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
@@ -525,7 +507,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                 )}
             />
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="genotype"
                 render={({field}) => (
@@ -544,7 +526,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
             <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                 <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
@@ -623,11 +605,6 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
             <ContactsFormField form={form} />
             <AttachmentsFormField form={form} />
 
-
-
-            <Separator />
-            <h1 className="font-semibold text-md py-0 my-0">Additional Biosample Information</h1>
-
             <FormField
                 control={form.control}
                 name="milestones"
@@ -641,6 +618,27 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                     </FormItem>
                 )}
             />
+
+            <FormField
+                control={form.control}
+                name="description"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[100px]">{`Other Notes`}</FormLabel>
+                        <FormControl>
+                            <Textarea
+                                id="description"
+                                placeholder={`Enter other notes...`}
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            {/* <Separator />
+            <h1 className="font-semibold text-md py-0 my-0">Additional Biosample Information</h1>
 
             <FormField
                 control={form.control}
@@ -821,7 +819,6 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                 )}
             />
 
-            {/* <FormItem className="w-full flex gap-4 items-center"> */}
             <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
                 <FormLabel className="w-[100px]">{'Price Per Unit'}</FormLabel>
                 <div className="w-full gap-2 flex">
@@ -889,7 +886,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
         </div>
         </>
     )
@@ -1007,7 +1004,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             />
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="gender"
                 render={({field}) => (
@@ -1034,7 +1031,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
             {/* Race selections from the National Center for Education Studies (US Gov) */}
             {/* https://nces.ed.gov/ipeds/report-your-data/race-ethnicity-definitions */}
@@ -1069,7 +1066,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
 
             {/* Ethnicity selections from the National Center for Education Studies (US Gov) */}
             {/* https://nces.ed.gov/ipeds/report-your-data/race-ethnicity-definitions */}
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="ethnicity"
                 render={({field}) => (
@@ -1096,9 +1093,9 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="height"
                 render={({field}) => (
@@ -1119,9 +1116,9 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="weight"
                 render={({field}) => (
@@ -1142,7 +1139,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </div>
                     </FormItem>
                 )}
-            />
+            /> */}
 
             {/* <FormField
                 control={form.control}
@@ -1265,7 +1262,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 )}
             />  
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="treatments"
                 render={({field}) => (
@@ -1331,9 +1328,9 @@ export const DonorFormFields = ({form}: {form: any}) => {
 
                     </FormItem>
                 )}
-            /> 
+            />  */}
 
-            <FormField
+            {/* <FormField
                 control={form.control}
                 name="medications"
                 render={({field}) => (
@@ -1399,7 +1396,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
 
                     </FormItem>
                 )}
-            /> 
+            />  */}
         </div>
         </>
     )

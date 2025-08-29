@@ -202,17 +202,17 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //         label: "Variant",
         //     }
         // },
-        {
-            id: "genotype",
-            accessorKey: "genotype",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Genotype"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Genotype",
-            }
-        },
+        // {
+        //     id: "genotype",
+        //     accessorKey: "genotype",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Genotype"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Genotype",
+        //     }
+        // },
         {
             id: "availability",
             accessorKey: "availability",
