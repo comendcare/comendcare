@@ -68,7 +68,7 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                         </CardDescription>
                     )}
                 </CardHeader>
-                {(numPlans || numProjects || numTools || numRFPs) && (
+                {(numPlans > 0 || numProjects > 0 || numTools > 0 || numRFPs > 0) && (
                     <CardContent className="flex flex-col items-start justify-center">
                         <div className="flex flex-wrap w-full gap-4">
                             {numPlans > 0 && (
