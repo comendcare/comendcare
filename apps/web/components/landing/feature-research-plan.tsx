@@ -57,7 +57,7 @@ export default function FeatureResearchPlan() {
                             </dl>
                         </div>
 
-                        <FeaturedImages/>
+                        {/*<FeaturedImages/>*/}
                     </div>
                     <div className="block sm:hidden overflow-x-auto -mx-6 sm:mx-0">
                         <div className="w-[48rem] sm:w-[57rem] md:ml-0">
