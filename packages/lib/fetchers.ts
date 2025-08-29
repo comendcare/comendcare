@@ -2166,9 +2166,12 @@ export const getDiseaseModels = withOrganizationAuth(
                                     organizationId: organization.id
                                 },
                                 include: {
+                                    attachments: true,
+                                    contacts: true,
                                     organization: {include: {conditions: {include: {condition: true}}}},
                                     gene: true,
-                                    institution: true
+                                    institution: true,
+                                    milestones: {include: {milestone: true}},
                                 },
                                 orderBy: {createdAt: "asc"},
                             }),
@@ -2239,9 +2242,12 @@ export const getDiseaseModels = withOrganizationAuth(
                                 organizationId: organization.id
                             },
                             include: {
+                                attachments: true,
+                                contacts: true,
                                 organization: {include: {conditions: {include: {condition: true}}}},
                                 gene: true,
-                                institution: true
+                                institution: true,
+                                milestones: {include: {milestone: true}},
                             },
                             orderBy,
                         }),

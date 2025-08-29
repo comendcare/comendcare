@@ -18,7 +18,7 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useEffect } from "react"
 import { useShallow } from "zustand/react/shallow"
-import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
+import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -76,7 +76,7 @@ export default function MarketplacePage() {
                         ? (
                             <>
                                 {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
-                                    <OrganizationMarketplaceListElement organization={organization} key={index}/>
+                                    <OrganizationMarketplaceCard organization={organization} key={index} isPublic={true}/>
                                 ))}
                             </>
                         )

@@ -1968,6 +1968,7 @@ export const editBiosampleForm = z.object({
 
     // donor properties
     donorId: z.string().optional(),
+    internalDonorId: z.string().optional(),
     donor: z.array(optionSchema).optional(),
     donorInternalId: z.string().optional(),
     age: z.string().optional(),
@@ -2002,7 +2003,10 @@ export const editDiseaseModelForm = z.object({
         .min(1, "Type is required")
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
     isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
 
     // disease model properties
     genes: z.array(optionSchema).optional(),

@@ -168,6 +168,18 @@ export function EditDataToolForm({
 
     }
 
+    const handleGeneAsyncSearch = async (query: string) => {
+        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+        const genes = await res.json();
+        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+    };
+
+    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+        const response = await fetch(`/api/institutions?search=${query}`);
+        const data = await response.json();
+        return data;
+    };
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -248,36 +260,39 @@ export function EditDataToolForm({
                     onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1"
                 >
+                    <FormItem className="flex gap-2 items-center">
+                        <FormLabel className="flex items-center gap-1 grow">
+                            Visibility
+                            <Tooltip delayDuration={0}>
+                                <TooltipTrigger>
+                                    <Info className="h-4 w-4"/>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                    {`Private tools will not be shown to people outside of your organization.`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </FormLabel>
+                        <PrivatePublicFormField 
+                            form={form} 
+                            formData={formData} 
+                            // disabled={!orgIsPublished}
+                        />
+                    </FormItem>
+
                     <FormField
                         control={form.control}
                         name="title"
                         render={({field}) => (
-                            <FormItem>
-                                <FormLabel>{`Title`}</FormLabel>
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Title`}</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        id="title"
-                                        placeholder={`Enter a title`}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel >{`Description`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description...`}
-                                        {...field}
-                                    />
+                                    <div className="w-full">
+                                        <Input
+                                            id="title"
+                                            placeholder={`Enter a title`}
+                                            {...field}
+                                        />
+                                    </div>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
@@ -288,8 +303,8 @@ export function EditDataToolForm({
                         control={form.control}
                         name="types"
                         render={({field}) => (
-                            <FormItem className="w-full">
-                                <FormLabel>{`Type`}</FormLabel>
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         value={field.value}
@@ -336,27 +351,134 @@ export function EditDataToolForm({
                         </>
                     )}
 
-                    <FormItem className="flex gap-2 items-center">
-                        <FormLabel className="flex items-center gap-1 grow">
-                            Visibility
-                            <Tooltip delayDuration={0}>
-                                <TooltipTrigger>
-                                    <Info className="h-4 w-4"/>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                    {`Private tools will not be shown to people outside of your organization.`}
-                                </TooltipContent>
-                            </Tooltip>
-                        </FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                    </FormItem>
+                    <FormField
+                        control={form.control}
+                        name="cohortSize"
+                        render={({field}) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                                <FormLabel className="w-[100px]">{`Cohort Size`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="-mt-2 w-full">
+                                        <Input
+                                            id="cohortSize"
+                                            className="w-full min-h-[40px]"
+                                            placeholder={`Enter a number`}
+                                            type="number"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="genes"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <MultipleSelector
+                                            {...field}
+                                            onSearch={handleGeneAsyncSearch}
+                                            placeholder="Search for genes..."
+                                            triggerSearchOnFocus={true}
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading genes...</p>}
+                                            emptyIndicator={<p>No genes found.</p>}
+                                            showHoverCard={false}
+                                            className="-mt-2 w-full min-h-[40px]"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* <FormField
+                        control={form.control}
+                        name="variant"
+                        render={({field}) => (
+                            // <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                                <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="variant"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a variant`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    /> */}
+
+                    <FormField
+                        control={form.control}
+                        name="institutions"
+                        render={({field}) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={true}
+                                            maxSelected={1}
+                                            triggerSearchOnFocus={true}
+                                            onSearch={handleInstitutionAsyncSearch}
+                                            placeholder="Search for institutions..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading institutions...</p>}
+                                            emptyIndicator={<p>No institutions found.</p>}
+                                            showHoverCard={false}
+                                            className="-mt-2 w-full min-h-[40px]"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* <FormField
+                        control={form.control}
+                        name="patientId"
+                        render={({field}) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                                <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="patientId"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a phenotype`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    /> */}
+
+                    <ContactsFormField form={form} />
+                    <AttachmentsFormField form={form} />
 
                     <FormField
                         control={form.control}
                         name="milestones"
                         render={({field}) => (
-                            <FormItem className="w-full mt-2">
-                                <FormLabel >{`Linked Projects`}</FormLabel>
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -365,11 +487,23 @@ export function EditDataToolForm({
                         )}
                     />
 
-                    <ContactsFormField form={form} />
-                    <AttachmentsFormField form={form} />
-
-                    <Separator className="w-full"/>
-                    <AdditionalBiosampleFields form={form} />
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>
@@ -408,125 +542,5 @@ export function EditDataToolForm({
                 </form>
             </ScrollArea>
         </Form>
-    )
-}
-
-export const AdditionalBiosampleFields = ({form}: {form: any}) => {
-    const handleGeneAsyncSearch = async (query: string) => {
-        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
-        const genes = await res.json();
-        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
-    };
-
-    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-        const response = await fetch(`/api/institutions?search=${query}`);
-        const data = await response.json();
-        return data;
-    };
-
-    return (
-        <>
-        <h1 className="font-semibold text-md py-0 my-0">Clinical Dataset Information</h1>
-        <div className="flex-col space-y-4">
-
-        <FormField
-            control={form.control}
-            name="genes"
-            render={({field}) => (
-                <FormItem className="w-full flex gap-4 items-center">
-                    <FormLabel className="w-[100px]">Related Gene</FormLabel>
-                    <div className="w-full">
-                        <FormControl className="w-full">
-                            <MultipleSelector
-                                {...field}
-                                onSearch={handleGeneAsyncSearch}
-                                placeholder="Search for genes..."
-                                triggerSearchOnFocus={true}
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={<p>Loading genes...</p>}
-                                emptyIndicator={<p>No genes found.</p>}
-                                showHoverCard={false}
-                                className="-mt-2 w-full min-h-[40px]"
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </div>
-                </FormItem>
-            )}
-        />
-
-        {/* <FormField
-            control={form.control}
-            name="variant"
-            render={({field}) => (
-                // <FormItem className="w-full flex gap-4 items-center">
-                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
-                    <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
-                    <div className="w-full">
-                        <FormControl className="w-full">
-                            <Input
-                                id="variant"
-                                className="-mt-2 w-full min-h-[40px]"
-                                placeholder={`Enter a variant`}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </div>
-                </FormItem>
-            )}
-        /> */}
-
-        <FormField
-            control={form.control}
-            name="cohortSize"
-            render={({field}) => (
-                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
-                    <FormLabel className="w-[100px]">{`Cohort Size`}</FormLabel>
-                    <div className="w-full">
-                        <FormControl className="-mt-2 w-full">
-                            <Input
-                                id="cohortSize"
-                                className="w-full min-h-[40px]"
-                                placeholder={`Enter a number`}
-                                type="number"
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </div>
-                </FormItem>
-            )}
-        />
-
-        <FormField
-            control={form.control}
-            name="institutions"
-            render={({field}) => (
-                <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
-                    <FormLabel className="w-[100px]">Institution</FormLabel>
-                    <div className="w-full">
-                        <FormControl className="w-full">
-                            <MultipleSelector
-                                {...field}
-                                creatable={true}
-                                maxSelected={1}
-                                triggerSearchOnFocus={true}
-                                onSearch={handleInstitutionAsyncSearch}
-                                placeholder="Search for institutions..."
-                                hidePlaceholderWhenSelected={true}
-                                loadingIndicator={<p>Loading institutions...</p>}
-                                emptyIndicator={<p>No institutions found.</p>}
-                                showHoverCard={false}
-                                className="-mt-2 w-full min-h-[40px]"
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </div>
-                </FormItem>
-            )}
-        />
-        </div>
-        </>
     )
 }

@@ -467,7 +467,11 @@ export function EditRFPForm({
                         </FormDescription>
                         </div>
                         <div className="w-[90px]">
-                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                        <PrivatePublicFormField 
+                            form={form} 
+                            formData={formData} 
+                            // disabled={!orgIsPublished}
+                        />
                         </div>
                     </FormItem>
 

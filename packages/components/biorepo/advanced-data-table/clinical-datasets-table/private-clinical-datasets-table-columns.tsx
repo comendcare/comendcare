@@ -5,7 +5,6 @@ import {
   CircleDashed,
   Globe,
   Lock,
-  Pin,
   Text,
 } from "lucide-react";
 import * as React from "react";
@@ -13,40 +12,80 @@ import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-
 import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
-import Link from "next/link";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
-  const comendColumns: ColumnDef<any>[] = [
+  const columns: ColumnDef<any>[] = [
+    {
+        id: "private",
+        accessorKey: "private",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Visibility"/>
+        ),
+        cell: ({row}) => (
+            <div>
+                {row.getValue("private") 
+                    ? (
+                        <div className="flex gap-1 items-center">
+                            <Lock className="h-4 w-4"/>
+                            Private
+                        </div>
+                    )
+                    : (
+                        <div className="flex gap-1 items-center">
+                            <Globe className="h-4 w-4"/>
+                            Published
+                        </div>
+                    )
+                }
+            </div>
+        ),
+        enableHiding: true,
+        enableColumnFilter: true,
+        meta: {
+            label: "Visibility",
+            variant: "select",
+            options: [
+                {
+                    label: "Private",
+                    value: "true",
+                }, {
+                    label: "Published",
+                    value: "false",
+                }
+            ],
+            icon: CircleDashed,
+        },
+    },
     {
         id: "id",
         accessorKey: "id",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Sample ID"/>
+            <DataTableColumnHeader column={column} title="Tool ID"/>
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
-                <p>{row.original.id || 'No Sample ID'}</p>
+                <p>{row.original.id || 'No Tool ID'}</p>
             </div>
         ),
         enableHiding: true,
         meta: {
-            label: "Sample ID"
+            label: "Tool ID"
         }
     },
-    // {
-    //   id: "title",
-    //   accessorKey: "title",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Title" />
-    //   ),
-    //   meta: {
-    //     label: "Title",
-    //     placeholder: "Search titles...",
-    //     variant: "text",
-    //     icon: Text,
-    //   },
-    //   enableColumnFilter: true,
-    // },
+    {
+      id: "title",
+      accessorKey: "title",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Title" />
+      ),
+      meta: {
+        label: "Title",
+        placeholder: "Search titles...",
+        variant: "text",
+        icon: Text,
+      },
+      enableColumnFilter: true,
+    },
     {
         id: "types",
         accessorKey: "types",
@@ -73,19 +112,21 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         },
     },
     {
-        id: "condition",
-        accessorKey: "condition",
+        id: "cohortSize",
+        accessorKey: "cohortSize",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Condition"/>
+            <DataTableColumnHeader column={column} title="Cohort Size"/>
         ),
         cell: ({row}) => (
-            <div className="flex gap-2 items-center">
-                <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
-            </div>
+            <>{
+                (row.original.cohortSize !== null && row.original.cohortSize !== undefined)
+                    ? row.original.cohortSize
+                    : ''
+            }</>
         ),
         enableHiding: true,
         meta: {
-            label: "Condition"
+            label: "Cohort Size"
         }
     },
     {
@@ -102,37 +143,34 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             label: "Gene"
         }
     },
-    {
-        id: "cohortSize",
-        accessorKey: "cohortSize",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Cohort Size"/>
-        ),
-        cell: ({row}) => (
-            <>{row.original.cohortSize || ''}</>
-        ),
-        enableHiding: true,
-        meta: {
-            label: "Cohort Size"
-        }
-    },
-    {
-        accessorKey: "description",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
-        ),
-        cell: ({ row }) => (
-            <div className="line-clamp-3">
-                {row.original.description}
-            </div>
-        ),
-        enableHiding: true,
-    },
+    // {
+    //     id: "patientId",
+    //     accessorKey: "patientId",
+    //     header: ({column}) => (
+    //         <DataTableColumnHeader column={column} title="Linked Patient ID"/>
+    //     ),
+    //     enableHiding: true,
+    //     meta: {
+    //         label: "Linked Patient ID",
+    //     }
+    // },
+    // {
+    //     id: "availability",
+    //     accessorKey: "availability",
+    //     header: ({column}) => (
+    //         <DataTableColumnHeader column={column} title="Availability"/>
+    //     ),
+    //     enableHiding: true,
+    //     enableColumnFilter: true,
+    //     meta: {
+    //         label: "Availability",
+    //     }
+    // },
     {
         id: "institution",
         accessorKey: "institution",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Institution"/>
+            <DataTableColumnHeader column={column} title="Storage Facility"/>
         ),
         cell: ({row}) => {
             // if (row.original.institution?.website && row.original.institution?.name) {
@@ -148,59 +186,13 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         },
         enableHiding: true,
         meta: {
-            label: "Institution"
+            label: "Storage Facility"
         }
-    },
-    {
-        id: "private",
-        accessorKey: "private",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Visibility" />
-        ),
-        cell: ({ row }) => (
-            <div>
-                {row.getValue("private") ? 'Private' : 'Public'}
-            </div>
-        ),
-        enableHiding: true,
-        enableColumnFilter: true,
-        meta: {
-          label: "Visibility",
-          variant: "multiSelect",
-          options: [
-            {
-              label: "Private", 
-              value: "true",
-              // icon: Lock,
-            }, {
-              label: "Public", 
-              value: "false",
-              // icon: Globe
-            }
-          ],
-          icon: CircleDashed,
-        },
-    },
-    {
-        accessorKey: "milestones",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.milestones?.map((milestone: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
-                        {milestone.milestone?.title || undefined}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
     },
     {
         accessorKey: "contacts",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Contacts" />
+            <DataTableColumnHeader column={column} title="Point of Contact" />
         ),
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">
@@ -229,9 +221,51 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         enableHiding: true,
     },
-  ]
 
-  const actionsColumn: ColumnDef<any>[] = [
+    // {
+    //     id: "condition",
+    //     accessorKey: "condition",
+    //     header: ({column}) => (
+    //         <DataTableColumnHeader column={column} title="Condition"/>
+    //     ),
+    //     cell: ({row}) => (
+    //         <div className="flex gap-2 items-center">
+    //             <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+    //         </div>
+    //     ),
+    //     enableHiding: true,
+    //     meta: {
+    //         label: "Condition"
+    //     }
+    // },
+    {
+        accessorKey: "milestones",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Linked Projects" />
+        ),
+        cell: ({ row }) => (
+            <ul className="flex flex-col gap-2">
+                {row.original.milestones?.map((milestone: any, index: number) => (
+                    <li key={index} className="line-clamp-2">
+                        {milestone.milestone?.title || undefined}
+                    </li>
+                ))}
+            </ul>
+        ),
+        enableHiding: true,
+    },
+    {
+        accessorKey: "description",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Description" />
+        ),
+        cell: ({ row }) => (
+            <div className="line-clamp-3">
+                {row.original.description}
+            </div>
+        ),
+        enableHiding: true,
+    },
     {
         id: "actions",
         cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'data'}/>,
@@ -239,5 +273,5 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     },
   ]
 
-  return [...comendColumns, ...actionsColumn]
+  return columns
 }
