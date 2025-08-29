@@ -295,14 +295,16 @@ export const PAGProfileConditionsCard = ({
                                 )}
                             </div>
 
-                            <div className="flex flex-col space-y-2 text-left">
-                                <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
-                                    No Conditions Yet
-                                </h3>
-                                <p>
-                                    This organization is not associated with any conditions yet.
-                                </p>
-                            </div>
+                            {!condition && (
+                                <div className="flex flex-col space-y-2 text-left">
+                                    <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
+                                        No Conditions Yet
+                                    </h3>
+                                    <p>
+                                        This organization is not associated with any conditions yet.
+                                    </p>
+                                </div>
+                            )}
 
                         </div>
                     </CardContent>
