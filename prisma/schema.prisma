@@ -1166,13 +1166,13 @@ model PharmaProject {
 
 model Institution {
   id           String   @id @default(uuid())
-  rorId        String   @unique
+  rorId        String?   @unique
   name         String
   established  Int?
   types        String[]
   aliases      String[]
   acronyms     String[]
-  status       String
+  status       String?
   wikipediaUrl String?
   website      String?
   city         String?
@@ -1181,7 +1181,7 @@ model Institution {
 
   fundrefAll       String[]
   fundrefPreferred String?
-  gridAll          String
+  gridAll          String?
   gridPreferred    String?
   isniAll          String[]
   wikidataAll      String[]

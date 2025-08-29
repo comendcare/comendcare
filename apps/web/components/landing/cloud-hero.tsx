@@ -15,8 +15,11 @@ import { Button } from "@/packages/components/ui/button"
 import { cn } from "@/packages/lib/utils"
 
 const bubbles = [
-    { title: "Gap analysis", href: "#" },
-    { title: "Animal models", href: "#" },
+    { title: "Biosamples", href: "#" },
+    { title: "Research plans", href: "#" },
+    { title: "RFPs", href: "#" },
+    { title: "Mouse models", href: "#" },
+    { title: "Zebrafish", href: "#" },
     { title: "Cell lines", href: "#" },
     { title: "Organoids", href: "#" },
     { title: "Assay development", href: "#" },
@@ -27,15 +30,11 @@ const bubbles = [
     { title: "ASO", href: "#" },
     { title: "Drug repurposing", href: "#" },
     { title: "Gene editing", href: "#" },
-    { title: "RNAi", href: "#" },
     { title: "IND", href: "#" },
     { title: "Biomarkers", href: "#" },
-    { title: "Patient registry", href: "#" },
-    { title: "Natural history study", href: "#" },
-    { title: "Biobanking", href: "#" },
+    { title: "Patient registries", href: "#" },
+    { title: "Natural history studies", href: "#" },
     { title: "Outcome measures", href: "#" },
-    { title: "IP", href: "#" },
-    { title: "Clinical trials", href: "#" },
     { title: "Academics", href: "#" },
     { title: "CROs", href: "#" },
     { title: "Biotech", href: "#" },
@@ -284,7 +283,7 @@ export const CloudHeroSection = () => {
                             });
                         }}
                     >
-                        Schedule a demo
+                        Sign up
                     </PulsatingButton>
                     {/* <Link
                         href="/marketplace"

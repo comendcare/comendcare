@@ -3,17 +3,12 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   CircleDashed,
-  Globe,
-  Lock,
-  Pin,
   Text,
 } from "lucide-react";
 import * as React from "react";
 import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
-import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
-import Link from "next/link";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 
 export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
@@ -34,6 +29,36 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 {row.original.organization?.name}
             </div>
         ),
+    },
+    {
+        id: "id",
+        accessorKey: "id",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Tool ID"/>
+        ),
+        cell: ({row}) => (
+            <div className="flex gap-2 items-center">
+                <p>{row.original.id || 'No Tool ID'}</p>
+            </div>
+        ),
+        enableHiding: true,
+        meta: {
+            label: "Tool ID"
+        }
+    },
+    {
+      id: "title",
+      accessorKey: "title",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Title" />
+      ),
+      meta: {
+        label: "Title",
+        placeholder: "Search titles...",
+        variant: "text",
+        icon: Text,
+      },
+      enableColumnFilter: true,
     },
     {
         id: "types",
@@ -59,6 +84,24 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
           options: TOOL_TYPE_OPTIONS,
           icon: CircleDashed,
         },
+    },
+    {
+        id: "cohortSize",
+        accessorKey: "cohortSize",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Cohort Size"/>
+        ),
+        cell: ({row}) => (
+            <>{
+                (row.original.cohortSize !== null && row.original.cohortSize !== undefined)
+                    ? row.original.cohortSize
+                    : ''
+            }</>
+        ),
+        enableHiding: true,
+        meta: {
+            label: "Cohort Size"
+        }
     },
     {
         id: "condition",
@@ -91,84 +134,27 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "cohortSize",
-        accessorKey: "cohortSize",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Cohort Size"/>
-        ),
-        cell: ({row}) => (
-            <>{row.original.cohortSize || ''}</>
-        ),
-        enableHiding: true,
-        meta: {
-            label: "Cohort Size"
-        }
-    },
-    {
-        accessorKey: "description",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
-        ),
-        cell: ({ row }) => (
-            <div className="line-clamp-2 w-[200px]">
-                {row.original.description}
-            </div>
-        ),
-        enableHiding: true,
-    },
-    {
         id: "institution",
         accessorKey: "institution",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Institution"/>
+            <DataTableColumnHeader column={column} title="Storage Facility"/>
         ),
         cell: ({row}) => {
-            if (row.original.institution?.website && row.original.institution?.name) {
-                return (
-                    <Link className="underline" href={row.original.institution?.website}>
-                        {row.original.institution?.name}
-                    </Link>
-                )
-            }
-            if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
-            return <></>
+            // if (row.original.institution?.website && row.original.institution?.name) {
+            //     return (
+            //         <Link className="underline" href={row.original.institution?.website}>
+            //             {row.original.institution?.name}
+            //         </Link>
+            //     )
+            // }
+            // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
+            // return <></>
+            return <>{row.original.institution?.name}</>
         },
         enableHiding: true,
         meta: {
-            label: "Institution"
+            label: "Storage Facility"
         }
-    },
-    {
-        accessorKey: "milestones",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.milestones?.map((milestone: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
-                        {milestone.milestone?.title || undefined}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
-    },
-    {
-        accessorKey: "contacts",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Contacts" />
-        ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.contacts?.map((contact: any, index: number) => (
-                    <li key={index}>
-                        {contact.name || contact.email || contact.affiliation}
-                    </li>
-                ))}
-            </ul>
-        ),
-        enableHiding: true,
     },
     {
         accessorKey: "links",
@@ -183,6 +169,18 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                     </li>
                 ))}
             </ul>
+        ),
+        enableHiding: true,
+    },
+    {
+        accessorKey: "description",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Description" />
+        ),
+        cell: ({ row }) => (
+            <div className="line-clamp-3">
+                {row.original.description}
+            </div>
         ),
         enableHiding: true,
     },

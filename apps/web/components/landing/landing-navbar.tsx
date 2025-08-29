@@ -241,7 +241,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                         onClick={() => router.push("/login")}
                         variant="ghost"
                     >
-                        Sign in
+                        Log in
                     </Button>
                     <PulsatingButton
                         className="w-fit"
@@ -258,7 +258,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             }
                         }}
                     >
-                        Contact us
+                        Sign up
                     </PulsatingButton>
                 </div>
             }

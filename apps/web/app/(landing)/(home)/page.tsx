@@ -23,12 +23,14 @@ import FeatureResearchMarketplace from "~web/components/landing/feature-research
 import FeaturePublicPages from "~web/components/landing/feature-public-pages";
 import FeatureResearchPlan from "~web/components/landing/feature-research-plan";
 import {News} from "~web/components/landing/news";
+import LogoInfiniteCarousel from "~web/components/landing/logo-infinite-carousel";
 
 export default function App() {
     return (
         <>
             {/*<HeroSection/>*/}
             <CloudHeroSection />
+            <LogoInfiniteCarousel />
             {/*<JoinWaitlistSection*/}
             {/*    isSubscribedCallback={betaSubscribeCallback}*/}
             {/*    isSubscribed={isSubscribed}*/}

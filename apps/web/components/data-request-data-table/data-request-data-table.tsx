@@ -73,7 +73,7 @@ export const columns: ColumnDef<Asset>[] = [
         ),
         cell: ({ row }) => (
             <div>
-                {row.original.private ? 'Private' : 'Public'}
+                {row.original.private ? 'Private' : 'Published'}
             </div>
         ),
         enableHiding: true,

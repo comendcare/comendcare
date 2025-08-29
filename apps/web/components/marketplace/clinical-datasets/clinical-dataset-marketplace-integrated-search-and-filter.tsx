@@ -176,6 +176,23 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
         }
     };
 
+    const handleAsyncOrganizationSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/organizations?search=${query}`, {
+                method: 'GET'
+            });
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
@@ -298,6 +315,24 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                                 placeholder="Any"
                                 hidePlaceholderWhenSelected
                                 commandProps={{className: "bg-transparent"}}
+                                emptyIndicator={
+                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                }
+                                showHoverCard={false}
+                            />
+                        </div>
+
+                        {/* Patient Group */}
+                        <div>
+                            <Label className="text-base font-semibold text-gray-900">Organization</Label>
+                            <MultipleSelector
+                                value={filters.organizations ?? []}
+                                onChange={(vals) => setFilterKey("organizations", vals)}
+                                onSearch={handleAsyncOrganizationSearch}
+                                placeholder="Select organizations..."
+                                hidePlaceholderWhenSelected
+                                commandProps={{className: "bg-transparent"}}
+                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading organizations...</p>}
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
