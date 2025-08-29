@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
     try {
         const { ids } = await req.json();
+        console.log(`IDS`, ids)
+        
         if (!ids || ids.length === 0) return NextResponse.json([], { status: 200 });
 
         const results = await prisma.organization.findMany({

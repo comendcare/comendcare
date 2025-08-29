@@ -22,6 +22,7 @@ import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
+    featuredOrgs: state.featuredOrgs,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
@@ -76,10 +77,10 @@ export default function MarketplacePage() {
                     </Button>
                 </div>
                 <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {(organizationStore.searchResults && organizationStore.searchResults.length > 0 )
+                    {([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0 )
                         ? (
                             <>
-                                {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
+                                {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
                                     <OrganizationMarketplaceCard organization={organization} key={index} isPublic={true}/>
                                 ))}
                             </>
