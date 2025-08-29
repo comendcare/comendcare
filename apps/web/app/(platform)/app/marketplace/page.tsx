@@ -169,8 +169,18 @@ export default function MarketplacePage() {
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                                <CardTitle>No Public Biosamples Available</CardTitle>
-                                                <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription>
+                                                <CardTitle>Add biosamples in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/biosample"}>
+                                                        Biosamples Toolkit
+                                                    </Link>
+                                                </Button>
                                             </CardContent>
                                         </Card>
                                     )
@@ -210,8 +220,18 @@ export default function MarketplacePage() {
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                                <CardTitle>No Public Disease Models Available</CardTitle>
-                                                <CardDescription>Add disease models in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription>
+                                                <CardTitle>Add disease models in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add disease models in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/disease-models"}>
+                                                        Disease Models Toolkit
+                                                    </Link>
+                                                </Button>
                                             </CardContent>
                                         </Card>
                                     )
@@ -251,8 +271,18 @@ export default function MarketplacePage() {
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                                <CardTitle>No Public Clinical Datasets Available</CardTitle>
-                                                <CardDescription>Add clinical datasets in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription>
+                                                <CardTitle>Add clinical dataset in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add clinical datasets in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/data"}>
+                                                        Clinical Datasets Toolkit
+                                                    </Link>
+                                                </Button>
                                             </CardContent>
                                         </Card>
                                     )

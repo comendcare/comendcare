@@ -122,8 +122,8 @@ export default function MarketplacePage() {
                                 ? (
                                     <Card className="h-[286px] w-full">
                                         <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                            <CardTitle>No Public Biosamples Available</CardTitle>
-                                            <CardDescription>Want to add biosamples? Please sign up to add biosamples to the marketplace.</CardDescription>
+                                            <CardTitle>Sign up to upload biosamples!</CardTitle>
+                                            {/* <CardDescription>Want to add biosamples? Please sign up to add biosamples to the marketplace.</CardDescription> */}
                                             <Button
                                                 className="w-fit"
                                                 asChild
@@ -172,8 +172,8 @@ export default function MarketplacePage() {
                                 ? (
                                     <Card className="h-[286px] w-full">
                                         <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                            <CardTitle>No Public Disease Models Available</CardTitle>
-                                            <CardDescription>Want to add disease models? Please sign up to add disease models to the marketplace.</CardDescription>
+                                            <CardTitle>Sign up to upload disease models!</CardTitle>
+                                            {/* <CardDescription>Want to add disease models? Please sign up to add disease models to the marketplace.</CardDescription> */}
                                             <Button
                                                 className="w-fit"
                                                 asChild
@@ -222,8 +222,8 @@ export default function MarketplacePage() {
                                 ? (
                                     <Card className="h-[286px] w-full">
                                         <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                            <CardTitle>No Public Clinical Datasets Available</CardTitle>
-                                            <CardDescription>Want to add clinical datasets? Please sign up to add clinical datasets to the marketplace.</CardDescription>
+                                            <CardTitle>Sign up to upload clinical datasets!</CardTitle>
+                                            {/* <CardDescription>Want to add clinical datasets? Please sign up to add clinical datasets to the marketplace.</CardDescription> */}
                                             <Button
                                                 className="w-fit"
                                                 asChild
