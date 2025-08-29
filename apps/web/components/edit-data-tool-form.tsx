@@ -301,24 +301,6 @@ export function EditDataToolForm({
 
                     <FormField
                         control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description...`}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
                         name="types"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
@@ -441,41 +423,6 @@ export function EditDataToolForm({
 
                     <FormField
                         control={form.control}
-                        name="milestones"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
-                                <FormControl>
-                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
-                                </FormControl>
-                                <FormMessage className="text-primary"/>
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* <FormField
-                        control={form.control}
-                        name="patientId"
-                        render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
-                                <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Input
-                                            id="patientId"
-                                            className="-mt-2 w-full min-h-[40px]"
-                                            placeholder={`Enter a phenotype`}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    /> */}
-
-                    <FormField
-                        control={form.control}
                         name="institutions"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
@@ -502,8 +449,61 @@ export function EditDataToolForm({
                         )}
                     />
 
+                    {/* <FormField
+                        control={form.control}
+                        name="patientId"
+                        render={({field}) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                                <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="patientId"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a phenotype`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    /> */}
+
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
+
+                    <FormField
+                        control={form.control}
+                        name="milestones"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormControl>
+                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
+                                </FormControl>
+                                <FormMessage className="text-primary"/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>

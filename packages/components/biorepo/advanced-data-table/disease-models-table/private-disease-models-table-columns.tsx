@@ -339,22 +339,6 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //         label: "Condition"
         //     }
         // },
-        // {
-        //     id: "description",
-        //     accessorKey: "description",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Description"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <div className="line-clamp-3">
-        //             {row.original.description}
-        //         </div>
-        //     ),
-        //     meta: {
-        //         label: "Description"
-        //     },
-        //     enableHiding: true,
-        // },
         {
             id: "milestones",
             accessorKey: "milestones",
@@ -379,6 +363,22 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 showInAdvancedOnly: true,
                 onAsyncSearch: handleAsyncMilestoneSearch
             }
+        },
+        {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Description"/>
+            ),
+            cell: ({row}) => (
+                <div className="line-clamp-3">
+                    {row.original.description}
+                </div>
+            ),
+            meta: {
+                label: "Description"
+            },
+            enableHiding: true,
         },
         {
             id: "actions",

@@ -141,29 +141,29 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             label: "Gene"
         }
     },
-    {
-        id: "patientId",
-        accessorKey: "patientId",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Linked Patient ID"/>
-        ),
-        enableHiding: true,
-        meta: {
-            label: "Linked Patient ID",
-        }
-    },
-    {
-        id: "availability",
-        accessorKey: "availability",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Availability"/>
-        ),
-        enableHiding: true,
-        enableColumnFilter: true,
-        meta: {
-            label: "Availability",
-        }
-    },
+    // {
+    //     id: "patientId",
+    //     accessorKey: "patientId",
+    //     header: ({column}) => (
+    //         <DataTableColumnHeader column={column} title="Linked Patient ID"/>
+    //     ),
+    //     enableHiding: true,
+    //     meta: {
+    //         label: "Linked Patient ID",
+    //     }
+    // },
+    // {
+    //     id: "availability",
+    //     accessorKey: "availability",
+    //     header: ({column}) => (
+    //         <DataTableColumnHeader column={column} title="Availability"/>
+    //     ),
+    //     enableHiding: true,
+    //     enableColumnFilter: true,
+    //     meta: {
+    //         label: "Availability",
+    //     }
+    // },
     {
         id: "institution",
         accessorKey: "institution",
@@ -236,18 +236,6 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     //         label: "Condition"
     //     }
     // },
-    // {
-    //     accessorKey: "description",
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title="Description" />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <div className="line-clamp-3">
-    //             {row.original.description}
-    //         </div>
-    //     ),
-    //     enableHiding: true,
-    // },
     {
         accessorKey: "milestones",
         header: ({ column }) => (
@@ -261,6 +249,18 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                     </li>
                 ))}
             </ul>
+        ),
+        enableHiding: true,
+    },
+    {
+        accessorKey: "description",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Description" />
+        ),
+        cell: ({ row }) => (
+            <div className="line-clamp-3">
+                {row.original.description}
+            </div>
         ),
         enableHiding: true,
     },
