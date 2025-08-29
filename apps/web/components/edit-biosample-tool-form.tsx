@@ -144,6 +144,7 @@ export function EditBiosampleToolForm({
 
             // donor properties
             donorId: toolData?.donorId || undefined,
+            internalDonorId: toolData?.internalId || undefined,
             donor: toolData?.donorId ? [{
                 img: `https://api.dicebear.com/8.x/shapes/svg?seed=${toolData.donorId}`,
                 label: toolData.donorId, 
@@ -188,6 +189,8 @@ export function EditBiosampleToolForm({
             );
             return;
         }
+
+        console.log(`form submit values`, values)
 
         try {
             if (toolData.id) {
@@ -266,6 +269,7 @@ export function EditBiosampleToolForm({
             form.setValue("medications", donorData?.medications || [], {shouldDirty: true})
 
             form.setValue("donorId", donorData?.id, {shouldDirty: true, shouldValidate: true})
+            form.setValue("internalDonorId", donorData?.internalId?.toString() ?? "", {shouldDirty: true, shouldValidate: true})
         }
 
         console.log(`donor`, formData.donor)
@@ -969,6 +973,27 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         </FormControl>
                     )}
                     <FormMessage/>
+                </FormItem>
+            )}
+        />
+
+        <FormField
+            control={form.control}
+            name="internalDonorId"
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel>{`Internal Donor ID`}</FormLabel>
+                    <div className="w-full">
+                        <FormControl className="w-full">
+                            <Input
+                                id="internalDonorId"
+                                className="-mt-2 w-full min-h-[40px]"
+                                placeholder={`Enter a donor ID`}
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </div>
                 </FormItem>
             )}
         />

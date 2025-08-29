@@ -2784,6 +2784,7 @@ export const updateBiosample = withOrganizationAuth(
                 await prisma.donor.update({
                     where: { id: data.donorId },
                     data: {
+                        internalId: data.internalDonorId,
                         age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,

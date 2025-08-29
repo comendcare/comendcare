@@ -175,11 +175,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Private Donor ID"/>
+                <DataTableColumnHeader column={column} title="Internal Donor ID"/>
             ),
             enableHiding: true,
             meta: {
-                label: "Private Donor ID"
+                label: "Internal Donor ID"
             }
         },
         {

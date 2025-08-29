@@ -1968,6 +1968,7 @@ export const editBiosampleForm = z.object({
 
     // donor properties
     donorId: z.string().optional(),
+    internalDonorId: z.string().optional(),
     donor: z.array(optionSchema).optional(),
     donorInternalId: z.string().optional(),
     age: z.string().optional(),
