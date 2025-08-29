@@ -69,6 +69,22 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             },
         },
         {
+            id: "condition",
+            accessorKey: "condition",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Condition"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Condition"
+            }
+        },
+        {
             id: "gene",
             accessorKey: "gene",
             header: ({column}) => (
