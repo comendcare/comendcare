@@ -2584,7 +2584,7 @@ export const createBiosample = withOrganizationAuth(
                             where: {id: data.donorId || nanoid()},
                             create: {
                                 id: data.donorId || generateDonorNanoid(),
-                                internalId: data.donorInternalId,
+                                internalId: data.internalDonorId,
                                 age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,
                                 gender: data.gender,
