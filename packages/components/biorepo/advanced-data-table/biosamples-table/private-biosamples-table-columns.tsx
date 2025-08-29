@@ -5,70 +5,27 @@ import {
     CircleDashed,
     Globe,
     Lock,
-    Pin,
 } from "lucide-react";
 import * as React from "react";
 import {
     DataTableColumnHeader
 } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
 import {
-    ANATOMICAL_SITE_OPTIONS,
     AVAILABILITY_OPTIONS,
     BIOSAMPLE_TYPE_OPTIONS,
-    COUNTRY_OPTIONS,
     DIAGNOSIS_SEVERITY_OPTIONS,
-    DONOR_ETHNICITY_OPTIONS,
-    DONOR_GENDER_OPTIONS,
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
     Milestone,
-    SAMPLE_PRESERVATION_METHOD_OPTIONS,
-    SAMPLE_TRANSPORT_METHOD_OPTIONS,
 } from "@comend/lib/types";
 import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
-import {revalidate} from "@comend/lib/revalidate";
-import {Button} from "@comend/components/ui/button";
-import {updateBiosample} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
 import { Badge } from "@comend/components/ui/badge";
-import { format } from "date-fns";
-import Link from "next/link";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { getDiagnosisTypes, getMilestones } from "@comend/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "@comend/lib/types";
-import { Biosample } from "@prisma/client";
-
-// columns temporarily hidden on production
-const hiddenColumnIds = [
-    'donor.diagnoses',
-    // 'gene',
-    'variant',
-    'availability', 
-    'quantity',
-    'volume',
-    'currentCountry',
-    'countryOfCollection',
-    'institution',
-    'pathology',
-    'preservationMethod',
-    'anatomicalSite',
-    'methodOfTransport',
-    // 'collectionDate',
-    // 'donorId',
-    'donor.age',
-    'donor.sex',
-    'donor.gender',
-    'donor.race',
-    'donor.ethnicity',
-    'donor.height',
-    'donor.weight',
-    'donor.bmi',
-    'donor.medications',
-    'donor.treatments',
-]
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
@@ -449,15 +406,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
             cell: ({row}) => {
-                // if (row.original.institution?.website && row.original.institution?.name) {
-                //     return (
-                //         <Link className="underline" href={row.original.institution?.website}>
-                //             {row.original.institution?.name}
-                //         </Link>
-                //     )
-                // }
-                // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
-                // return <></>
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
@@ -809,12 +757,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableHiding: false,
         },
     ]
-
-    // Temporarily hide additional biobank columns from users on production
-    // This can be removed, and all columns enabled once our biobank feature is built out
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-        return columns.filter(column => column.id && !hiddenColumnIds.includes(column.id))
-    }
 
     return columns
 }
