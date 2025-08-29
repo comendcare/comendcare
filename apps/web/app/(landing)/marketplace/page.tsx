@@ -7,7 +7,8 @@ import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/a
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@/packages/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
+import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
 import { Separator } from "@/packages/components/ui/separator"
 import { Skeleton } from "@/packages/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
@@ -26,16 +27,19 @@ const organizationSelector = (state: OrganizationSearchState) => ({
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
@@ -113,9 +117,29 @@ export default function MarketplacePage() {
                             </>
                         )
                         : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
+                            biosampleStore.initialized 
+                                ? (
+                                    <Card className="h-[286px] w-full">
+                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                            <CardTitle>No Public Biosamples Available</CardTitle>
+                                            <CardDescription>Want to add biosamples? Please sign up to add biosamples to the marketplace.</CardDescription>
+                                            <Button
+                                                className="w-fit"
+                                                asChild
+                                            >
+                                                {/* <Link href={"/#contact"}> */}
+                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                                    Sign up
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
+                                : (
+                                    <>
+                                        <Skeleton className="h-[286px] w-full"/>
+                                    </>
+                                )
                         )
                     }
                 </ol>
@@ -143,9 +167,29 @@ export default function MarketplacePage() {
                             </>
                         )
                         : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
+                            diseaseModelStore.initialized 
+                                ? (
+                                    <Card className="h-[286px] w-full">
+                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                            <CardTitle>No Public Disease Models Available</CardTitle>
+                                            <CardDescription>Want to add disease models? Please sign up to add disease models to the marketplace.</CardDescription>
+                                            <Button
+                                                className="w-fit"
+                                                asChild
+                                            >
+                                                {/* <Link href={"/#contact"}> */}
+                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                                    Sign up
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
+                                : (
+                                    <>
+                                        <Skeleton className="h-[286px] w-full"/>
+                                    </>
+                                )
                         )
                     }
                 </ol>
@@ -173,9 +217,29 @@ export default function MarketplacePage() {
                             </>
                         )
                         : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
+                            clinicalDatasetStore.initialized 
+                                ? (
+                                    <Card className="h-[286px] w-full">
+                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                            <CardTitle>No Public Clinical Datasets Available</CardTitle>
+                                            <CardDescription>Want to add clinical datasets? Please sign up to add clinical datasets to the marketplace.</CardDescription>
+                                            <Button
+                                                className="w-fit"
+                                                asChild
+                                            >
+                                                {/* <Link href={"/#contact"}> */}
+                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                                    Sign up
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
+                                : (
+                                    <>
+                                        <Skeleton className="h-[286px] w-full"/>
+                                    </>
+                                )
                         )
                     }
                 </ol>
