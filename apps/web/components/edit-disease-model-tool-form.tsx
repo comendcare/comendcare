@@ -247,24 +247,6 @@ export function EditDiseaseModelToolForm({
 
                     <FormField
                         control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description...`}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
                         name="types"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
@@ -454,7 +436,7 @@ export function EditDiseaseModelToolForm({
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
-                    {/* <FormField
+                    <FormField
                         control={form.control}
                         name="milestones"
                         render={({field}) => (
@@ -466,7 +448,25 @@ export function EditDiseaseModelToolForm({
                                 <FormMessage className="text-primary"/>
                             </FormItem>
                         )}
-                    /> */}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>

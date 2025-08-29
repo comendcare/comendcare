@@ -189,17 +189,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             },
         },
-        {
-            id: "strain",
-            accessorKey: "strain",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Strain"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Strain"
-            }
-        },
+        // {
+        //     id: "strain",
+        //     accessorKey: "strain",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Strain"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Strain"
+        //     }
+        // },
         {
             id: "gene",
             accessorKey: "gene",
@@ -225,40 +225,40 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //         label: "Genotype",
         //     }
         // },
-        {
-            id: "phenotype",
-            accessorKey: "phenotype",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Phenotype"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Phenotype",
-            }
-        },
-        {
-            id: "patientId",
-            accessorKey: "patientId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Linked Patient ID"/>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Linked Patient ID",
-            }
-        },
-        {
-            id: "availability",
-            accessorKey: "availability",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability"/>
-            ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Availability",
-            }
-        },
+        // {
+        //     id: "phenotype",
+        //     accessorKey: "phenotype",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Phenotype"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Phenotype",
+        //     }
+        // },
+        // {
+        //     id: "patientId",
+        //     accessorKey: "patientId",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Linked Patient ID"/>
+        //     ),
+        //     enableHiding: true,
+        //     meta: {
+        //         label: "Linked Patient ID",
+        //     }
+        // },
+        // {
+        //     id: "availability",
+        //     accessorKey: "availability",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Availability"/>
+        //     ),
+        //     enableHiding: true,
+        //     enableColumnFilter: true,
+        //     meta: {
+        //         label: "Availability",
+        //     }
+        // },
         {
             id: "institution",
             accessorKey: "institution",
