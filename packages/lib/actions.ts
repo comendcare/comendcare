@@ -2198,7 +2198,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     ...diseaseModelData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(diseaseModelData.id ? {id: diseaseModelData.id} : undefined),
+                    id: diseaseModelData.id || generateToolNanoid(),
                     private: diseaseModelData.private || false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
@@ -2239,6 +2239,12 @@ function generateDonorNanoid() {
     const id = nanoid(8) // generate 8 char
     console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
     return (id.slice(0, 4) + '-' + id.slice(4))
+}
+
+function generateToolNanoid() {
+    const id = nanoid(12) // generate 12 char
+    console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4, 8) + '-' + id.slice(8))
+    return (id.slice(0, 4) + '-' + id.slice(4, 8) + '-' + id.slice(8))
 }
 
 export const createDataTool = withOrganizationAuth(
@@ -2287,7 +2293,7 @@ export const createDataTool = withOrganizationAuth(
                     ...dataToolData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(dataToolData.id ? {id: dataToolData.id} : undefined),
+                    id: dataToolData.id || generateToolNanoid(),
                     attachments: {
                         createMany: {
                             data: (dataToolData?.attachments || []).map((attachment: any) => ({
@@ -2531,7 +2537,7 @@ export const createBiosample = withOrganizationAuth(
                     ...biosampleData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
+                    id: biosampleData.id || generateToolNanoid(),
                     attachments: {
                         createMany: {
                             data: (biosampleData?.attachments || []).map((attachment: any) => ({
