@@ -81,9 +81,9 @@ export default function AnalyticsGoalReachedCard({data}: OrgProfileViewsMileston
                                 className="h-8 w-8 rounded-full"
                             />
                             <div className="flex flex-col">
-                                {orgSubdomain ? (
+                                {subdomain ? (
                                     <Link
-                                        href={`/app/organization/${orgSubdomain}`}
+                                        href={`/app/organization/${subdomain}`}
                                         className="font-medium md:text-base underline-offset-2 hover:underline"
                                     >
                                         {orgName}
