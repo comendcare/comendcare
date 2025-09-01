@@ -60,8 +60,8 @@ export default function ToolUpdatedCard({ data }: Props) {
                                         <>
                                             {" "}
                                             •{" "}
-                                            {orgId ? (
-                                                <Link href={`/org/${orgId}`} className="underline-offset-2 hover:underline">
+                                            {orgSubdomain ? (
+                                                <Link href={`/app/organization/${orgSubdomain}`} className="underline-offset-2 hover:underline">
                                                     {orgName}
                                                 </Link>
                                             ) : (
@@ -88,7 +88,7 @@ export default function ToolUpdatedCard({ data }: Props) {
                 </CardContent>
 
                 <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={toolId ? `/tool/${toolId}` : "#"} aria-disabled={!toolId} passHref>
+                    <Link href={toolId ? `/app/tools/biosample` : "#"} aria-disabled={!toolId} passHref>
                         <Button size="sm" variant="outline" className="flex gap-1 items-center" disabled={!toolId}>
                             <ExternalLink className="h-4 w-4" />
                             View Tool

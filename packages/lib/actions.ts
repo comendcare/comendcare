@@ -528,6 +528,7 @@ export const createOrganization = withAuth(
                     payload: {
                         orgId: organization.id,
                         orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
                         orgImage: organization.image,
                         userId: session.user.id,
                         userName: session.user.name,
@@ -4079,6 +4080,7 @@ export const createNodes = withOrganizationAuth(
                     const m = n.data; // Milestone
                     if (m?.nodeType === "PROJECT" && m?.private === false) {
                         createdPublicProjects.push({
+                            researchPlanId: m.roadmapId,
                             projectId: m.id,
                             title: m.title,
                             startDate: m.startDate ?? null,
@@ -4141,6 +4143,7 @@ export const createNodes = withOrganizationAuth(
                     payload: {
                         orgId: organizationId,
                         orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
                         orgImage: organization.image,
                         projects: createdPublicProjects,
                         userId: session?.user.id,

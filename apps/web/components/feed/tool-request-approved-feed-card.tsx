@@ -35,7 +35,7 @@ export default function ToolRequestApprovedCard({ data }: Props) {
     const displayTitle = data.title || (data.content.title ? `Tool request approved: ${data.content.title}` : "Tool request approved");
     const approvedText = data.content.approvedAt ? formatDates(new Date(data.content.approvedAt)) : createdAt;
 
-    const requestHref = data.content.requestId ? `/requests/${data.content.requestId}` : "#";
+    const requestHref = data.content.requestId ? `/app/requests/${data.content.requestId}` : "#";
 
     return (
         <MotionConfig transition={{ duration: 0.3 }}>
@@ -47,8 +47,8 @@ export default function ToolRequestApprovedCard({ data }: Props) {
                             {/* Organization avatar/logo */}
                             <ProfilePhoto img={orgImage} name={orgName} className="h-8 w-8 rounded-full" />
                             <div className="flex flex-col">
-                                {orgId ? (
-                                    <Link href={`/org/${orgId}`} className="font-medium md:text-base underline-offset-2 hover:underline">
+                                {orgSubdomain ? (
+                                    <Link href={`/app/organization/${orgSubdomain}`} className="font-medium md:text-base underline-offset-2 hover:underline">
                                         {orgName}
                                     </Link>
                                 ) : (

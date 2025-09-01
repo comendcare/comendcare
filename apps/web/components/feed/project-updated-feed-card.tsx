@@ -10,6 +10,7 @@ import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Workflow, ExternalLink } from "lucide-react";
 
 interface ProjectItem {
+    researchPlanId: string;
     projectId: string;
     title?: string | null;
     startDate?: string | null;
@@ -35,6 +36,7 @@ interface Props {
         title: string;
         content: Content;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -45,6 +47,7 @@ export default function ProjectUpdatedCard({ data }: Props) {
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
     const orgId = data.content.organization?.id ?? data.orgId;
+    const orgSubdomain = data.content.organization?.subdomain ?? data.orgSubdomain;
     const orgImage = data.content.organization?.image;
 
     const items = data.content.projects ?? [];
@@ -62,9 +65,9 @@ export default function ProjectUpdatedCard({ data }: Props) {
                         <div className="flex items-center gap-2">
                             <ProfilePhoto img={orgImage} name={orgName} className="h-8 w-8 rounded-full" />
                             <div className="flex flex-col">
-                                {orgId ? (
+                                {orgSubdomain ? (
                                     <Link
-                                        href={`/org/${orgId}`}
+                                        href={`/app/organization/${orgSubdomain}`}
                                         className="font-medium md:text-base underline-offset-2 hover:underline"
                                     >
                                         {orgName}
@@ -117,26 +120,26 @@ export default function ProjectUpdatedCard({ data }: Props) {
 
                 <CardFooter className="flex justify-end p-4 pt-0">
                     {items.length === 1 ? (
-                        <Link href={items[0]?.projectId ? `/project/${items[0].projectId}` : "#"} passHref>
+                        <Link href={items[0]?.projectId ? `/app/research-plan/${p.researchPlanId}?project=${items[0].projectId}` : "#"} passHref>
                             <Button
                                 size="sm"
                                 variant="outline"
                                 className="flex gap-1 items-center"
-                                disabled={!items[0]?.projectId}
-                                title={items[0]?.projectId ? "View Project" : "No project link available"}
+                                disabled={!items[0]?.projectId || !items[0]?.researchPlanId}
+                                title={items[0]?.projectId && items[0].researchPlanId ? "View Project" : "No project link available"}
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 View Project
                             </Button>
                         </Link>
                     ) : (
-                        <Link href={orgId ? `/org/${orgId}` : "#"} aria-disabled={!orgId} passHref>
+                        <Link href={orgSubdomain ? `/org/${orgSubdomain}` : "#"} aria-disabled={!orgSubdomain} passHref>
                             <Button
                                 size="sm"
                                 variant="outline"
                                 className="flex gap-1 items-center"
-                                disabled={!orgId}
-                                title={orgId ? "View All Projects" : "No organization link available"}
+                                disabled={!orgSubdomain}
+                                title={orgSubdomain ? "View All Projects" : "No organization link available"}
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 View All

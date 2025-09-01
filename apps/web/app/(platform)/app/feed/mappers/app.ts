@@ -300,6 +300,7 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgSubdomain,
         orgImage,
         projects, // array of { projectId, title, ... }
         userId,
@@ -307,8 +308,10 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         projects: Array<{
+            researchPlanId: string
             projectId: string;
             title?: string;
             startDate?: Date | string | null;
@@ -341,6 +344,7 @@ register("app", "org_created_project", async ({ payload, occurredAt }) => {
             organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
+        orgSubdomain,
         occurredAt,
         idempotencyKey,
     };
@@ -355,6 +359,7 @@ register("app", "org_updated_project", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgSubdomain,
         orgImage,
         projects, // array of project snapshots (see emitter above)
         userId,
@@ -362,6 +367,7 @@ register("app", "org_updated_project", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         projects: Array<{
             projectId: string;
@@ -402,6 +408,7 @@ register("app", "org_updated_project", async ({ payload, occurredAt }) => {
             organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
+        orgSubdomain,
         occurredAt,
         idempotencyKey,
     };
@@ -414,6 +421,7 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgSubdomain,
         orgImage,
         toolId, // Tool.id
         title,  // Tool.title
@@ -426,6 +434,7 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId?: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         toolId: string;
         title?: string;
@@ -457,6 +466,7 @@ register("app", "org_created_tool", async ({ payload, occurredAt }) => {
             organization: { id: orgId, name: orgName, image: orgImage },
         },
         orgId,
+        orgSubdomain,
         occurredAt,
         idempotencyKey,
     };
@@ -576,12 +586,14 @@ register("app", "pag_profile_created", async ({ payload, occurredAt }) => {
     const {
         orgId,      // PAG org id
         orgName,    // PAG org name
+        orgSubdomain,    // PAG org subdomain
         orgImage,
         userId,
         userName,
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         userId?: string;
         userName?: string;
@@ -599,6 +611,7 @@ register("app", "pag_profile_created", async ({ payload, occurredAt }) => {
         content: {
             pagOrganizationId: orgId,
             pagOrganizationName: orgName,
+            pagOrganizationSubdomain: orgSubdomain,
             pagOrganizationImage: orgImage,
             actor: { userId, name: userName },
             organization: { id: orgId, name: orgName },
@@ -829,12 +842,14 @@ register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
     const {
         orgId,
         orgName,
+        orgSubdomain,
         host,          // e.g. "acme.comend.io"
         totalViews,    // lifetime public profile views (number)
         milestone,     // number crossed (e.g. 10, 100, 1000, 10000, ...)
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         host?: string;
         totalViews: number;
         milestone: number;
@@ -854,7 +869,7 @@ register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
             milestone,
             totalViews,
             host,
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, subdomain: orgSubdomain },
         },
         orgId,
         occurredAt,

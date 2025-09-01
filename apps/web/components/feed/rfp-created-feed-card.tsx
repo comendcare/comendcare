@@ -68,8 +68,8 @@ export default function RFPCreatedCard({ data }: RfpCreatedProps) {
 
                             {/* Organization name to the right of the image */}
                             <div className="flex flex-col">
-                                {orgId ? (
-                                    <Link href={`/org/${orgId}`} className="font-medium md:text-base underline-offset-2 hover:underline">
+                                {orgSubdomain ? (
+                                    <Link href={`/app/organization/${orgSubdomain}`} className="font-medium md:text-base underline-offset-2 hover:underline">
                                         {orgName}
                                     </Link>
                                 ) : (
@@ -113,14 +113,14 @@ export default function RFPCreatedCard({ data }: RfpCreatedProps) {
                     </p>
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={rfpHref} aria-disabled={!data.content.rfpId} passHref>
-                        <Button size="sm" variant="outline" className="flex gap-1 items-center" disabled={!data.content.rfpId} title={data.content.rfpId ? "View RFP" : "No RFP link available"}>
-                            <FileText className="h-4 w-4" />
-                            View RFP
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {/*<CardFooter className="flex justify-end p-4 pt-0">*/}
+                {/*    <Link href={rfpHref} aria-disabled={!data.content.rfpId} passHref>*/}
+                {/*        <Button size="sm" variant="outline" className="flex gap-1 items-center" disabled={!data.content.rfpId} title={data.content.rfpId ? "View RFP" : "No RFP link available"}>*/}
+                {/*            <FileText className="h-4 w-4" />*/}
+                {/*            View RFP*/}
+                {/*        </Button>*/}
+                {/*    </Link>*/}
+                {/*</CardFooter>*/}
             </Card>
         </MotionConfig>
     );
