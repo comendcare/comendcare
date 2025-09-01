@@ -58,7 +58,7 @@ const tabContent = {
     },
 };
 
-export default function TabsFeaturesSection() {
+export default function VerticalTimedTabsFeaturesSection() {
     const [activeTab, setActiveTab] = useState("profiles")
     const tabs = ["profiles", "marketplace", "forums"]
     const tabDuration = 8
