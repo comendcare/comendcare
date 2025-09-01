@@ -62,55 +62,55 @@ export default function FeaturePublicPages() {
                                 ))}
                             </dl>
                         </div>
-                        <div className="lg:mt-10 mt-20 flex flex-col">
-                            <div className="flex items-center justify-start">
-                                <Image
-                                    src={insta}
-                                    alt="insta"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[7deg] mb-[24px]"
-                                />
-                                <Image
-                                    src={x}
-                                    alt="x"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={fb}
-                                    alt="facebook"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[12deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={linkedin}
-                                    alt="linkedin"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={whatsapp}
-                                    alt="whatsapp"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[10deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={gmail}
-                                    alt="gmail"
-                                    width="50"
-                                    height="50"
-                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
-                                />
-                            </div>
-                            <p className="text-balance text-base text-neutral-600 dark:text-neutral-300">
-                                {`Easily share on social media`}
-                            </p>
-                        </div>
+                        {/*<div className="lg:mt-10 mt-20 flex flex-col">*/}
+                        {/*    <div className="flex items-center justify-start">*/}
+                        {/*        <Image*/}
+                        {/*            src={insta}*/}
+                        {/*            alt="insta"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[7deg] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={x}*/}
+                        {/*            alt="x"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[-10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={fb}*/}
+                        {/*            alt="facebook"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[12deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={linkedin}*/}
+                        {/*            alt="linkedin"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[-10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={whatsapp}*/}
+                        {/*            alt="whatsapp"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={gmail}*/}
+                        {/*            alt="gmail"*/}
+                        {/*            width="50"*/}
+                        {/*            height="50"*/}
+                        {/*            className="rotate-[-10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*    <p className="text-balance text-base text-neutral-600 dark:text-neutral-300">*/}
+                        {/*        {`Easily share on social media`}*/}
+                        {/*    </p>*/}
+                        {/*</div>*/}
                     </div>
                     <div className="block sm:hidden overflow-x-auto -mx-6 sm:mx-0">
                         <div className="w-[48rem] sm:w-[57rem] md:ml-0">

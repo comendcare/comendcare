@@ -19,10 +19,10 @@ interface Feature {
 
 const features: Array<Feature> = [
     {
-        name: 'Reporting',
-        summary: 'Stay on top of things with always up-to-date reporting features.',
+        name: 'Research Plans',
+        summary: 'Indicate your therapeutic goals and map out your projects.',
         description:
-            'We talked about reporting in the section above but we needed three items here, so mentioning it one more time for posterity.',
+            'Toggle project privacy levels, try our research plan templates, and get project development recommendations',
         image: researchPlanner,
         icon: function ReportingIcon() {
             let id = useId()
@@ -53,11 +53,11 @@ const features: Array<Feature> = [
         },
     },
     {
-        name: 'Inventory',
+        name: 'Pre-clinical toolkit',
         summary:
-            'Never lose track of what’s in stock with accurate inventory tracking.',
+            'Streamline discovery and access for research tools.',
         description:
-            'We don’t offer this as part of our software but that statement is inarguably true. Accurate inventory tracking would help you for sure.',
+            'Upload information about existing patient biosamples, disease models, and clinical datasets and easily handle inquiries.',
         image: publicProfile,
         icon: function InventoryIcon() {
             return (
@@ -81,11 +81,11 @@ const features: Array<Feature> = [
         },
     },
     {
-        name: 'Contacts',
+        name: 'Requests for proposals (RFPs)',
         summary:
-            'Organize all of your contacts, service providers, and invoices in one place.',
+            'Broadcast research opportunities in your disease area.',
         description:
-            'This also isn’t actually a feature, it’s just some friendly advice. We definitely recommend that you do this, you’ll feel really organized and professional.',
+            'We help you create a targeted list of academics and service providers for your project requests and streamline your evaluation process.',
         image: marketplace,
         icon: function ContactsIcon() {
             return (
@@ -246,11 +246,10 @@ export function HorizontalTabsFeatures() {
             <Container>
                 <div className="mx-auto max-w-2xl md:text-center">
                     <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-                        Simplify everyday business tasks.
+                        Systematize your research
                     </p>
                     <p className="mt-6 text-lg/8 text-gray-600">
-                        Because you’d probably be a little confused if we suggested you
-                        complicate your everyday business tasks instead.
+                        Organize projects, tools, and opportunities with your team and streamline them for researchers to discover and access.
                     </p>
                 </div>
                 <FeaturesMobile />
