@@ -12,10 +12,10 @@ export default function ContactSection() {
                             id="contact"
                             className="text-black text-2xl md:text-3xl font-bold mb-4"
                         >
-                            🎉&nbsp;&nbsp;Want to see how it works?
+                            🧑🏻‍💻&nbsp;&nbsp;Want to see what we can do for you?
                         </h2>
                         <p className="text-xl text-gray-900">
-                            Get a personalized demo to learn how we can help your organization plan, partner, and broadcast your research.
+                            Schedule a personalized 30 minute demo to see how we can help your organization plan, partner, and broadcast your research.
                         </p>
                     </div>
 
