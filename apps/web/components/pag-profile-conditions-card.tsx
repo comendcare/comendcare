@@ -80,6 +80,9 @@ export const PAGProfileConditionsCard = ({
                             key={condition?.id}
                             className="flex flex-col space-y-4"
                         >
+                            <p className="line-clamp-4">
+                                {condition?.description}
+                            </p>
 
                             {/* <div className="space-y-2">
                                 {(isPrivate || (!isPrivate && condition)) && (
