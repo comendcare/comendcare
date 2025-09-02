@@ -14,6 +14,7 @@ import Pepi from "@/public/profiles/Pepi.jpg"
 import Betty from "@/public/profiles/Betty.jpeg"
 import Megan from "@/public/profiles/Megan.png"
 import Ashley from "@/public/profiles/Ashley.jpeg"
+import Lauren from "@/public/profiles/Lauren.jpeg"
 import {Instagram, Linkedin} from "lucide-react"
 
 export function TeamSection() {
@@ -298,38 +299,6 @@ const cards = [
         }
     },
     {
-        name: "Ashley Winslow",
-        title: "Advisor",
-        src: Ashley,
-        linkedInURL: "https://www.linkedin.com/in/arwinslow/",
-        instagramURL: "",
-        content: () => {
-            return (
-                <p>
-                    {`CEO and CSO of Odylia Therapeutics.`}
-                </p>
-            )
-        }
-    },
-    {
-        name: "Pepi Martinez",
-        title: "Head of Data Governance",
-        src: Pepi,
-        linkedInURL: "https://www.linkedin.com/in/pepimartinez/",
-        instagramURL: "",
-        content: () => {
-            return (
-                <p>
-                    {`Excited to help Comend revolutionize the future of patient-first drug
-                    discovery. I come from a software engineering background with a focus
-                    on decentralization, governance systems, and on-chain dynamics. I've
-                    been a passionate builder for about 10 years, and have been theorizing
-                    heavily in the future of patient drug discovery for the last 3 years.`}
-                </p>
-            )
-        }
-    },
-    {
         name: "Betty Trevino",
         title: "Head of Product Marketing",
         src: Betty,
@@ -360,6 +329,52 @@ const cards = [
                     build our products. My background is in computer science, with a focus
                     on full stack development and user experience design. In my free time I
                     enjoy knitting, spinning yarn, and generally exploring the fiber arts.`}
+                </p>
+            )
+        }
+    },
+    {
+        name: "Pepi Martinez",
+        title: "Head of Data Governance",
+        src: Pepi,
+        linkedInURL: "https://www.linkedin.com/in/pepimartinez/",
+        instagramURL: "",
+        content: () => {
+            return (
+                <p>
+                    {`Excited to help Comend revolutionize the future of patient-first drug
+                    discovery. I come from a software engineering background with a focus
+                    on decentralization, governance systems, and on-chain dynamics. I've
+                    been a passionate builder for about 10 years, and have been theorizing
+                    heavily in the future of patient drug discovery for the last 3 years.`}
+                </p>
+            )
+        }
+    },
+    {
+        name: "Lauren Chaby",
+        title: "Advisor",
+        src: Lauren,
+        linkedInURL: "https://www.linkedin.com/in/laurenchaby/",
+        instagramURL: "",
+        content: () => {
+            return (
+                <p>
+                    {``}
+                </p>
+            )
+        }
+    },
+    {
+        name: "Ashley Winslow",
+        title: "Advisor",
+        src: Ashley,
+        linkedInURL: "https://www.linkedin.com/in/arwinslow/",
+        instagramURL: "",
+        content: () => {
+            return (
+                <p>
+                    {`CEO and CSO of Odylia Therapeutics.`}
                 </p>
             )
         }
@@ -405,11 +420,7 @@ const cards = [
         content: () => {
             return (
                 <p>
-                    {`Experienced C-suite executive and a thought leader in drug development,
-                    philanthropy, and patient advocacy with professional experience in all
-                    areas of executive management, including strategy, advocacy, medical
-                    affairs, legal, operations, finance, sales, marketing, and IT; success
-                    in small, mid-size, and large businesses, and entrepreneurial ventures.`}
+                    {``}
                 </p>
             )
         }
