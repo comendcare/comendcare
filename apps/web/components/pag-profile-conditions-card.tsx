@@ -81,7 +81,7 @@ export const PAGProfileConditionsCard = ({
                             className="flex flex-col space-y-4"
                         >
                             <p className="line-clamp-4">
-                                {condition?.description}
+                                {condition?.summary}
                             </p>
 
                             {/* <div className="space-y-2">
