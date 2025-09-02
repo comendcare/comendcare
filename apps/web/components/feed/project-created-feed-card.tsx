@@ -44,7 +44,7 @@ export default function ProjectCreatedCard({ data }: Props) {
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
     const orgId = data.content.organization?.id ?? data.orgId;
-    const orgSubdomain = data.content.organization?.subdomain ?? data.orgSubdomain;
+    const orgSubdomain = data.orgSubdomain;
     const orgImage = data.content.organization?.image;
 
     const items = data.content.projects ?? [];
