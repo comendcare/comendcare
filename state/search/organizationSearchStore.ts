@@ -213,6 +213,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                         ? [
                             'cm6f847kk0000g1r3mkm3zh62', // AGSAA
                             'cmdrkqiqv0000w45azqlanvcd', // CDLS
+                            'cm6quxnmv00007qh34myx7zr7', // Rory Belle Foundation
                             // ADD PROJECT 8P WHEN THEY'VE CREATED THEIR ACCOUNT
                         ]
                         : [

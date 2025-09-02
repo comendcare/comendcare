@@ -47,7 +47,7 @@ export default function ProjectUpdatedCard({ data }: Props) {
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
     const orgId = data.content.organization?.id ?? data.orgId;
-    const orgSubdomain = data.content.organization?.subdomain ?? data.orgSubdomain;
+    const orgSubdomain = data.orgSubdomain;
     const orgImage = data.content.organization?.image;
 
     const items = data.content.projects ?? [];
@@ -120,7 +120,7 @@ export default function ProjectUpdatedCard({ data }: Props) {
 
                 <CardFooter className="flex justify-end p-4 pt-0">
                     {items.length === 1 ? (
-                        <Link href={items[0]?.projectId ? `/app/research-plan/${p.researchPlanId}?project=${items[0].projectId}` : "#"} passHref>
+                        <Link href={items[0]?.projectId ? `/app/research-plan/${items[0]?.researchPlanId}?project=${items[0].projectId}` : "#"} passHref>
                             <Button
                                 size="sm"
                                 variant="outline"

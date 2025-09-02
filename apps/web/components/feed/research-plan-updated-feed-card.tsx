@@ -33,6 +33,7 @@ interface ResearchPlanUpdatedProps {
         title: string; // event title (e.g., "Research plan updated: XYZ")
         content: ResearchPlanUpdatedContent;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -42,6 +43,7 @@ export default function ResearchPlanUpdatedCard({ data }: ResearchPlanUpdatedPro
 
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
 

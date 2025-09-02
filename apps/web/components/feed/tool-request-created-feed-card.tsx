@@ -20,7 +20,7 @@ interface Content {
 }
 
 interface Props {
-    data: { id: string; title: string; content: Content; orgId?: string; createdAt: string | Date };
+    data: { id: string; title: string; content: Content; orgId?: string; orgSubdomain: string; createdAt: string | Date };
 }
 
 export default function ToolRequestCreatedCard({ data }: Props) {
@@ -31,6 +31,7 @@ export default function ToolRequestCreatedCard({ data }: Props) {
     const orgName = data.content.organization?.name ?? "Organization";
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
+    const orgSubdomain = data.orgSubdomain;
 
     const submitted = data.content.submittedAt ? formatDates(new Date(data.content.submittedAt)) : createdAt;
 

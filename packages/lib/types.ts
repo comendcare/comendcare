@@ -73,6 +73,7 @@ export interface FeedItemDTO {
     externalUrl?: string | null;
     createdAt: string; // ISO from API
     orgId?: string | null;
+    orgSubdomain?: string | null;
     userId?: string | null;
 }
 

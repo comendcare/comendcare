@@ -32,6 +32,7 @@ interface ResearchPlanCreatedProps {
         title: string;
         content: ResearchPlanCreatedContent;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -41,6 +42,7 @@ export default function ResearchPlanCreatedCard({ data }: ResearchPlanCreatedPro
 
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
 

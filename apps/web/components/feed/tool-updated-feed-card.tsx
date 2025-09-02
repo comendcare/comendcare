@@ -26,6 +26,7 @@ interface Props {
         title: string;
         content: OrgUpdatedToolContent;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -35,6 +36,7 @@ export default function ToolUpdatedCard({ data }: Props) {
 
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name;
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
 
     const toolId = data.content.toolId;

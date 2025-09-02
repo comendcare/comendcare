@@ -32,6 +32,7 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
         rfpId: string;
         orgId?: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         title: string;
         deadline?: string;
@@ -125,6 +126,7 @@ register("app", "rfp_closed", async ({ payload, occurredAt }) => {
         rfpId: string;
         orgId?: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         title: string;
         deadline?: string;
@@ -169,6 +171,7 @@ register("app", "org_updated", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         userId?: string;
         userName?: string;
         changedFields?: string[];
@@ -212,6 +215,7 @@ register("app", "org_research_plan_created", async ({ payload, occurredAt }) => 
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         roadmapId: string;
         title?: string;
@@ -259,6 +263,7 @@ register("app", "org_research_plan_updated", async ({ payload, occurredAt }) => 
     } = payload as {
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         roadmapId: string;
         title?: string;
         userId?: string;
@@ -488,6 +493,7 @@ register("app", "org_updated_tool", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId?: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         toolId: string;
         title?: string;
@@ -543,6 +549,7 @@ register("app", "org_created_rfp", async ({ payload, occurredAt }) => {
     } = payload as {
         orgId?: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         rfpId: string;
         title?: string;
@@ -643,6 +650,7 @@ register("app", "tool_request_created", async ({ payload, occurredAt }) => {
         title: string;
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         researcherId: string;
         userId?: string;
@@ -694,6 +702,7 @@ register("app", "tool_request_comment_created", async ({ payload, occurredAt }) 
         commentId: string;
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         userId: string;
         userName?: string;
@@ -744,6 +753,7 @@ register("app", "tool_request_approved", async ({ payload, occurredAt }) => {
         title?: string;
         orgId: string;
         orgName?: string;
+        orgSubdomain?: string;
         orgImage?: string;
         approverUserId?: string;
         approverUserName?: string;

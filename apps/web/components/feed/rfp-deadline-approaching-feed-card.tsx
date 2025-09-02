@@ -24,6 +24,7 @@ interface Props {
         title: string;
         content: Content;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -32,6 +33,7 @@ export default function RfpDeadlineApproachingCard({ data }: Props) {
     const createdAt = React.useMemo(() => formatDates(data.createdAt as Date), [data.createdAt]);
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
 

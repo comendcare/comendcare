@@ -26,7 +26,7 @@ interface Content {
 }
 
 interface Props {
-    data: { id: string; title: string; content: Content; orgId?: string; createdAt: string | Date };
+    data: { id: string; title: string; content: Content; orgId?: string; orgSubdomain: string; createdAt: string | Date };
 }
 
 export default function ServiceProviderCreatedCard({ data }: Props) {
@@ -35,6 +35,7 @@ export default function ServiceProviderCreatedCard({ data }: Props) {
 
     // SUBJECT: Organization
     const orgName = data.content.organization?.name ?? "Organization";
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
 
