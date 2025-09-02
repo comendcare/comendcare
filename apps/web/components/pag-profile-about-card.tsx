@@ -60,32 +60,7 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
         <Card className="organization-profile-tour-step1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                    <div className="max-w-full overflow-hidden">
-                        {(isPrivate || (!isPrivate && organization?.website)) && (
-                            organization?.website ?
-                                <Link
-                                    onClick={() => mixpanelTrack("Organization Website Visited", {
-                                        "Website": organization.website
-                                    })}
-                                    href={organization.website.startsWith("http")
-                                        ? organization.website
-                                        : `https://${organization.website}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
-                                >
-                                    <span className="truncate block max-w-[180px] overflow-hidden whitespace-nowrap">
-                                        {organization?.website}
-                                    </span>
-                                    <ExternalLink className="h-4 w-4"/>
-                                </Link>
-                                : (
-                                    <p className="text-gray-400">
-                                        {`No website.`}
-                                    </p>
-                                )
-                        )}
-                    </div>
+                    About
                 </CardTitle>
                 {(organization && editable) &&
                     <EditPagProfileAboutCardDialog organization={organization}/>
@@ -98,6 +73,32 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                         <p>
                             {organization?.description}
                         </p>
+                        <div className="max-w-full overflow-hidden">
+                            {(isPrivate || (!isPrivate && organization?.website)) && (
+                                organization?.website ?
+                                    <Link
+                                        onClick={() => mixpanelTrack("Organization Website Visited", {
+                                            "Website": organization.website
+                                        })}
+                                        href={organization.website.startsWith("http")
+                                            ? organization.website
+                                            : `https://${organization.website}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                                    >
+                                        <span className="truncate block max-w-[180px] overflow-hidden whitespace-nowrap">
+                                            {organization?.website}
+                                        </span>
+                                        <ExternalLink className="h-4 w-4"/>
+                                    </Link>
+                                    : (
+                                        <p className="text-gray-400">
+                                            {`No website.`}
+                                        </p>
+                                    )
+                            )}
+                        </div>
                         {/*<div className="max-w-full overflow-hidden">*/}
                         {/*    {(isPrivate || (!isPrivate && organization?.website)) && (*/}
                         {/*        organization?.website ?*/}
