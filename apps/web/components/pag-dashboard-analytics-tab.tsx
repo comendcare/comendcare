@@ -118,31 +118,7 @@ export default async function PAGDashboardAnalyticsTab() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2 text-base font-medium">
-                            Active RFPs
-                            <Button
-                                asChild
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
-                            >
-                                <Link href="/app/rfps" aria-label="Open RFPs">
-                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                                </Link>
-                            </Button>
-                        </CardTitle>
-                        <Megaphone className="h-4 w-4 text-muted-foreground"/>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-4xl font-bold">{organization.rfps.length}</div>
-                        {/*<p className="text-xs text-muted-foreground">*/}
-                        {/*    +180.1% from last month*/}
-                        {/*</p>*/}
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="flex flex-row items-center justify-start gap-x-2 text-base font-medium">
-                            Total tools
+                            Tools
                             <Button
                                 asChild
                                 variant="ghost"
@@ -165,6 +141,30 @@ export default async function PAGDashboardAnalyticsTab() {
                         {/*</p>*/}
                     </CardContent>
                 </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="flex flex-row items-center justify-start gap-x-2 text-base font-medium">
+                            RFPs
+                            <Button
+                                asChild
+                                variant="ghost"
+                                size="icon"
+                                className="p-0 h-auto w-auto"
+                            >
+                                <Link href="/app/rfps" aria-label="Open RFPs">
+                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                </Link>
+                            </Button>
+                        </CardTitle>
+                        <Megaphone className="h-4 w-4 text-muted-foreground"/>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-4xl font-bold">{organization.rfps.length}</div>
+                        {/*<p className="text-xs text-muted-foreground">*/}
+                        {/*    +180.1% from last month*/}
+                        {/*</p>*/}
+                    </CardContent>
+                </Card>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 {/*<Card className="col-span-4">*/}
@@ -177,10 +177,10 @@ export default async function PAGDashboardAnalyticsTab() {
                 {/*</Card>*/}
                 {/*<DonutChartCard organization={organization}/>*/}
                 <DashboardProjectsStatusCard organization={organization}/>
-                <PAGAnalyticsLineChartCard organization={organization}/>
+                <PAGAnalyticsToolsCard organization={organization}/>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <PAGAnalyticsToolsCard organization={organization}/>
+                <PAGAnalyticsLineChartCard organization={organization}/>
                 <PAGAnalyticsProfileCard organization={organization}/>
             </div>
         </div>

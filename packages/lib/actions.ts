@@ -271,45 +271,53 @@ export const createCondition = withAuth(
             }
 
             try {
-                // 1) Parse & normalize associated conditions from the incoming formData
+// 1) Parse names from the payload
                 const rawAssociated = (formData.get("associatedConditions") as string | null)?.split(",") ?? [];
-                const requestedSlugs = rawAssociated
-                    .map(s => toKebabCase((s || "").trim()))
-                    .filter(Boolean);
 
-                // 2) Compute this condition's slug the same way the record is made
-                //    (you already did above; re-use the same `slug` variable)
-                //    -> ensure no self-association and no duplicates
-                const targetSlugs = Array.from(
-                    new Set(requestedSlugs.filter(s => s !== slug))
-                );
+// 2) Normalize to slugs, drop self and dupes
+                const targetNames = rawAssociated.map(s => (s || "").trim()).filter(Boolean);
+                const targetSlugs = Array.from(new Set(targetNames.map(n => toKebabCase(n)).filter(s => s !== slug)));
 
                 if (targetSlugs.length) {
-                    // 3) Look up existing associated conditions by slug
-                    const assocTargets = await prisma.condition.findMany({
+                    // 3) Find existing by slug
+                    const existing = await prisma.condition.findMany({
                         where: { slug: { in: targetSlugs } },
                         select: { id: true, slug: true }
                     });
+                    const existingBySlug = new Map(existing.map(e => [e.slug, e.id]));
 
-                    // 4) (Optional) Warn on any slugs that didn't resolve to a Condition
-                    const foundSlugs = new Set(assocTargets.map(a => a.slug));
-                    const missing = targetSlugs.filter(s => !foundSlugs.has(s));
+                    // 4) Upsert any missing
+                    const missing = targetSlugs.filter(s => !existingBySlug.has(s));
                     if (missing.length) {
-                        console.warn("Associated conditions not found (skipped):", missing);
+                        const created = await Promise.all(
+                            missing.map(async (s) => {
+                                const name = targetNames.find(n => toKebabCase(n) === s) || s;
+                                const c = await prisma.condition.upsert({
+                                    where: { slug: s },
+                                    update: { name, slug: s },
+                                    create: { name, slug: s }
+                                });
+                                return c;
+                            })
+                        );
+                        created.forEach(c => existingBySlug.set(c.slug, c.id));
                     }
 
-                    // 5) Replace associations atomically
+                    // 5) Connect all
                     await prisma.condition.update({
                         where: { id: condition.id },
                         data: {
                             associatedConditions: {
-                                set: [],                              // replace existing associations
-                                connect: assocTargets.map(a => ({ id: a.id }))
+                                set: [],
+                                connect: targetSlugs
+                                    .map(s => existingBySlug.get(s))
+                                    .filter(Boolean)
+                                    .map(id => ({ id: id as string }))
                             }
                         }
                     });
                 } else {
-                    // If nothing valid was provided, ensure we clear previous associations
+                    // Clear if none provided
                     await prisma.condition.update({
                         where: { id: condition.id },
                         data: { associatedConditions: { set: [] } }
@@ -520,6 +528,7 @@ export const createOrganization = withAuth(
                     payload: {
                         orgId: organization.id,
                         orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
                         orgImage: organization.image,
                         userId: session.user.id,
                         userName: session.user.name,
@@ -1949,73 +1958,110 @@ export const updateCondition = withOrganizationAuth(
                 const str = value.toString();
 
                 if (key === "metadata") {
-                    data[key] = JSON.parse(str) as JsonValue;
+                    data[key] = JSON.parse(str);
                     return;
                 }
-
-                // Treat empty string or "null" as a real null (clear field)
                 if (str === "" || str === "null") {
                     data[key] = null;
                     return;
                 }
-
-                // Numbers
                 if (!isNaN(Number(str))) {
                     data[key] = Number(str);
                     return;
                 }
-
-                // Arrays (JSON)
                 if (str.startsWith("[")) {
-                    try {
-                        data[key] = JSON.parse(str);
-                    } catch {
-                        data[key] = str;
-                    }
+                    try { data[key] = JSON.parse(str); } catch { data[key] = str; }
                     return;
                 }
-
-                // Fallback for plain strings
                 data[key] = str;
             });
 
-            const conditions = await prisma.conditionToOrganization.findMany({
-                where: {organizationId: organization.id},
-                include: {condition: true},
+            const link = await prisma.conditionToOrganization.findFirst({
+                where: { organizationId: organization.id },
+                select: { conditionId: true, condition: { select: { slug: true } } },
             });
 
-            if (conditions.length > 0 && conditions[0].conditionId) {
-                // ✅ Update existing condition
-                const updatedCondition = await prisma.condition.update({
-                    where: {id: conditions[0].conditionId},
-                    data,
-                });
-
-                revalidatePath("app/profile/");
-                return {success: true, data: updatedCondition};
-            } else {
-                // ✅ Create new condition and link to organization
+            // Create if org has none yet
+            if (!link?.conditionId) {
                 const newCondition = await prisma.condition.create({
-                    data: {
-                        ...data,
-                        slug: toKebabCase(data.name),
-                        name: data.name,
-                    },
+                    data: { ...data, slug: toKebabCase(String(data.name || "")), name: data.name },
                 });
-
                 await prisma.conditionToOrganization.create({
+                    data: { conditionId: newCondition.id, organizationId: organization.id },
+                });
+                revalidatePath("/app/profile");
+                return { success: true, data: newCondition };
+            }
+
+            const conditionId = link.conditionId;
+            const thisSlug = link.condition?.slug;
+
+            // --- relation handling ---
+            // Pull out associatedConditions before scalar update
+            const incoming = data.associatedConditions as string[] | undefined;
+            delete data.associatedConditions;
+
+            // 1) Update scalar fields first
+            const updated = await prisma.condition.update({
+                where: { id: conditionId },
+                data,
+            });
+
+            // 2) If client sent associated conditions, sync the relation
+            if (incoming) {
+                // We expect slugs from the UI. If you sent names instead, map to slugs here.
+                const targetSlugs = Array.from(
+                    new Set(
+                        (incoming || [])
+                            .map(s => (s || "").trim())
+                            .filter(Boolean)
+                    )
+                ).filter(s => s !== thisSlug); // prevent self-association
+
+                // If you allow 'creatable', upsert any missing ones (optional)
+                // Remove this block if you want to restrict to existing only.
+                const existing = await prisma.condition.findMany({
+                    where: { slug: { in: targetSlugs } },
+                    select: { id: true, slug: true },
+                });
+                const existingBySlug = new Map(existing.map(e => [e.slug, e.id]));
+                const missing = targetSlugs.filter(s => !existingBySlug.has(s));
+
+                if (missing.length) {
+                    const created = await Promise.all(
+                        missing.map(async (slug) => {
+                            const nameGuess = slug.replace(/-/g, " ");
+                            return prisma.condition.upsert({
+                                where: { slug },
+                                update: { name: nameGuess, slug },
+                                create: { name: nameGuess, slug },
+                            });
+                        })
+                    );
+                    created.forEach(c => existingBySlug.set(c.slug, c.id));
+                }
+
+                const connectIds = targetSlugs
+                    .map(s => existingBySlug.get(s))
+                    .filter(Boolean)
+                    .map(id => ({ id: id as string }));
+
+                await prisma.condition.update({
+                    where: { id: conditionId },
                     data: {
-                        conditionId: newCondition.id,
-                        organizationId: organization.id,
+                        associatedConditions: {
+                            set: [],         // replace all
+                            connect: connectIds,
+                        },
                     },
                 });
-
-                revalidatePath("app/profile/");
-                return {success: true, data: newCondition};
             }
+
+            revalidatePath("/app/profile");
+            return { success: true, data: updated };
         } catch (error: any) {
             console.error("Error in updateCondition:", error);
-            return {success: false, error: error.message || "Failed to update or create condition."};
+            return { success: false, error: error.message || "Failed to update or create condition." };
         }
     }
 );
@@ -2104,20 +2150,12 @@ export const updateDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
-                milestones: (data.milestones || []).map((m) => ({
-                    milestoneId: m.id,
-                    biosampleId: data.id || "",
-                })),
-                attachments: data.attachments,
-                contacts: data.contacts,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
                 where: {id: data.id},
                 include: {
-                    contacts: true,
-                    attachments: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
@@ -2131,6 +2169,9 @@ export const updateDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
+                        ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
+                        : {institution: {disconnect: true}}),
+                    ...(diseaseModelData.institution
                         ? { institution: { 
                             connectOrCreate: { 
                                 where: {id: diseaseModelData.institution.value},
@@ -2140,46 +2181,6 @@ export const updateDiseaseModel = withOrganizationAuth(
                              } }
                          }
                         : { institution: { disconnect: true } }),
-                    ...(diseaseModelData.attachments ? (
-                        {
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(diseaseModelData.contacts ? (
-                        {
-                            contacts: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (diseaseModelData?.contacts || []).map((contact: any) => ({
-                                        name: contact.name,
-                                        email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(diseaseModelData.milestones ? (
-                        {
-                            milestones: {
-                                deleteMany: {},
-                                create: (diseaseModelData.milestones || []).map((milestone: any) => ({
-                                    milestone: {
-                                        connect: {id: milestone.milestoneId}
-                                    }
-                                }))
-                            },
-                        }
-                    ) : undefined),
                 },
             })
 
@@ -2211,21 +2212,11 @@ export const createDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
-                milestones: (data.milestones || []).map((milestone) => {
-                    return ({
-                        milestoneId: milestone.id,
-                        biosampleId: data.id || '',
-                    })
-                }),
-                attachments: data.attachments,
-                contacts: data.contacts,
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
 
             const response = await prisma.diseaseModel.create({
                 include: {
-                    attachments: true,
-                    contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
@@ -2234,7 +2225,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     ...diseaseModelData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    id: diseaseModelData.id || generateToolNanoid(),
+                    ...(diseaseModelData.id ? {id: diseaseModelData.id} : undefined),
                     private: diseaseModelData.private || false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
@@ -2251,31 +2242,6 @@ export const createDiseaseModel = withOrganizationAuth(
                              }
                         }})
                         : undefined),
-                    attachments: {
-                        createMany: {
-                            data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
-                                link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
-                    },
-                    contacts: {
-                        createMany: {
-                            data: (diseaseModelData?.contacts || []).map((contact: any) => ({
-                                name: contact.name,
-                                email: contact.email,
-                                ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
-                    },
-                    milestones: {
-                        create: (diseaseModelData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
-                    },
                 }
             })
 
@@ -2293,12 +2259,6 @@ function generateDonorNanoid() {
     const id = nanoid(8) // generate 8 char
     console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4))
     return (id.slice(0, 4) + '-' + id.slice(4))
-}
-
-function generateToolNanoid() {
-    const id = nanoid(12) // generate 12 char
-    console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4, 8) + '-' + id.slice(8))
-    return (id.slice(0, 4) + '-' + id.slice(4, 8) + '-' + id.slice(8))
 }
 
 export const createDataTool = withOrganizationAuth(
@@ -2347,7 +2307,7 @@ export const createDataTool = withOrganizationAuth(
                     ...dataToolData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    id: dataToolData.id || generateToolNanoid(),
+                    ...(dataToolData.id ? {id: dataToolData.id} : undefined),
                     attachments: {
                         createMany: {
                             data: (dataToolData?.attachments || []).map((attachment: any) => ({
@@ -2429,12 +2389,7 @@ export const updateDataTool = withOrganizationAuth(
                 attachments: data.attachments,
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                ...((
-                    data.cohortSize !== undefined && 
-                    data.cohortSize !== null
-                    ) 
-                        ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null} 
-                        : undefined),
+                ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
             }
 
@@ -2596,7 +2551,7 @@ export const createBiosample = withOrganizationAuth(
                     ...biosampleData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    id: biosampleData.id || generateToolNanoid(),
+                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
                     attachments: {
                         createMany: {
                             data: (biosampleData?.attachments || []).map((attachment: any) => ({
@@ -2643,7 +2598,7 @@ export const createBiosample = withOrganizationAuth(
                             where: {id: data.donorId || nanoid()},
                             create: {
                                 id: data.donorId || generateDonorNanoid(),
-                                internalId: data.internalDonorId,
+                                internalId: data.donorInternalId,
                                 age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,
                                 gender: data.gender,
@@ -2843,7 +2798,6 @@ export const updateBiosample = withOrganizationAuth(
                 await prisma.donor.update({
                     where: { id: data.donorId },
                     data: {
-                        internalId: data.internalDonorId,
                         age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,
@@ -4126,6 +4080,7 @@ export const createNodes = withOrganizationAuth(
                     const m = n.data; // Milestone
                     if (m?.nodeType === "PROJECT" && m?.private === false) {
                         createdPublicProjects.push({
+                            researchPlanId: m.roadmapId,
                             projectId: m.id,
                             title: m.title,
                             startDate: m.startDate ?? null,
@@ -4188,6 +4143,7 @@ export const createNodes = withOrganizationAuth(
                     payload: {
                         orgId: organizationId,
                         orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
                         orgImage: organization.image,
                         projects: createdPublicProjects,
                         userId: session?.user.id,

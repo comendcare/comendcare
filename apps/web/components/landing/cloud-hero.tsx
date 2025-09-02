@@ -274,17 +274,26 @@ export const CloudHeroSection = () => {
                     <p className="max-w-screen-sm text-xl">
                         {`Plan, partner, and showcase your progress with the rare disease ecosystem.`}
                     </p>
-                    <PulsatingButton
+                    {/*<PulsatingButton*/}
+                    {/*    className="w-fit"*/}
+                    {/*    onClick={() => {*/}
+                    {/*        window.scrollTo({*/}
+                    {/*            top: document.documentElement.scrollHeight,*/}
+                    {/*            behavior: 'smooth' // Makes it scroll smoothly*/}
+                    {/*        });*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    Sign up*/}
+                    {/*</PulsatingButton>*/}
+                    <Button
+                        variant="cta"
                         className="w-fit"
-                        onClick={() => {
-                            window.scrollTo({
-                                top: document.documentElement.scrollHeight,
-                                behavior: 'smooth' // Makes it scroll smoothly
-                            });
-                        }}
+                        asChild
                     >
-                        Sign up
-                    </PulsatingButton>
+                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                            Sign up
+                        </Link>
+                    </Button>
                     {/* <Link
                         href="/marketplace"
                         className={cn(

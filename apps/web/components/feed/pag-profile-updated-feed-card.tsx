@@ -2,22 +2,23 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { MotionConfig } from "framer-motion";
+import {MotionConfig} from "framer-motion";
 import {
     Card,
     CardContent,
     CardFooter,
     CardHeader,
 } from "@comend/components/ui/card";
-import { Button } from "@comend/components/ui/button";
-import { formatDates } from "@comend/lib/utils";
-import { ProfilePhoto } from "@comend/components/profile-photo";
-import { Building2, FileText, Pencil } from "lucide-react";
+import {Button} from "@comend/components/ui/button";
+import {formatDates} from "@comend/lib/utils";
+import {ProfilePhoto} from "@comend/components/profile-photo";
+import {Building2, FileText, Pencil} from "lucide-react";
 
 interface OrgUpdatedContent {
     organization?: {
         id?: string;
         name?: string;
+        subdomain?: string;
         image?: string;
     };
     changedFields?: string[];
@@ -38,7 +39,7 @@ interface OrgUpdatedProps {
     };
 }
 
-export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
+export default function PAGProfileUpdatedCard({data}: OrgUpdatedProps) {
     const createdAt = React.useMemo(
         () => formatDates(data.createdAt as Date),
         [data.createdAt]
@@ -50,6 +51,7 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
         data.title?.replace(/^Organization updated:\s*/i, "") ??
         "Organization";
     const orgId = data.content.organization?.id ?? data.orgId;
+    const subdomain = data.content.organization?.subdomain;
 
     // Display title mirrors research plan card behavior
     const displayTitle =
@@ -57,7 +59,7 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
         data.title?.replace(/^Organization updated:\s*/i, "") ||
         "Organization";
 
-    const { changedFields = [], changes } = data.content;
+    const {changedFields = [], changes} = data.content;
 
     // prepare a compact view of up to 3 diffs
     const diffEntries = React.useMemo(() => {
@@ -77,7 +79,7 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
     }, [changes]);
 
     return (
-        <MotionConfig transition={{ duration: 0.3 }}>
+        <MotionConfig transition={{duration: 0.3}}>
             <Card className="rounded-sm w-full">
                 <CardHeader className="space-y-1 md:space-y-1.5 p-4">
                     <div className="flex justify-between items-center">
@@ -89,7 +91,7 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
                             />
                             <div className="flex flex-col">
                 <span className="font-medium md:text-base flex items-center gap-1">
-                  <Building2 className="h-4 w-4" />
+                  <Building2 className="h-4 w-4"/>
                   Organization Updated
                 </span>
                                 <span className="font-light text-muted-foreground text-[0.6rem] md:text-xs leading-3">
@@ -103,9 +105,9 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
                                         <>
                                             {" "}
                                             •{" "}
-                                            {orgId ? (
+                                            {subdomain ? (
                                                 <Link
-                                                    href={`/org/${orgId}`}
+                                                    href={`/app/organization/${subdomain}`}
                                                     className="underline-offset-2 hover:underline"
                                                 >
                                                     {orgName}
@@ -136,7 +138,7 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
                                         key={field}
                                         className="inline-flex items-center gap-1 text-[0.65rem] md:text-xs rounded px-2 py-0.5 bg-muted text-muted-foreground"
                                     >
-                    <Pencil className="h-3 w-3" />
+                    <Pencil className="h-3 w-3"/>
                                         {field}
                   </span>
                                 ))}
@@ -145,7 +147,7 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
 
                         {diffEntries.length > 0 && (
                             <div className="mt-1 grid gap-1.5">
-                                {diffEntries.map(({ key, before, after }) => (
+                                {diffEntries.map(({key, before, after}) => (
                                     <div key={key} className="text-xs">
                                         <div className="font-medium">{key}</div>
                                         <div className="rounded bg-muted/40 p-2">
@@ -171,10 +173,10 @@ export default function PAGProfileUpdatedCard({ data }: OrgUpdatedProps) {
                 </CardContent>
 
                 <CardFooter className="flex justify-end p-4 pt-0">
-                    {orgId ? (
-                        <Link href={`/org/${orgId}`} passHref>
+                    {subdomain ? (
+                        <Link href={`/app/organization/${subdomain}`} passHref>
                             <Button size="sm" variant="outline" className="flex gap-1 items-center">
-                                <FileText className="h-4 w-4" />
+                                <FileText className="h-4 w-4"/>
                                 View Organization
                             </Button>
                         </Link>

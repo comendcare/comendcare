@@ -17,6 +17,7 @@ import { Building2, FileText } from "lucide-react";
 interface PagProfileCreatedContent {
     pagOrganizationId: string;
     pagOrganizationName?: string;
+    pagOrganizationSubdomain?: string;
     actor?: {
         userId?: string;
         name?: string;
@@ -47,6 +48,8 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName =
         data.content.pagOrganizationName ?? data.content.organization?.name ?? "Organization";
+    const orgSubdomain =
+        data.content.pagOrganizationSubdomain ?? data.content.pagOrganizationSubdomain ?? "";
     const orgId =
         data.content.organization?.id ??
         data.content.pagOrganizationId ??
@@ -108,16 +111,16 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
                 </CardContent>
 
                 <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={orgId ? `/org/${orgId}` : "#"} aria-disabled={!orgId} passHref>
+                    <Link href={orgSubdomain ? `/app/organization/${orgSubdomain}` : "#"} aria-disabled={!orgSubdomain} passHref>
                         <Button
                             size="sm"
                             variant="outline"
                             className="flex gap-1 items-center"
-                            disabled={!orgId}
-                            title={orgId ? "View PAG Profile" : "No profile link available"}
+                            disabled={!orgSubdomain}
+                            title={orgSubdomain ? "View PAG Profile" : "No profile link available"}
                         >
                             <FileText className="h-4 w-4" />
-                            View Profile
+                            View profile
                         </Button>
                     </Link>
                 </CardFooter>

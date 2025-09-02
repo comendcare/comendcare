@@ -19,7 +19,7 @@ import ToolRequestCreatedCard from "~web/components/feed/tool-request-created-fe
 import ToolRequestCommentCard from "~web/components/feed/tool-request-comment-created-feed-card";
 import ToolRequestApprovedCard from "~web/components/feed/tool-request-approved-feed-card";
 import ServiceProviderCreatedCard from "~web/components/feed/service-provider-created-feed-card";
-import AnalyticsGoalReachedCard from "~web/components/feed/analaytics-goal-reached-feed-card";
+import AnalyticsGoalReachedCard from "~web/components/feed/analytics-goal-reached-feed-card";
 
 // Lazy-load rare/heavier cards
 const FDAFeedCard = dynamic(

@@ -5,7 +5,7 @@
 // import { HeroSection } from "@comend/components/landing/sections/hero"
 // import { ServicesSection } from "@comend/components/landing/sections/services"
 // import { WhoSection } from "@comend/components/landing/sections/who"
-// import TabsFeaturesSection from "@comend/components/landing/sections/tabs-features"
+// import VerticalTimedTabsFeaturesSection from "~web/components/landing/vertical-timed-tabs-features"
 // import HowItWorks from "@comend/components/landing/sections/how-it-works"
 // import CTASection from "@comend/components/landing/sections/cta"
 // import { LibrareySection } from "@comend/components/landing/sections/librarey-section"
@@ -22,8 +22,10 @@ import ContactSection from "~web/components/landing/contact";
 import FeatureResearchMarketplace from "~web/components/landing/feature-research-marketplace";
 import FeaturePublicPages from "~web/components/landing/feature-public-pages";
 import FeatureResearchPlan from "~web/components/landing/feature-research-plan";
+import FeatureFeed from "~web/components/landing/feature-feed";
 import {News} from "~web/components/landing/news";
 import LogoInfiniteCarousel from "~web/components/landing/logo-infinite-carousel";
+import {HorizontalTabsFeatures} from "~web/components/landing/horizontal-tabs-feature";
 
 export default function App() {
     return (
@@ -37,10 +39,12 @@ export default function App() {
             {/*/>*/}
             {/*<HowItWorks/>*/}
             {/*<ClientsLogoCloud />*/}
-            <FeatureResearchPlan />
-            <FeatureResearchMarketplace  />
+            <HorizontalTabsFeatures />
+            {/*<FeatureResearchPlan />*/}
             <FeaturePublicPages />
-            {/*<TabsFeaturesSection />*/}
+            <FeatureResearchMarketplace  />
+            <FeatureFeed />
+            {/*<VerticalTimedTabsFeaturesSection />*/}
             {/*<MoreFeaturesSection />*/}
             {/*<WhoSection/>*/}
             {/*<FeaturesSection/>*/}

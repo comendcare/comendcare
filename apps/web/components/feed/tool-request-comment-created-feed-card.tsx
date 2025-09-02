@@ -35,11 +35,8 @@ export default function ToolRequestCommentCard({ data }: Props) {
 
     const displayTitle = data.content.title || data.title || "Tool request";
 
-    const threadHref =
-        data.content.requestId && data.content.commentId
-            ? `/requests/${data.content.requestId}#comment-${data.content.commentId}`
-            : data.content.requestId
-                ? `/requests/${data.content.requestId}`
+    const threadHref = data.content.requestId
+                ? `/app/requests/${data.content.requestId}`
                 : "#";
     const hasThreadLink = Boolean(data.content.requestId);
 
@@ -53,8 +50,8 @@ export default function ToolRequestCommentCard({ data }: Props) {
                             {/* Organization avatar/logo */}
                             <ProfilePhoto img={orgImage} name={orgName} className="h-8 w-8 rounded-full" />
                             <div className="flex flex-col">
-                                {orgId ? (
-                                    <Link href={`/org/${orgId}`} className="font-medium md:text-base underline-offset-2 hover:underline">
+                                {orgSubdomain ? (
+                                    <Link href={`/app/organization/${orgSubdomain}`} className="font-medium md:text-base underline-offset-2 hover:underline">
                                         {orgName}
                                     </Link>
                                 ) : (

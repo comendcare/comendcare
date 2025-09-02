@@ -27,6 +27,7 @@ export const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
 
 export const researchFormSchema = z.object({
     disorder: z.array(optionSchema).optional(),     // MultipleSelector; empty array = cleared
+    associatedConditions: z.array(optionSchema),
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),

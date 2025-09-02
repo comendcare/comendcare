@@ -41,7 +41,7 @@ export default function ToolRequestCreatedCard({ data }: Props) {
 
     const statusLabel = data.content.status ?? "PENDING";
 
-    const requestHref = data.content.requestId ? `/requests/${data.content.requestId}` : "#";
+    const requestHref = data.content.requestId ? `/app/requests/${data.content.requestId}` : "#";
 
     return (
         <MotionConfig transition={{ duration: 0.3 }}>
@@ -53,8 +53,8 @@ export default function ToolRequestCreatedCard({ data }: Props) {
                             {/* Organization avatar/logo */}
                             <ProfilePhoto img={orgImage} name={orgName} className="h-8 w-8 rounded-full" />
                             <div className="flex flex-col">
-                                {orgId ? (
-                                    <Link href={`/org/${orgId}`} className="font-medium md:text-base underline-offset-2 hover:underline">
+                                {orgSubdomain ? (
+                                    <Link href={`/app/organization/${orgSubdomain}`} className="font-medium md:text-base underline-offset-2 hover:underline">
                                         {orgName}
                                     </Link>
                                 ) : (

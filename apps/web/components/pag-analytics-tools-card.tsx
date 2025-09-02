@@ -33,7 +33,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Microscope className="h-5 w-5"/>
-                    Tools
+                    Toolkit overview
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -43,7 +43,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                         <div className="flex items-center gap-2">
                             <TestTubeDiagonal className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
-                                Patient Biosamples
+                                Patient biosamples
                             </span>
                             <Button
                                 onClick={() => router.push("/app/tools/biosample")}
@@ -64,7 +64,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                         <div className="flex items-center gap-2">
                             <Rat className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
-                                Disease Models
+                                Disease models
                             </span>
                             <Button
                                 onClick={() => router.push("/app/tools/disease-models")}
@@ -85,7 +85,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                         <div className="flex items-center gap-2">
                             <Database className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
-                                Clinical Datasets
+                                Clinical datasets
                             </span>
                             <Button
                                 onClick={() => router.push("/app/tools/data")}
@@ -106,7 +106,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                 <div className="pt-4 border-t">
                     <div className="flex items-center justify-between">
                         <span className="flex flex-row items-center justify-center gap-x-2 text-sm font-medium">
-                            Open Access Requests
+                            Open access requests
                             <TooltipProvider delayDuration={50}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>

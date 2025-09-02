@@ -61,7 +61,7 @@ export default function ResearchPlanUpdatedCard({ data }: ResearchPlanUpdatedPro
         }));
     }, [changes]);
 
-    const planHref = data.content.roadmapId ? `/app/roadmap/${data.content.roadmapId}` : "#";
+    const planHref = data.content.roadmapId ? `/app/research-plan/${data.content.roadmapId}` : "#";
 
     return (
         <MotionConfig transition={{ duration: 0.3 }}>
@@ -75,8 +75,8 @@ export default function ResearchPlanUpdatedCard({ data }: ResearchPlanUpdatedPro
 
                             {/* Organization name to the right of the image */}
                             <div className="flex flex-col">
-                                {orgId ? (
-                                    <Link href={`/org/${orgId}`} className="font-medium md:text-base underline-offset-2 hover:underline">
+                                {orgSubdomain ? (
+                                    <Link href={`/app/organization/${orgSubdomain}`} className="font-medium md:text-base underline-offset-2 hover:underline">
                                         {orgName}
                                     </Link>
                                 ) : (

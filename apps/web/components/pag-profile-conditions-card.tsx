@@ -81,7 +81,7 @@ export const PAGProfileConditionsCard = ({
                             className="flex flex-col space-y-4"
                         >
 
-                            <div className="space-y-2">
+                            {/* <div className="space-y-2">
                                 {(isPrivate || (!isPrivate && condition)) && (
                                     <>
                                         <div className="flex flex-row items-center justify-between w-full">
@@ -111,7 +111,7 @@ export const PAGProfileConditionsCard = ({
                                         })()}
                                     </>
                                 )}
-                            </div>
+                            </div> */}
                             {/*<div className="space-y-2">*/}
                             {/*    <div className="inline-flex flex-row justify-between items-center">*/}
                             {/*<Link*/}

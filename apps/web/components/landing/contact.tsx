@@ -1,5 +1,7 @@
 import React from "react"
 import {SimpleContactForm} from "~web/components/simple-contact-form";
+import {Button} from "@/packages/components/ui/button";
+import Link from "next/link";
 
 export default function ContactSection() {
     return (
@@ -12,10 +14,10 @@ export default function ContactSection() {
                             id="contact"
                             className="text-black text-2xl md:text-3xl font-bold mb-4"
                         >
-                            🎉&nbsp;&nbsp;Want to see how it works?
+                            🧑🏻‍💻&nbsp;&nbsp;Want to see what we can do for you?
                         </h2>
                         <p className="text-xl text-gray-900">
-                            Get a personalized demo to learn how we can help your organization plan, partner, and broadcast your research.
+                            Schedule a personalized 30 minute demo to see how we can help your organization plan, partner, and broadcast your research.
                         </p>
                     </div>
 
@@ -30,7 +32,16 @@ export default function ContactSection() {
                         {/*    isSubscribedCallback={isSubscribedCallback}*/}
                         {/*    aria-label="Beta signup form"*/}
                         {/*/>*/}
-                        <SimpleContactForm />
+                        {/*<SimpleContactForm />*/}
+                        <Button
+                            variant="cta"
+                            className="w-fit"
+                            asChild
+                        >
+                            <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                Sign up
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </div>
