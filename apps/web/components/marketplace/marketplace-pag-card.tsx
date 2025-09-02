@@ -23,20 +23,34 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
 
     return (
         <Link
+            // href={
+            //     process.env.NEXT_PUBLIC_VERCEL_ENV
+            //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+            //         : `http://localhost:3000/app/organization/${subdomain}`
+            // }
             href={
-                process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-                    : `http://localhost:3000/app/organization/${subdomain}`
+                isPublic
+                    ? process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                        : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
                 <CardHeader className="gap-2">
                     <div className="flex justify-between">
                         <Link
+                            // href={
+                            //     process.env.NEXT_PUBLIC_VERCEL_ENV
+                            //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                            //         : `http://localhost:3000/app/organization/${subdomain}`
+                            // }
                             href={
-                                process.env.NEXT_PUBLIC_VERCEL_ENV
-                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-                                    : `http://localhost:3000/app/organization/${subdomain}`
+                                isPublic
+                                    ? process.env.NEXT_PUBLIC_VERCEL_ENV
+                                        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                        : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
                             }
                         >
                             <CardTitle className="text-xl flex flex-row gap-2 items-center">

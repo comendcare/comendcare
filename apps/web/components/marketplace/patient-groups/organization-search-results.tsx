@@ -39,7 +39,7 @@ export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
             return (
                 <ol className="w-full flex flex-col gap-4">
                     {searchResults.map((organization, index) => (
-                        <OrganizationMarketplaceListElement organization={organization} key={index}/>
+                        <OrganizationMarketplaceListElement organization={organization} key={index} isPublic={isPublic} />
                     ))}
                 </ol>
             )
