@@ -51,6 +51,7 @@ export default function PAGProfileUpdatedCard({data}: OrgUpdatedProps) {
         data.title?.replace(/^Organization updated:\s*/i, "") ??
         "Organization";
     const orgId = data.content.organization?.id ?? data.orgId;
+    const subdomain = data.content.organization?.subdomain;
 
     // Display title mirrors research plan card behavior
     const displayTitle =
@@ -104,9 +105,9 @@ export default function PAGProfileUpdatedCard({data}: OrgUpdatedProps) {
                                         <>
                                             {" "}
                                             •{" "}
-                                            {orgSubdomain ? (
+                                            {subdomain ? (
                                                 <Link
-                                                    href={`/app/organization/${orgSubdomain}`}
+                                                    href={`/app/organization/${subdomain}`}
                                                     className="underline-offset-2 hover:underline"
                                                 >
                                                     {orgName}
@@ -172,8 +173,8 @@ export default function PAGProfileUpdatedCard({data}: OrgUpdatedProps) {
                 </CardContent>
 
                 <CardFooter className="flex justify-end p-4 pt-0">
-                    {orgSubdomain ? (
-                        <Link href={`/app/organization/${orgSubdomain}`} passHref>
+                    {subdomain ? (
+                        <Link href={`/app/organization/${subdomain}`} passHref>
                             <Button size="sm" variant="outline" className="flex gap-1 items-center">
                                 <FileText className="h-4 w-4"/>
                                 View Organization
