@@ -2151,12 +2151,20 @@ export const updateDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                milestones: (data.milestones || []).map((m) => ({
+                    milestoneId: m.id,
+                    biosampleId: data.id || "",
+                })),
+                attachments: data.attachments,
+                contacts: data.contacts,
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
                 where: {id: data.id},
                 include: {
+                    contacts: true,
+                    attachments: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
@@ -2170,9 +2178,6 @@ export const updateDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
-                        ? ({institution: {connect: {id: diseaseModelData.institution.value}}})
-                        : {institution: {disconnect: true}}),
-                    ...(diseaseModelData.institution
                         ? { institution: { 
                             connectOrCreate: { 
                                 where: {id: diseaseModelData.institution.value},
@@ -2182,6 +2187,46 @@ export const updateDiseaseModel = withOrganizationAuth(
                              } }
                          }
                         : { institution: { disconnect: true } }),
+                    ...(diseaseModelData.attachments ? (
+                        {
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(diseaseModelData.contacts ? (
+                        {
+                            contacts: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (diseaseModelData?.contacts || []).map((contact: any) => ({
+                                        name: contact.name,
+                                        email: contact.email,
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(diseaseModelData.milestones ? (
+                        {
+                            milestones: {
+                                deleteMany: {},
+                                create: (diseaseModelData.milestones || []).map((milestone: any) => ({
+                                    milestone: {
+                                        connect: {id: milestone.milestoneId}
+                                    }
+                                }))
+                            },
+                        }
+                    ) : undefined),
                 },
             })
 
@@ -2213,11 +2258,21 @@ export const createDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                milestones: (data.milestones || []).map((milestone) => {
+                    return ({
+                        milestoneId: milestone.id,
+                        biosampleId: data.id || '',
+                    })
+                }),
+                attachments: data.attachments,
+                contacts: data.contacts,
             }
 
             const response = await prisma.diseaseModel.create({
                 include: {
+                    attachments: true,
+                    contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
@@ -2226,7 +2281,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     ...diseaseModelData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(diseaseModelData.id ? {id: diseaseModelData.id} : undefined),
+                    id: diseaseModelData.id || generateToolNanoid(),
                     private: diseaseModelData.private || false,
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
@@ -2243,6 +2298,31 @@ export const createDiseaseModel = withOrganizationAuth(
                              }
                         }})
                         : undefined),
+                    attachments: {
+                        createMany: {
+                            data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
+                                link: attachment.link,
+                                ...(attachment.name ? {name: attachment.name} : undefined)
+                            }))
+                        }
+                    },
+                    contacts: {
+                        createMany: {
+                            data: (diseaseModelData?.contacts || []).map((contact: any) => ({
+                                name: contact.name,
+                                email: contact.email,
+                                ...(contact.role ? {role: contact.role} : undefined),
+                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                            }))
+                        }
+                    },
+                    milestones: {
+                        create: (diseaseModelData.milestones || []).map((milestone: any) => ({
+                            milestone: {
+                                connect: {id: milestone.milestoneId}
+                            }
+                        }))
+                    },
                 }
             })
 
@@ -2255,6 +2335,12 @@ export const createDiseaseModel = withOrganizationAuth(
         }
     }
 )
+
+function generateToolNanoid() {
+    const id = nanoid(12) // generate 12 char
+    console.log(`new donor id`, id.slice(0, 4) + '-' + id.slice(4, 8) + '-' + id.slice(8))
+    return (id.slice(0, 4) + '-' + id.slice(4, 8) + '-' + id.slice(8))
+}
 
 function generateDonorNanoid() {
     const id = nanoid(8) // generate 8 char
@@ -2308,7 +2394,7 @@ export const createDataTool = withOrganizationAuth(
                     ...dataToolData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(dataToolData.id ? {id: dataToolData.id} : undefined),
+                    id: dataToolData.id || generateToolNanoid(),
                     attachments: {
                         createMany: {
                             data: (dataToolData?.attachments || []).map((attachment: any) => ({
@@ -2340,6 +2426,12 @@ export const createDataTool = withOrganizationAuth(
                     ...(dataToolData.gene
                         ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
                         : undefined),
+                    ...((
+                        data.cohortSize !== undefined && 
+                        data.cohortSize !== null
+                        ) 
+                            ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null} 
+                            : undefined),
                     ...(dataToolData.institution
                         ? ({institution: {
                             connectOrCreate: { 
@@ -2552,7 +2644,7 @@ export const createBiosample = withOrganizationAuth(
                     ...biosampleData,
                     // create with the given id if it's available. This is useful for situations like 'undo'
                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
+                    id: biosampleData.id || generateToolNanoid(),
                     attachments: {
                         createMany: {
                             data: (biosampleData?.attachments || []).map((attachment: any) => ({
@@ -2599,7 +2691,7 @@ export const createBiosample = withOrganizationAuth(
                             where: {id: data.donorId || nanoid()},
                             create: {
                                 id: data.donorId || generateDonorNanoid(),
-                                internalId: data.donorInternalId,
+                                internalId: data.internalDonorId,
                                 age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,
                                 gender: data.gender,
@@ -2800,6 +2892,7 @@ export const updateBiosample = withOrganizationAuth(
                 await prisma.donor.update({
                     where: { id: data.donorId },
                     data: {
+                        internalId: data.internalDonorId,
                         age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,
