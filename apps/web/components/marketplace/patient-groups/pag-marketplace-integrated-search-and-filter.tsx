@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Funnel, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { debounce } from "lodash";
@@ -104,6 +104,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             setSearchTerm: state.setSearchTerm
         }))
     )
+    const dialogRef = useRef<HTMLDivElement>(null)
 
 
     const [query, setQuery] = useState(searchTerm);
@@ -284,7 +285,13 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                             <Funnel />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent
+                        ref={dialogRef}
+                        onOpenAutoFocus={(e) => {
+                            e.preventDefault() // prevent focusing the first input
+                            dialogRef.current?.focus() // focus the dialog content instead
+                        }}
+                    >
                         <DialogTitle>Patient Group Filters</DialogTitle>
                             {/* Conditions */}
                             <div>
