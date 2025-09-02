@@ -278,7 +278,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         <DialogTitle>Biosample Filters</DialogTitle>
                         {/* Conditions */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Condition</Label>
+                            <Label>Condition</Label>
                             <MultipleSelector
                                 value={filters.conditions ?? []}
                                 onChange={(vals) => setFilterKey("conditions", vals)}
@@ -296,7 +296,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Genes */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Gene</Label>
+                            <Label>Gene</Label>
                             <MultipleSelector
                                 value={filters.genes ?? []}
                                 onChange={(vals) => setFilterKey("genes", vals)}
@@ -314,7 +314,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         
                         {/* Biosample Types */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Biosample Types</Label>
+                            <Label>Biosample Types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}
@@ -331,7 +331,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Patient Group */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Organization</Label>
+                            <Label>Organization</Label>
                             <MultipleSelector
                                 value={filters.organizations ?? []}
                                 onChange={(vals) => setFilterKey("organizations", vals)}
