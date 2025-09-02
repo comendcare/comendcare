@@ -33,7 +33,9 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                     ? process.env.NEXT_PUBLIC_VERCEL_ENV
                         ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
                         : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                    : `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                    : process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
@@ -50,7 +52,9 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                                     ? process.env.NEXT_PUBLIC_VERCEL_ENV
                                         ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
                                         : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                                    : `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                                    : process.env.NEXT_PUBLIC_VERCEL_ENV
+                                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                                        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
                             }
                         >
                             <CardTitle className="text-xl flex flex-row gap-2 items-center">
