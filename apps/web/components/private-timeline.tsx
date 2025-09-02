@@ -433,7 +433,7 @@ export const TimelineItemContent = ({
                 //     </div>
                 // </div>
                 <>
-                    {milestone.biosamples.map(({biosample}) => {
+                    {(milestone.biosamples || []).map(({biosample}) => {
                         const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                         return (
                             <Badge variant="violet" className="min-w-fit w-fit font-normal">
@@ -442,7 +442,7 @@ export const TimelineItemContent = ({
                             </Badge>
                         )
                     })}
-                    {milestone.diseaseModels.map(({diseaseModel}) => {
+                    {(milestone.diseaseModels || []).map(({diseaseModel}) => {
                         const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                         return (
                             <Badge variant="yellow" className="min-w-fit w-fit font-normal">
@@ -451,7 +451,7 @@ export const TimelineItemContent = ({
                             </Badge>
                         )
                     })}
-                    {milestone.tools.map(({tool}) => (
+                    {(milestone.tools || []).map(({tool}) => (
                         <Badge variant="emerald" className="min-w-fit w-fit font-normal">
                             <Microscope size={16} />
                             {tool?.title}
