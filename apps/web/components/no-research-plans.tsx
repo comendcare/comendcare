@@ -26,7 +26,7 @@ export function PrivateNoResearchPlansRow() {
                     {`No research plans yet!`}
                 </h1>
                 <p className="text-lg text-stone-500">
-                    {`Your organization does not have any research plans yet.`}
+                    {`Your organization does not have any public research plans yet.`}
                 </p>
             </div>
         </div>
@@ -54,7 +54,7 @@ export function PrivateNoResearchPlansColumn() {
                 className="hidden dark:block"
             />
             <p className="text-lg text-stone-500">
-                {`Your organization does not have any research plans yet. Create one to get started.`}
+                {`Your organization does not have any public research plans yet. Create one to get started.`}
             </p>
             <Link href="/app/research-plan" className={cn(buttonVariants({ variant: "cta" }))}>
                 <Plus />
@@ -83,7 +83,7 @@ export function PublicNoResearchPlans({organizationName}: {organizationName?: st
                 className="hidden dark:block"
             />
             <p className="text-lg text-stone-500">
-                {organizationName ? `${organizationName} doesn't have any research plans yet.`: `This organization doesn't have any research plans yet.`}
+                {organizationName ? `${organizationName} doesn't have any public research plans yet.`: `This organization doesn't have any public research plans yet.`}
             </p>
         </div>
     )
