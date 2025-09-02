@@ -13,12 +13,6 @@ import {motion} from "framer-motion"
 
 const features = [
     {
-        name: "Toolkits.",
-        description:
-            "Streamline requests and inventory for your biosamples, datasets, and more.",
-        icon: Lock,
-    },
-    {
         name: "Attract biopharma.",
         description:
             "Opt-in for us to highlight opportunities in your disease area to industry.",

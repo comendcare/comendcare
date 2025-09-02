@@ -5,6 +5,8 @@ import marketplace from "@/public/screenshots/marketplace.png"
 import {motion} from "framer-motion"
 import {NumberTicker} from "@/packages/components/ui/number-ticker";
 import {cn} from "@/packages/lib/utils";
+import {useRouter} from "next/navigation";
+import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 
 const features = [
     {
@@ -22,6 +24,8 @@ const features = [
 ];
 
 export default function FeatureResearchMarketplace() {
+    const router = useRouter()
+
     return (
         <motion.section
             initial={{opacity: 0, y: 50}}
@@ -93,13 +97,19 @@ export default function FeatureResearchMarketplace() {
                         >
                             <div className="flex items-center gap-2">
                                 <p className="text-3xl font-bold text-neutral-700 dark:text-neutral-200">
-                                    <NumberTicker value={2001}/>
+                                    <NumberTicker value={2000}/>
                                 </p>
                             </div>
                             <p className="mt-4 text-balance text-base text-neutral-600 dark:text-neutral-300">
                                 {`Service providers and counting`}
                             </p>
                         </motion.div>
+                        <PulsatingButton
+                            className="w-fit"
+                            onClick={() => router.push("/marketplace")}
+                        >
+                            View public marketplace
+                        </PulsatingButton>
                     </div>
                 </div>
             </div>
