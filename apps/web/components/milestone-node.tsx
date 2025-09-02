@@ -219,7 +219,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                     <span className="text-emerald-900 text-nowrap">Linked Tools</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {props.data?.biosamples.map(({biosample}) => {
+                                    {(props.data?.biosamples || []).map(({biosample}) => {
                                         const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                                         return (
                                             <Badge variant="violet">
@@ -227,7 +227,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                             </Badge>
                                         )
                                     })}
-                                    {props.data?.diseaseModels.map(({diseaseModel}) => {
+                                    {(props.data?.diseaseModels || []).map(({diseaseModel}) => {
                                         const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                                         return (
                                             <Badge variant="yellow">
@@ -235,7 +235,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                             </Badge>
                                         )
                                     })}
-                                    {props.data?.tools.map(({tool}) => (
+                                    {(props.data?.tools || []).map(({tool}) => (
                                         <Badge variant="emerald">
                                             {tool?.title}
                                         </Badge>
