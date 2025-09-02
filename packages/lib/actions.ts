@@ -1779,7 +1779,7 @@ export const createRequestComment = withAuth(
                         select: {
                             id: true,
                             title: true,
-                            organization: { select: { id: true, name: true, image: true } },
+                            organization: { select: { id: true, name: true, image: true, subdomain: true } },
                         },
                     },
                     author: { select: { id: true, name: true } },
@@ -1805,6 +1805,7 @@ export const createRequestComment = withAuth(
                     commentId: comment.id,
                     orgId: comment.materialAndDataAccessRequest.organization.id,
                     orgName: comment.materialAndDataAccessRequest.organization.name,
+                    orgSubdomain: comment.materialAndDataAccessRequest.organization.subdomain,
                     orgImage: comment.materialAndDataAccessRequest.organization.image,
                     userId: comment.author.id,
                     userName: comment.author.name ?? session.user.name,
@@ -2643,6 +2644,7 @@ export const createBiosample = withOrganizationAuth(
                         biosampleId: response.id,
                         orgId: organization.id,
                         orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
                         orgImage: organization.image,
                         title: response.description || `Biosample ${response.id}`,
                         private: false,
@@ -2845,6 +2847,7 @@ export const updateBiosample = withOrganizationAuth(
                         toolId: newBiosample.id,
                         orgId: organization.id,
                         orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
                         orgImage: organization.image,
                         title: newBiosample.description || `Biosample ${newBiosample.id}`,
                         private: false,
@@ -3447,6 +3450,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         rfpId: response.id,
                         title,
                         orgId,
+                        orgSubdomain: organization.subdomain,
                         orgName,
                         orgImage: organization.image,
                         startDate,
@@ -3475,6 +3479,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         rfpId: response.id,
                         orgId,
                         orgImage: organization.image,
+                        orgSubdomain: organization.subdomain,
                         title,
                         deadline: endDate ?? undefined,
                         userId: actor?.userId,
@@ -3502,6 +3507,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         payload: {
                             rfpId: response.id,
                             orgImage: organization.image,
+                            orgSubdomain: organization.subdomain,
                             orgId,
                             title,
                             deadline: endDate,
@@ -3579,6 +3585,7 @@ export const createRoadmap = withOrganizationAuth(
                     // mapper expects these:
                     orgId: organization.id,
                     orgName: organization.name ?? finalRoadmap?.organization?.name,
+                    orgSubdomain: organization.subdomain,
                     orgImage: organization.image,
                     roadmapId: roadmap.id,
                     title: finalRoadmap?.title ?? roadmapTemplate?.title,
@@ -3997,6 +4004,7 @@ export const createNodes = withOrganizationAuth(
         try {
             const updatedNodes: any[] = []
             const createdPublicProjects: Array<{
+                researchPlanId: string;
                 projectId: string;
                 title?: string;
                 startDate?: Date | string | null;
@@ -4080,7 +4088,7 @@ export const createNodes = withOrganizationAuth(
                     const m = n.data; // Milestone
                     if (m?.nodeType === "PROJECT" && m?.private === false) {
                         createdPublicProjects.push({
-                            researchPlanId: m.roadmapId,
+                            researchPlanId: roadmapId,
                             projectId: m.id,
                             title: m.title,
                             startDate: m.startDate ?? null,
@@ -4141,6 +4149,7 @@ export const createNodes = withOrganizationAuth(
                     externalId,
                     occurredAt: new Date(),
                     payload: {
+                        researchPlanId: roadmapId,
                         orgId: organizationId,
                         orgName: organization.name,
                         orgSubdomain: organization.subdomain,
@@ -4506,13 +4515,15 @@ export const updateMilestones = withOrganizationAuth(
                 const orgId = publishedProjects[0].orgId!;
                 let orgName: string | undefined = undefined;
                 let orgImage: string | undefined = undefined;
+                let orgSubdomain: string | undefined = undefined;
                 try {
                     const org = await prisma.organization.findUnique({
                         where: { id: orgId },
-                        select: { name: true, image: true },
+                        select: { name: true, image: true, subdomain: true },
                     });
                     orgName = org?.name ?? undefined;
                     orgImage = org?.image ?? undefined;
+                    orgSubdomain = org?.subdomain ?? undefined;
                 } catch {}
 
                 await writeRawEvent({
@@ -4523,6 +4534,7 @@ export const updateMilestones = withOrganizationAuth(
                     payload: {
                         orgId,
                         orgName,
+                        orgSubdomain,
                         orgImage,
                         projects: publishedProjects,
                         userId: session?.user.id,
@@ -5665,7 +5677,7 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
         try {
             const request = await prisma.materialAndDataAccessRequest.create({
                 include: {
-                    organization: { select: { id: true, name: true, image: true} },
+                    organization: { select: { id: true, name: true, image: true, subdomain: true} },
                     researcher: { select: { id: true } },
                 },
                 data: {
@@ -5724,6 +5736,7 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
                     title: request.title,
                     orgId: request.organization?.id ?? organizationId,
                     orgName: request.organization?.name,
+                    orgSubdomain: request.organization?.subdomain,
                     orgImage: request.organization?.image,
                     researcherId: request.researcher?.id!, // created via connect, should exist
                     userId: session.user.id,
@@ -5820,6 +5833,7 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
                         title: updatedRequest.title,
                         orgId: updatedRequest.organizationId,
                         orgName: updatedRequest.organization?.name,
+                        orgSubdomain: updatedRequest.organization?.subdomain,
                         orgImage: updatedRequest.organization?.image,
                         approverUserId: session.user.id,
                         approverUserName: session.user.name,

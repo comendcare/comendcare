@@ -120,7 +120,7 @@ export default function ProjectUpdatedCard({ data }: Props) {
 
                 <CardFooter className="flex justify-end p-4 pt-0">
                     {items.length === 1 ? (
-                        <Link href={items[0]?.projectId ? `/app/research-plan/${p.researchPlanId}?project=${items[0].projectId}` : "#"} passHref>
+                        <Link href={items[0]?.projectId ? `/app/research-plan/${items[0]?.researchPlanId}?project=${items[0].projectId}` : "#"} passHref>
                             <Button
                                 size="sm"
                                 variant="outline"
