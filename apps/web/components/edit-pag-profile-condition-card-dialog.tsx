@@ -69,11 +69,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
                             disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
-                            associatedConditions:
-                                (condition.associatedConditions ?? []).map((c: any) => ({
-                                    label: c.name,
-                                    value: c.slug,
-                                })),
+                            // associatedConditions:
+                            //     (condition.associatedConditions ?? []).map((c: any) => ({
+                            //         label: c.name,
+                            //         value: c.slug,
+                            //     })),
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
                             causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
@@ -133,7 +133,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             const mappedData: Record<string, any> = {
                 name: values.disorder?.[0]?.label || "",
-                associatedConditions: (values.associatedConditions ?? []).map(o => o.value),
+                // associatedConditions: (values.associatedConditions ?? []).map(o => o.value),
                 summary: values.summary ?? "",
                 diseaseCategories: (values.categories ?? []).map(i => i.label),
                 prevalenceNumerator: numOrNull(values.prevalenceNumerator),
@@ -307,7 +307,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     )}
                                 />
 
-                                <FormField
+                                {/* <FormField
                                     control={editResearchForm.control}
                                     name="associatedConditions"
                                     render={({ field }) => (
@@ -330,7 +330,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <FormMessage />
                                         </FormItem>
                                     )}
-                                />
+                                /> */}
 
                                 <FormField
                                     control={editResearchForm.control}
