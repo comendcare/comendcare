@@ -1,6 +1,6 @@
 "use client"
 
-import {useCallback, useEffect, useMemo, useState} from "react"
+import {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {Funnel, SearchIcon, X} from "lucide-react"
 import {cn} from "@comend/lib/utils"
 import {useShallow} from "zustand/react/shallow"
@@ -79,6 +79,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
             setSearchTerm: state.setSearchTerm
         }))
     )
+    const dialogRef = useRef<HTMLDivElement>(null)
 
     const [query, setQuery] = useState(searchTerm)
 
@@ -267,11 +268,17 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                             <Funnel />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent
+                        ref={dialogRef}
+                        onOpenAutoFocus={(e) => {
+                            e.preventDefault() // prevent focusing the first input
+                            dialogRef.current?.focus() // focus the dialog content instead
+                        }}
+                    >
                         <DialogTitle>Clinical Dataset Filters</DialogTitle>
                         {/* Conditions */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Condition</Label>
+                            <Label>Condition</Label>
                             <MultipleSelector
                                 value={filters.conditions ?? []}
                                 onChange={(vals) => setFilterKey("conditions", vals)}
@@ -289,7 +296,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Genes */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Gene</Label>
+                            <Label>Gene</Label>
                             <MultipleSelector
                                 value={filters.genes ?? []}
                                 onChange={(vals) => setFilterKey("genes", vals)}
@@ -307,7 +314,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Clinical Dataset Types */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Clinical Dataset Types</Label>
+                            <Label>Clinical Dataset Types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}
@@ -324,7 +331,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Patient Group */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Organization</Label>
+                            <Label>Organization</Label>
                             <MultipleSelector
                                 value={filters.organizations ?? []}
                                 onChange={(vals) => setFilterKey("organizations", vals)}

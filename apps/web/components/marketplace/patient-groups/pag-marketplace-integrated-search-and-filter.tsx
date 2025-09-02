@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Funnel, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { debounce } from "lodash";
@@ -104,6 +104,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
             setSearchTerm: state.setSearchTerm
         }))
     )
+    const dialogRef = useRef<HTMLDivElement>(null)
 
 
     const [query, setQuery] = useState(searchTerm);
@@ -284,11 +285,17 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                             <Funnel />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent
+                        ref={dialogRef}
+                        onOpenAutoFocus={(e) => {
+                            e.preventDefault() // prevent focusing the first input
+                            dialogRef.current?.focus() // focus the dialog content instead
+                        }}
+                    >
                         <DialogTitle>Patient Group Filters</DialogTitle>
                             {/* Conditions */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">Condition</Label>
+                                <Label>Condition</Label>
                                 <MultipleSelector
                                     value={filters.conditions ?? []}
                                     onChange={(vals) => setFilterKey("conditions", vals)}
@@ -306,7 +313,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Genes */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">Gene</Label>
+                                <Label>Gene</Label>
                                 <MultipleSelector
                                     value={filters.genes ?? []}
                                     onChange={(vals) => setFilterKey("genes", vals)}
@@ -324,7 +331,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Mechanisms of action */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">
+                                <Label>
                                     Mechanisms of Action
                                 </Label>
                                 <MultipleSelector
@@ -345,7 +352,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Associated systems */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">
+                                <Label>
                                     Associated Systems
                                 </Label>
                                 <MultipleSelector
@@ -365,7 +372,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Modalities */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">
+                                <Label>
                                     Modalities of Interest
                                 </Label>
                                 <MultipleSelector
