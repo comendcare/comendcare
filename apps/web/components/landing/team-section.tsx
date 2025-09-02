@@ -360,7 +360,7 @@ const cards = [
         content: () => {
             return (
                 <p>
-                    {``}
+                    {`Lauren Chaby, PhD is a mission-driven neuroscientist and rare disease data innovator with experience in platform design, biotech engagement, and translational research. Her leadership bridges science, strategy, and equity to deliver measurable impact across the healthcare ecosystem.`}
                 </p>
             )
         }
