@@ -1033,6 +1033,41 @@ export const getAssets = withOrganizationAuth(
     }
 )
 
+export const getRFP = withOrganizationAuth(
+    async (
+        organization: Organization,
+        id: string,
+        select: Prisma.RFPSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }> 
+    ) => {
+        try {
+            const rfp = await prisma?.rFP.findUnique({
+                where: {id},
+                select: {
+                    ...select,
+                    ...(select.milestones ? {milestones: {include: {milestone: true}}} : undefined)
+                },
+            })
+
+            if (!rfp) {
+                return {success: false, error: "RFP not found"}
+            }
+
+            return {
+                success: true,
+                data: rfp
+            }
+        } catch (error: any) {
+            logError("Error fetching RFP", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const getRFPs = withOrganizationAuth(
     async (
         organization: Organization,

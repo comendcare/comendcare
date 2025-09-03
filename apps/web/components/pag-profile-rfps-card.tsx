@@ -48,7 +48,7 @@ export const PAGProfileRFPsHoverableCard = ({ rfps, isPrivate }: { rfps: any[], 
                                     {rfps.map((rfp, index) => (
                                     <CarouselItem key={index}>
                                         <div className="h-full p-1">
-                                            <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
+                                            {/* <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
                                                 <DialogTrigger className="w-full max-w-full h-full" onClick={() => {
                                                     mixpanelTrack("RFP Details Viewed", {
                                                         "ID": rfp.id,
@@ -67,7 +67,12 @@ export const PAGProfileRFPsHoverableCard = ({ rfps, isPrivate }: { rfps: any[], 
                                                 <DialogContent className="overflow-hidden">
                                                     <RFPDetails rfp={rfp} />
                                                 </DialogContent>
-                                            </Dialog>
+                                            </Dialog> */}
+                                            <Link
+                                                href={`/app/rfps/${rfp.id}`}
+                                            >
+                                                <RFPCard rfp={rfp} /> 
+                                            </Link>
                                         </div>
                                     </CarouselItem>
                                     ))}
