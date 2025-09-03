@@ -131,8 +131,8 @@ const unifiedSchema = z.object({
     orgImage: z.string().optional(),
 
     // RESEARCH / CONDITION
-    disorder: z.array(optionSchema),
-    associatedConditions: z.array(optionSchema),
+    disorder: z.array(optionSchema).optional(),
+    // associatedConditions: z.array(optionSchema),
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),
@@ -162,16 +162,16 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
     const disorderLabel = normalized(vals.disorder?.[0]?.label);
     if (!disorderLabel) return;
 
-    const hasSelf = (vals.associatedConditions || [])
-        .some(opt => normalized(opt?.label) === disorderLabel);
+    // const hasSelf = (vals.associatedConditions || [])
+    //     .some(opt => normalized(opt?.label) === disorderLabel);
 
-    if (hasSelf) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["associatedConditions"],
-            message: "A condition cannot be associated with itself."
-        });
-    }
+    // if (hasSelf) {
+    //     ctx.addIssue({
+    //         code: z.ZodIssueCode.custom,
+    //         path: ["associatedConditions"],
+    //         message: "A condition cannot be associated with itself."
+    //     });
+    // }
 });
 
 /**************************************
@@ -199,7 +199,7 @@ export default function CreateNewOrganizationPage() {
         mode: "onChange",
         resolver: zodResolver(refinedSchema),
         defaultValues: {
-            name: "",
+            name: session?.user?.name || "",
             notificationSettings: true,
             consentSettings: true,
             isNewOrganization: true,
@@ -427,7 +427,7 @@ export default function CreateNewOrganizationPage() {
                 const cfd = new FormData();
                 const conditionData = {
                     name: values.disorder?.[0]?.label || "",
-                    associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
+                    // associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
                     summary: values.summary || "",
                     diseaseCategories: values.categories?.map((c) => c.label).join(",") || "",
                     prevalenceNumerator: values.prevalenceNumerator || "",
@@ -879,7 +879,7 @@ export default function CreateNewOrganizationPage() {
                                         )}
                                     />
 
-                                    <FormField
+                                    {/* <FormField
                                         control={form.control}
                                         name="associatedConditions"
                                         render={({field}) => (
@@ -901,7 +901,7 @@ export default function CreateNewOrganizationPage() {
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
-                                    />
+                                    /> */}
 
                                     <FormField control={form.control} name="summary" render={({field}) => (
                                         <FormItem>
