@@ -351,7 +351,7 @@ export function EditDiseaseModelToolForm({
                         control={form.control}
                         name="genotype"
                         render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Genotype`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
@@ -372,7 +372,7 @@ export function EditDiseaseModelToolForm({
                         control={form.control}
                         name="phenotype"
                         render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Phenotype`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
@@ -393,7 +393,7 @@ export function EditDiseaseModelToolForm({
                         control={form.control}
                         name="patientId"
                         render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
@@ -415,7 +415,7 @@ export function EditDiseaseModelToolForm({
                         name="institutions"
                         render={({field}) => (
                             // <FormItem className="w-full flex gap-4 items-center">
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">Storage Facility</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
