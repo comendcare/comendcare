@@ -1,6 +1,6 @@
 import { RFP } from "@prisma/client";
 import { Separator } from "@comend/components/ui/separator";
-import { Clock, DollarSign, Megaphone } from "lucide-react";
+import { Check, Clock, DollarSign, Megaphone } from "lucide-react";
 import { Badge } from "@comend/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { ProfilePhoto } from "@comend/components/profile-photo";
@@ -97,7 +97,8 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
                             </CardHeader>
                             <CardContent>
                                 <div>
-                                    <p className="text-xl"><DollarSign className="inline-block"/> {rfp.budget}</p>
+                                    <p className="text-2xl font-bold text-green-800">{`$ ${rfp.budget}`}</p>
+                                    <p className="text-muted-foreground text-sm">Available funding for selected proposals</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -106,34 +107,34 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
                             <CardHeader>
                                 <CardTitle>Deadlines</CardTitle>
                             </CardHeader>
-                            {/* <CardContent className="flex flex-col gap-4">
-                                <div className="flex gap-2 items-center">
-                                    <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name}/>
-                                    <div>
-                                        <p>{rfp.organization.name}</p>
-                                    </div>
+                            <CardContent>
+                                <div className="flex flex-col gap-2">
+                                    <p className="text-lg">{`Opens: ${rfp?.startDate?.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}`}</p>
+                                    <p className="text-lg">{`Due: ${rfp?.endDate?.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}`}</p>
                                 </div>
-                                <Button variant="secondary" className="w-full">
-                                    Visit Profile
-                                </Button>
-                            </CardContent> */}
+                            </CardContent>
                         </Card>
 
                         <Card className="w-full">
                             <CardHeader>
                                 <CardTitle>Open To</CardTitle>
                             </CardHeader>
-                            {/* <CardContent className="flex flex-col gap-4">
-                                <div className="flex gap-2 items-center">
-                                    <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name}/>
-                                    <div>
-                                        <p>{rfp.organization.name}</p>
-                                    </div>
+                            <CardContent>
+                                <div className="flex flex-col gap-2">
+                                    {rfp.openTo.includes('CRO') && (
+                                        <div className="text-lg flex gap-2 items-center">
+                                            <div className="bg-green-100 rounded-full p-1 font-semibold"><Check className="text-green-800 h-5 w-5 font-semibold"/></div>
+                                            Service Providers
+                                        </div>
+                                    )}
+                                    {rfp.openTo.includes('ACADEMIC') && (
+                                        <div className="text-lg flex gap-2 items-center">
+                                            <div className="bg-green-100 rounded-full p-1 font-semibold"><Check className="text-green-800 h-5 w-5 font-semibold"/></div>
+                                            Researchers
+                                        </div>
+                                    )}
                                 </div>
-                                <Button variant="secondary" className="w-full">
-                                    Visit Profile
-                                </Button>
-                            </CardContent> */}
+                            </CardContent>
                         </Card>
                     </div>
                     <Card className="w-full">
@@ -170,7 +171,7 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
                         </CardContent> */}
                     </Card>
                 </div>
-                <div className="flex flex-col max-w-md">
+                <div className="flex flex-col gap-4 max-w-md">
                     <Card className="w-full">
                         <CardHeader>
                             <CardTitle>Organization</CardTitle>
