@@ -241,25 +241,34 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                         onClick={() => router.push("/login")}
                         variant="ghost"
                     >
-                        Sign in
+                        Log in
                     </Button>
-                    <PulsatingButton
+                    {/*<PulsatingButton*/}
+                    {/*    className="w-fit"*/}
+                    {/*    onClick={() => {*/}
+                    {/*        if (pathname === "/") {*/}
+                    {/*            // If we're on the landing page, scroll to the bottom*/}
+                    {/*            window.scrollTo({*/}
+                    {/*                top: document.documentElement.scrollHeight,*/}
+                    {/*                behavior: 'smooth'*/}
+                    {/*            });*/}
+                    {/*        } else {*/}
+                    {/*            // Otherwise, redirect to the landing page with the anchor*/}
+                    {/*            router.push("/contact");*/}
+                    {/*        }*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    Sign up*/}
+                    {/*</PulsatingButton>*/}
+                    <Button
+                        variant="cta"
                         className="w-fit"
-                        onClick={() => {
-                            if (pathname === "/") {
-                                // If we're on the landing page, scroll to the bottom
-                                window.scrollTo({
-                                    top: document.documentElement.scrollHeight,
-                                    behavior: 'smooth'
-                                });
-                            } else {
-                                // Otherwise, redirect to the landing page with the anchor
-                                router.push("/contact");
-                            }
-                        }}
+                        asChild
                     >
-                        Contact us
-                    </PulsatingButton>
+                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                            Sign up
+                        </Link>
+                    </Button>
                 </div>
             }
 

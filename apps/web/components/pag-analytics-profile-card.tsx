@@ -60,7 +60,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                         <div className="flex items-center gap-2">
                             <Earth className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
-                                Patient population
+                                Patients engaged
                             </span>
                             <Button
                                 onClick={() => router.push("/app/profile")}
@@ -72,8 +72,8 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                             </Button>
                         </div>
                         <div className="text-lg font-bold">
-                            {organization.conditions?.[0].condition?.globalEstimatedPopulation
-                                ? formatNumberWithCommas(organization.conditions[0].condition.globalEstimatedPopulation.toString())
+                            {organization.conditions?.[0].condition?.numberOfPatientsEngaged
+                                ? formatNumberWithCommas(organization.conditions[0].condition.numberOfPatientsEngaged.toString())
                                 : "--"}
                         </div>
                     </div>

@@ -26,7 +26,7 @@ interface Content {
 }
 
 interface Props {
-    data: { id: string; title: string; content: Content; orgId?: string; createdAt: string | Date };
+    data: { id: string; title: string; content: Content; orgId?: string; orgSubdomain: string; createdAt: string | Date };
 }
 
 export default function ServiceProviderCreatedCard({ data }: Props) {
@@ -35,6 +35,7 @@ export default function ServiceProviderCreatedCard({ data }: Props) {
 
     // SUBJECT: Organization
     const orgName = data.content.organization?.name ?? "Organization";
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
 
@@ -42,7 +43,7 @@ export default function ServiceProviderCreatedCard({ data }: Props) {
 
     const displayTitle = data.title || `New service provider: ${data.content.title}`;
 
-    const companyHref = data.content.companyId ? `/companies/${data.content.companyId}` : "#";
+    const companyHref = data.content.companyId ? `/app/service-providers/${data.content.companyId}` : "#";
     const siteHref = data.content.url || "#";
     const hasSite = Boolean(data.content.url);
 
@@ -56,8 +57,8 @@ export default function ServiceProviderCreatedCard({ data }: Props) {
                             {/* Organization avatar/logo */}
                             <ProfilePhoto img={orgImage} name={orgName} className="h-8 w-8 rounded-full" />
                             <div className="flex flex-col">
-                                {orgId ? (
-                                    <Link href={`/org/${orgId}`} className="font-medium md:text-base underline-offset-2 hover:underline">
+                                {orgSubdomain ? (
+                                    <Link href={`/app/organization/${orgSubdomain}`} className="font-medium md:text-base underline-offset-2 hover:underline">
                                         {orgName}
                                     </Link>
                                 ) : (

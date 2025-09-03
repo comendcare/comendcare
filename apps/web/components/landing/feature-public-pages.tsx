@@ -2,7 +2,7 @@
 
 import {Lock, Megaphone} from "lucide-react";
 import Image from "next/image"
-import publicProfile from "@/public/screenshots/public-profile.png"
+import publicProfile from "@/public/screenshots/profile.png"
 import fb from "@/public/logos/fb.svg"
 import x from "@/public/logos/x.svg"
 import insta from "@/public/logos/insta.svg"
@@ -12,12 +12,6 @@ import whatsapp from "@/public/logos/whatsapp.svg"
 import {motion} from "framer-motion"
 
 const features = [
-    {
-        name: "Toolkits.",
-        description:
-            "Streamline requests and inventory for your biosamples, datasets, and more.",
-        icon: Lock,
-    },
     {
         name: "Attract biopharma.",
         description:
@@ -62,55 +56,55 @@ export default function FeaturePublicPages() {
                                 ))}
                             </dl>
                         </div>
-                        <div className="lg:mt-10 mt-20 flex flex-col">
-                            <div className="flex items-center justify-start">
-                                <Image
-                                    src={insta}
-                                    alt="insta"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[7deg] mb-[24px]"
-                                />
-                                <Image
-                                    src={x}
-                                    alt="x"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={fb}
-                                    alt="facebook"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[12deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={linkedin}
-                                    alt="linkedin"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={whatsapp}
-                                    alt="whatsapp"
-                                    width="48"
-                                    height="48"
-                                    className="rotate-[10deg] ml-[-7px] mb-[24px]"
-                                />
-                                <Image
-                                    src={gmail}
-                                    alt="gmail"
-                                    width="50"
-                                    height="50"
-                                    className="rotate-[-10deg] ml-[-7px] mb-[24px]"
-                                />
-                            </div>
-                            <p className="text-balance text-base text-neutral-600 dark:text-neutral-300">
-                                {`Easily share on social media`}
-                            </p>
-                        </div>
+                        {/*<div className="lg:mt-10 mt-20 flex flex-col">*/}
+                        {/*    <div className="flex items-center justify-start">*/}
+                        {/*        <Image*/}
+                        {/*            src={insta}*/}
+                        {/*            alt="insta"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[7deg] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={x}*/}
+                        {/*            alt="x"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[-10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={fb}*/}
+                        {/*            alt="facebook"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[12deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={linkedin}*/}
+                        {/*            alt="linkedin"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[-10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={whatsapp}*/}
+                        {/*            alt="whatsapp"*/}
+                        {/*            width="48"*/}
+                        {/*            height="48"*/}
+                        {/*            className="rotate-[10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*        <Image*/}
+                        {/*            src={gmail}*/}
+                        {/*            alt="gmail"*/}
+                        {/*            width="50"*/}
+                        {/*            height="50"*/}
+                        {/*            className="rotate-[-10deg] ml-[-7px] mb-[24px]"*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*    <p className="text-balance text-base text-neutral-600 dark:text-neutral-300">*/}
+                        {/*        {`Easily share on social media`}*/}
+                        {/*    </p>*/}
+                        {/*</div>*/}
                     </div>
                     <div className="block sm:hidden overflow-x-auto -mx-6 sm:mx-0">
                         <div className="w-[48rem] sm:w-[57rem] md:ml-0">

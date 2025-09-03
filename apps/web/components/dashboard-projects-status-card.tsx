@@ -28,7 +28,7 @@ import {useRouter} from "next/navigation";
 
 const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
-    INPROGRESS: "In Progress",
+    INPROGRESS: "In progress",
     COMPLETED: "Completed",
 }
 
@@ -104,7 +104,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
         <Card className="col-span-3 flex flex-col">
             <CardHeader className="items-start pb-0">
                 <CardTitle className="flex flex-row items-center justify-start gap-x-2">
-                    Project Status Overview
+                    Project overview
                     <Button
                         onClick={() => router.push("/app/research-plan")}
                         variant="ghost"

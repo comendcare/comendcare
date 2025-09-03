@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Institution" ALTER COLUMN "rorId" DROP NOT NULL,
+ALTER COLUMN "status" DROP NOT NULL,
+ALTER COLUMN "gridAll" DROP NOT NULL;

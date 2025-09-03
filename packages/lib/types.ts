@@ -73,6 +73,7 @@ export interface FeedItemDTO {
     externalUrl?: string | null;
     createdAt: string; // ISO from API
     orgId?: string | null;
+    orgSubdomain?: string | null;
     userId?: string | null;
 }
 
@@ -1273,6 +1274,13 @@ export const MODALITIES: Option[] = [
     },
     {
         id: '13',
+        label: 'Drug Repurposing',
+        value: 'DRUG_REPURPOSING',
+        description: 'The process of identifying and developing existing drugs for new therapeutic uses beyond their original medical indication.',
+        strengths: 'Faster and less costly development compared to novel drugs, existing safety data reduces risk, and potential to quickly address unmet medical needs.',
+    },
+    {
+        id: '14',
         label: 'Other',
         value: 'OTHER',
         description: 'Any additional or emerging therapeutic approaches not covered in the predefined categories.',
@@ -1968,6 +1976,7 @@ export const editBiosampleForm = z.object({
 
     // donor properties
     donorId: z.string().optional(),
+    internalDonorId: z.string().optional(),
     donor: z.array(optionSchema).optional(),
     donorInternalId: z.string().optional(),
     age: z.string().optional(),
@@ -2002,7 +2011,10 @@ export const editDiseaseModelForm = z.object({
         .min(1, "Type is required")
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
     isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
 
     // disease model properties
     genes: z.array(optionSchema).optional(),

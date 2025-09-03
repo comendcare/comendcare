@@ -1,6 +1,6 @@
 "use client"
 
-import {useCallback, useEffect, useMemo, useState} from "react"
+import {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {Funnel, SearchIcon, X} from "lucide-react"
 import {cn} from "@comend/lib/utils"
 import {useShallow} from "zustand/react/shallow"
@@ -79,6 +79,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
             setSearchTerm: state.setSearchTerm
         }))
     )
+    const dialogRef = useRef<HTMLDivElement>(null)
 
     const [query, setQuery] = useState(searchTerm)
 
@@ -176,6 +177,23 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
         }
     };
 
+    const handleAsyncOrganizationSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/organizations?search=${query}`, {
+                method: 'GET'
+            });
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
@@ -250,11 +268,17 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                             <Funnel />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent
+                        ref={dialogRef}
+                        onOpenAutoFocus={(e) => {
+                            e.preventDefault() // prevent focusing the first input
+                            dialogRef.current?.focus() // focus the dialog content instead
+                        }}
+                    >
                         <DialogTitle>Biosample Filters</DialogTitle>
                         {/* Conditions */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Condition</Label>
+                            <Label>Condition</Label>
                             <MultipleSelector
                                 value={filters.conditions ?? []}
                                 onChange={(vals) => setFilterKey("conditions", vals)}
@@ -272,7 +296,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Genes */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Gene</Label>
+                            <Label>Gene</Label>
                             <MultipleSelector
                                 value={filters.genes ?? []}
                                 onChange={(vals) => setFilterKey("genes", vals)}
@@ -290,7 +314,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         
                         {/* Biosample Types */}
                         <div>
-                            <Label className="text-base font-semibold text-gray-900">Biosample Types</Label>
+                            <Label>Biosample Types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}
@@ -298,6 +322,24 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                                 placeholder="Select types..."
                                 hidePlaceholderWhenSelected
                                 commandProps={{className: "bg-transparent"}}
+                                emptyIndicator={
+                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                }
+                                showHoverCard={false}
+                            />
+                        </div>
+
+                        {/* Patient Group */}
+                        <div>
+                            <Label>Organization</Label>
+                            <MultipleSelector
+                                value={filters.organizations ?? []}
+                                onChange={(vals) => setFilterKey("organizations", vals)}
+                                onSearch={handleAsyncOrganizationSearch}
+                                placeholder="Select organizations..."
+                                hidePlaceholderWhenSelected
+                                commandProps={{className: "bg-transparent"}}
+                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading organizations...</p>}
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }

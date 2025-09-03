@@ -555,6 +555,14 @@ export const syncToTypesense = async (env: {
                     optional: false
                 },
                 {
+                    name: "title",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
                     name: "description",
                     type: "string",
                     index: true,
@@ -672,6 +680,7 @@ export const syncToTypesense = async (env: {
             },
             select: {
                 id: true,
+                title: true,
                 description: true,
                 organization: {include: {conditions: {include: {condition: true}}}},
                 gene: true,
@@ -801,6 +810,7 @@ export const syncToTypesense = async (env: {
         if (clinicalDatasets.length > 0) {
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
                 id: dataset.id,
+                title: dataset.title,
                 description: dataset.description,
                 // types: dataset.types,
                 types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),

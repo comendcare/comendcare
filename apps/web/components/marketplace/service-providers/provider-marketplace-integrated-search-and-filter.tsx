@@ -1,6 +1,6 @@
 "use client"
 
-import {useCallback, useEffect, useMemo, useState} from "react"
+import {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {Funnel, SearchIcon, X} from "lucide-react"
 import {cn} from "@comend/lib/utils"
 import {useShallow} from "zustand/react/shallow"
@@ -40,6 +40,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
             totalResults: state.totalResults,
         }))
     )
+    const dialogRef = useRef<HTMLDivElement>(null)
 
     const [query, setQuery] = useState(searchTerm)
 
@@ -166,11 +167,17 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                             <Funnel />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent
+                        ref={dialogRef}
+                        onOpenAutoFocus={(e) => {
+                            e.preventDefault() // prevent focusing the first input
+                            dialogRef.current?.focus() // focus the dialog content instead
+                        }}
+                    >
                         <DialogTitle>Service Provider Filters</DialogTitle>
                             {/* Project Types */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">Project Types</Label>
+                                <Label>Project Types</Label>
                                 <MultipleSelector
                                     value={filters.milestoneTypes}
                                     onChange={(vals) => setFilterKey("milestoneTypes", vals)}
@@ -186,7 +193,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Business Types */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">Business Types</Label>
+                                <Label>Business Types</Label>
                                 <MultipleSelector
                                     value={filters.types}
                                     onChange={(vals) => setFilterKey("types", vals)}
@@ -202,7 +209,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Certifications */}
                             <div>
-                                <Label className="text-base font-semibold text-gray-900">Certifications</Label>
+                                <Label>Certifications</Label>
                                 <MultipleSelector
                                     value={filters.certifications}
                                     onChange={(vals) => setFilterKey("certifications", vals)}

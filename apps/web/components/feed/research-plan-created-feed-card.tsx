@@ -32,6 +32,7 @@ interface ResearchPlanCreatedProps {
         title: string;
         content: ResearchPlanCreatedContent;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -41,6 +42,7 @@ export default function ResearchPlanCreatedCard({ data }: ResearchPlanCreatedPro
 
     const actorName = data.content.actor?.name ?? "Someone";
     const orgName = data.content.organization?.name ?? "Organization";
+    const orgSubdomain = data.orgSubdomain;
     const orgId = data.content.organization?.id ?? data.orgId;
     const orgImage = data.content.organization?.image ?? data.content.organization?.logo;
 
@@ -50,7 +52,7 @@ export default function ResearchPlanCreatedCard({ data }: ResearchPlanCreatedPro
     const displayTitle = data.content.title || data.title;
     const isPublished = data.content.published === true;
 
-    const planHref = data.content.roadmapId ? `/app/roadmap/${data.content.roadmapId}` : "#";
+    const planHref = data.content.roadmapId ? `/app/research-plan/${data.content.roadmapId}` : "#";
 
     return (
         <MotionConfig transition={{ duration: 0.3 }}>
@@ -64,9 +66,9 @@ export default function ResearchPlanCreatedCard({ data }: ResearchPlanCreatedPro
 
                             {/* Organization name to the right of the image */}
                             <div className="flex flex-col">
-                                {orgId ? (
+                                {orgSubdomain ? (
                                     <Link
-                                        href={`/org/${orgId}`}
+                                        href={`/app/organization/${orgSubdomain}`}
                                         className="font-medium md:text-base underline-offset-2 hover:underline"
                                     >
                                         {orgName}

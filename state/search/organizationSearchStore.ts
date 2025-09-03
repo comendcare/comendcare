@@ -183,7 +183,8 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
 export interface OrganizationSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => void,
+    initState: (filters: FiltersType) => Promise<void>,
+    featuredOrgs: any[],
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
@@ -205,9 +206,34 @@ export interface OrganizationSearchState {
 export const useOrganizationSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: FiltersType) => {
-                set({initialized: true, filters})
+            initState: async (filters: FiltersType) => {
+                // temporarily set featured orgs for global genes!
+                const ids = 
+                    process.env.NEXT_PUBLIC_NODE_ENV === 'production' 
+                        ? [
+                            'cm6f847kk0000g1r3mkm3zh62', // AGSAA
+                            'cmdrkqiqv0000w45azqlanvcd', // CDLS
+                            'cm6quxnmv00007qh34myx7zr7', // Rory Belle Foundation
+                            // ADD PROJECT 8P WHEN THEY'VE CREATED THEIR ACCOUNT
+                        ]
+                        : [
+                            'cmd3i7su6000fmgom1v8umgfk' // arcadion is first in preview & development environments, for testing purposes
+                        ]
+                console.log(`IDS`, ids)
+                const prismaResponse = await fetch('/api/organizations', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ids}),
+                });
+                console.log(`prisma response`, prismaResponse)
+                const prismaResults = await prismaResponse.json();
+
+                console.log(`featured orgs`, prismaResults)
+                const featuredOrgs = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
+                set({initialized: true, filters, featuredOrgs})
             },
+            featuredOrgs: [],
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const {results: newSearchResults, total} = await getUpdatedSearchResults({

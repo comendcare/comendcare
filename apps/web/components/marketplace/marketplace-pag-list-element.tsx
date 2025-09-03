@@ -4,7 +4,7 @@ import { Badge } from "@comend/components/ui/badge";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Building2, HandCoins, Calendar } from "lucide-react";
 
-export function OrganizationMarketplaceListElement({ organization }: { organization: any }) {
+export function OrganizationMarketplaceListElement({ organization, isPublic = false }: { organization: any, isPublic?: boolean }) {
     return (
         <Link
             href={

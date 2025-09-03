@@ -5,6 +5,8 @@ import logoDrive from "@/public/logos/affiliations/Drive.jpg"
 import logoNextAI from "@/public/logos/affiliations/NextAI.png"
 import logoOpenTreatments from "@/public/logos/affiliations/Open Treatments.png"
 import logoOdylia from "@/public/logos/affiliations/Odylia.png"
+import logoPharmStars from "@/public/logos/affiliations/pharmstars.png"
+import logoProject8p from "@/public/logos/affiliations/project8p.png"
 import Image from "next/image"
 import React from "react"
 
@@ -41,15 +43,15 @@ export function PartneredWithLogoCloud() {
         {
             name: "Odylia",
             src: logoOdylia
-        }
-        // {
-        //     name: "OUAG",
-        //     src: logoOUAG,
-        // },
-        // {
-        //     name: "WABS",
-        //     src: logoWABS,
-        // },
+        },
+        {
+            name: "PharmStars",
+            src: logoPharmStars,
+        },
+        {
+            name: "Project8p",
+            src: logoProject8p,
+        },
     ]
 
     return (

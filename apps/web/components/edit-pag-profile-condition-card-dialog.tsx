@@ -69,6 +69,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
                             disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
+                            // associatedConditions:
+                            //     (condition.associatedConditions ?? []).map((c: any) => ({
+                            //         label: c.name,
+                            //         value: c.slug,
+                            //     })),
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
                             causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
@@ -128,6 +133,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             const mappedData: Record<string, any> = {
                 name: values.disorder?.[0]?.label || "",
+                // associatedConditions: (values.associatedConditions ?? []).map(o => o.value),
                 summary: values.summary ?? "",
                 diseaseCategories: (values.categories ?? []).map(i => i.label),
                 prevalenceNumerator: numOrNull(values.prevalenceNumerator),
@@ -300,6 +306,31 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                         </FormItem>
                                     )}
                                 />
+
+                                {/* <FormField
+                                    control={editResearchForm.control}
+                                    name="associatedConditions"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Associated conditions</FormLabel>
+                                            <FormDescription>Select any related conditions.</FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    creatable
+                                                    maxSelected={5}
+                                                    onSearch={handleConditionAsyncSearch}
+                                                    placeholder="Search for conditions..."
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Loading conditions...</p>}
+                                                    emptyIndicator={<p>No conditions found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                /> */}
 
                                 <FormField
                                     control={editResearchForm.control}

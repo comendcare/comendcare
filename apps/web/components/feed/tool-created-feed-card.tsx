@@ -38,6 +38,7 @@ interface ToolCreatedProps {
         title: string; // legacy/event title
         content: ToolCreatedContent;
         orgId?: string;
+        orgSubdomain?: string;
         createdAt: string | Date;
     };
 }
@@ -53,8 +54,8 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
     // Subject = organization (name, id, image)
     const orgName =
         data.content.organization?.name ?? "Organization";
-    const orgId =
-        data.content.organization?.id ?? data.orgId;
+    const orgId = data.content.organization?.id ?? data.orgId;
+    const orgSubdomain = data.orgSubdomain;
     const orgImage = data.content.organization?.image;
 
     // Action is a title in the Card body (feed-style)
@@ -79,9 +80,9 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
                                 className="h-8 w-8 rounded-full"
                             />
                             <div className="flex flex-col">
-                                {orgId ? (
+                                {orgSubdomain ? (
                                     <Link
-                                        href={`/org/${orgId}`}
+                                        href={`/app/organization/${orgSubdomain}`}
                                         className="font-medium md:text-base underline-offset-2 hover:underline"
                                     >
                                         {orgName}
@@ -138,15 +139,15 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
                 <CardFooter className="flex justify-end p-4 pt-0">
                     <div className="flex gap-2">
                         <Link
-                            href={orgId ? `/org/${orgId}` : "#"}
-                            aria-disabled={!orgId}
+                            href={orgSubdomain ? `/app/organization/${orgSubdomain}` : "#"}
+                            aria-disabled={!orgSubdomain}
                             passHref
                         >
                             <Button
                                 size="sm"
                                 variant="outline"
                                 disabled={!orgId}
-                                title={orgId ? "View Organization" : "No organization link available"}
+                                title={orgSubdomain ? "View Organization" : "No organization link available"}
                             >
                                 <FileText className="h-4 w-4" />
                                 View Organization
@@ -154,7 +155,7 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
                         </Link>
 
                         <Link
-                            href={data.content.toolId ? `/app/tool/${data.content.toolId}` : "#"}
+                            href={data.content.toolId ? `/app/tools/biosample` : "#"}
                             aria-disabled={!data.content.toolId}
                             passHref
                         >

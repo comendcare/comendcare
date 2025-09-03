@@ -4,57 +4,57 @@ import {formatMoney, truncate} from "@comend/lib/utils";
 import {Badge} from "@comend/components/ui/badge";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
-import {FileText, HandCoins, Megaphone, Microscope, Users} from "lucide-react";
+import {FileText, HandCoins, Megaphone, MegaphoneIcon, Microscope, MicroscopeIcon, Users, Workflow} from "lucide-react";
 import React from "react";
 import { PropertyBadge } from "../property-badge";
 import SaveOrganizationDialog from "../save-organization-dialog";
 
 type NodeTypeCount = Record<string, number>;
 
-function countPublicNodeTypes(data: { nodeType: string; private: boolean }[]): NodeTypeCount {
-    return data
-        .filter(item => !item.private) // Filter out private milestones
-        .reduce((acc: NodeTypeCount, item) => {
-            const type = item.nodeType;
-            acc[type] = (acc[type] || 0) + 1;
-            return acc;
-        }, {});
-}
-
 export function OrganizationMarketplaceCard({organization, isPublic}: { organization: any, isPublic: boolean }) {
-    const {subdomain, image, name, description, moneyDeployed, condition} = organization;
-    const orgCondition = condition?.[0]?.condition || {};
-    const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
+    const {subdomain, image, name, description, moneyDeployed, conditions, therapeuticsOfInterest} = organization
+    const orgCondition = conditions?.[0]?.condition || {}
+    const {associatedGenes = [], causalGenes = [], numberOfPatientsEngaged} = orgCondition
 
-    const nodeTypeCount = countPublicNodeTypes(organization.milestones)
-    // const nodeTypeCount = {
-    //     "PROJECT": (organization.Milestone || []).filter((item: any) => !item.private).length,
-    //     "ASSET": (organization.Asset || []).filter((item: any) => !item.private).length,
-    //     "RFP": (organization.RFP || []).filter((item: any) => !item.private).length
-    // }
-
-    const nodeTypeLabels = [
-        {key: "ASSET", icon: Microscope, label: "Tool"},
-        {key: "RFP", icon: Megaphone, label: "RFP"},
-        {key: "PROJECT", icon: FileText, label: "Project"}
-    ];
+    const numPlans = organization.roadmaps?.length || 0
+    const numProjects = organization.milestones?.length || 0
+    const numTools = (organization.tools?.length || 0) + (organization.biosamples?.length || 0) + (organization.diseaseModels?.length || 0)
+    const numRFPs = organization.rfps?.length || 0
 
     return (
         <Link
+            // href={
+            //     process.env.NEXT_PUBLIC_VERCEL_ENV
+            //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+            //         : `http://localhost:3000/app/organization/${subdomain}`
+            // }
             href={
-                process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-                    : `http://localhost:3000/app/organization/${subdomain}`
+                isPublic
+                    ? process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                        : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
                 <CardHeader className="gap-2">
                     <div className="flex justify-between">
                         <Link
+                            // href={
+                            //     process.env.NEXT_PUBLIC_VERCEL_ENV
+                            //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                            //         : `http://localhost:3000/app/organization/${subdomain}`
+                            // }
                             href={
-                                process.env.NEXT_PUBLIC_VERCEL_ENV
-                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-                                    : `http://localhost:3000/app/organization/${subdomain}`
+                                isPublic
+                                    ? process.env.NEXT_PUBLIC_VERCEL_ENV
+                                        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                        : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : process.env.NEXT_PUBLIC_VERCEL_ENV
+                                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                                        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
                             }
                         >
                             <CardTitle className="text-xl flex flex-row gap-2 items-center">
@@ -86,22 +86,41 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                         </CardDescription>
                     )}
                 </CardHeader>
-                {Object.keys(nodeTypeCount).length > 0 && (
+                {(numPlans > 0 || numProjects > 0 || numTools > 0 || numRFPs > 0) && (
                     <CardContent className="flex flex-col items-start justify-center">
-                        <div className="flex w-full gap-4">
-                            {nodeTypeLabels
-                                .filter(({ key }) => nodeTypeCount[key])
-                                .map(({ key, icon: Icon, label }, index) => {
-                                    const count = nodeTypeCount[key];
-                                    return (
-                                        <PropertyBadge key={key} icon={Icon}>
-                                            <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
-                                                <div className="text-sm">{count}</div>{label}
-                                                {count > 1 ? "s" : ""}
-                                            </span>
-                                        </PropertyBadge>
-                                    );
-                                })}
+                        <div className="flex flex-wrap w-full gap-4">
+                            {numPlans > 0 && (
+                                <PropertyBadge icon={Workflow}>
+                                    <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
+                                        <div className="text-sm">{numPlans}</div>
+                                        {numPlans > 1 ? "Plans" : "Plan"}
+                                    </span>
+                                </PropertyBadge>
+                            )}
+                            {numProjects > 0 && (
+                                <PropertyBadge icon={FileText}>
+                                    <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
+                                        <div className="text-sm">{numProjects}</div>
+                                        {numProjects > 1 ? "Projects" : "Project"}
+                                    </span>
+                                </PropertyBadge>
+                            )}
+                            {numTools > 0 && (
+                                <PropertyBadge icon={MicroscopeIcon}>
+                                    <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
+                                        <div className="text-sm">{numTools}</div>
+                                        {numTools > 1 ? "Tools" : "Tool"}
+                                    </span>
+                                </PropertyBadge>
+                            )}
+                            {numRFPs > 0 && (
+                                <PropertyBadge icon={MegaphoneIcon}>
+                                    <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
+                                        <div className="text-sm">{numRFPs}</div>
+                                        {numRFPs > 1 ? "RFPs" : "RFP"}
+                                    </span>
+                                </PropertyBadge>
+                            )}
                         </div>
                     </CardContent>
                 )}
@@ -112,8 +131,13 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                             <h2 className="text-base font-semibold">
                                 {orgCondition.name}
                             </h2>
-                            {associatedGenes.length > 0 && (
+                            {(associatedGenes.length > 0 || causalGenes.length > 0) && (
                                 <span className="w-full flex flex-row gap-2 flex-wrap">
+                                    {causalGenes.map((gene: string, index: number) => (
+                                        <Badge key={index} className="text-xs flex">
+                                            {gene}
+                                        </Badge>
+                                    ))}
                                     {associatedGenes.map((gene: string, index: number) => (
                                         <Badge key={index} className="text-xs flex">
                                             {gene}

@@ -6,33 +6,41 @@ import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-da
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
+import { Button } from "@/packages/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
+import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
 import { Separator } from "@/packages/components/ui/separator"
 import { Skeleton } from "@/packages/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
+import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 import { useEffect } from "react"
 import { useShallow } from "zustand/react/shallow"
-import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
+import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
+    featuredOrgs: state.featuredOrgs,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
@@ -57,16 +65,23 @@ export default function MarketplacePage() {
     return (
         <main className="w-full h-full flex flex-col gap-10">
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Patient Groups</h2>
-                    <a href="/marketplace/patient-groups" className="justify-self-end self-end underline text-right">See all patient groups</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/patient-groups"}
+                        >
+                            Browse all patient groups
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {(organizationStore.searchResults && organizationStore.searchResults.length > 0 )
+                    {([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0 )
                         ? (
                             <>
-                                {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
-                                    <OrganizationMarketplaceListElement organization={organization} key={index}/>
+                                {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
+                                    <OrganizationMarketplaceCard organization={organization} key={index} isPublic={true}/>
                                 ))}
                             </>
                         )
@@ -82,9 +97,16 @@ export default function MarketplacePage() {
             </div>
     
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Biosamples</h2>
-                    <a href="/marketplace/biosamples" className="justify-self-end self-end underline text-right">See all biosamples</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/biosamples"}
+                        >
+                            Browse all biosamples
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full">
                     {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
@@ -96,18 +118,45 @@ export default function MarketplacePage() {
                             </>
                         )
                         : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
+                            biosampleStore.initialized 
+                                ? (
+                                    <Card className="h-[286px] w-full">
+                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                            <CardTitle>Sign up to upload biosamples!</CardTitle>
+                                            {/* <CardDescription>Want to add biosamples? Please sign up to add biosamples to the marketplace.</CardDescription> */}
+                                            <Button
+                                                className="w-fit"
+                                                asChild
+                                            >
+                                                {/* <Link href={"/#contact"}> */}
+                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                                    Sign up
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
+                                : (
+                                    <>
+                                        <Skeleton className="h-[286px] w-full"/>
+                                    </>
+                                )
                         )
                     }
                 </ol>
             </div>
 
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Disease Models</h2>
-                    <a href="/marketplace/disease-models" className="justify-self-end self-end underline text-right">See all disease models</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/disease-models"}
+                        >
+                            Browse all disease models
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full">
                     {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
@@ -119,18 +168,45 @@ export default function MarketplacePage() {
                             </>
                         )
                         : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
+                            diseaseModelStore.initialized 
+                                ? (
+                                    <Card className="h-[286px] w-full">
+                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                            <CardTitle>Sign up to upload disease models!</CardTitle>
+                                            {/* <CardDescription>Want to add disease models? Please sign up to add disease models to the marketplace.</CardDescription> */}
+                                            <Button
+                                                className="w-fit"
+                                                asChild
+                                            >
+                                                {/* <Link href={"/#contact"}> */}
+                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                                    Sign up
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
+                                : (
+                                    <>
+                                        <Skeleton className="h-[286px] w-full"/>
+                                    </>
+                                )
                         )
                     }
                 </ol>
             </div>
 
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Clinical Datasets</h2>
-                    <a href="/marketplace/biosamples" className="justify-self-end self-end underline text-right">See all clinical datasets</a>
+                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Link
+                            href={"/marketplace/clinical-datasets"}
+                        >
+                            Browse all clinical datasets
+                            <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
                 <ol className="w-full">
                     {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
@@ -142,9 +218,29 @@ export default function MarketplacePage() {
                             </>
                         )
                         : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
+                            clinicalDatasetStore.initialized 
+                                ? (
+                                    <Card className="h-[286px] w-full">
+                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                            <CardTitle>Sign up to upload clinical datasets!</CardTitle>
+                                            {/* <CardDescription>Want to add clinical datasets? Please sign up to add clinical datasets to the marketplace.</CardDescription> */}
+                                            <Button
+                                                className="w-fit"
+                                                asChild
+                                            >
+                                                {/* <Link href={"/#contact"}> */}
+                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                                    Sign up
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )
+                                : (
+                                    <>
+                                        <Skeleton className="h-[286px] w-full"/>
+                                    </>
+                                )
                         )
                     }
                 </ol>

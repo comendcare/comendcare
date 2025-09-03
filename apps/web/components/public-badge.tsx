@@ -12,7 +12,7 @@ export function PublicBadge({ className = "", iconOnly = false }: { className?: 
                 <TooltipContent className="max-w-80 text-wrap text-left">
                     <p className={cn(className, "text-normal")}>
                         {/* {`Visible on your profile and discoverable in the marketplace.`} */}
-                        {`Public projects are visible on your profile and discoverable in the marketplace.`}
+                        {`Published projects are visible on your profile and discoverable in the marketplace.`}
                     </p>
                 </TooltipContent>
             </Tooltip>
@@ -22,7 +22,7 @@ export function PublicBadge({ className = "", iconOnly = false }: { className?: 
     return(
         <p className={cn(className, "mt-0 inline-flex items-center gap-x-2 text-sm")}>
             <Globe className="h-4 w-4"/>
-            {!iconOnly && `Public`}
+            {!iconOnly && `Published`}
         </p>
     )
 }

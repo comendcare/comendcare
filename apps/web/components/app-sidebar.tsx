@@ -58,13 +58,13 @@ const data = {
             url: "/app/dashboard",
             subPages: []
         },
-        // {
-        //     title: "Feed",
-        //     icon: Newspaper,
-        //     variant: "ghost",
-        //     url: "/app/feed",
-        //     subPages: []
-        // },
+        {
+            title: "Feed",
+            icon: Newspaper,
+            variant: "ghost",
+            url: "/app/feed",
+            subPages: []
+        },
         {
             title: "Marketplace",
             icon: Store,

@@ -282,63 +282,6 @@ export default function CreateNewOrganizationPage() {
                     setOrganizations(opts);
                 }
 
-                // If already has an org, preload some org fields
-                if (session?.user?.organizationId) {
-                    const oRes = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                        id: true,
-                        name: true,
-                        description: true,
-                        subdomain: true,
-                        website: true,
-                        contactEmail: true,
-                        yearFounded: true,
-                        therapeuticsInDevelopment: true,
-                        therapeuticsOfInterest: true,
-                        // incorporationStatus: true,
-                        image: true,
-                        members: true,
-                        metadata: true,
-                    } as any);
-                    if (oRes.success && oRes.data) {
-                        const org = oRes.data as any;
-                        const currentUserMember = org.members?.find((m: any) => m.userId === session?.user?.id);
-                        const currentUserTitle = currentUserMember?.title || "";
-
-                        form.reset({
-                            ...form.getValues(),
-                            isNewOrganization: false, // assume they may want to update existing
-                            orgName: org.name || "",
-                            description: org.description || "",
-                            subdomain: org.subdomain || "",
-                            website: org.website || "",
-                            contactEmail: org.contactEmail || "",
-                            title: currentUserTitle,
-                            founded: org.yearFounded ? `${org.yearFounded}-01-01` : undefined,
-                            therapeuticsInDevelopment: org.therapeuticsInDevelopment?.map((x: string) => ({
-                                label: x,
-                                value: x
-                            })),
-                            otherTherapeuticsInDevelopment: typeof org?.metadata === "object" ? (org.metadata as any)?.otherTherapeuticsInDevelopment : undefined,
-                            therapeuticsOfInterest: org.therapeuticsOfInterest?.map((x: string) => ({
-                                label: x,
-                                value: x
-                            })),
-                            otherTherapeuticsOfInterest: typeof org?.metadata === "object" ? (org.metadata as any)?.otherTherapeuticsOfInterest : undefined,
-                            // incorporationStatus: org.incorporationStatus,
-                            orgImage: org.image || "",
-                        });
-
-                        if (org.image) {
-                            try {
-                                const of: File = await getPublicFile(org.image);
-                                const withPreview = Object.assign(of, {preview: URL.createObjectURL(of)});
-                                setSelectedOrgFile(withPreview);
-                            } catch (e) {
-                                console.error(e);
-                            }
-                        }
-                    }
-                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -558,7 +501,7 @@ export default function CreateNewOrganizationPage() {
 
     if (status === "loading" || isInitializing) {
         return (
-            <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto">
+            <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8">
                 <Skeleton className="h-[20px] w-full"/>
                 <Skeleton className="h-[32px] w-full"/>
                 <Skeleton className="mt-4 h-[80px] w-full"/>
@@ -588,92 +531,6 @@ export default function CreateNewOrganizationPage() {
                         console.log(e);
                         toast.error("Please fix the highlighted errors.");
                     })} className="space-y-10">
-                        {/* USER */}
-                        <section className="space-y-6">
-                            <h2 className="text-xl font-semibold">Your profile</h2>
-
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Your full name (required)</FormLabel>
-                                        <FormControl><Input type="text" {...field} /></FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="notificationSettings"
-                                    render={({field}) => (
-                                        <FormItem
-                                            className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                            <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
-                                            </FormControl>
-                                            <div className="space-y-1 leading-none">
-                                                <FormLabel>Allow platform updates & notifications</FormLabel>
-                                                <FormDescription>You can change this later in
-                                                    settings.</FormDescription>
-                                            </div>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="consentSettings"
-                                    render={({field}) => (
-                                        <FormItem
-                                            className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                            <FormControl>
-                                                <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
-                                            </FormControl>
-                                            <div className="space-y-1 leading-none">
-                                                <FormLabel>I consent to data collection to improve Comend</FormLabel>
-                                                <FormDescription>Analytics preferences can be updated
-                                                    anytime.</FormDescription>
-                                            </div>
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            {/* User image picker */}
-                            <FormField
-                                control={form.control}
-                                name="userImage"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Profile photo</FormLabel>
-                                        <div {...userDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
-                                            <input {...userDropzone.getInputProps()} />
-                                            {selectedUserFile ? (
-                                                <div className="flex items-center space-x-4">
-                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                    <img src={(selectedUserFile as any).preview} alt="preview"
-                                                         className="h-16 w-16 rounded-full object-cover"/>
-                                                    <span>Click to replace</span>
-                                                </div>
-                                            ) : (
-                                                <p>Drag & drop or click to upload</p>
-                                            )}
-                                        </div>
-                                        <FormDescription className="text-xs">PNG/JPG only (no SVG).</FormDescription>
-                                        {/*<FormControl>*/}
-                                        {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
-                                        {/*</FormControl>*/}
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                        </section>
-
-                        <Separator/>
-
                         {/* ORGANIZATION */}
                         <section className="space-y-6">
                             <h2 className="text-xl font-semibold">Organization</h2>

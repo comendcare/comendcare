@@ -6,12 +6,17 @@ import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-da
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
+import { Button } from "@/packages/components/ui/button"
+import { Card, CardContent, CardDescription, CardTitle } from "@/packages/components/ui/card"
+import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
 import { Skeleton } from "@/packages/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
+import { ArrowRight } from "lucide-react"
+import Link from "next/link"
 import { useEffect } from "react"
 import { useShallow } from "zustand/react/shallow"
 import { CROMarketplaceCard } from "~web/components/marketplace/marketplace-cro-card"
@@ -24,21 +29,25 @@ const croSelector = (state: CROSearchState) => ({
 })
 
 const organizationSelector = (state: OrganizationSearchState) => ({
+    featuredOrgs: state.featuredOrgs,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
+    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
@@ -66,9 +75,16 @@ export default function MarketplacePage() {
         <div className="flex flex-col w-full px-4 h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Service Providers</h2>
-                        <a href="/app/marketplace/service-providers" className="justify-self-end self-end underline">See all service providers...</a>
+                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/service-providers"}
+                            >
+                                Browse all service providers
+                                <ArrowRight />
+                            </Link>
+                        </Button>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(croStore.searchResults && croStore.searchResults.length > 0 )
@@ -91,15 +107,22 @@ export default function MarketplacePage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient Groups</h2>
-                        <a href="/app/marketplace/patient-groups" className="justify-self-end self-end underline">See all patient groups...</a>
+                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/patient-groups"}
+                            >
+                                Browse all patient groups
+                                <ArrowRight />
+                            </Link>
+                        </Button>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(organizationStore.searchResults && organizationStore.searchResults.length > 0 )
+                        {([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0 )
                             ? (
                                 <>
-                                    {organizationStore.searchResults?.slice(0, 3).map((organization, index) => (
+                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
                                         <OrganizationMarketplaceCard organization={organization} key={index} isPublic={false} />
                                     ))}
                                 </>
@@ -121,9 +144,16 @@ export default function MarketplacePage() {
                 </div> */}
         
                 <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Biosamples</h2>
-                        <a href="/app/marketplace/biosamples" className="justify-self-end self-end underline">See all biosamples...</a>
+                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/biosamples"}
+                            >
+                                Browse all biosamples
+                                <ArrowRight />
+                            </Link>
+                        </Button>
                     </div>
                     <ol className="w-full">
                         {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
@@ -135,18 +165,46 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
+                                biosampleStore.initialized 
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add biosamples in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/biosample"}>
+                                                        Biosamples Toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
                             )
                         }
                     </ol>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Disease Models</h2>
-                        <a href="/app/marketplace/disease-models" className="justify-self-end self-end underline">See all disease models...</a>
+                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/disease-models"}
+                            >
+                                Browse all disease models
+                                <ArrowRight />
+                            </Link>
+                        </Button>
                     </div>
                     <ol className="w-full">
                         {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
@@ -158,18 +216,46 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
+                                diseaseModelStore.initialized 
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add disease models in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add disease models in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/disease-models"}>
+                                                        Disease Models Toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
                             )
                         }
                     </ol>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Clinical Datasets</h2>
-                        <a href="/app/marketplace/biosamples" className="justify-self-end self-end underline">See all clinical datasets...</a>
+                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/clinical-datasets"}
+                            >
+                                Browse all clinical datasets
+                                <ArrowRight />
+                            </Link>
+                        </Button>
                     </div>
                     <ol className="w-full">
                         {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
@@ -181,9 +267,30 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                </>
+                                clinicalDatasetStore.initialized 
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add clinical dataset in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add clinical datasets in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/data"}>
+                                                        Clinical Datasets Toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
                             )
                         }
                     </ol>
