@@ -199,7 +199,7 @@ export default function CreateNewOrganizationPage() {
         mode: "onChange",
         resolver: zodResolver(refinedSchema),
         defaultValues: {
-            name: session?.user.name || "",
+            name: session?.user?.name || "",
             notificationSettings: true,
             consentSettings: true,
             isNewOrganization: true,
