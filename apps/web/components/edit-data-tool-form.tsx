@@ -355,7 +355,7 @@ export function EditDataToolForm({
                         control={form.control}
                         name="cohortSize"
                         render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Cohort Size`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="-mt-2 w-full">
@@ -404,7 +404,7 @@ export function EditDataToolForm({
                         name="variant"
                         render={({field}) => (
                             // <FormItem className="w-full flex gap-4 items-center">
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
@@ -425,7 +425,7 @@ export function EditDataToolForm({
                         control={form.control}
                         name="institutions"
                         render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">Storage Facility</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
@@ -453,7 +453,7 @@ export function EditDataToolForm({
                         control={form.control}
                         name="patientId"
                         render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center", process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "hidden": "")}>
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
