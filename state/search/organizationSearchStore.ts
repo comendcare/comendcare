@@ -263,7 +263,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     totalResults: total,
                 })
             },
-            sortBy: "recently-updated",
+            sortBy: "alphabetical",
             setSortBy: async (sortBy: string | undefined) => {
                 const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
