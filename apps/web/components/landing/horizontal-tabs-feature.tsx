@@ -5,9 +5,9 @@ import Image, { type ImageProps } from 'next/image'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import clsx from 'clsx'
 
-import marketplace from "@/public/screenshots/marketplace.png"
-import publicProfile from "@/public/screenshots/public-profile.png"
-import researchPlanner from "@/public/screenshots/research-planner.png"
+import preclinicalTookit from "@/public/screenshots/pre-clinical toolkit.png"
+import projects from "@/public/screenshots/projects.png"
+import rfps from "@/public/screenshots/RFPs.png"
 
 interface Feature {
     name: React.ReactNode
@@ -23,7 +23,7 @@ const features: Array<Feature> = [
         summary: 'Indicate your therapeutic goals and map out your projects.',
         description:
             'Toggle project privacy levels, try our research plan templates, and get project development recommendations',
-        image: researchPlanner,
+        image: projects,
         icon: function ReportingIcon() {
             let id = useId()
             return (
@@ -58,7 +58,7 @@ const features: Array<Feature> = [
             'Streamline discovery and access for research tools.',
         description:
             'Upload information about existing patient biosamples, disease models, and clinical datasets and easily handle inquiries.',
-        image: publicProfile,
+        image: preclinicalTookit,
         icon: function InventoryIcon() {
             return (
                 <>
@@ -86,7 +86,7 @@ const features: Array<Feature> = [
             'Broadcast research opportunities in your disease area.',
         description:
             'We help you create a targeted list of academics and service providers for your project requests and streamline your evaluation process.',
-        image: marketplace,
+        image: rfps,
         icon: function ContactsIcon() {
             return (
                 <>
@@ -217,9 +217,9 @@ function FeaturesDesktop() {
                                     style={{ transform: `translateX(-${selectedIndex * 100}%)` }}
                                     aria-hidden={featureIndex !== selectedIndex}
                                 >
-                                    <div className="min-w-[calc(100vh-136px)] overflow-hidden rounded-xl bg-white shadow-lg ring-1 shadow-slate-900/5 ring-slate-500/10">
+                                    <div className="min-w-[calc(100vw-272px)] overflow-hidden rounded-xl bg-white shadow-lg ring-1 shadow-slate-900/5 ring-slate-500/10">
                                         <Image
-                                            className="w-full"
+                                            className="min-w-[calc(100vw-272px)]"
                                             src={feature.image}
                                             alt=""
                                             // sizes="52.75rem"

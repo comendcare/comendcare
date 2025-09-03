@@ -2,7 +2,7 @@
 
 import {Lock, Megaphone} from "lucide-react";
 import Image from "next/image"
-import publicProfile from "@/public/screenshots/public-profile.png"
+import publicProfile from "@/public/screenshots/profile.png"
 import fb from "@/public/logos/fb.svg"
 import x from "@/public/logos/x.svg"
 import insta from "@/public/logos/insta.svg"
@@ -12,12 +12,6 @@ import whatsapp from "@/public/logos/whatsapp.svg"
 import {motion} from "framer-motion"
 
 const features = [
-    {
-        name: "Toolkits.",
-        description:
-            "Streamline requests and inventory for your biosamples, datasets, and more.",
-        icon: Lock,
-    },
     {
         name: "Attract biopharma.",
         description:

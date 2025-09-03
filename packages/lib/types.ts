@@ -1274,6 +1274,13 @@ export const MODALITIES: Option[] = [
     },
     {
         id: '13',
+        label: 'Drug Repurposing',
+        value: 'DRUG_REPURPOSING',
+        description: 'The process of identifying and developing existing drugs for new therapeutic uses beyond their original medical indication.',
+        strengths: 'Faster and less costly development compared to novel drugs, existing safety data reduces risk, and potential to quickly address unmet medical needs.',
+    },
+    {
+        id: '14',
         label: 'Other',
         value: 'OTHER',
         description: 'Any additional or emerging therapeutic approaches not covered in the predefined categories.',
