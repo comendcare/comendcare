@@ -10,58 +10,58 @@ import { cn, formatMoney } from "@comend/lib/utils";
 import { RFPActionsMenu } from "./rfp-actions-menu";
 import { Badge } from "@/packages/components/ui/badge";
 
-export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean}) => {
-    type DateStatus =
-        | { status: 'Not Open'; daysRemaining: number | undefined; variant: 'yellow' }
-        | { status: 'Open'; daysRemaining: number | undefined; variant: 'green' }
-        | { status: 'Closed'; daysRemaining: number | undefined; variant: 'red' }
-        | undefined;
+export type DateStatus =
+    | { status: 'Not Open'; daysRemaining: number | undefined; variant: 'yellow' }
+    | { status: 'Open'; daysRemaining: number | undefined; variant: 'green' }
+    | { status: 'Closed'; daysRemaining: number | undefined; variant: 'red' }
+    | undefined;
 
-    function checkDateRange(startDateStr?: string, endDateStr?: string): DateStatus {
-        // If both dates are undefined, return undefined
-        if (!startDateStr && !endDateStr) return undefined;
+export function checkDateRange(startDateStr?: string, endDateStr?: string): DateStatus {
+    // If both dates are undefined, return undefined
+    if (!startDateStr && !endDateStr) return undefined;
 
-        const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        const startDate = startDateStr ? new Date(startDateStr) : undefined;
-        const endDate = endDateStr ? new Date(endDateStr) : undefined;
+    const startDate = startDateStr ? new Date(startDateStr) : undefined;
+    const endDate = endDateStr ? new Date(endDateStr) : undefined;
 
-        // Check for invalid dates
-        if ((startDate && isNaN(startDate.getTime())) || (endDate && isNaN(endDate.getTime()))) {
-            return undefined;
-        }
-
-        // Normalize dates for day-level comparison
-        const start = startDate
-            ? new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-            : undefined;
-        const end = endDate
-            ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
-            : undefined;
-
-        // If before start date
-        if (start && today < start) {
-            return { status: 'Not Open', daysRemaining: undefined, variant: 'yellow' };
-        }
-
-        // If after end date
-        if (end && today > end) {
-            return { status: 'Closed', daysRemaining: undefined, variant: 'red' };
-        }
-
-        // If within range (start <= today <= end)
-        if ((!start || today >= start) && (!end || today <= end)) {
-            const daysRemaining = end
-            ? Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-            : 0;
-            return { status: 'Open', daysRemaining, variant: 'green' };
-        }
-
-        // Fallback
+    // Check for invalid dates
+    if ((startDate && isNaN(startDate.getTime())) || (endDate && isNaN(endDate.getTime()))) {
         return undefined;
     }
 
+    // Normalize dates for day-level comparison
+    const start = startDate
+        ? new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+        : undefined;
+    const end = endDate
+        ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
+        : undefined;
+
+    // If before start date
+    if (start && today < start) {
+        return { status: 'Not Open', daysRemaining: undefined, variant: 'yellow' };
+    }
+
+    // If after end date
+    if (end && today > end) {
+        return { status: 'Closed', daysRemaining: undefined, variant: 'red' };
+    }
+
+    // If within range (start <= today <= end)
+    if ((!start || today >= start) && (!end || today <= end)) {
+        const daysRemaining = end
+        ? Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+        return { status: 'Open', daysRemaining, variant: 'green' };
+    }
+
+    // Fallback
+    return undefined;
+}
+
+export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean}) => {
     const status = checkDateRange(rfp.startDate, rfp.endDate)
 
     return (

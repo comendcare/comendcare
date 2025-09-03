@@ -31,7 +31,7 @@ export default async function ResearchPlanLayout({params}: {params: { id: string
     }
 
     return (
-        <main className="h-full w-full max-w-7xl">
+        <main className="h-full w-full">
             <RFPPage rfp={rfp} />
         </main>
     )
