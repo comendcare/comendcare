@@ -1,10 +1,11 @@
-import { RFP } from "@prisma/client";
+import { ExternalAttachment, RFP } from "@prisma/client";
 import { Separator } from "@comend/components/ui/separator";
-import { Check, Clock, DollarSign, Megaphone } from "lucide-react";
+import { Check, Clock, DollarSign, Link2, Megaphone, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@comend/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Button } from "@comend/components/ui/button";
+import Link from "next/link";
 
 export type DateStatus =
     | { status: 'Not Open'; daysRemaining: number | undefined; variant: 'yellow' }
@@ -68,17 +69,17 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
 
     return (
         <div className="flex flex-col items-center">
-            <div className="p-8 flex flex-col gap-4 max-w-7xl">
+            <div className="p-8 flex flex-col gap-4 max-w-7xl w-full">
                 <span className="flex gap-4 items-center w-full">
                     <div className="p-2 bg-primary/10 rounded-lg">
                     <Megaphone className="h-6 w-6 text-primary" />
                     </div>
-                    <h1 className="text-2xl font-semibold">
+                    <h1 className="text-4xl font-semibold">
                         {rfp.title || 'Untitled RFP'}
                     </h1>
                     {status && <Badge variant={status.variant} className="text-sm">{status.status}</Badge>}
                 </span>
-                <p className="-mt-4 pl-14 text-muted-foreground">{rfp.description}</p>
+                {/* <p className="-mt-4 pl-14 text-muted-foreground">{rfp.description}</p> */}
 
                 {status?.daysRemaining !== undefined && (
                     <Badge variant={"green"} className="w-full font-normal flex gap-2">
@@ -88,9 +89,9 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
                 )}
             </div>
             <Separator className="mb-4"/>
-            <div className="p-8 w-full max-w-7xl flex gap-4">
+            <div className="p-8 w-full max-w-7xl flex flex-col md:flex-row gap-4">
                 <div className="flex flex-col gap-4 w-full">
-                    <div className="w-full flex gap-4">
+                    <div className="w-full flex flex-col md:flex-row gap-4">
                         <Card className="w-full">
                             <CardHeader>
                                 <CardTitle>Awards</CardTitle>
@@ -105,12 +106,18 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
 
                         <Card className="w-full">
                             <CardHeader>
-                                <CardTitle>Deadlines</CardTitle>
+                                <CardTitle>Timeline</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="flex flex-col gap-2">
-                                    <p className="text-lg">{`Opens: ${rfp?.startDate?.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}`}</p>
-                                    <p className="text-lg">{`Due: ${rfp?.endDate?.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}`}</p>
+                                    <div>
+                                        <p className="text-muted-foreground">Request Opens</p>
+                                        <p className="text-xl">{`${rfp?.startDate?.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}`}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-muted-foreground">Deadline for Proposals</p>
+                                        <p className="text-xl">{`${rfp?.endDate?.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}`}</p>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -139,7 +146,75 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
                     </div>
                     <Card className="w-full">
                         <CardHeader>
+                            <CardTitle>Scope</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <>
+                                <p>{rfp.description}</p>
+                            </>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full">
+                        <CardHeader>
+                            <CardTitle>Eligibility</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <>
+                                <p>{rfp.description}</p>
+                            </>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full">
+                        <CardHeader>
+                            <CardTitle>Instructions</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <>
+                                <p>{rfp.description}</p>
+                            </>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full">
+                        <CardHeader>
+                            <CardTitle>Selection Process</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <>
+                                <p>{rfp.description}</p>
+                            </>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full">
+                        <CardHeader>
                             <CardTitle>Links</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <>
+                                {rfp.attachments?.map((attachment: ExternalAttachment) => (
+                                    <div className="flex justify-between items-center gap-4 p-4 border border-solid border-gray-200 rounded-md">
+                                        <div className="flex gap-4 items-center">
+                                            <LinkIcon />
+                                            <div>
+                                                <p className="text-lg">{attachment.name}</p>
+                                                <p className="text-muted-foreground">{attachment.link}</p>
+                                            </div>
+                                        </div>
+                                        <Button asChild variant={'secondary'}>
+                                            <Link href={attachment.link}>View Link</Link>
+                                        </Button>
+                                    </div>
+                                ))}
+                            </>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full">
+                        <CardHeader>
+                            <CardTitle>Relevant Projects</CardTitle>
                         </CardHeader>
                         {/* <CardContent className="flex flex-col gap-4">
                             <div className="flex gap-2 items-center">
@@ -156,7 +231,7 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
 
                     <Card className="w-full">
                         <CardHeader>
-                            <CardTitle>Linked Projects</CardTitle>
+                            <CardTitle>Relevant Tools</CardTitle>
                         </CardHeader>
                         {/* <CardContent className="flex flex-col gap-4">
                             <div className="flex gap-2 items-center">
