@@ -11,39 +11,39 @@ import librareyLogo from "@/public/logos/librarey-logo.svg"
 import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
 import Link from "next/link"
-import { Button } from "@/packages/components/ui/button"
-import { cn } from "@/packages/lib/utils"
+import {Button} from "@/packages/components/ui/button"
+import {cn} from "@/packages/lib/utils"
 
 const bubbles = [
-    { title: "Biosamples", href: "#" },
-    { title: "Research plans", href: "#" },
-    { title: "RFPs", href: "#" },
-    { title: "Mouse models", href: "#" },
-    { title: "Zebrafish", href: "#" },
-    { title: "Cell lines", href: "#" },
-    { title: "Organoids", href: "#" },
-    { title: "Assay development", href: "#" },
-    { title: "Oligo synthesis", href: "#" },
-    { title: "GMP manufacturing", href: "#" },
-    { title: "Toxicology", href: "#" },
-    { title: "Gene therapy", href: "#" },
-    { title: "ASO", href: "#" },
-    { title: "Drug repurposing", href: "#" },
-    { title: "Gene editing", href: "#" },
-    { title: "IND", href: "#" },
-    { title: "Biomarkers", href: "#" },
-    { title: "Patient registries", href: "#" },
-    { title: "Natural history studies", href: "#" },
-    { title: "Outcome measures", href: "#" },
-    { title: "Academics", href: "#" },
-    { title: "CROs", href: "#" },
-    { title: "Biotech", href: "#" },
-    { title: "Pharma", href: "#" },
-    { title: "Consultants", href: "#" },
-    { title: "Target validation", href: "#" },
-    { title: "Lead optimization", href: "#" },
-    { title: "Real world evidence", href: "#" },
-    { title: "Trial design", href: "#" }
+    {title: "Biosamples", href: "#"},
+    {title: "Research plans", href: "#"},
+    {title: "RFPs", href: "#"},
+    {title: "Mouse models", href: "#"},
+    {title: "Zebrafish", href: "#"},
+    {title: "Cell lines", href: "#"},
+    {title: "Organoids", href: "#"},
+    {title: "Assay development", href: "#"},
+    {title: "Oligo synthesis", href: "#"},
+    {title: "GMP manufacturing", href: "#"},
+    {title: "Toxicology", href: "#"},
+    {title: "Gene therapy", href: "#"},
+    {title: "ASO", href: "#"},
+    {title: "Drug repurposing", href: "#"},
+    {title: "Gene editing", href: "#"},
+    {title: "IND", href: "#"},
+    {title: "Biomarkers", href: "#"},
+    {title: "Patient registries", href: "#"},
+    {title: "Natural history studies", href: "#"},
+    {title: "Outcome measures", href: "#"},
+    {title: "Academics", href: "#"},
+    {title: "CROs", href: "#"},
+    {title: "Biotech", href: "#"},
+    {title: "Pharma", href: "#"},
+    {title: "Consultants", href: "#"},
+    {title: "Target validation", href: "#"},
+    {title: "Lead optimization", href: "#"},
+    {title: "Real world evidence", href: "#"},
+    {title: "Trial design", href: "#"}
 ];
 
 export const CloudHeroSection = () => {
@@ -257,9 +257,9 @@ export const CloudHeroSection = () => {
                         transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                         className="max-w-screen-lg text-3xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
                     >
-                        The drug development platform
+                        The digital platform for
                         <Highlight className="text-black dark:text-white">
-                            for patient groups
+                            patient research groups
                         </Highlight>
                     </motion.h1>
                 </HeroHighlight>
@@ -272,7 +272,7 @@ export const CloudHeroSection = () => {
                     className="flex flex-col justify-center items-center mx-auto space-y-4"
                 >
                     <p className="max-w-screen-sm text-xl">
-                        {`Plan, partner, and showcase your progress with the rare disease ecosystem.`}
+                        {`Organize your research and share it with the world.`}
                     </p>
                     {/*<PulsatingButton*/}
                     {/*    className="w-fit"*/}

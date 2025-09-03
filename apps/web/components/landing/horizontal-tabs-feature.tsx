@@ -160,7 +160,7 @@ function Feature({
 
 function FeaturesMobile() {
     return (
-        <div className="-mx-4 mt-20 flex flex-col gap-y-10 overflow-hidden px-4 sm:-mx-6 sm:px-6 lg:hidden">
+        <div className="-mx-4 mt-16 flex flex-col gap-y-10 overflow-hidden px-4 sm:-mx-6 sm:px-6 lg:hidden">
             {features.map((feature) => (
                 <div key={feature.summary}>
                     <Feature feature={feature} className="mx-auto max-w-2xl" isActive />
@@ -183,7 +183,7 @@ function FeaturesMobile() {
 
 function FeaturesDesktop() {
     return (
-        <TabGroup className="hidden lg:mt-20 lg:block">
+        <TabGroup className="hidden lg:mt-16 lg:block">
             {({ selectedIndex }) => (
                 <>
                     <TabList className="grid grid-cols-3 gap-x-8">
@@ -217,9 +217,9 @@ function FeaturesDesktop() {
                                     style={{ transform: `translateX(-${selectedIndex * 100}%)` }}
                                     aria-hidden={featureIndex !== selectedIndex}
                                 >
-                                    <div className="min-w-[calc(100vw-272px)] overflow-hidden rounded-xl bg-white shadow-lg ring-1 shadow-slate-900/5 ring-slate-500/10">
+                                    <div className="min-w-[calc(100vw-472px)] overflow-hidden rounded-xl bg-white shadow-lg ring-1 shadow-slate-900/5 ring-slate-500/10">
                                         <Image
-                                            className="min-w-[calc(100vw-272px)]"
+                                            className="min-w-[calc(100vw-472px)]"
                                             src={feature.image}
                                             alt=""
                                             // sizes="52.75rem"
@@ -241,11 +241,11 @@ export function HorizontalTabsFeatures() {
         <section
             id="secondary-features"
             aria-label="Features for simplifying everyday business tasks"
-            className="pt-20 pb-14 sm:pt-32 sm:pb-20 lg:pb-32"
+            className="py-16"
         >
             <Container>
                 <div className="mx-auto max-w-2xl md:text-center">
-                    <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                    <p className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
                         Systematize your research
                     </p>
                     <p className="mt-6 text-lg/8 text-gray-600">
