@@ -85,7 +85,7 @@ export default function VerticalTimedTabsFeaturesSection() {
             animate={{ opacity: 1, y: [50, -10, 0] }}
             transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
             id="features"
-            className="w-full container mx-auto max-w-7xl px-8 py-24 sm:py-24 space-y-8"
+            className="w-full container mx-auto max-w-7xl px-8 py-16 space-y-8"
             aria-labelledby="features-heading"
         >
             <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
