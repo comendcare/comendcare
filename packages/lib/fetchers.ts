@@ -266,6 +266,52 @@ export async function getPublicRoadmapsForOrganization(
                             contacts: true,
                             attachments: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {
+                                include: {
+                                    biosample: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                },
+                                where: {
+                                    biosample: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                }
+                            },
+                            diseaseModels: {
+                                include: {
+                                    diseaseModel: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {private: {equals: false}}
+                                                }
+                                            }
+                                        }
+                                    },
+                                },
+                                where: {
+                                    diseaseModel: {private: {equals: false}}
+                                }
+                            },
                             tools: {
                                 include: {
                                     tool: {
@@ -337,6 +383,52 @@ export async function getPublicRoadmapsForOrganization(
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
+                    biosamples: {
+                        include: {
+                            biosample: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        where: {
+                            biosample: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        }
+                    },
+                    diseaseModels: {
+                        include: {
+                            diseaseModel: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {private: {equals: false}}
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        where: {
+                            diseaseModel: {private: {equals: false}}
+                        }
+                    },
                     tools: {
                         include: {
                             tool: {
