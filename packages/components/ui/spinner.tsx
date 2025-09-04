@@ -1,4 +1,4 @@
-import { cn } from "@comend/lib/utils"
+import { cn } from "./../../../packages/lib/utils"
 
 interface SpinnerProps {
     className?: string

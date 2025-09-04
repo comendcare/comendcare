@@ -3,8 +3,5 @@
   "version": "0.1.0",
   "files": ["**/*"],
   "private": true,
-  "dependencies": {
-    "@comend/components": "*",
-    "@comend/lib": "*"
-  }
+  "dependencies": {}
 }

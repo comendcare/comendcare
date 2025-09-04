@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
-import { ProfilePhoto } from "@comend/components/profile-photo";
+import { ProfilePhoto } from "./profile-photo";
 import { Building2, HandCoins, Calendar } from "lucide-react";
 
 export function CROMarketplaceListElement({ cro }: { cro: any }) {

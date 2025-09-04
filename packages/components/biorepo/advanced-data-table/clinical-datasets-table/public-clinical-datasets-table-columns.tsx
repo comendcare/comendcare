@@ -6,10 +6,10 @@ import {
   Text,
 } from "lucide-react";
 import * as React from "react";
-import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
-import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
-import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
-import { ProfilePhoto } from "@comend/components/profile-photo";
+import { DataTableColumnHeader } from "./../data-table/data-table-column-header";
+import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
+import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
+import { ProfilePhoto } from "./../../../profile-photo";
 
 export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [

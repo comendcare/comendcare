@@ -4,13 +4,13 @@ import type { Column, Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import * as React from "react";
 
-import { DataTableDateFilter } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-date-filter";
-import { DataTableFacetedFilter } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-faceted-filter";
-import { DataTableSliderFilter } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-slider-filter";
-import { DataTableViewOptions } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-view-options";
-import { Button } from "@comend/components/ui/button";
-import { Input } from "@comend/components/ui/input";
-import { cn } from "@comend/lib/utils";
+import { DataTableDateFilter } from "./../data-table/data-table-date-filter";
+import { DataTableFacetedFilter } from "./../data-table/data-table-faceted-filter";
+import { DataTableSliderFilter } from "./../data-table/data-table-slider-filter";
+import { DataTableViewOptions } from "./../data-table/data-table-view-options";
+import { Button } from "./../../../ui/button";
+import { Input } from "./../../../ui/input";
+import { cn } from "./../../../../../packages/lib/utils";
 import { DataTableSortList } from "./data-table-sort-list";
 
 interface DataTableToolbarProps<TData> extends React.ComponentProps<"div"> {

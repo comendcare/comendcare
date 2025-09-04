@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Input } from "@comend/components/ui/input"
-import { Button } from "@comend/components/ui/button"
+import { Input } from "./input"
+import { Button } from "./button"
 import { Search } from "lucide-react"
 import {
     Select,
@@ -10,7 +10,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "@comend/components/ui/select"
+} from "./select"
 
 const categories = [
     "All",

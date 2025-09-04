@@ -7,10 +7,10 @@ import {
     FormLabel,
     FormDescription,
     FormMessage
-} from "@comend/components/ui/form";
-import {Input} from "@comend/components/ui/input"; // ShadCN UI Input
+} from "./ui/form";
+import {Input} from "./ui/input"; // ShadCN UI Input
 import {UseFormReturn} from "react-hook-form";
-import {cn, formatMoney} from "@comend/lib/utils";
+import {cn, formatMoney} from "./../../packages/lib/utils";
 
 
 type TextInputProps = {

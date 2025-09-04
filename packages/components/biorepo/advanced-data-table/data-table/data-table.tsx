@@ -1,7 +1,7 @@
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 import type * as React from "react";
 
-import { DataTablePagination, TypesenseDataTablePagination } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-pagination";
+import { DataTablePagination, TypesenseDataTablePagination } from "./../data-table/data-table-pagination";
 import {
   Table,
   TableBody,
@@ -9,9 +9,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@comend/components/ui/table";
-import { getCommonPinningStyles } from "@comend/lib/data-table";
-import { cn } from "@comend/lib/utils";
+} from "./../../../ui/table";
+import { getCommonPinningStyles } from "./../../../../../packages/lib/data-table";
+import { cn } from "./../../../../../packages/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { StoreApi, UseBoundStore } from "zustand";
 import { TemporalState } from "zundo";

@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
-import {cn} from "@comend/lib/utils";
+import {Avatar, AvatarFallback, AvatarImage} from "./ui/avatar";
+import {cn} from "./../../packages/lib/utils";
 
 export function ProfilePhoto({
     img,

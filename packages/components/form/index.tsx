@@ -1,7 +1,7 @@
 "use client"
 
-import LoadingDots from "@comend/components/icons/loading-dots"
-import { cn } from "@comend/lib/utils"
+import LoadingDots from "./../icons/loading-dots"
+import { cn } from "./../../../packages/lib/utils"
 import { useSession } from "next-auth/react"
 import { useParams, useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"

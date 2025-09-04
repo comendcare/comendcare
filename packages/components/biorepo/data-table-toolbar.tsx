@@ -3,11 +3,11 @@
 import {Table} from "@tanstack/react-table"
 import {X} from "lucide-react"
 
-import {Button} from "@comend/components/ui/button"
-import {Input} from "@comend/components/ui/input"
+import {Button} from "./../ui/button"
+import {Input} from "./../ui/input"
 import {DataTableViewOptions} from "./data-table-view-options"
 
-import {priorities, statuses} from "@comend/data/pharma-data/data"
+import {priorities, statuses} from "./../../../packages/data/pharma-data/data"
 import {DataTableFacetedFilter} from "./data-table-faceted-filter"
 import PharmaProjectBiosampleFilterDialog from "comend-pag-platform/components/pharma-project-biosample-filter-dialog";
 

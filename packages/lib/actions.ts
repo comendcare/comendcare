@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "@comend/lib/prisma"
+import prisma from "./prisma"
 import {
     Roadmap,
     Organization,
@@ -12,8 +12,8 @@ import {
     Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "@/packages/lib/auth"
-import {getSession} from "@/packages/lib/auth"
+import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
+import {getSession} from "./auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {
@@ -23,8 +23,8 @@ import {
     logError,
     toKebabCase,
     updateTypeSenseDocument
-} from "@comend/lib/utils";
-import {validateEmailDomain} from "@comend/lib/server-utils";
+} from "./utils";
+import {validateEmailDomain} from "./server-utils";
 import {Session} from "next-auth";
 import {
     sendInviteEmail,
@@ -33,7 +33,7 @@ import {
     sendNewOrganizationEmail,
     sendMemberRequestDeniedEmail,
     sendMemberDeletedEmail, sendProviderContactRequestEmail,
-} from "@comend/lib/emails";
+} from "./emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {
     Actor,
@@ -48,11 +48,11 @@ import {
     Option,
     optionSchema,
     RFP
-} from "@comend/lib/types";
+} from "./types";
 import {templateResearchPlans} from "./templates"
 import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
 import z from "zod"
-import {writeRawEvent} from "@comend/lib/raw-events";
+import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
 
 export const getSessionInfo = async () => {

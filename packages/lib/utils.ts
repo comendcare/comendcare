@@ -11,11 +11,12 @@ import {
     ImportField,
     MILESTONE_TYPE_OPTIONS,
     milestoneCategories,
-    MilestoneKey
-} from "@comend/lib/types";
+    MilestoneKey,
+    Milestone, 
+    Option,
+    Task
+} from "./types";
 import Papa from "papaparse";
-import type { Milestone, Option } from "@comend/lib/types";
-import {Task} from "./types";
 
 const normalize = (s: string) => s.trim().toLowerCase()
 

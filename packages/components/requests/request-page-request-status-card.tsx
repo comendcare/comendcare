@@ -1,12 +1,12 @@
 "use client"
 
 import {useState} from "react"
-import {Button} from "@comend/components/ui/button"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card"
-import {Badge} from "@comend/components/ui/badge"
-import {Progress} from "@comend/components/ui/progress"
-import {Separator} from "@comend/components/ui/separator"
-import {Alert, AlertDescription} from "@comend/components/ui/alert"
+import {Button} from "./../ui/button"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "./../ui/card"
+import {Badge} from "./../ui/badge"
+import {Progress} from "./../ui/progress"
+import {Separator} from "./../ui/separator"
+import {Alert, AlertDescription} from "./../ui/alert"
 import {
     CheckCircle,
     Clock,

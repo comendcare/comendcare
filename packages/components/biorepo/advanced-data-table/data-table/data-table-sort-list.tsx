@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
-import { Badge } from "@comend/components/ui/badge";
-import { Button } from "@comend/components/ui/button";
+import { Badge } from "./../../../ui/badge";
+import { Button } from "./../../../ui/button";
 import {
   Command,
   CommandEmpty,
@@ -18,28 +18,28 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@comend/components/ui/command";
+} from "./../../../ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@comend/components/ui/popover";
+} from "./../../../ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@comend/components/ui/select";
+} from "./../../../ui/select";
 import {
   Sortable,
   SortableContent,
   SortableItem,
   SortableItemHandle,
   SortableOverlay,
-} from "@comend/components/ui/sortable";
-import { dataTableConfig } from "@comend/lib/config/data-table";
-import { cn } from "@comend/lib/utils";
+} from "./../../../ui/sortable";
+import { dataTableConfig } from "./../../../../../packages/lib/config/data-table";
+import { cn } from "./../../../../../packages/lib/utils";
 
 const OPEN_MENU_SHORTCUT = "s";
 const REMOVE_SORT_SHORTCUTS = ["backspace", "delete"];

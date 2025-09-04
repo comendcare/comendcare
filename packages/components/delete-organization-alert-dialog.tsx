@@ -10,13 +10,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@comend/components/ui/alert-dialog";
+} from "./ui/alert-dialog";
 import {useSession} from "next-auth/react";
 import {useState} from "react";
-import {deleteOrganization} from "@comend/lib/actions";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
+import {deleteOrganization} from "./../../packages/lib/actions";
+import { mixpanelTrack } from "./../../packages/lib/mixpanel";
 import {toast} from "sonner";
-import {Button} from "@comend/components/ui/button";
+import {Button} from "./ui/button";
 import {Organization} from "@prisma/client";
 
 

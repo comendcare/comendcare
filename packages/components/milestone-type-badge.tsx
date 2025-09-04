@@ -1,4 +1,4 @@
-import { Badge } from "@comend/components/ui/badge"
+import { Badge } from "./ui/badge"
 
 export const MilestoneTypeBadge = ({label}: {label: string | undefined}) => {
     return (

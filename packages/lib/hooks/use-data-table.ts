@@ -29,9 +29,9 @@ import {
 } from "nuqs";
 import * as React from "react";
 
-import { useDebouncedCallback } from "@comend/lib/hooks/use-debounced-callback";
-import { getSortingStateParser } from "@comend/lib/parsers";
-import type { ExtendedColumnSort } from "@comend/components/types/data-table";
+import { useDebouncedCallback } from "./use-debounced-callback";
+import { getSortingStateParser } from "./../parsers";
+import type { ExtendedColumnSort } from "../types/data-table";
 
 const PAGE_KEY = "page";
 const PER_PAGE_KEY = "perPage";
