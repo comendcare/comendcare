@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react"
-import {formatDate} from "@comend/lib/format";
+import {formatDate} from "./../../../../packages/lib/format";
 import CommentReplyDropdown from "./comment-reply-dropdown";
 import {ProfilePhoto} from "../../profile-photo";
 

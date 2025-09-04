@@ -1579,7 +1579,7 @@ export const MOLECULAR_MECHANISMS: Option[] = [
     },
     {
         id: '4',
-        label: 'Chromosomal aberration',
+        label: 'Chromosomal Rearrangement',
         value: 'CHROMOSOMAL_ABERRATION',
         description: 'A mechanism involving structural or numerical changes in chromosomes that can disrupt normal gene function or regulation.',
     },

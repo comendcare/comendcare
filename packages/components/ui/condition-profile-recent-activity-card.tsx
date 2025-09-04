@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent, CardFooter, CardHeader } from "@comend/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar"
-import { Button } from "@comend/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader } from "./card"
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar"
+import { Button } from "./button"
 import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react'
 
 type Post = {

@@ -2,9 +2,9 @@ import * as React from "react"
 import { Column } from "@tanstack/react-table"
 import { Check, PlusCircle } from "lucide-react"
 
-import { cn } from "@comend/lib/utils"
-import { Badge } from "@comend/components/ui/badge"
-import { Button } from "@comend/components/ui/button"
+import { cn } from "./../../../packages/lib/utils"
+import { Badge } from "./../ui/badge"
+import { Button } from "./../ui/button"
 import {
   Command,
   CommandEmpty,
@@ -13,13 +13,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@comend/components/ui/command"
+} from "./../ui/command"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@comend/components/ui/popover"
-import { Separator } from "@comend/components/ui/separator"
+} from "./../ui/popover"
+import { Separator } from "./../ui/separator"
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>

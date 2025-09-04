@@ -2,7 +2,7 @@
 
 import { CursorOverlayPlugin } from '@udecode/plate-selection/react';
 
-import { CursorOverlay } from '@comend/components/plate-ui/cursor-overlay';
+import { CursorOverlay } from './../../plate-ui/cursor-overlay';
 
 export const cursorOverlayPlugin = CursorOverlayPlugin.configure({
   render: {

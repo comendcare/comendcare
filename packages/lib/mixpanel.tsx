@@ -4,9 +4,9 @@ import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
-import { customerIOIdentify } from "@comend/lib/customer-io"
-import { getOrganizationFromOrganizationId, getUser } from "@comend/lib/fetchers"
-import { getCookie } from "@comend/lib/utils"
+import { customerIOIdentify } from "./customer-io"
+import { getOrganizationFromOrganizationId, getUser } from "./fetchers"
+import { getCookie } from "./utils"
 
 const MixpanelContext = createContext<any>(null)
 

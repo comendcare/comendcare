@@ -3,7 +3,7 @@
 import { Row } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 
-import { Button } from "@comend/components/ui/button"
+import { Button } from "./../ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,10 +16,10 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@comend/components/ui/dropdown-menu"
+} from "./../ui/dropdown-menu"
 
-import { labels } from "@comend/data/pharma-data/data"
-import { taskSchema } from "@comend/data/pharma-data/schema"
+import { labels } from "./../../../packages/data/pharma-data/data"
+import { taskSchema } from "./../../../packages/data/pharma-data/schema"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>

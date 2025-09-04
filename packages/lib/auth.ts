@@ -5,7 +5,7 @@ import FacebookProvider from "next-auth/providers/facebook"
 import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
-import prisma from "@/packages/lib/prisma"
+import prisma from "./prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
 import sgMail from "@sendgrid/mail";
 

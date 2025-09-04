@@ -6,12 +6,12 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger
-} from "@comend/components/ui/dropdown-menu"
+} from "./../../ui/dropdown-menu"
 import {Ellipsis, CircleX} from "lucide-react";
 import { useSession } from "next-auth/react"
-import AreYouSure from "@comend/components/are-you-sure"
+import AreYouSure from "./../../are-you-sure"
 import {toast} from "sonner"
-import { deleteRequestComment } from "@comend/lib/actions"
+import { deleteRequestComment } from "./../../../../packages/lib/actions"
 
 export default function CommentReplyDropdown(props: {
     requestId: string

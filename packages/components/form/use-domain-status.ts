@@ -1,6 +1,6 @@
 import useSWR from "swr"
-import { fetcher } from "@comend/lib/utils"
-import { DomainResponse, DomainVerificationStatusProps } from "@comend/lib/types"
+import { fetcher } from "./../../../packages/lib/utils"
+import { DomainResponse, DomainVerificationStatusProps } from "./../../../packages/lib/types"
 
 export function useDomainStatus({ domain }: { domain: string }) {
     const { data, isValidating } = useSWR<{

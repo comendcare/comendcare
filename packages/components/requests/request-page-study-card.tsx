@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card";
-import { MaterialAndDataAccessRequestWithResearcherAndComments } from "@comend/lib/types";
+import { Card, CardContent, CardHeader, CardTitle } from "./../../../packages/components/ui/card";
+import { MaterialAndDataAccessRequestWithResearcherAndComments } from "./../../../packages/lib/types";
 
 export default function RequestPageStudyCard({ requestData }: { requestData: MaterialAndDataAccessRequestWithResearcherAndComments }) {
     console.log(requestData)

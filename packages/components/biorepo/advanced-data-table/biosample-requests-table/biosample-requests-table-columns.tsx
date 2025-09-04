@@ -9,9 +9,8 @@ import {
   Text,
 } from "lucide-react";
 import * as React from "react";
-import { DataTableColumnHeader } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
-import { REQUEST_STATUS_OPTIONS } from "@comend/lib/types";
-import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge";
+import { DataTableColumnHeader } from "./../data-table/data-table-column-header";
+import { REQUEST_STATUS_OPTIONS } from "./../../../../lib/types";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 
 export function getBiosampleRequestsTableColumns(): ColumnDef<any>[] {

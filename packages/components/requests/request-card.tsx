@@ -1,8 +1,8 @@
 "use client"
 
-import {Badge} from "@comend/components/ui/badge"
-import {Button} from "@comend/components/ui/button"
-import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
+import {Badge} from "./../ui/badge"
+import {Button} from "./../ui/button"
+import {Card, CardContent, CardHeader, CardTitle} from "./../ui/card"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@comend/components/ui/dropdown-menu"
-import { formatDate } from "@comend/lib/utils"
+} from "./../ui/dropdown-menu"
+import { formatDate } from "./../../../packages/lib/utils"
 import {Calendar, Download, Eye, MoreHorizontal, User} from "lucide-react"
 import {useRouter} from "next/navigation";
 

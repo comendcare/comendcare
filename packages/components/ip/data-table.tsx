@@ -23,11 +23,11 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@comend/components/ui/table"
+} from "./../ui/table"
 
 import {DataTablePagination} from "./data-table-pagination"
 import {DataTableToolbar} from "./data-table-toolbar"
-import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area";
+import {ScrollArea, ScrollBar} from "./../ui/scroll-area";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

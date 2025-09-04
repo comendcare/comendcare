@@ -3,8 +3,8 @@
 import type { Table } from "@tanstack/react-table";
 import type * as React from "react";
 
-import { DataTableViewOptions } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-view-options";
-import { cn } from "@comend/lib/utils";
+import { DataTableViewOptions } from "./../data-table/data-table-view-options";
+import { cn } from "./../../../../../packages/lib/utils";
 import { DataTableSortList } from "./data-table-sort-list";
 
 interface DataTableAdvancedToolbarProps<TData>
