@@ -42,7 +42,7 @@ import { formatDate } from "./../../../../../packages/lib/format";
 import { generateId } from "./../../../../../packages/lib/id";
 import { getFiltersStateParser } from "./../../../../../packages/lib/parsers";
 import { cn } from "./../../../../../packages/lib/utils";
-import type { ExtendedColumnFilter, FilterOperator } from "./../../../types/data-table";
+import type { ExtendedColumnFilter, FilterOperator } from "@comend/lib/types/data-table";
 
 const FILTERS_KEY = "filters";
 const DEBOUNCE_MS = 300;

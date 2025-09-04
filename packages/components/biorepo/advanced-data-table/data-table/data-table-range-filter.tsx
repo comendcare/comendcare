@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { Input } from "./../../../ui/input";
 import { cn } from "./../../../../../packages/lib/utils";
-import type { ExtendedColumnFilter } from "./../../../types/data-table";
+import type { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 
 interface DataTableRangeFilterProps<TData> extends React.ComponentProps<"div"> {
   filter: ExtendedColumnFilter<TData>;

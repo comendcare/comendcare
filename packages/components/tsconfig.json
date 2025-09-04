@@ -17,6 +17,6 @@
         // "@/loading": ["loading.tsx"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/tool-actions-menu.tsx", "biorepo/advanced-data-table/biosamples-table/biosamples-table-columns.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../apps/web/components/tool-actions-menu.tsx", "biorepo/advanced-data-table/biosamples-table/biosamples-table-columns.tsx", "../lib/types/data-table.ts"],
   "exclude": ["node_modules", "dist"]
 }

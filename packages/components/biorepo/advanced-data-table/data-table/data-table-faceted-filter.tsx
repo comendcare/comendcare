@@ -22,7 +22,7 @@ import {
 } from "./../../../ui/popover";
 import { Separator } from "./../../../ui/separator";
 import { cn } from "./../../../../../packages/lib/utils";
-import type { Option } from "./../../../types/data-table";
+import type { Option } from "@comend/lib/types/data-table";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;

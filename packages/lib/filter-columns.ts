@@ -1,6 +1,6 @@
 import { addDays, endOfDay, startOfDay } from "date-fns";
 import { Prisma } from "@prisma/client";
-import type { ExtendedColumnFilter, JoinOperator } from "./../../packages/components/types/data-table";
+import type { ExtendedColumnFilter, JoinOperator } from "./types/data-table";
 
 /**
  * Construct Prisma conditions based on the provided filters for a specific table.

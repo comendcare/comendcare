@@ -1,13 +1,12 @@
 import { createParser } from "nuqs/server";
 import { z } from "zod";
-import { Option } from "./../../packages/components/types/data-table"
 
 import { dataTableConfig } from "./config/data-table";
 
 import type {
   ExtendedColumnFilter,
   ExtendedColumnSort,
-} from "./../../packages/components/types/data-table";
+} from "./types/data-table";
 
 const sortingItemSchema = z.object({
   id: z.string(),
@@ -56,7 +55,7 @@ const filterItemSchema = z.object({
   variant: z.enum(dataTableConfig.filterVariants),
   operator: z.enum(dataTableConfig.operators),
   filterId: z.string(),
-  onAsyncSearch: z.custom<(query?: string) => Promise<Option[]>>().optional() 
+  onAsyncSearch: z.custom<(query?: string) => Promise<any[]>>().optional() 
 });
 
 export type FilterItemSchema = z.infer<typeof filterItemSchema>;

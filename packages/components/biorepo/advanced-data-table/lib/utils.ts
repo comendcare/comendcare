@@ -13,7 +13,7 @@ import { customAlphabet } from "nanoid";
 import { Prisma, Label, Priority, Status, type Task } from "@prisma/client";
 
 import { generateId } from "./../../../../../packages/lib/id";
-import {PRIORITIES, LABELS, STATUSES} from "./../../../types/data-table";
+import {PRIORITIES, LABELS, STATUSES} from "@comend/lib/types/data-table";
 
 export function generateRandomTask(): Task {
   return {
