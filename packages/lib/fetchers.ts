@@ -35,14 +35,13 @@ import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
 import {filterColumns} from "./filter-columns";
-// import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "./../../packages/components/biorepo/advanced-data-table";
 import {nanoid} from "nanoid";
 import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "./types";
 import {mergeResearcherData} from "./../../apps/researcher/lib/utils";
 import {
     GetBiosamplesSchema,
     GetDiseaseModelSchema
-} from "./../../packages/components/biorepo/advanced-data-table/lib/validations";
+} from "./validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getServicesOfCompany(

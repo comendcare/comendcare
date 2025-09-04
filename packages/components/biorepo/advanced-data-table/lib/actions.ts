@@ -6,7 +6,7 @@ import prisma from "./../../../../../packages/lib/prisma"
 import { type Task, Label, Priority, Status } from "@prisma/client";
 import { getErrorMessage } from "./../../../../../packages/lib/handle-error";
 import { generateRandomTask } from "./utils";
-import type { CreateTaskSchema, UpdateTaskSchema } from "./validations";
+import type { CreateTaskSchema, UpdateTaskSchema } from "./../../../../../packages/lib/validations";
 
 // ─────────────────────────────────────────────
 // Seed Tasks
