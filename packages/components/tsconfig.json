@@ -10,7 +10,7 @@
     "paths": {
         // "@comend/lib/*": ["lib/*"],
         // "@/components/*": ["components/*"],
-        "@/*": ["packages/*"],
+        // "@/*": ["packages/*"],
         "@/state/*": ["state/*"],
         // "@/data/*": ["data/*"],
         // "@/public/*": ["public/*"],
