@@ -9,16 +9,16 @@ import {
 import * as React from "react";
 import {
     DataTableColumnHeader
-} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
+} from "./../data-table/data-table-column-header";
 import {
     DISEASE_MODEL_TYPE_OPTIONS,
     Milestone,
-} from "@comend/lib/types";
-import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
+} from "./../../../../../packages/lib/types";
+import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {useSession} from "next-auth/react";
-import { getMilestones } from "@comend/lib/fetchers";
-import { Option } from "@comend/lib/types";
+import { getMilestones } from "./../../../../../packages/lib/fetchers";
+import { Option } from "./../../../../../packages/lib/types";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()

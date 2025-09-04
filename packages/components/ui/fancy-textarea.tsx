@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react"
-import { cn } from "@comend/lib/utils"
+import { cn } from "./../../../packages/lib/utils"
 import { useMotionTemplate, useMotionValue, motion } from "framer-motion"
 
 export interface TextareaProps

@@ -6,12 +6,12 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@comend/components/ui/dialog";
-import {Button} from "@comend/components/ui/button";
-import {Input} from "@comend/components/ui/input";
-import {Textarea} from "@comend/components/ui/textarea";
+} from "./../ui/dialog";
+import {Button} from "./../ui/button";
+import {Input} from "./../ui/input";
+import {Textarea} from "./../ui/textarea";
 import {useState} from "react";
-import {updateMaterialAndDataAccessRequestProperty} from "@comend/lib/actions";
+import {updateMaterialAndDataAccessRequestProperty} from "./../../../packages/lib/actions";
 import {toast} from "sonner";
 
 type PropertyKey =

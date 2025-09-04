@@ -1,16 +1,16 @@
 "use server"
 
 import {unstable_cache} from "next/cache"
-import prisma from "@comend/lib/prisma"
+import prisma from "./prisma"
 import {
     ApiResponse,
     GLOBAL_FEED_TYPES,
     milestoneCategories,
     RequestFiltersType,
     RESEARCH_PLAN_TYPES
-} from "@comend/lib/types";
-import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@/packages/lib/auth";
+} from "./types";
+import {formatMoney, getProfileCompletionChecks, getStage, logError} from "./utils";
+import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "./auth";
 import {
     Condition,
     MaterialAndDataAccessRequest,
@@ -30,19 +30,19 @@ import {
     clinicalStudySchema,
     preclinicalStudySchema,
     taskSchema
-} from "@comend/data/pharma-data/schema";
+} from "./../../packages/data/pharma-data/schema";
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
-import {filterColumns} from "@comend/lib/filter-columns";
-// import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "@comend/components/biorepo/advanced-data-table";
+import {filterColumns} from "./filter-columns";
+// import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "./../../packages/components/biorepo/advanced-data-table";
 import {nanoid} from "nanoid";
-import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "@comend/lib/types";
-import {mergeResearcherData} from "@/apps/researcher/lib/utils";
+import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "./types";
+import {mergeResearcherData} from "./../../apps/researcher/lib/utils";
 import {
     GetBiosamplesSchema,
     GetDiseaseModelSchema
-} from "@comend/components/biorepo/advanced-data-table/lib/validations";
+} from "./../../packages/components/biorepo/advanced-data-table/lib/validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getServicesOfCompany(
@@ -2544,11 +2544,95 @@ export const getAllBiosamples = withResearcherAuth(
 
 export const getDatasamples = withOrganizationAuth(
     async (organization: Organization, input?: GetBiosamplesSchema) => {
-        try {
-            if (!input) {
+            try {
+                if (!input) {
+                    const [data, total] = await prisma.$transaction([
+                        prisma.tool.findMany({
+                            where: {
+                                organizationId: organization.id
+                            },
+                            include: {
+                                organization: {include: {conditions: {include: {condition: true}}}},
+                                milestones: {include: {milestone: true}},
+                                contacts: true,
+                                attachments: true,
+                                institution: true,
+                                gene: true,
+                            },
+                            orderBy: {createdAt: "asc"},
+                        }),
+                        prisma.tool.count({where: {organizationId: organization.id}}),
+                    ]);
+
+                    return {data, pageCount: 1};
+                }
+
+                const offset = (input.page - 1) * input.perPage;
+                const advancedTable =
+                    input.filterFlag === "advancedFilters"
+
+                let where: any = {};
+
+                if (advancedTable) {
+                    const preProcessedFilters: any = input.filters.map(filter => ({
+                        ...filter,
+                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                    }))
+
+                    where = filterColumns({
+                        filters: preProcessedFilters,
+                        joinOperator: input.joinOperator,
+                    })
+                } else {
+                    const filters: any[] = []
+                    if (input.title) {
+                        filters.push({
+                            id: 'title',
+                            value: input.title,
+                            variant: 'text',
+                            operator: 'iLike',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    if (input.private.length == 1) {
+                        // private only has two options, we only filter if ONE of them
+                        // is selected...
+                        filters.push({
+                            id: 'private',
+                            value: input.private[0],
+                            variant: 'select',
+                            operator: 'eq',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    if (input.types.length > 0) {
+                        filters.push({
+                            id: 'types',
+                            value: input.types,
+                            variant: 'multiSelect',
+                            operator: 'inArray',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    where = filterColumns({
+                        filters,
+                        joinOperator: "and"
+                    })
+                }
+
+                const orderBy = input.sort.length
+                    ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                    : [{createdAt: "asc"}];
+
                 const [data, total] = await prisma.$transaction([
                     prisma.tool.findMany({
+                        skip: offset,
+                        take: input.perPage,
                         where: {
+                            ...where,
                             organizationId: organization.id
                         },
                         include: {
@@ -2559,100 +2643,16 @@ export const getDatasamples = withOrganizationAuth(
                             institution: true,
                             gene: true,
                         },
-                        orderBy: {createdAt: "asc"},
+                        orderBy,
                     }),
-                    prisma.tool.count({where: {organizationId: organization.id}}),
+                    prisma.tool.count({where}),
                 ]);
 
-                return {data, pageCount: 1};
+                const pageCount = Math.ceil(total / input.perPage);
+                return {data, pageCount};
+            } catch {
+                return {data: [], pageCount: 0};
             }
-
-            const offset = (input.page - 1) * input.perPage;
-            const advancedTable =
-                input.filterFlag === "advancedFilters"
-
-            let where: any = {};
-
-            if (advancedTable) {
-                const preProcessedFilters: any = input.filters.map(filter => ({
-                    ...filter,
-                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-                }))
-
-                where = filterColumns({
-                    filters: preProcessedFilters,
-                    joinOperator: input.joinOperator,
-                })
-            } else {
-                const filters: any[] = []
-                if (input.title) {
-                    filters.push({
-                        id: 'title',
-                        value: input.title,
-                        variant: 'text',
-                        operator: 'iLike',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.private.length == 1) {
-                    // private only has two options, we only filter if ONE of them
-                    // is selected...
-                    filters.push({
-                        id: 'private',
-                        value: input.private[0],
-                        variant: 'select',
-                        operator: 'eq',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.types.length > 0) {
-                    filters.push({
-                        id: 'types',
-                        value: input.types,
-                        variant: 'multiSelect',
-                        operator: 'inArray',
-                        filterId: nanoid()
-                    })
-                }
-
-                where = filterColumns({
-                    filters,
-                    joinOperator: "and"
-                })
-            }
-
-            const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
-
-            const [data, total] = await prisma.$transaction([
-                prisma.tool.findMany({
-                    skip: offset,
-                    take: input.perPage,
-                    where: {
-                        ...where,
-                        organizationId: organization.id
-                    },
-                    include: {
-                        organization: {include: {conditions: {include: {condition: true}}}},
-                        milestones: {include: {milestone: true}},
-                        contacts: true,
-                        attachments: true,
-                        institution: true,
-                        gene: true,
-                    },
-                    orderBy,
-                }),
-                prisma.tool.count({where}),
-            ]);
-
-            const pageCount = Math.ceil(total / input.perPage);
-            return {data, pageCount};
-        } catch {
-            return {data: [], pageCount: 0};
-        }
     }
 )
 

@@ -3,14 +3,14 @@
 import { useQueryState } from "nuqs";
 import * as React from "react";
 
-import { ToggleGroup, ToggleGroupItem } from "@comend/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "./../../../ui/toggle-group";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@comend/components/ui/tooltip";
-import { type FlagConfig, flagConfig } from "@comend/lib/config/flag";
-import { Tabs, TabsList, TabsTrigger } from "@comend/components/ui/tabs";
+} from "./../../../ui/tooltip";
+import { type FlagConfig, flagConfig } from "./../../../../../packages/lib/config/flag";
+import { Tabs, TabsList, TabsTrigger } from "./../../../ui/tabs";
 
 type FilterFlag = FlagConfig["featureFlags"][number]["value"];
 

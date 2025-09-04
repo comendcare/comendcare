@@ -1,9 +1,9 @@
 "use client"
 
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "./ui/form";
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {FileWithPreview, ImageSelector} from "@comend/components/image-selector";
-import {acceptedFiletypes, cn, getPublicFile, sleep} from "@comend/lib/utils";
+import {FileWithPreview, ImageSelector} from "./image-selector";
+import {acceptedFiletypes, cn, getPublicFile, sleep} from "./../../packages/lib/utils";
 
 export const FormImageSelector = ({
                                       className = "",

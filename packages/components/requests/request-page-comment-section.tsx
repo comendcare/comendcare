@@ -1,4 +1,4 @@
-import {MaterialAndDataAccessRequestWithResearcherAndComments} from "@comend/lib/types";
+import {MaterialAndDataAccessRequestWithResearcherAndComments} from "./../../../packages/lib/types";
 import WriteAComment from "./comments/write-a-comment";
 import Comment from "./comments/comment";
 

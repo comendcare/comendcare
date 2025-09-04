@@ -12,10 +12,10 @@ import {
 import { parseAsStringEnum, useQueryState } from "nuqs";
 import * as React from "react";
 
-import { DataTableRangeFilter } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-range-filter";
-import { Badge } from "@comend/components/ui/badge";
-import { Button } from "@comend/components/ui/button";
-import { Calendar } from "@comend/components/ui/calendar";
+import { DataTableRangeFilter } from "./../data-table/data-table-range-filter";
+import { Badge } from "./../../../ui/badge";
+import { Button } from "./../../../ui/button";
+import { Calendar } from "./../../../ui/calendar";
 import {
   Command,
   CommandEmpty,
@@ -23,7 +23,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@comend/components/ui/command";
+} from "./../../../ui/command";
 import {
   Faceted,
   FacetedBadgeList,
@@ -34,39 +34,39 @@ import {
   FacetedItem,
   FacetedList,
   FacetedTrigger,
-} from "@comend/components/ui/faceted";
-import { Input } from "@comend/components/ui/input";
+} from "./../../../ui/faceted";
+import { Input } from "./../../../ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@comend/components/ui/popover";
+} from "./../../../ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@comend/components/ui/select";
+} from "./../../../ui/select";
 import {
   Sortable,
   SortableContent,
   SortableItem,
   SortableItemHandle,
   SortableOverlay,
-} from "@comend/components/ui/sortable";
-import { dataTableConfig } from "@comend/lib/config/data-table";
-import { useDebouncedCallback } from "@comend/lib/hooks/use-debounced-callback";
-import { getDefaultFilterOperator, getFilterOperators } from "@comend/lib/data-table";
-import { formatDate } from "@comend/lib/format";
-import { generateId } from "@comend/lib/id";
-import { getFiltersStateParser } from "@comend/lib/parsers";
-import { cn } from "@comend/lib/utils";
+} from "./../../../ui/sortable";
+import { dataTableConfig } from "./../../../../../packages/lib/config/data-table";
+import { useDebouncedCallback } from "./../../../../../packages/lib/hooks/use-debounced-callback";
+import { getDefaultFilterOperator, getFilterOperators } from "./../../../../../packages/lib/data-table";
+import { formatDate } from "./../../../../../packages/lib/format";
+import { generateId } from "./../../../../../packages/lib/id";
+import { getFiltersStateParser } from "./../../../../../packages/lib/parsers";
+import { cn } from "./../../../../../packages/lib/utils";
 import type {
   ExtendedColumnFilter,
   FilterOperator,
   JoinOperator,
-} from "@comend/components/types/data-table";
+} from "./../../../types/data-table";
 
 const FILTERS_KEY = "filters";
 const JOIN_OPERATOR_KEY = "joinOperator";

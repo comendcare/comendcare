@@ -2,9 +2,9 @@
 
 import {useState} from "react"
 import {AlertCircle} from "lucide-react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card"
-import {Label} from "@comend/components/ui/label"
-import {Checkbox} from "@comend/components/ui/checkbox"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "./../ui/card"
+import {Label} from "./../ui/label"
+import {Checkbox} from "./../ui/checkbox"
 
 export default function RequestPageTermsAndConditionsCard() {
     const [agreedToTerms, setAgreedToTerms] = useState(false)

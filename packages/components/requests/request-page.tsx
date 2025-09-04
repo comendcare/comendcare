@@ -2,10 +2,10 @@
 
 import {ArrowLeft, Paperclip} from "lucide-react";
 import RequestPageCommentSection from "./request-page-comment-section";
-import {MaterialAndDataAccessRequestWithResearcherAndComments} from "@comend/lib/types";
-import {Button} from "@comend/components/ui/button"
-import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
-import {Badge} from "@comend/components/ui/badge"
+import {MaterialAndDataAccessRequestWithResearcherAndComments} from "./../../../packages//lib/types";
+import {Button} from "./../ui/button"
+import {Card, CardContent, CardHeader, CardTitle} from "./../ui/card"
+import {Badge} from "./../ui/badge"
 import RequestPageTermsAndConditionsCard from "./request-page-terms-and-conditions-card";
 import RequestPageRequestStatusCard from "./request-page-request-status-card";
 import {useRouter} from "next/navigation";

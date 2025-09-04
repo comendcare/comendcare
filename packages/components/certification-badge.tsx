@@ -1,5 +1,5 @@
 import { CircleCheck, Flower, Sprout } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn } from "./../../packages/lib/utils";
 
 export function CertificationBadge({ certificationName }: { certificationName: string }) {
     let badgeClass = "bg-blue-100 text-blue-900";

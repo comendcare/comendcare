@@ -6,12 +6,12 @@ import {
   parseAsStringEnum,
 } from "nuqs/server";
 import * as z from "zod";
-import { flagConfig } from "@comend/lib/config/flag";
+import { flagConfig } from "./../../../../../packages/lib/config/flag";
 import { type Task, Status, Priority, Label, Tool } from "@prisma/client";
 import {
   getFiltersStateParser,
   getSortingStateParser,
-} from "@comend/lib/parsers";
+} from "./../../../../../packages/lib/parsers";
 
 // Manually define the enums to use in Zod
 const statusEnum = z.enum(["todo", "in_progress", "done", "canceled"]);

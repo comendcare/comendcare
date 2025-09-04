@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { useDomainStatus } from "./use-domain-status"
-import { getSubdomain } from "@comend/lib/domains"
+import { getSubdomain } from "./../../../packages/lib/domains"
 import { AlertCircle, XCircle } from "lucide-react"
-import { cn } from "@comend/lib/utils"
+import { cn } from "./../../../packages/lib/utils"
 
 export const InlineSnippet = ({
     className,

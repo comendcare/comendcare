@@ -1,6 +1,6 @@
 import type {ColumnSort, Row, RowData} from "@tanstack/react-table";
-import type {DataTableConfig} from "@comend/lib/config/data-table";
-import type {FilterItemSchema} from "@comend/lib/parsers";
+import type {DataTableConfig} from "./../../../packages/lib/config/data-table";
+import type {FilterItemSchema} from "./../../../packages/lib/parsers";
 import {Label, Priority, Status} from "@prisma/client";
 
 declare module "@tanstack/react-table" {

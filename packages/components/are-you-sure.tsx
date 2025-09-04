@@ -8,8 +8,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger
-} from "@comend/components/ui/alert-dialog"
-import { buttonVariants } from "@comend/components/ui/button"
+} from "./ui/alert-dialog"
+import { buttonVariants } from "./ui/button"
 
 interface AreYouSureProps {
     isOpen: boolean

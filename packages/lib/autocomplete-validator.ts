@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type {AddressType} from "@comend/lib/types";
+import type {AddressType} from "./types";
 
 /**
  * Checks if the autocomplete address is valid. Change to your own validation logic.

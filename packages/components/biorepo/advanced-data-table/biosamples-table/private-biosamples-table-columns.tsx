@@ -9,7 +9,7 @@ import {
 import * as React from "react";
 import {
     DataTableColumnHeader
-} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
+} from "./../data-table/data-table-column-header";
 import {
     AVAILABILITY_OPTIONS,
     BIOSAMPLE_TYPE_OPTIONS,
@@ -17,15 +17,15 @@ import {
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
     Milestone,
-} from "@comend/lib/types";
-import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
+} from "./../../../../../packages/lib/types";
+import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
-import { Badge } from "@comend/components/ui/badge";
-import { getDiagnosisTypes, getMilestones } from "@comend/lib/fetchers";
+import { Badge } from "./../../../ui/badge";
+import { getDiagnosisTypes, getMilestones } from "./../../../../../packages/lib/fetchers";
 import { useEffect, useState } from "react";
-import { Option } from "@comend/lib/types";
+import { Option } from "./../../../../../packages/lib/types";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
