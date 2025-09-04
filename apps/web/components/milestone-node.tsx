@@ -171,47 +171,9 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                     onStatusChange={() => {}}
                 />
 
-                {(props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
+                {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
                     <>
                     <Separator className="bg-gray-300 h-[2px] rounded-full my-4"/>
-                        {/* {props.data?.tools.map(({tool}) => (
-                            <Card
-                                className={cn(
-                                    "border-2 border-emerald-200 bg-emerald-50 w-full text-wrap break-words",
-                                )}
-                            >
-                                <CardHeader className="p-4">
-                                    <CardTitle className="text-emerald-900 text-md">
-                                        <Microscope size={20} className="inline-block align-middle mr-2"/>
-                                        {tool?.title || "untitled tool"}
-                                    </CardTitle>
-                                    {tool?.description && (
-                                        <CardDescription className="line-clamp-2">
-                                            {truncate(tool?.description || "", 200)}
-                                        </CardDescription>
-                                    )}
-                                </CardHeader>
-                            </Card>
-                        ))}
-                        {props.data?.rfps.map(({rfp}) => (
-                            <Card
-                                className={cn(
-                                    "border-2 border-orange-200 bg-orange-50 w-full text-wrap break-words",
-                                )}
-                            >
-                                <CardHeader className="p-4">
-                                    <CardTitle className="text-orange-900 text-md">
-                                        <Megaphone size={20} className="inline-block align-middle mr-2"/>
-                                        {rfp?.title || "untitled RFP"}
-                                    </CardTitle>
-                                    {rfp?.description && (
-                                        <CardDescription className="line-clamp-2">
-                                            {truncate(rfp?.description || "", 200)}
-                                        </CardDescription>
-                                    )}
-                                </CardHeader>
-                            </Card>
-                        ))} */}
                         {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
                             <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
                                 <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
