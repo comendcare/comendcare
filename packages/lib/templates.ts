@@ -1,7 +1,7 @@
 import {MILESTONE_TYPE_OPTIONS, MODALITIES} from "./types"
-import ASOResearchPlan from '@comend/data/research-plan-templates/ASO Research Plan-cmaqujvbw00007u8av9kl1u60.json'
-import GeneTherapyResearchPlan from '@comend/data/research-plan-templates/Gene-Therapy-Template.json'
-import DrugScreenResearchPlan from '@comend/data/research-plan-templates/Drug-Screen-Template.json'
+import ASOResearchPlan from './../data/research-plan-templates/ASO Research Plan-cmaqujvbw00007u8av9kl1u60.json'
+import GeneTherapyResearchPlan from './../data/research-plan-templates/Gene-Therapy-Template.json'
+import DrugScreenResearchPlan from './../data/research-plan-templates/Drug-Screen-Template.json'
 
 export const templateMilestones = MILESTONE_TYPE_OPTIONS.map(typeData => ({
     title: typeData.label,

@@ -3,7 +3,7 @@ import {render} from "@react-email/render"
 import sgMail from "@sendgrid/mail"
 import ContactEmail from "./../../packages/transactional/emails/contact/contact-email"
 import PAGContactEmail from "./../../packages/transactional/emails/pag/contact-email";
-import rateLimit from "@comend/lib/rate-limit";
+import rateLimit from "./rate-limit";
 import axios from "axios";
 import WaitlistEmail from "./../../packages/transactional/emails/contact/waitlist-email";
 import InviteToOrganizationEmail from "./../../packages/transactional/emails/invitations/invite-to-organization-email";

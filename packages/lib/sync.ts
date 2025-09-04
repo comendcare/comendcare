@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
 import prisma from "./prisma"
-import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "./types";
 
 
 const sendTypeSenseRequest = async (
