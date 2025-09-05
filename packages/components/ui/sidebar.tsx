@@ -5,19 +5,19 @@ import {Slot} from "@radix-ui/react-slot"
 import {VariantProps, cva} from "class-variance-authority"
 import {PanelLeft, PanelLeftOpen, PanelRightOpen} from "lucide-react"
 
-import {useIsMobile} from "@comend/lib/hooks/use-mobile";
-import {cn} from "@comend/lib/utils";
-import {Button} from "@comend/components/ui/button"
-import {Input} from "@comend/components/ui/input"
-import {Separator} from "@comend/components/ui/separator"
-import {Sheet, SheetContent} from "@comend/components/ui/sheet"
-import {Skeleton} from "@comend/components/ui/skeleton"
+import {useIsMobile} from "./../../../packages/lib/hooks/use-mobile";
+import {cn} from "./../../../packages/lib/utils";
+import {Button} from "./button"
+import {Input} from "./input"
+import {Separator} from "./separator"
+import {Sheet, SheetContent} from "./sheet"
+import {Skeleton} from "./skeleton"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@comend/components/ui/tooltip"
+} from "./tooltip"
 
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"

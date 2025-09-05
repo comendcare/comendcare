@@ -18,7 +18,7 @@ import {
   BlockSelectionPlugin,
 } from '@udecode/plate-selection/react';
 
-import { useIsTouchDevice } from '@comend/lib/hooks/use-is-touch-device';
+import { useIsTouchDevice } from './../../../packages/lib/hooks/use-is-touch-device';
 
 import {
   ContextMenu,

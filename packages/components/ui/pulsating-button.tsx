@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@comend/lib/utils";
+import { cn } from "./../../../packages/lib/utils";
 
 interface PulsatingButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {

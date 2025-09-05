@@ -1,5 +1,5 @@
 import fs from 'fs'
-import prisma from "@comend/lib/prisma"
+import prisma from "./prisma"
 export const dynamic = 'force-dynamic'; // Prevent caching
 
 async function getPrismaSchema() {

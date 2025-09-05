@@ -1,16 +1,15 @@
 "use server"
 
-import {unstable_cache} from "next/cache"
-import prisma from "@comend/lib/prisma"
+import prisma from "./prisma"
 import {
     ApiResponse,
     GLOBAL_FEED_TYPES,
     milestoneCategories,
     RequestFiltersType,
     RESEARCH_PLAN_TYPES
-} from "@comend/lib/types";
-import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "@/packages/lib/auth";
+} from "./types";
+import {formatMoney, getProfileCompletionChecks, getStage, logError} from "./utils";
+import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "./auth";
 import {
     Condition,
     MaterialAndDataAccessRequest,
@@ -30,19 +29,18 @@ import {
     clinicalStudySchema,
     preclinicalStudySchema,
     taskSchema
-} from "@comend/data/pharma-data/schema";
+} from "./../../packages/data/pharma-data/schema";
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
 import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
-import {filterColumns} from "@comend/lib/filter-columns";
-// import type {GetBiosampleRequestsSchema, GetBiosamplesSchema, GetTasksSchema} from "@comend/components/biorepo/advanced-data-table";
+import {filterColumns} from "./filter-columns";
 import {nanoid} from "nanoid";
-import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "@comend/lib/types";
-import {mergeResearcherData} from "@/apps/researcher/lib/utils";
+import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "./types";
+import {mergeResearcherData} from "./../../apps/researcher/lib/utils";
 import {
     GetBiosamplesSchema,
     GetDiseaseModelSchema
-} from "@comend/components/biorepo/advanced-data-table/lib/validations";
+} from "./validations";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getServicesOfCompany(
@@ -267,6 +265,52 @@ export async function getPublicRoadmapsForOrganization(
                             contacts: true,
                             attachments: true,
                             types: {include: {milestoneType: true}},
+                            biosamples: {
+                                include: {
+                                    biosample: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                },
+                                where: {
+                                    biosample: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                }
+                            },
+                            diseaseModels: {
+                                include: {
+                                    diseaseModel: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {private: {equals: false}}
+                                                }
+                                            }
+                                        }
+                                    },
+                                },
+                                where: {
+                                    diseaseModel: {private: {equals: false}}
+                                }
+                            },
                             tools: {
                                 include: {
                                     tool: {
@@ -338,6 +382,52 @@ export async function getPublicRoadmapsForOrganization(
                     contacts: true,
                     attachments: true,
                     types: {include: {milestoneType: true}},
+                    biosamples: {
+                        include: {
+                            biosample: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        where: {
+                            biosample: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        }
+                    },
+                    diseaseModels: {
+                        include: {
+                            diseaseModel: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {private: {equals: false}}
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        where: {
+                            diseaseModel: {private: {equals: false}}
+                        }
+                    },
                     tools: {
                         include: {
                             tool: {
@@ -478,49 +568,40 @@ export async function getOrganizationData(
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
-    return await unstable_cache(
-        async () => {
-            let organization = await prisma.organization.findUnique({
-                where: subdomain ? {subdomain} : {customDomain: domain},
-                select: {
-                    ...select,
-                    members: select.members ? ({
-                        include: {user: true},
-                        orderBy: {createdAt: 'asc'},
-                    }) : undefined
-                }
+        let organization = await prisma.organization.findUnique({
+            where: subdomain ? {subdomain} : {customDomain: domain},
+            select: {
+                ...select,
+                members: select.members ? ({
+                    include: {user: true},
+                    orderBy: {createdAt: 'asc'},
+                }) : undefined
+            }
+        })
+
+        if (!organization) return organization
+
+        if (organization.members) {
+            // sort members list - move org owners to the beginning of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.role === 'owner' && b.role !== 'owner') return -1
+                if (b.role === 'owner' && a.role !== 'owner') return 1
+                return 0
             })
 
-            if (!organization) return organization
-
-            if (organization.members) {
-                // sort members list - move org owners to the beginning of the list
-                organization.members = organization.members.sort((a, b) => {
-                    if (a.role === 'owner' && b.role !== 'owner') return -1
-                    if (b.role === 'owner' && a.role !== 'owner') return 1
-                    return 0
-                })
-
-                // sort members list - move comend users to the end of the list
-                organization.members = organization.members.sort((a, b) => {
-                    if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-                    if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-                    return 0
-                })
-            }
-
-            const sanitizedOrganization = omit(organization, [
-                'contactEmailHash'
-            ])
-
-            return sanitizedOrganization
-        },
-        [`${domain}-metadata`],
-        {
-            revalidate: 900,
-            tags: [`${domain}-metadata`]
+            // sort members list - move comend users to the end of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+                return 0
+            })
         }
-    )()
+
+        const sanitizedOrganization = omit(organization, [
+            'contactEmailHash'
+        ])
+
+        return sanitizedOrganization
 }
 
 export const getPublicOrganizationData = async (
@@ -2156,113 +2237,107 @@ export const getDiseaseModels = withOrganizationAuth(
         data: DiseaseModel[],
         pageCount: number
     }> => {
-        return unstable_cache(
-            async () => {
-                try {
-                    if (!input) {
-                        const [data, total] = await prisma.$transaction([
-                            prisma.diseaseModel.findMany({
-                                where: {
-                                    organizationId: organization.id
-                                },
-                                include: {
-                                    attachments: true,
-                                    contacts: true,
-                                    organization: {include: {conditions: {include: {condition: true}}}},
-                                    gene: true,
-                                    institution: true,
-                                    milestones: {include: {milestone: true}},
-                                },
-                                orderBy: {createdAt: "asc"},
-                            }),
-                            prisma.diseaseModel.count({where: {organizationId: organization.id}}),
-                        ]);
+        try {
+            if (!input) {
+                const [data, total] = await prisma.$transaction([
+                    prisma.diseaseModel.findMany({
+                        where: {
+                            organizationId: organization.id
+                        },
+                        include: {
+                            attachments: true,
+                            contacts: true,
+                            organization: {include: {conditions: {include: {condition: true}}}},
+                            gene: true,
+                            institution: true,
+                            milestones: {include: {milestone: true}},
+                        },
+                        orderBy: {createdAt: "asc"},
+                    }),
+                    prisma.diseaseModel.count({where: {organizationId: organization.id}}),
+                ]);
 
-                        return {data, pageCount: 1};
-                    }
+                return {data, pageCount: 1};
+            }
 
-                    const offset = (input.page - 1) * input.perPage;
-                    const advancedTable =
-                        input.filterFlag === "advancedFilters"
+            const offset = (input.page - 1) * input.perPage;
+            const advancedTable =
+                input.filterFlag === "advancedFilters"
 
-                    let where: any = {};
-                    console.log(`input`, input)
+            let where: any = {};
+            console.log(`input`, input)
 
-                    if (advancedTable) {
-                        const preProcessedFilters: any = input.filters.map(filter => ({
-                            ...filter,
-                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                        }))
+            if (advancedTable) {
+                const preProcessedFilters: any = input.filters.map(filter => ({
+                    ...filter,
+                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                }))
 
-                        where = filterColumns({
-                            filters: preProcessedFilters,
-                            joinOperator: input.joinOperator,
-                        })
-                    } else {
-                        const filters: any[] = []
+                where = filterColumns({
+                    filters: preProcessedFilters,
+                    joinOperator: input.joinOperator,
+                })
+            } else {
+                const filters: any[] = []
 
-                        if (input.private.length == 1) {
-                            // private only has two options, we only filter if ONE of them
-                            // is selected...
-                            filters.push({
-                                id: 'private',
-                                value: input.private[0],
-                                variant: 'select',
-                                operator: 'eq',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.types.length > 0) {
-                            filters.push({
-                                id: 'types',
-                                value: input.types,
-                                variant: 'multiSelect',
-                                operator: 'inArray',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        where = filterColumns({
-                            filters,
-                            joinOperator: "and"
-                        })
-                    }
-
-                    const orderBy = input.sort.length
-                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                        : [{createdAt: "asc"}];
-
-                    const [data, total] = await prisma.$transaction([
-                        prisma.diseaseModel.findMany({
-                            skip: offset,
-                            take: input.perPage,
-                            where: {
-                                ...where,
-                                organizationId: organization.id
-                            },
-                            include: {
-                                attachments: true,
-                                contacts: true,
-                                organization: {include: {conditions: {include: {condition: true}}}},
-                                gene: true,
-                                institution: true,
-                                milestones: {include: {milestone: true}},
-                            },
-                            orderBy,
-                        }),
-                        prisma.diseaseModel.count({where: {...where, organizationId: organization.id}}),
-                    ]);
-
-                    const pageCount = Math.ceil(total / input.perPage);
-                    return {data, pageCount};
-                } catch {
-                    return {data: [], pageCount: 0};
+                if (input.private.length == 1) {
+                    // private only has two options, we only filter if ONE of them
+                    // is selected...
+                    filters.push({
+                        id: 'private',
+                        value: input.private[0],
+                        variant: 'select',
+                        operator: 'eq',
+                        filterId: nanoid()
+                    })
                 }
-            },
-            [JSON.stringify(input)],
-            {revalidate: 1, tags: ["diseaseModels"]},
-        )()
+
+                if (input.types.length > 0) {
+                    filters.push({
+                        id: 'types',
+                        value: input.types,
+                        variant: 'multiSelect',
+                        operator: 'inArray',
+                        filterId: nanoid()
+                    })
+                }
+
+                where = filterColumns({
+                    filters,
+                    joinOperator: "and"
+                })
+            }
+
+            const orderBy = input.sort.length
+                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                : [{createdAt: "asc"}];
+
+            const [data, total] = await prisma.$transaction([
+                prisma.diseaseModel.findMany({
+                    skip: offset,
+                    take: input.perPage,
+                    where: {
+                        ...where,
+                        organizationId: organization.id
+                    },
+                    include: {
+                        attachments: true,
+                        contacts: true,
+                        organization: {include: {conditions: {include: {condition: true}}}},
+                        gene: true,
+                        institution: true,
+                        milestones: {include: {milestone: true}},
+                    },
+                    orderBy,
+                }),
+                prisma.diseaseModel.count({where: {...where, organizationId: organization.id}}),
+            ]);
+
+            const pageCount = Math.ceil(total / input.perPage);
+            return {data, pageCount};
+        } catch {
+            return {data: [], pageCount: 0};
+        }
     }
 )
 
@@ -2271,142 +2346,136 @@ export const getBiosamples = withOrganizationAuth(
         data: Biosample[],
         pageCount: number
     }> => {
-        return unstable_cache(
-            async () => {
-                try {
-                    if (!input) {
-                        const [data, total] = await prisma.$transaction([
-                            prisma.biosample.findMany({
-                                where: {
-                                    organizationId: organization.id
-                                },
-                                include: {
-                                    milestones: {include: {milestone: true}},
-                                    contacts: true,
-                                    attachments: true,
-                                    gene: true,
-                                    donor: {
-                                        include: {diagnoses: {include: {type: true}}}
-                                    },
-                                    institution: true,
-                                    materialAndDataAccessRequests: true
-                                },
-                                orderBy: {createdAt: "asc"},
-                            }),
-                            prisma.biosample.count({where: {organizationId: organization.id}}),
-                        ]);
-
-                        return {data, pageCount: 1};
-                    }
-
-                    const offset = (input.page - 1) * input.perPage;
-                    const advancedTable =
-                        input.filterFlag === "advancedFilters"
-
-                    let where: any = {};
-                    console.log(`input`, input)
-
-                    if (advancedTable) {
-                        const preProcessedFilters: any = input.filters.map(filter => ({
-                            ...filter,
-                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                            ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                            ...(filter.id === "gene" && {value: {symbol: filter.value}}),
-                            ...(filter.id === "institution" && {value: {name: filter.value}}),
-                            ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
-                        }))
-
-                        where = filterColumns({
-                            filters: preProcessedFilters,
-                            joinOperator: input.joinOperator,
-                        })
-                    } else {
-                        const filters: any[] = []
-                        if (input.title) {
-                            filters.push({
-                                id: 'title',
-                                value: input.title,
-                                variant: 'text',
-                                operator: 'iLike',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.private.length == 1) {
-                            // private only has two options, we only filter if ONE of them
-                            // is selected...
-                            filters.push({
-                                id: 'private',
-                                value: input.private[0],
-                                variant: 'select',
-                                operator: 'eq',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.types.length > 0) {
-                            filters.push({
-                                id: 'types',
-                                value: input.types,
-                                variant: 'multiSelect',
-                                operator: 'inArray',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.quantity) {
-                            filters.push({
-                                id: 'quantity',
-                                value: input.quantity,
-                                variant: 'range',
-                                operator: 'isBetween',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        where = filterColumns({
-                            filters,
-                            joinOperator: "and"
-                        })
-                    }
-
-                    const orderBy = input.sort.length
-                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                        : [{createdAt: "asc"}];
-
-                    const [data, total] = await prisma.$transaction([
-                        prisma.biosample.findMany({
-                            skip: offset,
-                            take: input.perPage,
-                            where: {
-                                ...where,
-                                organizationId: organization.id
+        try {
+            if (!input) {
+                const [data, total] = await prisma.$transaction([
+                    prisma.biosample.findMany({
+                        where: {
+                            organizationId: organization.id
+                        },
+                        include: {
+                            milestones: {include: {milestone: true}},
+                            contacts: true,
+                            attachments: true,
+                            gene: true,
+                            donor: {
+                                include: {diagnoses: {include: {type: true}}}
                             },
-                            include: {
-                                milestones: {include: {milestone: true}},
-                                contacts: true,
-                                attachments: true,
-                                gene: true,
-                                donor: {
-                                    include: {diagnoses: {include: {type: true}}}
-                                },
-                                institution: true,
-                                materialAndDataAccessRequests: true
-                            },
-                            orderBy,
-                        }),
-                        prisma.biosample.count({where: {...where, organizationId: organization.id}}),
-                    ]);
+                            institution: true,
+                            materialAndDataAccessRequests: true
+                        },
+                        orderBy: {createdAt: "asc"},
+                    }),
+                    prisma.biosample.count({where: {organizationId: organization.id}}),
+                ]);
 
-                    const pageCount = Math.ceil(total / input.perPage);
-                    return {data, pageCount};
-                } catch {
-                    return {data: [], pageCount: 0};
+                return {data, pageCount: 1};
+            }
+
+            const offset = (input.page - 1) * input.perPage;
+            const advancedTable =
+                input.filterFlag === "advancedFilters"
+
+            let where: any = {};
+            console.log(`input`, input)
+
+            if (advancedTable) {
+                const preProcessedFilters: any = input.filters.map(filter => ({
+                    ...filter,
+                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                    ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
+                    ...(filter.id === "gene" && {value: {symbol: filter.value}}),
+                    ...(filter.id === "institution" && {value: {name: filter.value}}),
+                    ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
+                }))
+
+                where = filterColumns({
+                    filters: preProcessedFilters,
+                    joinOperator: input.joinOperator,
+                })
+            } else {
+                const filters: any[] = []
+                if (input.title) {
+                    filters.push({
+                        id: 'title',
+                        value: input.title,
+                        variant: 'text',
+                        operator: 'iLike',
+                        filterId: nanoid()
+                    })
                 }
-            },
-            [JSON.stringify(input)],
-            {revalidate: 1, tags: ["biosamples"]},
-        )();
+
+                if (input.private.length == 1) {
+                    // private only has two options, we only filter if ONE of them
+                    // is selected...
+                    filters.push({
+                        id: 'private',
+                        value: input.private[0],
+                        variant: 'select',
+                        operator: 'eq',
+                        filterId: nanoid()
+                    })
+                }
+
+                if (input.types.length > 0) {
+                    filters.push({
+                        id: 'types',
+                        value: input.types,
+                        variant: 'multiSelect',
+                        operator: 'inArray',
+                        filterId: nanoid()
+                    })
+                }
+
+                if (input.quantity) {
+                    filters.push({
+                        id: 'quantity',
+                        value: input.quantity,
+                        variant: 'range',
+                        operator: 'isBetween',
+                        filterId: nanoid()
+                    })
+                }
+
+                where = filterColumns({
+                    filters,
+                    joinOperator: "and"
+                })
+            }
+
+            const orderBy = input.sort.length
+                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                : [{createdAt: "asc"}];
+
+            const [data, total] = await prisma.$transaction([
+                prisma.biosample.findMany({
+                    skip: offset,
+                    take: input.perPage,
+                    where: {
+                        ...where,
+                        organizationId: organization.id
+                    },
+                    include: {
+                        milestones: {include: {milestone: true}},
+                        contacts: true,
+                        attachments: true,
+                        gene: true,
+                        donor: {
+                            include: {diagnoses: {include: {type: true}}}
+                        },
+                        institution: true,
+                        materialAndDataAccessRequests: true
+                    },
+                    orderBy,
+                }),
+                prisma.biosample.count({where: {...where, organizationId: organization.id}}),
+            ]);
+
+            const pageCount = Math.ceil(total / input.perPage);
+            return {data, pageCount};
+        } catch {
+            return {data: [], pageCount: 0};
+        }
     }
 )
 
@@ -2556,97 +2625,11 @@ export const getAllBiosamples = withResearcherAuth(
 
 export const getDatasamples = withOrganizationAuth(
     async (organization: Organization, input?: GetBiosamplesSchema) => {
-        return unstable_cache(
-            async () => {
-                try {
-                    if (!input) {
-                        const [data, total] = await prisma.$transaction([
-                            prisma.tool.findMany({
-                                where: {
-                                    organizationId: organization.id
-                                },
-                                include: {
-                                    organization: {include: {conditions: {include: {condition: true}}}},
-                                    milestones: {include: {milestone: true}},
-                                    contacts: true,
-                                    attachments: true,
-                                    institution: true,
-                                    gene: true,
-                                },
-                                orderBy: {createdAt: "asc"},
-                            }),
-                            prisma.tool.count({where: {organizationId: organization.id}}),
-                        ]);
-
-                        return {data, pageCount: 1};
-                    }
-
-                    const offset = (input.page - 1) * input.perPage;
-                    const advancedTable =
-                        input.filterFlag === "advancedFilters"
-
-                    let where: any = {};
-
-                    if (advancedTable) {
-                        const preProcessedFilters: any = input.filters.map(filter => ({
-                            ...filter,
-                            ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-                        }))
-
-                        where = filterColumns({
-                            filters: preProcessedFilters,
-                            joinOperator: input.joinOperator,
-                        })
-                    } else {
-                        const filters: any[] = []
-                        if (input.title) {
-                            filters.push({
-                                id: 'title',
-                                value: input.title,
-                                variant: 'text',
-                                operator: 'iLike',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.private.length == 1) {
-                            // private only has two options, we only filter if ONE of them
-                            // is selected...
-                            filters.push({
-                                id: 'private',
-                                value: input.private[0],
-                                variant: 'select',
-                                operator: 'eq',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        if (input.types.length > 0) {
-                            filters.push({
-                                id: 'types',
-                                value: input.types,
-                                variant: 'multiSelect',
-                                operator: 'inArray',
-                                filterId: nanoid()
-                            })
-                        }
-
-                        where = filterColumns({
-                            filters,
-                            joinOperator: "and"
-                        })
-                    }
-
-                    const orderBy = input.sort.length
-                        ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                        : [{createdAt: "asc"}];
-
+            try {
+                if (!input) {
                     const [data, total] = await prisma.$transaction([
                         prisma.tool.findMany({
-                            skip: offset,
-                            take: input.perPage,
                             where: {
-                                ...where,
                                 organizationId: organization.id
                             },
                             include: {
@@ -2657,20 +2640,100 @@ export const getDatasamples = withOrganizationAuth(
                                 institution: true,
                                 gene: true,
                             },
-                            orderBy,
+                            orderBy: {createdAt: "asc"},
                         }),
-                        prisma.tool.count({where}),
+                        prisma.tool.count({where: {organizationId: organization.id}}),
                     ]);
 
-                    const pageCount = Math.ceil(total / input.perPage);
-                    return {data, pageCount};
-                } catch {
-                    return {data: [], pageCount: 0};
+                    return {data, pageCount: 1};
                 }
-            },
-            [JSON.stringify(input)],
-            {revalidate: 1, tags: ["datasamples"]},
-        )();
+
+                const offset = (input.page - 1) * input.perPage;
+                const advancedTable =
+                    input.filterFlag === "advancedFilters"
+
+                let where: any = {};
+
+                if (advancedTable) {
+                    const preProcessedFilters: any = input.filters.map(filter => ({
+                        ...filter,
+                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                    }))
+
+                    where = filterColumns({
+                        filters: preProcessedFilters,
+                        joinOperator: input.joinOperator,
+                    })
+                } else {
+                    const filters: any[] = []
+                    if (input.title) {
+                        filters.push({
+                            id: 'title',
+                            value: input.title,
+                            variant: 'text',
+                            operator: 'iLike',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    if (input.private.length == 1) {
+                        // private only has two options, we only filter if ONE of them
+                        // is selected...
+                        filters.push({
+                            id: 'private',
+                            value: input.private[0],
+                            variant: 'select',
+                            operator: 'eq',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    if (input.types.length > 0) {
+                        filters.push({
+                            id: 'types',
+                            value: input.types,
+                            variant: 'multiSelect',
+                            operator: 'inArray',
+                            filterId: nanoid()
+                        })
+                    }
+
+                    where = filterColumns({
+                        filters,
+                        joinOperator: "and"
+                    })
+                }
+
+                const orderBy = input.sort.length
+                    ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                    : [{createdAt: "asc"}];
+
+                const [data, total] = await prisma.$transaction([
+                    prisma.tool.findMany({
+                        skip: offset,
+                        take: input.perPage,
+                        where: {
+                            ...where,
+                            organizationId: organization.id
+                        },
+                        include: {
+                            organization: {include: {conditions: {include: {condition: true}}}},
+                            milestones: {include: {milestone: true}},
+                            contacts: true,
+                            attachments: true,
+                            institution: true,
+                            gene: true,
+                        },
+                        orderBy,
+                    }),
+                    prisma.tool.count({where}),
+                ]);
+
+                const pageCount = Math.ceil(total / input.perPage);
+                return {data, pageCount};
+            } catch {
+                return {data: [], pageCount: 0};
+            }
     }
 )
 
@@ -2710,78 +2773,72 @@ const getRequests = async (
     input: GetRequestsInput,
     additionalWhere?: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
 ) => {
-    return unstable_cache(
-        async () => {
-            try {
-                const page = input.page ?? 1
-                const perPage = input.perPage ?? 10
-                const offset = (page - 1) * perPage
+    try {
+        const page = input.page ?? 1
+        const perPage = input.perPage ?? 10
+        const offset = (page - 1) * perPage
 
-                const filters: any[] = []
+        const filters: any[] = []
 
-                if (input.searchTerm) {
-                    filters.push({
-                        id: "title",
-                        value: input.searchTerm,
-                        operator: "iLike",
-                        variant: "text",
-                        filterId: nanoid(),
-                    })
+        if (input.searchTerm) {
+            filters.push({
+                id: "title",
+                value: input.searchTerm,
+                operator: "iLike",
+                variant: "text",
+                filterId: nanoid(),
+            })
+        }
+
+        if (input.filters.statuses.length > 0) {
+            filters.push({
+                id: "status",
+                value: input.filters.statuses.map((s: Option) => s.value),
+                operator: "inArray",
+                variant: "multiSelect",
+                filterId: nanoid(),
+            })
+        }
+
+        if (input.filters.types.length > 0) {
+            filters.push({
+                id: "type",
+                value: input.filters.types.map((t: Option) => t.value),
+                operator: "inArray",
+                variant: "multiSelect",
+                filterId: nanoid(),
+            })
+        }
+
+        const where = filterColumns({filters, joinOperator: "and"})
+
+        const [data, total] = await prisma.$transaction([
+            prisma.materialAndDataAccessRequest.findMany({
+                where: {
+                    ...where,
+                    ...additionalWhere
+                },
+                skip: offset,
+                take: perPage,
+                orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+            }),
+            prisma.materialAndDataAccessRequest.count({
+                where: {
+                    ...where,
+                    ...additionalWhere
                 }
+            })
+        ])
 
-                if (input.filters.statuses.length > 0) {
-                    filters.push({
-                        id: "status",
-                        value: input.filters.statuses.map((s: Option) => s.value),
-                        operator: "inArray",
-                        variant: "multiSelect",
-                        filterId: nanoid(),
-                    })
-                }
-
-                if (input.filters.types.length > 0) {
-                    filters.push({
-                        id: "type",
-                        value: input.filters.types.map((t: Option) => t.value),
-                        operator: "inArray",
-                        variant: "multiSelect",
-                        filterId: nanoid(),
-                    })
-                }
-
-                const where = filterColumns({filters, joinOperator: "and"})
-
-                const [data, total] = await prisma.$transaction([
-                    prisma.materialAndDataAccessRequest.findMany({
-                        where: {
-                            ...where,
-                            ...additionalWhere
-                        },
-                        skip: offset,
-                        take: perPage,
-                        orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
-                    }),
-                    prisma.materialAndDataAccessRequest.count({
-                        where: {
-                            ...where,
-                            ...additionalWhere
-                        }
-                    })
-                ])
-
-                return {
-                    success: true,
-                    data,
-                    total,
-                }
-            } catch (err) {
-                console.error("getRequests error", err)
-                return {success: false, data: [], total: 0}
-            }
-        },
-        [JSON.stringify(input)],
-        {revalidate: 1, tags: ["requests"]},
-    )()
+        return {
+            success: true,
+            data,
+            total,
+        }
+    } catch (err) {
+        console.error("getRequests error", err)
+        return {success: false, data: [], total: 0}
+    }
 }
 
 // export const getRequests = withOrganizationAuth(
@@ -2790,73 +2847,67 @@ const getRequests = async (
 //         additionalWhere: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
 //         input: GetRequestsInput
 //     ) => {
-//         return unstable_cache(
-//             async () => {
-//                 try {
-//                     const page = input.page ?? 1
-//                     const perPage = input.perPage ?? 10
-//                     const offset = (page - 1) * perPage
+//         try {
+//             const page = input.page ?? 1
+//             const perPage = input.perPage ?? 10
+//             const offset = (page - 1) * perPage
 
-//                     const filters: any[] = []
+//             const filters: any[] = []
 
-//                     if (input.searchTerm) {
-//                         filters.push({
-//                             id: "title",
-//                             value: input.searchTerm,
-//                             operator: "iLike",
-//                             variant: "text",
-//                             filterId: nanoid(),
-//                         })
-//                     }
+//             if (input.searchTerm) {
+//                 filters.push({
+//                     id: "title",
+//                     value: input.searchTerm,
+//                     operator: "iLike",
+//                     variant: "text",
+//                     filterId: nanoid(),
+//                 })
+//             }
 
-//                     if (input.filters.statuses.length > 0) {
-//                         filters.push({
-//                             id: "status",
-//                             value: input.filters.statuses.map(s => s.value),
-//                             operator: "inArray",
-//                             variant: "multiSelect",
-//                             filterId: nanoid(),
-//                         })
-//                     }
+//             if (input.filters.statuses.length > 0) {
+//                 filters.push({
+//                     id: "status",
+//                     value: input.filters.statuses.map(s => s.value),
+//                     operator: "inArray",
+//                     variant: "multiSelect",
+//                     filterId: nanoid(),
+//                 })
+//             }
 
-//                     if (input.filters.types.length > 0) {
-//                         filters.push({
-//                             id: "type",
-//                             value: input.filters.types.map(t => t.value),
-//                             operator: "inArray",
-//                             variant: "multiSelect",
-//                             filterId: nanoid(),
-//                         })
-//                     }
+//             if (input.filters.types.length > 0) {
+//                 filters.push({
+//                     id: "type",
+//                     value: input.filters.types.map(t => t.value),
+//                     operator: "inArray",
+//                     variant: "multiSelect",
+//                     filterId: nanoid(),
+//                 })
+//             }
 
-//                     const where = filterColumns({filters, joinOperator: "and"})
+//             const where = filterColumns({filters, joinOperator: "and"})
 
-//                     const [data, total] = await prisma.$transaction([
-//                         prisma.materialAndDataAccessRequest.findMany({
-//                             where: {
-//                                 ...where,
-//                                 // organizationId: organization.id
-//                                 ...additionalWhere
-//                             },
-//                             skip: offset,
-//                             take: perPage,
-//                             orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
-//                         }),
-//                         prisma.materialAndDataAccessRequest.count({where}),
-//                     ])
+//             const [data, total] = await prisma.$transaction([
+//                 prisma.materialAndDataAccessRequest.findMany({
+//                     where: {
+//                         ...where,
+//                         // organizationId: organization.id
+//                         ...additionalWhere
+//                     },
+//                     skip: offset,
+//                     take: perPage,
+//                     orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+//                 }),
+//                 prisma.materialAndDataAccessRequest.count({where}),
+//             ])
 
-//                     return {
-//                         data,
-//                         total,
-//                     }
-//                 } catch (err) {
-//                     console.error("getRequests error", err)
-//                     return {data: [], total: 0}
-//                 }
-//             },
-//             [JSON.stringify(input)],
-//             {revalidate: 1, tags: ["requests"]},
-//         )()
+//             return {
+//                 data,
+//                 total,
+//             }
+//         } catch (err) {
+//             console.error("getRequests error", err)
+//             return {data: [], total: 0}
+//         }
 //     }
 // )
 

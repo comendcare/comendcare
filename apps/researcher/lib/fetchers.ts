@@ -3,13 +3,9 @@
 import prisma from "@comend/lib/prisma"
 import {withResearcherAuth} from "@/packages/lib/auth";
 import {Organization, Tool} from "@prisma/client";
-import {unstable_cache} from "@comend/lib/unstable-cache"
-import {filterColumns} from "@comend/lib/filter-columns"
-import {nanoid} from "nanoid"
-import { RequestFiltersType } from "@/packages/lib/types";
 
 export const getAllBiosamples = withResearcherAuth(
-    async (organization: Organization): Promise<{data: Tool[], pageCount: number}> => {
+    async (_: Organization): Promise<{data: Tool[], pageCount: number}> => {
         try {
             const data = await prisma.tool.findMany({
                 include: {

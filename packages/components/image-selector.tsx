@@ -9,12 +9,12 @@ import ReactCrop, {
     type PixelCrop,
 } from "react-image-crop"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar"
-import { Button } from "@comend/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { Button } from "./ui/button"
 
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Image, Pencil, Trash2Icon, Upload } from "lucide-react"
-import {acceptedFiletypes, cn, getPublicFile, sleep} from "@comend/lib/utils";
+import {acceptedFiletypes, cn, getPublicFile, sleep} from "./../../packages/lib/utils";
 import { toast } from "sonner"
 import {FileWithPath, useDropzone} from "react-dropzone";
 

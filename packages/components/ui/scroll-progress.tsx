@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@comend/lib/utils";
+import { cn } from "./../../../packages/lib/utils";
 import { motion, MotionProps, useScroll } from "framer-motion";
 import React from "react";
 interface ScrollProgressProps

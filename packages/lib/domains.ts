@@ -2,7 +2,7 @@ import {
     DomainResponse,
     DomainConfigResponse,
     DomainVerificationResponse
-} from "@comend/lib/types"
+} from "./types"
 
 export const addDomainToVercel = async (domain: string) => {
     return await fetch(

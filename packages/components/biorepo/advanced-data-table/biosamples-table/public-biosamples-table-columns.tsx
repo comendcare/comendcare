@@ -7,15 +7,15 @@ import {
 import * as React from "react";
 import {
     DataTableColumnHeader
-} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-column-header";
+} from "./../data-table/data-table-column-header";
 import {
     BIOSAMPLE_TYPE_OPTIONS,
     AVAILABILITY_OPTIONS
-} from "@comend/lib/types";
-import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge";
-import { ProfilePhoto } from "@comend/components/profile-photo";
-import { Badge } from "@comend/components/ui/badge";
-import { Option } from "@comend/lib/types";
+} from "./../../../../../packages/lib/types";
+import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
+import { ProfilePhoto } from "./../../../profile-photo";
+import { Badge } from "./../../../ui/badge";
+import { Option } from "./../../../../../packages/lib/types";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
 

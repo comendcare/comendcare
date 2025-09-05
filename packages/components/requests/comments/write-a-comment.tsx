@@ -4,7 +4,7 @@ import va from "@vercel/analytics"
 import {useSession} from "next-auth/react"
 import {toast} from "sonner"
 import {usePathname, useRouter} from "next/navigation"
-import { createRequestComment } from "@comend/lib/actions"
+import { createRequestComment } from "./../../../../packages/lib/actions"
 
 export default function WriteAComment({
                                           requestId

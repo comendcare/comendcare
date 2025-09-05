@@ -1,6 +1,6 @@
 "use client";
 
-import { useRoadmapStore } from "@/apps/web/state/roadmap/roadmapStore";
+import { useRoadmapStore } from "../../apps/web/state/roadmap/roadmapStore";
 import { PlatformNotification, Prisma } from "@prisma/client";
 import { useNotificationsStore } from "../../state/notifications/notificationsStore";
 import { useCROSearchStore } from "../../state/search/croSearchStore";
@@ -11,7 +11,7 @@ import { FiltersType as PAGMarketplaceFiltersType} from "../../state/search/orga
 import { FiltersType as BiosampleMarketplaceFiltersType, useBiosampleSearchStore} from "../../state/search/biosampleSearchStore";
 import { FiltersType as DiseaseModelMarketplaceFiltersType, useDiseaseModelSearchStore} from "../../state/search/diseaseModelSearchStore";
 import { FiltersType as ClinicalDatasetMarketplaceFiltersType, useClinicalDatasetSearchStore} from "../../state/search/clinicalDatasetSearchStore";
-import { Asset, RFP, Roadmap } from '@comend/lib/types';
+import { Asset, RFP, Roadmap } from './types';
 import { useToolStore } from "../../state/tool/toolStore";
 import { useRFPStore } from "../../state/rfp/rfpStore";
 

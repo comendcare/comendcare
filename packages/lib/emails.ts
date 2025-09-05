@@ -1,18 +1,18 @@
 "use server"
 import {render} from "@react-email/render"
 import sgMail from "@sendgrid/mail"
-import ContactEmail from "@/packages/transactional/emails/contact/contact-email"
-import PAGContactEmail from "@/packages/transactional/emails/pag/contact-email";
-import rateLimit from "@comend/lib/rate-limit";
+import ContactEmail from "./../../packages/transactional/emails/contact/contact-email"
+import PAGContactEmail from "./../../packages/transactional/emails/pag/contact-email";
+import rateLimit from "./rate-limit";
 import axios from "axios";
-import WaitlistEmail from "@/packages/transactional/emails/contact/waitlist-email";
-import InviteToOrganizationEmail from "@/packages/transactional/emails/invitations/invite-to-organization-email";
-import {NewMemberRequestEmail} from "@/packages/transactional/emails/invitations/new-member-request-email";
-import NewOrganizationEmail from "@/packages/transactional/emails/admins/new-organization";
-import memberRequestApprovedEmail from "@/packages/transactional/emails/invitations/member-request-approved-email";
-import memberRequestDeniedEmail from "@/packages/transactional/emails/invitations/member-request-denied-email";
-import MemberDeletedEmail from "@/packages/transactional/emails/invitations/member-deleted-email";
-import ContactRequestEmail from "@/packages/transactional/emails/providers/contact-request-email";
+import WaitlistEmail from "./../../packages/transactional/emails/contact/waitlist-email";
+import InviteToOrganizationEmail from "./../../packages/transactional/emails/invitations/invite-to-organization-email";
+import {NewMemberRequestEmail} from "./../../packages/transactional/emails/invitations/new-member-request-email";
+import NewOrganizationEmail from "./../../packages/transactional/emails/admins/new-organization";
+import memberRequestApprovedEmail from "./../../packages/transactional/emails/invitations/member-request-approved-email";
+import memberRequestDeniedEmail from "./../../packages/transactional/emails/invitations/member-request-denied-email";
+import MemberDeletedEmail from "./../../packages/transactional/emails/invitations/member-deleted-email";
+import ContactRequestEmail from "./../../packages/transactional/emails/providers/contact-request-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)

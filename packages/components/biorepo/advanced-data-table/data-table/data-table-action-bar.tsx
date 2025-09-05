@@ -5,14 +5,14 @@ import { Loader, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Button } from "@comend/components/ui/button";
-import { Separator } from "@comend/components/ui/separator";
+import { Button } from "./../../../ui/button";
+import { Separator } from "./../../../ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@comend/components/ui/tooltip";
-import { cn } from "@comend/lib/utils";
+} from "./../../../ui/tooltip";
+import { cn } from "./../../../../../packages/lib/utils";
 
 interface DataTableActionBarProps<TData>
   extends React.ComponentProps<typeof motion.div> {

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
-import {getDates, truncate} from "@comend/lib/utils";
+import {formatMoney, getDates, truncate} from "@comend/lib/utils";
 import {PrivateBadge} from "./private-badge"
 import { cn } from "@comend/lib/utils"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
@@ -28,7 +28,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical, Megaphone, Microscope, User, Lock, Calendar} from "lucide-react"
+import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
@@ -418,20 +418,16 @@ export const TimelineItemContent = ({
                 }
             })}
 
+            {(milestone.budget) && (
+                <li>
+                    <Badge className="min-w-fit w-fit m-1 font-normal">
+                        <DollarSign size={16}/>
+                        <p>{formatMoney(milestone.budget)}</p>
+                    </Badge>
+                </li>
+            )}
+
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
-                // <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
-                //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                //         <Microscope className="h-4 w-4 text-emerald-900" />
-                //         <span className="text-emerald-900">Linked Tools</span>
-                //         <div className="flex flex-wrap gap-2">
-                //             {milestone.tools.map(({tool}) => (
-                //                 <Badge variant="emerald" className="min-w-fit w-fit">
-                //                     {tool?.title}
-                //                 </Badge>
-                //             ))}
-                //         </div>
-                //     </div>
-                // </div>
                 <>
                     {(milestone.biosamples || []).map(({biosample}) => {
                         const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
@@ -460,19 +456,6 @@ export const TimelineItemContent = ({
                 </>
             )}
             {milestone?.rfps?.length > 0 && (
-                // <div className="border-l-4 border-orange-200 pl-4 space-y-3">
-                //     <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                //         <Megaphone className="h-4 w-4 text-orange-900" />
-                //         <span className="text-orange-900">Linked RFPs</span>
-                //         <div className="flex flex-wrap gap-2">
-                //             {milestone.rfps.map(({rfp}) => (
-                //                 <Badge variant="orange" className="min-w-fit w-fit">
-                //                     {rfp?.title}
-                //                 </Badge>
-                //             ))}
-                //         </div>
-                //     </div>
-                // </div>
                 <>
                     {milestone.rfps.map(({rfp}) => (
                         <Badge variant="orange" className="min-w-fit w-fit font-normal">

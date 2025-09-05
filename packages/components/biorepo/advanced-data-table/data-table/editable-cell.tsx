@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { revalidate } from "@comend/lib/revalidate";
-import { createOrUpdateBiosample } from "@comend/lib/actions";
+import { revalidate } from "./../../../../../packages/lib/revalidate";
+import { createOrUpdateBiosample } from "./../../../../../packages/lib/actions";
 import { useEffect, useRef, useState } from "react";
-import { Textarea } from "@comend/components/ui/textarea";
+import { Textarea } from "./../../../ui/textarea";
 
 export function EditableCell({ row, session, pathname }: { row: any, session: any, pathname: string }) {
     const [isEditing, setIsEditing] = useState(false)

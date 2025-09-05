@@ -768,7 +768,7 @@ const syncToTypesense = async (env: {
                 types: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value)),
                 gene: biosample.gene?.symbol,
                 conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                organizationSchema: biosample.organization
+                organization: biosample.organization
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {

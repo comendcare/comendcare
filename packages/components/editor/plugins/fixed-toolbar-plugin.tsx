@@ -2,8 +2,8 @@
 
 import { createPlatePlugin } from '@udecode/plate-common/react';
 
-import { FixedToolbar } from '@comend/components/plate-ui/fixed-toolbar';
-import { FixedToolbarButtons } from '@comend/components/plate-ui/fixed-toolbar-buttons';
+import { FixedToolbar } from './../../plate-ui/fixed-toolbar';
+import { FixedToolbarButtons } from './../../plate-ui/fixed-toolbar-buttons';
 
 export const FixedToolbarPlugin = createPlatePlugin({
   key: 'fixed-toolbar',

@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./../ui/card";
 import { Paperclip } from "lucide-react";
-import { MaterialAndDataAccessRequestWithResearcherAndComments } from "@comend/lib/types";
+import { MaterialAndDataAccessRequestWithResearcherAndComments } from "./../../../packages/lib/types";
 import {RequestUpdatePropertyDialog} from "./request-update-property-dialog";
 
 export default function RequestPageDetailsCard({ requestData }: { requestData: MaterialAndDataAccessRequestWithResearcherAndComments }) {

@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@comend/components/ui/avatar';
-import { cn } from '@comend/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { cn } from './../../../packages/lib/utils';
 import React from 'react';
 
 // Helper to get initials from a name
