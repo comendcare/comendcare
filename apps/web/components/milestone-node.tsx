@@ -28,7 +28,7 @@ import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 // import {PublicMilestoneNode} from "./public-milestone-node"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock, BadgeAlert } from "lucide-react"
+import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock, BadgeAlert, DollarSign } from "lucide-react"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
 import { Separator } from "@/packages/components/ui/separator"
@@ -141,12 +141,10 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                         if (contact.affiliation) {
                             return (
                                 <li key={index}>
-                                    {/* <PropertyBadge icon={User} className="border-gray-300 text-gray-900"> */}
                                     <Badge>
                                         <User size={18}/>
                                         <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
                                     </Badge>
-                                    {/* </PropertyBadge> */}
                                 </li>
                             )
                         }
@@ -154,12 +152,19 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
 
                     {(props?.data?.startDate || props?.data?.endDate) && (
                         <li>
-                            {/* <PropertyBadge icon={Calendar} className="border-gray-300 text-gray-900"> */}
                             <Badge>
                                 <Calendar size={16}/>
                                 <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
                             </Badge>
-                            {/* </PropertyBadge> */}
+                        </li>
+                    )}
+
+                    {(props?.data?.budget) && (
+                        <li>
+                            <Badge>
+                                <DollarSign size={16}/>
+                                <p>{formatMoney(props?.data?.budget)}</p>
+                            </Badge>
                         </li>
                     )}
                 </ul>
