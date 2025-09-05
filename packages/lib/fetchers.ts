@@ -1,6 +1,5 @@
 "use server"
 
-import {unstable_cache} from "next/cache"
 import prisma from "./prisma"
 import {
     ApiResponse,
@@ -569,49 +568,40 @@ export async function getOrganizationData(
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
-    return await unstable_cache(
-        async () => {
-            let organization = await prisma.organization.findUnique({
-                where: subdomain ? {subdomain} : {customDomain: domain},
-                select: {
-                    ...select,
-                    members: select.members ? ({
-                        include: {user: true},
-                        orderBy: {createdAt: 'asc'},
-                    }) : undefined
-                }
+        let organization = await prisma.organization.findUnique({
+            where: subdomain ? {subdomain} : {customDomain: domain},
+            select: {
+                ...select,
+                members: select.members ? ({
+                    include: {user: true},
+                    orderBy: {createdAt: 'asc'},
+                }) : undefined
+            }
+        })
+
+        if (!organization) return organization
+
+        if (organization.members) {
+            // sort members list - move org owners to the beginning of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.role === 'owner' && b.role !== 'owner') return -1
+                if (b.role === 'owner' && a.role !== 'owner') return 1
+                return 0
             })
 
-            if (!organization) return organization
-
-            if (organization.members) {
-                // sort members list - move org owners to the beginning of the list
-                organization.members = organization.members.sort((a, b) => {
-                    if (a.role === 'owner' && b.role !== 'owner') return -1
-                    if (b.role === 'owner' && a.role !== 'owner') return 1
-                    return 0
-                })
-
-                // sort members list - move comend users to the end of the list
-                organization.members = organization.members.sort((a, b) => {
-                    if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-                    if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-                    return 0
-                })
-            }
-
-            const sanitizedOrganization = omit(organization, [
-                'contactEmailHash'
-            ])
-
-            return sanitizedOrganization
-        },
-        [`${domain}-metadata`],
-        {
-            revalidate: 900,
-            tags: [`${domain}-metadata`]
+            // sort members list - move comend users to the end of the list
+            organization.members = organization.members.sort((a, b) => {
+                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+                return 0
+            })
         }
-    )()
+
+        const sanitizedOrganization = omit(organization, [
+            'contactEmailHash'
+        ])
+
+        return sanitizedOrganization
 }
 
 export const getPublicOrganizationData = async (
@@ -2783,78 +2773,72 @@ const getRequests = async (
     input: GetRequestsInput,
     additionalWhere?: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
 ) => {
-    return unstable_cache(
-        async () => {
-            try {
-                const page = input.page ?? 1
-                const perPage = input.perPage ?? 10
-                const offset = (page - 1) * perPage
+    try {
+        const page = input.page ?? 1
+        const perPage = input.perPage ?? 10
+        const offset = (page - 1) * perPage
 
-                const filters: any[] = []
+        const filters: any[] = []
 
-                if (input.searchTerm) {
-                    filters.push({
-                        id: "title",
-                        value: input.searchTerm,
-                        operator: "iLike",
-                        variant: "text",
-                        filterId: nanoid(),
-                    })
+        if (input.searchTerm) {
+            filters.push({
+                id: "title",
+                value: input.searchTerm,
+                operator: "iLike",
+                variant: "text",
+                filterId: nanoid(),
+            })
+        }
+
+        if (input.filters.statuses.length > 0) {
+            filters.push({
+                id: "status",
+                value: input.filters.statuses.map((s: Option) => s.value),
+                operator: "inArray",
+                variant: "multiSelect",
+                filterId: nanoid(),
+            })
+        }
+
+        if (input.filters.types.length > 0) {
+            filters.push({
+                id: "type",
+                value: input.filters.types.map((t: Option) => t.value),
+                operator: "inArray",
+                variant: "multiSelect",
+                filterId: nanoid(),
+            })
+        }
+
+        const where = filterColumns({filters, joinOperator: "and"})
+
+        const [data, total] = await prisma.$transaction([
+            prisma.materialAndDataAccessRequest.findMany({
+                where: {
+                    ...where,
+                    ...additionalWhere
+                },
+                skip: offset,
+                take: perPage,
+                orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+            }),
+            prisma.materialAndDataAccessRequest.count({
+                where: {
+                    ...where,
+                    ...additionalWhere
                 }
+            })
+        ])
 
-                if (input.filters.statuses.length > 0) {
-                    filters.push({
-                        id: "status",
-                        value: input.filters.statuses.map((s: Option) => s.value),
-                        operator: "inArray",
-                        variant: "multiSelect",
-                        filterId: nanoid(),
-                    })
-                }
-
-                if (input.filters.types.length > 0) {
-                    filters.push({
-                        id: "type",
-                        value: input.filters.types.map((t: Option) => t.value),
-                        operator: "inArray",
-                        variant: "multiSelect",
-                        filterId: nanoid(),
-                    })
-                }
-
-                const where = filterColumns({filters, joinOperator: "and"})
-
-                const [data, total] = await prisma.$transaction([
-                    prisma.materialAndDataAccessRequest.findMany({
-                        where: {
-                            ...where,
-                            ...additionalWhere
-                        },
-                        skip: offset,
-                        take: perPage,
-                        orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
-                    }),
-                    prisma.materialAndDataAccessRequest.count({
-                        where: {
-                            ...where,
-                            ...additionalWhere
-                        }
-                    })
-                ])
-
-                return {
-                    success: true,
-                    data,
-                    total,
-                }
-            } catch (err) {
-                console.error("getRequests error", err)
-                return {success: false, data: [], total: 0}
-            }
-        },
-        [JSON.stringify(input)],
-        {revalidate: 1, tags: ["requests"]},
-    )()
+        return {
+            success: true,
+            data,
+            total,
+        }
+    } catch (err) {
+        console.error("getRequests error", err)
+        return {success: false, data: [], total: 0}
+    }
 }
 
 // export const getRequests = withOrganizationAuth(
@@ -2863,73 +2847,67 @@ const getRequests = async (
 //         additionalWhere: Partial<Prisma.MaterialAndDataAccessRequestWhereInput>,
 //         input: GetRequestsInput
 //     ) => {
-//         return unstable_cache(
-//             async () => {
-//                 try {
-//                     const page = input.page ?? 1
-//                     const perPage = input.perPage ?? 10
-//                     const offset = (page - 1) * perPage
+//         try {
+//             const page = input.page ?? 1
+//             const perPage = input.perPage ?? 10
+//             const offset = (page - 1) * perPage
 
-//                     const filters: any[] = []
+//             const filters: any[] = []
 
-//                     if (input.searchTerm) {
-//                         filters.push({
-//                             id: "title",
-//                             value: input.searchTerm,
-//                             operator: "iLike",
-//                             variant: "text",
-//                             filterId: nanoid(),
-//                         })
-//                     }
+//             if (input.searchTerm) {
+//                 filters.push({
+//                     id: "title",
+//                     value: input.searchTerm,
+//                     operator: "iLike",
+//                     variant: "text",
+//                     filterId: nanoid(),
+//                 })
+//             }
 
-//                     if (input.filters.statuses.length > 0) {
-//                         filters.push({
-//                             id: "status",
-//                             value: input.filters.statuses.map(s => s.value),
-//                             operator: "inArray",
-//                             variant: "multiSelect",
-//                             filterId: nanoid(),
-//                         })
-//                     }
+//             if (input.filters.statuses.length > 0) {
+//                 filters.push({
+//                     id: "status",
+//                     value: input.filters.statuses.map(s => s.value),
+//                     operator: "inArray",
+//                     variant: "multiSelect",
+//                     filterId: nanoid(),
+//                 })
+//             }
 
-//                     if (input.filters.types.length > 0) {
-//                         filters.push({
-//                             id: "type",
-//                             value: input.filters.types.map(t => t.value),
-//                             operator: "inArray",
-//                             variant: "multiSelect",
-//                             filterId: nanoid(),
-//                         })
-//                     }
+//             if (input.filters.types.length > 0) {
+//                 filters.push({
+//                     id: "type",
+//                     value: input.filters.types.map(t => t.value),
+//                     operator: "inArray",
+//                     variant: "multiSelect",
+//                     filterId: nanoid(),
+//                 })
+//             }
 
-//                     const where = filterColumns({filters, joinOperator: "and"})
+//             const where = filterColumns({filters, joinOperator: "and"})
 
-//                     const [data, total] = await prisma.$transaction([
-//                         prisma.materialAndDataAccessRequest.findMany({
-//                             where: {
-//                                 ...where,
-//                                 // organizationId: organization.id
-//                                 ...additionalWhere
-//                             },
-//                             skip: offset,
-//                             take: perPage,
-//                             orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
-//                         }),
-//                         prisma.materialAndDataAccessRequest.count({where}),
-//                     ])
+//             const [data, total] = await prisma.$transaction([
+//                 prisma.materialAndDataAccessRequest.findMany({
+//                     where: {
+//                         ...where,
+//                         // organizationId: organization.id
+//                         ...additionalWhere
+//                     },
+//                     skip: offset,
+//                     take: perPage,
+//                     orderBy: input.sortBy ? sortByMap[input.sortBy] : {createdAt: "desc"},
+//                 }),
+//                 prisma.materialAndDataAccessRequest.count({where}),
+//             ])
 
-//                     return {
-//                         data,
-//                         total,
-//                     }
-//                 } catch (err) {
-//                     console.error("getRequests error", err)
-//                     return {data: [], total: 0}
-//                 }
-//             },
-//             [JSON.stringify(input)],
-//             {revalidate: 1, tags: ["requests"]},
-//         )()
+//             return {
+//                 data,
+//                 total,
+//             }
+//         } catch (err) {
+//             console.error("getRequests error", err)
+//             return {data: [], total: 0}
+//         }
 //     }
 // )
 
