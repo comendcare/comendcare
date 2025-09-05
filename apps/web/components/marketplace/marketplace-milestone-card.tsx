@@ -1,12 +1,16 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@comend/lib/types";
+import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS, StatusType} from "@comend/lib/types";
 import React from "react";
 import {cn, formatMoney, truncate} from "@comend/lib/utils";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
-import {Banknote, ExternalLink} from "lucide-react";
+import {Banknote, Calendar, ExternalLink, Lock, User} from "lucide-react";
 import { TypeBadge } from "../type-badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Badge } from "@/packages/components/ui/badge";
+import { DateView } from "../miletone-date-view";
+import StatusButton from "../milestone-status-button";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
@@ -27,6 +31,8 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
     const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
     const organization = milestone.organization || {};
+
+    console.log(`milestone`, milestone)
 
     const getLink = () => {
         if (organization?.subdomain) {
@@ -52,122 +58,119 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const statusStyle = StatusData[statusKey]?.styling || "bg-gray-100 text-gray-800";
 
     return (
-        <Link href={getLink()}>
-            <Card 
-                className={cn("text-wrap break-words h-full w-full flex flex-col")}
-            >
-                <CardHeader className="flex gap-2 pb-4">
-                    <CardDescription
-                        className="text-base flex flex-row justify-between items-center"
-                    >
-                        {organization?.name}
-                        <ProfilePhoto img={organization?.image} name={organization?.name} className="size-6"/>
-                    </CardDescription>
-                    <Separator className="my-2"/>
-                    <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
-                        <TypeBadge type={milestone.nodeType}/>
-                        {!milestone.private && <ExternalLink className="h-[12px] w-[12px]"/>}
-                    </div>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4 grow">
-                    <div className="flex flex-col gap-2">
-                        <CardTitle className="text-xl">
-                            {milestone.title || "New Milestone"}
-                        </CardTitle>
-                        <CardDescription className="text-wrap break-words line-clamp-2">
-                            {truncate(milestone.description || "", 200)}
-                        </CardDescription>
-                    </div>
-    
-                    {/* <div className="flex flex-col gap-4 justify-end grow">
-                        <CardContents props={{
-                            type: milestone.nodeType,
-                            data: milestone
-                        } as NodeProps<PublicMilestoneNode>}/>
-                    </div> */}
-                </CardContent>
-            </Card>
-        </Link>
-    )
+        // <Link href={getLink()}>
+        <Card>
+            <CardHeader className="py-4">
+                <CardTitle className="text-gray-900">
+                    {milestone.title || "New Milestone"}
+                    {milestone.private && (
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Lock size={20} className="inline-block align-middle ml-2 mb-1"/>
+                            </TooltipTrigger>
+                            <TooltipContent className="font-normal">
+                                {`Only visible to your team`}
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
+                </CardTitle>
+                <CardDescription className="line-clamp-2">
+                    {truncate(milestone.description || "", 200)}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+                <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">
+                    {(milestone.types || []).sort((a: any, b: any) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType, index) => (
+                        <li key={index}>
+                            <Badge className="w-fit">
+                                {milestoneType?.milestoneType?.label || "No type"}
+                            </Badge>
+                        </li>
+                    ))}
 
-    return (
-        <Link
-            href={getLink()}
-        >
-            <Card className="h-full w-full text-left flex flex-col justify-between">
-                <div>
-                    <CardHeader>
-                        <div className="space-y-4">
-                            <CardDescription
-                                className="text-base flex flex-row justify-between items-center"
-                            >
-                                {organization?.name}
-                                <ProfilePhoto img={organization?.image} name={organization?.name} className="size-6"/>
-                            </CardDescription>
-                            <Separator className="my-2"/>
-                            <div className="flex flex-row items-center justify-between gap-4">
-                                <CardTitle className="text-xl font-normal flex flex-row items-center gap-2 flex-grow">
-                                    {milestone.title}
-                                </CardTitle>
+                    {(milestone.contacts || []).map((contact: any, index: number) => {
+                        if (contact.affiliation) {
+                            return (
+                                <li key={index}>
+                                    <Badge>
+                                        <User size={18}/>
+                                        <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                    </Badge>
+                                </li>
+                            )
+                        }
+                    })}
 
-                                <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone?.nodeType))?.value || "PROJECT"}/>
-                            </div>
-                        </div>
+                    {(milestone.startDate || milestone.endDate) && (
+                        <li>
+                            <Badge>
+                                <Calendar size={16}/>
+                                <DateView startDate={milestone.startDate || undefined} endDate={milestone.endDate || undefined}/>
+                            </Badge>
+                        </li>
+                    )}
+                </ul>
 
-                        {status && (
-                            <div
-                                className={`w-fit h-8 px-2 py-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 flex-shrink-0 ${statusStyle}`}
-                            >
-                                {status}
+                {/* <StatusButton 
+                    status={milestone.status as StatusType || undefined}
+                    minimal={true}
+                    disabled={true}
+                    onStatusChange={() => {}}
+                /> */}
+
+                {/* {(milestone.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
+                    <>
+                    <Separator className="bg-gray-300 h-[2px] rounded-full my-4"/>
+                        {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
+                            <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
+                                <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                                    <Microscope className="h-4 w-4 min-w-4 text-emerald-900" />
+                                    <span className="text-emerald-900 text-nowrap">Linked Tools</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {(props.data?.biosamples || []).map(({biosample}) => {
+                                        const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                                        return (
+                                            <Badge variant="violet">
+                                                {`${biosample.donorId} --- ${type?.label || ''}`}
+                                            </Badge>
+                                        )
+                                    })}
+                                    {(props.data?.diseaseModels || []).map(({diseaseModel}) => {
+                                        const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                                        return (
+                                            <Badge variant="yellow">
+                                                {`${diseaseModel.id} --- ${type?.label}`}
+                                            </Badge>
+                                        )
+                                    })}
+                                    {(props.data?.tools || []).map(({tool}) => (
+                                        <Badge variant="emerald">
+                                            {tool?.title}
+                                        </Badge>
+                                    ))}
+                                </div>
                             </div>
                         )}
-
-                        {/*<span className="w-full flex">*/}
-                        {/*    {(milestoneType) && (*/}
-                        {/*        <span className="w-full flex">*/}
-                        {/*            <Badge className="flex text-sm">{milestoneType}</Badge>*/}
-                        {/*        </span>*/}
-                        {/*    )}*/}
-                        {/*</span>*/}
-                    </CardHeader>
-
-                    <CardContent className="flex flex-col items-start justify-center gap-4">
-                        {/*<div className="line-clamp-3">*/}
-                        {/*    {milestone.description}*/}
-                        {/*</div>*/}
-
-                        {/*{milestone.budget &&*/}
-                        {/*    <div className="m-0 flex items-center">*/}
-                        {/*        <Banknote className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>*/}
-                        {/*        {formatMoney(milestone.budget)} budget*/}
-                        {/*    </div>*/}
-                        {/*}*/}
-                    </CardContent>
-                </div>
-
-                {milestone.budget &&
-                    <CardFooter className="justify-self-end">
-                        <div className="m-0 flex items-center">
-                            <Banknote className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
-                            {formatMoney(milestone.budget)} budget
-                        </div>
-                        {/*<div className="flex flex-row space-x-2">*/}
-                        {/*    {[{icon: Paperclip, label: "3 Attachments"}, {*/}
-                        {/*        icon: UserCheck,*/}
-                        {/*        label: "2 Contacts"*/}
-                        {/*    }].map(({icon: Icon, label}, idx) => (*/}
-                        {/*        <div*/}
-                        {/*            key={idx}*/}
-                        {/*            className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"*/}
-                        {/*        >*/}
-                        {/*            <Icon className="size-4"/>*/}
-                        {/*            {label}*/}
-                        {/*        </div>*/}
-                        {/*    ))}*/}
-                        {/*</div>*/}
-                    </CardFooter>
-                }
-            </Card>
-        </Link>
+                        {props.data?.rfps?.length > 0 && (
+                            <div className="border-l-4 border-orange-200 pl-4 space-y-3">
+                                <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                                    <Megaphone className="h-4 w-4 min-w-4 text-orange-900" />
+                                    <span className="text-orange-900 text-nowrap">Linked RFPs</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {props.data?.rfps.map(({rfp}) => (
+                                        <Badge variant="orange">
+                                            {rfp?.title}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )} */}
+            </CardContent>
+        </Card>
+        // </Link>
     )
 }

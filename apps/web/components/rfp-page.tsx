@@ -1,4 +1,4 @@
-import { ExternalAttachment, RFP } from "@prisma/client";
+import { ExternalAttachment, Milestone, RFP } from "@prisma/client";
 import { Separator } from "@comend/components/ui/separator";
 import { Check, Clock, DollarSign, Link2, Megaphone, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@comend/components/ui/badge";
@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Button } from "@comend/components/ui/button";
 import Link from "next/link";
+import { MilestoneMarketplaceCard } from "./marketplace/marketplace-milestone-card";
 
 export type DateStatus =
     | { status: 'Not Open'; daysRemaining: number | undefined; variant: 'yellow' }
@@ -216,17 +217,13 @@ export function RFPPage({rfp}: {rfp: any | undefined}) {
                         <CardHeader>
                             <CardTitle>Relevant Projects</CardTitle>
                         </CardHeader>
-                        {/* <CardContent className="flex flex-col gap-4">
-                            <div className="flex gap-2 items-center">
-                                <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name}/>
-                                <div>
-                                    <p>{rfp.organization.name}</p>
-                                </div>
-                            </div>
-                            <Button variant="secondary" className="w-full">
-                                Visit Profile
-                            </Button>
-                        </CardContent> */}
+                        <CardContent className="flex flex-col gap-4">
+                            <>
+                            {rfp.milestones?.map(({milestone}: {milestone: Milestone}) => (
+                                <MilestoneMarketplaceCard milestone={milestone}/>
+                            ))}
+                            </>
+                        </CardContent>
                     </Card>
 
                     <Card className="w-full">

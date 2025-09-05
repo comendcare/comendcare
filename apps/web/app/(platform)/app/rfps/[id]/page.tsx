@@ -1,6 +1,6 @@
 import { getSession } from "@/packages/lib/auth"
 import { getRFP } from "@/packages/lib/fetchers"
-import { RFPPage } from "@/packages/components/rfp-page"
+import { RFPPage } from "~web/components/rfp-page"
 
 export default async function ResearchPlanLayout({params}: {params: { id: string }}) {
     const session = await getSession()
