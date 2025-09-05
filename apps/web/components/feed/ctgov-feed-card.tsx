@@ -101,7 +101,7 @@ export default function CtgovFeedCard({ data }: CtgovFeedCardProps) {
                 <CardHeader className="p-4">
                     <div className="flex gap-2 items-center">
                         <ProfilePhoto
-                            img={undefined}
+                            img={"https://www.google.com/s2/favicons?domain=https://clinicaltrials.gov/"}
                             name="ClinicalTrials.gov"
                             className="h-8 w-8 rounded-full"
                         />

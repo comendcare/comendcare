@@ -106,7 +106,7 @@ export default function FDAFeedCard({ data }: FDAFeedCardProps) {
                 <CardHeader className="p-4">
                     <div className="flex gap-2 items-center">
                         {/* Hard-coded FDA branding */}
-                        <ProfilePhoto img={undefined} name="FDA" className="h-8 w-8 rounded-full" />
+                        <ProfilePhoto img={"https://www.google.com/s2/favicons?domain=https://www.fda.gov/"} name="FDA" className="h-8 w-8 rounded-full" />
                         <div className="flex flex-col">
               <span className="font-medium md:text-base flex items-center gap-1">
                 <Icon className="h-4 w-4" aria-hidden="true" />

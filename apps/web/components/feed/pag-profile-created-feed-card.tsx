@@ -18,6 +18,7 @@ interface PagProfileCreatedContent {
     pagOrganizationId: string;
     pagOrganizationName?: string;
     pagOrganizationSubdomain?: string;
+    pagOrganizationImage?: string;
     actor?: {
         userId?: string;
         name?: string;
@@ -54,7 +55,7 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
         data.content.organization?.id ??
         data.content.pagOrganizationId ??
         data.orgId;
-    const orgImage = data.content.organization?.image;
+    const orgImage = data.content.organization?.image ?? data.content.pagOrganizationImage;
 
     // Display title is now the action title inside CardContent.
     const actionTitle = "PAG Profile Created";

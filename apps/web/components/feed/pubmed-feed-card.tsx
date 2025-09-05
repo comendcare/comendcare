@@ -84,7 +84,7 @@ export default function PubMedFeedCard({ data }: PubMedFeedCardProps) {
                 <CardHeader className="p-4">
                     <div className="flex gap-2 items-center">
                         <ProfilePhoto
-                            img={undefined}
+                            img={`https://www.google.com/s2/favicons?domain=https://pubmed.ncbi.nlm.nih.gov/`}
                             name="PubMed"
                             className="h-8 w-8 rounded-full"
                         />
