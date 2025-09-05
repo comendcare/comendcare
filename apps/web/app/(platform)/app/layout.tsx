@@ -17,17 +17,6 @@ import { MembershipWithOrganization } from "@comend/lib/types";
 import {MobileWarning} from "~web/components/mobile-warning";
 import {useIsMobile} from "@comend/lib/hooks/use-mobile";
 import {NavUser} from "~web/components/nav-user";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@comend/components/ui/alert-dialog"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/packages/components/ui/dialog";
 import { Button } from "@/packages/components/ui/button";
 import { cn } from "@/packages/lib/utils";
@@ -43,12 +32,6 @@ interface AppLayoutProps {
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [memberships, setMemberships] = useState<MembershipWithOrganization[]>([]);
-
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            redirect("/login");
-        }
-    }, [status])
 
     useEffect(() => {
         if (status === "authenticated" && session) {
