@@ -55,6 +55,20 @@ import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
 
+const PATHS = [
+    "/app",
+    "/app/profile",
+    "/app/dashboard",
+    "/app/feed",
+    "/app/settings",
+    "/app/tools/biosample",
+    "/app/tools/disease-models",
+    "/app/tools/data",
+    "/app/rfps",
+    "/app/requests",
+    "/app/research-plan",
+]
+
 export const getSessionInfo = async () => {
     const session = await getSession()
     return session
@@ -905,15 +919,7 @@ export const deleteOrganization = withOrganizationAuth(
         );
 
         // Revalidate org-scoped pages
-        for (const p of [
-            "/app",
-            "/app/profile",
-            "/app/tools/biosample",
-            "/app/tools/disease-models",
-            "/app/tools/data",
-            "/app/requests",
-            "/app/research-plan",
-        ]) {
+        for (const p of PATHS) {
             revalidatePath(p);
         }
 
@@ -1575,16 +1581,7 @@ export const leaveOrganization = withOrganizationAuth(
             ]);
 
             // Revalidate org-scoped pages and any UI that reflects org state
-            for (const p of [
-                "/app",
-                "/app/profile",
-                "/app/dashboard",
-                "/app/tools/biosample",
-                "/app/tools/disease-models",
-                "/app/tools/data",
-                "/app/requests",
-                "/app/research-plan",
-            ]) {
+            for (const p of PATHS) {
                 revalidatePath(p);
             }
 
@@ -1740,17 +1737,7 @@ export const deleteMember = withOrganizationAuth(
             }).catch(() => {});
 
             // 4) Revalidate pages that may depend on org context
-            for (const p of [
-                "/app",
-                "/app/profile",
-                "/app/dashboard",
-                "/app/tools/biosample",
-                "/app/tools/disease-models",
-                "/app/tools/data",
-                "/app/requests",
-                "/app/research-plan",
-                "/app/analytics",
-            ]) revalidatePath(p);
+            for (const p of PATHS) revalidatePath(p);
 
             return { success: true, data: member };
         } catch (error: any) {
@@ -6060,15 +6047,9 @@ export async function switchOrganization(organizationId: string) {
     });
 
     // Revalidate key pages that depend on org
-    revalidatePath("/app");
-    revalidatePath("/app/profile");
-    revalidatePath("/app/dashboard");
-    revalidatePath("/app/settings");
-    revalidatePath("/app/tools/biosample");
-    revalidatePath("/app/tools/disease-models");
-    revalidatePath("/app/tools/data");
-    revalidatePath("/app/requests");
-    revalidatePath("/app/research-plan");
+    for (const p of PATHS) {
+        revalidatePath(p);
+    }
 
     return { success: true };
 }
