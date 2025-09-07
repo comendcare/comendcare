@@ -205,14 +205,6 @@ export default function OrganizationOnboardingForm(
         }
     }, [debouncedNickname, checkSubdomainAvailability, newOrgForm])
 
-    async function updateSession(response: { organization: Organization, membership: Member }) {
-        await update({
-            ...session,
-            organizationId: response.organization.id,
-            membership: response.membership
-        })
-    }
-
     async function joinOrgOnSubmit() {
         setLoading(true)
         try {
@@ -300,7 +292,6 @@ export default function OrganizationOnboardingForm(
                     }
 
                     // Update the session object with the newly created organizationId
-                    updateSession(res)
                     router.refresh()
                     router.push(nextLink)
                     toast.success(`Successfully created organization!`)

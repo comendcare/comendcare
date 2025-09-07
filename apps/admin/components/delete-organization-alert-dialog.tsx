@@ -11,17 +11,17 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog";
-import {useSession} from "next-auth/react";
 import {useState} from "react";
 import {deleteOrganization} from "@comend/lib/actions";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {toast} from "sonner";
 import {Button} from "@comend/components/ui/button";
 import {Organization} from "@prisma/client";
+import {useRouter} from "next/navigation";
 
 
 export function DeleteOrganizationAlertDialog({organization}: { organization: Organization }) {
-    const {data: session, update} = useSession()
+    const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false); // Track API call state
 
     const handleDeleteOrganization = async () => {
@@ -31,13 +31,7 @@ export function DeleteOrganizationAlertDialog({organization}: { organization: Or
             await deleteOrganization(organization.id, organization)
                 .then(async res => {
                     if (res.success) {
-                        await update({
-                            user: {
-                                ...session?.user,
-                                organizationId: undefined,
-                                membership: undefined,
-                            }
-                        })
+                        router.refresh();
 
                         mixpanelTrack("Organization Deleted", {
                             "ID": res?.data?.id,
