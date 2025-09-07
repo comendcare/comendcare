@@ -230,6 +230,7 @@ export function NavUser() {
         }
 
         async function fetchMemberRequestData() {
+            console.log("fuck", session)
             try {
                 const response = await getUserMemberRequests(session?.user.id, {
                     id: true,

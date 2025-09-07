@@ -25,6 +25,7 @@ enum OrganizationToCompanyEngagement {
 
 model User {
   id                    String                 @id @default(cuid())
+  activeOrganizationId  String?                @db.VarChar(191)
   name                  String? /// @encrypted
   nameHash              String? /// @encryption:hash(name)
   username              String?
@@ -1166,7 +1167,7 @@ model PharmaProject {
 
 model Institution {
   id           String   @id @default(uuid())
-  rorId        String?   @unique
+  rorId        String?  @unique
   name         String
   established  Int?
   types        String[]
