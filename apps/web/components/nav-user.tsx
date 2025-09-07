@@ -231,7 +231,6 @@ export function NavUser() {
         }
 
         async function fetchMemberRequestData() {
-            console.log("fuck", session)
             try {
                 const response = await getUserMemberRequests(session?.user.id, {
                     id: true,
@@ -260,10 +259,12 @@ export function NavUser() {
             }
         }
 
-        fetchUserData()
-        fetchOrgData()
-        fetchInvitationData()
-        fetchMemberRequestData()
+        if (status === "authenticated" && session?.user?.id) {
+            fetchUserData();
+            fetchOrgData();
+            fetchInvitationData();
+            fetchMemberRequestData();
+        }
     }, [status, session, router]);
 
     async function handleAcceptInvitation(invitationId: string) {
@@ -356,7 +357,7 @@ export function NavUser() {
     };
 
     if (status === "loading") {
-        return <Spinner className="scale-100" />
+        return <Spinner className="scale-100"/>
     }
 
     if (!userData) {
