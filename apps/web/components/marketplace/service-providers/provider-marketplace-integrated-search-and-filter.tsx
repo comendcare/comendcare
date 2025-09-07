@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {Funnel, SearchIcon, X} from "lucide-react"
 import {cn} from "@comend/lib/utils"
 import {useShallow} from "zustand/react/shallow"
-
+import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "~web/components/marketplace/service-providers/cro-filters";
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
@@ -22,11 +22,6 @@ import {
 } from "@comend/lib/types"
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
-
-export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
-    ...option,
-    value: option.id,
-}))
 
 export function ProviderMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useCROSearchStore(
