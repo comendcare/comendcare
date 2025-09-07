@@ -61,6 +61,7 @@ import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
+import Spinner from "@/packages/components/ui/spinner";
 
 
 export function NavUser() {
@@ -355,7 +356,7 @@ export function NavUser() {
     };
 
     if (status === "loading") {
-        return <Loading/>;
+        return <Spinner className="scale-100" />
     }
 
     if (!userData) {
