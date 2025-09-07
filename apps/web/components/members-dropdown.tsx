@@ -35,7 +35,7 @@ const formSchema = z.object({
 
 export default function MembersDropdown({member}: { member: MemberWithUser }) {
     const router = useRouter()
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isLastOwner, setIsLastOwner] = useState(false)
 

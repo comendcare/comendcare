@@ -72,7 +72,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                             </Button>
                         </div>
                         <div className="text-lg font-bold">
-                            {organization.conditions?.[0].condition?.numberOfPatientsEngaged
+                            {organization.conditions?.[0]?.condition?.numberOfPatientsEngaged
                                 ? formatNumberWithCommas(organization.conditions[0].condition.numberOfPatientsEngaged.toString())
                                 : "--"}
                         </div>

@@ -94,7 +94,7 @@ export default function OrganizationOnboardingForm(
         showSkip: boolean,
     }
 ) {
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const router = useRouter()
     const pathname = usePathname()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
