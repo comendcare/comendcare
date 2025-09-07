@@ -1,4 +1,5 @@
 import {getSession} from "@/packages/lib/auth";
+import { unstable_noStore as noStore } from "next/cache";
 import {redirect} from "next/navigation";
 import prisma from "@comend/lib/prisma";
 
@@ -7,43 +8,39 @@ interface PlatformLayoutProps {
 }
 
 export default async function PlatformLayout({children}: PlatformLayoutProps) {
+    noStore();
+
     const session = await getSession()
+    if (!session) redirect("/login");
 
-    const whitelist = await prisma.whitelist.findMany({
-        select: { email: true },
-    });
+    const rawEmail = session.user?.email;
+    if (!rawEmail) redirect("/signed-out?reason=no_email");
 
-    const blacklist = await prisma.blacklist.findMany({
-        select: { email: true },
-    });
+    const email = rawEmail.toLowerCase();
+    const isCompanyEmail = email.endsWith("@comendcare.com");
 
-    const email = session?.user?.email?.toLowerCase();
+    // Targeted, parallel lookups (fast & index-friendly)
+    const [whitelistHit, blacklistHit] = await Promise.all([
+        prisma.whitelist.findFirst({
+            where: { email: { equals: email, mode: "insensitive" } },
+            select: { email: true },
+        }),
+        prisma.blacklist.findFirst({
+            where: { email: { equals: email, mode: "insensitive" } },
+            select: { email: true },
+        }),
+    ]);
 
-    // Env variable whitelisting
-    // const isWhitelisted =
-    //     email?.endsWith("@comendcare.com") ||
-    //     process.env.USER_WHITELIST?.split(",").some((whitelistedEmail) => whitelistedEmail.toLowerCase() === email);
+    const isWhitelisted = Boolean(whitelistHit) || isCompanyEmail;
+    const isBlacklisted = Boolean(blacklistHit);
 
-    // Database whitelisting
-    const isWhitelisted = whitelist.some(
-        (entry) => entry.email.toLowerCase() === email
-    ) || email?.endsWith("@comendcare.com")
+    // Precedence: blacklist > whitelist
+    if (isBlacklisted) redirect("/signed-out?reason=blacklisted");
+    if (!isWhitelisted) redirect("/signed-out?reason=not_whitelisted");
 
-    const isBlacklisted = blacklist.some(
-        (entry) => entry.email.toLowerCase() === email
-    )
-
-    if (!session) {
-        redirect("/");
-    } else if (!isWhitelisted) {
-        redirect("/signed-out?reason=not_whitelisted");
-    } else if (isBlacklisted) {
-        redirect("/signed-out?reason=blacklisted");
-    } else if (session.terminate) {
-        redirect("/signed-out?reason=terminated");
-    } else if (session.roleChanged) {
-        redirect("/signed-out?reason=roleChanged");
-    }
+    // Custom flags on the session (type these on your Session object)
+    if ((session as any).terminate) redirect("/signed-out?reason=terminated");
+    if ((session as any).roleChanged) redirect("/signed-out?reason=roleChanged");
 
     return (
         <>

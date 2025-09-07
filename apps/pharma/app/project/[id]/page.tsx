@@ -21,7 +21,7 @@ import {Button} from "@comend/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {getPharmaProjectData} from "@comend/lib/fetchers";
-import PharmaProjectBiorepositoryTab from "~web/components/pharma-project-biorepository-tab";
+import PharmaProjectBiorepositoryTab from "comend-pag-platform/components/pharma-project-biorepository-tab";
 import Loading from "@/loading";
 import {
     Tooltip,
@@ -29,10 +29,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
-import PharmaProjectAnalyticsTab from "~web/components/pharma-project-analytics-tab";
-import PharmaProjectClinicalTab from "~web/components/pharma-project-clinical-tab";
-import PharmaProjectPreclinicalTab from "~web/components/pharma-project-preclinical-tab";
-import PharmaProjectIPTab from "~web/components/pharma-project-ip-tab";
+import PharmaProjectAnalyticsTab from "comend-pag-platform/components/pharma-project-analytics-tab";
+import PharmaProjectClinicalTab from "comend-pag-platform/components/pharma-project-clinical-tab";
+import PharmaProjectPreclinicalTab from "comend-pag-platform/components/pharma-project-preclinical-tab";
+import PharmaProjectIPTab from "comend-pag-platform/components/pharma-project-ip-tab";
 
 
 export default function PharmaProjectPage() {

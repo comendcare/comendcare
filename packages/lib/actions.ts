@@ -12,7 +12,7 @@ import {
     Institution,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
+import {authOptions, withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
 import {getSession} from "./auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
@@ -25,7 +25,7 @@ import {
     updateTypeSenseDocument
 } from "./utils";
 import {validateEmailDomain} from "./server-utils";
-import {Session} from "next-auth";
+import {getServerSession, Session} from "next-auth";
 import {
     sendInviteEmail,
     sendMemberRequestCreatedEmail,
@@ -5956,3 +5956,36 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
     }
 );
 
+
+export async function switchOrganization(organizationId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        return { success: false, error: "Not authenticated" };
+    }
+
+    // Verify the user is a member of that org
+    const membership = await prisma.member.findFirst({
+        where: { userId: session.user.id, organizationId },
+    });
+
+    if (!membership) {
+        return { success: false, error: "Not authorized for this organization" };
+    }
+
+    await prisma.user.update({
+        where: { id: session.user.id },
+        data: { activeOrganizationId: organizationId },
+    });
+
+    // Revalidate key pages that depend on org
+    revalidatePath("/app");
+    revalidatePath("/app/dashboard");
+    revalidatePath("/app/profile");
+    revalidatePath("/app/tools/biosample");
+    revalidatePath("/app/tools/disease-models");
+    revalidatePath("/app/tools/data");
+    revalidatePath("/app/requests");
+    revalidatePath("/app/research-plan");
+
+    return { success: true };
+}

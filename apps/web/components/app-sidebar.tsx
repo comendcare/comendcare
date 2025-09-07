@@ -201,12 +201,6 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
     }
 
     useEffect(() => {
-        if (status === "unauthenticated") {
-            redirect("/login");
-        }
-    }, [status])
-
-    useEffect(() => {
         setTourName(getTourName())
     }, [pathname, roadmapId, getTourName])
 

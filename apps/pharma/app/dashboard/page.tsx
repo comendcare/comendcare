@@ -1,5 +1,5 @@
-import {PharmaChartAreaInteractive} from "~web/components/pharma-chart-area-interactive"
-import {PharmaDashboardSectionCards} from "~web/components/pharma-dashboard-section-cards"
+import {PharmaChartAreaInteractive} from "comend-pag-platform/components/pharma-chart-area-interactive"
+import {PharmaDashboardSectionCards} from "comend-pag-platform/components/pharma-dashboard-section-cards"
 
 // import data from "@comend/data/pharma-data.json"
 

@@ -110,6 +110,7 @@ async function runCheck() {
             const payload = {
                 orgId: org.id,
                 orgName: org.name,
+                orgSubdomain: org.subdomain,
                 host,
                 totalViews,
                 milestone,
@@ -129,7 +130,7 @@ async function runCheck() {
                 },
                 create: {
                     provider: "app",
-                    eventType: "org_profile_views_milestone",
+                    eventType: "analytics_goal_reached",
                     occurredAt,
                     status: "PENDING",
                     payload: payload,
@@ -144,13 +145,14 @@ async function runCheck() {
             await prisma.rawIngestEvent.create({
                 data: {
                     provider: "app",
-                    eventType: "org_profile_views_milestone",
+                    eventType: "analytics_goal_reached",
                     occurredAt: new Date(),
                     status: "FAILED",
                     error: String(err),
                     payload: {
                         orgId: org.id,
                         orgName: org.name,
+                        orgSubdomain: org.subdomain,
                         host,
                     },
                     dedupeKey: stableDedupeKey(org.id, -1), // harmless unique key for failure row
