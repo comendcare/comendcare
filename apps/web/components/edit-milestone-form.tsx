@@ -591,9 +591,9 @@ export function EditMilestoneForm({
                                             <NotificationBubble/>
                                         } */}
                                     </TabsTrigger>
-                                    <TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">
-                                        Publications
-                                    </TabsTrigger>
+                                    {/*<TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">*/}
+                                    {/*    Publications*/}
+                                    {/*</TabsTrigger>*/}
                                     <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
                                         Similar projects
                                     </TabsTrigger>
@@ -1165,11 +1165,11 @@ export function EditMilestoneForm({
                                             </Button>
                                         </Link>
                                     </TabsContent>
-                                    <TabsContent value="publications" className="space-y-4 w-full">
-                                        <EditMilestoneDetailsPublicationsTab
-                                            onAttach={(att) => addAttachmentToForm(form, att)}
-                                        />
-                                    </TabsContent>
+                                    {/*<TabsContent value="publications" className="space-y-4 w-full">*/}
+                                    {/*    <EditMilestoneDetailsPublicationsTab*/}
+                                    {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
+                                    {/*    />*/}
+                                    {/*</TabsContent>*/}
                                     <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
                                     </TabsContent>
