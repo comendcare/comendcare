@@ -179,7 +179,7 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
  **************************************/
 export default function CreateNewOrganizationPage() {
     const router = useRouter();
-    const {data: session, status} = useSession();
+    const {data: session, status, update} = useSession();
 
     // Loading/initial state
     const [isInitializing, setIsInitializing] = useState(true);
@@ -414,7 +414,6 @@ export default function CreateNewOrganizationPage() {
                     orgName: values.orgName,
                     looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
                 });
-
             }
 
             // 5) Condition (optional; only if disorder selected and we have an org)
@@ -468,6 +467,7 @@ export default function CreateNewOrganizationPage() {
             }
 
             // 7) Final route
+            await update({})
             if (hasInvitations) router.push("/app/profile");
             else router.push("/app/dashboard");
             toast.success("Onboarding complete ✨");

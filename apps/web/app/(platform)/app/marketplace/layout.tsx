@@ -27,7 +27,7 @@ interface ProjectLayoutProps {
     children: React.ReactNode
 }
 
-export default function ProjectLayout({children}: ProjectLayoutProps) {
+export default function MarketplaceLayout({children}: ProjectLayoutProps) {
     // Zustand state management
     const {data: session} = useSession()
     const {defaultLayout, setLayout} = useFiltersStore()

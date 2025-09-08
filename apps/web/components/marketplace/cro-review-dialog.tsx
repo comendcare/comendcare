@@ -233,12 +233,12 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                             name="milestone"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>{`Associated Milestone`}</FormLabel>
+                                    <FormLabel>{`Associated project`}</FormLabel>
                                     <div className="flex flex-row gap-4">
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Link to a milestone"/>
+                                                    <SelectValue placeholder="Link to a project"/>
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
