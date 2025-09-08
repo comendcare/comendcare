@@ -55,6 +55,20 @@ import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
 
+const PATHS = [
+    "/app",
+    "/app/profile",
+    "/app/dashboard",
+    "/app/feed",
+    "/app/settings",
+    "/app/tools/biosample",
+    "/app/tools/disease-models",
+    "/app/tools/data",
+    "/app/rfps",
+    "/app/requests",
+    "/app/research-plan",
+]
+
 export const getSessionInfo = async () => {
     const session = await getSession()
     return session
@@ -420,74 +434,57 @@ export const createOrganization = withAuth(
             : {}
 
         try {
-            const organization = await prisma.organization.upsert({
-                where: {
-                    subdomain,
-                },
-                update: {
-                    name,
-                    description,
-                    subdomain,
-                    yearFounded: founded?.toString(),
-                    contactEmail,
-                    website,
-                    incorporationStatus,
-                    therapeuticsInDevelopment,
-                    therapeuticsOfInterest,
-                    address1,
-                    address2,
-                    formattedAddress,
-                    city,
-                    region,
-                    postalCode,
-                    country,
-                    lat,
-                    lng,
-                    image,
-                    verified: true,  // Default verified to true for beta testing
-                    metadata
-                },
-                create: {
-                    name,
-                    description,
-                    subdomain,
-                    yearFounded: founded?.toString(),
-                    contactEmail,
-                    website,
-                    incorporationStatus,
-                    therapeuticsInDevelopment,
-                    therapeuticsOfInterest,
-                    address1,
-                    address2,
-                    formattedAddress,
-                    city,
-                    region,
-                    postalCode,
-                    country,
-                    lat,
-                    lng,
-                    image,
-                    user: {
-                        connect: {
-                            id: session.user.id,
-                        },
+            const result = await prisma.$transaction(async (tx) => {
+                // Ensure subdomain unique (CREATE only)
+                const exists = await tx.organization.findUnique({ where: { subdomain } });
+                if (exists) throw Object.assign(new Error("This subdomain is already taken"), { code: "SUBDOMAIN_TAKEN" });
+
+                const organization = await tx.organization.create({
+                    data: {
+                        name,
+                        description,
+                        subdomain,
+                        yearFounded: founded || undefined,
+                        contactEmail,
+                        website,
+                        incorporationStatus,
+                        therapeuticsInDevelopment,
+                        therapeuticsOfInterest,
+                        address1,
+                        address2,
+                        formattedAddress,
+                        city,
+                        region,
+                        postalCode,
+                        country,
+                        lat,
+                        lng,
+                        image,
+                        verified: true, // beta default
+                        metadata,
+                        user: { connect: { id: session.user.id } },
                     },
-                    verified: true,  // Default verified to true for beta testing
-                    metadata
-                },
+                });
+
+                const membership = await tx.member.create({
+                    data: {
+                        userId: session.user.id,
+                        email: session.user.email,
+                        role: "owner",
+                        title,
+                        organizationId: organization.id,
+                    },
+                });
+
+                await tx.user.update({
+                    where: { id: session.user.id },
+                    data: { activeOrganizationId: organization.id },
+                });
+
+                return { organization, membership };
             });
 
-            const membership = await prisma.member.create({
-                data: {
-                    userId: session.user.id,
-                    email: session.user.email,
-                    role: "owner", // Creator of organization is owner by default
-                    title: title,
-                    organizationId: organization.id
-                }
-            })
-
-            if (organization.verified && organization.published) {
+            if (result.organization.verified && result.organization.published) {
                 await addTypeSenseDocument(
                     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                     (
@@ -495,7 +492,7 @@ export const createOrganization = withAuth(
                             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                             : process.env.TYPESENSE_ADMIN_API_KEY
                     )!,
-                    organization,
+                    result.organization,
                     'organizations'
                 );
             }
@@ -511,32 +508,32 @@ export const createOrganization = withAuth(
                         email: session.user.email
                     },
                     organization: {
-                        name: organization.name,
-                        subdomain: organization.subdomain
+                        name: result.organization.name,
+                        subdomain: result.organization.subdomain
                     }
                 }
             ).then(() => {
                 console.log("email sent")
             })
 
-            if (organization.verified && organization.published) {
+            if (result.organization.verified && result.organization.published) {
                 await writeRawEvent({
                     provider: "app",
                     eventType: "pag_profile_created",
-                    externalId: organization.id,
+                    externalId: result.organization.id,
                     occurredAt: new Date(),
                     payload: {
-                        orgId: organization.id,
-                        orgName: organization.name,
-                        orgSubdomain: organization.subdomain,
-                        orgImage: organization.image,
+                        orgId: result.organization.id,
+                        orgName: result.organization.name,
+                        orgSubdomain: result.organization.subdomain,
+                        orgImage: result.organization.image,
                         userId: session.user.id,
                         userName: session.user.name,
                     },
                 });
             }
 
-            return {organization, membership};
+            return {organization: result.organization, membership: result.membership};
         } catch (error: any) {
             if (error.code === "P2002") {
                 const target = error.meta?.target?.[0];
@@ -842,55 +839,94 @@ export const updateOrganization = withOrganizationAuth(
 
 export const deleteOrganization = withOrganizationAuth(
     async (organization: Organization) => {
-        try {
-            const deleteOrganization = prisma.organization.delete({
-                where: {id: organization.id},
-            });
-
-            // For now, delete the condition too when organization is deleted
-            const deleteConditions = prisma.condition.deleteMany({
-                where: {
-                    organizations: {
-                        some: {
-                            id: organization.id
-                        }
-                    }
-                }
-            });
-
-            const deleteTypeSense = deleteTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                (
-                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                        : process.env.TYPESENSE_ADMIN_API_KEY
-                )!,
-                organization.id,
-                'organizations'
-            );
-
-            // Run both deletions concurrently
-            const [response] = await Promise.all([deleteOrganization, deleteConditions, deleteTypeSense])
-
-            await revalidateTag(
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-            )
-            response.customDomain &&
-            (await revalidateTag(`${organization.customDomain}-metadata`))
-
-            if (!response) {
-                console.error("Error deleting organization.")
-                return {success: false, error: "Database error. please try again later."}
-            }
-
-            return {success: true, data: response}
-        } catch (error: any) {
-            console.error("Error deleting organization:", error)
-            return {success: false, error: "Database error. please try again later."}
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return { success: false, error: "Not authenticated" };
         }
+
+        const userId = session.user.id;
+
+        // Compute the next active org for THIS user (owner who triggered deletion)
+        const remainingMemberships = await prisma.member.findMany({
+            where: {
+                userId,
+                organizationId: { not: organization.id },
+            },
+            select: { organizationId: true, createdAt: true },
+            orderBy: { createdAt: "asc" }, // or "desc" if you prefer “most recent”
+        });
+
+        const nextOrgId: string | null =
+            remainingMemberships.length > 0 ? remainingMemberships[0].organizationId : null;
+
+        // Prepare side-effects (e.g., Typesense)
+        const typeSenseDelete = deleteTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+                process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
+            organization.id,
+            "organizations"
+        );
+
+        // Run everything that touches DB in a single transaction
+        const [deletedOrg] = await prisma.$transaction([
+            prisma.organization.delete({ where: { id: organization.id } }),
+            prisma.user.update({
+                where: { id: userId },
+                data: { activeOrganizationId: nextOrgId },
+            }),
+        ])
+            .then(async ([orgDeleteResult, _userUpdate]) => {
+                await Promise.all([
+                    typeSenseDelete,
+                    prisma.condition.deleteMany({
+                        where: {
+                            organizations: { some: { id: organization.id } },
+                        },
+                    }),
+                ]);
+                return [orgDeleteResult];
+            })
+            .catch((err) => {
+                console.error("Delete transaction failed", err);
+                throw err;
+            });
+
+        // AFTER deleting the org, before revalidatePath:
+        const affectedUsers = await prisma.user.findMany({
+            where: { activeOrganizationId: organization.id },
+            select: { id: true },
+        });
+
+        // For each affected user, pick their next membership (excluding the deleted org)
+        await Promise.all(
+            affectedUsers.map(async (u) => {
+                const next = await prisma.member.findFirst({
+                    where: { userId: u.id, organizationId: { not: organization.id } },
+                    orderBy: { createdAt: "asc" },
+                    select: { organizationId: true },
+                });
+
+                await prisma.user.update({
+                    where: { id: u.id },
+                    data: { activeOrganizationId: next?.organizationId ?? null },
+                });
+            })
+        );
+
+        // Revalidate org-scoped pages
+        for (const p of PATHS) {
+            revalidatePath(p);
+        }
+
+        return { success: true, data: deletedOrg };
     },
-    ['owner']
-)
+    ["owner"]
+);
 
 export const updateRoadmap = withOrganizationAuth(
     async (organizationId: string, data: Partial<Roadmap>) => {
@@ -1475,55 +1511,85 @@ export const declineAndDeleteInvitation = async (invitation: Invitation): Promis
 
 // Invite user function with updated Organization model
 export const leaveOrganization = withOrganizationAuth(
-    async (organization: Organization, session: Session | null) => {
-        try {
-            if (!session) {
-                return {success: false, error: "Session not found."};
-            }
+    async (organization: Organization) => {
+        const session = await getSession();
+        if (!session?.user?.id) {
+            return { success: false, error: "Session not found." };
+        }
 
-            // Check if the user is an owner
+        const userId = session.user.id;
+
+        try {
+            // Fetch the caller's membership + role
             const currentMember = await prisma.member.findUnique({
                 where: {
-                    userId_organizationId: {
-                        userId: session.user.id,
-                        organizationId: organization.id,
-                    }
-                }
+                    userId_organizationId: { userId, organizationId: organization.id },
+                },
+                select: { id: true, role: true },
             });
-
             if (!currentMember) {
-                return {success: false, error: "Membership not found."};
+                return { success: false, error: "Membership not found." };
             }
 
+            // If owner, ensure not the last owner
             if (currentMember.role === "owner") {
                 const ownerCount = await prisma.member.count({
-                    where: {
-                        organizationId: organization.id,
-                        role: "owner"
-                    }
+                    where: { organizationId: organization.id, role: "owner" },
                 });
-
                 if (ownerCount <= 1) {
                     return {
                         success: false,
-                        error: "You are the last owner and cannot leave the organization. Assign another owner first."
+                        error:
+                            "You are the last owner and cannot leave the organization. Assign another owner first.",
                     };
                 }
             }
 
-            const member = await prisma.member.delete({
-                where: {
-                    userId_organizationId: {
-                        userId: session.user.id,
-                        organizationId: organization.id,
-                    }
-                }
+            // Get the user's current active org and compute "next" org BEFORE deletion
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { activeOrganizationId: true },
             });
 
-            return {success: true, data: member};
-        } catch (error: any) {
+            const nextMembership = await prisma.member.findFirst({
+                where: {
+                    userId,
+                    organizationId: { not: organization.id },
+                },
+                orderBy: { createdAt: "asc" }, // or "desc" for most-recent
+                select: { organizationId: true },
+            });
+
+            // Delete membership and (conditionally) update active org
+            const [deletedMembership] = await prisma.$transaction([
+                prisma.member.delete({
+                    where: {
+                        userId_organizationId: { userId, organizationId: organization.id },
+                    },
+                }),
+                // Update activeOrganizationId only if user was pointing to this org
+                ...(user?.activeOrganizationId === organization.id
+                    ? [
+                        prisma.user.update({
+                            where: { id: userId },
+                            data: {
+                                activeOrganizationId: nextMembership?.organizationId ?? null,
+                            },
+                        }),
+                    ]
+                    : []),
+            ]);
+
+            // Revalidate org-scoped pages and any UI that reflects org state
+            for (const p of PATHS) {
+                revalidatePath(p);
+            }
+
+            return { success: true, data: deletedMembership };
+        } catch (error) {
+            // your logger
             logError("Error leaving organization", error);
-            return {success: false, error: "Internal server error"};
+            return { success: false, error: "Internal server error" };
         }
     }
 );
@@ -1629,55 +1695,58 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 
 // Invite user function with updated Organization model
 export const deleteMember = withOrganizationAuth(
-    async (
-        _: Organization,
-        membershipId: string
-    ) => {
-        const session = await getSession()
+    async (_: Organization, membershipId: string) => {
+        const session = await getSession();
+        if (!session) return { success: false, error: "Session not found." };
 
         try {
-            if (!session) {
-                return {success: false, error: "Session not found."};
-            }
-
+            // 1) Delete the membership and fetch needed fields
             const member = await prisma.member.delete({
-                where: {
-                    id: membershipId
-                },
+                where: { id: membershipId },
                 include: {
-                    user: true,
-                    organization: true,
-                }
-            })
+                    user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
+                    organization: { select: { id: true, name: true, image: true } },
+                },
+            });
 
-            if (!member) {
-                return {success: false, error: "Membership not found"};
+            if (!member) return { success: false, error: "Membership not found" };
+
+            // 2) If the revoked user's active org was this org, pick a new one (or null)
+            if (member.user.activeOrganizationId === member.organization.id) {
+                const nextMembership = await prisma.member.findFirst({
+                    where: {
+                        userId: member.user.id,
+                        organizationId: { not: member.organization.id },
+                    },
+                    orderBy: { createdAt: "asc" }, // or "desc" if you prefer most-recent
+                    select: { organizationId: true },
+                });
+
+                await prisma.user.update({
+                    where: { id: member.user.id },
+                    data: { activeOrganizationId: nextMembership?.organizationId ?? null },
+                });
             }
 
-            if (member) {
-                await sendMemberDeletedEmail(
-                    {
-                        name: member.user.name,
-                        email: member.email,
-                        organizationName: member.organization.name || "",
-                        organizationImage: member.organization.image || "",
-                    }
-                ).then(() => {
-                    console.log("email sent")
-                })
-            }
+            // 3) Notify (non-blocking)
+            sendMemberDeletedEmail({
+                name: member.user.name,
+                email: member.email,
+                organizationName: member.organization.name || "",
+                organizationImage: member.organization.image || "",
+            }).catch(() => {});
 
-            revalidatePath("/app/analytics")
+            // 4) Revalidate pages that may depend on org context
+            for (const p of PATHS) revalidatePath(p);
 
-            return {success: true, data: member};
+            return { success: true, data: member };
         } catch (error: any) {
             logError("Error deleting membership", error);
-            return {success: false, error: "Internal server error"};
+            return { success: false, error: "Internal server error" };
         }
     },
-    ['owner']
-)
-
+    ["owner"]
+);
 
 // Invite user function with updated Organization model
 export const deleteUser = withAuth(
@@ -2178,8 +2247,8 @@ export const updateDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
-                        ? { institution: { 
-                            connectOrCreate: { 
+                        ? { institution: {
+                            connectOrCreate: {
                                 where: {id: diseaseModelData.institution.value},
                                 create: {
                                     name: diseaseModelData.institution.value
@@ -2290,7 +2359,7 @@ export const createDiseaseModel = withOrganizationAuth(
                         : undefined),
                     ...(diseaseModelData.institution
                         ? ({institution: {
-                            connectOrCreate: { 
+                            connectOrCreate: {
                                 where: {id: diseaseModelData.institution.value},
                                 create: {
                                     name: diseaseModelData.institution.value,
@@ -2427,14 +2496,14 @@ export const createDataTool = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
                         : undefined),
                     ...((
-                        data.cohortSize !== undefined && 
+                        data.cohortSize !== undefined &&
                         data.cohortSize !== null
-                        ) 
-                            ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null} 
+                        )
+                            ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null}
                             : undefined),
                     ...(dataToolData.institution
                         ? ({institution: {
-                            connectOrCreate: { 
+                            connectOrCreate: {
                                 where: {id: dataToolData.institution.value},
                                 create: {
                                     name: dataToolData.institution.value,
@@ -2550,8 +2619,8 @@ export const updateDataTool = withOrganizationAuth(
                         }
                     }) : {gene: {disconnect: true}}),
                     ...(dataToolData.institution
-                        ? { institution: { 
-                            connectOrCreate: { 
+                        ? { institution: {
+                            connectOrCreate: {
                                 where: {id: dataToolData.institution.value},
                                 create: {
                                     name: dataToolData.institution.value
@@ -2678,7 +2747,7 @@ export const createBiosample = withOrganizationAuth(
                         : undefined),
                     ...(biosampleData.institution
                         ? ({institution: {
-                            connectOrCreate: { 
+                            connectOrCreate: {
                                 where: {id: biosampleData.institution.value},
                                 create: {
                                     name: biosampleData.institution.value,
@@ -2873,8 +2942,8 @@ export const updateBiosample = withOrganizationAuth(
                         ? { gene: { connect: { symbol: biosampleData.gene.value } } }
                         : { gene: { disconnect: true } }),
                     ...(biosampleData.institution
-                        ? { institution: { 
-                            connectOrCreate: { 
+                        ? { institution: {
+                            connectOrCreate: {
                                 where: {id: biosampleData.institution.value},
                                 create: {
                                     name: biosampleData.institution.value
@@ -5978,14 +6047,9 @@ export async function switchOrganization(organizationId: string) {
     });
 
     // Revalidate key pages that depend on org
-    revalidatePath("/app");
-    revalidatePath("/app/dashboard");
-    revalidatePath("/app/profile");
-    revalidatePath("/app/tools/biosample");
-    revalidatePath("/app/tools/disease-models");
-    revalidatePath("/app/tools/data");
-    revalidatePath("/app/requests");
-    revalidatePath("/app/research-plan");
+    for (const p of PATHS) {
+        revalidatePath(p);
+    }
 
     return { success: true };
 }

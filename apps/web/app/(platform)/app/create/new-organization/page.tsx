@@ -179,7 +179,7 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
  **************************************/
 export default function CreateNewOrganizationPage() {
     const router = useRouter();
-    const {data: session, status, update} = useSession();
+    const {data: session, status} = useSession();
 
     // Loading/initial state
     const [isInitializing, setIsInitializing] = useState(true);
@@ -415,11 +415,6 @@ export default function CreateNewOrganizationPage() {
                     looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
                 });
 
-                // Update session with new org
-                if (createRes?.organization?.id) {
-                    orgId = createRes.organization.id as string;
-                    await update({...session, organizationId: orgId, membership: createRes.membership});
-                }
             }
 
             // 5) Condition (optional; only if disorder selected and we have an org)

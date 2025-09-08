@@ -29,11 +29,6 @@ import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/sea
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 
-export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map((option) => ({
-    ...option,
-    value: option.id,
-}))
-
 export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useBiosampleSearchStore(
         useShallow((state: BiosampleSearchState) => ({

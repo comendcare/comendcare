@@ -28,7 +28,7 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
             return;
         }
         await update({})
-        router.refresh();
+        router.push("/app/profile");
     };
 
     const activeOrg = memberships.find(m => m.organizationId === activeId) ?? null;

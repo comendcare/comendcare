@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import {BiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
+// import {BiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
 import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import {
@@ -54,12 +54,12 @@ export default function PublicBiosampleToolsPage({data, pageCount}: { data: Tool
                             />
                         }
                     >
-                        <BiosamplesTable
-                            data={data}
-                            pageCount={pageCount}
-                            columns={columns}
-                            onSelectionChange={setSelectedItems}
-                        />
+                        {/*<BiosamplesTable*/}
+                        {/*    data={data}*/}
+                        {/*    pageCount={pageCount}*/}
+                        {/*    columns={columns}*/}
+                        {/*    onSelectionChange={setSelectedItems}*/}
+                        {/*/>*/}
                     </React.Suspense>
                 </FeatureFlagsProvider>
             </Shell>
