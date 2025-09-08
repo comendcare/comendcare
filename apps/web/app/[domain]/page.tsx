@@ -129,6 +129,7 @@ export default async function OrganizationHomePage({
             attachments: true,
             milestones: true,
             organizationId: true,
+            organization: true,
         })
     ])
 

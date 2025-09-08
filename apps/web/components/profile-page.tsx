@@ -169,7 +169,8 @@ export default function PAGProfilePage() {
                         contacts: true,
                         attachments: true,
                         milestones: true,
-                        organizationId: true
+                        organizationId: true,
+                        organization: true,
                     })
                 ])
 
