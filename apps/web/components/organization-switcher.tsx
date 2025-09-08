@@ -27,8 +27,8 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
             toast.error(res.error ?? "Could not switch organization");
             return;
         }
-        await update({})
         router.push("/app/profile");
+        await update({})
     };
 
     const activeOrg = memberships.find(m => m.organizationId === activeId) ?? null;

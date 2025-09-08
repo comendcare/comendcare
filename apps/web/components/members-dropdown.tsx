@@ -35,7 +35,7 @@ const formSchema = z.object({
 
 export default function MembersDropdown({member}: { member: MemberWithUser }) {
     const router = useRouter()
-    const {data: session} = useSession()
+    const {data: session, update} = useSession()
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isLastOwner, setIsLastOwner] = useState(false)
 
@@ -143,7 +143,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
         }
 
         toast.success("Removed from organization successfully.");
-        // Server action already set next active org (or null); just refresh & navigate
+        await update({})
         router.refresh();
         router.push("/app/profile");
     };
