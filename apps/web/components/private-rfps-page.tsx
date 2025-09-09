@@ -4,7 +4,6 @@ import Image from "next/image"
 import { useShallow } from "zustand/react/shallow"
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { EditRFPDialog, NewRFPDialog } from "./edit-rfp-dialog"
-import { RFPBulkImportDialog } from "./rfp-bulk-import-dialog"
 import { RFPCard } from "./rfp-card"
 
 const rfpSelector = (state: RFPState) => ({
@@ -17,7 +16,6 @@ export const PrivateRFPsPage = () => {
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
             <div className="flex gap-2 w-full justify-end">
-                <RFPBulkImportDialog />
                 <NewRFPDialog />
             </div>
 
