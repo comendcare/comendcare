@@ -366,7 +366,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Causal genes</FormLabel>
-                                            <FormDescription>
+                                            <FormDescription className="flex flex-row items-baseline">
                                                 {`Select all that apply.`}
                                                 <Tooltip delayDuration={0}>
                                                     <TooltipTrigger asChild>
@@ -403,7 +403,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Associated genes</FormLabel>
-                                            <FormDescription>
+                                            <FormDescription className="flex flex-row items-baseline">
                                                 {`Select all that apply.`}
                                                 <Tooltip delayDuration={0}>
                                                     {/*disabled to make the tooltip unclickable*/}
@@ -500,7 +500,9 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Associated systems</FormLabel>
-                                            <FormDescription>{`The systems affected by your condition. Select all that apply.`}</FormDescription>
+                                            <FormDescription>
+                                                {`The systems affected by your condition. Select all that apply.`}
+                                            </FormDescription>
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
@@ -548,7 +550,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field: numeratorField}) => (
                                         <FormItem>
                                             <FormLabel>
-                                                {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
+                                                {`Estimated total prevalence`} –{" "}
+                                                {formatNumberWithCommas(numeratorField.value)}
+                                                {editResearchForm.watch("prevalenceDenominator") && (
+                                                    <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
+                                                )}
                                             </FormLabel>
                                             <FormDescription>
                                                 {`The estimated global prevalence ratio of your condition.`}
