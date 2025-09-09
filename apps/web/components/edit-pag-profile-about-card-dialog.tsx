@@ -8,7 +8,15 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from "@comend/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -17,14 +25,13 @@ import {Textarea} from "@comend/components/ui/textarea";
 import {Button} from "@comend/components/ui/button";
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {Member, Organization, User} from "@prisma/client";
+import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MODALITIES, optionSchema} from "@comend/lib/types";
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {
@@ -41,8 +48,8 @@ const editOrgFormSchema = z.object({
 
 export default function EditPagProfileAboutCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session} = useSession();
-    const router = useRouter();
     const [open, setOpen] = useState(false);
+    const isOwner = session?.user?.membership?.role === "owner";
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
@@ -166,19 +173,25 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                 }}
             >
                 <Tooltip>
-                    <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                disabled={session?.user?.membership?.role !== "owner"}
-                            >
-                                <Pencil/>
-                            </Button>
-                        </DialogTrigger>
+                    <TooltipTrigger asChild>
+                        {isOwner ? (
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" aria-label="Edit">
+                                    <Pencil className="h-4 w-4"/>
+                                </Button>
+                            </DialogTrigger>
+                        ) : (
+                            <div>
+                                <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
+                                    <Pencil className="h-4 w-4"/>
+                                </Button>
+                            </div>
+                        )}
                     </TooltipTrigger>
-                    {session?.user?.membership?.role !== "owner" && (
+
+                    {!isOwner && (
                         <TooltipContent className="max-w-80">
-                            <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                            Editing is owners-only. See Organization Settings → Memberships.
                         </TooltipContent>
                     )}
                 </Tooltip>

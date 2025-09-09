@@ -8,7 +8,6 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {
     Form,
     FormControl,
@@ -32,7 +31,6 @@ import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
 import {Button} from "@comend/components/ui/button";
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
@@ -61,8 +59,8 @@ const editOrgFormSchema = z.object({
 
 export default function EditPAGProfileHeaderDialog({organization}: { organization: Organization }) {
     const {data: session} = useSession();
-    const router = useRouter();
     const [open, setOpen] = useState(false);
+    const isOwner = session?.user?.membership?.role === "owner";
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
@@ -188,28 +186,37 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                     setOpen(state);
                 }}
             >
-                <Tooltip>
-                    <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                className="organization-profile-tour-step3"
-                                onClick={() => console.log("DialogTrigger clicked")}
-                                disabled={session?.user?.membership?.role !== "owner"}
-                            >
-                                <Pencil/>
-                            </Button>
-                        </DialogTrigger>
-                    </TooltipTrigger>
-                    {session?.user?.membership?.role !== "owner" && (
+                {isOwner ? (
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="organization-profile-tour-step3"
+                        >
+                            <Pencil/>
+                        </Button>
+                    </DialogTrigger>
+                ) : (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div>
+                                <Button
+                                    variant="ghost"
+                                    className="organization-profile-tour-step3"
+                                    disabled
+                                >
+                                    <Pencil/>
+                                </Button>
+                            </div>
+                        </TooltipTrigger>
                         <TooltipContent className="max-w-80">
-                            <p>Profile editing is only enabled for organization owners. Please contact the owners of
-                                your
-                                organization. Owners are visible in the Organization Settings tab in the memberships
-                                section.</p>
+                            <p>
+                                Profile editing is only enabled for organization owners. Please contact
+                                the owners of your organization. Owners are visible in the Organization
+                                Settings tab in the memberships section.
+                            </p>
                         </TooltipContent>
-                    )}
-                </Tooltip>
+                    </Tooltip>
+                )}
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Edit Organization Profile</DialogTitle>
