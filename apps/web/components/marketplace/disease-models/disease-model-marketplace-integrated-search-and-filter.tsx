@@ -259,8 +259,9 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                 {/* Mobile and additional filters */}
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button className="m-4 rounded-full" size="icon" variant={'cta'}>
+                        <Button className="m-4 rounded-full" variant={'cta'}>
                             <Funnel />
+                            Filters
                         </Button>
                     </DialogTrigger>
                     <DialogContent
