@@ -10,7 +10,7 @@ export default function AboutPage() {
             <About/>
             <PartneredWithLogoCloud />
             <TeamSection />
-            <News />
+            {/* <News /> */}
         </>
     )
 }
