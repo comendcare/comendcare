@@ -153,14 +153,14 @@ export default function LogoInfiniteCarousel() {
                             <span className="hidden md:inline">
                               Built with the support of 20+ patient groups.
                             </span>
-                        <a
+                        {/* <a
                             href="/marketplace"
                             className="font-semibold text-blue-dark hover:text-blue-light dark:text-blue-400 dark:hover:text-blue-300 ml-2"
                         >
                             <span aria-hidden="true" className="absolute inset-0"/>
                             Browse all our patient groups
                             <span aria-hidden="true"> →</span>
-                        </a>
+                        </a> */}
                     </p>
                 </div>
             </div>
