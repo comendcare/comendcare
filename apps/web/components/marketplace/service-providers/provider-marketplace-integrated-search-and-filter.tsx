@@ -87,10 +87,10 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
+                {/* <Separator orientation="vertical" className="h-8 hidden lg:block"/> */}
 
                 {/* Project Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                {/* <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Project Types</Label>
                     <MultipleSelector
                         value={filters.milestoneTypes}
@@ -107,12 +107,12 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
                     />
-                </div>
+                </div> */}
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
+                {/* <Separator orientation="vertical" className="h-8 hidden lg:block"/> */}
 
                 {/* Business Types */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                {/* <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Business Types</Label>
                     <MultipleSelector
                         value={filters.types}
@@ -129,12 +129,12 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
                     />
-                </div>
+                </div> */}
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
+                {/* <Separator orientation="vertical" className="h-8 hidden lg:block"/> */}
 
                 {/* Certifications */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                {/* <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Certifications</Label>
                     <MultipleSelector
                         value={filters.certifications}
@@ -151,7 +151,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                         showCountInsteadOfSelected={true}
                         showBadgesInDropdown={true}
                     />
-                </div>
+                </div> */}
 
                 <Separator orientation="vertical" className="h-8" />
 

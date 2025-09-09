@@ -230,10 +230,10 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                     />
                 </div>
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
+                {/* <Separator orientation="vertical" className="h-8 hidden lg:block"/> */}
 
                 {/* Conditions */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                {/* <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Condition</Label>
                     <MultipleSelector
                         value={filters.conditions ?? []}
@@ -251,12 +251,12 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         showBadgesInDropdown={true}
                         showHoverCard={false}
                     />
-                </div>
+                </div> */}
 
-                <Separator orientation="vertical" className="h-8 hidden lg:block"/>
+                {/* <Separator orientation="vertical" className="h-8 hidden lg:block"/> */}
 
                 {/* Genes */}
-                <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
+                {/* <div className="flex-1 px-6 py-4 min-w-[100px] hidden lg:block">
                     <Label className="text-base font-semibold text-gray-900">Gene</Label>
                     <MultipleSelector
                         value={filters.genes ?? []}
@@ -274,7 +274,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         showBadgesInDropdown={true}
                         showHoverCard={false}
                     />
-                </div>
+                </div> */}
 
                 <Separator orientation="vertical" className="h-8" />
 
