@@ -411,7 +411,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
     useEffect(() => {
         async function fetchResearchData() {
             if (!organization.id) {
-                toast.error("You must be signed into an organization.");
+                toast.error("You're not a part of an organization.");
                 return;
             }
 
