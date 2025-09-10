@@ -147,15 +147,16 @@ const data = {
             variant: "ghost",
             url: `/app/tools/biosample`,
             match: (path: string) => path.startsWith('/app/tools'),
-            subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
-                {
-                    title: "Tool Requests",
-                    icon: TestTube,
-                    variant: "ghost",
-                    url: `/app/requests`,
-                    subPages: []
-                }
-            ] : []
+            // subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
+            //     {
+            //         title: "Tool Requests",
+            //         icon: TestTube,
+            //         variant: "ghost",
+            //         url: `/app/requests`,
+            //         subPages: []
+            //     }
+            // ] : []
+            subPages: []
         },
         {
             title: "RFPs",
