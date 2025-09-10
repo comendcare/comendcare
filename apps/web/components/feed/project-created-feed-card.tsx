@@ -118,31 +118,39 @@ export default function ProjectCreatedCard({ data }: Props) {
 
                 <CardFooter className="flex justify-end p-4 pt-0">
                     {single ? (
-                        <Link href={items[0]?.projectId ? `/app/research-plan/${items[0]?.researchPlanId}?project=${items[0].projectId}` : "#"} passHref>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex gap-1 items-center"
-                                disabled={!items[0]?.projectId || !items[0]?.researchPlanId}
-                                title={items[0]?.projectId && items[0].researchPlanId ? "View Project" : "No project link available"}
+                        items[0]?.projectId && items[0]?.researchPlanId && (
+                            <Link
+                                href={`/app/research-plan/${items[0].researchPlanId}?project=${items[0].projectId}`}
+                                passHref
                             >
-                                <ExternalLink className="h-4 w-4" />
-                                View Project
-                            </Button>
-                        </Link>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex gap-1 items-center"
+                                    title="View Project"
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                    View Project
+                                </Button>
+                            </Link>
+                        )
                     ) : (
-                        <Link href={orgSubdomain ? `/app/organization/${orgSubdomain}` : "#"} aria-disabled={!orgSubdomain} passHref>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex gap-1 items-center"
-                                disabled={!orgSubdomain}
-                                title={orgSubdomain ? "View All Projects" : "No organization link available"}
+                        orgSubdomain && (
+                            <Link
+                                href={`/app/organization/${orgSubdomain}`}
+                                passHref
                             >
-                                <ExternalLink className="h-4 w-4" />
-                                View All
-                            </Button>
-                        </Link>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex gap-1 items-center"
+                                    title="View All Projects"
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                    View All
+                                </Button>
+                            </Link>
+                        )
                     )}
                 </CardFooter>
             </Card>

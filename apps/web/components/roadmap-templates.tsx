@@ -2,20 +2,25 @@
 
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
-import { ScrollArea} from "@comend/components/ui/scroll-area";
-import { SetStateAction, useEffect, useState } from "react";
-import { templateMilestones, templateResearchPlans } from '@comend/lib/templates'
-import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
-import { useShallow } from "zustand/react/shallow";
+import {ScrollArea} from "@comend/components/ui/scroll-area";
+import {SetStateAction, useEffect, useState} from "react";
+import {templateMilestones, templateResearchPlans} from '@comend/lib/templates'
+import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore";
+import {useShallow} from "zustand/react/shallow";
 import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
-import { EmptyResearchPlanCard, MilestoneTemplateCardMultiSelect, ResearchPlanTemplateCardSelect } from "./milestone-template-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
-import { DialogClose } from "@comend/components/ui/dialog";
-import { Plus, Router, X } from "lucide-react";
-import { cn, getCookie } from "@comend/lib/utils";
-import { ASSOCIATED_CATEGORIES } from "@comend/lib/types";
-import { createRoadmap } from "@comend/lib/actions";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import {
+    EmptyResearchPlanCard,
+    MilestoneTemplateCardMultiSelect,
+    ResearchPlanTemplateCardSelect
+} from "./milestone-template-card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {DialogClose} from "@comend/components/ui/dialog";
+import {Plus, Router, X} from "lucide-react";
+import {cn, getCookie} from "@comend/lib/utils";
+import {ASSOCIATED_CATEGORIES} from "@comend/lib/types";
+import {createRoadmap} from "@comend/lib/actions";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import CreateResearchPlanDialog from "~web/components/create-research-plan-dialog"
 // import { consentedLocalStorage } from "@comend/lib/consent-scripts/functionalConsent";
 
 
@@ -36,7 +41,7 @@ export default function RoadmapTemplates() {
 
     if (isLoading) {
         return (
-            <ComendLoadingSpinner />
+            <ComendLoadingSpinner/>
         )
     }
 
@@ -51,7 +56,7 @@ export default function RoadmapTemplates() {
                 </p>
             </span>
 
-            <MilestoneTemplateTabs 
+            <MilestoneTemplateTabs
                 selectedMilestones={selectedMilestones}
                 setSelectedMilestones={setSelectedMilestones}
                 createEmpty={async () => {
@@ -81,7 +86,12 @@ export default function RoadmapTemplates() {
     )
 }
 
-export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestones, createEmpty, inDialog = false }: {selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void, createEmpty: () => void, inDialog?: boolean}) => {
+export const MilestoneTemplateTabs = ({selectedMilestones, setSelectedMilestones, createEmpty, inDialog = false}: {
+    selectedMilestones: any[],
+    setSelectedMilestones: (value: SetStateAction<any[]>) => void,
+    createEmpty: () => void,
+    inDialog?: boolean
+}) => {
     return (
         <div className="min-h-0 h-full flex flex-col">
             <ScrollArea className="h-0 flex-1 w-full" type="always">
@@ -89,7 +99,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                     <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                     {templateMilestones.map((milestoneData, index) => (
                         <MilestoneTemplateCardMultiSelect
-                            key={index} 
+                            key={index}
                             milestoneData={milestoneData}
                             selectedMilestones={selectedMilestones}
                             setSelectedMilestones={setSelectedMilestones}
@@ -101,22 +111,22 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
     )
 }
 
-export const MilestoneTemplates = ({ 
-    selectedMilestonesTemplate, 
-    setSelectedMilestonesTemplate, 
-    createEmpty, 
-    inDialog = false, 
-    className 
-}: {
-    selectedMilestonesTemplate: any, 
-    setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void, 
-    createEmpty: () => void, 
+export const MilestoneTemplates = ({
+                                       selectedMilestonesTemplate,
+                                       setSelectedMilestonesTemplate,
+                                       createEmpty,
+                                       inDialog = false,
+                                       className
+                                   }: {
+    selectedMilestonesTemplate: any,
+    setSelectedMilestonesTemplate: (value: SetStateAction<any>) => void,
+    createEmpty: () => void,
     inDialog?: boolean,
     className?: string
 }) => {
     const allCategories = Array.from(new Set(templateMilestones.flatMap(template => template.categories))) || []
-    
-    return(
+
+    return (
         <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-5 pt-2", className)}>
             {/* {allCategories.map((category, index) => (
                 <>
@@ -135,13 +145,13 @@ export const MilestoneTemplates = ({
             {ASSOCIATED_CATEGORIES.map((categoryData, index) => (
                 <>
                     <div className={cn("col-span-full", index !== 0 ? "mt-8" : "")}>
-                    <h3 key={`category-title-${index}`} className="text-2xl font-semibold">{categoryData.label}</h3>
-                    <p>{categoryData.description}</p>
+                        <h3 key={`category-title-${index}`} className="text-2xl font-semibold">{categoryData.label}</h3>
+                        <p>{categoryData.description}</p>
                     </div>
                     {templateMilestones.filter(milestone => milestone.categories.includes(categoryData.value)).map((milestoneData, index) => (
                         <MilestoneTemplateCardMultiSelect
                             key={index}
-                            className={index === 0 ? "onborda-select-a-template": ""}
+                            className={index === 0 ? "onborda-select-a-template" : ""}
                             milestoneData={milestoneData}
                             selectedMilestones={selectedMilestonesTemplate}
                             setSelectedMilestones={setSelectedMilestonesTemplate}
@@ -167,7 +177,15 @@ export const MilestoneTemplates = ({
 //     )
 // }
 
-export const ResearchPlanTemplates = ({ selectedResearchPlanTemplate, setSelectedResearchPlanTemplate, inDialog = false }: {selectedResearchPlanTemplate: any, setSelectedResearchPlanTemplate: (value: SetStateAction<any>) => void, inDialog?: boolean}) => {
+export const ResearchPlanTemplates = ({
+                                          selectedResearchPlanTemplate,
+                                          setSelectedResearchPlanTemplate,
+                                          inDialog = false
+                                      }: {
+    selectedResearchPlanTemplate: any,
+    setSelectedResearchPlanTemplate: (value: SetStateAction<any>) => void,
+    inDialog?: boolean
+}) => {
     const [selectedResearchPlanId, setSelectedResearchPlanId] = useState<string | undefined>(undefined)
 
     const handleSetSelectedResearchPlan = (researchPlanData: any) => {
@@ -180,39 +198,41 @@ export const ResearchPlanTemplates = ({ selectedResearchPlanTemplate, setSelecte
             setSelectedResearchPlanTemplate(undefined)
         }
     }
-    
-    return(
+
+    return (
         <div className="h-[50vh] max-h-[50vh]">
-        <ScrollArea type="always" className="h-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                {templateResearchPlans.map(template => (
-                    <ResearchPlanTemplateCardSelect
-                        key={template.id}
-                        researchPlanData={template}
-                        selectedResearchPlanId={selectedResearchPlanId}
-                        setSelectedResearchPlanId={(id) => id === template.title ? handleSetSelectedResearchPlan(template) : handleSetSelectedResearchPlan(undefined)}
-                    />
-                ))}
-            </div>
-        </ScrollArea>
+            <ScrollArea type="always" className="h-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                    {templateResearchPlans.map(template => (
+                        <ResearchPlanTemplateCardSelect
+                            key={template.id}
+                            researchPlanData={template}
+                            selectedResearchPlanId={selectedResearchPlanId}
+                            setSelectedResearchPlanId={(id) => id === template.title ? handleSetSelectedResearchPlan(template) : handleSetSelectedResearchPlan(undefined)}
+                        />
+                    ))}
+                </div>
+            </ScrollArea>
         </div>
     )
 }
 
-const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) => void, inDialog: boolean}) => {
+const EmptyMilestoneCard = ({handleClick, inDialog}: { handleClick: (event: any) => void, inDialog: boolean }) => {
     if (inDialog) {
         return (
             <DialogClose className="p-0 m-0">
-                <Button 
+                <Button
                     variant="secondary"
                     onClick={handleClick}
                     asChild
                     className="hover:cursor-pointer"
                 >
-                    <Card className="h-full w-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
-                        <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                    <Card
+                        className="h-full w-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
+                        <CardContent
+                            className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
                             <CardTitle>{`Create an empty milestone`}</CardTitle>
-                            <Plus />
+                            <Plus/>
                         </CardContent>
                     </Card>
                 </Button>
@@ -221,7 +241,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
     }
 
     return (
-        <Button 
+        <Button
             variant="secondary"
             onClick={handleClick}
             asChild
@@ -230,14 +250,17 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
             <Card className="h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
                 <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
                     <CardTitle>{`Create an empty milestone`}</CardTitle>
-                    <Plus />
+                    <Plus/>
                 </CardContent>
             </Card>
         </Button>
     )
 }
 
-export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
+export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
+    orgId: string,
+    setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
     const [isHidden, setIsHidden] = useState(window.functionalConsentedLocalStorage?.get('isHidden') ? true : false)
 
     useEffect(() => {
@@ -262,18 +285,20 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
                 <CardTitle>
                     Research Plan Templates
                 </CardTitle>
-                <CardDescription>Create a research plan from one of our curated templates.</CardDescription>
+                <CardDescription>
+                    Create a research plan from one of our curated templates.
+                </CardDescription>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button 
-                            variant={"ghost"} 
-                            className="absolute top-0 right-0 hover:bg-transparent" 
+                        <Button
+                            variant={"ghost"}
+                            className="absolute top-0 right-0 hover:bg-transparent"
                             onClick={() => {
                                 window.functionalConsentedLocalStorage?.set('isHidden', true)
                                 setIsHidden(true)
                             }}
                         >
-                            <X />
+                            <X/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -284,42 +309,55 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {orgId: string,
             <CardContent className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                 <CreateEmptyResearchPlanCard setIsLoading={setIsLoading}/>
                 {templateResearchPlans.map(plan => (
-                    <CreateResearchPlanFromTemplateCard key={plan.id} plan={plan} orgId={orgId} setIsLoading={setIsLoading}/>
+                    <CreateResearchPlanFromTemplateCard key={plan.id} plan={plan} orgId={orgId}
+                                                        setIsLoading={setIsLoading}/>
                 ))}
             </CardContent>
         </Card>
     )
 }
 
-export const CreateEmptyResearchPlanCard = ({setIsLoading}: {setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
+export const CreateEmptyResearchPlanCard = ({setIsLoading}: {
+    setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
     const router = useRouter()
 
     return (
-        <button
-            onClick={() => {
-                if (setIsLoading) setIsLoading(true)
-                router.push(`/app/research-plan/create`)
-            }}
-            className="hover:cursor-pointer"
-        >
-            <Card className="h-full hover:border-black">
-                <CardContent className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
-                    <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
-                    <Plus />
-                </CardContent>
-            </Card>
-        </button>
+        <CreateResearchPlanDialog
+            trigger={
+                <button
+                    // onClick={() => {
+                    //     if (setIsLoading) setIsLoading(true)
+                    //     router.push(`/app/research-plan/create`)
+                    // }}
+                    className="hover:cursor-pointer"
+                >
+                    <Card className="h-full hover:border-black">
+                        <CardContent
+                            className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                            <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
+                            <Plus/>
+                        </CardContent>
+                    </Card>
+                </button>
+            }
+            setIsLoading={setIsLoading}
+        />
     )
 }
 
-export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: {plan: typeof templateResearchPlans[0], orgId: string, setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>}) => {
+export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: {
+    plan: typeof templateResearchPlans[0],
+    orgId: string,
+    setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
     const router = useRouter()
 
     return (
         <button
             onClick={async () => {
                 if (setIsLoading) setIsLoading(true)
-                const roadmap =  await createRoadmap(orgId, plan)
+                const roadmap = await createRoadmap(orgId, plan)
                 if (roadmap && roadmap.id) {
                     router.push(`/app/research-plan/${roadmap.id}`)
                 }

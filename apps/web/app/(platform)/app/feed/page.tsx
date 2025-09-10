@@ -6,6 +6,7 @@ import Image from "next/image";
 import {toast} from "sonner";
 import {FeedList} from "~web/components/feed/feed-list";
 import {FeedPageDTO} from "@/packages/lib/types";
+import {Separator} from "@comend/components/ui/separator"
 
 export default async function FeedPage() {
     const session = await getSession()
@@ -133,7 +134,16 @@ export default async function FeedPage() {
             )
         } else if (posts.data) {
             return (
-                <main className="flex flex-col items-center w-full max-w-4xl mx-auto p-4 space-y-4">
+                <main className="flex flex-col justify-start items-center w-full max-w-4xl mx-auto p-8 space-y-4">
+                    <div className="w-full space-y-2 flex-col place-self-start">
+                        <h2 className="text-xl font-semibold leading-6 text-gray-900">
+                            Feed
+                        </h2>
+                        <p className="text-sm text-gray-700">
+                            {`Activity in your organization, and news from the rare disease world.`}
+                        </p>
+                        <Separator/>
+                    </div>
                     <FeedList initialPage={initialPage as FeedPageDTO} orgId={session?.user.organizationId}/>
                 </main>
             )

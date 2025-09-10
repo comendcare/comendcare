@@ -2051,16 +2051,42 @@ export const updateCondition = withOrganizationAuth(
                 select: { conditionId: true, condition: { select: { slug: true } } },
             });
 
-            // Create if org has none yet
+            // Create or update if org has none yet
             if (!link?.conditionId) {
-                const newCondition = await prisma.condition.create({
-                    data: { ...data, slug: toKebabCase(String(data.name || "")), name: data.name },
-                });
+                const requestedId: string | undefined = (data as any).id ?? (data as any).conditionId;
+                const requestedSlug: string | undefined =
+                    (data as any).slug ?? (data.name ? toKebabCase(String(data.name)) : undefined);
+
+                // Try to find an existing condition (prefer id, then slug)
+                let existing =
+                    requestedId
+                        ? await prisma.condition.findUnique({ where: { id: requestedId } })
+                        : requestedSlug
+                            ? await prisma.condition.findUnique({ where: { slug: requestedSlug } })
+                            : null;
+
+                let condition;
+                if (existing) {
+                    // Update existing with incoming scalar fields
+                    condition = await prisma.condition.update({
+                        where: { id: existing.id },
+                        data,
+                    });
+                } else {
+                    // Create new condition (derive slug if not provided)
+                    const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
+                    condition = await prisma.condition.create({
+                        data: { ...data, slug, name: data.name },
+                    });
+                }
+
+                // Link org → condition
                 await prisma.conditionToOrganization.create({
-                    data: { conditionId: newCondition.id, organizationId: organization.id },
+                    data: { conditionId: condition.id, organizationId: organization.id },
                 });
+
                 revalidatePath("/app/profile");
-                return { success: true, data: newCondition };
+                return { success: true, data: condition };
             }
 
             const conditionId = link.conditionId;

@@ -138,38 +138,38 @@ export default function ToolCreatedCard({ data }: ToolCreatedProps) {
 
                 <CardFooter className="flex justify-end p-4 pt-0">
                     <div className="flex gap-2">
-                        <Link
-                            href={orgSubdomain ? `/app/organization/${orgSubdomain}` : "#"}
-                            aria-disabled={!orgSubdomain}
-                            passHref
-                        >
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                disabled={!orgId}
-                                title={orgSubdomain ? "View Organization" : "No organization link available"}
+                        {orgSubdomain && (
+                            <Link
+                                href={`/app/organization/${orgSubdomain}`}
+                                passHref
                             >
-                                <FileText className="h-4 w-4" />
-                                View Organization
-                            </Button>
-                        </Link>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    title="View Organization"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    View Organization
+                                </Button>
+                            </Link>
+                        )}
 
-                        <Link
-                            href={data.content.toolId ? `/app/tools/biosample` : "#"}
-                            aria-disabled={!data.content.toolId}
-                            passHref
-                        >
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex gap-1 items-center"
-                                disabled={!data.content.toolId}
-                                title={data.content.toolId ? "View Tool" : "No tool link available"}
+                        {data.content.toolId && (
+                            <Link
+                                href={`/app/tools/biosample`}
+                                passHref
                             >
-                                <FileText className="h-4 w-4" />
-                                View Tool
-                            </Button>
-                        </Link>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex gap-1 items-center"
+                                    title="View Tool"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    View Tool
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </CardFooter>
             </Card>

@@ -67,7 +67,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Patient Groups</h2>
-                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
                         <Link
                             href={"/marketplace/patient-groups"}
                         >
@@ -99,7 +99,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Biosamples</h2>
-                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
                         <Link
                             href={"/marketplace/biosamples"}
                         >
@@ -149,7 +149,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Disease Models</h2>
-                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
                         <Link
                             href={"/marketplace/disease-models"}
                         >
@@ -199,7 +199,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-semibold">Clinical Datasets</h2>
-                    <Button asChild variant={"cta"} className="justify-self-end self-end">
+                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
                         <Link
                             href={"/marketplace/clinical-datasets"}
                         >

@@ -101,14 +101,16 @@ export default function ToolRequestCreatedCard({ data }: Props) {
                     </div>
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={requestHref} aria-disabled={!data.content.requestId} passHref>
-                        <Button size="sm" variant="outline" className="flex gap-1 items-center" disabled={!data.content.requestId} title={data.content.requestId ? "View Request" : "No request link available"}>
-                            <ExternalLink className="h-4 w-4" />
-                            View Request
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {data.content.requestId && (
+                    <CardFooter className="flex justify-end p-4 pt-0">
+                        <Link href={requestHref} aria-disabled={!data.content.requestId} passHref>
+                            <Button size="sm" variant="outline" className="flex gap-1 items-center" title={data.content.requestId ? "View Request" : "No request link available"}>
+                                <ExternalLink className="h-4 w-4" />
+                                View Request
+                            </Button>
+                        </Link>
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );

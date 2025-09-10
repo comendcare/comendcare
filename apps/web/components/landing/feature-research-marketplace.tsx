@@ -104,12 +104,12 @@ export default function FeatureResearchMarketplace() {
                                 {`Service providers and counting`}
                             </p>
                         </motion.div>
-                        <PulsatingButton
+                        {/* <PulsatingButton
                             className="w-fit"
                             onClick={() => router.push("/marketplace")}
                         >
                             View public marketplace
-                        </PulsatingButton>
+                        </PulsatingButton> */}
                     </div>
                 </div>
             </div>

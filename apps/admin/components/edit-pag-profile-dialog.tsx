@@ -411,7 +411,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
     useEffect(() => {
         async function fetchResearchData() {
             if (!organization.id) {
-                toast.error("You must be signed into an organization.");
+                toast.error("You're not a part of an organization.");
                 return;
             }
 
@@ -1207,7 +1207,11 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field: numeratorField}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
+                                                    {`Estimated total prevalence`} –{" "}
+                                                    {formatNumberWithCommas(numeratorField.value)}
+                                                    {editResearchForm.watch("prevalenceDenominator") && (
+                                                        <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
+                                                    )}
                                                 </FormLabel>
                                                 <FormDescription>
                                                     {`The estimated global prevalence ratio of your condition.`}
