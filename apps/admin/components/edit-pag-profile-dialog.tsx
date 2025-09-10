@@ -1207,7 +1207,11 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field: numeratorField}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
+                                                    {`Estimated total prevalence`} –{" "}
+                                                    {formatNumberWithCommas(numeratorField.value)}
+                                                    {editResearchForm.watch("prevalenceDenominator") && (
+                                                        <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
+                                                    )}
                                                 </FormLabel>
                                                 <FormDescription>
                                                     {`The estimated global prevalence ratio of your condition.`}

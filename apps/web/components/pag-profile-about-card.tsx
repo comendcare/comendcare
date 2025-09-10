@@ -236,9 +236,10 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                     </div>
                                 </div>
                             )
-                            : <div>
+                            : <p className="text-gray-400">
+
                                 No known members
-                            </div>
+                            </p>
                         }
                     </div>
 

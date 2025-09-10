@@ -65,7 +65,7 @@ export default async function PAGDashboardAnalyticsTab() {
     }
 
     return (
-        <div className="p-4 space-y-4 w-full">
+        <div className="space-y-4 w-full">
             <div className="space-y-2 sm:flex-auto">
                 <h2 className="text-xl font-semibold leading-6 text-gray-900">
                     {session?.user?.name ? `Hello, ${session.user.name.split(" ")[0]}` : `Hello`}

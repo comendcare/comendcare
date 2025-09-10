@@ -172,20 +172,16 @@ export default function PAGProfileUpdatedCard({data}: OrgUpdatedProps) {
                     </div>
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    {subdomain ? (
+                {subdomain && (
+                    <CardFooter className="flex justify-end p-4 pt-0">
                         <Link href={`/app/organization/${subdomain}`} passHref>
                             <Button size="sm" variant="outline" className="flex gap-1 items-center">
                                 <FileText className="h-4 w-4"/>
                                 View Organization
                             </Button>
                         </Link>
-                    ) : (
-                        <div className="text-[0.7rem] text-muted-foreground">
-                            Organization link unavailable
-                        </div>
-                    )}
-                </CardFooter>
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );

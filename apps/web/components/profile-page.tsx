@@ -12,10 +12,11 @@ import {Building2, Calendar, ExternalLink, HandCoins} from "lucide-react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
 import ShareDialog from "~web/components/share-dialog";
-import {Button} from "@comend/components/ui/button";
+import {Button, buttonVariants} from "@comend/components/ui/button";
 import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
+import Link from "next/link";
 
 type ToolCounts = {
     biosampleCount: number;
@@ -117,22 +118,31 @@ export default function PAGProfilePage({
                                         </div>
                                     </div>
                                 </div>
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button variant="cta">
-                                            Share public profile
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="min-w-fit">
-                                        <ShareDialog
-                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
-                                            organization={organization}
-                                            trackShareEvent={{
-                                                title: `Organization Profile Shared`,
-                                            }}
-                                        />
-                                    </DialogContent>
-                                </Dialog>
+                                <div className="flex flex-row space-x-2">
+                                    <Link
+                                        href={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                        className={buttonVariants({variant: "secondary"})}
+                                        target="_blank"
+                                    >
+                                        View public profile
+                                    </Link>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="cta">
+                                                Share public profile
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="min-w-fit">
+                                            <ShareDialog
+                                                url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                                organization={organization}
+                                                trackShareEvent={{
+                                                    title: `Organization Profile Shared`,
+                                                }}
+                                            />
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
                             </div>
                         </Card>
 
