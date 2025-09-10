@@ -91,20 +91,21 @@ export default function ToolRequestCommentCard({ data }: Props) {
                     )}
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={threadHref} aria-disabled={!hasThreadLink} passHref>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex gap-1 items-center"
-                            disabled={!hasThreadLink}
-                            title={hasThreadLink ? "View Thread" : "No request link available"}
-                        >
-                            <ExternalLink className="h-4 w-4" />
-                            View Thread
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {hasThreadLink && (
+                    <CardFooter className="flex justify-end p-4 pt-0">
+                        <Link href={threadHref} aria-disabled={!hasThreadLink} passHref>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex gap-1 items-center"
+                                title={hasThreadLink ? "View Thread" : "No request link available"}
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                                View Thread
+                            </Button>
+                        </Link>
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );

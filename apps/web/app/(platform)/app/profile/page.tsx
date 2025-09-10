@@ -111,6 +111,7 @@ export default async function ProfilePage(_props: IndexPageProps) {
                 attachments: true,
                 milestones: true,
                 organizationId: true,
+                organization: true
             }),
         ])
         : [[], {}, []];

@@ -1,14 +1,10 @@
 "use client"
 import {PublicMarketplaceNav} from "~web/components/marketplace/marketplace-nav"
-import {MilestoneFilters} from "~web/components/milestone-filters"
-import {PAGFilters} from "~web/components/marketplace/patient-groups/pag-filters"
-import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@comend/components/ui/resizable"
 import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
 import {useEffect, useState} from "react";
 import {getMilestoneTypes, getPublicOrganizationData} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {CROFilters} from "~web/components/marketplace/service-providers/cro-filters";
 import { useQueryState } from "nuqs"
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@comend/lib/initialize-client-state"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@comend/lib/types"
@@ -179,16 +175,4 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
             </div>
         </TooltipProvider>
     )
-}
-
-const FiltersPanel = () => {
-    const pathname = usePathname()
-
-    if (pathname.endsWith('/milestones')) {
-        return <MilestoneFilters/>
-    } else if (pathname.endsWith('/service-providers')){
-        return <CROFilters/>
-    } else if (pathname.endsWith('/organizations')) {
-        return <PAGFilters/>
-    }
 }

@@ -146,33 +146,37 @@ export default function AnalyticsGoalReachedCard({data}: OrgProfileViewsMileston
                     </div>
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0 gap-2">
-                    {host && (
-                        <a
-                            href={`https://${host}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Open public profile"
-                        >
-                            <Button size="sm" variant="ghost" className="flex gap-1 items-center">
-                                <ExternalLink className="h-4 w-4"/>
-                                Open Site
-                            </Button>
-                        </a>
-                    )}
-                    <Link href={subdomain ? `/app/organization/${subdomain}` : "#"} aria-disabled={!subdomain} passHref>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex gap-1 items-center"
-                            disabled={!subdomain}
-                            title={subdomain ? "View Profile" : "No profile link available"}
-                        >
-                            <Eye className="h-4 w-4"/>
-                            View Profile
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {(host || subdomain) && (
+                    <CardFooter className="flex justify-end p-4 pt-0 gap-2">
+                        {host && (
+                            <a
+                                href={`https://${host}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Open public profile"
+                            >
+                                <Button size="sm" variant="ghost" className="flex gap-1 items-center">
+                                    <ExternalLink className="h-4 w-4" />
+                                    Open Site
+                                </Button>
+                            </a>
+                        )}
+
+                        {subdomain && (
+                            <Link href={`/app/organization/${subdomain}`} passHref>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex gap-1 items-center"
+                                    title="View Profile"
+                                >
+                                    <Eye className="h-4 w-4" />
+                                    View Profile
+                                </Button>
+                            </Link>
+                        )}
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );

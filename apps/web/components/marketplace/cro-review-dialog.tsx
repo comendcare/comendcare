@@ -51,10 +51,10 @@ import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 
 export const reviewForm = z.object({
-    title: z
-        .string({required_error: "Please provide a title"})
-        .min(1, "Title is required")
-        .max(100, "Title must be less than 100 characters"),
+    // title: z
+    //     .string({required_error: "Please provide a title"})
+    //     .min(1, "Title is required")
+    //     .max(100, "Title must be less than 100 characters"),
     body: z
         .string({required_error: "Please provide a description"})
         .min(1, "Description is required")
@@ -78,7 +78,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         mode: "onChange",
         resolver: zodResolver(reviewForm),
         defaultValues: {
-            title: "",
+            // title: "",
             body: "",
             rating: 0,
             milestone: "",
@@ -124,7 +124,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                     mixpanelTrack("Service Provider Review Submitted", {
                         "Service Provider ID": cro.id,
                         "Service Provider Name": cro.title,
-                        "Title": res.data.title,
+                        // "Title": res.data.title,
                         "Description": res.data.body,
                         "Rating": res.data.rating,
                         "Milestone Title": milestone?.title,
@@ -182,33 +182,19 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Title</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter a title" {...field} />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="body"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea placeholder="Enter a description" {...field} />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                        {/*<FormField*/}
+                        {/*    control={form.control}*/}
+                        {/*    name="title"*/}
+                        {/*    render={({field}) => (*/}
+                        {/*        <FormItem>*/}
+                        {/*            <FormLabel>Title</FormLabel>*/}
+                        {/*            <FormControl>*/}
+                        {/*                <Input placeholder="Enter a title" {...field} />*/}
+                        {/*            </FormControl>*/}
+                        {/*            <FormMessage/>*/}
+                        {/*        </FormItem>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
 
                         <FormField
                             control={form.control}
@@ -266,6 +252,20 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                             <Link2Off/>
                                         </Button>
                                     </div>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="body"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Enter a description" {...field} />
+                                    </FormControl>
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />

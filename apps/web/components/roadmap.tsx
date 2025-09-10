@@ -30,7 +30,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@comend/components/ui/dialog"
-import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Globe, Import, Info, Lock, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
+import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Globe, Import, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -841,7 +841,7 @@ const RoadmapHeader = ({
                     ? (
                         <Tooltip>
                             <div className="p-[6px] h-[40px] w-[40px] min-w-[40px]">
-                                <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center bg-red-100">
+                                <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center">
                                     <Lock className="text-red-600 h-4 w-4"/>
                                 </TooltipTrigger>
                             </div>
@@ -853,7 +853,7 @@ const RoadmapHeader = ({
                     : (
                         <Tooltip>
                             <div className="p-[6px] h-[40px] w-[40px] min-w-[40px]">
-                                <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center bg-green-100">
+                                <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center">
                                     <Globe className="text-green-600 h-4 w-4"/>
                                 </TooltipTrigger>
                             </div>
@@ -907,8 +907,10 @@ const RoadmapHeader = ({
                         setTab('projects')
                         setNewMilestoneIsOpen(true)
                     }}
+                    size={isCollapsed ? "icon" : "default"}
                 >
-                    Templates
+                    <LayoutTemplate />
+                    {!isCollapsed && <p>{`Templates`}</p>}
                 </Button>
 
                 <Tooltip>

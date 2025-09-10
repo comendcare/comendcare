@@ -7,7 +7,7 @@ import {useState, useEffect} from "react"
 import {toast} from "sonner"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription} from "@comend/components/ui/form";
 import {Input} from "@comend/components/ui/input";
 import {Button} from "@comend/components/ui/button";
 import {z} from "zod"
@@ -55,6 +55,9 @@ export default function LoginForm({callback = "/", isCaptchaVerified = true}: { 
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>Email address</FormLabel>
+                                <FormDescription>
+                                    {`Please use your organization's email.`}
+                                </FormDescription>
                                 <FormControl>
                                     <Input
                                         id="email"

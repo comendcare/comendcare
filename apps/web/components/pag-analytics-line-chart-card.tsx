@@ -49,7 +49,7 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
                 // current period
                 const resCurrent = await fetch(
                     `/api/mixpanel-pageviews?from=${from}&to=${to}&host=${encodeURIComponent(orgHost)}`,
-                    { cache: "no-store" }
+                    {cache: "no-store"}
                 );
                 const jsonCurrent = await resCurrent.json();
                 const currentData = Array.isArray(jsonCurrent) ? jsonCurrent : [];
@@ -57,7 +57,7 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
                 // previous period
                 const resPrev = await fetch(
                     `/api/mixpanel-pageviews?from=${prevFrom}&to=${prevTo}&host=${encodeURIComponent(orgHost)}`,
-                    { cache: "no-store" }
+                    {cache: "no-store"}
                 );
                 const jsonPrev = await resPrev.json();
                 const prevData = Array.isArray(jsonPrev) ? jsonPrev : [];
@@ -98,30 +98,30 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                            <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                         </Link>
                     </Button>
                 </CardTitle>
-                <CardDescription>
+                <div className="text-muted-foreground">
                     <div className="text-2xl font-bold inline-flex items-baseline">
                         {total}
-                        <div className="text-sm font-bold">
-                            &nbsp;this week
-                        </div>
+                        <span className="text-sm font-bold">&nbsp;this week</span>
                     </div>
                     {percentChange !== null && (
-                        <p className={`text-xs ${percentChange >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        <div
+                            className={`text-xs ${percentChange >= 0 ? "text-green-600" : "text-red-600"}`}
+                        >
                             {percentChange >= 0 ? "+" : ""}
                             {percentChange.toFixed(1)}% from last week
-                        </p>
+                        </div>
                     )}
-                </CardDescription>
+                </div>
             </CardHeader>
             <CardContent className="h-60">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                         data={data}
-                        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                        margin={{top: 5, right: 10, left: 10, bottom: 5}}
                     >
                         <Tooltip
                             formatter={(value: number) => [value.toLocaleString(), "Page Views"]}
@@ -144,7 +144,7 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
                             dataKey="pageViews"
                             activeDot={{
                                 r: 6,
-                                style: { fill: "var(--theme-primary)", opacity: 0.25 },
+                                style: {fill: "var(--theme-primary)", opacity: 0.25},
                             }}
                         />
                     </LineChart>

@@ -90,7 +90,9 @@ export function FeedList({ orgId, initialPage }: { orgId?: string; initialPage?:
 
 
             {!hasMore && (
-                <div className="text-center text-xs text-muted-foreground py-4">You’re all caught up</div>
+                <div className="text-center text-xs text-muted-foreground py-4">
+                    {`You’re all caught up`}
+                </div>
             )}
         </div>
     );

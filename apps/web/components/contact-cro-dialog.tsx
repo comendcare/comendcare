@@ -185,49 +185,49 @@ export const ContactCroDialogContent = ({cro, setOpen}: {cro: Company, setOpen: 
             </DialogHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="rfps"
-                        render={({field}) => (
-                            <FormItem className="w-full">
-                                <FormLabel>
-                                    Open RFPs
-                                </FormLabel>
-                                <FormDescription className="flex items-center">
-                                    {`Is there an RFP you’d like to attach to this service provider?`}
-                                </FormDescription>
-                                <FormControl>
-                                    <MultipleSelector
-                                        value={field.value?.map(rfp => ({
-                                            ...rfp,
-                                            value: rfp.value,
-                                            label: rfp.label
-                                        } as Option))}
-                                        onChange={field.onChange}
-                                        defaultOptions={fetchedRFPs.map(rfp => ({
-                                            ...rfp,
-                                            value: rfp.id,
-                                            label: rfp.title
-                                        } as Option))}
-                                        options={fetchedRFPs.map(rfp => ({
-                                            ...rfp,
-                                            value: rfp.id,
-                                            label: rfp.title
-                                        } as Option))}
-                                        hidePlaceholderWhenSelected={true}
-                                        showHoverCard={false}
-                                        placeholder="Link RFPs"
-                                        emptyIndicator={
-                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                no results found.
-                                            </p>
-                                        }
-                                    />
-                                </FormControl>
-                                <FormMessage className="text-primary"/>
-                            </FormItem>
-                        )}
-                    />
+                    {/*<FormField*/}
+                    {/*    control={form.control}*/}
+                    {/*    name="rfps"*/}
+                    {/*    render={({field}) => (*/}
+                    {/*        <FormItem className="w-full">*/}
+                    {/*            <FormLabel>*/}
+                    {/*                Open RFPs*/}
+                    {/*            </FormLabel>*/}
+                    {/*            <FormDescription className="flex items-center">*/}
+                    {/*                {`Is there an RFP you’d like to attach to this service provider?`}*/}
+                    {/*            </FormDescription>*/}
+                    {/*            <FormControl>*/}
+                    {/*                <MultipleSelector*/}
+                    {/*                    value={field.value?.map(rfp => ({*/}
+                    {/*                        ...rfp,*/}
+                    {/*                        value: rfp.value,*/}
+                    {/*                        label: rfp.label*/}
+                    {/*                    } as Option))}*/}
+                    {/*                    onChange={field.onChange}*/}
+                    {/*                    defaultOptions={fetchedRFPs.map(rfp => ({*/}
+                    {/*                        ...rfp,*/}
+                    {/*                        value: rfp.id,*/}
+                    {/*                        label: rfp.title*/}
+                    {/*                    } as Option))}*/}
+                    {/*                    options={fetchedRFPs.map(rfp => ({*/}
+                    {/*                        ...rfp,*/}
+                    {/*                        value: rfp.id,*/}
+                    {/*                        label: rfp.title*/}
+                    {/*                    } as Option))}*/}
+                    {/*                    hidePlaceholderWhenSelected={true}*/}
+                    {/*                    showHoverCard={false}*/}
+                    {/*                    placeholder="Link RFPs"*/}
+                    {/*                    emptyIndicator={*/}
+                    {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                    {/*                            no results found.*/}
+                    {/*                        </p>*/}
+                    {/*                    }*/}
+                    {/*                />*/}
+                    {/*            </FormControl>*/}
+                    {/*            <FormMessage className="text-primary"/>*/}
+                    {/*        </FormItem>*/}
+                    {/*    )}*/}
+                    {/*/>*/}
 
                     <FormField
                         control={form.control}
@@ -268,35 +268,35 @@ export const ContactCroDialogContent = ({cro, setOpen}: {cro: Company, setOpen: 
                         )}
                     />
 
-                    <FormField
-                        control={form.control}
-                        name="timeline"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Timeline</FormLabel>
-                                <FormDescription>When would you like this meeting?</FormDescription>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select an approximate time" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="1-3">
-                                            1-3 months
-                                        </SelectItem>
-                                        <SelectItem value="4-6">
-                                            4-6 months
-                                        </SelectItem>
-                                        <SelectItem value="6+">
-                                            6+ months
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
+                    {/*<FormField*/}
+                    {/*    control={form.control}*/}
+                    {/*    name="timeline"*/}
+                    {/*    render={({field}) => (*/}
+                    {/*        <FormItem>*/}
+                    {/*            <FormLabel>Timeline</FormLabel>*/}
+                    {/*            <FormDescription>When would you like this meeting?</FormDescription>*/}
+                    {/*            <Select onValueChange={field.onChange} defaultValue={field.value}>*/}
+                    {/*                <FormControl>*/}
+                    {/*                    <SelectTrigger>*/}
+                    {/*                        <SelectValue placeholder="Select an approximate time" />*/}
+                    {/*                    </SelectTrigger>*/}
+                    {/*                </FormControl>*/}
+                    {/*                <SelectContent>*/}
+                    {/*                    <SelectItem value="1-3">*/}
+                    {/*                        1-3 months*/}
+                    {/*                    </SelectItem>*/}
+                    {/*                    <SelectItem value="4-6">*/}
+                    {/*                        4-6 months*/}
+                    {/*                    </SelectItem>*/}
+                    {/*                    <SelectItem value="6+">*/}
+                    {/*                        6+ months*/}
+                    {/*                    </SelectItem>*/}
+                    {/*                </SelectContent>*/}
+                    {/*            </Select>*/}
+                    {/*            <FormMessage/>*/}
+                    {/*        </FormItem>*/}
+                    {/*    )}*/}
+                    {/*/>*/}
 
                     <FormField
                         control={form.control}

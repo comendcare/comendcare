@@ -89,14 +89,16 @@ export default function ToolUpdatedCard({ data }: Props) {
                     )}
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={toolId ? `/app/tools/biosample` : "#"} aria-disabled={!toolId} passHref>
-                        <Button size="sm" variant="outline" className="flex gap-1 items-center" disabled={!toolId}>
-                            <ExternalLink className="h-4 w-4" />
-                            View Tool
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {toolId && (
+                    <CardFooter className="flex justify-end p-4 pt-0">
+                        <Link href={toolId ? `/app/tools/biosample` : "#"} aria-disabled={!toolId} passHref>
+                            <Button size="sm" variant="outline" className="flex gap-1 items-center">
+                                <ExternalLink className="h-4 w-4" />
+                                View Tool
+                            </Button>
+                        </Link>
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );
