@@ -18,17 +18,24 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import {EditResearchPlanForm} from "~web/components/edit-research-plan-form";
+import {Roadmap} from "@prisma/client";
 
 export default function CreateResearchPlanDialog({
                                                      trigger,
                                                      researchPlanData,
+                                                     setIsLoading: setIsLoadingExternal,
                                                  }: {
     trigger?: React.ReactNode
     researchPlanData?: Partial<Roadmap>
+    setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const [open, setOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
+    const setLoadingBoth = (val: boolean) => {
+        setIsLoading(val)
+        if (setIsLoadingExternal) setIsLoadingExternal(val)
+    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -63,7 +70,7 @@ export default function CreateResearchPlanDialog({
                         <EditResearchPlanForm
                             researchPlanData={researchPlanData}
                             closeDialog={() => setOpen(false)}
-                            setIsSubmitting={setIsLoading}
+                            setIsSubmitting={setLoadingBoth}
                         />
                     </div>
                 )}

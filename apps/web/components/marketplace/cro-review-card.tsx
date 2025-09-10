@@ -70,7 +70,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
         mode: "onChange",
         resolver: zodResolver(reviewForm),
         defaultValues: {
-            title: review.title,
+            // title: review.title,
             body: review.body,
             rating: review.rating,
             milestone: "",
@@ -272,9 +272,9 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
             </div>
 
             <div className="col-span-2">
-                <h4 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {review.title}
-                </h4>
+                {/*<h4 className="text-xl font-bold text-gray-900 dark:text-white">*/}
+                {/*    {review.title}*/}
+                {/*</h4>*/}
                 <p className="mb-2 text-gray-500 dark:text-gray-400">
                     {review.body}
                 </p>
@@ -337,34 +337,19 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                             </DialogHeader>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="title"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Title</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Enter a title" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="body"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Description</FormLabel>
-                                                <FormControl>
-                                                    <Textarea placeholder="Enter a description" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
+                                    {/*<FormField*/}
+                                    {/*    control={form.control}*/}
+                                    {/*    name="title"*/}
+                                    {/*    render={({field}) => (*/}
+                                    {/*        <FormItem>*/}
+                                    {/*            <FormLabel>Title</FormLabel>*/}
+                                    {/*            <FormControl>*/}
+                                    {/*                <Input placeholder="Enter a title" {...field} />*/}
+                                    {/*            </FormControl>*/}
+                                    {/*            <FormMessage/>*/}
+                                    {/*        </FormItem>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
                                     <FormField
                                         control={form.control}
                                         name="rating"
@@ -423,6 +408,20 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                                                         <Link2Off />
                                                     </Button>
                                                 </div>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="body"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Description</FormLabel>
+                                                <FormControl>
+                                                    <Textarea placeholder="Enter a description" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
