@@ -18,6 +18,7 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import {EditResearchPlanForm} from "~web/components/edit-research-plan-form";
+import {Roadmap} from "@prisma/client";
 
 export default function CreateResearchPlanDialog({
                                                      trigger,
