@@ -91,24 +91,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
 
                 <div className={`${disabled ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
                     <div
-                        className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
-                        <div className="flex flex-grow flex-col">
-                            <div className="text-sm font-medium leading-6 text-gray-900">
-                                Delete Organization
-                            </div>
-                            <div className="text-sm text-gray-500">
-                                This will delete all memberships, roadmaps, and tasks from this organization.
-                                This organization will then be permanently deleted.
-                            </div>
-                        </div>
-
-                        <DeleteOrganizationAlertDialog organization={organization}/>
-                    </div>
-                </div>
-
-                <div className={`${disabled ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
-                    <div
-                        className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
+                        className="w-full border rounded-md p-8 border-gray-200 flex items-center justify-between gap-4">
                         <div className="flex flex-grow flex-col">
                             <div className="text-sm font-medium leading-6 text-gray-900">
                                 Export Organization Data
@@ -120,7 +103,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="destructive" disabled={disabled || isPending}>
+                                <Button variant="secondary" disabled={disabled || isPending}>
                                     {isPending ? "Exporting..." : "Export Data"}
                                 </Button>
                             </DropdownMenuTrigger>
@@ -150,6 +133,24 @@ export default function OrganizationSettingsPage({organization}: { organization:
                         </DropdownMenu>
                     </div>
                 </div>
+
+                <div className={`${disabled ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
+                    <div
+                        className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
+                        <div className="flex flex-grow flex-col">
+                            <div className="text-sm font-medium leading-6 text-gray-900">
+                                Delete Organization
+                            </div>
+                            <div className="text-sm text-gray-500">
+                                This will delete all memberships, roadmaps, and tasks from this organization.
+                                This organization will then be permanently deleted.
+                            </div>
+                        </div>
+
+                        <DeleteOrganizationAlertDialog organization={organization}/>
+                    </div>
+                </div>
+
             </div>
         </main>
     )

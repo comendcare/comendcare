@@ -34,7 +34,7 @@ const formSchema = z.object({
     // }),
     // milestoneId: z.string().min(1, "Please select a project"),
     milestones: z.array(z.custom<Milestone>())
-        .min(1, "Please select a project")
+        // .min(1, "Please select a project")
         .max(1, "Cannot select more than one project")
 });
 
