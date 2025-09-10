@@ -127,26 +127,37 @@ export default function ServiceProviderCreatedCard({ data }: Props) {
                     </div>
                 </CardContent>
 
-                <CardFooter className="flex justify-end gap-2 p-4 pt-0">
-                    <Link href={companyHref} aria-disabled={!data.content.companyId} passHref>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex gap-1 items-center"
-                            disabled={!data.content.companyId}
-                            title={data.content.companyId ? "View Company" : "No company link available"}
-                        >
-                            <ExternalLink className="h-4 w-4" />
-                            View Company
-                        </Button>
-                    </Link>
-                    <Link href={siteHref} aria-disabled={!hasSite} passHref>
-                        <Button size="sm" variant="ghost" className="flex gap-1 items-center" disabled={!hasSite} title={hasSite ? "Open Website" : "No website available"}>
-                            <ExternalLink className="h-4 w-4" />
-                            Visit Site
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {(data.content.companyId || hasSite) && (
+                    <CardFooter className="flex justify-end gap-2 p-4 pt-0">
+                        {data.content.companyId && (
+                            <Link href={companyHref} passHref>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex gap-1 items-center"
+                                    title="View Company"
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                    View Company
+                                </Button>
+                            </Link>
+                        )}
+
+                        {hasSite && (
+                            <Link href={siteHref} passHref>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="flex gap-1 items-center"
+                                    title="Open Website"
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                    Visit Site
+                                </Button>
+                            </Link>
+                        )}
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );
