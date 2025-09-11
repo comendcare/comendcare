@@ -54,22 +54,22 @@ export default function PAGSettingsInvitationsTab() {
 
     if (!session?.user?.organizationId) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center py-20">
+            <div className="w-full h-full flex flex-col items-center justify-center py-8">
                 <Image
                     alt="missing organization"
                     src="https://illustrations.popsy.co/gray/success.svg"
-                    width={400}
-                    height={400}
+                    width={300}
+                    height={300}
                     className="dark:hidden"
                 />
                 <Image
                     alt="missing organization"
                     src="https://illustrations.popsy.co/white/success.svg"
-                    width={400}
-                    height={400}
+                    width={300}
+                    height={300}
                     className="hidden dark:block"
                 />
-                <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
                     {`You're not part of an organization yet.`}
                 </p>
                 <div className="mt-8">
@@ -92,15 +92,15 @@ export default function PAGSettingsInvitationsTab() {
                 <Image
                     alt="No open invitations"
                     src="https://illustrations.popsy.co/gray/paper-plane.svg"
-                    width={200}
-                    height={200}
+                    width={300}
+                    height={300}
                     className="dark:hidden"
                 />
                 <Image
                     alt="No open invitations"
                     src="https://illustrations.popsy.co/white/paper-plane.svg"
-                    width={200}
-                    height={200}
+                    width={300}
+                    height={300}
                     className="hidden dark:block"
                 />
                 <p className="font-title text-xl text-stone-600 dark:text-stone-400">

@@ -57,15 +57,15 @@ export default function PAGSettingsMembersTab() {
                 <Image
                     alt="missing organization"
                     src="https://illustrations.popsy.co/gray/success.svg"
-                    width={200}
-                    height={200}
+                    width={300}
+                    height={300}
                     className="dark:hidden"
                 />
                 <Image
                     alt="missing organization"
                     src="https://illustrations.popsy.co/white/success.svg"
-                    width={200}
-                    height={200}
+                    width={300}
+                    height={300}
                     className="hidden dark:block"
                 />
                 <p className="font-title text-xl text-stone-600 dark:text-stone-400">
@@ -151,22 +151,22 @@ export default function PAGSettingsMembersTab() {
                     </div>
                 </div>
             ) : (
-                <div className="h-full flex flex-col items-center justify-center py-20">
+                <div className="h-full flex flex-col items-center justify-center py-8">
                     <Image
                         alt="no members"
                         src="https://illustrations.popsy.co/gray/success.svg"
-                        width={400}
-                        height={400}
+                        width={300}
+                        height={300}
                         className="dark:hidden"
                     />
                     <Image
                         alt="no members"
                         src="https://illustrations.popsy.co/white/success.svg"
-                        width={400}
-                        height={400}
+                        width={300}
+                        height={300}
                         className="hidden dark:block"
                     />
-                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                    <p className="font-title text-xl text-stone-600 dark:text-stone-400">
                         No members yet.
                     </p>
                 </div>

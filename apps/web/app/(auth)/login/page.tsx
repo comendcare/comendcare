@@ -74,7 +74,7 @@ export default function LoginPage() {
                 <div
                     className="relative flex space-x-2 items-center z-10 rounded-full bg-neutral-100 dark:bg-neutral-800 py-1.5 px-4 ring-1 ring-white/10 ">
                     <span>🎉 &nbsp;
-                        {`We're currently in closed beta. To access the platform your email must be whitelisted.`}
+                        {`We're currently invite only. To access the platform you must have an invitation sent to your email.`}
                     </span>
                 </div>
                 <span

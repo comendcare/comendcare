@@ -60,6 +60,7 @@ const PATHS = [
     "/app/profile",
     "/app/dashboard",
     "/app/notifications",
+    "/app/team",
     "/app/settings",
     "/app/tools/biosample",
     "/app/tools/disease-models",
