@@ -59,7 +59,7 @@ const PATHS = [
     "/app",
     "/app/profile",
     "/app/dashboard",
-    "/app/feed",
+    "/app/notifications",
     "/app/settings",
     "/app/tools/biosample",
     "/app/tools/disease-models",
@@ -1796,7 +1796,7 @@ export const createPost = withAuth(
                 return {success: false, error: "failed to create post"};
             }
 
-            revalidatePath("/app/feed")
+            revalidatePath("/app/notifications")
 
             return {success: true, data: post};
         } catch (error: any) {

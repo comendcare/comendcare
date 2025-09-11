@@ -137,7 +137,7 @@ export default async function FeedPage() {
                 <main className="flex flex-col justify-start items-center w-full max-w-4xl mx-auto p-8 space-y-4">
                     <div className="w-full space-y-2 flex-col place-self-start">
                         <h2 className="text-xl font-semibold leading-6 text-gray-900">
-                            Feed
+                            Notifications
                         </h2>
                         <p className="text-sm text-gray-700">
                             {`Activity in your organization, and news from the rare disease world.`}

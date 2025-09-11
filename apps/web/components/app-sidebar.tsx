@@ -59,10 +59,10 @@ const data = {
             subPages: []
         },
         {
-            title: "Feed",
+            title: "Notifications",
             icon: Newspaper,
             variant: "ghost",
-            url: "/app/feed",
+            url: "/app/notifications",
             subPages: []
         },
         {
