@@ -54,7 +54,7 @@ export default function PAGSettingsInvitationsTab() {
 
     if (!session?.user?.organizationId) {
         return (
-            <div className="h-full flex flex-col items-center justify-center py-20">
+            <div className="w-full h-full flex flex-col items-center justify-center py-20">
                 <Image
                     alt="missing organization"
                     src="https://illustrations.popsy.co/gray/success.svg"
@@ -92,18 +92,18 @@ export default function PAGSettingsInvitationsTab() {
                 <Image
                     alt="No open invitations"
                     src="https://illustrations.popsy.co/gray/paper-plane.svg"
-                    width={400}
-                    height={400}
+                    width={200}
+                    height={200}
                     className="dark:hidden"
                 />
                 <Image
                     alt="No open invitations"
                     src="https://illustrations.popsy.co/white/paper-plane.svg"
-                    width={400}
-                    height={400}
+                    width={200}
+                    height={200}
                     className="hidden dark:block"
                 />
-                <p className="text-3xl p-10">
+                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
                     {`Your organization doesn't have any open invitations.`}
                 </p>
             </div>
@@ -111,7 +111,7 @@ export default function PAGSettingsInvitationsTab() {
     }
 
     return (
-        <div className="p-4">
+        <div className="w-full p-4">
             <div className="sm:flex sm:items-center">
                 <div className="space-y-2 sm:flex-auto">
                     <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
