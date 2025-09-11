@@ -11,8 +11,26 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+
+const apps = [
+    { name: 'web',        dir: 'apps/web',        port: 3000, envVar: 'WEB_URL' },
+    { name: 'admin',      dir: 'apps/admin',      port: 3001, envVar: 'ADMIN_URL' },
+    { name: 'pharma',     dir: 'apps/pharma',     port: 3002, envVar: 'PHARMA_URL' },
+    { name: 'provider',   dir: 'apps/provider',   port: 3003, envVar: 'PROVIDER_URL' },
+    { name: 'researcher', dir: 'apps/researcher', port: 3004, envVar: 'RESEARCHER_URL' },
+];
+
+const targets = [
+    { name: 'chromium', use: devices['Desktop Chrome'] },
+    { name: 'firefox',  use: devices['Desktop Firefox'] },
+    { name: 'webkit',   use: devices['Desktop Safari'] },
+    { name: 'iphone',   use: devices['iPhone 13'] },
+    { name: 'android',  use: devices['Pixel 5'] },
+];
+
 export default defineConfig({
-  testDir: './tests',
+  testDir: './apps',
+  testMatch: /.*\/tests\/.*\.spec\.ts/,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -32,48 +50,26 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // Flatten matrix: one project per (app × target)
+    projects: apps.flatMap(app =>
+        targets.map(t => ({
+            name: `${app.name}-${t.name}`,
+            testDir: `${app.dir}/tests`,
+            use: {
+                ...t.use,
+                baseURL: process.env[app.envVar] || `http://localhost:${app.port}`,
+            },
+        })),
+    ),
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
-  ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+    // Start local servers for apps that don't have a BASE_URL provided
+    webServer: apps
+        .filter(app => !process.env[app.envVar])
+        .map(app => ({
+            command: `npm --workspace ${app.dir} run dev`,
+            port: app.port,
+            reuseExistingServer: !process.env.CI,
+            env: { PORT: String(app.port), NODE_ENV: 'test' },
+        })),
 });
