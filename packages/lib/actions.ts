@@ -59,7 +59,8 @@ const PATHS = [
     "/app",
     "/app/profile",
     "/app/dashboard",
-    "/app/feed",
+    "/app/notifications",
+    "/app/team",
     "/app/settings",
     "/app/tools/biosample",
     "/app/tools/disease-models",
@@ -1796,7 +1797,7 @@ export const createPost = withAuth(
                 return {success: false, error: "failed to create post"};
             }
 
-            revalidatePath("/app/feed")
+            revalidatePath("/app/notifications")
 
             return {success: true, data: post};
         } catch (error: any) {
@@ -5395,47 +5396,33 @@ export const deleteReview = withOrganizationAuth(
 )
 
 export const saveCRO = withOrganizationAuth(
-    async (organization: Organization, croId: string, milestoneId: string) => {
+    async (organization: Organization, croId: string, milestoneId?: string | null) => {
         try {
+            const data: Prisma.SavedCompanyUncheckedCreateInput = {
+                companyId: croId,
+                organizationId: organization.id,
+                ...(milestoneId ? { milestoneId } : {}), // omit if none
+            };
+
             const response = await prisma.savedCompany.create({
+                data,
                 include: {
                     company: true,
-                    milestone: {include: {types: true}}
+                    ...(milestoneId ? { milestone: { include: { types: true } } } : {}),
                 },
-                data: {
-                    company: {
-                        connect: {
-                            id: croId
-                        }
-                    },
-                    organization: {
-                        connect: {
-                            id: organization.id
-                        }
-                    },
-                    milestone: {
-                        connect: {
-                            id: milestoneId
-                        }
-                    },
-                    // engagement: engagement as OrganizationToCompanyEngagement
-                }
             });
 
             if (!response) {
-                console.error("Error saving company.")
-                return {success: false, error: "Database error. please try again later."}
+                return { success: false, error: "Database error. please try again later." };
             }
 
-            console.log(`response`, response)
-
-            return {success: true, data: response}
-        } catch (error: any) {
-            console.error("Error saving company:", error)
-            return {success: false, error: "Database error. please try again later."}
+            return { success: true, data: response };
+        } catch (error) {
+            console.error("Error saving company:", error);
+            return { success: false, error: "Database error. please try again later." };
         }
     }
-)
+);
 
 export const contactCRO = withOrganizationAuth(
     async (organization: Organization, croId: string, formData: FormData) => {

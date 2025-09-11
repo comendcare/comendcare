@@ -6,6 +6,7 @@ import {
     Store, User, Workflow,
     Bookmark,
     Megaphone,
+    Bell,
     TestTube,
     Book, Wand2, BookOpen, Cookie,
     Microscope, LayoutDashboard, Building2,
@@ -26,6 +27,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarRail, SidebarTrigger,
     useSidebar,
 } from "@comend/components/ui/sidebar"
@@ -57,60 +61,6 @@ const data = {
             variant: "ghost",
             url: "/app/dashboard",
             subPages: []
-        },
-        {
-            title: "Feed",
-            icon: Newspaper,
-            variant: "ghost",
-            url: "/app/feed",
-            subPages: []
-        },
-        {
-            title: "Marketplace",
-            icon: Store,
-            variant: "ghost",
-            url: "/app/marketplace",
-            match: (path: string) => path.startsWith('/app/marketplace'),
-            subPages: [{
-                title: "Shortlist",
-                icon: Bookmark,
-                variant: "ghost",
-                match: (path: string) => path.startsWith('/app/shortlist'),
-                url: "/app/shortlist/service-providers"
-            }]
-
-            // subPages: [
-            //     {
-            //         title: "Service Providers",
-            //         icon: Building2,
-            //         variant: "ghost",
-            //         url: "/app/marketplace/service-providers"
-            //     },
-            //     {
-            //         title: "Patient Groups",
-            //         icon: Users,
-            //         variant: "ghost",
-            //         url: "/app/marketplace/patient-groups"
-            //     },
-            //     {
-            //         title: "Biosamples",
-            //         icon: TestTubeDiagonal,
-            //         variant: "ghost",
-            //         url: "/app/marketplace/biosamples"
-            //     },
-            //     {
-            //         title: "Disease Models",
-            //         icon: Rat,
-            //         variant: "ghost",
-            //         url: "/app/marketplace/disease-models"
-            //     },
-            //     {
-            //         title: "Clinical Datasets",
-            //         icon: Database,
-            //         variant: "ghost",
-            //         url: "/app/marketplace/clinical-datasets"
-            //     },
-            // ]
         },
         // {
         //     title: "Shortlist",
@@ -170,14 +120,76 @@ const data = {
             icon: User,
             variant: "ghost",
             url: "/app/profile",
+            subPages: [
+                {
+                    title: "Team",
+                    icon: Users,
+                    variant: "ghost",
+                    url: "/app/team",
+                    subPages: []
+                },
+                {
+                    title: "Settings",
+                    icon: Cog,
+                    variant: "ghost",
+                    url: "/app/settings",
+                    subPages: []
+                },
+            ]
+        },
+        {
+            title: "Notifications",
+            icon: Bell,
+            variant: "ghost",
+            url: "/app/notifications",
             subPages: []
         },
         {
-            title: "Organization Settings",
-            icon: Cog,
+            title: "Marketplace",
+            icon: Store,
             variant: "ghost",
-            url: "/app/settings",
-            subPages: []
+            url: "/app/marketplace",
+            match: (path: string) => path.startsWith('/app/marketplace'),
+            subPages: [{
+                title: "Shortlist",
+                icon: Bookmark,
+                variant: "ghost",
+                match: (path: string) => path.startsWith('/app/shortlist'),
+                url: "/app/shortlist/service-providers"
+            }]
+
+            // subPages: [
+            //     {
+            //         title: "Service Providers",
+            //         icon: Building2,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/service-providers"
+            //     },
+            //     {
+            //         title: "Patient Groups",
+            //         icon: Users,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/patient-groups"
+            //     },
+            //     {
+            //         title: "Biosamples",
+            //         icon: TestTubeDiagonal,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/biosamples"
+            //     },
+            //     {
+            //         title: "Disease Models",
+            //         icon: Rat,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/disease-models"
+            //     },
+            //     {
+            //         title: "Clinical Datasets",
+            //         icon: Database,
+            //         variant: "ghost",
+            //         url: "/app/marketplace/clinical-datasets"
+            //     },
+            // ]
         },
     ]
 }
@@ -205,13 +217,28 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
         setTourName(getTourName())
     }, [pathname, roadmapId, getTourName])
 
+    const exploreSet = new Set(["Notifications", "Marketplace"])
+    const exploreItems = data.navMain.filter(i => exploreSet.has(i.title))
+    const manageItems = data.navMain.filter(i => !exploreSet.has(i.title))
+
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="bg-gray-50">
                 <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>
             <SidebarContent className="bg-gray-50">
-                <NavMain items={data.navMain}/>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Manage</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <NavMain items={manageItems} />
+                    </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Explore</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <NavMain items={exploreItems} />
+                    </SidebarGroupContent>
+                </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="bg-gray-50 p-2">
                 <Separator className="w-full"/>

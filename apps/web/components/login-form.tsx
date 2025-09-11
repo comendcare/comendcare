@@ -56,7 +56,7 @@ export default function LoginForm({callback = "/", isCaptchaVerified = true}: { 
                             <FormItem>
                                 <FormLabel>Email address</FormLabel>
                                 <FormDescription>
-                                    {`Please use your organization's email.`}
+                                    {`Please use your organization’s email. The email you use to sign in will be linked to your organization, and used for login and notifications.`}
                                 </FormDescription>
                                 <FormControl>
                                     <Input

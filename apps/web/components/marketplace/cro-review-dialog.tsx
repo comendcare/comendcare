@@ -56,14 +56,15 @@ export const reviewForm = z.object({
     //     .min(1, "Title is required")
     //     .max(100, "Title must be less than 100 characters"),
     body: z
-        .string({required_error: "Please provide a description"})
-        .min(1, "Description is required")
-        .max(500, "Description must be less than 500 characters"),
+        .string()
+        .max(500, "Description must be less than 500 characters")
+        .optional(),
     rating: z
         .number({required_error: "Please provide a rating"})
         .min(1, "Rating is required"),
     milestone: z
-        .string({required_error: "Please provide a milestone"})
+        .string()
+        .optional()
 });
 
 export default function CROReviewDialog({cro}: { cro: Company }) {
