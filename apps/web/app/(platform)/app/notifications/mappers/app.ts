@@ -1,6 +1,6 @@
 // feed/mappers/app.ts
 import crypto from "node:crypto";
-import { register } from "~web/app/(platform)/app/feed/registry";
+import { register } from "~web/app/(platform)/app/notifications/registry";
 
 /**
  * NOTE ON CONTENT SHAPE
