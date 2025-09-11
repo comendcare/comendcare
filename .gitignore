@@ -46,3 +46,10 @@ prisma/migrations/migration_lock.toml
 
 # Jetbrains
 .idea
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

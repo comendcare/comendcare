@@ -202,6 +202,7 @@
   "devDependencies": {
     "@faker-js/faker": "^9.3.0",
     "@next/bundle-analyzer": "^15.3.3",
+    "@playwright/test": "^1.55.0",
     "@prisma/studio": "^0.511.0",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.16",
