@@ -1,9 +1,3 @@
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@comend/components/ui/tabs"
 import PAGDashboardAnalyticsTab from "~web/components/pag-dashboard-analytics-tab";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
@@ -76,7 +70,6 @@ export default async function AnalyticsPage() {
 
     if (organization) {
         if (!organization.verified) {
-            // Render unverified organization state
             return (
                 <UnverifiedOrganizationPage organization={organization}/>
             );

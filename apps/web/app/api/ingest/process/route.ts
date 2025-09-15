@@ -1,9 +1,9 @@
 // app/api/ingest/process/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@comend/lib/prisma";
-import {getMapper} from "~web/app/(platform)/app/feed/registry";
+import {getMapper} from "~web/app/(platform)/app/notifications/registry";
 import {CanonicalFeed, GLOBAL_FEED_TYPES} from "@comend/lib/types";
-import "~web/app/(platform)/app/feed/mappers"
+import "~web/app/(platform)/app/notifications/mappers"
 
 
 export const dynamic = "force-dynamic";

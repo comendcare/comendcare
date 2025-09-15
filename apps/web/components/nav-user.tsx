@@ -61,6 +61,7 @@ import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
+import Spinner from "@/packages/components/ui/spinner";
 
 
 export function NavUser() {
@@ -258,10 +259,12 @@ export function NavUser() {
             }
         }
 
-        fetchUserData()
-        fetchOrgData()
-        fetchInvitationData()
-        fetchMemberRequestData()
+        if (status === "authenticated" && session?.user?.id) {
+            fetchUserData();
+            fetchOrgData();
+            fetchInvitationData();
+            fetchMemberRequestData();
+        }
     }, [status, session, router]);
 
     async function handleAcceptInvitation(invitationId: string) {
@@ -354,7 +357,7 @@ export function NavUser() {
     };
 
     if (status === "loading") {
-        return <Loading/>;
+        return <Spinner className="scale-100"/>
     }
 
     if (!userData) {

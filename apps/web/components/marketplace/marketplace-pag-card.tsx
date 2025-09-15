@@ -6,7 +6,7 @@ import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
 import {FileText, HandCoins, Megaphone, MegaphoneIcon, Microscope, MicroscopeIcon, Users, Workflow} from "lucide-react";
 import React from "react";
-import { PropertyBadge } from "../property-badge";
+import {PropertyBadge} from "../property-badge";
 import SaveOrganizationDialog from "../save-organization-dialog";
 
 type NodeTypeCount = Record<string, number>;
@@ -23,20 +23,12 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
 
     return (
         <Link
-            // href={
-            //     process.env.NEXT_PUBLIC_VERCEL_ENV
-            //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-            //         : `http://localhost:3000/app/organization/${subdomain}`
-            // }
             href={
-                isPublic
-                    ? process.env.NEXT_PUBLIC_VERCEL_ENV
-                        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                        : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                    : process.env.NEXT_PUBLIC_VERCEL_ENV
-                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-                        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                process.env.NEXT_PUBLIC_VERCEL_ENV
+                    ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
             }
+            target="_blank"
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
                 <CardHeader className="gap-2">
@@ -48,14 +40,11 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                             //         : `http://localhost:3000/app/organization/${subdomain}`
                             // }
                             href={
-                                isPublic
-                                    ? process.env.NEXT_PUBLIC_VERCEL_ENV
-                                        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                                        : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                                    : process.env.NEXT_PUBLIC_VERCEL_ENV
-                                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
-                                        : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                                process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
                             }
+                            target="_blank"
                         >
                             <CardTitle className="text-xl flex flex-row gap-2 items-center">
                                 <ProfilePhoto img={image} name={name} className="h-10 w-10"/>

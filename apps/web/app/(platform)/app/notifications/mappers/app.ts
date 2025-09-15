@@ -1,6 +1,6 @@
 // feed/mappers/app.ts
 import crypto from "node:crypto";
-import { register } from "~web/app/(platform)/app/feed/registry";
+import { register } from "~web/app/(platform)/app/notifications/registry";
 
 /**
  * NOTE ON CONTENT SHAPE
@@ -621,7 +621,7 @@ register("app", "pag_profile_created", async ({ payload, occurredAt }) => {
             pagOrganizationSubdomain: orgSubdomain,
             pagOrganizationImage: orgImage,
             actor: { userId, name: userName },
-            organization: { id: orgId, name: orgName },
+            organization: { id: orgId, name: orgName, image: orgImage},
         },
         orgId: undefined, // explicit undefined/null so that it appears in all feeds
         occurredAt,
@@ -853,6 +853,7 @@ register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
         orgId,
         orgName,
         orgSubdomain,
+        orgImage,
         host,          // e.g. "acme.comend.io"
         totalViews,    // lifetime public profile views (number)
         milestone,     // number crossed (e.g. 10, 100, 1000, 10000, ...)
@@ -860,6 +861,7 @@ register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
         orgId: string;
         orgName?: string;
         orgSubdomain?: string;
+        orgImage?: string;
         host?: string;
         totalViews: number;
         milestone: number;
@@ -879,7 +881,7 @@ register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
             milestone,
             totalViews,
             host,
-            organization: { id: orgId, name: orgName, subdomain: orgSubdomain },
+            organization: { id: orgId, name: orgName, subdomain: orgSubdomain, image: orgImage },
         },
         orgId,
         occurredAt,

@@ -18,6 +18,7 @@ interface PagProfileCreatedContent {
     pagOrganizationId: string;
     pagOrganizationName?: string;
     pagOrganizationSubdomain?: string;
+    pagOrganizationImage?: string;
     actor?: {
         userId?: string;
         name?: string;
@@ -54,7 +55,7 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
         data.content.organization?.id ??
         data.content.pagOrganizationId ??
         data.orgId;
-    const orgImage = data.content.organization?.image;
+    const orgImage = data.content.organization?.image ?? data.content.pagOrganizationImage;
 
     // Display title is now the action title inside CardContent.
     const actionTitle = "PAG Profile Created";
@@ -110,20 +111,21 @@ export default function PAGProfileCreatedCard({ data }: PagProfileCreatedProps) 
                     </p>
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={orgSubdomain ? `/app/organization/${orgSubdomain}` : "#"} aria-disabled={!orgSubdomain} passHref>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex gap-1 items-center"
-                            disabled={!orgSubdomain}
-                            title={orgSubdomain ? "View PAG Profile" : "No profile link available"}
-                        >
-                            <FileText className="h-4 w-4" />
-                            View profile
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {orgSubdomain && (
+                    <CardFooter className="flex justify-end p-4 pt-0">
+                        <Link href={orgSubdomain ? `/app/organization/${orgSubdomain}` : "#"} aria-disabled={!orgSubdomain} passHref>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex gap-1 items-center"
+                                title={orgSubdomain ? "View PAG Profile" : "No profile link available"}
+                            >
+                                <FileText className="h-4 w-4" />
+                                View profile
+                            </Button>
+                        </Link>
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );

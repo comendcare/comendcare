@@ -18,7 +18,7 @@ export const PAGProfileActivityCard = () => {
                 </CardTitle>
                 <Button
                     variant="ghost"
-                    onClick={() => router.push("/app/feed")}
+                    onClick={() => router.push("/app/notifications")}
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
                     View feed

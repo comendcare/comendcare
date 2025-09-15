@@ -22,7 +22,7 @@ import {getResearcherFromUserId} from "@/packages/lib/fetchers";
 
 
 export default function ResearcherSettingsPage() {
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const [isDeleting, setIsDeleting] = useState(false); // Track API call state
 
     const handleDeleteResearcher = async () => {
@@ -47,7 +47,6 @@ export default function ResearcherSettingsPage() {
             })
 
             if (response.success) {
-                await update({organizationId: null})
                 revalidatePath("/app/profile")
                 toast.success("Deleted your account successfully.");
             } else {

@@ -6,6 +6,7 @@ import {
     Store, User, Workflow,
     Bookmark,
     Megaphone,
+    Bell,
     TestTube,
     Book, Wand2, BookOpen, Cookie,
     Microscope, LayoutDashboard, Building2,
@@ -26,6 +27,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarRail, SidebarTrigger,
     useSidebar,
 } from "@comend/components/ui/sidebar"
@@ -58,11 +62,86 @@ const data = {
             url: "/app/dashboard",
             subPages: []
         },
+        // {
+        //     title: "Shortlist",
+        //     icon: Bookmark,
+        //     variant: "ghost",
+        //     url: "/app/shortlist/service-providers"
+        // },
         {
-            title: "Feed",
-            icon: Newspaper,
+            title: "Research Planner",
+            icon: Workflow,
             variant: "ghost",
-            url: "/app/feed",
+            url: `/app/research-plan`,
+            match: (path: string) => path.startsWith('/app/research-plan'),
+            subPages: [
+                // {
+                //     title: "Assets",
+                //     icon: Microscope,
+                //     variant: "ghost",
+                //     url: `/app/tools`,
+                //     subPages: []
+                // },
+                // {
+                //     title: "RFPs",
+                //     icon: Megaphone,
+                //     variant: "ghost",
+                //     url: `/app/rfps`,
+                //     subPages: []
+                // }
+            ]
+        },
+        {
+            title: "Toolkit",
+            icon: Microscope,
+            variant: "ghost",
+            url: `/app/tools/biosample`,
+            match: (path: string) => path.startsWith('/app/tools'),
+            // subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
+            //     {
+            //         title: "Tool Requests",
+            //         icon: TestTube,
+            //         variant: "ghost",
+            //         url: `/app/requests`,
+            //         subPages: []
+            //     }
+            // ] : []
+            subPages: []
+        },
+        {
+            title: "RFPs",
+            icon: Megaphone,
+            variant: "ghost",
+            url: `/app/rfps`,
+            subPages: []
+        },
+        {
+            title: "Organization Profile",
+            icon: User,
+            variant: "ghost",
+            url: "/app/profile",
+            subPages: [
+                {
+                    title: "Team",
+                    icon: Users,
+                    variant: "ghost",
+                    url: "/app/team",
+                    subPages: []
+                },
+                {
+                    title: "Settings",
+                    icon: Cog,
+                    variant: "ghost",
+                    url: "/app/settings",
+                    subPages: []
+                },
+            ]
+        },
+        {
+            title: "Notifications",
+            icon: Bell,
+            variant: "ghost",
+            url: "/app/notifications",
             subPages: []
         },
         {
@@ -112,72 +191,6 @@ const data = {
             //     },
             // ]
         },
-        // {
-        //     title: "Shortlist",
-        //     icon: Bookmark,
-        //     variant: "ghost",
-        //     url: "/app/shortlist/service-providers"
-        // },
-        {
-            title: "Research Planner",
-            icon: Workflow,
-            variant: "ghost",
-            url: `/app/research-plan`,
-            match: (path: string) => path.startsWith('/app/research-plan'),
-            subPages: [
-                // {
-                //     title: "Assets",
-                //     icon: Microscope,
-                //     variant: "ghost",
-                //     url: `/app/tools`,
-                //     subPages: []
-                // },
-                // {
-                //     title: "RFPs",
-                //     icon: Megaphone,
-                //     variant: "ghost",
-                //     url: `/app/rfps`,
-                //     subPages: []
-                // }
-            ]
-        },
-        {
-            title: "Toolkit",
-            icon: Microscope,
-            variant: "ghost",
-            url: `/app/tools/biosample`,
-            match: (path: string) => path.startsWith('/app/tools'),
-            subPages: process.env.NEXT_PUBLIC_NODE_ENV !== "production" ? [
-                {
-                    title: "Tool Requests",
-                    icon: TestTube,
-                    variant: "ghost",
-                    url: `/app/requests`,
-                    subPages: []
-                }
-            ] : []
-        },
-        {
-            title: "RFPs",
-            icon: Megaphone,
-            variant: "ghost",
-            url: `/app/rfps`,
-            subPages: []
-        },
-        {
-            title: "Organization Profile",
-            icon: User,
-            variant: "ghost",
-            url: "/app/profile",
-            subPages: []
-        },
-        {
-            title: "Organization Settings",
-            icon: Cog,
-            variant: "ghost",
-            url: "/app/settings",
-            subPages: []
-        },
     ]
 }
 
@@ -201,14 +214,12 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
     }
 
     useEffect(() => {
-        if (status === "unauthenticated") {
-            redirect("/login");
-        }
-    }, [status])
-
-    useEffect(() => {
         setTourName(getTourName())
     }, [pathname, roadmapId, getTourName])
+
+    const exploreSet = new Set(["Notifications", "Marketplace"])
+    const exploreItems = data.navMain.filter(i => exploreSet.has(i.title))
+    const manageItems = data.navMain.filter(i => !exploreSet.has(i.title))
 
     return (
         <Sidebar collapsible="icon">
@@ -216,7 +227,18 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
                 <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>
             <SidebarContent className="bg-gray-50">
-                <NavMain items={data.navMain}/>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Manage</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <NavMain items={manageItems} />
+                    </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Explore</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <NavMain items={exploreItems} />
+                    </SidebarGroupContent>
+                </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="bg-gray-50 p-2">
                 <Separator className="w-full"/>

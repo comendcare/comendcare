@@ -39,14 +39,14 @@ export function TabNav({
                             href={baseLink + link.href}
                             key={link.href}
                             className={cn(
-                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary",
                                 pathname?.endsWith(link.href)
                                     ? "bg-blue-light font-medium text-primary"
                                     : "text-muted-foreground",
                                 link.comingSoon ? "pointer-events-none opacity-60" : "" // Disable click and add opacity
                             )}
                         >
-                            {link.icon && <link.icon className="mr-2 h-4 w-4"/>}
+                            {link.icon && <link.icon className="mr-2 h-6 w-6"/>}
                             {link.name}
                         </Link>
                 ))}

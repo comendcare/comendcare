@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import prisma from "@comend/lib/prisma";
-import { register } from "~web/app/(platform)/app/feed/registry";
+import { register } from "~web/app/(platform)/app/notifications/registry";
 
 type RssItem = {
     guid?: string;

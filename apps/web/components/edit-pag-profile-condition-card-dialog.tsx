@@ -20,7 +20,6 @@ import {Textarea} from "@comend/components/ui/textarea";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {getConditionsFromOrganizationId} from "@comend/lib/fetchers";
 import {
@@ -38,14 +37,14 @@ import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
-    const {data: session} = useSession()
-    const router = useRouter()
+    const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     // const [otherModality, setOtherModality] = useState<string>("");
     // const [otherCategories, setOtherCategories] = useState<string>("");
     // const [otherSystem, setOtherSystem] = useState<string>("");
     const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
+    const isOwner = session?.user?.membership?.role === "owner";
 
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
@@ -54,14 +53,14 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
     useEffect(() => {
         async function fetchResearchData() {
-            if (!session?.user?.organizationId) {
-                toast.error("You must be signed into an organization.");
+            if (status === "authenticated" && !organization.id) {
+                toast.error("You're not a part of an organization.");
                 return;
             }
 
             try {
                 // Fetch conditions for the given organization ID
-                const response = await getConditionsFromOrganizationId(session.user.organizationId);
+                const response = await getConditionsFromOrganizationId(organization.id);
 
                 if (response.success) {
                     const conditions = response.data;
@@ -237,23 +236,27 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 onCloseForm();
             }
         }}>
+
             <Tooltip>
-                <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                    <DialogTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            className="gap-x-2"
-                            disabled={session?.user?.membership?.role !== "owner"}
-                        >
-                            <Pencil/>
-                        </Button>
-                    </DialogTrigger>
+                <TooltipTrigger asChild>
+                    {isOwner ? (
+                        <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon" aria-label="Edit">
+                                <Pencil className="h-4 w-4"/>
+                            </Button>
+                        </DialogTrigger>
+                    ) : (
+                        <div>
+                            <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
+                                <Pencil className="h-4 w-4"/>
+                            </Button>
+                        </div>
+                    )}
                 </TooltipTrigger>
-                {session?.user?.membership?.role !== "owner" && (
+
+                {!isOwner && (
                     <TooltipContent className="max-w-80">
-                        <p>Condition editing is only enabled for organization owners. Please contact the owners of your
-                            organization. Owners are visible in the Organization Settings tab in the memberships
-                            section.</p>
+                        Editing is owners-only. See Organization Settings → Memberships.
                     </TooltipContent>
                 )}
             </Tooltip>
@@ -363,23 +366,17 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Causal genes</FormLabel>
-                                            <FormDescription>
+                                            <FormDescription className="flex flex-row items-baseline">
                                                 {`Select all that apply.`}
                                                 <Tooltip delayDuration={0}>
-                                                    {/*disabled to make the tooltip unclickable*/}
-                                                    <TooltipTrigger disabled>
-                                                        <Info
-                                                            className="text-black inline-block align-baseline mx-1 h-4 w-4"/>
+                                                    <TooltipTrigger asChild>
+                                                        <div tabIndex={0} role="button"
+                                                             aria-label="What is a causal gene?">
+                                                            <Info className="mx-1 inline-block h-4 w-4"/>
+                                                        </div>
                                                     </TooltipTrigger>
-                                                    <TooltipContent
-                                                        side="right"
-                                                        sideOffset={8}
-                                                        avoidCollisions={false}
-                                                        className="z-[9999] max-w-xs overflow-visible"
-                                                    >
-                                                        <p>
-                                                            {`Causal genes are those that are known to directly cause your disorder.`}
-                                                        </p>
+                                                    <TooltipContent side="right" sideOffset={8} avoidCollisions={false}>
+                                                        <p>Causal genes are those that directly cause your disorder.</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </FormDescription>
@@ -406,13 +403,15 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Associated genes</FormLabel>
-                                            <FormDescription>
+                                            <FormDescription className="flex flex-row items-baseline">
                                                 {`Select all that apply.`}
                                                 <Tooltip delayDuration={0}>
                                                     {/*disabled to make the tooltip unclickable*/}
-                                                    <TooltipTrigger disabled>
-                                                        <Info
-                                                            className="text-black inline-block align-baseline mx-1 h-4 w-4"/>
+                                                    <TooltipTrigger asChild>
+                                                        <div tabIndex={0} role="button"
+                                                             aria-label="What is an associated gene?">
+                                                            <Info className="mx-1 inline-block h-4 w-4"/>
+                                                        </div>
                                                     </TooltipTrigger>
                                                     <TooltipContent
                                                         side="right"
@@ -501,7 +500,9 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Associated systems</FormLabel>
-                                            <FormDescription>{`The systems affected by your condition. Select all that apply.`}</FormDescription>
+                                            <FormDescription>
+                                                {`The systems affected by your condition. Select all that apply.`}
+                                            </FormDescription>
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
@@ -549,7 +550,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     render={({field: numeratorField}) => (
                                         <FormItem>
                                             <FormLabel>
-                                                {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
+                                                {`Estimated total prevalence`} –{" "}
+                                                {formatNumberWithCommas(numeratorField.value)}
+                                                {editResearchForm.watch("prevalenceDenominator") && (
+                                                    <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
+                                                )}
                                             </FormLabel>
                                             <FormDescription>
                                                 {`The estimated global prevalence ratio of your condition.`}

@@ -31,7 +31,7 @@ import {z} from "zod";
 import {Ellipsis, Pencil} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {editUser, updateResearcher} from "@comend/lib/actions";
-import {Option, optionSchema} from "@comend/lib/types";
+import {MILESTONE_TYPE_OPTIONS, Option, optionSchema} from "@comend/lib/types";
 import {
     getUser,
     getResearcherFromUserId,
@@ -40,8 +40,12 @@ import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@/packages/components/ui/skeleton";
 import {badgeVariants} from "@/packages/components/ui/badge";
-import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "@/apps/web/components/cro-filters";
 import LoadingDots from "@/packages/components/icons/loading-dots";
+
+export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
+    ...option,
+    value: option.id,
+}));
 
 const formSchema = z.object({
     name: z.string().min(2),

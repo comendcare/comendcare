@@ -24,8 +24,8 @@ import {
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
 import {useQueryState} from "nuqs"
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, TOOL_TYPE_OPTIONS} from "@comend/lib/types";
-import {PharmaSidebar} from "~web/components/pharma-sidebar";
-import {PharmaHeader} from "~web/components/pharma-header";
+import {PharmaSidebar} from "comend-pag-platform/components/pharma-sidebar";
+import {PharmaHeader} from "comend-pag-platform/components/pharma-header";
 import { rule } from "postcss";
 
 interface AppLayoutProps {

@@ -25,6 +25,7 @@ enum OrganizationToCompanyEngagement {
 
 model User {
   id                    String                 @id @default(cuid())
+  activeOrganizationId  String?                @db.VarChar(191)
   name                  String? /// @encrypted
   nameHash              String? /// @encryption:hash(name)
   username              String?
@@ -949,15 +950,14 @@ model Company {
 }
 
 model SavedCompany {
-  id             String @id @default(uuid())
+  id             String  @id @default(uuid())
   organizationId String
   companyId      String
-  milestoneId    String
-  // engagement     OrganizationToCompanyEngagement
+  milestoneId    String?
 
   organization Organization @relation("cro_save_organization", fields: [organizationId], references: [id], onDelete: Cascade)
   company      Company      @relation("cro_save_savedCompany", fields: [companyId], references: [id], onDelete: Cascade)
-  milestone    Milestone    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  milestone    Milestone?   @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
 
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
@@ -1166,7 +1166,7 @@ model PharmaProject {
 
 model Institution {
   id           String   @id @default(uuid())
-  rorId        String?   @unique
+  rorId        String?  @unique
   name         String
   established  Int?
   types        String[]

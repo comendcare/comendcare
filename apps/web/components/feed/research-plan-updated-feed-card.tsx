@@ -172,14 +172,21 @@ export default function ResearchPlanUpdatedCard({ data }: ResearchPlanUpdatedPro
                     )}
                 </CardContent>
 
-                <CardFooter className="flex justify-end p-4 pt-0">
-                    <Link href={planHref} aria-disabled={!data.content.roadmapId} passHref>
-                        <Button size="sm" variant="outline" className="flex gap-1 items-center" disabled={!data.content.roadmapId} title={data.content.roadmapId ? "View Plan" : "No plan link available"}>
-                            <FileText className="h-4 w-4" />
-                            View Plan
-                        </Button>
-                    </Link>
-                </CardFooter>
+                {data.content.roadmapId && (
+                    <CardFooter className="flex justify-end p-4 pt-0">
+                        <Link href={planHref} aria-disabled={!data.content.roadmapId} passHref>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex gap-1 items-center"
+                                title={data.content.roadmapId ? "View Plan" : "No plan link available"}
+                            >
+                                <FileText className="h-4 w-4" />
+                                View Plan
+                            </Button>
+                        </Link>
+                    </CardFooter>
+                )}
             </Card>
         </MotionConfig>
     );

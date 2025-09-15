@@ -106,9 +106,6 @@ const unifiedSchema = z.object({
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     userImage: z.string().optional(),
-
-    // ORG MODE
-    isNewOrganization: z.boolean().default(true),
     // join existing
     org: z.array(optionSchema).optional(), // id,label (max 1)
     // create new
@@ -202,14 +199,10 @@ export default function CreateNewOrganizationPage() {
             name: session?.user?.name || "",
             notificationSettings: true,
             consentSettings: true,
-            isNewOrganization: true,
         },
     });
 
     const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
-
-    // Derived helpers
-    const isNewOrg = form.watch("isNewOrganization");
 
     /**************************************
      * Image drop handlers
@@ -362,65 +355,45 @@ export default function CreateNewOrganizationPage() {
             // 4) Organization: join or create (and possibly update existing)
             let orgId = session?.user?.organizationId as string | undefined;
 
-            if (!values.isNewOrganization) {
-                // Joining existing org
-                const orgValue = values.org?.[0]?.value;
-                if (orgValue && typeof orgValue === "string") {
-                    const resp = await createMemberRequest(orgValue);
-                    if (!resp?.success) {
-                        console.error(resp?.error);
-                        toast.error(resp?.error || "Failed to request membership.");
-                        return;
-                    }
-                    toast.success(`A membership request has been sent to ${values.org?.[0]?.label}`);
-                }
-            } else {
-                // Create/update org
-                const formData = new FormData();
-                if (values.orgName) formData.append("orgName", values.orgName);
-                if (values.description) formData.append("description", values.description);
-                if (values.subdomain) formData.append("subdomain", values.subdomain);
-                if (values.website) formData.append("website", values.website);
-                if (values.contactEmail) formData.append("contactEmail", values.contactEmail);
-                if (values.title) formData.append("title", values.title);
-                if (values.founded) formData.append("founded", values.founded);
-                // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
+            // Create/update org
+            const formData = new FormData();
+            if (values.orgName) formData.append("orgName", values.orgName);
+            if (values.description) formData.append("description", values.description);
+            if (values.subdomain) formData.append("subdomain", values.subdomain);
+            if (values.website) formData.append("website", values.website);
+            if (values.contactEmail) formData.append("contactEmail", values.contactEmail);
+            if (values.title) formData.append("title", values.title);
+            if (values.founded) formData.append("founded", values.founded);
+            // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
 
-                // Upload org image only if changed
-                if (selectedOrgFile && values.orgImage) {
-                    const imgUrl = await handleImageUpload(selectedOrgFile as File, values.orgImage);
-                    if (imgUrl) formData.set("image", imgUrl);
-                } else if (values.orgImage) {
-                    formData.set("image", values.orgImage);
-                }
-
-                const extra = {
-                    therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "",
-                    therapeuticsOfInterest: values.therapeuticsOfInterest?.map((t) => t.label).join(",") || "",
-                    metadata: JSON.stringify({
-                        otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
-                        otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest,
-                    }),
-                };
-                Object.entries(extra).forEach(([k, v]) => v && formData.append(k, v as string));
-
-                const createRes: any = await createOrganization(formData);
-                if (createRes?.error) {
-                    toast.error(createRes.error);
-                    return;
-                }
-                toast.success("Successfully created organization!");
-                mixpanelTrack("Created Organization", {
-                    orgName: values.orgName,
-                    looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
-                });
-
-                // Update session with new org
-                if (createRes?.organization?.id) {
-                    orgId = createRes.organization.id as string;
-                    await update({...session, organizationId: orgId, membership: createRes.membership});
-                }
+            // Upload org image only if changed
+            if (selectedOrgFile && values.orgImage) {
+                const imgUrl = await handleImageUpload(selectedOrgFile as File, values.orgImage);
+                if (imgUrl) formData.set("image", imgUrl);
+            } else if (values.orgImage) {
+                formData.set("image", values.orgImage);
             }
+
+            const extra = {
+                therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "",
+                therapeuticsOfInterest: values.therapeuticsOfInterest?.map((t) => t.label).join(",") || "",
+                metadata: JSON.stringify({
+                    otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
+                    otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest,
+                }),
+            };
+            Object.entries(extra).forEach(([k, v]) => v && formData.append(k, v as string));
+
+            const createRes: any = await createOrganization(formData);
+            if (createRes?.error) {
+                toast.error(createRes.error);
+                return;
+            }
+            toast.success("Successfully created organization!");
+            mixpanelTrack("Created Organization", {
+                orgName: values.orgName,
+                looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
+            });
 
             // 5) Condition (optional; only if disorder selected and we have an org)
             if (values.disorder?.length && orgId) {
@@ -473,6 +446,7 @@ export default function CreateNewOrganizationPage() {
             }
 
             // 7) Final route
+            await update({})
             if (hasInvitations) router.push("/app/profile");
             else router.push("/app/dashboard");
             toast.success("Onboarding complete ✨");
@@ -533,353 +507,298 @@ export default function CreateNewOrganizationPage() {
                     })} className="space-y-10">
                         {/* ORGANIZATION */}
                         <section className="space-y-6">
-                            <h2 className="text-xl font-semibold">Organization</h2>
+                            <h2 className="text-xl font-semibold">
+                                Organization
+                            </h2>
 
-                            <FormField
-                                control={form.control}
-                                name="isNewOrganization"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <ToggleGroup
-                                                type="single"
-                                                value={field.value ? "new" : "existing"}
-                                                onValueChange={(v) => field.onChange(v === "new")}
-                                                className="items-start self-start justify-start"
-                                            >
-                                                <ToggleGroupItem value="new" aria-label="Create a new organization"
-                                                                 className={field.value ? "bg-gray-200" : ""}>
-                                                    Create a new organization
-                                                </ToggleGroupItem>
-                                                <ToggleGroupItem value="existing"
-                                                                 aria-label="Join an existing organization"
-                                                                 className={!field.value ? "bg-gray-200" : ""}>
-                                                    Join an existing organization
-                                                </ToggleGroupItem>
-                                            </ToggleGroup>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            {!isNewOrg ? (
+                            <div className="space-y-6">
                                 <FormField
                                     control={form.control}
-                                    name="org"
+                                    name="orgName"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Organization name</FormLabel>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    maxSelected={1}
-                                                    defaultOptions={organizations}
-                                                    placeholder="Select your organization..."
-                                                    emptyIndicator={<p
-                                                        className="text-center text-sm text-muted-foreground">no results
-                                                        found.</p>}
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>Your request to join the organization will be
-                                                sent.</FormDescription>
+                                            <FormLabel>Organization Name (required)</FormLabel>
+                                            <FormControl><Input type="text" {...field} /></FormControl>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
-                            ) : (
-                                <div className="space-y-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="orgName"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Organization Name (required)</FormLabel>
-                                                <FormControl><Input type="text" {...field} /></FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="description"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Describe your organization in a few sentences.</FormLabel>
-                                                <FormControl>
-                                                    <Textarea
-                                                        rows={4}
-                                                        placeholder="Up to 500 characters"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="subdomain"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Organization Abbreviation (required)</FormLabel>
-                                                <FormDescription>
-                                                    Choose the URL for your custom profile site.
-                                                    {form.watch("subdomain") && !form.formState.errors.subdomain && (
-                                                        <div className="font-semibold">Your site will
-                                                            be {form.watch("subdomain")?.toLowerCase()?.replace(/\s+/g, "-")}.comend.io</div>
-                                                    )}
-                                                </FormDescription>
-                                                <FormControl>
-                                                    <Input {...field}
-                                                           onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}/>
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="website"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Website</FormLabel>
-                                                    <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="contactEmail"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Contact Email</FormLabel>
-                                                    <FormControl><Input type="email"
-                                                                        placeholder="name@example.com" {...field} /></FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-
-                                    <FormField
-                                        control={form.control}
-                                        name="title"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Title of your role</FormLabel>
-                                                <FormControl><Input type="text" {...field} /></FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="founded"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Year Founded</FormLabel>
-                                                <Select onValueChange={(v) => field.onChange(`${v}-01-01`)}
-                                                        defaultValue={field.value?.split("-")?.[0]}>
-                                                    <FormControl>
-                                                        <SelectTrigger><SelectValue
-                                                            placeholder="Select a year"/></SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {years.map((y) => (
-                                                            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="therapeuticsInDevelopment"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Therapeutics under development</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        defaultOptions={MODALITIES}
-                                                        placeholder="Select modalities..."
-                                                        hidePlaceholderWhenSelected
-                                                        emptyIndicator={<p
-                                                            className="text-center text-sm text-muted-foreground">no
-                                                            results found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    {form.watch("therapeuticsInDevelopment")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
-                                        <FormField
-                                            control={form.control}
-                                            name="otherTherapeuticsInDevelopment"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormDescription>(Optional) Other details for internal improvement
-                                                        only.</FormDescription>
-                                                    <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Describe your organization in a few sentences.</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    rows={4}
+                                                    placeholder="Up to 500 characters"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
                                     )}
+                                />
 
+                                <FormField
+                                    control={form.control}
+                                    name="subdomain"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Organization Abbreviation (required)</FormLabel>
+                                            <FormDescription>
+                                                Choose the URL for your custom profile site.
+                                                {form.watch("subdomain") && !form.formState.errors.subdomain && (
+                                                    <div className="font-semibold">Your site will
+                                                        be {form.watch("subdomain")?.toLowerCase()?.replace(/\s+/g, "-")}.comend.io</div>
+                                                )}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <Input {...field}
+                                                       onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}/>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <FormField
                                         control={form.control}
-                                        name="therapeuticsOfInterest"
+                                        name="website"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Therapeutics of interest</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        defaultOptions={MODALITIES}
-                                                        placeholder="Select modalities..."
-                                                        hidePlaceholderWhenSelected
-                                                        emptyIndicator={<p
-                                                            className="text-center text-sm text-muted-foreground">no
-                                                            results found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
+                                                <FormLabel>Website</FormLabel>
+                                                <FormControl><Input {...field} /></FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
 
-                                    {form.watch("therapeuticsOfInterest")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
-                                        <FormField
-                                            control={form.control}
-                                            name="otherTherapeuticsOfInterest"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormDescription>(Optional) Other details for internal improvement
-                                                        only.</FormDescription>
-                                                    <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )}
-
-                                    {/*<FormField*/}
-                                    {/*    control={form.control}*/}
-                                    {/*    name="incorporationStatus"*/}
-                                    {/*    render={({field}) => (*/}
-                                    {/*        <FormItem className="space-y-3">*/}
-                                    {/*            <FormLabel>What is your 501(c)(3) status?</FormLabel>*/}
-                                    {/*            <FormControl>*/}
-                                    {/*                <RadioGroup onValueChange={field.onChange} value={field.value}*/}
-                                    {/*                            className="flex flex-col space-y-1">*/}
-                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
-                                    {/*                        <FormControl><RadioGroupItem value="YES"/></FormControl>*/}
-                                    {/*                        <FormLabel className="font-normal">Yes, I have a*/}
-                                    {/*                            501(c)(3)</FormLabel>*/}
-                                    {/*                    </FormItem>*/}
-                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
-                                    {/*                        <FormControl><RadioGroupItem*/}
-                                    {/*                            value="INPROGRESS"/></FormControl>*/}
-                                    {/*                        <FormLabel className="font-normal">*/}
-                                    {/*                            {`No, but I'm working on it`}*/}
-                                    {/*                        </FormLabel>*/}
-                                    {/*                    </FormItem>*/}
-                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
-                                    {/*                        <FormControl><RadioGroupItem value="NO"/></FormControl>*/}
-                                    {/*                        <FormLabel className="font-normal">*/}
-                                    {/*                            {`No, I don't have a 501(c)(3)`}*/}
-                                    {/*                        </FormLabel>*/}
-                                    {/*                    </FormItem>*/}
-                                    {/*                </RadioGroup>*/}
-                                    {/*            </FormControl>*/}
-                                    {/*            <FormMessage/>*/}
-                                    {/*        </FormItem>*/}
-                                    {/*    )}*/}
-                                    {/*/>*/}
-
-                                    {/* Org image */}
                                     <FormField
                                         control={form.control}
-                                        name="orgImage"
+                                        name="contactEmail"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Organization logo</FormLabel>
-                                                <div {...orgDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
-                                                    <input {...orgDropzone.getInputProps()} />
-                                                    {selectedOrgFile ? (
-                                                        <div className="flex items-center space-x-4">
-                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                            <img src={(selectedOrgFile as any).preview} alt="preview"
-                                                                 className="h-16 w-16 rounded-md object-cover"/>
-                                                            <span>Click to replace</span>
-                                                        </div>
-                                                    ) : (
-                                                        <p>Drag & drop or click to upload</p>
-                                                    )}
-                                                </div>
-                                                <FormDescription className="text-xs">PNG/JPG only (no
-                                                    SVG).</FormDescription>
-                                                {/*<FormControl>*/}
-                                                {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
-                                                {/*</FormControl>*/}
+                                                <FormLabel>Contact Email</FormLabel>
+                                                <FormControl><Input type="email"
+                                                                    placeholder="name@example.com" {...field} /></FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
                                 </div>
-                            )}
-                        </section>
 
-                        {isNewOrg && (
-                            <>
-                                <Separator/>
+                                <FormField
+                                    control={form.control}
+                                    name="title"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Title of your role</FormLabel>
+                                            <FormControl><Input type="text" {...field} /></FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
-                                {/* RESEARCH / CONDITION */}
-                                <section className="space-y-6">
-                                    <h2 className="text-xl font-semibold">Condition</h2>
+                                <FormField
+                                    control={form.control}
+                                    name="founded"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Year Founded</FormLabel>
+                                            <Select onValueChange={(v) => field.onChange(`${v}-01-01`)}
+                                                    defaultValue={field.value?.split("-")?.[0]}>
+                                                <FormControl>
+                                                    <SelectTrigger><SelectValue
+                                                        placeholder="Select a year"/></SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {years.map((y) => (
+                                                        <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
+                                <FormField
+                                    control={form.control}
+                                    name="therapeuticsInDevelopment"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Therapeutics under development</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    defaultOptions={MODALITIES}
+                                                    placeholder="Select modalities..."
+                                                    hidePlaceholderWhenSelected
+                                                    emptyIndicator={<p
+                                                        className="text-center text-sm text-muted-foreground">no
+                                                        results found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {form.watch("therapeuticsInDevelopment")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
                                     <FormField
                                         control={form.control}
-                                        name="disorder"
+                                        name="otherTherapeuticsInDevelopment"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Name of condition</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        creatable
-                                                        maxSelected={1}
-                                                        onSearch={handleConditionSearch}
-                                                        placeholder="Search for conditions..."
-                                                        hidePlaceholderWhenSelected
-                                                        loadingIndicator={<p>Loading conditions...</p>}
-                                                        emptyIndicator={<p>No conditions found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
+                                                <FormDescription>(Optional) Other details for internal improvement
+                                                    only.</FormDescription>
+                                                <FormControl><Input {...field} /></FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
+                                )}
 
-                                    {/* <FormField
+                                <FormField
+                                    control={form.control}
+                                    name="therapeuticsOfInterest"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Therapeutics of interest</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    defaultOptions={MODALITIES}
+                                                    placeholder="Select modalities..."
+                                                    hidePlaceholderWhenSelected
+                                                    emptyIndicator={<p
+                                                        className="text-center text-sm text-muted-foreground">no
+                                                        results found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {form.watch("therapeuticsOfInterest")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                                    <FormField
+                                        control={form.control}
+                                        name="otherTherapeuticsOfInterest"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription>(Optional) Other details for internal improvement
+                                                    only.</FormDescription>
+                                                <FormControl><Input {...field} /></FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                {/*<FormField*/}
+                                {/*    control={form.control}*/}
+                                {/*    name="incorporationStatus"*/}
+                                {/*    render={({field}) => (*/}
+                                {/*        <FormItem className="space-y-3">*/}
+                                {/*            <FormLabel>What is your 501(c)(3) status?</FormLabel>*/}
+                                {/*            <FormControl>*/}
+                                {/*                <RadioGroup onValueChange={field.onChange} value={field.value}*/}
+                                {/*                            className="flex flex-col space-y-1">*/}
+                                {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                {/*                        <FormControl><RadioGroupItem value="YES"/></FormControl>*/}
+                                {/*                        <FormLabel className="font-normal">Yes, I have a*/}
+                                {/*                            501(c)(3)</FormLabel>*/}
+                                {/*                    </FormItem>*/}
+                                {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                {/*                        <FormControl><RadioGroupItem*/}
+                                {/*                            value="INPROGRESS"/></FormControl>*/}
+                                {/*                        <FormLabel className="font-normal">*/}
+                                {/*                            {`No, but I'm working on it`}*/}
+                                {/*                        </FormLabel>*/}
+                                {/*                    </FormItem>*/}
+                                {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                {/*                        <FormControl><RadioGroupItem value="NO"/></FormControl>*/}
+                                {/*                        <FormLabel className="font-normal">*/}
+                                {/*                            {`No, I don't have a 501(c)(3)`}*/}
+                                {/*                        </FormLabel>*/}
+                                {/*                    </FormItem>*/}
+                                {/*                </RadioGroup>*/}
+                                {/*            </FormControl>*/}
+                                {/*            <FormMessage/>*/}
+                                {/*        </FormItem>*/}
+                                {/*    )}*/}
+                                {/*/>*/}
+
+                                {/* Org image */}
+                                <FormField
+                                    control={form.control}
+                                    name="orgImage"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Organization logo</FormLabel>
+                                            <div {...orgDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
+                                                <input {...orgDropzone.getInputProps()} />
+                                                {selectedOrgFile ? (
+                                                    <div className="flex items-center space-x-4">
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={(selectedOrgFile as any).preview} alt="preview"
+                                                             className="h-16 w-16 rounded-md object-cover"/>
+                                                        <span>Click to replace</span>
+                                                    </div>
+                                                ) : (
+                                                    <p>Drag & drop or click to upload</p>
+                                                )}
+                                            </div>
+                                            <FormDescription className="text-xs">PNG/JPG only (no
+                                                SVG).</FormDescription>
+                                            {/*<FormControl>*/}
+                                            {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
+                                            {/*</FormControl>*/}
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </section>
+                        <>
+                            <Separator/>
+
+                            {/* RESEARCH / CONDITION */}
+                            <section className="space-y-6">
+                                <h2 className="text-xl font-semibold">Condition</h2>
+
+                                <FormField
+                                    control={form.control}
+                                    name="disorder"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name of condition</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    creatable
+                                                    maxSelected={1}
+                                                    onSearch={handleConditionSearch}
+                                                    placeholder="Search for conditions..."
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Loading conditions...</p>}
+                                                    emptyIndicator={<p>No conditions found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* <FormField
                                         control={form.control}
                                         name="associatedConditions"
                                         render={({field}) => (
@@ -903,160 +822,159 @@ export default function CreateNewOrganizationPage() {
                                         )}
                                     /> */}
 
-                                    <FormField control={form.control} name="summary" render={({field}) => (
+                                <FormField control={form.control} name="summary" render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Describe your condition in a few sentences.</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                rows={4}
+                                                placeholder="Up to 500 characters"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}/>
+
+                                <FormField
+                                    control={form.control}
+                                    name="categories"
+                                    render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Describe your condition in a few sentences.</FormLabel>
+                                            <FormLabel>Mechanisms of action</FormLabel>
+                                            <FormDescription>What types of genetic effects are you investigating?
+                                                Select all that apply.</FormDescription>
                                             <FormControl>
-                                                <Textarea
-                                                    rows={4}
-                                                    placeholder="Up to 500 characters"
+                                                <MultipleSelector
                                                     {...field}
+                                                    defaultOptions={MOLECULAR_MECHANISMS}
+                                                    placeholder="Select categories..."
+                                                    hidePlaceholderWhenSelected
+                                                    emptyIndicator={<p
+                                                        className="text-center text-sm text-muted-foreground">no
+                                                        results found.</p>}
+                                                    showHoverCard={false}
                                                 />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
-                                    )}/>
-
-                                    <FormField
-                                        control={form.control}
-                                        name="categories"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Mechanisms of action</FormLabel>
-                                                <FormDescription>What types of genetic effects are you investigating?
-                                                    Select all that apply.</FormDescription>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        defaultOptions={MOLECULAR_MECHANISMS}
-                                                        placeholder="Select categories..."
-                                                        hidePlaceholderWhenSelected
-                                                        emptyIndicator={<p
-                                                            className="text-center text-sm text-muted-foreground">no
-                                                            results found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    {form.watch("categories")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
-                                        <FormField
-                                            control={form.control}
-                                            name="otherCategories"
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormDescription>(Optional) Other details for internal improvement
-                                                        only.</FormDescription>
-                                                    <FormControl><Input {...field} /></FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
                                     )}
+                                />
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField control={form.control} name="engaged" render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Number of patients engaged</FormLabel>
-                                                <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                        />
-                                        <FormField control={form.control} name="national" render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Estimated US patient population</FormLabel>
-                                                <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}/>
-                                        <FormField control={form.control} name="global" render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Estimated global patient population</FormLabel>
-                                                <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}/>
-                                    </div>
-
+                                {form.watch("categories")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
                                     <FormField
                                         control={form.control}
-                                        name="causal"
+                                        name="otherCategories"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Causal genes</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        onSearch={handleGeneSearch}
-                                                        placeholder="Search for genes..."
-                                                        triggerSearchOnFocus
-                                                        hidePlaceholderWhenSelected
-                                                        loadingIndicator={<p>Loading genes...</p>}
-                                                        emptyIndicator={<p>No genes found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
+                                                <FormDescription>(Optional) Other details for internal improvement
+                                                    only.</FormDescription>
+                                                <FormControl><Input {...field} /></FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
+                                )}
 
-                                    <FormField
-                                        control={form.control}
-                                        name="genes"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Associated genes</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        onSearch={handleGeneSearch}
-                                                        placeholder="Search for genes..."
-                                                        triggerSearchOnFocus
-                                                        hidePlaceholderWhenSelected
-                                                        loadingIndicator={<p>Loading genes...</p>}
-                                                        emptyIndicator={<p>No genes found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <FormField control={form.control} name="engaged" render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Number of patients engaged</FormLabel>
+                                            <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
                                     />
-                                </section>
+                                    <FormField control={form.control} name="national" render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Estimated US patient population</FormLabel>
+                                            <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}/>
+                                    <FormField control={form.control} name="global" render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Estimated global patient population</FormLabel>
+                                            <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}/>
+                                </div>
 
-                                <Separator/>
+                                <FormField
+                                    control={form.control}
+                                    name="causal"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Causal genes</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    onSearch={handleGeneSearch}
+                                                    placeholder="Search for genes..."
+                                                    triggerSearchOnFocus
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Loading genes...</p>}
+                                                    emptyIndicator={<p>No genes found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
-                                {/* FINANCES */}
-                                <section className="space-y-6">
-                                    <h2 className="text-xl font-semibold">Finances</h2>
+                                <FormField
+                                    control={form.control}
+                                    name="genes"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Associated genes</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    onSearch={handleGeneSearch}
+                                                    placeholder="Search for genes..."
+                                                    triggerSearchOnFocus
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Loading genes...</p>}
+                                                    emptyIndicator={<p>No genes found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </section>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <MoneyInput
-                                            form={form}
-                                            label="Total funds raised to date"
-                                            name="raised"
-                                        />
+                            <Separator/>
 
-                                        <MoneyInput
-                                            form={form}
-                                            label="Total funds deployed to date"
-                                            name="deployed"
-                                        />
+                            {/* FINANCES */}
+                            <section className="space-y-6">
+                                <h2 className="text-xl font-semibold">Finances</h2>
 
-                                        <MoneyInput
-                                            form={form}
-                                            label="Total annual research budget"
-                                            name="budget"
-                                        />
-                                    </div>
-                                </section>
-                            </>
-                        )}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <MoneyInput
+                                        form={form}
+                                        label="Total funds raised to date"
+                                        name="raised"
+                                    />
+
+                                    <MoneyInput
+                                        form={form}
+                                        label="Total funds deployed to date"
+                                        name="deployed"
+                                    />
+
+                                    <MoneyInput
+                                        form={form}
+                                        label="Total annual research budget"
+                                        name="budget"
+                                    />
+                                </div>
+                            </section>
+                        </>
                         <div className="flex justify-between">
                             <div/>
                             <Button type="submit" disabled={loading}>

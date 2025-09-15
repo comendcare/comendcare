@@ -22,64 +22,8 @@ import {getAllMembershipsFromUserId} from "@comend/lib/fetchers";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 export default function UserSettings() {
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const [isDeleting, setIsDeleting] = useState(false); // Track API call state
-    const [isLeaving, setIsLeaving] = useState(false); // Track API call state
-
-    const handleLeaveOrganization = async () => {
-        try {
-            const response = await leaveOrganization(session?.user.organizationId, session);
-
-            if (session && response.success) {
-                // Fetch the latest memberships after leaving
-                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id, {
-                    id: true,
-                    role: true,
-                    title: true,
-                    email: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    invitedBy: true,
-                    organization: true,
-                    user: true,
-                    metadata: true
-                });
-
-                if (updatedMembershipsResponse.success && updatedMembershipsResponse.data) {
-                    if (updatedMembershipsResponse.data.length > 0) {
-                        // Assign to another membership (pick the first one)
-                        const newMembership = updatedMembershipsResponse.data[0];
-
-                        await update({
-                            user: {
-                                ...session?.user,
-                                organizationId: newMembership.organizationId,
-                                membership: newMembership,
-                            },
-                        });
-
-                        toast.success(`Switched to ${newMembership.organization?.name || "another organization"} successfully.`);
-                    }
-                } else {
-                    // No other memberships left, reset to null
-                    await update({
-                        user: {
-                            ...session?.user,
-                            organizationId: null,
-                            membership: null,
-                        },
-                    });
-
-                    toast.success("Removed from Organization successfully.");
-                }
-            } else {
-                toast.error("Failed to leave organization. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error leaving organization:", error);
-            toast.error("An error occurred. Please try again later.");
-        }
-    };
 
     const handleDeleteAccount = async () => {
         setIsDeleting(true); // Disable the button
@@ -94,7 +38,6 @@ export default function UserSettings() {
             })
 
             if (response.success) {
-                await update({organizationId: null})
                 revalidatePath("/app/profile")
                 toast.success("Deleted your account successfully.");
             } else {

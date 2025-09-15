@@ -72,12 +72,12 @@ export default function MarketplacePage() {
     }, []);
     
     return (
-        <div className="flex flex-col w-full px-4 h-full mx-auto gap-8">
+        <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Service Providers</h2>
-                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/service-providers"}
                             >
@@ -109,7 +109,7 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient Groups</h2>
-                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/patient-groups"}
                             >
@@ -146,7 +146,7 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Biosamples</h2>
-                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/biosamples"}
                             >
@@ -197,7 +197,7 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Disease Models</h2>
-                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/disease-models"}
                             >
@@ -248,7 +248,7 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Clinical Datasets</h2>
-                        <Button asChild variant={"cta"} className="justify-self-end self-end">
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/clinical-datasets"}
                             >

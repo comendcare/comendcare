@@ -60,7 +60,38 @@ export const PAGProfileConditionsCard = ({
     isPrivate?: boolean
 }) => {
 
-    if (conditions) {
+    if (conditions === null) {
+        return (
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                        Conditions
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent>
+                    {`We couldn't get this organization's condition information.`}
+                </CardContent>
+            </Card>
+        )
+    } else if (conditions.length === 0) {
+        return (
+            <Card className="organization-profile-tour-step2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">Conditions</CardTitle>
+                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col space-y-2 text-left">
+                        <h3 className="scroll-m-20 text-md tracking-tight font-semibold">No Conditions Yet</h3>
+                        <p className="text-gray-400">
+                            This organization is not associated with any conditions yet.
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    } else {
         const condition = conditions[0]
 
         return (
@@ -68,7 +99,7 @@ export const PAGProfileConditionsCard = ({
                 <Card className="organization-profile-tour-step2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                            {condition?.name}
+                            {condition?.name ?? "No name condition"}
                         </CardTitle>
                         {showEditDialog &&
                             <EditPAGProfileConditionCardDialog organization={organization}/>
@@ -189,7 +220,9 @@ export const PAGProfileConditionsCard = ({
                                         )}
                                     </ul>
                                 ) : (
-                                    <p className="text-gray-400">No data available.</p>
+                                    <p className="text-gray-400">
+                                        No data available.
+                                    </p>
                                 )}
                             </div>
 
@@ -205,7 +238,7 @@ export const PAGProfileConditionsCard = ({
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
 
-                                                if (condition?.diseaseCategories?.length === 0) {
+                                                if (!condition?.diseaseCategories?.length) {
                                                     return (
                                                         <p className="text-gray-400">
                                                             {`No relevant badges.`}
@@ -239,7 +272,7 @@ export const PAGProfileConditionsCard = ({
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
 
-                                                if (condition?.causalGenes?.length === 0) {
+                                                if (!condition?.causalGenes?.length) {
                                                     return (
                                                         <p className="text-gray-400">
                                                             {`No relevant badges.`}
@@ -273,7 +306,7 @@ export const PAGProfileConditionsCard = ({
                                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                             {(() => {
 
-                                                if (condition?.associatedGenes?.length === 0) {
+                                                if (!condition?.associatedGenes?.length) {
                                                     return (
                                                         <p className="text-gray-400">
                                                             {`No relevant badges.`}
@@ -303,7 +336,7 @@ export const PAGProfileConditionsCard = ({
                                     <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
                                         No Conditions Yet
                                     </h3>
-                                    <p>
+                                    <p className="text-gray-400">
                                         This organization is not associated with any conditions yet.
                                     </p>
                                 </div>
@@ -313,20 +346,6 @@ export const PAGProfileConditionsCard = ({
                     </CardContent>
                 </Card>
             </TooltipProvider>
-        )
-    } else {
-        return (
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
-                        Conditions
-                    </CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                    {`We couldn't get this organization's condition information.`}
-                </CardContent>
-            </Card>
         )
     }
 }

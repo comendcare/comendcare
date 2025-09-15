@@ -16,7 +16,6 @@ export default function DeleteOrganizationForm({
     organization: Organization;
 }) {
     const router = useRouter();
-    const { data: session, update } = useSession();
 
     return (
         <form
@@ -30,10 +29,6 @@ export default function DeleteOrganizationForm({
                         const response = await deleteOrganization(organization.id, organization);
 
                         if (response.success) {
-                            await update({
-                                ...session,
-                                organizationId: undefined,
-                            });
                             va.track("Deleted Organization");
                             router.refresh();
                             router.push("/admin/organizations");

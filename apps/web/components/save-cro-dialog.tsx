@@ -34,8 +34,9 @@ const formSchema = z.object({
     // }),
     // milestoneId: z.string().min(1, "Please select a project"),
     milestones: z.array(z.custom<Milestone>())
-        .min(1, "Please select a project")
+        // .min(1, "Please select a project")
         .max(1, "Cannot select more than one project")
+        .optional()
 });
 
 type SaveCROFormData = z.infer<typeof formSchema>;
@@ -92,35 +93,54 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            // const response = await saveCRO(cro.id, data.milestoneId)
-            if (data.milestones.length !== 1) {
-                console.error(`Error: incorrect number of milestones selected`)
-                return
-            }
+            const selected = data.milestones?.[0]; // may be undefined
 
-            const response = await saveCRO(data.milestones[0].organizationId, cro.id, data.milestones[0].id)
+            const response = await saveCRO(
+                session?.user?.organizationId || undefined,
+                cro.id,
+                selected?.id ?? null // allow null/undefined
+            );
 
             if (response.success && response.data) {
                 va.track("Shortlisted CRO");
-                mixpanelTrack("Service Provider Saved", {
-                    "Location": location,
+
+                // Safe analytics payload building
+                const baseProps: Record<string, any> = {
+                    Location: location,
                     "Service Provider Name": response.data.company.title,
                     "Service Provider ID": response.data.company.id,
-                    "Milestone Title": response.data.milestone.title,
-                    "Milestone ID": response.data.milestone.id,
-                    "Milestone Types": response.data.milestone.types.map((type: any) => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label),
-                    "Milestone Budget": response.data.milestone.budget
-                })
+                };
+
+                if (response.data.milestone) {
+                    Object.assign(baseProps, {
+                        "Milestone Title": response.data.milestone.title,
+                        "Milestone ID": response.data.milestone.id,
+                        "Milestone Types": response.data.milestone.types?.map(
+                            (type: any) => MILESTONE_TYPE_OPTIONS.find(t => t.id === type.milestoneTypeId)?.label
+                        ),
+                        "Milestone Budget": response.data.milestone.budget,
+                    });
+                } else {
+                    baseProps["Milestone Title"] = null;
+                    baseProps["Milestone ID"] = null;
+                    baseProps["Milestone Types"] = null;
+                    baseProps["Milestone Budget"] = null;
+                }
+
+                mixpanelTrack("Service Provider Saved", baseProps);
+
                 router.refresh();
-                toast.success("Successfully saved service provider!");
-                setOpen(false)
+                toast.success(
+                    response.data.milestone
+                        ? "Successfully saved service provider to a milestone!"
+                        : "Successfully saved service provider!"
+                );
+                setOpen(false);
             } else {
                 toast.error(response.error);
             }
         } catch (error) {
-            toast.error(
-                "An unexpected error occurred. Please try again later."
-            );
+            toast.error("An unexpected error occurred. Please try again later.");
             console.error("Error saving cro:", error);
         } finally {
             setIsSubmitting(false);

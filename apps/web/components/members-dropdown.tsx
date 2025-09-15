@@ -87,64 +87,45 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     }, [session, member]);
 
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
-        if (session?.user.organizationId) {
-            const response = session?.user?.membership?.role === "owner" 
-                ? await updateMemberWithOwnerPermission(session?.user.organizationId, member.id, values)
-                : await updateMemberWithMemberPermission(session?.user.organizationId, member.id, values)
+        if (!session?.user.organizationId) return;
 
-            if (response.success && response.data) {
-                const isSelf = session.user.id === member.user.id;
-                toast.success(`Successfully updated ${isSelf ? "your" : `${member.user.name}'s`} membership.`);
+        const res = session.user.membership?.role === "owner"
+            ? await updateMemberWithOwnerPermission(session.user.organizationId, member.id, values)
+            : await updateMemberWithMemberPermission(session.user.organizationId, member.id, values);
 
-                mixpanelTrack("Membership Updated", {
-                    "Member Name": response.data.user.name,
-                    "Member Email": response.data.user.email,
-                    "Title": response.data.title,
-                    "Role": response.data.role
-                })
-
-                if (session.user.id === member.user.id) {
-                    await update({
-                        user: {
-                            ...session.user,  // Keep all existing properties intact
-                            organizationId: session.user.organizationId, // explicitly keep it
-                            membership: {
-                                ...session.user.membership, // Preserve existing membership details
-                                title: values.title,
-                                role: values.role
-                            }
-                        }
-                    });
-                }
-
-                setIsDialogOpen(false)
-                window.location.reload() // force full page refresh
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
+        if (!res.success) {
+            console.error(res.error); toast.error(res.error); return;
         }
+
+        mixpanelTrack("Membership Updated", {
+            "Member Name": res.data.user.name,
+            "Member Email": res.data.user.email,
+            "Title": res.data.title,
+            "Role": res.data.role,
+        });
+
+        toast.success(`Successfully updated ${session.user.id === member.user.id ? "your" : `${member.user.name}'s`} membership.`);
+        setIsDialogOpen(false);
+        router.refresh();
     }
 
     async function revokeMembership(member: MemberWithUser) {
-        if (session?.user.organizationId) {
-            const response = await deleteMember(session?.user.organizationId, member.id)
+        if (!session?.user.organizationId) return;
 
-            if (response.success && response.data) {
-                mixpanelTrack("Membership Revoked", {
-                    "Member Name": response.data.user.name,
-                    "Member Email": response.data.user.email,
-                    "Title": response.data.title,
-                    "Role": response.data.role
-                })
-                toast.success(`Successfully deleted ${member.user.name}'s membership.`)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-
-            window.location.reload() // force full page refresh
+        const res = await deleteMember(session.user.organizationId, member.id);
+        if (!res.success) {
+            console.error(res.error); toast.error(res.error); return;
         }
+
+        mixpanelTrack("Membership Revoked", {
+            "Member Name": res.data.user.name,
+            "Member Email": res.data.user.email,
+            "Title": res.data.title,
+            "Role": res.data.role,
+        });
+
+        toast.success(`Successfully deleted ${member.user.name}'s membership.`);
+        router.refresh();
     }
 
     const handleLeaveOrganization = async () => {
@@ -152,61 +133,19 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             toast.error("You are the last owner and cannot leave the organization. Please assign another owner first.");
             return;
         }
+        if (!session?.user.organizationId) return;
 
-        try {
-            const response = await leaveOrganization(session?.user.organizationId, session);
-
-            if (session && response.success) {
-                // Fetch the latest memberships after leaving
-                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id, {
-                    id: true,
-                    role: true,
-                    title: true,
-                    email: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    invitedBy: true,
-                    organization: true,
-                    user: true,
-                    metadata: true
-                });
-
-                if (updatedMembershipsResponse.success && updatedMembershipsResponse.data) {
-                    if (updatedMembershipsResponse.data.length > 0) {
-                        // Assign to another membership (pick the first one)
-                        const newMembership = updatedMembershipsResponse.data[0];
-
-                        await update({
-                            user: {
-                                ...session?.user,
-                                organizationId: newMembership.organizationId,
-                                membership: newMembership,
-                            },
-                        });
-
-                        toast.success(`Switched to ${newMembership.organization?.name || "another organization"} successfully.`);
-                    }
-                } else {
-                    // No other memberships left, reset to null
-                    await update({
-                        user: {
-                            ...session?.user,
-                            organizationId: null,
-                            membership: null,
-                        },
-                    });
-
-                    toast.success("Removed from Organization successfully.");
-                }
-            } else {
-                toast.error("Failed to leave organization. Please try again.");
-            }
-
-            window.location.reload() // force full page refresh
-        } catch (error) {
-            console.error("Error leaving organization:", error);
-            toast.error("An error occurred. Please try again later.");
+        const res = await leaveOrganization(session.user.organizationId)
+        if (!res.success) {
+            console.log(res.error);
+            toast.error(`Failed to leave organization. ${res.error}.`);
+            return;
         }
+
+        toast.success("Removed from organization successfully.");
+        await update({})
+        router.refresh();
+        router.push("/app/profile");
     };
 
     const canEditMembership = session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner";
