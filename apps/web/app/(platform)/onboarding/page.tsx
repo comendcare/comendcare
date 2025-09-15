@@ -6,6 +6,8 @@ import {useSession} from "next-auth/react";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
+import { TID } from "@/utils/test-utils/test-ids";
+
 
 // UI
 import {
@@ -614,8 +616,13 @@ export default function OnboardingPage() {
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Your full name (required)</FormLabel>
-                                        <FormControl><Input type="text" {...field} /></FormControl>
-                                        <FormMessage/>
+                                        <FormControl>
+                                            <Input
+                                                data-testid="onboard-name"
+                                                type="text" {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage data-testid={TID.inlineError} />
                                     </FormItem>
                                 )}
                             />
@@ -682,7 +689,7 @@ export default function OnboardingPage() {
                                         {/*<FormControl>*/}
                                         {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
                                         {/*</FormControl>*/}
-                                        <FormMessage/>
+                                        <FormMessage data-testid={TID.inlineError} />
                                     </FormItem>
                                 )}
                             />
@@ -703,8 +710,13 @@ export default function OnboardingPage() {
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Organization Name (required)</FormLabel>
-                                            <FormControl><Input type="text" {...field} /></FormControl>
-                                            <FormMessage/>
+                                            <FormControl>
+                                                <Input
+                                                    data-testid="onboard-org-name"
+                                                    type="text" {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -722,7 +734,7 @@ export default function OnboardingPage() {
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -741,10 +753,13 @@ export default function OnboardingPage() {
                                                 )}
                                             </FormDescription>
                                             <FormControl>
-                                                <Input {...field}
-                                                       onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}/>
+                                                <Input
+                                                    data-testid="onboard-subdomain"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
+                                                />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -757,7 +772,7 @@ export default function OnboardingPage() {
                                             <FormItem>
                                                 <FormLabel>Website</FormLabel>
                                                 <FormControl><Input {...field} /></FormControl>
-                                                <FormMessage/>
+                                                <FormMessage data-testid={TID.inlineError} />
                                             </FormItem>
                                         )}
                                     />
@@ -768,9 +783,15 @@ export default function OnboardingPage() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Contact Email</FormLabel>
-                                                <FormControl><Input type="email"
-                                                                    placeholder="name@example.com" {...field} /></FormControl>
-                                                <FormMessage/>
+                                                <FormControl>
+                                                    <Input
+                                                        data-testid="onboard-email"
+                                                        type="email"
+                                                        placeholder="name@example.com"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage data-testid={TID.inlineError} />
                                             </FormItem>
                                         )}
                                     />
@@ -783,7 +804,7 @@ export default function OnboardingPage() {
                                         <FormItem>
                                             <FormLabel>Title of your role</FormLabel>
                                             <FormControl><Input type="text" {...field} /></FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -806,7 +827,7 @@ export default function OnboardingPage() {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -829,7 +850,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -843,7 +864,7 @@ export default function OnboardingPage() {
                                                 <FormDescription>(Optional) Other details for internal improvement
                                                     only.</FormDescription>
                                                 <FormControl><Input {...field} /></FormControl>
-                                                <FormMessage/>
+                                                <FormMessage data-testid={TID.inlineError} />
                                             </FormItem>
                                         )}
                                     />
@@ -867,7 +888,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -881,7 +902,7 @@ export default function OnboardingPage() {
                                                 <FormDescription>(Optional) Other details for internal improvement
                                                     only.</FormDescription>
                                                 <FormControl><Input {...field} /></FormControl>
-                                                <FormMessage/>
+                                                <FormMessage data-testid={TID.inlineError} />
                                             </FormItem>
                                         )}
                                     />
@@ -946,7 +967,7 @@ export default function OnboardingPage() {
                                             {/*<FormControl>*/}
                                             {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
                                             {/*</FormControl>*/}
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -979,7 +1000,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -1003,7 +1024,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -1018,7 +1039,7 @@ export default function OnboardingPage() {
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage data-testid={TID.inlineError} />
                                     </FormItem>
                                 )}/>
 
@@ -1042,7 +1063,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -1056,7 +1077,7 @@ export default function OnboardingPage() {
                                                 <FormDescription>(Optional) Other details for internal improvement
                                                     only.</FormDescription>
                                                 <FormControl><Input {...field} /></FormControl>
-                                                <FormMessage/>
+                                                <FormMessage data-testid={TID.inlineError} />
                                             </FormItem>
                                         )}
                                     />
@@ -1067,7 +1088,7 @@ export default function OnboardingPage() {
                                         <FormItem>
                                             <FormLabel>Number of patients engaged</FormLabel>
                                             <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                     />
@@ -1075,14 +1096,14 @@ export default function OnboardingPage() {
                                         <FormItem>
                                             <FormLabel>Estimated US patient population</FormLabel>
                                             <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}/>
                                     <FormField control={form.control} name="global" render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Estimated global patient population</FormLabel>
                                             <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}/>
                                 </div>
@@ -1105,7 +1126,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -1128,7 +1149,7 @@ export default function OnboardingPage() {
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
+                                            <FormMessage data-testid={TID.inlineError} />
                                         </FormItem>
                                     )}
                                 />
@@ -1163,7 +1184,11 @@ export default function OnboardingPage() {
                         </>
                         <div className="flex justify-between">
                             <div/>
-                            <Button type="submit" disabled={loading}>
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                data-testid="onboard-submit"
+                            >
                                 {loading ? <LoadingDots color="#808080"/> : "Complete sign-up"}
                             </Button>
                         </div>

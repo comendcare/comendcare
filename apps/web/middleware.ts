@@ -35,6 +35,10 @@ export default async function middleware(req: NextRequest) {
 
     const url = req.nextUrl
 
+    if (process.env.E2E && url.pathname.startsWith("/api/test-login")) {
+        return NextResponse.next();
+    }
+
     const isPageNavigation = req.method === "GET" && req.headers.get("accept")?.includes("text/html")
 
     // Skip rate limiting in local/dev
