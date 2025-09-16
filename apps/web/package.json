@@ -15,7 +15,7 @@
   },
   "prisma": {
     "schema": "../../prisma/schema.prisma",
-    "seed": "tsx prisma/seed/seed.ts"
+    "seed": "tsx ../../prisma/seed/seed.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.7",

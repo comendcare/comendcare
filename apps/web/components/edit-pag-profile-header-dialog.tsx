@@ -217,7 +217,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                         </TooltipContent>
                     </Tooltip>
                 )}
-                <DialogContent>
+                <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Organization Profile</DialogTitle>
                         <DialogDescription>{`Update your organization's details.`}</DialogDescription>

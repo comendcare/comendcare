@@ -128,8 +128,8 @@ const unifiedSchema = z.object({
     orgImage: z.string().optional(),
 
     // RESEARCH / CONDITION
-    disorder: z.array(optionSchema).optional(),
-    // associatedConditions: z.array(optionSchema),
+    disorder: z.array(optionSchema),
+    associatedConditions: z.array(optionSchema).optional(),
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),
@@ -159,16 +159,16 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
     const disorderLabel = normalized(vals.disorder?.[0]?.label);
     if (!disorderLabel) return;
 
-    // const hasSelf = (vals.associatedConditions || [])
-    //     .some(opt => normalized(opt?.label) === disorderLabel);
+    const hasSelf = (vals.associatedConditions || [])
+        .some(opt => normalized(opt?.label) === disorderLabel);
 
-    // if (hasSelf) {
-    //     ctx.addIssue({
-    //         code: z.ZodIssueCode.custom,
-    //         path: ["associatedConditions"],
-    //         message: "A condition cannot be associated with itself."
-    //     });
-    // }
+    if (hasSelf) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["associatedConditions"],
+            message: "A condition cannot be associated with itself."
+        });
+    }
 });
 
 /**************************************
@@ -352,9 +352,6 @@ export default function CreateNewOrganizationPage() {
             // Track
             mixpanelTrack("Onboarding: user saved", {name: values.name});
 
-            // 4) Organization: join or create (and possibly update existing)
-            let orgId = session?.user?.organizationId as string | undefined;
-
             // Create/update org
             const formData = new FormData();
             if (values.orgName) formData.append("orgName", values.orgName);
@@ -395,12 +392,15 @@ export default function CreateNewOrganizationPage() {
                 looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
             });
 
+            // 4) Organization: join or create (and possibly update existing)
+            let orgId = createRes.organization.id
+
             // 5) Condition (optional; only if disorder selected and we have an org)
             if (values.disorder?.length && orgId) {
                 const cfd = new FormData();
                 const conditionData = {
                     name: values.disorder?.[0]?.label || "",
-                    // associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
+                    associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
                     summary: values.summary || "",
                     diseaseCategories: values.categories?.map((c) => c.label).join(",") || "",
                     prevalenceNumerator: values.prevalenceNumerator || "",
@@ -798,29 +798,29 @@ export default function CreateNewOrganizationPage() {
                                     )}
                                 />
 
-                                {/* <FormField
-                                        control={form.control}
-                                        name="associatedConditions"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Associated Conditions</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        creatable
-                                                        maxSelected={5}
-                                                        onSearch={handleConditionSearch}
-                                                        placeholder="Search for conditions..."
-                                                        hidePlaceholderWhenSelected
-                                                        loadingIndicator={<p>Loading conditions...</p>}
-                                                        emptyIndicator={<p>No conditions found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    /> */}
+                                <FormField
+                                    control={form.control}
+                                    name="associatedConditions"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Associated Conditions</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    creatable
+                                                    maxSelected={5}
+                                                    onSearch={handleConditionSearch}
+                                                    placeholder="Search for conditions..."
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Loading conditions...</p>}
+                                                    emptyIndicator={<p>No conditions found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <FormField control={form.control} name="summary" render={({field}) => (
                                     <FormItem>

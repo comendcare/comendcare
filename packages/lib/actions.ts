@@ -1180,7 +1180,7 @@ export const inviteUser = withOrganizationAuth(
     async (
         organization: Organization,
         session: Session | null,
-        email: string = "therealflawnsontong@gmail.com",
+        email: string,
         role: string = "member",
         ip: string,
     ): Promise<ApiResponse<any>> => {
@@ -1271,7 +1271,8 @@ export const inviteUser = withOrganizationAuth(
                 return {success: false, error: "Database error. please try again later."}
             }
 
-            revalidatePath("/app/analytics")
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
 
             return {success: true, data: invitation}
         } catch (error: any) {
@@ -1301,7 +1302,7 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
                 }
             })
 
-            revalidatePath("/app/analytics")
+            revalidatePath("/app/team")
             revalidatePath("/app/profile")
 
             if (member) {
@@ -1436,7 +1437,8 @@ export const denyMemberRequest = withOrganizationAuth(
                 return {success: false, error: "Failed to send denial email."};
             }
 
-            revalidatePath("/app/analytics")
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
 
             return {success: true, data: deletedMemberRequest};
 
@@ -1466,7 +1468,8 @@ export const deleteInvitation = withOrganizationAuth(
                 return {success: false, error: "Failed to delete invitation. Request not found."};
             }
 
-            revalidatePath("/app/settings")
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
 
             return {success: true, data: deletedInvitation};
 
@@ -1500,7 +1503,8 @@ export const declineAndDeleteInvitation = async (invitation: Invitation): Promis
             return {success: false, error: "Failed to delete invitation. Request not found."};
         }
 
-        revalidatePath("/app/settings")
+        revalidatePath("/app/team")
+        revalidatePath("/app/profile")
 
         return {success: true, data: deletedInvitation};
 
@@ -1624,7 +1628,7 @@ export const updateMemberWithMemberPermission = withOrganizationAuth(
                 }
             });
 
-            revalidatePath("/app/analytics");
+            revalidatePath("/app/team");
             revalidatePath("/app/profile");
 
             return {success: true, data: updatedMember};
@@ -1682,7 +1686,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
                 data
             });
 
-            revalidatePath("/app/analytics");
+            revalidatePath("/app/team");
             revalidatePath("/app/profile");
 
             return {success: true, data: updatedMember};
@@ -5273,7 +5277,7 @@ export const createReview = withAuth(
                 return review;
             });
 
-            revalidatePath("app/service-providers/");
+            revalidatePath(`/app/service-providers/${companyId}`);
 
             return {success: true, data: result};
         } catch (error: any) {
@@ -5359,7 +5363,7 @@ export const editReview = withAuth(
                 return updatedReview;
             });
 
-            revalidatePath("app/service-providers/");
+            revalidatePath(`/app/service-providers/${companyId}`);
 
             return {success: true, data: result};
         } catch (error: any) {

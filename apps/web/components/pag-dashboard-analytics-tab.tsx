@@ -134,7 +134,7 @@ export default async function PAGDashboardAnalyticsTab() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-4xl font-bold">
-                            {organization.tools.length}
+                            {organization.tools.length + organization.biosamples.length + organization.diseaseModel.length}
                         </div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +201 since last hour*/}
