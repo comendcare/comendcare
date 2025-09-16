@@ -176,7 +176,7 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
  **************************************/
 export default function OnboardingPage() {
     const router = useRouter();
-    const {data: session, status} = useSession();
+    const {data: session, status, update} = useSession();
 
     // Loading/initial state
     const [isInitializing, setIsInitializing] = useState(true);
@@ -449,9 +449,6 @@ export default function OnboardingPage() {
             // Track
             mixpanelTrack("Onboarding: user saved", {name: values.name});
 
-            // 4) Organization: join or create (and possibly update existing)
-            let orgId = session?.user?.organizationId as string | undefined;
-
             // Create/update org
             const formData = new FormData();
             if (values.orgName) formData.append("orgName", values.orgName);
@@ -491,6 +488,9 @@ export default function OnboardingPage() {
                 orgName: values.orgName,
                 looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
             });
+
+            // 4) Organization: join or create (and possibly update existing)
+            let orgId = createRes.organization.id
 
             // 5) Condition (optional; only if disorder selected and we have an org)
             if (values.disorder?.length && orgId) {
@@ -542,9 +542,10 @@ export default function OnboardingPage() {
                 }
             }
 
-            // 7) Final route
-            if (hasInvitations) router.push("/app/profile");
-            else router.push("/app/dashboard");
+            // 7) Final route (erases onboarding from history so user can't navigate back)
+            await update({})
+            if (hasInvitations) router.replace("/app/profile");
+            else router.replace("/app/dashboard");
             toast.success("Onboarding complete ✨");
         } catch (error) {
             console.error(error);
