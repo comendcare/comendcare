@@ -6,13 +6,17 @@ import NoOrganization from "~web/components/no-organization";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
 import PAGSettingsMembersTab from "~web/components/pag-settings-members-tab"
 import PAGSettingsInvitationsTab from "~web/components/pag-settings-invitations-tab"
+import {Invitation} from "@prisma/client";
+
+export const dynamic = "force-dynamic";
 
 export default async function TeamPage() {
     const session = await getSession()
+    const orgId = session?.user?.organizationId;
 
     let organization = null
     // let dbMilestones = []
-    if (session?.user.organizationId) {
+    if (orgId) {
         const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {
             id: true,
             public: true,
@@ -50,7 +54,11 @@ export default async function TeamPage() {
             user: true,
             userId: true,
             roadmaps: true,
-            members: true,
+            members: {
+                include: {
+                    user: true
+                }
+            },
             clients: true,
             invitations: true,
             membershipRequests: true,
@@ -71,6 +79,9 @@ export default async function TeamPage() {
         }
     }
 
+    console.log("fuck", orgId)
+    console.log("shit", organization)
+
     if (organization) {
         if (!organization.verified) {
             // Render unverified organization state
@@ -81,8 +92,8 @@ export default async function TeamPage() {
         return (
             <TooltipProvider>
                 <div className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8">
-                    <PAGSettingsMembersTab />
-                    <PAGSettingsInvitationsTab />
+                    <PAGSettingsMembersTab members={organization.members}/>
+                    <PAGSettingsInvitationsTab invitations={organization.invitations}/>
                 </div>
             </TooltipProvider>
         )

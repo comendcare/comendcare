@@ -128,8 +128,8 @@ const unifiedSchema = z.object({
     orgImage: z.string().optional(),
 
     // RESEARCH / CONDITION
-    disorder: z.array(optionSchema).optional(),
-    // associatedConditions: z.array(optionSchema),
+    disorder: z.array(optionSchema),
+    associatedConditions: z.array(optionSchema).optional(),
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),
@@ -159,16 +159,16 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
     const disorderLabel = normalized(vals.disorder?.[0]?.label);
     if (!disorderLabel) return;
 
-    // const hasSelf = (vals.associatedConditions || [])
-    //     .some(opt => normalized(opt?.label) === disorderLabel);
+    const hasSelf = (vals.associatedConditions || [])
+        .some(opt => normalized(opt?.label) === disorderLabel);
 
-    // if (hasSelf) {
-    //     ctx.addIssue({
-    //         code: z.ZodIssueCode.custom,
-    //         path: ["associatedConditions"],
-    //         message: "A condition cannot be associated with itself."
-    //     });
-    // }
+    if (hasSelf) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["associatedConditions"],
+            message: "A condition cannot be associated with itself."
+        });
+    }
 });
 
 /**************************************
@@ -400,7 +400,7 @@ export default function CreateNewOrganizationPage() {
                 const cfd = new FormData();
                 const conditionData = {
                     name: values.disorder?.[0]?.label || "",
-                    // associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
+                    associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
                     summary: values.summary || "",
                     diseaseCategories: values.categories?.map((c) => c.label).join(",") || "",
                     prevalenceNumerator: values.prevalenceNumerator || "",
@@ -798,29 +798,29 @@ export default function CreateNewOrganizationPage() {
                                     )}
                                 />
 
-                                {/* <FormField
-                                        control={form.control}
-                                        name="associatedConditions"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Associated Conditions</FormLabel>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        creatable
-                                                        maxSelected={5}
-                                                        onSearch={handleConditionSearch}
-                                                        placeholder="Search for conditions..."
-                                                        hidePlaceholderWhenSelected
-                                                        loadingIndicator={<p>Loading conditions...</p>}
-                                                        emptyIndicator={<p>No conditions found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    /> */}
+                                <FormField
+                                    control={form.control}
+                                    name="associatedConditions"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Associated Conditions</FormLabel>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    creatable
+                                                    maxSelected={5}
+                                                    onSearch={handleConditionSearch}
+                                                    placeholder="Search for conditions..."
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Loading conditions...</p>}
+                                                    emptyIndicator={<p>No conditions found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <FormField control={form.control} name="summary" render={({field}) => (
                                     <FormItem>
