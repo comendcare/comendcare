@@ -129,7 +129,7 @@ const unifiedSchema = z.object({
 
     // RESEARCH / CONDITION
     disorder: z.array(optionSchema),
-    associatedConditions: z.array(optionSchema),
+    associatedConditions: z.array(optionSchema).optional(),
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),

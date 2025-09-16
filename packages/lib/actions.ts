@@ -1180,7 +1180,7 @@ export const inviteUser = withOrganizationAuth(
     async (
         organization: Organization,
         session: Session | null,
-        email: string = "therealflawnsontong@gmail.com",
+        email: string,
         role: string = "member",
         ip: string,
     ): Promise<ApiResponse<any>> => {
