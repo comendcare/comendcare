@@ -1,56 +1,15 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Image from "next/image"
-import {useSession} from "next-auth/react"
-import { getInvitees } from "@comend/lib/fetchers"
-import { toast } from "sonner"
 import InviteUserToOrgDialog from "~web/components/invite-user-to-org-dialog"
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import InvitationsDropdown from "~web/components/invitations-dropdown"
-import Loading from "@/loading";
+import {Invitation} from "@prisma/client";
+import {getSession} from "@/packages/lib/auth";
 
-export default function PAGSettingsInvitationsTab() {
-    const {data: session} = useSession()
-    const [invitees, setInvitees] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
+export default async function PAGSettingsInvitationsTab({invitations}: {invitations: Invitation[]}) {
+    const session = await getSession()
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-
-            if (!session?.user?.organizationId) {
-                setLoading(false)
-                return
-            }
-
-            const response = await getInvitees(session.user.organizationId, {
-                id: true,
-                email: true,
-                role: true,
-                organizationId: true,
-                createdAt: true,
-                updatedAt: true,
-                accepted: true,
-            })
-
-            if (response.success) {
-                setInvitees(response.data ?? [])
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-
-            setLoading(false)
-        }
-
-        fetchData()
-    }, [])
-
-    if (loading) {
-        return <Loading/>
-    }
+    const invitees = invitations.filter(inv => !inv.accepted);
 
     if (!session?.user?.organizationId) {
         return (
@@ -147,8 +106,8 @@ export default function PAGSettingsInvitationsTab() {
                                         <div className="flex items-center">
                                             <div className="h-11 w-11 flex-shrink-0">
                                                 <ProfilePhoto
-                                                    img={person?.image}
-                                                    name={person?.name}
+                                                    img={null}
+                                                    name={person?.email} // use email for now since we don't get name
                                                     className="h-11 w-11 rounded-full"
                                                 />
                                             </div>

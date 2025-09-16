@@ -1,32 +1,39 @@
-"use client"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
+"use client";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@comend/components/ui/form";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@comend/components/ui/select"
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {inviteUser} from "@comend/lib/actions";
-import {getIp} from "@comend/lib/utils";
-import {useSession} from "next-auth/react";
-import {useEffect, useState} from "react";
-import {Organization} from "@prisma/client";
-import {Input} from "@comend/components/ui/input";
-import {Button} from "@comend/components/ui/button";
+} from "@comend/components/ui/select";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { inviteUser } from "@comend/lib/actions";
+import { getIp } from "@comend/lib/utils";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { Input } from "@comend/components/ui/input";
+import { Button } from "@comend/components/ui/button";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
+    DialogTrigger,
 } from "@comend/components/ui/dialog";
-import {toast} from "sonner";
-import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
+import { toast } from "sonner";
+import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import LoadingDots from "@comend/components/icons/loading-dots";
@@ -34,138 +41,140 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
     role: z.enum(["member", "owner"], { message: "Role must be either Member or Owner." }),
-})
+});
 
 export default function InviteUserToOrgDialog() {
-    const session = useSession();
+    const { data: session, status } = useSession();
     const [loading, setLoading] = useState(false);
-    const [organization, setOrganization] = useState<Organization | null>();
-    const [isOpen, setIsOpen] = useState(false); // Control dialog state
+    const [organization, setOrganization] = useState<any>(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId, {
-            id: true,
-            public: true,
-            verified: true,
-            published: true,
-            name: true,
-            description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
-        }).then((response) => {
+        if (status === "loading") return; // wait for session to resolve
+        if (status === "unauthenticated") return; // no-op if not signed in
+
+        const orgId = session?.user?.organizationId;
+        if (!orgId) {
+            // only show once session is resolved
+            toast.error("No organizationId provided");
+            return;
+        }
+
+        let cancelled = false;
+        (async () => {
+            const response = await getOrganizationFromOrganizationId(orgId, {
+                id: true,
+                public: true,
+                verified: true,
+                published: true,
+                name: true,
+                description: true,
+                contactEmail: true,
+                logo: true,
+                image: true,
+                headerImage: true,
+                biopharmaConsentSettings: true,
+                subdomain: true,
+                customDomain: true,
+                statedGoal: true,
+                yearFounded: true,
+                incorporationStatus: true,
+                therapeuticsOfInterest: true,
+                therapeuticsInDevelopment: true,
+                website: true,
+                moneyRaised: true,
+                moneyDeployed: true,
+                researchBudget: true,
+                createdAt: true,
+                updatedAt: true,
+                user: true,
+                userId: true,
+                roadmaps: true,
+                members: true,
+                clients: true,
+                invitations: true,
+                membershipRequests: true,
+                conditions: true,
+                kanban: true,
+                milestones: true,
+                platformNotifications: true,
+                reviews: true,
+                savedCompanies: true,
+                tools: true,
+                rfps: true,
+                metadata: true,
+            });
+
+            if (cancelled) return;
+
             if (response.success) {
-                const organization = response.data
-                setOrganization(organization)
+                setOrganization(response.data);
             } else {
-                console.error(response.error)
-                toast.error(response.error)
+                console.error(response.error);
+                toast.error(response.error);
             }
-        }) : toast.error("No organizationId provided")
-    }, [session.data?.user?.organizationId, setOrganization]);
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [status, session?.user?.organizationId]);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
-        defaultValues: {
-            role: "member"
-        }
-    })
+        defaultValues: { role: "member" },
+    });
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        setLoading(true)
+        setLoading(true);
         try {
             const response = await inviteUser(
                 organization?.id as string, // organizationId
-                session.data,
-                form.getValues("email"),
-                form.getValues("role"),
-                await getIp(),
-                // {
-                //     organizationId: organization?.id as string,
-                //     organizationName: organization?.name as string,
-                //     organizationImage: organization?.image as string,
-                // }
-            )
+                session as any,             // your action expects the session object; adjust typing if needed
+                values.email,
+                values.role,
+                await getIp()
+            );
 
             if (response.success) {
-                const invitation = response.data
-                setIsOpen(false)
+                const invitation = response.data;
+                setIsOpen(false);
 
                 mixpanelTrack("Membership Invitation Sent", {
-                    "Email": invitation.email,
-                    "Role": invitation.role
-                })
-                
-                toast.success(`Invitation to ${invitation.email} sent successfully.`)
-                window.location.reload() // force page reload
+                    Email: invitation.email,
+                    Role: invitation.role,
+                });
+
+                toast.success(`Invitation to ${invitation.email} sent successfully.`);
+                window.location.reload();
             } else {
-                console.error(response.error)
-                toast.error(response.error)
+                console.error(response.error);
+                toast.error(response.error);
             }
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     }
+
+    const disabled = session?.user?.membership?.role !== "owner" || status !== "authenticated";
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className="gap-x-2" disabled={session?.data?.user?.membership?.role !== "owner"}>
+                <Button className="gap-x-2" disabled={disabled}>
                     <UserPlus />
                     Invite user
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        Invite user
-                    </DialogTitle>
+                    <DialogTitle>Invite user</DialogTitle>
                     <DialogDescription>
                         {`You can invite users by providing their email here.
-                        If they don't already have an account they will be asked to create one.`}
+            If they don't already have an account they will be asked to create one.`}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -174,18 +183,14 @@ export default function InviteUserToOrgDialog() {
                         <FormField
                             control={form.control}
                             name="email"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Email
-                                    </FormLabel>
-                                    <FormDescription>
-                                        The invitation to your organization will be sent here.
-                                    </FormDescription>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormDescription>The invitation to your organization will be sent here.</FormDescription>
                                     <FormControl>
                                         <Input type="email" placeholder="example@gmail.com" {...field} />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -196,9 +201,7 @@ export default function InviteUserToOrgDialog() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Role</FormLabel>
-                                    <FormDescription>
-                                        Choose the role for the invited user.
-                                    </FormDescription>
+                                    <FormDescription>Choose the role for the invited user.</FormDescription>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
@@ -215,12 +218,12 @@ export default function InviteUserToOrgDialog() {
                             )}
                         />
 
-                        <Button type="submit">
-                            {loading ? <LoadingDots color="#808080"/> : "Submit"}
+                        <Button type="submit" disabled={loading || !organization}>
+                            {loading ? <LoadingDots color="#808080" /> : "Submit"}
                         </Button>
                     </form>
                 </Form>
             </DialogContent>
         </Dialog>
-    )
+    );
 }
