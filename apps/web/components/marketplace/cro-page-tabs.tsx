@@ -34,6 +34,7 @@ export default function CROPageTabs() {
             const pathParts = pathname.split("/")
             const id = decodeURIComponent(pathParts[pathParts.length - 1])
             const data = await getCROData(id, {
+                id: true,
                 services: true,
                 reviews: true,
             })

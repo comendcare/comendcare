@@ -47,7 +47,7 @@ import {StarRatingSelector} from "~web/components/star-rating-selector";
 import {getMilestones} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 
 export const reviewForm = z.object({
@@ -102,7 +102,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         }
 
         fetchData()
-    }, [])
+    }, [session?.user?.organizationId])
 
     const handleFormSubmit = async (values: z.infer<typeof reviewForm>) => {
         setLoading(true);
@@ -137,6 +137,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                     // router.refresh();
                     toast.success("Successfully published review!");
                     setOpen(false);
+                    router.refresh()
                 }
             })
         } catch (error) {
@@ -149,30 +150,13 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {fetchedMilestones.length === 0 ?
-                    <HoverCard openDelay={0}>
-                        <HoverCardTrigger>
-                            <Button
-                                variant="cta"
-                                className="w-fit"
-                                disabled
-                            >
-                                <PencilLine/>
-                                Write a Review
-                            </Button>
-                        </HoverCardTrigger>
-                        <HoverCardContent>
-                            To leave a review you must have a research plan.
-                        </HoverCardContent>
-                    </HoverCard>
-                    : <Button
-                        variant="cta"
-                        className="w-fit"
-                    >
-                        <PencilLine/>
-                        Write a Review
-                    </Button>
-                }
+                <Button
+                    variant="cta"
+                    className="w-fit"
+                >
+                    <PencilLine/>
+                    Write a Review
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
