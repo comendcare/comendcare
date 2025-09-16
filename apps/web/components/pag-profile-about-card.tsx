@@ -210,7 +210,6 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                 </Link>
                             }
                         </div>
-                        {/*Don't show member if name isn't specified*/}
                         {organization?.members ? organization?.members.map((member, index) =>
                                 <div
                                     key={index}
@@ -237,7 +236,6 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                 </div>
                             )
                             : <p className="text-gray-400">
-
                                 No known members
                             </p>
                         }

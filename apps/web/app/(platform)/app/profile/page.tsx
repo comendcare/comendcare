@@ -58,6 +58,11 @@ export default async function ProfilePage(_props: IndexPageProps) {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            members: {
+                select: {
+                    user: true
+                }
+            }
             // include only what you actually render
         },
     });
