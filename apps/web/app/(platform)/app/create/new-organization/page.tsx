@@ -352,9 +352,6 @@ export default function CreateNewOrganizationPage() {
             // Track
             mixpanelTrack("Onboarding: user saved", {name: values.name});
 
-            // 4) Organization: join or create (and possibly update existing)
-            let orgId = session?.user?.organizationId as string | undefined;
-
             // Create/update org
             const formData = new FormData();
             if (values.orgName) formData.append("orgName", values.orgName);
@@ -394,6 +391,9 @@ export default function CreateNewOrganizationPage() {
                 orgName: values.orgName,
                 looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
             });
+
+            // 4) Organization: join or create (and possibly update existing)
+            let orgId = createRes.organization.id
 
             // 5) Condition (optional; only if disorder selected and we have an org)
             if (values.disorder?.length && orgId) {
