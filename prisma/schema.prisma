@@ -1058,9 +1058,9 @@ model RFI {
 
 model Review {
   id             String              @id @default(uuid())
-  title          String
-  body           String
-  rating         Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  title          String?
+  body           String?
+  rating         Float?              @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
   authorId       String
   author         User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
   companyId      String

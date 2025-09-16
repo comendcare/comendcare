@@ -568,40 +568,40 @@ export async function getOrganizationData(
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
 
-        let organization = await prisma.organization.findUnique({
-            where: subdomain ? {subdomain} : {customDomain: domain},
-            select: {
-                ...select,
-                members: select.members ? ({
-                    include: {user: true},
-                    orderBy: {createdAt: 'asc'},
-                }) : undefined
-            }
+    let organization = await prisma.organization.findUnique({
+        where: subdomain ? {subdomain} : {customDomain: domain},
+        select: {
+            ...select,
+            members: select.members ? ({
+                include: {user: true},
+                orderBy: {createdAt: 'asc'},
+            }) : undefined
+        }
+    })
+
+    if (!organization) return organization
+
+    if (organization.members) {
+        // sort members list - move org owners to the beginning of the list
+        organization.members = organization.members.sort((a, b) => {
+            if (a.role === 'owner' && b.role !== 'owner') return -1
+            if (b.role === 'owner' && a.role !== 'owner') return 1
+            return 0
         })
 
-        if (!organization) return organization
+        // sort members list - move comend users to the end of the list
+        organization.members = organization.members.sort((a, b) => {
+            if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
+            if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
+            return 0
+        })
+    }
 
-        if (organization.members) {
-            // sort members list - move org owners to the beginning of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.role === 'owner' && b.role !== 'owner') return -1
-                if (b.role === 'owner' && a.role !== 'owner') return 1
-                return 0
-            })
+    const sanitizedOrganization = omit(organization, [
+        'contactEmailHash'
+    ])
 
-            // sort members list - move comend users to the end of the list
-            organization.members = organization.members.sort((a, b) => {
-                if (a.email.includes(`@comendcare.com`) && !b.email.includes(`@comendcare.com`)) return 1
-                if (b.email.includes(`@comendcare.com`) && !a.email.includes(`@comendcare.com`)) return -1
-                return 0
-            })
-        }
-
-        const sanitizedOrganization = omit(organization, [
-            'contactEmailHash'
-        ])
-
-        return sanitizedOrganization
+    return sanitizedOrganization
 }
 
 export const getPublicOrganizationData = async (
@@ -2625,95 +2625,11 @@ export const getAllBiosamples = withResearcherAuth(
 
 export const getDatasamples = withOrganizationAuth(
     async (organization: Organization, input?: GetBiosamplesSchema) => {
-            try {
-                if (!input) {
-                    const [data, total] = await prisma.$transaction([
-                        prisma.tool.findMany({
-                            where: {
-                                organizationId: organization.id
-                            },
-                            include: {
-                                organization: {include: {conditions: {include: {condition: true}}}},
-                                milestones: {include: {milestone: true}},
-                                contacts: true,
-                                attachments: true,
-                                institution: true,
-                                gene: true,
-                            },
-                            orderBy: {createdAt: "asc"},
-                        }),
-                        prisma.tool.count({where: {organizationId: organization.id}}),
-                    ]);
-
-                    return {data, pageCount: 1};
-                }
-
-                const offset = (input.page - 1) * input.perPage;
-                const advancedTable =
-                    input.filterFlag === "advancedFilters"
-
-                let where: any = {};
-
-                if (advancedTable) {
-                    const preProcessedFilters: any = input.filters.map(filter => ({
-                        ...filter,
-                        ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-                    }))
-
-                    where = filterColumns({
-                        filters: preProcessedFilters,
-                        joinOperator: input.joinOperator,
-                    })
-                } else {
-                    const filters: any[] = []
-                    if (input.title) {
-                        filters.push({
-                            id: 'title',
-                            value: input.title,
-                            variant: 'text',
-                            operator: 'iLike',
-                            filterId: nanoid()
-                        })
-                    }
-
-                    if (input.private.length == 1) {
-                        // private only has two options, we only filter if ONE of them
-                        // is selected...
-                        filters.push({
-                            id: 'private',
-                            value: input.private[0],
-                            variant: 'select',
-                            operator: 'eq',
-                            filterId: nanoid()
-                        })
-                    }
-
-                    if (input.types.length > 0) {
-                        filters.push({
-                            id: 'types',
-                            value: input.types,
-                            variant: 'multiSelect',
-                            operator: 'inArray',
-                            filterId: nanoid()
-                        })
-                    }
-
-                    where = filterColumns({
-                        filters,
-                        joinOperator: "and"
-                    })
-                }
-
-                const orderBy = input.sort.length
-                    ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                    : [{createdAt: "asc"}];
-
+        try {
+            if (!input) {
                 const [data, total] = await prisma.$transaction([
                     prisma.tool.findMany({
-                        skip: offset,
-                        take: input.perPage,
                         where: {
-                            ...where,
                             organizationId: organization.id
                         },
                         include: {
@@ -2724,16 +2640,100 @@ export const getDatasamples = withOrganizationAuth(
                             institution: true,
                             gene: true,
                         },
-                        orderBy,
+                        orderBy: {createdAt: "asc"},
                     }),
-                    prisma.tool.count({where}),
+                    prisma.tool.count({where: {organizationId: organization.id}}),
                 ]);
 
-                const pageCount = Math.ceil(total / input.perPage);
-                return {data, pageCount};
-            } catch {
-                return {data: [], pageCount: 0};
+                return {data, pageCount: 1};
             }
+
+            const offset = (input.page - 1) * input.perPage;
+            const advancedTable =
+                input.filterFlag === "advancedFilters"
+
+            let where: any = {};
+
+            if (advancedTable) {
+                const preProcessedFilters: any = input.filters.map(filter => ({
+                    ...filter,
+                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+                }))
+
+                where = filterColumns({
+                    filters: preProcessedFilters,
+                    joinOperator: input.joinOperator,
+                })
+            } else {
+                const filters: any[] = []
+                if (input.title) {
+                    filters.push({
+                        id: 'title',
+                        value: input.title,
+                        variant: 'text',
+                        operator: 'iLike',
+                        filterId: nanoid()
+                    })
+                }
+
+                if (input.private.length == 1) {
+                    // private only has two options, we only filter if ONE of them
+                    // is selected...
+                    filters.push({
+                        id: 'private',
+                        value: input.private[0],
+                        variant: 'select',
+                        operator: 'eq',
+                        filterId: nanoid()
+                    })
+                }
+
+                if (input.types.length > 0) {
+                    filters.push({
+                        id: 'types',
+                        value: input.types,
+                        variant: 'multiSelect',
+                        operator: 'inArray',
+                        filterId: nanoid()
+                    })
+                }
+
+                where = filterColumns({
+                    filters,
+                    joinOperator: "and"
+                })
+            }
+
+            const orderBy = input.sort.length
+                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
+                : [{createdAt: "asc"}];
+
+            const [data, total] = await prisma.$transaction([
+                prisma.tool.findMany({
+                    skip: offset,
+                    take: input.perPage,
+                    where: {
+                        ...where,
+                        organizationId: organization.id
+                    },
+                    include: {
+                        organization: {include: {conditions: {include: {condition: true}}}},
+                        milestones: {include: {milestone: true}},
+                        contacts: true,
+                        attachments: true,
+                        institution: true,
+                        gene: true,
+                    },
+                    orderBy,
+                }),
+                prisma.tool.count({where}),
+            ]);
+
+            const pageCount = Math.ceil(total / input.perPage);
+            return {data, pageCount};
+        } catch {
+            return {data: [], pageCount: 0};
+        }
     }
 )
 
@@ -2940,7 +2940,7 @@ export async function fetchFeedPage(opts: {
         orderBy,
         take: limit,
         ...(cursor && {
-            cursor: { createdAt_id: { createdAt: cursor.createdAt, id: cursor.id } },
+            cursor: {createdAt_id: {createdAt: cursor.createdAt, id: cursor.id}},
             skip: 1,
         }),
     });

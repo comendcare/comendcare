@@ -5277,7 +5277,7 @@ export const createReview = withAuth(
                 return review;
             });
 
-            revalidatePath("app/service-providers/");
+            revalidatePath(`/app/service-providers/${companyId}`);
 
             return {success: true, data: result};
         } catch (error: any) {
@@ -5363,7 +5363,7 @@ export const editReview = withAuth(
                 return updatedReview;
             });
 
-            revalidatePath("app/service-providers/");
+            revalidatePath(`/app/service-providers/${companyId}`);
 
             return {success: true, data: result};
         } catch (error: any) {
