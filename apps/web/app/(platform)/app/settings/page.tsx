@@ -4,7 +4,6 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
-import OrganizationSettingsTabs from "~web/components/organization-settings-tabs";
 import OrganizationSettingsPage from "~web/components/organization-settings-page";
 
 export default async function SettingsPage() {
@@ -80,7 +79,6 @@ export default async function SettingsPage() {
         }
         return (
             <TooltipProvider>
-                {/*<OrganizationSettingsTabs organization={organization}/>*/}
                 <OrganizationSettingsPage organization={organization} />
             </TooltipProvider>
         )
