@@ -47,7 +47,7 @@ export const columns: ColumnDef<SavedCompanyData>[] = [
         ),
         cell: ({ row }) => (
             <div>
-                {row.original.company.title}
+                {row.original.company?.title}
             </div>
         ),
         enableHiding: true,
@@ -60,7 +60,7 @@ export const columns: ColumnDef<SavedCompanyData>[] = [
         ),
         cell: ({ row }) => (
             <div className="line-clamp-3 w-96">
-                {row.original.company.description}
+                {row.original.company?.description}
             </div>
         ),
         enableHiding: true,
@@ -73,7 +73,7 @@ export const columns: ColumnDef<SavedCompanyData>[] = [
         ),
         cell: ({ row }) => (
             <div>
-                {row.original.company.website}
+                {row.original.company?.website}
             </div>
         ),
         enableHiding: true,
@@ -99,7 +99,7 @@ export const columns: ColumnDef<SavedCompanyData>[] = [
         ),
         cell: ({ row }) => (
             <div>
-                {row.original.milestone.title}
+                {row.original.milestone?.title}
             </div>
         ),
         enableHiding: true,
