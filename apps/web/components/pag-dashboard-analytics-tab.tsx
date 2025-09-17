@@ -12,57 +12,10 @@ import PAGAnalyticsToolsCard from "~web/components/pag-analytics-tools-card";
 import PAGAnalyticsProfileCard from "~web/components/pag-analytics-profile-card";
 import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
+import {OrganizationForAnalytics} from "@/packages/lib/types";
 
-export default async function PAGDashboardAnalyticsTab() {
+export default async function PAGDashboardAnalyticsTab({organization}: {organization: OrganizationForAnalytics}) {
     const session = await getSession()
-
-    if (!session?.user.organizationId) {
-        return <div className="h-full flex flex-col items-center justify-center py-20">
-            <Image
-                alt="No organization selected"
-                src="https://illustrations.popsy.co/gray/keynote-presentation.svg"
-                width={400}
-                height={400}
-                className="dark:hidden"
-            />
-            <Image
-                alt="No organization selected"
-                src="https://illustrations.popsy.co/white/keynote-presentation.svg"
-                width={400}
-                height={400}
-                className="hidden dark:block"
-            />
-            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                {`You're not part of an organization yet.`}
-            </p>
-            <div className="mt-8">
-                <CreateOrJoinOrganizationButton/>
-            </div>
-        </div>
-    }
-
-    const organization = await prisma.organization.findUnique({
-        where: {id: session.user.organizationId},
-        include: {
-            conditions: {
-                include: {
-                    condition: true
-                }
-            },
-            roadmaps: true,
-            members: true,
-            tools: true,
-            biosamples: true,
-            diseaseModel: true,
-            rfps: true,
-            materialAndDataAccessRequests: true,
-            savedCompanies: true
-        },
-    });
-
-    if (!organization) {
-        return <div>No organization data available.</div>;
-    }
 
     return (
         <div className="space-y-4 w-full">

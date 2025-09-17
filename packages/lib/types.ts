@@ -26,6 +26,25 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export const orgForAnalyticsInclude = Prisma.validator<Prisma.OrganizationInclude>()({
+    roadmaps: true,
+    tools: true,
+    rfps: true,
+    biosamples: true,
+    diseaseModel: true,
+    reviews: true,
+    members: true,
+    savedCompanies: true,
+    platformNotifications: true,
+    materialAndDataAccessRequests: true,
+    conditions: { include: { condition: true } },
+});
+
+// Type of an Organization with the relations above
+export type OrganizationForAnalytics = Prisma.OrganizationGetPayload<{
+    include: typeof orgForAnalyticsInclude;
+}>;
+
 export const GLOBAL_FEED_TYPES = [
     "SERVICE_PROVIDER_CREATED",
     "PAG_PROFILE_CREATED",

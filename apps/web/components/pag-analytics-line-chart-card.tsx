@@ -8,6 +8,7 @@ import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
 import {ExternalLink} from "lucide-react"
 import Link from "next/link";
+import {OrganizationForAnalytics} from "@/packages/lib/types";
 
 type Point = { date: string; pageViews: number };
 
@@ -22,7 +23,7 @@ function formatISODate(label: string) {
 }
 
 
-export default function PAGAnalyticsLineChartCard({organization}: { organization: Organization }) {
+export default function PAGAnalyticsLineChartCard({organization}: { organization: OrganizationForAnalytics }) {
     const router = useRouter();
     const [data, setData] = useState<Point[]>([]);
     const [total, setTotal] = useState(0);

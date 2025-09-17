@@ -11,6 +11,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from "@comend/components/ui/tooltip"
+import {OrganizationForAnalytics} from "@/packages/lib/types";
 
 type OrganizationWithIncludes = Prisma.OrganizationGetPayload<{
     include: {
@@ -25,7 +26,7 @@ type OrganizationWithIncludes = Prisma.OrganizationGetPayload<{
     };
 }>;
 
-export default function PAGAnalyticsToolsCard({organization}: { organization: OrganizationWithIncludes }) {
+export default function PAGAnalyticsToolsCard({organization}: { organization: OrganizationForAnalytics }) {
     const router = useRouter();
 
     return (

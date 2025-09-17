@@ -19,7 +19,7 @@ import {
 } from "@comend/components/ui/chart"
 import {getMilestones} from "@/packages/lib/fetchers";
 import {useEffect, useState} from "react"
-import {StatusType} from "@comend/lib/types"
+import {OrganizationForAnalytics, StatusType} from "@comend/lib/types"
 import {Organization} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import {ExternalLink} from "lucide-react"
@@ -44,7 +44,7 @@ const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
     COMPLETED: "--chart-3",
 }
 
-export function DashboardProjectsStatusCard({organization}: { organization: Organization }) {
+export function DashboardProjectsStatusCard({organization}: { organization: OrganizationForAnalytics }) {
     const router = useRouter();
     const [data, setData] = useState<
         { status: StatusType; count: number; fill: string; colorPreview: string }[]
