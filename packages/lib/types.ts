@@ -26,6 +26,57 @@ import {
 } from "@prisma/client";
 import {z} from "zod";
 
+export const orgForAnalyticsInclude = Prisma.validator<Prisma.OrganizationSelect>()({
+    id: true,
+    public: true,
+    verified: true,
+    published: true,
+    name: true,
+    description: true,
+    contactEmail: true,
+    logo: true,
+    image: true,
+    headerImage: true,
+    biopharmaConsentSettings: true,
+    subdomain: true,
+    customDomain: true,
+    statedGoal: true,
+    yearFounded: true,
+    incorporationStatus: true,
+    therapeuticsOfInterest: true,
+    therapeuticsInDevelopment: true,
+    website: true,
+    moneyRaised: true,
+    moneyDeployed: true,
+    researchBudget: true,
+    createdAt: true,
+    updatedAt: true,
+    user: true,
+    userId: true,
+    roadmaps: true,
+    members: true,
+    clients: true,
+    invitations: true,
+    membershipRequests: true,
+    kanban: true,
+    milestones: true,
+    platformNotifications: true,
+    reviews: true,
+    savedCompanies: true,
+    tools: true,
+    rfps: true,
+    conditions: { include: { condition: true } }, // keep nested include here
+    biosamples: true,
+    diseaseModel: true,
+    materialAndDataAccessRequests: true,
+    metadata: true,
+});
+
+// Type of an Organization with the relations above
+export type OrganizationForAnalytics = Prisma.OrganizationGetPayload<{
+    include: typeof orgForAnalyticsInclude;
+}>;
+
 export const GLOBAL_FEED_TYPES = [
     "SERVICE_PROVIDER_CREATED",
     "PAG_PROFILE_CREATED",

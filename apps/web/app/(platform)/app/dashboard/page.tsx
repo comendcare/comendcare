@@ -4,6 +4,8 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import React from "react";
+import Image from "next/image";
+import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button";
 
 export default async function AnalyticsPage() {
     const session = await getSession()
@@ -33,15 +35,6 @@ export default async function AnalyticsPage() {
             moneyRaised: true,
             moneyDeployed: true,
             researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
             createdAt: true,
             updatedAt: true,
             user: true,
@@ -51,7 +44,6 @@ export default async function AnalyticsPage() {
             clients: true,
             invitations: true,
             membershipRequests: true,
-            conditions: true,
             kanban: true,
             milestones: true,
             platformNotifications: true,
@@ -59,6 +51,14 @@ export default async function AnalyticsPage() {
             savedCompanies: true,
             tools: true,
             rfps: true,
+            conditions: {
+                include: {
+                    condition: true
+                }
+            },
+            biosamples: true,
+            diseaseModel: true,
+            materialAndDataAccessRequests: true,
             metadata: true
         })
         if (response.success) {
@@ -66,6 +66,31 @@ export default async function AnalyticsPage() {
         } else {
             console.error(response.error)
         }
+    }
+
+    if (!session?.user.organizationId) {
+        return <div className="h-full flex flex-col items-center justify-center py-20">
+            <Image
+                alt="No organization selected"
+                src="https://illustrations.popsy.co/gray/keynote-presentation.svg"
+                width={400}
+                height={400}
+                className="dark:hidden"
+            />
+            <Image
+                alt="No organization selected"
+                src="https://illustrations.popsy.co/white/keynote-presentation.svg"
+                width={400}
+                height={400}
+                className="hidden dark:block"
+            />
+            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                {`You're not part of an organization yet.`}
+            </p>
+            <div className="mt-8">
+                <CreateOrJoinOrganizationButton/>
+            </div>
+        </div>
     }
 
     if (organization) {
@@ -76,7 +101,7 @@ export default async function AnalyticsPage() {
         }
         return (
             <main className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8">
-                <PAGDashboardAnalyticsTab/>
+                <PAGDashboardAnalyticsTab organization={organization}/>
             </main>
         )
     } else {

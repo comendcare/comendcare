@@ -8,13 +8,55 @@ import {
 import { ArrowLeft, Store } from "lucide-react";
 import CROPageTabs from "~web/components/marketplace/cro-page-tabs";
 import CROPageHeader from "~web/components/marketplace/cro-page-header";
+import {notFound} from "next/navigation";
+import prisma from "@/packages/lib/prisma";
+import {CompanyWithReviewsAndServices} from "@/packages/lib/types";
 
-export default function CompanyHomePage({
+export default async function CompanyHomePage({
                                                   params
                                               }: {
     params: { id: string }
 }) {
     const id = decodeURIComponent(params.id)
+
+    const company = await prisma.company.findUnique({
+        where: {id},
+        select: {
+            id: true,
+            url: true,
+            scientistDotComURL: true,
+            title: true,
+            description: true,
+            yearEstablished: true,
+            website: true,
+            headquarters: true,
+            companyType: true,
+            sites: true,
+            services: true,
+            certifications: true,
+            simplifiedCertifications: true,
+            rfis: true,
+            reviews: {
+                include: {
+                    author: true,
+                    organization: true,
+                    feedbacks: true
+                }
+            },
+            tags: true,
+            avgRating: true,
+            categories: true,
+            milestoneTypes: true,
+            savedByOrganizations: true,
+            createdAt: true,
+            updatedAt: true,
+            metadata: true
+        },
+    });
+
+    if (!company) {
+        notFound();
+    }
 
     return (
         <TooltipProvider>
@@ -34,8 +76,8 @@ export default function CompanyHomePage({
                     Return to marketplace
                 </Link>
                 <main className="flex flex-col w-full max-w-7xl mx-auto space-y-8">
-                    <CROPageHeader id={id}/>
-                    <CROPageTabs/>
+                    <CROPageHeader company={company as CompanyWithReviewsAndServices}/>
+                    <CROPageTabs company={company as CompanyWithReviewsAndServices}/>
                 </main>
             </div>
         </TooltipProvider>

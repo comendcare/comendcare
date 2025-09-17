@@ -11,21 +11,9 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from "@comend/components/ui/tooltip"
+import {OrganizationForAnalytics} from "@/packages/lib/types";
 
-type OrganizationWithIncludes = Prisma.OrganizationGetPayload<{
-    include: {
-        conditions: { include: { condition: true } },
-        roadmaps: true;
-        members: true;
-        tools: true;
-        biosamples: true;
-        diseaseModel: true;
-        rfps: true;
-        materialAndDataAccessRequests: true;
-    };
-}>;
-
-export default function PAGAnalyticsToolsCard({organization}: { organization: OrganizationWithIncludes }) {
+export default function PAGAnalyticsToolsCard({organization}: { organization: OrganizationForAnalytics }) {
     const router = useRouter();
 
     return (

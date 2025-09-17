@@ -296,8 +296,8 @@ export const createCondition = withAuth(
                 if (targetSlugs.length) {
                     // 3) Find existing by slug
                     const existing = await prisma.condition.findMany({
-                        where: { slug: { in: targetSlugs } },
-                        select: { id: true, slug: true }
+                        where: {slug: {in: targetSlugs}},
+                        select: {id: true, slug: true}
                     });
                     const existingBySlug = new Map(existing.map(e => [e.slug, e.id]));
 
@@ -308,9 +308,9 @@ export const createCondition = withAuth(
                             missing.map(async (s) => {
                                 const name = targetNames.find(n => toKebabCase(n) === s) || s;
                                 const c = await prisma.condition.upsert({
-                                    where: { slug: s },
-                                    update: { name, slug: s },
-                                    create: { name, slug: s }
+                                    where: {slug: s},
+                                    update: {name, slug: s},
+                                    create: {name, slug: s}
                                 });
                                 return c;
                             })
@@ -320,22 +320,22 @@ export const createCondition = withAuth(
 
                     // 5) Connect all
                     await prisma.condition.update({
-                        where: { id: condition.id },
+                        where: {id: condition.id},
                         data: {
                             associatedConditions: {
                                 set: [],
                                 connect: targetSlugs
                                     .map(s => existingBySlug.get(s))
                                     .filter(Boolean)
-                                    .map(id => ({ id: id as string }))
+                                    .map(id => ({id: id as string}))
                             }
                         }
                     });
                 } else {
                     // Clear if none provided
                     await prisma.condition.update({
-                        where: { id: condition.id },
-                        data: { associatedConditions: { set: [] } }
+                        where: {id: condition.id},
+                        data: {associatedConditions: {set: []}}
                     });
                 }
             } catch (assocErr) {
@@ -437,8 +437,8 @@ export const createOrganization = withAuth(
         try {
             const result = await prisma.$transaction(async (tx) => {
                 // Ensure subdomain unique (CREATE only)
-                const exists = await tx.organization.findUnique({ where: { subdomain } });
-                if (exists) throw Object.assign(new Error("This subdomain is already taken"), { code: "SUBDOMAIN_TAKEN" });
+                const exists = await tx.organization.findUnique({where: {subdomain}});
+                if (exists) throw Object.assign(new Error("This subdomain is already taken"), {code: "SUBDOMAIN_TAKEN"});
 
                 const organization = await tx.organization.create({
                     data: {
@@ -463,7 +463,7 @@ export const createOrganization = withAuth(
                         image,
                         verified: true, // beta default
                         metadata,
-                        user: { connect: { id: session.user.id } },
+                        user: {connect: {id: session.user.id}},
                     },
                 });
 
@@ -478,11 +478,11 @@ export const createOrganization = withAuth(
                 });
 
                 await tx.user.update({
-                    where: { id: session.user.id },
-                    data: { activeOrganizationId: organization.id },
+                    where: {id: session.user.id},
+                    data: {activeOrganizationId: organization.id},
                 });
 
-                return { organization, membership };
+                return {organization, membership};
             });
 
             if (result.organization.verified && result.organization.published) {
@@ -774,11 +774,11 @@ export const updateOrganization = withOrganizationAuth(
         try {
             // Get previous org for diffing
             const before = await prisma.organization.findUnique({
-                where: { id: organization.id },
+                where: {id: organization.id},
             });
 
             const response = await prisma.organization.update({
-                where: { id: organization.id },
+                where: {id: organization.id},
                 data,
             });
 
@@ -807,7 +807,7 @@ export const updateOrganization = withOrganizationAuth(
                     const afterVal = (response as any)[key];
                     if (JSON.stringify(beforeVal) !== JSON.stringify(afterVal)) {
                         changedFields.push(key);
-                        changes[key] = { before: beforeVal, after: afterVal };
+                        changes[key] = {before: beforeVal, after: afterVal};
                     }
                 }
             }
@@ -842,7 +842,7 @@ export const deleteOrganization = withOrganizationAuth(
     async (organization: Organization) => {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
-            return { success: false, error: "Not authenticated" };
+            return {success: false, error: "Not authenticated"};
         }
 
         const userId = session.user.id;
@@ -851,10 +851,10 @@ export const deleteOrganization = withOrganizationAuth(
         const remainingMemberships = await prisma.member.findMany({
             where: {
                 userId,
-                organizationId: { not: organization.id },
+                organizationId: {not: organization.id},
             },
-            select: { organizationId: true, createdAt: true },
-            orderBy: { createdAt: "asc" }, // or "desc" if you prefer “most recent”
+            select: {organizationId: true, createdAt: true},
+            orderBy: {createdAt: "asc"}, // or "desc" if you prefer “most recent”
         });
 
         const nextOrgId: string | null =
@@ -875,10 +875,10 @@ export const deleteOrganization = withOrganizationAuth(
 
         // Run everything that touches DB in a single transaction
         const [deletedOrg] = await prisma.$transaction([
-            prisma.organization.delete({ where: { id: organization.id } }),
+            prisma.organization.delete({where: {id: organization.id}}),
             prisma.user.update({
-                where: { id: userId },
-                data: { activeOrganizationId: nextOrgId },
+                where: {id: userId},
+                data: {activeOrganizationId: nextOrgId},
             }),
         ])
             .then(async ([orgDeleteResult, _userUpdate]) => {
@@ -886,7 +886,7 @@ export const deleteOrganization = withOrganizationAuth(
                     typeSenseDelete,
                     prisma.condition.deleteMany({
                         where: {
-                            organizations: { some: { id: organization.id } },
+                            organizations: {some: {id: organization.id}},
                         },
                     }),
                 ]);
@@ -899,22 +899,22 @@ export const deleteOrganization = withOrganizationAuth(
 
         // AFTER deleting the org, before revalidatePath:
         const affectedUsers = await prisma.user.findMany({
-            where: { activeOrganizationId: organization.id },
-            select: { id: true },
+            where: {activeOrganizationId: organization.id},
+            select: {id: true},
         });
 
         // For each affected user, pick their next membership (excluding the deleted org)
         await Promise.all(
             affectedUsers.map(async (u) => {
                 const next = await prisma.member.findFirst({
-                    where: { userId: u.id, organizationId: { not: organization.id } },
-                    orderBy: { createdAt: "asc" },
-                    select: { organizationId: true },
+                    where: {userId: u.id, organizationId: {not: organization.id}},
+                    orderBy: {createdAt: "asc"},
+                    select: {organizationId: true},
                 });
 
                 await prisma.user.update({
-                    where: { id: u.id },
-                    data: { activeOrganizationId: next?.organizationId ?? null },
+                    where: {id: u.id},
+                    data: {activeOrganizationId: next?.organizationId ?? null},
                 });
             })
         );
@@ -924,7 +924,7 @@ export const deleteOrganization = withOrganizationAuth(
             revalidatePath(p);
         }
 
-        return { success: true, data: deletedOrg };
+        return {success: true, data: deletedOrg};
     },
     ["owner"]
 );
@@ -1481,45 +1481,57 @@ export const deleteInvitation = withOrganizationAuth(
     ['owner']
 )
 
-export const declineAndDeleteInvitation = async (invitation: Invitation): Promise<ApiResponse<any>> => {
-    if (!invitation) {
-        throw new Error("Invalid invitation");
-    }
+export const declineAndDeleteInvitation = withAuth(
+    async (invitationId: string) => {
+        try {
+            const session = await getSession();
+            if (!session?.user?.id) {
+                throw new Error("You must be signed in to perform this action");
+            }
 
-    const session = await getSession();
-    if (session?.user.email !== invitation.email) {
-        throw new Error("Current user email doesn't match the invite email.")
-    }
+            // Check if the invitation exists and is not already accepted
+            const invitation = await prisma.invitation.findUnique({
+                where: {
+                    id: invitationId,
+                },
+            });
 
-    try {
-        // Ensure the composite key is valid or fallback to another unique identifier like `id`
-        const deletedInvitation = await prisma.invitation.delete({
-            where: {
-                id: invitation.id
-            },
-        });
+            if (invitation?.email !== session.user.email) {
+                return {
+                    success: false,
+                    error: "Error accepting invitation: active user email does not match the invite email."
+                }
+            }
 
-        if (!deletedInvitation) {
-            return {success: false, error: "Failed to delete invitation. Request not found."};
+            // Ensure the composite key is valid or fallback to another unique identifier like `id`
+            const deletedInvitation = await prisma.invitation.delete({
+                where: {
+                    id: invitation.id
+                },
+            });
+
+            if (!deletedInvitation) {
+                return {success: false, error: "Failed to delete invitation. Request not found."};
+            }
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: deletedInvitation};
+
+        } catch (error) {
+            console.error("Error deleting invitation:", error);
+            return {success: false, error: "Failed to delete invitation."};
         }
-
-        revalidatePath("/app/team")
-        revalidatePath("/app/profile")
-
-        return {success: true, data: deletedInvitation};
-
-    } catch (error) {
-        console.error("Error deleting invitation:", error);
-        return {success: false, error: "Failed to delete invitation."};
     }
-}
+)
 
 // Invite user function with updated Organization model
 export const leaveOrganization = withOrganizationAuth(
     async (organization: Organization) => {
         const session = await getSession();
         if (!session?.user?.id) {
-            return { success: false, error: "Session not found." };
+            return {success: false, error: "Session not found."};
         }
 
         const userId = session.user.id;
@@ -1528,18 +1540,18 @@ export const leaveOrganization = withOrganizationAuth(
             // Fetch the caller's membership + role
             const currentMember = await prisma.member.findUnique({
                 where: {
-                    userId_organizationId: { userId, organizationId: organization.id },
+                    userId_organizationId: {userId, organizationId: organization.id},
                 },
-                select: { id: true, role: true },
+                select: {id: true, role: true},
             });
             if (!currentMember) {
-                return { success: false, error: "Membership not found." };
+                return {success: false, error: "Membership not found."};
             }
 
             // If owner, ensure not the last owner
             if (currentMember.role === "owner") {
                 const ownerCount = await prisma.member.count({
-                    where: { organizationId: organization.id, role: "owner" },
+                    where: {organizationId: organization.id, role: "owner"},
                 });
                 if (ownerCount <= 1) {
                     return {
@@ -1552,31 +1564,31 @@ export const leaveOrganization = withOrganizationAuth(
 
             // Get the user's current active org and compute "next" org BEFORE deletion
             const user = await prisma.user.findUnique({
-                where: { id: userId },
-                select: { activeOrganizationId: true },
+                where: {id: userId},
+                select: {activeOrganizationId: true},
             });
 
             const nextMembership = await prisma.member.findFirst({
                 where: {
                     userId,
-                    organizationId: { not: organization.id },
+                    organizationId: {not: organization.id},
                 },
-                orderBy: { createdAt: "asc" }, // or "desc" for most-recent
-                select: { organizationId: true },
+                orderBy: {createdAt: "asc"}, // or "desc" for most-recent
+                select: {organizationId: true},
             });
 
             // Delete membership and (conditionally) update active org
             const [deletedMembership] = await prisma.$transaction([
                 prisma.member.delete({
                     where: {
-                        userId_organizationId: { userId, organizationId: organization.id },
+                        userId_organizationId: {userId, organizationId: organization.id},
                     },
                 }),
                 // Update activeOrganizationId only if user was pointing to this org
                 ...(user?.activeOrganizationId === organization.id
                     ? [
                         prisma.user.update({
-                            where: { id: userId },
+                            where: {id: userId},
                             data: {
                                 activeOrganizationId: nextMembership?.organizationId ?? null,
                             },
@@ -1590,11 +1602,11 @@ export const leaveOrganization = withOrganizationAuth(
                 revalidatePath(p);
             }
 
-            return { success: true, data: deletedMembership };
+            return {success: true, data: deletedMembership};
         } catch (error) {
             // your logger
             logError("Error leaving organization", error);
-            return { success: false, error: "Internal server error" };
+            return {success: false, error: "Internal server error"};
         }
     }
 );
@@ -1702,34 +1714,34 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 export const deleteMember = withOrganizationAuth(
     async (_: Organization, membershipId: string) => {
         const session = await getSession();
-        if (!session) return { success: false, error: "Session not found." };
+        if (!session) return {success: false, error: "Session not found."};
 
         try {
             // 1) Delete the membership and fetch needed fields
             const member = await prisma.member.delete({
-                where: { id: membershipId },
+                where: {id: membershipId},
                 include: {
-                    user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
-                    organization: { select: { id: true, name: true, image: true } },
+                    user: {select: {id: true, activeOrganizationId: true, name: true, email: true}},
+                    organization: {select: {id: true, name: true, image: true}},
                 },
             });
 
-            if (!member) return { success: false, error: "Membership not found" };
+            if (!member) return {success: false, error: "Membership not found"};
 
             // 2) If the revoked user's active org was this org, pick a new one (or null)
             if (member.user.activeOrganizationId === member.organization.id) {
                 const nextMembership = await prisma.member.findFirst({
                     where: {
                         userId: member.user.id,
-                        organizationId: { not: member.organization.id },
+                        organizationId: {not: member.organization.id},
                     },
-                    orderBy: { createdAt: "asc" }, // or "desc" if you prefer most-recent
-                    select: { organizationId: true },
+                    orderBy: {createdAt: "asc"}, // or "desc" if you prefer most-recent
+                    select: {organizationId: true},
                 });
 
                 await prisma.user.update({
-                    where: { id: member.user.id },
-                    data: { activeOrganizationId: nextMembership?.organizationId ?? null },
+                    where: {id: member.user.id},
+                    data: {activeOrganizationId: nextMembership?.organizationId ?? null},
                 });
             }
 
@@ -1739,15 +1751,16 @@ export const deleteMember = withOrganizationAuth(
                 email: member.email,
                 organizationName: member.organization.name || "",
                 organizationImage: member.organization.image || "",
-            }).catch(() => {});
+            }).catch(() => {
+            });
 
             // 4) Revalidate pages that may depend on org context
             for (const p of PATHS) revalidatePath(p);
 
-            return { success: true, data: member };
+            return {success: true, data: member};
         } catch (error: any) {
             logError("Error deleting membership", error);
-            return { success: false, error: "Internal server error" };
+            return {success: false, error: "Internal server error"};
         }
     },
     ["owner"]
@@ -1853,14 +1866,14 @@ export const createRequestComment = withAuth(
                         select: {
                             id: true,
                             title: true,
-                            organization: { select: { id: true, name: true, image: true, subdomain: true } },
+                            organization: {select: {id: true, name: true, image: true, subdomain: true}},
                         },
                     },
-                    author: { select: { id: true, name: true } },
+                    author: {select: {id: true, name: true}},
                 },
                 data: {
-                    materialAndDataAccessRequest: { connect: { id: requestId } },
-                    author: { connect: { id: session.user.id } },
+                    materialAndDataAccessRequest: {connect: {id: requestId}},
+                    author: {connect: {id: session.user.id}},
                     text,
                 },
             });
@@ -2004,16 +2017,13 @@ export const acceptInvitation = withAuth(
                         id: invitationId,
                     },
                 }),
-                // prisma.invitation.update({
-                //     where: {
-                //         id: invitationId,
-                //     },
-                //     data: {
-                //         accepted: true,
-                //     },
-                // }),
+                prisma.user.update({
+                    where: {id: session.user.id},
+                    data: {activeOrganizationId: invitation.organizationId},
+                })
             ]);
 
+            revalidatePath("/app/team")
             revalidatePath("/app/profile")
 
             return {success: true, data: invitation};
@@ -2045,15 +2055,19 @@ export const updateCondition = withOrganizationAuth(
                     return;
                 }
                 if (str.startsWith("[")) {
-                    try { data[key] = JSON.parse(str); } catch { data[key] = str; }
+                    try {
+                        data[key] = JSON.parse(str);
+                    } catch {
+                        data[key] = str;
+                    }
                     return;
                 }
                 data[key] = str;
             });
 
             const link = await prisma.conditionToOrganization.findFirst({
-                where: { organizationId: organization.id },
-                select: { conditionId: true, condition: { select: { slug: true } } },
+                where: {organizationId: organization.id},
+                select: {conditionId: true, condition: {select: {slug: true}}},
             });
 
             // Create or update if org has none yet
@@ -2065,33 +2079,33 @@ export const updateCondition = withOrganizationAuth(
                 // Try to find an existing condition (prefer id, then slug)
                 let existing =
                     requestedId
-                        ? await prisma.condition.findUnique({ where: { id: requestedId } })
+                        ? await prisma.condition.findUnique({where: {id: requestedId}})
                         : requestedSlug
-                            ? await prisma.condition.findUnique({ where: { slug: requestedSlug } })
+                            ? await prisma.condition.findUnique({where: {slug: requestedSlug}})
                             : null;
 
                 let condition;
                 if (existing) {
                     // Update existing with incoming scalar fields
                     condition = await prisma.condition.update({
-                        where: { id: existing.id },
+                        where: {id: existing.id},
                         data,
                     });
                 } else {
                     // Create new condition (derive slug if not provided)
                     const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
                     condition = await prisma.condition.create({
-                        data: { ...data, slug, name: data.name },
+                        data: {...data, slug, name: data.name},
                     });
                 }
 
                 // Link org → condition
                 await prisma.conditionToOrganization.create({
-                    data: { conditionId: condition.id, organizationId: organization.id },
+                    data: {conditionId: condition.id, organizationId: organization.id},
                 });
 
                 revalidatePath("/app/profile");
-                return { success: true, data: condition };
+                return {success: true, data: condition};
             }
 
             const conditionId = link.conditionId;
@@ -2104,7 +2118,7 @@ export const updateCondition = withOrganizationAuth(
 
             // 1) Update scalar fields first
             const updated = await prisma.condition.update({
-                where: { id: conditionId },
+                where: {id: conditionId},
                 data,
             });
 
@@ -2122,8 +2136,8 @@ export const updateCondition = withOrganizationAuth(
                 // If you allow 'creatable', upsert any missing ones (optional)
                 // Remove this block if you want to restrict to existing only.
                 const existing = await prisma.condition.findMany({
-                    where: { slug: { in: targetSlugs } },
-                    select: { id: true, slug: true },
+                    where: {slug: {in: targetSlugs}},
+                    select: {id: true, slug: true},
                 });
                 const existingBySlug = new Map(existing.map(e => [e.slug, e.id]));
                 const missing = targetSlugs.filter(s => !existingBySlug.has(s));
@@ -2133,9 +2147,9 @@ export const updateCondition = withOrganizationAuth(
                         missing.map(async (slug) => {
                             const nameGuess = slug.replace(/-/g, " ");
                             return prisma.condition.upsert({
-                                where: { slug },
-                                update: { name: nameGuess, slug },
-                                create: { name: nameGuess, slug },
+                                where: {slug},
+                                update: {name: nameGuess, slug},
+                                create: {name: nameGuess, slug},
                             });
                         })
                     );
@@ -2145,10 +2159,10 @@ export const updateCondition = withOrganizationAuth(
                 const connectIds = targetSlugs
                     .map(s => existingBySlug.get(s))
                     .filter(Boolean)
-                    .map(id => ({ id: id as string }));
+                    .map(id => ({id: id as string}));
 
                 await prisma.condition.update({
-                    where: { id: conditionId },
+                    where: {id: conditionId},
                     data: {
                         associatedConditions: {
                             set: [],         // replace all
@@ -2159,10 +2173,10 @@ export const updateCondition = withOrganizationAuth(
             }
 
             revalidatePath("/app/profile");
-            return { success: true, data: updated };
+            return {success: true, data: updated};
         } catch (error: any) {
             console.error("Error in updateCondition:", error);
-            return { success: false, error: error.message || "Failed to update or create condition." };
+            return {success: false, error: error.message || "Failed to update or create condition."};
         }
     }
 );
@@ -2278,15 +2292,17 @@ export const updateDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
-                        ? { institution: {
-                            connectOrCreate: {
-                                where: {id: diseaseModelData.institution.value},
-                                create: {
-                                    name: diseaseModelData.institution.value
+                        ? {
+                            institution: {
+                                connectOrCreate: {
+                                    where: {id: diseaseModelData.institution.value},
+                                    create: {
+                                        name: diseaseModelData.institution.value
+                                    }
                                 }
-                             } }
-                         }
-                        : { institution: { disconnect: true } }),
+                            }
+                        }
+                        : {institution: {disconnect: true}}),
                     ...(diseaseModelData.attachments ? (
                         {
                             attachments: {
@@ -2389,14 +2405,16 @@ export const createDiseaseModel = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
                         : undefined),
                     ...(diseaseModelData.institution
-                        ? ({institution: {
-                            connectOrCreate: {
-                                where: {id: diseaseModelData.institution.value},
-                                create: {
-                                    name: diseaseModelData.institution.value,
+                        ? ({
+                            institution: {
+                                connectOrCreate: {
+                                    where: {id: diseaseModelData.institution.value},
+                                    create: {
+                                        name: diseaseModelData.institution.value,
+                                    }
                                 }
-                             }
-                        }})
+                            }
+                        })
                         : undefined),
                     attachments: {
                         createMany: {
@@ -2529,18 +2547,20 @@ export const createDataTool = withOrganizationAuth(
                     ...((
                         data.cohortSize !== undefined &&
                         data.cohortSize !== null
-                        )
-                            ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null}
-                            : undefined),
+                    )
+                        ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null}
+                        : undefined),
                     ...(dataToolData.institution
-                        ? ({institution: {
-                            connectOrCreate: {
-                                where: {id: dataToolData.institution.value},
-                                create: {
-                                    name: dataToolData.institution.value,
+                        ? ({
+                            institution: {
+                                connectOrCreate: {
+                                    where: {id: dataToolData.institution.value},
+                                    create: {
+                                        name: dataToolData.institution.value,
+                                    }
                                 }
-                             }
-                        }})
+                            }
+                        })
                         : undefined),
                 }
             })
@@ -2650,15 +2670,17 @@ export const updateDataTool = withOrganizationAuth(
                         }
                     }) : {gene: {disconnect: true}}),
                     ...(dataToolData.institution
-                        ? { institution: {
-                            connectOrCreate: {
-                                where: {id: dataToolData.institution.value},
-                                create: {
-                                    name: dataToolData.institution.value
+                        ? {
+                            institution: {
+                                connectOrCreate: {
+                                    where: {id: dataToolData.institution.value},
+                                    create: {
+                                        name: dataToolData.institution.value
+                                    }
                                 }
-                             } }
-                         }
-                        : { institution: { disconnect: true } }),
+                            }
+                        }
+                        : {institution: {disconnect: true}}),
                 },
             })
 
@@ -2777,14 +2799,16 @@ export const createBiosample = withOrganizationAuth(
                         ? ({gene: {connect: {symbol: biosampleData.gene.value}}})
                         : undefined),
                     ...(biosampleData.institution
-                        ? ({institution: {
-                            connectOrCreate: {
-                                where: {id: biosampleData.institution.value},
-                                create: {
-                                    name: biosampleData.institution.value,
+                        ? ({
+                            institution: {
+                                connectOrCreate: {
+                                    where: {id: biosampleData.institution.value},
+                                    create: {
+                                        name: biosampleData.institution.value,
+                                    }
                                 }
-                             }
-                        }})
+                            }
+                        })
                         : undefined),
                     donor: {
                         connectOrCreate: {
@@ -2870,15 +2894,15 @@ export const updateBiosample = withOrganizationAuth(
 
             // Fetch existing to capture previous privacy state (and avoid a second roundtrip for description if you like)
             const existing = await prisma.biosample.findUnique({
-                where: { id: data.id },
-                select: { id: true, private: true },
+                where: {id: data.id},
+                select: {id: true, private: true},
             });
             if (!existing) throw new Error("Biosample not found.");
 
             const biosampleData: any = {
                 id: data.id,
                 types: data.types ? data.types.map((t) => t.value) : undefined,
-                metadata: { otherTypeDetails: data.otherTypeDetails } as JsonObject,
+                metadata: {otherTypeDetails: data.otherTypeDetails} as JsonObject,
                 private:
                     data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 milestones: (data.milestones || []).map((m) => ({
@@ -2896,11 +2920,11 @@ export const updateBiosample = withOrganizationAuth(
                 collectionDate: data.collectionDate,
                 availability: data.availability,
                 ...(data.quantity !== undefined && data.quantity !== null
-                    ? { quantity: JSON.parse(data.quantity) }
+                    ? {quantity: JSON.parse(data.quantity)}
                     : undefined),
                 quantityUnit: data.quantityUnit,
                 ...(data.price !== undefined && data.price !== null
-                    ? { price: JSON.parse(data.price) }
+                    ? {price: JSON.parse(data.price)}
                     : undefined),
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
@@ -2912,13 +2936,13 @@ export const updateBiosample = withOrganizationAuth(
             };
 
             const newBiosample = await prisma.biosample.update({
-                where: { id: data.id },
+                where: {id: data.id},
                 include: {
                     contacts: true,
                     attachments: true,
                     milestones: {
                         include: {
-                            milestone: { include: { types: { include: { milestoneType: true } } } },
+                            milestone: {include: {types: {include: {milestoneType: true}}}},
                         },
                     },
                     donor: true,
@@ -2933,7 +2957,7 @@ export const updateBiosample = withOrganizationAuth(
                                 createMany: {
                                     data: (biosampleData?.attachments || []).map((a: any) => ({
                                         link: a.link,
-                                        ...(a.name ? { name: a.name } : undefined),
+                                        ...(a.name ? {name: a.name} : undefined),
                                     })),
                                 },
                             },
@@ -2947,8 +2971,8 @@ export const updateBiosample = withOrganizationAuth(
                                     data: (biosampleData?.contacts || []).map((c: any) => ({
                                         name: c.name,
                                         email: c.email,
-                                        ...(c.role ? { role: c.role } : undefined),
-                                        ...(c.affiliation ? { affiliation: c.affiliation } : undefined),
+                                        ...(c.role ? {role: c.role} : undefined),
+                                        ...(c.affiliation ? {affiliation: c.affiliation} : undefined),
                                     })),
                                 },
                             },
@@ -2959,7 +2983,7 @@ export const updateBiosample = withOrganizationAuth(
                             milestones: {
                                 deleteMany: {},
                                 create: (biosampleData.milestones || []).map((m: any) => ({
-                                    milestone: { connect: { id: m.milestoneId } },
+                                    milestone: {connect: {id: m.milestoneId}},
                                 })),
                             },
                         }
@@ -2970,27 +2994,29 @@ export const updateBiosample = withOrganizationAuth(
                             : false,
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
-                        ? { gene: { connect: { symbol: biosampleData.gene.value } } }
-                        : { gene: { disconnect: true } }),
+                        ? {gene: {connect: {symbol: biosampleData.gene.value}}}
+                        : {gene: {disconnect: true}}),
                     ...(biosampleData.institution
-                        ? { institution: {
-                            connectOrCreate: {
-                                where: {id: biosampleData.institution.value},
-                                create: {
-                                    name: biosampleData.institution.value
+                        ? {
+                            institution: {
+                                connectOrCreate: {
+                                    where: {id: biosampleData.institution.value},
+                                    create: {
+                                        name: biosampleData.institution.value
+                                    }
                                 }
-                             } }
-                         }
-                        : { institution: { disconnect: true } }),
+                            }
+                        }
+                        : {institution: {disconnect: true}}),
                     ...(data.donorId
-                        ? { donor: { connect: { id: data.donorId } } }
-                        : { donor: { disconnect: true } }),
+                        ? {donor: {connect: {id: data.donorId}}}
+                        : {donor: {disconnect: true}}),
                 },
             });
 
             if (data.donorId) {
                 await prisma.donor.update({
-                    where: { id: data.donorId },
+                    where: {id: data.donorId},
                     data: {
                         internalId: data.internalDonorId,
                         age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
@@ -3011,8 +3037,8 @@ export const updateBiosample = withOrganizationAuth(
                                         severity: d.severity,
                                         type: {
                                             connectOrCreate: {
-                                                where: { id: d.diagnosis[0].value },
-                                                create: { id: d.diagnosis[0].value, label: d.diagnosis[0].label },
+                                                where: {id: d.diagnosis[0].value},
+                                                create: {id: d.diagnosis[0].value, label: d.diagnosis[0].label},
                                             },
                                         },
                                     })),
@@ -3023,7 +3049,7 @@ export const updateBiosample = withOrganizationAuth(
                 });
             }
 
-            const response = await prisma.biosample.findUnique({ where: { id: data.id } });
+            const response = await prisma.biosample.findUnique({where: {id: data.id}});
 
             // --- Event emission: private/undefined -> public (first publication)
             const wasPrivate = existing?.private;            // prior state
@@ -4541,7 +4567,7 @@ export const syncDBRFPs = withOrganizationAuth(
 )
 
 export const updateMilestones = withOrganizationAuth(
-    async (_: Organization, { milestones }: { milestones: Milestone[] }) => {
+    async (_: Organization, {milestones}: { milestones: Milestone[] }) => {
         try {
             const session = await getSession();
             let updatedMilestones: Milestone[] = [];
@@ -4564,14 +4590,14 @@ export const updateMilestones = withOrganizationAuth(
             await Promise.all(
                 milestones.map(async (milestone: any) => {
                     const previousMilestone = await prisma.milestone.findUnique({
-                        where: { nodeId: milestone.nodeId },
+                        where: {nodeId: milestone.nodeId},
                         include: {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: { include: { milestoneType: true } },
-                            tools: { include: { tool: true } },
-                            rfps: { include: { rfp: true } },
+                            types: {include: {milestoneType: true}},
+                            tools: {include: {tool: true}},
+                            rfps: {include: {rfp: true}},
                         },
                     });
 
@@ -4582,17 +4608,17 @@ export const updateMilestones = withOrganizationAuth(
                     }
 
                     const m = await prisma.milestone.update({
-                        where: { nodeId: milestone.nodeId },
+                        where: {nodeId: milestone.nodeId},
                         include: {
                             node: true,
                             contacts: true,
                             attachments: true,
                             roadmap: true,
-                            types: { include: { milestoneType: true } },
-                            biosamples: { include: { biosample: true } },
-                            diseaseModels: { include: { diseaseModel: true } },
-                            tools: { include: { tool: true } },
-                            rfps: { include: { rfp: true } },
+                            types: {include: {milestoneType: true}},
+                            biosamples: {include: {biosample: true}},
+                            diseaseModels: {include: {diseaseModel: true}},
+                            tools: {include: {tool: true}},
+                            rfps: {include: {rfp: true}},
                         },
                         data: {
                             title: milestone.title,
@@ -4600,7 +4626,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.types || []).map((type: any) => ({
                                     milestoneType: {
-                                        connect: { id: type.milestoneTypeId || type.milestoneType.id },
+                                        connect: {id: type.milestoneTypeId || type.milestoneType.id},
                                     },
                                 })),
                             },
@@ -4608,7 +4634,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.biosamples || []).map((tool: any) => ({
                                     biosample: {
-                                        connect: { id: tool.toolId || tool.biosample.id },
+                                        connect: {id: tool.toolId || tool.biosample.id},
                                     },
                                 })),
                             },
@@ -4616,7 +4642,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.diseaseModels || []).map((tool: any) => ({
                                     diseaseModel: {
-                                        connect: { id: tool.toolId || tool.diseaseModel.id },
+                                        connect: {id: tool.toolId || tool.diseaseModel.id},
                                     },
                                 })),
                             },
@@ -4624,7 +4650,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.tools || []).map((tool: any) => ({
                                     tool: {
-                                        connect: { id: tool.toolId || tool.tool.id },
+                                        connect: {id: tool.toolId || tool.tool.id},
                                     },
                                 })),
                             },
@@ -4632,7 +4658,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.rfps || []).map((rfp: any) => ({
                                     rfp: {
-                                        connect: { id: rfp.rfpId || rfp.rfp.id },
+                                        connect: {id: rfp.rfpId || rfp.rfp.id},
                                     },
                                 })),
                             },
@@ -4647,7 +4673,7 @@ export const updateMilestones = withOrganizationAuth(
                                 createMany: {
                                     data: (milestone?.attachments || []).map((attachment: any) => ({
                                         link: attachment.link,
-                                        ...(attachment.name ? { name: attachment.name } : undefined),
+                                        ...(attachment.name ? {name: attachment.name} : undefined),
                                     })),
                                 },
                             },
@@ -4657,8 +4683,8 @@ export const updateMilestones = withOrganizationAuth(
                                     data: (milestone?.contacts || []).map((contact: any) => ({
                                         name: contact.name,
                                         email: contact.email,
-                                        ...(contact.role ? { role: contact.role } : undefined),
-                                        ...(contact.affiliation ? { affiliation: contact.affiliation } : undefined),
+                                        ...(contact.role ? {role: contact.role} : undefined),
+                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
                                     })),
                                 },
                             },
@@ -4667,7 +4693,7 @@ export const updateMilestones = withOrganizationAuth(
                             private: milestone.private ?? false, // <-- preserve explicit false
                             notes: milestone.notes,
                             nodeType: milestone.nodeType || "PROJECT",
-                            ...(milestone.metadata ? { metadata: milestone.metadata } : undefined),
+                            ...(milestone.metadata ? {metadata: milestone.metadata} : undefined),
                         },
                     });
 
@@ -4714,13 +4740,14 @@ export const updateMilestones = withOrganizationAuth(
                 let orgSubdomain: string | undefined = undefined;
                 try {
                     const org = await prisma.organization.findUnique({
-                        where: { id: orgId },
-                        select: { name: true, image: true, subdomain: true },
+                        where: {id: orgId},
+                        select: {name: true, image: true, subdomain: true},
                     });
                     orgName = org?.name ?? undefined;
                     orgImage = org?.image ?? undefined;
                     orgSubdomain = org?.subdomain ?? undefined;
-                } catch {}
+                } catch {
+                }
 
                 await writeRawEvent({
                     provider: "app",
@@ -4739,10 +4766,10 @@ export const updateMilestones = withOrganizationAuth(
                 });
             }
 
-            return { success: true, data: updatedMilestones };
+            return {success: true, data: updatedMilestones};
         } catch (error: any) {
             logError(`Error updating Milestone: `, error);
-            return { success: false, error: "Internal server error" };
+            return {success: false, error: "Internal server error"};
         }
     },
 );
@@ -5408,27 +5435,27 @@ export const saveCRO = withOrganizationAuth(
             const data: Prisma.SavedCompanyUncheckedCreateInput = {
                 companyId: croId,
                 organizationId: organization.id,
-                ...(milestoneId ? { milestoneId } : {}), // omit if none
+                ...(milestoneId ? {milestoneId} : {}), // omit if none
             };
 
             const response = await prisma.savedCompany.create({
                 data,
                 include: {
                     company: true,
-                    ...(milestoneId ? { milestone: { include: { types: true } } } : {}),
+                    ...(milestoneId ? {milestone: {include: {types: true}}} : {}),
                 },
             });
 
             if (!response) {
-                return { success: false, error: "Database error. please try again later." };
+                return {success: false, error: "Database error. please try again later."};
             }
 
             revalidatePath(`/app/service-providers/${croId}`);
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         } catch (error) {
             console.error("Error saving company:", error);
-            return { success: false, error: "Database error. please try again later." };
+            return {success: false, error: "Database error. please try again later."};
         }
     }
 );
@@ -5861,8 +5888,8 @@ export const createMaterialAndDataAccessRequest = withResearcherAuth(
         try {
             const request = await prisma.materialAndDataAccessRequest.create({
                 include: {
-                    organization: { select: { id: true, name: true, image: true, subdomain: true} },
-                    researcher: { select: { id: true } },
+                    organization: {select: {id: true, name: true, image: true, subdomain: true}},
+                    researcher: {select: {id: true}},
                 },
                 data: {
                     title: name,
@@ -6051,21 +6078,21 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
 export async function switchOrganization(organizationId: string) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-        return { success: false, error: "Not authenticated" };
+        return {success: false, error: "Not authenticated"};
     }
 
     // Verify the user is a member of that org
     const membership = await prisma.member.findFirst({
-        where: { userId: session.user.id, organizationId },
+        where: {userId: session.user.id, organizationId},
     });
 
     if (!membership) {
-        return { success: false, error: "Not authorized for this organization" };
+        return {success: false, error: "Not authorized for this organization"};
     }
 
     await prisma.user.update({
-        where: { id: session.user.id },
-        data: { activeOrganizationId: organizationId },
+        where: {id: session.user.id},
+        data: {activeOrganizationId: organizationId},
     });
 
     // Revalidate key pages that depend on org
@@ -6073,5 +6100,5 @@ export async function switchOrganization(organizationId: string) {
         revalidatePath(p);
     }
 
-    return { success: true };
+    return {success: true};
 }

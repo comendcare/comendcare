@@ -20,7 +20,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
-import {companyTypeMap} from "@comend/lib/types";
+import {companyTypeMap, CompanyWithReviewsAndServices} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
 
 
@@ -34,33 +34,7 @@ const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Consultant (<5 employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
 };
 
-export default async function CROPageHeader({id}: { id: string }) {
-    const cro = await getCROData(id, {
-        id: true,
-        url: true,
-        scientistDotComURL: true,
-        title: true,
-        description: true,
-        yearEstablished: true,
-        website: true,
-        headquarters: true,
-        companyType: true,
-        sites: true,
-        services: true,
-        certifications: true,
-        simplifiedCertifications: true,
-        rfis: true,
-        reviews: true,
-        tags: true,
-        avgRating: true,
-        categories: true,
-        milestoneTypes: true,
-        savedByOrganizations: true,
-    })
-
-    if (!cro) {
-        notFound()
-    }
+export default async function CROPageHeader({company}: {company: CompanyWithReviewsAndServices}) {
 
     const allowedCertifications = new Set([
         "Good Clinical Practice (GCP)",
@@ -79,7 +53,7 @@ export default async function CROPageHeader({id}: { id: string }) {
         "Woman-Owned Business",
     ]);
 
-    const filteredCertifications = cro.simplifiedCertifications.filter(certification =>
+    const filteredCertifications = company.simplifiedCertifications.filter(certification =>
         allowedCertifications.has(certification)
     );
 
@@ -88,7 +62,7 @@ export default async function CROPageHeader({id}: { id: string }) {
             <div className="col-span-4 flex flex-col space-y-4">
                 <div className="min-w-0 flex-1 text-wrap text-3xl font-bold text-gray-900">
                     <h1 className="leading-normal">
-                        {cro.title}
+                        {company.title}
                     </h1>
                 </div>
                 {/*<Link*/}
@@ -98,42 +72,42 @@ export default async function CROPageHeader({id}: { id: string }) {
                 {/*    {[...Array(5)].map((_, index) => (*/}
                 {/*        <Star*/}
                 {/*            key={index}*/}
-                {/*            filled={cro.avgRating ? index < Math.round(cro.avgRating) : false}*/}
+                {/*            filled={company.avgRating ? index < Math.round(company.avgRating) : false}*/}
                 {/*        />*/}
                 {/*    ))}*/}
                 {/*    <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">*/}
-                {/*        {cro.reviews.length > 0 && typeof cro.avgRating === "number"*/}
-                {/*            ? Number.isInteger(cro.avgRating)*/}
-                {/*                ? `${cro.avgRating} out of 5`*/}
-                {/*                : `${cro.avgRating.toFixed(2)} out of 5`*/}
+                {/*        {company.reviews.length > 0 && typeof company.avgRating === "number"*/}
+                {/*            ? Number.isInteger(company.avgRating)*/}
+                {/*                ? `${company.avgRating} out of 5`*/}
+                {/*                : `${company.avgRating.toFixed(2)} out of 5`*/}
                 {/*            : "No reviews yet"}*/}
                 {/*    </p>*/}
                 {/*</Link>*/}
                 <div
                     className="flex flex-col sm:flex-row sm:flex-wrap items-baseline sm:space-x-6">
-                    {cro.headquarters &&
+                    {company.headquarters &&
                         <div className="flex items-center text-gray-500">
                             <MapPin
                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                 aria-hidden="true"
                             />
-                            Headquartered in {cro.headquarters}
+                            Headquartered in {company.headquarters}
                         </div>
                     }
-                    {cro.yearEstablished && (
+                    {company.yearEstablished && (
                         <div className="flex items-center text-gray-500">
                             <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                       aria-hidden="true"
                             />
-                            Founded in {cro.yearEstablished}
+                            Founded in {company.yearEstablished}
                         </div>
                     )}
-                    {cro.companyType && (
+                    {company.companyType && (
                         <div className="flex items-center text-gray-500">
-                            {companyTypeIcons[cro.companyType] ||
+                            {companyTypeIcons[company.companyType] ||
                                 <Building className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                           aria-hidden="true"/>}
-                            {companyTypeMap[cro.companyType] || cro.companyType}
+                            {companyTypeMap[company.companyType] || company.companyType}
                         </div>
                     )}
                     <Link
@@ -145,10 +119,10 @@ export default async function CROPageHeader({id}: { id: string }) {
                                   aria-hidden="true"
                             />
                             <div className="flex items-center text-gray-500">
-                                {cro.reviews.length > 0 && typeof cro.avgRating === "number"
-                                    ? Number.isInteger(cro.avgRating)
-                                        ? `${cro.avgRating} out of 5`
-                                        : `${cro.avgRating.toFixed(2)} out of 5`
+                                {company.reviews.length > 0 && typeof company.avgRating === "number"
+                                    ? Number.isInteger(company.avgRating)
+                                        ? `${company.avgRating} out of 5`
+                                        : `${company.avgRating.toFixed(2)} out of 5`
                                     : "No reviews yet"}
                             </div>
                         </div>
@@ -161,9 +135,9 @@ export default async function CROPageHeader({id}: { id: string }) {
                             certificationName={certification}
                         />
                     ))}
-                    {cro.tags && cro.tags.length > 0 && (
+                    {company.tags && company.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 w-5/6">
-                            {cro.tags.map((tag, index) => (
+                            {company.tags.map((tag, index) => (
                                 <span
                                     key={index}
                                     className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 font-medium text-muted-foreground shadow-sm"
@@ -182,17 +156,17 @@ export default async function CROPageHeader({id}: { id: string }) {
                         </div>
                     )}
                 </div>
-                {cro.description && cro.description.trim() && (
+                {company.description && company.description.trim() && (
                     <div className="w-5/6">
-                        {/*<CRODescription text={cro.description}/>*/}
-                        {cro.description}
+                        {/*<CRODescription text={company.description}/>*/}
+                        {company.description}
                     </div>
                 )}
             </div>
             <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
-                <ServiceProviderWebsiteButton cro={cro}/>
-                <SaveCRODialog cro={cro} type={"page"} location={"Service Provider Profile"}/>
-                <ContactCroDialog cro={cro}/>
+                <ServiceProviderWebsiteButton cro={company}/>
+                <SaveCRODialog cro={company} type={"page"} location={"Service Provider Profile"}/>
+                <ContactCroDialog cro={company}/>
             </div>
         </div>
     )
