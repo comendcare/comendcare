@@ -3,7 +3,6 @@
 import {useState, useEffect} from "react";
 import {ResponsiveContainer, Line, LineChart, XAxis, YAxis, Tooltip, CartesianGrid} from "recharts";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
-import {Organization} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
 import {ExternalLink} from "lucide-react"

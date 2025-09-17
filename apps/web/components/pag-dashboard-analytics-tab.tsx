@@ -1,12 +1,7 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
-import PAGAnalyticsBarChart from "~web/components/pag-analytics-bar-chart";
 import PAGAnalyticsLineChartCard from "~web/components/pag-analytics-line-chart-card";
-import {DonutChartCard} from "~web/components/donut-chart-card";
 import {Workflow, ExternalLink, Microscope, Megaphone} from "lucide-react";
-import prisma from "@comend/lib/prisma"
 import {getSession} from "@/packages/lib/auth";
-import Image from "next/image";
-import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button";
 import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
 import PAGAnalyticsToolsCard from "~web/components/pag-analytics-tools-card";
 import PAGAnalyticsProfileCard from "~web/components/pag-analytics-profile-card";

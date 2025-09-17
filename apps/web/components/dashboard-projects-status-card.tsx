@@ -17,10 +17,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@comend/components/ui/chart"
-import {getMilestones} from "@/packages/lib/fetchers";
-import {useEffect, useState} from "react"
 import {OrganizationForAnalytics, StatusType} from "@comend/lib/types"
-import {Organization} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import {ExternalLink} from "lucide-react"
 import {useRouter} from "next/navigation";
@@ -46,53 +43,41 @@ const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
 
 export function DashboardProjectsStatusCard({organization}: { organization: OrganizationForAnalytics }) {
     const router = useRouter();
-    const [data, setData] = useState<
-        { status: StatusType; count: number; fill: string; colorPreview: string }[]
-    >([])
-    const [total, setTotal] = useState(0)
 
-    useEffect(() => {
-        async function fetchData() {
-            if (!organization?.id) return
-
-            const result = await getMilestones(organization.id, {
-                status: true,
-            })
-
-            if (result.success && result.data) {
-                const counts: Record<StatusType, number> = {
-                    PLANNED: 0,
-                    INPROGRESS: 0,
-                    COMPLETED: 0,
-                }
-
-                for (const m of result.data) {
-                    const status = (m.status ?? "PLANNED") as StatusType
-                    counts[status]++
-                }
-
-                const chartData = (Object.entries(counts) as [StatusType, number][]).map(
-                    ([status, count]) => {
-                        const hslValue = getComputedStyle(document.documentElement)
-                            .getPropertyValue(STATUS_COLORS_VAR_MAP[status])
-                            .trim()
-
-                        return {
-                            status,
-                            count,
-                            fill: `hsl(${hslValue})`,         // Used for <Pie />
-                            colorPreview: `hsl(${hslValue})`, // Used for legend
-                        }
-                    }
-                )
-
-                setData(chartData)
-                setTotal(Object.values(counts).reduce((a, b) => a + b, 0))
-            }
+    // Derive counts + chart data directly from props (no effects/state)
+    const { data, total } = React.useMemo(() => {
+        const counts: Record<StatusType, number> = {
+            PLANNED: 0,
+            INPROGRESS: 0,
+            COMPLETED: 0,
         }
 
-        fetchData()
-    }, [organization])
+        for (const m of organization.milestones ?? []) {
+            const s = (m.status ?? "PLANNED") as StatusType
+            counts[s] += 1
+        }
+
+        const orderedStatuses: StatusType[] = ["PLANNED", "INPROGRESS", "COMPLETED"]
+
+        const chartData = (Object.entries(counts) as [StatusType, number][]).map(
+            ([status, count]) => {
+                const hslValue = getComputedStyle(document.documentElement)
+                    .getPropertyValue(STATUS_COLORS_VAR_MAP[status])
+                    .trim()
+
+                return {
+                    status,
+                    count,
+                    fill: `hsl(${hslValue})`,         // Used for <Pie />
+                    colorPreview: `hsl(${hslValue})`, // Used for legend
+                }
+            }
+        )
+
+        const sum = orderedStatuses.reduce((acc, s) => acc + counts[s], 0)
+
+        return { data: chartData, total: sum }
+    }, [organization.milestones])
 
     const chartConfig: ChartConfig = {
         PLANNED: {label: STATUS_LABELS.PLANNED, color: STATUS_COLORS.PLANNED},
