@@ -17,7 +17,6 @@ import {
     Database, Newspaper
 } from "lucide-react"
 import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
-import {NavUser} from "~web/components/nav-user"
 import {OrganizationSwitcher} from "~web/components/organization-switcher"
 import {
     Sidebar,

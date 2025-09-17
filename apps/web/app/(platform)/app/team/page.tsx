@@ -79,9 +79,6 @@ export default async function TeamPage() {
         }
     }
 
-    console.log("fuck", orgId)
-    console.log("shit", organization)
-
     if (organization) {
         if (!organization.verified) {
             // Render unverified organization state
