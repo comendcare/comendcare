@@ -3789,6 +3789,9 @@ export const createRoadmap = withOrganizationAuth(
                 },
             });
 
+            // This is to make it so that shortlisting shows the newly created projects from the roadmap
+            revalidatePath("/app/marketplace/service-providers")
+
             return finalRoadmap;
         } catch (error: any) {
             console.error("Error creating roadmap:", error?.message ?? error);
@@ -5419,6 +5422,8 @@ export const saveCRO = withOrganizationAuth(
             if (!response) {
                 return { success: false, error: "Database error. please try again later." };
             }
+
+            revalidatePath(`/app/service-providers/${croId}`);
 
             return { success: true, data: response };
         } catch (error) {
