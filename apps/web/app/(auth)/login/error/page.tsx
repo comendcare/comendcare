@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const copy: Record<string, string> = {
     Verification:
@@ -80,9 +81,9 @@ export default function AuthErrorPage() {
                 </form>
             )}
 
-            <a href="/login" className="underline">
+            <Link href="/login" className="underline">
                 Back to sign in
-            </a>
+            </Link>
         </main>
     );
 }
