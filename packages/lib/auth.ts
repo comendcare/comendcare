@@ -151,13 +151,36 @@ export const authOptions: NextAuthOptions = {
 
     callbacks: {
 
-        async signIn({user, account, profile, email, credentials}) {
-            const isAllowedToSignIn = true
-            if (isAllowedToSignIn) {
-                return true
-            } else {
-                return false
+        async signIn({ user, account, email }) {
+            // Always allow the initial verification email to be sent
+            if (account?.provider === "email" && email?.verificationRequest) {
+                return true;
             }
+
+            if (!user?.email || !account?.provider) return true;
+
+            const existing = await prisma.user.findUnique({
+                where: { email: user.email },
+                include: { accounts: true },
+            });
+
+            if (!existing) return true;
+
+            const hasOauth = existing.accounts.length > 0;
+            const oauthProviders = new Set(existing.accounts.map(a => a.provider));
+            const trying = account.provider;
+            const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+            if (hasOauth && trying === "email") {
+                const firstProvider = oauthProviders.values().next().value as string | undefined;
+                return `${baseUrl}/login/error?reason=use_original&provider=${firstProvider}`;
+            }
+
+            if (!hasOauth && trying !== "email") {
+                return `${baseUrl}/login/error?reason=use_original&provider=email`;
+            }
+
+            return true;
         },
 
         async jwt({ token, user }) {

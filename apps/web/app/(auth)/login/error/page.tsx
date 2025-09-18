@@ -1,4 +1,3 @@
-// app/auth/error/page.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -12,24 +11,40 @@ const copy: Record<string, string> = {
         "You don't have access to sign in with this account.",
     OAuthAccountNotLinked:
         "This email is already linked with a different sign-in method.",
+    use_original:
+        "This account was created with a different sign-in method. Please continue with that method.",
 };
 
 export default function AuthErrorPage() {
     const params = useSearchParams();
-    const error = params.get("error") ?? "Verification";
+    const error = params.get("error");
+    const reason = params.get("reason");
+    const provider = params.get("provider");
     const initialEmail = params.get("email") ?? "";
     const [email, setEmail] = useState(initialEmail);
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => setEmail(initialEmail), [initialEmail]);
 
-    const message = copy[error] ?? "Something went wrong while signing you in.";
+    let message =
+        copy[error ?? ""] ?? copy[reason ?? ""] ?? "Something went wrong while signing you in.";
+
+    if (reason === "use_original") {
+        if (provider === "email") {
+            message = "This account was created with Email. Please sign in using Email.";
+        } else if (provider === "google") {
+            message = "This account was created with Google. Please sign in using Google.";
+        } else if (provider === "facebook") {
+            message = "This account was created with Facebook. Please sign in using Facebook.";
+        } else if (provider === "linkedin") {
+            message = "This account was created with LinkedIn. Please sign in using LinkedIn.";
+        }
+    }
 
     const onResend = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            // Redirect so the normal flow continues after email click
             await signIn("email", {
                 email,
                 callbackUrl: "/",
@@ -65,7 +80,7 @@ export default function AuthErrorPage() {
                 </form>
             )}
 
-            <a href="/auth/signin" className="text-sm underline">
+            <a href="/login" className="underline">
                 Back to sign in
             </a>
         </main>
