@@ -48,7 +48,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
                             {`You're not a member of any organizations yet. Please contact your organization's owner to request an invitation. Otherwise, create a new organization.`}
                         </p>
 
-                        <Link href="/app/create/new-organization" className="inline-block">
+                        <Link href="/create/new-organization" className="inline-block">
                             <Button variant="cta">Create an organization</Button>
                         </Link>
                     </main>
