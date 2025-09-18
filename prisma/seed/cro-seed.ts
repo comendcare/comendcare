@@ -5,7 +5,7 @@ async function main() {
     console.log('Starting seed script...');
 
     // Load the JSON data
-    const companies = JSON.parse(await fs.readFile('data/new_dataset.json', 'utf-8'));
+    const companies = JSON.parse(await fs.readFile('../../packages/data/new_dataset.json', 'utf-8'));
 
     console.log(`Total records to process: ${companies.length}`);
 

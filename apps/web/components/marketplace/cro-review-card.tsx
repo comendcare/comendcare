@@ -71,8 +71,8 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
         resolver: zodResolver(reviewForm),
         defaultValues: {
             // title: review.title,
-            body: review.body,
-            rating: review.rating,
+            body: review.body ?? "",
+            rating: review.rating ?? 0,
             milestone: "",
         },
     });
@@ -222,7 +222,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                     </div>
 
                     <div className="font-medium dark:text-white">
-                        <StarRatingIndicator rating={review.rating}/>
+                        <StarRatingIndicator rating={review.rating ?? 0}/>
                         <div className="flex items-start">
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Reviewed:{" "}

@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {signOut, useSession} from "next-auth/react";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {ChevronsUpDown, LogOut, User} from "lucide-react";
 import {
     Avatar,
@@ -18,12 +18,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu";
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
-} from "@comend/components/ui/sidebar";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -44,8 +38,7 @@ import {
     getUserMemberRequests
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
-import {acceptInvitation, declineAndDeleteInvitation, deleteInvitation, deleteMemberRequest} from "@comend/lib/actions";
-import {Invitation, Member, Organization} from "@prisma/client";
+import {acceptInvitation, deleteMemberRequest} from "@comend/lib/actions";
 import {
     Dialog,
     DialogContent,
@@ -67,7 +60,6 @@ import Spinner from "@/packages/components/ui/spinner";
 export function NavUser() {
     const {data: session, update, status} = useSession();
     const router = useRouter();
-    const {isMobile} = useSidebar();
     const [userData, setUserData] = useState<any>(null);
     const [memberships, setMemberships] = useState<MembershipWithOrganization[]>();
     const [invitations, setInvitations] = useState<any[]>([]);
@@ -291,49 +283,6 @@ export function NavUser() {
         }
     }
 
-    const handleAccept = async (invitation: Invitation) => {
-        try {
-            const response = await acceptInvitation(invitation.id);
-
-            if (response.success && response.data) {
-                toast.success("Invitation accepted successfully!");
-                // Remove the accepted invitation from the list
-                setInvitations((prevInvitations) =>
-                    prevInvitations?.filter((oldInvitation) => oldInvitation.id !== invitation.id)
-                );
-                await update({
-                    ...session,
-                    organizationId: response.data.organizationId,
-                })
-                router.refresh()
-            } else {
-                toast.error(response.error || "Failed to accept the invitation.");
-            }
-        } catch (error) {
-            toast.error("Failed to accept invitation.");
-        } finally {
-            setIsDialogOpen(false);
-        }
-    };
-
-    const handleDecline = async (invitation: Invitation) => {
-        try {
-            // Call API to deny invitation
-            const response = await declineAndDeleteInvitation(invitation)
-
-            if (response.success) {
-                toast.success(`Successfully deleted your invitation to ${invitations[0].organization?.name}.`)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-        } catch (error) {
-            toast.error("Failed to deny invitation.");
-        } finally {
-            setIsDialogOpen(false);
-        }
-    };
-
     const handleClose = async (memberRequest: MemberRequestWithUser) => {
         try {
             mixpanelTrack("Membership Request Approval Acknowledged", {
@@ -368,29 +317,6 @@ export function NavUser() {
 
     return (
         <>
-            {isDialogOpen && invitations.length > 0 && (
-                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>You’ve been invited
-                                to {invitations[0].organization?.name}</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Join {invitations[0].organization?.name} on Comend to access their profile, research
-                                plan, and dashboard.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => handleDecline(invitations[0])}>
-                                Decline
-                            </AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleAccept(invitations[0])}>
-                                Accept
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
-
             {memberRequests[0]?.approved && (
                 <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <AlertDialogContent>

@@ -12,7 +12,7 @@ export default function CreateOrJoinOrganizationButton() {
             pulseColor={"#9ca3af"}
             onClick={() => router.push("/app/create/new-organization")}
         >
-            Create or join an organization
+            Create an organization
         </PulsatingButton>
     )
 }

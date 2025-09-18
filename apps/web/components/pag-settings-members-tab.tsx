@@ -1,55 +1,13 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Image from "next/image"
 import {useSession} from "next-auth/react"
-import { getMembers } from "@comend/lib/fetchers"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
 import MembersDropdown from "~web/components/members-dropdown"
-import Loading from "@/loading";
+import {getSession} from "@/packages/lib/auth";
+import {MemberWithUser} from "@/packages/lib/types";
 
-export default function PAGSettingsMembersTab() {
-    const {data: session} = useSession()
-    const [members, setMembers] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-
-            if (session?.user?.organizationId) {
-                const response = await getMembers(session?.user.organizationId, {
-                    id: true,
-                    role: true,
-                    title: true,
-                    email: true,
-                    userId: true,
-                    invitedById: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    organizationId: true,
-                    invitedBy: true,
-                    organization: true,
-                    user: true
-                })
-
-                if (response.success) {
-                    setMembers(response.data || [])
-                } else {
-                    console.error(response.error)
-                }
-            }
-
-            setLoading(false)
-        }
-
-        fetchData()
-    }, [])
-
-    if (loading) {
-        return <Loading/>
-    }
+export default async function PAGSettingsMembersTab({members}: {members: MemberWithUser[]}) {
+    const session = await getSession()
 
     if (!session?.user?.organizationId) {
         return (

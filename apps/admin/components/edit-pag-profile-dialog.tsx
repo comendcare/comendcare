@@ -477,7 +477,6 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
                         const defaultValues = fetchedValues[0] || {};
-                        console.log("hello", defaultValues)
 
                         setDefaultResearchValues(defaultValues);
                         editResearchForm.reset(defaultValues);

@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useState } from "react"
+import {useEffect, useState} from "react"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 import {
     Tabs,
@@ -12,37 +12,18 @@ import { Briefcase, Users } from "lucide-react";
 import CROMarketplaceProfileServicesTab from "@comend/components/cro-marketplace-profile-services-tab";
 import CROMarketplaceProfileReviewsTab from "~web/components/marketplace/cro-marketplace-profile-reviews-tab";
 import {CompanyWithReviewsAndServices} from "@comend/lib/types";
-import {getCROData} from "@comend/lib/fetchers";
 import { Skeleton } from "@comend/components/ui/skeleton";
 
-export default function CROPageTabs() {
+export default function CROPageTabs({company}: {company: CompanyWithReviewsAndServices}) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [selectedTab, setSelectedTab] = useState("services")
-    const [cro, setCRO] = useState<any | null>(null)
-    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const tabFromUrl = searchParams.get("tab") || "services"
         setSelectedTab(tabFromUrl)
     }, [searchParams])
-
-    useEffect(() => {
-        const fetchCRO = async () => {
-            setLoading(true)
-            const pathParts = pathname.split("/")
-            const id = decodeURIComponent(pathParts[pathParts.length - 1])
-            const data = await getCROData(id, {
-                services: true,
-                reviews: true,
-            })
-            setCRO(data)
-            setLoading(false)
-        }
-
-        fetchCRO()
-    }, [pathname])
 
     return (
         <Tabs
@@ -59,61 +40,61 @@ export default function CROPageTabs() {
                 <TabsTrigger value="services" variant="outline" className="px-8">
                     <Briefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                     Services
-                    {cro?.services?.length !== undefined && (
+                    {company.services?.length !== undefined && (
                         <div
                             className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
                         >
-                            {cro.services.length}
+                            {company.services.length}
                         </div>
                     )}
                 </TabsTrigger>
                 {/*<TabsTrigger value="sites" variant="outline" className="px-8">*/}
                 {/*    <Map className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
                 {/*    Sites*/}
-                {/*    {cro.sites.length && (*/}
+                {/*    {company.sites.length && (*/}
                 {/*        <div*/}
                 {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
                 {/*        >*/}
-                {/*            {cro.sites.length}*/}
+                {/*            {company.sites.length}*/}
                 {/*        </div>*/}
                 {/*    )}*/}
                 {/*</TabsTrigger>*/}
                 {/*<TabsTrigger value="rfis" variant="outline" className="px-8">*/}
                 {/*    <FaFileContract className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
                 {/*    RFIs*/}
-                {/*    {cro.rfis.length && (*/}
+                {/*    {company.rfis.length && (*/}
                 {/*        <div*/}
                 {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
                 {/*        >*/}
-                {/*            {cro.rfis.length}*/}
+                {/*            {company.rfis.length}*/}
                 {/*        </div>*/}
                 {/*    )}*/}
                 {/*</TabsTrigger>*/}
                 {/*<TabsTrigger value="certifications" variant="outline" className="px-8">*/}
                 {/*    <FaListCheck className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
                 {/*    Certifications*/}
-                {/*    {cro.certifications.length && (*/}
+                {/*    {company.certifications.length && (*/}
                 {/*        <div*/}
                 {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
                 {/*        >*/}
-                {/*            {cro.certifications.length}*/}
+                {/*            {company.certifications.length}*/}
                 {/*        </div>*/}
                 {/*    )}*/}
                 {/*</TabsTrigger>*/}
                 <TabsTrigger value="reviews" variant="outline" className="px-8">
                     <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                     Reviews
-                    {cro?.reviews?.length !== undefined && (
+                    {company?.reviews?.length !== undefined && (
                         <div
                             className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
                         >
-                            {cro.reviews.length}
+                            {company.reviews.length}
                         </div>
                     )}
                 </TabsTrigger>
             </TabsList>
             <TabsContent value="services" className="space-y-4 w-full">
-                {(loading || !cro) ? (
+                {(!company) ? (
                     <div className="flex flex-col gap-4">
                         <div className="flex justify-between">
                             <Skeleton className="h-[32px] w-[250px]" />
@@ -122,20 +103,20 @@ export default function CROPageTabs() {
                         <Skeleton className="w-full h-[200px]" />
                     </div>
                 ): (
-                    <CROMarketplaceProfileServicesTab croServices={cro.services}/>
+                    <CROMarketplaceProfileServicesTab croServices={company.services}/>
                 )}
             </TabsContent>
             {/*<TabsContent value="sites" className="space-y-4 w-full">*/}
-            {/*    <CROMarketplaceProfileSitesTab croSites={cro.sites}/>*/}
+            {/*    <CROMarketplaceProfileSitesTab croSites={company.sites}/>*/}
             {/*</TabsContent>*/}
             {/*<TabsContent value="rfis" className="space-y-4 w-full">*/}
-            {/*    <CROMarketplaceProfileRFIsTab croRFIs={cro.rfis}/>*/}
+            {/*    <CROMarketplaceProfileRFIsTab croRFIs={company.rfis}/>*/}
             {/*</TabsContent>*/}
             {/*<TabsContent value="certifications" className="space-y-4 w-full">*/}
-            {/*    <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>*/}
+            {/*    <CROMarketplaceProfileCertificationsTab croCertifications={company.certifications}/>*/}
             {/*</TabsContent>*/}
             <TabsContent value="reviews" className="space-y-4 w-full">
-                <CROMarketplaceProfileReviewsTab cro={cro as CompanyWithReviewsAndServices}/>
+                <CROMarketplaceProfileReviewsTab cro={company as CompanyWithReviewsAndServices}/>
             </TabsContent>
         </Tabs>
     )

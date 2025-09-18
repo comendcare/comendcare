@@ -24,19 +24,32 @@ const RatingBar = ({ label, percentage }: { label: number; percentage: number })
 );
 
 const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
-    const validReviews = reviews.filter((review) => review.rating >= 1 && review.rating <= 5);
+    // ✅ Filter out null/invalid ratings
+    const validReviews = reviews.filter(
+        (review) =>
+            typeof review.rating === "number" &&
+            review.rating >= 1 &&
+            review.rating <= 5
+    );
     const totalReviews = validReviews.length;
 
     let avgRating = 0;
     const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
     if (totalReviews > 0) {
-        const totalRating = validReviews.reduce((acc, review) => acc + review.rating, 0);
+        // ✅ Use null-safe addition
+        const totalRating = validReviews.reduce(
+            (acc, review) => acc + (review.rating ?? 0),
+            0
+        );
         avgRating = totalRating / totalReviews;
 
+        // ✅ Guard against null when incrementing counts
         validReviews.forEach((review) => {
-            const roundedRating = Math.round(review.rating);
-            ratingCounts[roundedRating] += 1;
+            if (review.rating != null) {
+                const roundedRating = Math.round(review.rating);
+                ratingCounts[roundedRating] += 1;
+            }
         });
     }
 
@@ -76,11 +89,6 @@ const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
             {ratingPercentages.map(({ label, percentage }) => (
                 <RatingBar key={label} label={label} percentage={percentage} />
             ))}
-
-            {/* Placeholder for "How are ratings calculated?" */}
-            {/*<p className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">*/}
-            {/*    How are ratings calculated? ▼*/}
-            {/*</p>*/}
         </div>
     );
 };
