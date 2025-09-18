@@ -14,7 +14,6 @@ import OnboardingCard from "~web/components/onboarding-card";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/packages/lib/auth";
 import prisma from "@comend/lib/prisma";
-import InvitationGate from "~web/components/invitation-gate";
 import {Organization} from "@prisma/client";
 
 
@@ -83,24 +82,6 @@ export default async function RootLayout({
                                          }: {
     children: React.ReactNode
 }) {
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id ?? null;
-
-    // Fetch pending invitations server-side
-    let invitations: Array<{
-        id: string;
-        role: string;
-        organizationId: string;
-        organization: Organization;
-    }> = [];
-
-    if (userId) {
-        invitations = await prisma.invitation.findMany({
-            where: {email: session!.user!.email!, accepted: false},
-            select: {id: true, role: true, organizationId: true, organization: true},
-            orderBy: {createdAt: "asc"},
-        });
-    }
 
     return (
         <html
@@ -149,12 +130,9 @@ export default async function RootLayout({
                     disableTransitionOnChange
                 >
                     <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
-                        <InvitationGate invitations={invitations}>
-
-                            {children}
-                            {/* <FeedbackForm /> */}
-                            <Analytics/>
-                        </InvitationGate>
+                        {children}
+                        {/* <FeedbackForm /> */}
+                        <Analytics/>
                     </Onborda>
                 </ThemeProvider>
             </Providers>
