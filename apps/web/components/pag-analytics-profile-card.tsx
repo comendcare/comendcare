@@ -6,21 +6,9 @@ import { Prisma } from "@prisma/client";
 import {formatMoney, formatNumberWithCommas} from "@/packages/lib/utils";
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
+import {OrganizationForAnalytics} from "@/packages/lib/types";
 
-type OrganizationWithIncludes = Prisma.OrganizationGetPayload<{
-    include: {
-        conditions: { include: { condition: true } },
-        roadmaps: true;
-        members: true;
-        tools: true;
-        biosamples: true;
-        diseaseModel: true;
-        rfps: true;
-        materialAndDataAccessRequests: true;
-    };
-}>;
-
-export default function PAGAnalyticsProfileCard({organization}: { organization: OrganizationWithIncludes }) {
+export default function PAGAnalyticsProfileCard({organization}: { organization: OrganizationForAnalytics }) {
     const router = useRouter();
 
     return (

@@ -1,16 +1,21 @@
 import "@/globals.css"
-import { ThemeProvider } from "~web/theme-provider"
-import type { Metadata, ResolvingMetadata } from "next"
-import { Analytics } from '@vercel/analytics/next';
+import {ThemeProvider} from "~web/theme-provider"
+import type {Metadata, ResolvingMetadata} from "next"
+import {Analytics} from '@vercel/analytics/next';
 
 // Import Montserrat Display and Source Sans Pro
-import { Poppins, Source_Sans_3 } from "next/font/google"
-import { Providers } from "~web/providers"
-import { Suspense } from "react"
+import {Poppins, Source_Sans_3} from "next/font/google"
+import {Providers} from "~web/providers"
+import {Suspense} from "react"
 import Loading from "@/loading";
-import { onbordaTours } from "@/state/onborda/onbordaStore";
+import {onbordaTours} from "@/state/onborda/onbordaStore";
 import Onborda from "~web/components/onborda/Onborda";
 import OnboardingCard from "~web/components/onboarding-card";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/packages/lib/auth";
+import prisma from "@comend/lib/prisma";
+import InvitationGate from "~web/components/invitation-gate";
+import {Organization} from "@prisma/client";
 
 
 // Set up Playfair Display and Source Sans 3 fonts
@@ -50,7 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
             "Researchers"
         ],
         authors: [
-            { name: "Flawnson", url: "http://flawnson.com/" },
+            {name: "Flawnson", url: "http://flawnson.com/"},
             {
                 name: "Albert",
                 url: "https://www.linkedin.com/in/albert-yq-wang/"
@@ -73,21 +78,40 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
-export default function RootLayout({
-    children
-}: {
+export default async function RootLayout({
+                                             children
+                                         }: {
     children: React.ReactNode
 }) {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id ?? null;
+
+    // Fetch pending invitations server-side
+    let invitations: Array<{
+        id: string;
+        role: string;
+        organizationId: string;
+        organization: Organization;
+    }> = [];
+
+    if (userId) {
+        invitations = await prisma.invitation.findMany({
+            where: {email: session!.user!.email!, accepted: false},
+            select: {id: true, role: true, organizationId: true, organization: true},
+            orderBy: {createdAt: "asc"},
+        });
+    }
+
     return (
         <html
             lang="en"
             suppressHydrationWarning
             className={`${poppins.variable} ${sourceSans3.variable}`}
         >
-            <head>
-                {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
-                {process.env.NODE_ENV !== "production" ? (
-                    <>
+        <head>
+            {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
+            {process.env.NODE_ENV !== "production" ? (
+                <>
                     <script
                         data-cookieyes='cookieyes-functional'
                         src={`/functional-localstorage-manager.js`}
@@ -96,9 +120,9 @@ export default function RootLayout({
                         data-cookieyes='cookieyes-analytics'
                         src={`/analytics-localstorage-manager.js`}
                     />
-                    </>
-                ) : (
-                    <>
+                </>
+            ) : (
+                <>
                     <script
                         id="cookieyes"
                         type="text/javascript"
@@ -112,27 +136,30 @@ export default function RootLayout({
                         data-cookieyes='cookieyes-analytics'
                         src={`/analytics-localstorage-manager.js`}
                     />
-                    </>
-                )}
-            </head>
-            <body>
-                <Suspense fallback={<Loading />}>
-                <Providers>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="light"
-                        enableSystem={false}
-                        disableTransitionOnChange
-                    >
-                        <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
+                </>
+            )}
+        </head>
+        <body>
+        <Suspense fallback={<Loading/>}>
+            <Providers>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="light"
+                    enableSystem={false}
+                    disableTransitionOnChange
+                >
+                    <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
+                        <InvitationGate invitations={invitations}>
+
                             {children}
                             {/* <FeedbackForm /> */}
-                            <Analytics />
-                        </Onborda>
-                    </ThemeProvider>
-                </Providers>
-                </Suspense>
-            </body>
+                            <Analytics/>
+                        </InvitationGate>
+                    </Onborda>
+                </ThemeProvider>
+            </Providers>
+        </Suspense>
+        </body>
         </html>
     )
 }

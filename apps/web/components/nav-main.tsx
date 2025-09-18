@@ -46,7 +46,7 @@ export function NavMain({items}: { items: Item[] }) {
 
     return (
         <TooltipProvider>
-            <SidebarMenu className="px-2">
+            <SidebarMenu>
                 {items.map((item) => {
                     // const isActive = pathname === item.url
                     const isActive = item.match ? item.match(pathname) : pathname === item.url
