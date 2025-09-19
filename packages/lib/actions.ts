@@ -1987,6 +1987,16 @@ export const acceptInvitation = withAuth(
                 where: {
                     id: invitationId,
                 },
+                include: {
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            subdomain: true,
+                        },
+                    }
+                }
             });
 
             // extra auth logic
@@ -2007,7 +2017,7 @@ export const acceptInvitation = withAuth(
                 prisma.member.create({
                     data: {
                         email: invitation.email,
-                        organizationId: invitation.organizationId,
+                        organizationId: invitation.organization.id,
                         role: invitation.role || "member",
                         userId: session.user.id,
                     },
@@ -2019,9 +2029,24 @@ export const acceptInvitation = withAuth(
                 }),
                 prisma.user.update({
                     where: {id: session.user.id},
-                    data: {activeOrganizationId: invitation.organizationId},
+                    data: {activeOrganizationId: invitation.organization.id},
                 })
             ]);
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "user_accepted_organization_invitation", // batch payload handled by your register
+                occurredAt: new Date(),
+                payload: {
+                    orgId: invitation.organization.id,
+                    orgName: invitation.organization.name,
+                    orgSubdomain: invitation.organization.subdomain,
+                    orgImage: invitation.organization.image,
+                    userId: session.user.id,
+                    userName: session.user.name,
+                    userEmail: session.user.email,
+                },
+            });
 
             revalidatePath("/app/team")
             revalidatePath("/app/profile")
