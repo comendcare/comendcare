@@ -494,9 +494,12 @@ export default function CreateNewOrganizationPage() {
         <TooltipProvider>
             <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8">
                 <div>
-                    <h1 className="text-2xl font-semibold">Welcome to Comend</h1>
-                    <p className="text-sm text-muted-foreground">One simple form. We’ll use your answers to set up your
-                        profile, organization, condition, and finances.</p>
+                    <h1 className="text-2xl font-semibold">
+                        Create a new organization
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        One simple form. We’ll use your answers to set up your profile, organization, condition, and finances.
+                    </p>
                 </div>
                 <Separator/>
 

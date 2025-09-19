@@ -33,6 +33,7 @@ import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@comend/lib/t
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import ProjectMultipleSelector from "../project-multiple-selector";
 import { CompanyWithServices, ContactCroDialogContent } from "../contact-cro-dialog";
+import {BookmarkMinus, Handshake, Pencil} from "lucide-react";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -177,16 +178,19 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                 <DropdownMenuItem onClick={(e) => {
                     setContactIsOpen(true)
                 }}>
+                    <Handshake />
                     Request a meeting
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={(e) => {
                     setEditIsOpen(true)
                 }}>
+                    <Pencil />
                     Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={(e) => {
                     handleUnsaveCRO()
                 }}>
+                    <BookmarkMinus />
                     Unsave
                 </DropdownMenuItem>
             </DropdownMenuContent>

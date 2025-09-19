@@ -1,46 +1,33 @@
-"use client"
-
-import { useEffect, useState } from "react";
-import { PulsatingButton } from "@comend/components/ui/pulsating-button"
-import Image from "next/image"
-import {useRouter} from "next/navigation";
-import { useSession } from "next-auth/react";
 import NoOrganization from "~web/components/no-organization";
 import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
 import { SavedOrganizationsDataTable } from "~web/components/saved-organization-data-table/saved-organizations-data-table";
 import { columns } from "~web/components/saved-organization-data-table/saved-organizations-data-columns";
 import { SavedOrganizationData } from "@/packages/lib/types";
+import {getSession} from "@/packages/lib/auth";
 
-export default function OrganizationSavesPage() {
-    const router = useRouter()
-    const { data: session } = useSession();
-    const [savedOrganizations, setSavedOrganizations] = useState<SavedOrganizationData[]>([]);
-
-    useEffect(() => {
-        async function fetchData() {
-            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                savedOrganizationId: true,
-                savedOrganization: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedOrganizationsResponse.success) {
-                const savedOrganizationsData = savedOrganizationsResponse.data as SavedOrganizationData[];
-                setSavedOrganizations(savedOrganizationsData);
-            } else {
-                console.error(savedOrganizationsResponse.error);
-            }
-        }
-
-        if (session?.user?.organizationId) fetchData();
-    }, [session?.user?.organizationId]);
-    console.log(savedOrganizations);
+export default async function OrganizationSavesPage() {
+    const session = await getSession()
 
     if (!session?.user?.organizationId) return <NoOrganization />
+
+    let savedOrganizations: SavedOrganizationData[] = []
+    if (session?.user.organizationId) {
+        const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
+            id: true,
+            organizationId: true,
+            organization: true,
+            savedOrganizationId: true,
+            savedOrganization: true,
+            updatedAt: true,
+            createdAt: true,
+            metadata: true
+        });
+        if (savedOrganizationsResponse.success) {
+            savedOrganizations = savedOrganizationsResponse.data as SavedOrganizationData[];
+        } else {
+            console.error(savedOrganizationsResponse.error);
+        }
+    }
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
