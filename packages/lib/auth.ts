@@ -169,7 +169,7 @@ export const authOptions: NextAuthOptions = {
             const hasOauth = existing.accounts.length > 0;
             const oauthProviders = new Set(existing.accounts.map(a => a.provider));
             const trying = account.provider;
-            const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+            const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "http://localhost:3000";
 
             if (hasOauth && trying === "email") {
                 const firstProvider = oauthProviders.values().next().value as string | undefined;
