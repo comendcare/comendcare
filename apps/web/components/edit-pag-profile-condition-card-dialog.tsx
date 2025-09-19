@@ -30,7 +30,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {formatNumberWithCommas} from "@comend/lib/utils";
+import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← added to normalize creatable values
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
@@ -40,9 +40,6 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
     const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    // const [otherModality, setOtherModality] = useState<string>("");
-    // const [otherCategories, setOtherCategories] = useState<string>("");
-    // const [otherSystem, setOtherSystem] = useState<string>("");
     const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
     const isOwner = session?.user?.membership?.role === "owner";
 
@@ -60,7 +57,36 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             try {
                 // Fetch conditions for the given organization ID
-                const response = await getConditionsFromOrganizationId(organization.id);
+                const response = await getConditionsFromOrganizationId(organization.id,
+                    {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        synonyms: true,
+                        description: true,
+                        diseaseCategories: true,
+                        prevalenceNumerator: true,
+                        prevalenceDenominator: true,
+                        numberOfPatientsEngaged: true,
+                        nationalEstimatedPopulation: true,
+                        globalEstimatedPopulation: true,
+                        relevantDiseaseMechanisms: true,
+                        causalGenes: true,
+                        associatedGenes: true,
+                        associatedSystems: true,
+                        associatedSignsAndSymptoms: true,
+                        existingDatabasesAndStudies: true,
+                        toolsUnderDevelopment: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        gardURL: true,
+                        nordURL: true,
+                        summary: true,
+                        prevalenceRatio: true,
+                    }
+                );
+
+                console.log("response", response)
 
                 if (response.success) {
                     const conditions = response.data;
@@ -68,11 +94,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
                             disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
-                            // associatedConditions:
-                            //     (condition.associatedConditions ?? []).map((c: any) => ({
-                            //         label: c.name,
-                            //         value: c.slug,
-                            //     })),
+                            associatedConditions:
+                                (condition.associatedConditions ?? []).map((c: any) => ({
+                                    label: c.name,
+                                    value: c.slug,
+                                })),
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
                             causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
@@ -132,7 +158,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
             const mappedData: Record<string, any> = {
                 name: values.disorder?.[0]?.label || "",
-                // associatedConditions: (values.associatedConditions ?? []).map(o => o.value),
+                // Normalize to slugs even for creatable values
+                associatedConditions: (values.associatedConditions ?? []).map(o =>
+                    toKebabCase(String(o.value || o.label || "").trim())
+                ),
                 summary: values.summary ?? "",
                 diseaseCategories: (values.categories ?? []).map(i => i.label),
                 prevalenceNumerator: numOrNull(values.prevalenceNumerator),
@@ -310,10 +339,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     )}
                                 />
 
-                                {/* <FormField
+                                <FormField
                                     control={editResearchForm.control}
                                     name="associatedConditions"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Associated conditions</FormLabel>
                                             <FormDescription>Select any related conditions.</FormDescription>
@@ -330,10 +359,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                     showHoverCard={false}
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
-                                /> */}
+                                />
 
                                 <FormField
                                     control={editResearchForm.control}

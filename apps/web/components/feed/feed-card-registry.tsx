@@ -20,6 +20,7 @@ import ToolRequestCommentCard from "~web/components/feed/tool-request-comment-cr
 import ToolRequestApprovedCard from "~web/components/feed/tool-request-approved-feed-card";
 import ServiceProviderCreatedCard from "~web/components/feed/service-provider-created-feed-card";
 import AnalyticsGoalReachedCard from "~web/components/feed/analytics-goal-reached-feed-card";
+import InvitationAcceptedCard from "~web/components/feed/user-accept-organization-invitation-feed-card";
 
 // Lazy-load rare/heavier cards
 const FDAFeedCard = dynamic(
@@ -48,6 +49,7 @@ const registry: Partial<Record<FeedItemType, React.ComponentType<CardProps>>> = 
     TOOL_REQUEST_APPROVED: ToolRequestApprovedCard as React.ComponentType<CardProps>,
     SERVICE_PROVIDER_CREATED: ServiceProviderCreatedCard as React.ComponentType<CardProps>,
     ANALYTICS_GOAL_REACHED: AnalyticsGoalReachedCard as React.ComponentType<CardProps>,
+    USER_ACCEPTED_ORGANIZATION_INVITATION: InvitationAcceptedCard as React.ComponentType<CardProps>,
 
     // FDA (all four types go to the same flexible card)
     FDA_MEDWATCH_ALERT: FDAFeedCard as React.ComponentType<CardProps>,

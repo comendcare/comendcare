@@ -21,6 +21,7 @@ import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { revalidate } from "@/packages/lib/revalidate";
 import Link from "next/link";
+import {BookmarkMinus, Mail} from "lucide-react";
 
 const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -96,6 +97,7 @@ export function DataTableRowActions<TData extends Prisma.SavedOrganizationGetPay
                                 e.stopPropagation()
                             }}
                         >
+                            <Mail />
                             Contact Group
                         </DropdownMenuItem>
                     </Link>
@@ -106,6 +108,7 @@ export function DataTableRowActions<TData extends Prisma.SavedOrganizationGetPay
                         handleUnsaveOrganization()
                     }}
                 >
+                    <BookmarkMinus />
                     Unsave
                 </DropdownMenuItem>
             </DropdownMenuContent>

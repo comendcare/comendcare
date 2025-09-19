@@ -342,7 +342,7 @@ export default function UserEditForm() {
                             form={form}
                             name="image"
                             title="Profile Image"
-                            description=""
+                            description="PNG/JPG only (no SVG)."
                             aspect={1}
                             img={defaultValues?.image}
                             selectedFile={selectedFile}

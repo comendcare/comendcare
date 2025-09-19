@@ -1,48 +1,35 @@
-"use client"
-
-import { useEffect, useState } from "react";
-import { PulsatingButton } from "@comend/components/ui/pulsating-button"
-import Image from "next/image"
-import {useRouter} from "next/navigation";
-import { useSession } from "next-auth/react";
-import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
+import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@comend/lib/fetchers";
 import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@comend/lib/types";
 import NoOrganization from "~web/components/no-organization";
+import {getSession} from "@/packages/lib/auth";
 
-export default function ServiceProviderSavesPage() {
-    const router = useRouter()
-    const { data: session } = useSession();
-    const [savedCompanies, setSavedCompanies] = useState<SavedCompanyData[]>([]);
-
-    useEffect(() => {
-        async function fetchData() {
-            const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                companyId: true,
-                company: true,
-                milestoneId: true,
-                milestone: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedCompaniesResponse.success) {
-                const savedCompaniesData = savedCompaniesResponse.data as SavedCompanyData[];
-                setSavedCompanies(savedCompaniesData);
-            } else {
-                console.error(savedCompaniesResponse.error);
-            }
-        }
-
-        if (session?.user?.organizationId) fetchData();
-    }, [session?.user?.organizationId]);
-    console.log(savedCompanies);
+export default async function ServiceProviderSavesPage() {
+    const session = await getSession()
 
     if (!session?.user?.organizationId) return <NoOrganization />
+
+    let savedCompanies: SavedCompanyData[] = []
+    if (session?.user.organizationId) {
+        const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined, {
+            id: true,
+            organizationId: true,
+            organization: true,
+            companyId: true,
+            company: true,
+            milestoneId: true,
+            milestone: true,
+            updatedAt: true,
+            createdAt: true,
+            metadata: true
+        });
+        if (savedCompaniesResponse.success) {
+            savedCompanies = savedCompaniesResponse.data as SavedCompanyData[];
+        } else {
+            console.error(savedCompaniesResponse.error);
+        }
+    }
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
