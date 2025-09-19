@@ -13,11 +13,11 @@ dotenv.config({ path: path.resolve(__dirname, '.env.test') });
  */
 
 const apps = [
-    {name: 'web', dir: 'apps/web', port: 3000, envVar: 'WEB_URL'},
-    // {name: 'admin', dir: 'apps/admin', port: 3001, envVar: 'ADMIN_URL'},
-    // {name: 'pharma', dir: 'apps/pharma', port: 3002, envVar: 'PHARMA_URL'},
-    // {name: 'provider', dir: 'apps/provider', port: 3003, envVar: 'PROVIDER_URL'},
-    // {name: 'researcher', dir: 'apps/researcher', port: 3004, envVar: 'RESEARCHER_URL'},
+    {name: 'web', dir: 'apps/web', port: 3001, envVar: 'WEB_URL'},
+    // {name: 'admin', dir: 'apps/admin', port: 3002, envVar: 'ADMIN_URL'},
+    // {name: 'pharma', dir: 'apps/pharma', port: 3003, envVar: 'PHARMA_URL'},
+    // {name: 'provider', dir: 'apps/provider', port: 3004, envVar: 'PROVIDER_URL'},
+    // {name: 'researcher', dir: 'apps/researcher', port: 3005, envVar: 'RESEARCHER_URL'},
 ];
 
 const targets = [

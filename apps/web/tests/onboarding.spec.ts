@@ -9,7 +9,7 @@ const rand = () => Math.random().toString(36).slice(2, 8);
 const TEST_EMAIL = process.env.TEST_EMAIL ?? "e2e+user@comend.test";
 
 test('debug cookies', async ({ page, context }) => {
-    await page.goto('/'); // uses baseURL http://localhost:3000
+    await page.goto('/');
     const cookies = await context.cookies();
     console.log('cookies for origin', cookies.filter(c => c.domain?.includes('localhost')));
 });
@@ -66,16 +66,12 @@ export async function resetDb() {
 }
 
 test.describe('Onboarding', () => {
-    test.beforeEach(async ({ request }) => {
-        // optional reset when running locally against test env
-        if (process.env.NODE_ENV === 'test') {
-            // await resetDb()
-        }
-    });
-
-    test('Testing tests :D', async ({ page }) => {
-        await expect(true).toBeTruthy();
-    });
+    // test.beforeEach(async ({ request }) => {
+    //     // optional reset when running locally against test env
+    //     if (process.env.NODE_ENV === 'test') {
+    //         // await resetDb()
+    //     }
+    // });
 
 
     test('Testing simplest thing', async ({ page }) => {
