@@ -1424,15 +1424,19 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
             const conditions = await prisma.condition.findMany({
                 where: {
                     organizations: {
-                        some: {
-                            organizationId: organization.id, // Filter by organizationId
+                        some: { organizationId: organization.id },
+                    },
+                },
+                select: {
+                    ...select, // your existing scalar selections
+                    associatedConditions: {
+                        select: {
+                            id: true,
+                            name: true,
+                            slug: true,
                         },
                     },
                 },
-                // include: {
-                //     organizations: true, // Include related ConditionToOrganization data if needed
-                // },
-                select
             });
 
             if (!conditions || conditions.length === 0) {
