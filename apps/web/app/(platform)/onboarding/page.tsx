@@ -29,7 +29,6 @@ import type {FileWithPreview} from "@comend/components/image-selector";
 import {acceptedFiletypes, years, getPublicFile} from "@comend/lib/utils";
 
 // Data
-import {useDropzone} from "react-dropzone";
 import mixpanel from "mixpanel-browser";
 import {toast} from "sonner";
 
@@ -43,6 +42,8 @@ import {
     getUser,
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
+import {FormImageSelector} from "@/packages/components/form-image-selector";
+import {EditableProfilePhoto} from "~web/components/editable-profile-photo";
 
 const safeMixpanel = {
     identify: (...args: any[]) => {
@@ -94,9 +95,10 @@ export default function OnboardingPage() {
     const {data: session, status, update} = useSession();
     const [isInitializing, setIsInitializing] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [selectedUserFile, setSelectedUserFile] = useState<FileWithPreview | null>(null);
     const [invitations, setInvitations] = useState<any[]>([]);
     const hasInvitations = invitations.length > 0;
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [isCropping, setIsCropping] = useState(false)
 
     // Debounced subdomain check
     const form = useForm<z.infer<typeof unifiedSchema>>({
@@ -108,22 +110,6 @@ export default function OnboardingPage() {
             consentSettings: false,
         },
     });
-
-    /**************************************
-     * Image drop handlers
-     **************************************/
-    const onDropUser = useCallback((files: any[]) => {
-        const file = files?.[0];
-        if (!file) return;
-        if (file.type === "image/svg+xml") {
-            toast.error("SVG files are not allowed. Please select a valid image.");
-            return;
-        }
-        const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
-        setSelectedUserFile(withPreview);
-    }, []);
-
-    const userDropzone = useDropzone({onDrop: onDropUser, accept: acceptedFiletypes});
 
     /**************************************
      * Initialization: fetch user, orgs, invitations
@@ -190,7 +176,7 @@ export default function OnboardingPage() {
                             try {
                                 const file: File = await getPublicFile(u.image);
                                 const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
-                                setSelectedUserFile(withPreview);
+                                setSelectedFile(withPreview);
                             } catch (e) {
                                 console.error(e);
                             }
@@ -226,8 +212,9 @@ export default function OnboardingPage() {
             }
 
             // 2) User image upload (if changed)
-            if (selectedUserFile && values.userImage && values.userImage !== (form.formState.defaultValues as any)?.userImage) {
-                const imgUrl = await handleImageUpload(selectedUserFile as File, values.userImage);
+// 2) User image upload (if changed)
+            if (selectedFile && values.userImage && values.userImage !== (form.formState.defaultValues as any)?.userImage) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.userImage);
                 if (imgUrl) values.userImage = imgUrl;
             }
 
@@ -352,38 +339,22 @@ export default function OnboardingPage() {
                         </div>
 
                         {/* User image picker */}
-                        <FormField
-                            control={form.control}
+                        <FormImageSelector
+                            form={form}
                             name="userImage"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Profile photo</FormLabel>
-                                    <div {...userDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
-                                        <input {...userDropzone.getInputProps()} />
-                                        {selectedUserFile ? (
-                                            <div className="flex items-center space-x-4">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={(selectedUserFile as any).preview} alt="preview"
-                                                     className="h-16 w-16 rounded-full object-cover"/>
-                                                <span>Click to replace</span>
-                                            </div>
-                                        ) : (
-                                            <p>Drag & drop or click to upload</p>
-                                        )}
-                                    </div>
-                                    <FormDescription className="text-xs">PNG/JPG only (no SVG).</FormDescription>
-                                    {/*<FormControl>*/}
-                                    {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
-                                    {/*</FormControl>*/}
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            title="Profile Image"
+                            description="PNG/JPG only (no SVG)."
+                            aspect={1}
+                            img={form.watch("userImage") || undefined}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
+                            setIsCropping={setIsCropping}
                         />
                     </section>
 
                     <div className="flex justify-between">
                         <div/>
-                        <Button type="submit" disabled={loading}>
+                        <Button type="submit" disabled={loading || isCropping}>
                             {loading ? <LoadingDots color="#808080"/> : "Complete sign-up"}
                         </Button>
                     </div>
