@@ -382,7 +382,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                 name="budget"
                             />
 
-                            <BiopharmaConsentSwitch organization={organization}/>
+                            {/*<BiopharmaConsentSwitch organization={organization}/>*/}
 
                             <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>
                                 Save
