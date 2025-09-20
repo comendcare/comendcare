@@ -43,7 +43,7 @@ import {
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import {FormImageSelector} from "@/packages/components/form-image-selector";
-import {EditableProfilePhoto} from "~web/components/editable-profile-photo";
+import {TID} from "@/utils/test-utils/test-ids";
 
 const safeMixpanel = {
     identify: (...args: any[]) => {
@@ -294,8 +294,14 @@ export default function OnboardingPage() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Your full name (required)</FormLabel>
-                                    <FormControl><Input type="text" {...field} /></FormControl>
-                                    <FormMessage/>
+                                    <FormControl>
+                                        <Input
+                                            data-testid="onboard-name"
+                                            type="text"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage data-testid={TID.inlineError} />
                                 </FormItem>
                             )}
                         />
