@@ -33,7 +33,7 @@ import {ScrollProgress} from "@comend/components/ui/scroll-progress";
 
 // Domain helpers / types
 import type {FileWithPreview} from "@comend/components/image-selector";
-import {acceptedFiletypes, years, getPublicFile} from "@comend/lib/utils";
+import {acceptedFiletypes, years, getPublicFile, toKebabCase} from "@comend/lib/utils";
 import {Option, optionSchema, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 
 // Data
@@ -396,28 +396,53 @@ export default function CreateNewOrganizationPage() {
             let orgId = createRes.organization.id
 
             // 5) Condition (optional; only if disorder selected and we have an org)
+            const numOrNull = (s?: string | null) =>
+                s && String(s).trim() !== "" ? parseInt(String(s), 10) : null;
+
             if (values.disorder?.length && orgId) {
                 const cfd = new FormData();
-                const conditionData = {
+
+                // Build the same mapped structure as the editor
+                const mappedData: Record<string, any> = {
                     name: values.disorder?.[0]?.label || "",
-                    associatedConditions: values.associatedConditions?.map((g) => g.label).join(",") || "",
-                    summary: values.summary || "",
-                    diseaseCategories: values.categories?.map((c) => c.label).join(",") || "",
-                    prevalenceNumerator: values.prevalenceNumerator || "",
-                    prevalenceDenominator: values.prevalenceDenominator || "",
-                    numberOfPatientsEngaged: values.engaged || "",
-                    nationalEstimatedPopulation: values.national || "",
-                    globalEstimatedPopulation: values.global || "",
-                    relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
-                    causalGenes: values.causal?.map((g) => g.label).join(",") || "",
-                    associatedGenes: values.genes?.map((g) => g.label).join(",") || "",
-                    associatedSystems: values.systems?.map((s) => s.label).join(",") || "",
-                    metadata: JSON.stringify({
-                        otherCategories: values.otherCategories,
-                        otherSystems: values.otherSystems
-                    }),
+                    // normalize to slugs like the editor
+                    associatedConditions: (values.associatedConditions ?? []).map(o =>
+                        toKebabCase(String(o.value || o.label || "").trim())
+                    ),
+                    summary: values.summary ?? "",
+                    diseaseCategories: (values.categories ?? []).map(i => i.label),
+                    prevalenceNumerator: numOrNull(values.prevalenceNumerator),
+                    prevalenceDenominator: numOrNull(values.prevalenceDenominator),
+                    numberOfPatientsEngaged: numOrNull(values.engaged),
+                    nationalEstimatedPopulation: numOrNull(values.national),
+                    globalEstimatedPopulation: numOrNull(values.global),
+                    // keep mechanisms consistent with editor: it uses `categories` for UI and leaves `mechanisms` unused
+                    relevantDiseaseMechanisms: values.mechanisms ?? [],
+                    causalGenes: (values.causal ?? []).map(i => i.label),
+                    associatedGenes: (values.genes ?? []).map(i => i.label),
+                    associatedSystems: (values.systems ?? []).map(i => i.label),
+                    // wire up optional fields you already have in the schema
+                    associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
+                    existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
+                    toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
+                    metadata: {
+                        otherCategories: values.otherCategories ?? null,
+                        otherSystems: values.otherSystems ?? null,
+                    },
                 };
-                Object.entries(conditionData).forEach(([k, v]) => v && cfd.append(k, v as string));
+
+                // mirror the editor's FormData encoding
+                Object.entries(mappedData).forEach(([key, value]) => {
+                    if (key === "metadata") {
+                        cfd.append(key, JSON.stringify(value ?? {}));
+                    } else if (Array.isArray(value)) {
+                        cfd.append(key, JSON.stringify(value));
+                    } else if (value === null) {
+                        cfd.append(key, "null"); // allow clearing
+                    } else {
+                        cfd.append(key, String(value));
+                    }
+                });
 
                 const condRes = await createCondition(cfd);
                 if (condRes?.success && condRes?.data?.id) {
@@ -494,9 +519,12 @@ export default function CreateNewOrganizationPage() {
         <TooltipProvider>
             <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8">
                 <div>
-                    <h1 className="text-2xl font-semibold">Welcome to Comend</h1>
-                    <p className="text-sm text-muted-foreground">One simple form. We’ll use your answers to set up your
-                        profile, organization, condition, and finances.</p>
+                    <h1 className="text-2xl font-semibold">
+                        Create a new organization
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        One simple form. We’ll use your answers to set up your profile, organization, condition, and finances.
+                    </p>
                 </div>
                 <Separator/>
 

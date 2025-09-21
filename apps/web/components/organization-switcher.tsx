@@ -93,7 +93,7 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
 
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem
-                                onClick={() => router.push("/app/create/new-organization")}
+                                onClick={() => router.push("/create/new-organization")}
                                 className="gap-2 p-2"
                             >
                                 <div

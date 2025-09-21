@@ -21,7 +21,7 @@ export default function SignOutPage() {
 
         ;(async () => {
             // 1) Tell NextAuth to invalidate server cookies
-            await signOut({ redirect: false })
+            await signOut({redirect: false})
 
             // 2) Clear client-side storage your app might use
             try {
@@ -29,11 +29,13 @@ export default function SignOutPage() {
                 Object.keys(localStorage)
                     .filter(k => k.startsWith('comend:') || k.startsWith('nextauth:'))
                     .forEach(k => localStorage.removeItem(k))
-            } catch {}
+            } catch {
+            }
 
             try {
                 sessionStorage.clear()
-            } catch {}
+            } catch {
+            }
 
             // 3) Clear Service Worker caches (if you use next-pwa or any SW)
             try {
@@ -41,7 +43,8 @@ export default function SignOutPage() {
                     const keys = await caches.keys()
                     await Promise.all(keys.map(k => caches.delete(k)))
                 }
-            } catch {}
+            } catch {
+            }
 
             // 4) Force RSC/route cache to re-fetch on next render
             router.refresh()
@@ -53,6 +56,19 @@ export default function SignOutPage() {
                 toast.error('Your account has been deleted. If this was a mistake, please contact us.')
             } else if (reason === 'roleChanged') {
                 toast.error("Your role changed. For security, you'll need to sign back in.")
+            } else if (reason === 'use_original') {
+                const provider = searchParams.get('provider')
+                if (provider === 'email') {
+                    toast.error("This account was created with Email. Please sign in using Email.")
+                } else if (provider === 'google') {
+                    toast.error("This account was created with Google. Please sign in using Google.")
+                } else if (provider === 'facebook') {
+                    toast.error("This account was created with Facebook. Please sign in using Facebook.")
+                } else if (provider === 'linkedin') {
+                    toast.error("This account was created with LinkedIn. Please sign in using LinkedIn.")
+                } else {
+                    toast.error("This account is tied to a different sign-in method. Please use that method.")
+                }
             }
 
             // Start countdown after everything is cleared

@@ -888,3 +888,44 @@ register("app", "analytics_goal_reached", async ({ payload, occurredAt }) => {
         idempotencyKey,
     };
 });
+
+// ----------------------------------------
+// USER_ACCEPTED_ORGANIZATION_INVITATION (analytics)
+// ----------------------------------------
+register("app", "user_accepted_organization_invitation", async ({ payload, occurredAt }) => {
+    const {
+        orgId,
+        orgName,
+        orgSubdomain,
+        orgImage,
+        userId,
+        userName,
+        userEmail,
+    } = payload as {
+        orgId: string;
+        orgName?: string;
+        orgSubdomain?: string;
+        orgImage?: string;
+        userId: string;
+        userName?: string;
+        userEmail?: string;
+    };
+
+    const idempotencyKey = crypto
+        .createHash("sha256")
+        .update(`app:org:${userId}:joins:${orgId}`)
+        .digest("hex");
+
+    return {
+        type: "USER_ACCEPTED_ORGANIZATION_INVITATION",
+        source: "USER",
+        title: `🎉 ${userName} has joined your organization!`,
+        content: {
+            organization: { id: orgId, name: orgName, subdomain: orgSubdomain, image: orgImage },
+            user: {userId: userId, name: userName, email: userEmail}
+        },
+        orgId,
+        occurredAt,
+        idempotencyKey,
+    };
+});

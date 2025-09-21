@@ -1987,6 +1987,16 @@ export const acceptInvitation = withAuth(
                 where: {
                     id: invitationId,
                 },
+                include: {
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            subdomain: true,
+                        },
+                    }
+                }
             });
 
             // extra auth logic
@@ -2007,7 +2017,7 @@ export const acceptInvitation = withAuth(
                 prisma.member.create({
                     data: {
                         email: invitation.email,
-                        organizationId: invitation.organizationId,
+                        organizationId: invitation.organization.id,
                         role: invitation.role || "member",
                         userId: session.user.id,
                     },
@@ -2019,9 +2029,24 @@ export const acceptInvitation = withAuth(
                 }),
                 prisma.user.update({
                     where: {id: session.user.id},
-                    data: {activeOrganizationId: invitation.organizationId},
+                    data: {activeOrganizationId: invitation.organization.id},
                 })
             ]);
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "user_accepted_organization_invitation", // batch payload handled by your register
+                occurredAt: new Date(),
+                payload: {
+                    orgId: invitation.organization.id,
+                    orgName: invitation.organization.name,
+                    orgSubdomain: invitation.organization.subdomain,
+                    orgImage: invitation.organization.image,
+                    userId: session.user.id,
+                    userName: session.user.name,
+                    userEmail: session.user.email,
+                },
+            });
 
             revalidatePath("/app/team")
             revalidatePath("/app/profile")
@@ -2038,6 +2063,7 @@ export const acceptInvitation = withAuth(
 export const updateCondition = withOrganizationAuth(
     async (organization: Organization, formData: FormData) => {
         try {
+            // ---------- Parse FormData (unchanged) ----------
             const data: Record<string, any> = {};
             formData.forEach((value, key) => {
                 const str = value.toString();
@@ -2065,118 +2091,180 @@ export const updateCondition = withOrganizationAuth(
                 data[key] = str;
             });
 
+            // Utility: normalize associated condition inputs to slugs
+            const normalizeSlugs = (raws?: string[]) => {
+                if (!raws) return undefined;
+                const toSlug = (s: string) => toKebabCase(String(s || "").trim());
+                return Array.from(new Set(raws.map(toSlug).filter(Boolean)));
+            };
+
             const link = await prisma.conditionToOrganization.findFirst({
-                where: {organizationId: organization.id},
-                select: {conditionId: true, condition: {select: {slug: true}}},
+                where: { organizationId: organization.id },
+                select: { conditionId: true, condition: { select: { slug: true } } },
             });
 
-            // Create or update if org has none yet
+            // Pull out incoming associated condition slugs before scalar updates
+            const incomingRaw = data.associatedConditions as string[] | undefined;
+            delete data.associatedConditions;
+            const incomingSlugs = normalizeSlugs(incomingRaw);
+
+            // Helper to upsert any missing conditions by slug and return {slug -> id}
+            const ensureConditionsBySlugs = async (slugs: string[]) => {
+                if (!slugs.length) return new Map<string, string>();
+                const existing = await prisma.condition.findMany({
+                    where: { slug: { in: slugs } },
+                    select: { id: true, slug: true },
+                });
+                const bySlug = new Map(existing.map((e) => [e.slug, e.id]));
+
+                const missing = slugs.filter((s) => !bySlug.has(s));
+                if (missing.length) {
+                    const created = await Promise.all(
+                        missing.map((slug) => {
+                            const nameGuess = slug.replace(/-/g, " ");
+                            return prisma.condition.upsert({
+                                where: { slug },
+                                update: { name: nameGuess, slug },
+                                create: { name: nameGuess, slug },
+                            });
+                        })
+                    );
+                    created.forEach((c) => bySlug.set(c.slug, c.id));
+                }
+                return bySlug;
+            };
+
+            // Helper to replace Condition⇄Condition associations and return new target IDs
+            const replaceAssociatedConditions = async (
+                conditionId: string,
+                targetSlugs: string[],
+                selfSlug?: string | null
+            ): Promise<string[]> => {
+                const filteredSlugs = (targetSlugs || []).filter((s) => s && s !== selfSlug);
+                const bySlug = await ensureConditionsBySlugs(filteredSlugs);
+                const connectIds = Array.from(bySlug.values()).map((id) => ({ id }));
+
+                await prisma.condition.update({
+                    where: { id: conditionId },
+                    data: {
+                        associatedConditions: {
+                            set: [],
+                            connect: connectIds,
+                        },
+                    },
+                });
+
+                return Array.from(bySlug.values());
+            };
+
+            // Helper to compute diff and sync ConditionToOrganization for associated conditions
+            const syncOrgLinksForAssociatedConditions = async (
+                orgId: string,
+                prevIds: string[],
+                nextIds: string[]
+            ) => {
+                const prevSet = new Set(prevIds);
+                const nextSet = new Set(nextIds);
+                const added = nextIds.filter((id) => !prevSet.has(id));
+                const removed = prevIds.filter((id) => !nextSet.has(id));
+
+                if (added.length) {
+                    await prisma.conditionToOrganization.createMany({
+                        data: added.map((conditionId) => ({ conditionId, organizationId: orgId })),
+                        skipDuplicates: true,
+                    });
+                }
+
+                if (removed.length) {
+                    await prisma.conditionToOrganization.deleteMany({
+                        where: {
+                            organizationId: orgId,
+                            conditionId: { in: removed },
+                        },
+                    });
+                }
+            };
+
+            // ---------- CREATE or ATTACH branch ----------
             if (!link?.conditionId) {
                 const requestedId: string | undefined = (data as any).id ?? (data as any).conditionId;
                 const requestedSlug: string | undefined =
                     (data as any).slug ?? (data.name ? toKebabCase(String(data.name)) : undefined);
 
-                // Try to find an existing condition (prefer id, then slug)
+                // Find existing by id or slug
                 let existing =
                     requestedId
-                        ? await prisma.condition.findUnique({where: {id: requestedId}})
+                        ? await prisma.condition.findUnique({ where: { id: requestedId } })
                         : requestedSlug
-                            ? await prisma.condition.findUnique({where: {slug: requestedSlug}})
+                            ? await prisma.condition.findUnique({ where: { slug: requestedSlug } })
                             : null;
 
                 let condition;
                 if (existing) {
-                    // Update existing with incoming scalar fields
                     condition = await prisma.condition.update({
-                        where: {id: existing.id},
+                        where: { id: existing.id },
                         data,
                     });
                 } else {
-                    // Create new condition (derive slug if not provided)
                     const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
                     condition = await prisma.condition.create({
-                        data: {...data, slug, name: data.name},
+                        data: { ...data, slug, name: data.name },
                     });
                 }
 
-                // Link org → condition
+                // Link org → primary condition
                 await prisma.conditionToOrganization.create({
-                    data: {conditionId: condition.id, organizationId: organization.id},
+                    data: { conditionId: condition.id, organizationId: organization.id },
                 });
 
+                // Replace associated conditions (if provided)
+                let nextAssocIds: string[] = [];
+                if (incomingSlugs && incomingSlugs.length) {
+                    nextAssocIds = await replaceAssociatedConditions(
+                        condition.id,
+                        incomingSlugs,
+                        condition.slug ?? null
+                    );
+                }
+
+                // Compute prev (none for a fresh create) vs next, and sync Org links too
+                await syncOrgLinksForAssociatedConditions(organization.id, [], nextAssocIds);
+
                 revalidatePath("/app/profile");
-                return {success: true, data: condition};
+                return { success: true, data: condition };
             }
 
+            // ---------- UPDATE branch ----------
             const conditionId = link.conditionId;
-            const thisSlug = link.condition?.slug;
+            const thisSlug = link.condition?.slug ?? null;
 
-            // --- relation handling ---
-            // Pull out associatedConditions before scalar update
-            const incoming = data.associatedConditions as string[] | undefined;
-            delete data.associatedConditions;
+            // Fetch previous associated (for diff)
+            const prev = await prisma.condition.findUnique({
+                where: { id: conditionId },
+                select: { associatedConditions: { select: { id: true } } },
+            });
+            const prevAssocIds = (prev?.associatedConditions ?? []).map((c) => c.id);
 
-            // 1) Update scalar fields first
+            // Update scalar fields first (as you had)
             const updated = await prisma.condition.update({
-                where: {id: conditionId},
+                where: { id: conditionId },
                 data,
             });
 
-            // 2) If client sent associated conditions, sync the relation
-            if (incoming) {
-                // We expect slugs from the UI. If you sent names instead, map to slugs here.
-                const targetSlugs = Array.from(
-                    new Set(
-                        (incoming || [])
-                            .map(s => (s || "").trim())
-                            .filter(Boolean)
-                    )
-                ).filter(s => s !== thisSlug); // prevent self-association
-
-                // If you allow 'creatable', upsert any missing ones (optional)
-                // Remove this block if you want to restrict to existing only.
-                const existing = await prisma.condition.findMany({
-                    where: {slug: {in: targetSlugs}},
-                    select: {id: true, slug: true},
-                });
-                const existingBySlug = new Map(existing.map(e => [e.slug, e.id]));
-                const missing = targetSlugs.filter(s => !existingBySlug.has(s));
-
-                if (missing.length) {
-                    const created = await Promise.all(
-                        missing.map(async (slug) => {
-                            const nameGuess = slug.replace(/-/g, " ");
-                            return prisma.condition.upsert({
-                                where: {slug},
-                                update: {name: nameGuess, slug},
-                                create: {name: nameGuess, slug},
-                            });
-                        })
-                    );
-                    created.forEach(c => existingBySlug.set(c.slug, c.id));
-                }
-
-                const connectIds = targetSlugs
-                    .map(s => existingBySlug.get(s))
-                    .filter(Boolean)
-                    .map(id => ({id: id as string}));
-
-                await prisma.condition.update({
-                    where: {id: conditionId},
-                    data: {
-                        associatedConditions: {
-                            set: [],         // replace all
-                            connect: connectIds,
-                        },
-                    },
-                });
+            // Replace associations based on incoming slugs (preserve your prior semantics)
+            let nextAssocIds = prevAssocIds;
+            if (incomingSlugs) {
+                nextAssocIds = await replaceAssociatedConditions(conditionId, incomingSlugs, thisSlug);
             }
 
+            // Sync Org↔AssociatedCondition links using diff
+            await syncOrgLinksForAssociatedConditions(organization.id, prevAssocIds, nextAssocIds);
+
             revalidatePath("/app/profile");
-            return {success: true, data: updated};
+            return { success: true, data: updated };
         } catch (error: any) {
             console.error("Error in updateCondition:", error);
-            return {success: false, error: error.message || "Failed to update or create condition."};
+            return { success: false, error: error.message || "Failed to update or create condition." };
         }
     }
 );
