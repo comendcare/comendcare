@@ -24,6 +24,7 @@ import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
 import { ProfilePhoto } from "@comend/components/profile-photo";
+import LoadingDots from "@/packages/components/icons/loading-dots";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -43,6 +44,7 @@ export function EditableProfilePhoto({
 }) {
     const {data: session} = useSession();
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [selectedFileProfile, setSelectedFileProfile] = useState<FileWithPreview | null>(null);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
@@ -57,37 +59,38 @@ export function EditableProfilePhoto({
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
-        if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.");
-            return;
-        }
-
-        const formData = new FormData();
-
-        if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
-            try {
-                const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
-                if (imgUrl) {
-                    formData.set("image", imgUrl);
-                }
-            } catch (error) {
-                console.error("Failed to upload image:", error);
-                toast.error("Image upload failed.");
+        setLoading(true)
+        try {
+            if (!session?.user?.organizationId) {
+                toast.error("You're not signed into an organization right now.");
                 return;
             }
-        }
 
-        if (!selectedFileProfile) {
-            // no file selected, set profile image to null, allow deleting profile photo
-            formData.set("image", "")
-        }
+            const formData = new FormData();
 
-        if (values.image !== img && img) {
-            // if the image is being changed, delete the old image in our google cloud storage bucket
-            await handleImageDelete(img)
-        }
+            if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
+                try {
+                    const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
+                    if (imgUrl) {
+                        formData.set("image", imgUrl);
+                    }
+                } catch (error) {
+                    console.error("Failed to upload image:", error);
+                    toast.error("Image upload failed.");
+                    return;
+                }
+            }
 
-        try {
+            if (!selectedFileProfile) {
+                // no file selected, set profile image to null, allow deleting profile photo
+                formData.set("image", "")
+            }
+
+            if (values.image !== img && img) {
+                // if the image is being changed, delete the old image in our google cloud storage bucket
+                await handleImageDelete(img)
+            }
+
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
             // setHasCropped(false);
@@ -97,15 +100,15 @@ export function EditableProfilePhoto({
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
         <div className="relative inline-block">
-            {/* Avatar (Always Visible) */}
             <ProfilePhoto img={img} name={name} textSize={textSize} className={className}/>
 
-            {/* Edit Button (Only If Editable) */}
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                     <Button
@@ -140,9 +143,9 @@ export function EditableProfilePhoto({
                             <Button
                                 type="submit"
                                 className="w-fit"
-                                disabled={isCropping}
+                                disabled={loading || isCropping}
                             >
-                                Save
+                                {loading ? <LoadingDots color="#808080"/> : "Save"}
                             </Button>
                         </form>
                     </Form>
