@@ -1,4 +1,4 @@
-name: E2E (Vercel Preview, event-driven)
+name: E2E (Vercel Preview, event-driven) - preview only
 
 on:
   # Use Vercel’s native GitHub deployment events
