@@ -89,18 +89,50 @@ jobs:
         run: npx prisma migrate deploy
 
       # Small probe so we fail fast if preview isn’t reachable
-      - name: Wait for Preview URL to respond
+      - name: Wait for Preview URL to respond (with debug + bypass)
         shell: bash
+        env:
+          URL: ${{ env.PREVIEW_URL }}
+          BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
-          echo "Probing $PREVIEW_URL …"
-          for i in {1..30}; do
-            if curl -sS -I "$PREVIEW_URL" | head -n 1 | grep -qE "200|30[12]"; then
+          set -euo pipefail
+          
+          echo "Preview URL: ${URL:-<empty>}"
+          if [ -z "${URL:-}" ]; then
+            echo "ERROR: PREVIEW_URL is empty. Dumping incoming event for debugging:"
+            cat "$GITHUB_EVENT_PATH"
+            exit 1
+          fi
+          
+          echo "Resolving host…"
+          getent hosts "$(printf "%s" "$URL" | sed -E 's#https?://([^/]+)/?.*#\1#')" || true
+          
+          # Try up to ~3 minutes
+          for i in {1..36}; do
+            # Hit with bypass header, follow redirects, keep cookie jar
+            CODE=$(curl -s -o /tmp/pbody -D /tmp/pheaders -w "%{http_code}" \
+              -H "x-vercel-protection-bypass: $BYPASS" \
+              -c /tmp/pcookies -b /tmp/pcookies \
+              -L "$URL" || true)
+          
+            echo "Attempt $i -> HTTP $CODE"
+            # Accept 200 and common redirect codes (301/302/307/308)
+            if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
               echo "Preview is reachable."
               exit 0
             fi
+          
+            # Print a tiny snippet to help debug (don’t spam logs)
+            echo "---- response headers ----"
+            head -n 20 /tmp/pheaders || true
+            echo "---- body (first 200 chars) ----"
+            head -c 200 /tmp/pbody || true
+            echo
             sleep 5
           done
-          echo "Preview not reachable in time" >&2
+          
+          echo "Preview not reachable in time."
+          echo "Final headers:"; cat /tmp/pheaders || true
           exit 1
 
       - name: Run Playwright E2E (monorepo matrix)
