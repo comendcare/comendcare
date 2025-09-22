@@ -15,6 +15,8 @@ import { parseCSV, validateImport } from "@comend/lib/utils";
 import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import z from "zod";
+import { getOrganizationData, getOrganizationFromOrganizationId } from "@/packages/lib/fetchers";
+import { Donor } from "@prisma/client";
 
 export async function formatBiosampleData(biosample: any): Promise<z.infer<typeof editBiosampleForm>> {
     const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene'] || "")}`);
@@ -42,11 +44,19 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         description: biosample.Description,
         currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
         countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection'])?.value,
-        collectionDate: biosample['Collection Date'] ? new Date(biosample['Collection Date']) : undefined,
+        collectionDate: 
+            biosample['Collection Date'] 
+                // ? new Date(biosample['Collection Date'])
+                  ? (() => {
+                        const d = new Date(biosample["Collection Date"])
+                        // strip time, only store date (midnight, EST is stored as time in DB)
+                        return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+                    })()
+                : undefined,
         preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
         anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site'])?.value,
         methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport'])?.value,
-        donorInternalId: biosample['Donor ID'],
+        internalDonorId: biosample['Internal Donor ID'],
         age: biosample['Donor Age at Collection'],
         gender: DONOR_GENDER_OPTIONS.find(option => option.label === biosample['Donor Gender'])?.value,
         race: DONOR_RACE_OPTIONS.find(option => option.label === biosample['Donor Race'])?.value,
@@ -91,7 +101,7 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Anatomical Site', required: false, defaultValue: undefined, isValid: (entry) => ANATOMICAL_SITE_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Method of Transport', required: false, defaultValue: undefined, isValid: (entry) => SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Age at Collection', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                        {key: 'Donor ID', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Internal Donor ID', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Gender', required: false, defaultValue: undefined, isValid: (entry) => DONOR_GENDER_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Race', required: false, defaultValue: undefined, isValid: (entry) => DONOR_RACE_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Ethnicity', required: false, defaultValue: undefined, isValid: (entry) => DONOR_ETHNICITY_OPTIONS.find(option => option.label === entry) !== undefined},
@@ -114,14 +124,26 @@ export function BiosampleBulkImportDialog() {
 
                 let pagIDtoInternalID: {[key: string]: string} = {}
 
+                const {data: organization} = await getOrganizationFromOrganizationId(session?.user.organizationId, {
+                    donors: true
+                })
+
+                if (organization.donors && organization.donors.length > 0) {
+                    organization.donors.map((d: Donor) => {
+                        if (d.internalId && !pagIDtoInternalID[d.internalId]) {
+                            pagIDtoInternalID[d.internalId] = d.id
+                        }
+                    })
+                }
+
                 for (let i = 0; i < result.values.length; i++) {
                     const biosample = result.values[i]
                     let formattedBiosample = await formatBiosampleData(biosample)
-                    if (formattedBiosample.donorInternalId && pagIDtoInternalID[formattedBiosample.donorInternalId]) {
-                        formattedBiosample.donorId = pagIDtoInternalID[formattedBiosample.donorInternalId]
+                    if (formattedBiosample.internalDonorId && pagIDtoInternalID[formattedBiosample.internalDonorId]) {
+                        formattedBiosample.donorId = pagIDtoInternalID[formattedBiosample.internalDonorId]
                     }
                     const newBiosample = await createBiosample(session?.user.organizationId, formattedBiosample)
-                    if (formattedBiosample.donorInternalId) pagIDtoInternalID[formattedBiosample.donorInternalId] = newBiosample.donorId
+                    if (formattedBiosample.internalDonorId) pagIDtoInternalID[formattedBiosample.internalDonorId] = newBiosample.donorId
                     await revalidate(pathname)
                 }
             } catch (e) {
