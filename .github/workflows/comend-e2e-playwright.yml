@@ -22,9 +22,9 @@ permissions:
   pull-requests: read
 
 # Kill older runs for the same commit
-concurrency:
-  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
-  cancel-in-progress: true
+#concurrency:
+#  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
+#  cancel-in-progress: true
 
 jobs:
   e2e:
