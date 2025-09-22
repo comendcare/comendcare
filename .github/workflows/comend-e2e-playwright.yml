@@ -1,56 +1,45 @@
-name: E2E (Vercel Preview, event-driven)
+name: Playwright Tests (any deployment)
 
 on:
-  repository_dispatch:
-    types: [vercel.deployment.success]
+  deployment_status:
+    types: [success]  # only fire when deployment finished successfully
 
 permissions:
   contents: read
-  actions: read
+  deployments: read
 
-# Kill older runs for the same commit
 concurrency:
-  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
+  group: pw-any-${{ github.event.deployment.sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
-  e2e:
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
-    if: github.event_name == 'repository_dispatch' # defensive
+    timeout-minutes: 60
 
     env:
-      # From Vercel dispatch payload
-      PREVIEW_URL: ${{ github.event.client_payload.url }}
-      GIT_SHA: ${{ github.event.client_payload.git.sha }}
-
-      # Your Playwright matrix reads per-app URLs from env
-      WEB_URL: ${{ github.event.client_payload.url }}
-
-      # Safer test mode
-      NODE_ENV: test
-      E2E: "1"
-
-      # Needed by your app/tests
+      # app/test secrets
+      PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
 
-      # Protection Bypass (use the value generated in Vercel > Project Settings)
-      # Store the SAME value in GitHub as a repo/org secret.
+      # for preview protection
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
-      # If your middleware normalizes preview subdomains
-      NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX: vercel.app
+      # URL helpers from event
+      DEPLOY_ENV: ${{ github.event.deployment.environment }}  # "Preview" or "Production"
+      DEPLOY_REF: ${{ github.event.deployment.ref }}          # e.g. "refs/heads/feature/foo"
+      ENV_URL:    ${{ github.event.deployment_status.environment_url }}
+      TARGET_URL: ${{ github.event.deployment_status.target_url }}
 
     steps:
-      - name: Checkout repository at deployment SHA
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ env.GIT_SHA }}
+          # test exactly what Vercel deployed
+          ref: ${{ github.event.deployment.sha || github.sha }}
 
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -58,41 +47,78 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
+      - name: 🔐 Rehydrate SSL certs to /tmp
+        shell: bash
+        env:
+          CLIENT_CERT_BASE64: ${{ secrets.CLIENT_CERT_BASE64 }}
+          CLIENT_KEY_BASE64: ${{ secrets.CLIENT_KEY_BASE64 }}
+          SERVER_CA_BASE64: ${{ secrets.SERVER_CA_BASE64 }}
+        run: |
+          set -euo pipefail
+          echo "$CLIENT_CERT_BASE64" | base64 -d > /tmp/client-cert.pem
+          echo "$CLIENT_KEY_BASE64"   | base64 -d > /tmp/client-key.pem
+          echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
+          chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
+          ls -l /tmp/client-*.pem /tmp/server-ca.pem
+
+      - name: 🌐 Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # Small probe so we fail fast if preview isn’t reachable
-      - name: Wait for Preview URL to respond
+      - name: 🔑 Check encryption key presence
+        run: |
+          [ -n "${PRISMA_FIELD_ENCRYPTION_KEY:-}" ] && echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅" || (echo "Missing PRISMA_FIELD_ENCRYPTION_KEY" && exit 1)
+
+      - name: 🧭 Decide WEB_URL (Preview vs Production)
+        shell: bash
+        env:
+          PROJECT: ${{ vars.VERCEL_PROJECT_SLUG }}
+          TEAM:    ${{ vars.VERCEL_TEAM_SLUG }}
+        run: |
+          set -euo pipefail
+          # Branch alias for preview; otherwise prefer environment_url from the event (often canonical domain for prod)
+          if echo "${DEPLOY_ENV}" | grep -qi preview; then
+            REF="${DEPLOY_REF##*/}"  # "feature/foo" -> "foo" if you tag release refs; otherwise full branch name tail
+            SLUG="$(printf "%s" "$REF" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')"
+            URL="https://${PROJECT}-git-${SLUG}-${TEAM}.vercel.app"
+          else
+            URL="${ENV_URL:-${TARGET_URL:-}}"
+            # optional: hard default if event doesn't provide urls
+            : "${URL:=https://comendcare.com}"
+          fi
+          echo "WEB_URL=$URL" >> "$GITHUB_ENV"
+          echo "Using WEB_URL: $URL (env=${DEPLOY_ENV}, ref=${DEPLOY_REF})"
+
+      - name: ⏳ Wait for WEB_URL to respond (bypass for preview only)
         shell: bash
         run: |
-          echo "Probing $PREVIEW_URL …"
-          for i in {1..30}; do
-            if curl -sS -I "$PREVIEW_URL" | head -n 1 | grep -qE "200|30[12]"; then
-              echo "Preview is reachable."
-              exit 0
+          set -euo pipefail
+          echo "Probing: ${WEB_URL}"
+          PREVIEW=false
+          if echo "${DEPLOY_ENV}" | grep -qi preview; then PREVIEW=true; fi
+          for i in {1..36}; do
+            if [ "$PREVIEW" = true ]; then
+              CODE=$(curl -s -o /tmp/pbody -D /tmp/pheaders -w "%{http_code}" -L \
+                -H "x-vercel-protection-bypass: ${VERCEL_AUTOMATION_BYPASS_SECRET}" \
+                -H "x-vercel-set-bypass-cookie: true" \
+                -c /tmp/pcookies -b /tmp/pcookies \
+                "$WEB_URL" || true)
+            else
+              CODE=$(curl -s -o /tmp/pbody -D /tmp/pheaders -w "%{http_code}" -L "$WEB_URL" || true)
             fi
+            echo "Attempt $i -> HTTP $CODE"
+            if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then echo "Reachable."; exit 0; fi
+            head -n 20 /tmp/pheaders || true
+            head -c 200 /tmp/pbody || true; echo
             sleep 5
           done
-          echo "Preview not reachable in time" >&2
-          exit 1
+          echo "Not reachable."; cat /tmp/pheaders || true; exit 1
 
-      - name: Run Playwright E2E (monorepo matrix)
-        run: |
-          echo "Testing against $WEB_URL"
-          npm run test:e2e
+      - name: Run Playwright tests
+        run: npx playwright test
 
-      - name: Upload Playwright HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report
-          retention-days: 7
-
-      - name: Upload traces/videos on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: tests/test-results
-          retention-days: 7
+          path: playwright-report/
+          retention-days: 30
