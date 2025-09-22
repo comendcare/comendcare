@@ -54,7 +54,8 @@ export default defineConfig({
     forbidOnly: !!process.env.CI,
 
     // Flake handling
-    retries: process.env.CI ? 2 : 0,
+    // retries: process.env.CI ? 2 : 0,
+    retries: 0,
     workers: process.env.CI ? 1 : undefined,
 
     // DX + CI visibility
