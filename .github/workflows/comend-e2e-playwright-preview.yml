@@ -1,0 +1,139 @@
+name: E2E (Vercel Preview, event-driven) - preview only
+
+on:
+  # Use Vercel’s native GitHub deployment events
+  deployment_status:
+  # Still allow a manual run if you want
+  workflow_dispatch:
+    inputs:
+      git_sha:
+        description: "Commit SHA to checkout (optional)"
+        required: false
+
+permissions:
+  contents: read
+  actions: read
+  deployments: read    # <-- needed for deployment_status
+  pull-requests: read  # (optional; handy for future filtering)
+
+concurrency:
+  group: e2e-${{ github.event.deployment.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    # Only run when: deployment succeeds, environment is Preview, and branch is 'preview'
+    # or when manually triggered.
+    if: >
+      (github.event_name == 'deployment_status' &&
+       github.event.deployment_status.state == 'success' &&
+       contains(github.event.deployment.environment, 'Preview') &&
+       endsWith(github.event.deployment.ref, '/preview')) ||
+      (github.event_name == 'workflow_dispatch')
+
+    env:
+      # Always test the branch-alias host for 'preview'
+      WEB_URL: https://${{ vars.VERCEL_PROJECT_SLUG }}-git-preview-${{ vars.VERCEL_TEAM_SLUG }}.vercel.app
+
+      # Checkout exactly what Vercel deployed, or fall back to preview head on manual runs
+      GIT_SHA: ${{ github.event.deployment.sha || github.event.inputs.git_sha || 'refs/heads/preview' }}
+
+      # Test mode flags
+      NODE_ENV: test
+      E2E: "1"
+
+      # App/test secrets
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+      PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
+
+      # Vercel protection bypass (if previews are protected)
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX: vercel.app
+
+    steps:
+      - name: 🧾 Checkout repository at ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GIT_SHA }}
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔐 Rehydrate SSL certs to /tmp
+        shell: bash
+        env:
+          CLIENT_CERT_BASE64: ${{ secrets.CLIENT_CERT_BASE64 }}
+          CLIENT_KEY_BASE64: ${{ secrets.CLIENT_KEY_BASE64 }}
+          SERVER_CA_BASE64: ${{ secrets.SERVER_CA_BASE64 }}
+        run: |
+          set -euo pipefail
+          echo "$CLIENT_CERT_BASE64" | base64 -d > /tmp/client-cert.pem
+          echo "$CLIENT_KEY_BASE64"   | base64 -d > /tmp/client-key.pem
+          echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
+          chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
+          ls -l /tmp/client-*.pem /tmp/server-ca.pem
+
+      - name: 🌐 Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: 🔑 Check encryption key presence
+        run: |
+          [ -n "${PRISMA_FIELD_ENCRYPTION_KEY:-}" ] && echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅" || (echo "Missing PRISMA_FIELD_ENCRYPTION_KEY" && exit 1)
+
+      - name: 🗃️ Apply Prisma migrations
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+      - name: ⏳ Wait for WEB_URL to respond (with bypass)
+        shell: bash
+        env:
+          URL: ${{ env.WEB_URL }}
+          BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          set -euo pipefail
+          echo "Probing: ${URL}"
+          for i in {1..36}; do
+            CODE=$(curl -s -o /tmp/pbody -D /tmp/pheaders -w "%{http_code}" \
+              -H "x-vercel-protection-bypass: $BYPASS" \
+              -H "x-vercel-set-bypass-cookie: true" \
+              -c /tmp/pcookies -b /tmp/pcookies \
+              -L "$URL" || true)
+            echo "Attempt $i -> HTTP $CODE"
+            if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
+              echo "Preview is reachable."; exit 0
+            fi
+            head -n 20 /tmp/pheaders || true
+            head -c 200 /tmp/pbody || true; echo
+            sleep 5
+          done
+          echo "Preview not reachable in time."; cat /tmp/pheaders || true; exit 1
+
+      - name: 🏃 Run Playwright E2E
+        run: npx playwright test
+
+      - name: 📑 Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+      - name: 🎥 Upload traces/videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: tests/test-results
+          retention-days: 7
