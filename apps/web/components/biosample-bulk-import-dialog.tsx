@@ -44,7 +44,15 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         description: biosample.Description,
         currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
         countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection'])?.value,
-        collectionDate: biosample['Collection Date'] ? new Date(biosample['Collection Date']): undefined, // TODO - strip out time here
+        collectionDate: 
+            biosample['Collection Date'] 
+                // ? new Date(biosample['Collection Date'])
+                  ? (() => {
+                        const d = new Date(biosample["Collection Date"])
+                        // strip time, only store date (midnight, EST is stored as time in DB)
+                        return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+                    })()
+                : undefined,
         preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
         anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site'])?.value,
         methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport'])?.value,
