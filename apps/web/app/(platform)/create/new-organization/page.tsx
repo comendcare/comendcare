@@ -44,7 +44,6 @@ import {toast} from "sonner";
 
 // Actions / API
 import {
-    editUser,
     createMemberRequest,
     createOrganization,
     updateOrganization,
@@ -54,7 +53,6 @@ import {
 import {
     getInvitations,
     getPublicOrganizationData,
-    getUser,
     getAllNonMemberOrganizations,
     getOrganizationFromOrganizationId,
     checkSubdomainAvailability,
@@ -62,37 +60,7 @@ import {
 import {handleImageUpload} from "@comend/lib/upload";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {Textarea} from "@/packages/components/ui/textarea";
-
-const safeMixpanel = {
-    identify: (...args: any[]) => {
-        try {
-            if (typeof window !== "undefined" && (mixpanel as any)?.persistence) {
-// @ts-ignore
-                mixpanel.identify?.(...(args as any));
-            }
-        } catch (e) {
-            console.warn("mixpanel identify skipped:", e);
-        }
-    },
-    optIn: () => {
-        try {
-            if (typeof window !== "undefined" && (mixpanel as any)?.persistence) {
-                mixpanel.opt_in_tracking?.();
-            }
-        } catch (e) {
-            console.warn("mixpanel opt_in skipped:", e);
-        }
-    },
-    optOut: () => {
-        try {
-            if (typeof window !== "undefined" && (mixpanel as any)?.persistence) {
-                mixpanel.opt_out_tracking?.();
-            }
-        } catch (e) {
-            console.warn("mixpanel opt_out skipped:", e);
-        }
-    },
-};
+import {FormImageSelector} from "@/packages/components/form-image-selector";
 
 /**************************************
  * Zod schema (ALL FIELDS IN ONE)
@@ -101,11 +69,6 @@ const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
     z.preprocess((v) => (v === "" || v === null ? undefined : v), schema.optional());
 
 const unifiedSchema = z.object({
-    // USER
-    name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    notificationSettings: z.boolean().default(false),
-    consentSettings: z.boolean().default(false),
-    userImage: z.string().optional(),
     // join existing
     org: z.array(optionSchema).optional(), // id,label (max 1)
     // create new
@@ -181,10 +144,10 @@ export default function CreateNewOrganizationPage() {
     // Loading/initial state
     const [isInitializing, setIsInitializing] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [isCropping, setIsCropping] = useState(false)
 
     // Files
-    const [selectedUserFile, setSelectedUserFile] = useState<FileWithPreview | null>(null);
-    const [selectedOrgFile, setSelectedOrgFile] = useState<FileWithPreview | null>(null);
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
 
     // Collections
     const [organizations, setOrganizations] = useState<Option[]>([]);
@@ -195,42 +158,9 @@ export default function CreateNewOrganizationPage() {
     const form = useForm<z.infer<typeof unifiedSchema>>({
         mode: "onChange",
         resolver: zodResolver(refinedSchema),
-        defaultValues: {
-            name: session?.user?.name || "",
-            notificationSettings: true,
-            consentSettings: true,
-        },
     });
 
     const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
-
-    /**************************************
-     * Image drop handlers
-     **************************************/
-    const onDropUser = useCallback((files: any[]) => {
-        const file = files?.[0];
-        if (!file) return;
-        if (file.type === "image/svg+xml") {
-            toast.error("SVG files are not allowed. Please select a valid image.");
-            return;
-        }
-        const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
-        setSelectedUserFile(withPreview);
-    }, []);
-
-    const onDropOrg = useCallback((files: any[]) => {
-        const file = files?.[0];
-        if (!file) return;
-        if (file.type === "image/svg+xml") {
-            toast.error("SVG files are not allowed. Please select a valid image.");
-            return;
-        }
-        const withPreview = Object.assign(file, {preview: URL.createObjectURL(file)});
-        setSelectedOrgFile(withPreview);
-    }, []);
-
-    const userDropzone = useDropzone({onDrop: onDropUser, accept: acceptedFiletypes});
-    const orgDropzone = useDropzone({onDrop: onDropOrg, accept: acceptedFiletypes});
 
     /**************************************
      * Initialization: fetch user, orgs, invitations
@@ -315,42 +245,6 @@ export default function CreateNewOrganizationPage() {
         setLoading(true);
 
         try {
-            // 1) Consent / mixpanel
-            if (values.consentSettings) {
-                if (session?.user?.id && session?.user?.email) {
-                    if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") safeMixpanel.identify(session.user.email);
-                    else safeMixpanel.identify(session.user.id);
-                }
-                safeMixpanel.optIn();
-            } else {
-                safeMixpanel.optOut();
-            }
-
-            // 2) User image upload (if changed)
-            if (selectedUserFile && values.userImage && values.userImage !== (form.formState.defaultValues as any)?.userImage) {
-                const imgUrl = await handleImageUpload(selectedUserFile as File, values.userImage);
-                if (imgUrl) values.userImage = imgUrl;
-            }
-
-            // 3) Persist user fields (one-by-one, as before)
-            if (session?.user?.id) {
-                const userPayload: Record<string, any> = {
-                    name: values.name,
-                    notificationSettings: values.notificationSettings,
-                    consentSettings: values.consentSettings,
-                    image: values.userImage,
-                };
-                for (const [key, value] of Object.entries(userPayload)) {
-                    const res: any = await editUser(session.user.id as string, {[key]: value});
-                    if (res?.error) {
-                        toast.error(res.error);
-                        return;
-                    }
-                }
-            }
-
-            // Track
-            mixpanelTrack("Onboarding: user saved", {name: values.name});
 
             // Create/update org
             const formData = new FormData();
@@ -364,12 +258,12 @@ export default function CreateNewOrganizationPage() {
             // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
 
             // Upload org image only if changed
-            if (selectedOrgFile && values.orgImage) {
-                const imgUrl = await handleImageUpload(selectedOrgFile as File, values.orgImage);
-                if (imgUrl) formData.set("image", imgUrl);
-            } else if (values.orgImage) {
-                formData.set("image", values.orgImage);
+            if (selectedFile && values.orgImage && values.orgImage !== (form.formState.defaultValues as any)?.orgImage) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.orgImage);
+                if (imgUrl) values.orgImage = imgUrl;
             }
+
+            if (values.orgImage) formData.append("image", values.orgImage);
 
             const extra = {
                 therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "",
@@ -431,14 +325,17 @@ export default function CreateNewOrganizationPage() {
                     },
                 };
 
-                // mirror the editor's FormData encoding
+                const appendCsv = (fd: FormData, key: string, arr: string[]) => {
+                    if (arr && arr.length) fd.append(key, arr.join(",")); // e.g. "ABCF1,BRCA1"
+                };
+
                 Object.entries(mappedData).forEach(([key, value]) => {
                     if (key === "metadata") {
                         cfd.append(key, JSON.stringify(value ?? {}));
                     } else if (Array.isArray(value)) {
-                        cfd.append(key, JSON.stringify(value));
-                    } else if (value === null) {
-                        cfd.append(key, "null"); // allow clearing
+                        appendCsv(cfd, key, value);
+                    } else if (value === null || value === undefined || value === "") {
+                        // skip null/empty so server falls back to []
                     } else {
                         cfd.append(key, String(value));
                     }
@@ -765,34 +662,19 @@ export default function CreateNewOrganizationPage() {
                                 {/*/>*/}
 
                                 {/* Org image */}
-                                <FormField
-                                    control={form.control}
+                                <FormImageSelector
+                                    form={form}
                                     name="orgImage"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Organization logo</FormLabel>
-                                            <div {...orgDropzone.getRootProps({className: "border rounded-lg p-4 cursor-pointer"})}>
-                                                <input {...orgDropzone.getInputProps()} />
-                                                {selectedOrgFile ? (
-                                                    <div className="flex items-center space-x-4">
-                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={(selectedOrgFile as any).preview} alt="preview"
-                                                             className="h-16 w-16 rounded-md object-cover"/>
-                                                        <span>Click to replace</span>
-                                                    </div>
-                                                ) : (
-                                                    <p>Drag & drop or click to upload</p>
-                                                )}
-                                            </div>
-                                            <FormDescription className="text-xs">PNG/JPG only (no
-                                                SVG).</FormDescription>
-                                            {/*<FormControl>*/}
-                                            {/*    <Input type="text" placeholder="Existing image path (optional)" {...field} />*/}
-                                            {/*</FormControl>*/}
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
+                                    title="Organization Logo"
+                                    description="PNG/JPG only (no SVG)."
+                                    aspect={1}
+                                    img={form.watch("orgImage") || undefined}
+                                    selectedFile={selectedFile}
+                                    setSelectedFile={setSelectedFile}
+                                    className=""
+                                    setIsCropping={setIsCropping}
                                 />
+
                             </div>
                         </section>
                         <>
@@ -1005,7 +887,7 @@ export default function CreateNewOrganizationPage() {
                         </>
                         <div className="flex justify-between">
                             <div/>
-                            <Button type="submit" disabled={loading}>
+                            <Button type="submit" disabled={loading || isCropping}>
                                 {loading ? <LoadingDots color="#808080"/> : "Complete sign-up"}
                             </Button>
                         </div>

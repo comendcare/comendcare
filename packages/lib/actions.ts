@@ -2797,7 +2797,7 @@ export const createBiosample = withOrganizationAuth(
                 throw new Error("No organization id provided.")
             }
 
-            console.log(`incoming data`, data)
+            // console.log(`incoming data`, data)
 
             const biosampleData: any = {
                 id: data.id,
@@ -2834,7 +2834,7 @@ export const createBiosample = withOrganizationAuth(
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
 
-            console.log(`biosample data`, biosampleData)
+            // console.log(`biosample data`, biosampleData)
 
             const response = await prisma.biosample.create({
                 include: {
