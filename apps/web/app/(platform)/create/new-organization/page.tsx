@@ -431,14 +431,17 @@ export default function CreateNewOrganizationPage() {
                     },
                 };
 
-                // mirror the editor's FormData encoding
+                const appendCsv = (fd: FormData, key: string, arr: string[]) => {
+                    if (arr && arr.length) fd.append(key, arr.join(",")); // e.g. "ABCF1,BRCA1"
+                };
+
                 Object.entries(mappedData).forEach(([key, value]) => {
                     if (key === "metadata") {
                         cfd.append(key, JSON.stringify(value ?? {}));
                     } else if (Array.isArray(value)) {
-                        cfd.append(key, JSON.stringify(value));
-                    } else if (value === null) {
-                        cfd.append(key, "null"); // allow clearing
+                        appendCsv(cfd, key, value);
+                    } else if (value === null || value === undefined || value === "") {
+                        // skip null/empty so server falls back to []
                     } else {
                         cfd.append(key, String(value));
                     }
