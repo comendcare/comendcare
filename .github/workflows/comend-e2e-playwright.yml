@@ -1,4 +1,4 @@
-name: E2E (Vercel Preview, event-driven)
+name: E2E (Vercel Playwright, event-driven)
 
 on:
   repository_dispatch:
@@ -26,15 +26,15 @@ jobs:
         github.event.action == 'vercel.deployment.success' &&
         github.event.client_payload.environment == 'preview' &&
         (
-          github.event.client_payload.git.branch == 'preview' ||
-          github.event.client_payload.git.ref == 'preview'
+          github.event.client_payload.git.branch == 'playwright' ||
+          github.event.client_payload.git.ref == 'playwright'
         )
       ) || (
         github.event_name == 'workflow_dispatch'
       )
 
     env:
-      WEB_URL: https://comend-git-preview-comend.vercel.app
+      WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       GIT_SHA: ${{ github.event.client_payload.git.sha || github.event.inputs.git_sha || github.sha }}
       NODE_ENV: test
@@ -112,13 +112,13 @@ jobs:
               -L "$URL" || true)
             echo "Attempt $i -> HTTP $CODE"
             if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
-              echo "Preview is reachable."; exit 0
+              echo "Playwright is reachable."; exit 0
             fi
             head -n 20 /tmp/pheaders || true
             head -c 200 /tmp/pbody || true; echo
             sleep 5
           done
-          echo "Preview not reachable in time."; cat /tmp/pheaders || true; exit 1
+          echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
 
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
