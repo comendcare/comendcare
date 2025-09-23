@@ -19,6 +19,7 @@ import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu
 import {useSession} from "next-auth/react";
 import { getMilestones } from "./../../../../../packages/lib/fetchers";
 import { Option } from "./../../../../../packages/lib/types";
+import { Checkbox } from "./../../../ui/checkbox";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
@@ -58,6 +59,31 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     // }, [])
 
     const columns: ColumnDef<any>[] = [
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                    className="translate-y-[2px]"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="translate-y-[2px]"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+            meta: { label: "Select" }
+        },
         {
             id: "private",
             accessorKey: "private",

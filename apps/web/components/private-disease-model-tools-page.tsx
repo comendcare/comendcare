@@ -10,11 +10,18 @@ import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/she
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns";
 import { Tool } from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { revalidate } from "@/packages/lib/revalidate";
+import { useSession } from "next-auth/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Button } from "@/packages/components/ui/button";
+import { Lock, Globe } from "lucide-react"
+import { setDiseaseModelsVisibility } from "@/packages/lib/actions";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = useDiseaseModelsTableColumns()
+    const {data: session} = useSession()
+    const [rowSelection, setRowSelection] = useState<Object[]>([])
 
     // useEffect(() => {
     //     revalidate('/')
@@ -26,6 +33,42 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
             <FeatureFlagsProvider
                 additionalButtons={(
                     <>
+                        {rowSelection?.length > 0 && (
+                            <>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant={"secondary"}
+                                        size={"icon"}
+                                        onClick={async () => {
+                                            await setDiseaseModelsVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), true)
+                                        }}
+                                    >
+                                        <Lock />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Make selected private
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant={"secondary"}
+                                        size={"icon"}
+                                        onClick={async () => {
+                                            await setDiseaseModelsVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), false)
+                                        }}
+                                    >
+                                        <Globe />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Make selected public
+                                </TooltipContent>
+                            </Tooltip>
+                            </>
+                        )}
                         {/* <BiosampleBulkImportDialog/> */}
                         <NewToolDialog type={"diseaseModel"}/>
                     </>
@@ -49,7 +92,13 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
                         />
                     }
                 >
-                    <DiseaseModelsTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
+                    <DiseaseModelsTable 
+                        data={data} 
+                        pageCount={pageCount} 
+                        columns={columns} 
+                        searchParams={searchParams}
+                        onSelectionChange={setRowSelection}
+                    />
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

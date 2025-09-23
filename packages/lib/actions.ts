@@ -2338,6 +2338,30 @@ export const deleteDiseaseModel = withOrganizationAuth(
     }
 )
 
+export const setDiseaseModelsVisibility = withOrganizationAuth(
+    async (organization: Organization, ids: string[], isPrivate: boolean) => {
+        try {
+            if (!organization.id) throw new Error("No organization id provided.");
+            
+            const updatedDiseaseModels = await prisma.diseaseModel.updateMany({
+                where: {
+                    id: {in: ids}
+                },
+                data: {
+                    private: isPrivate
+                }
+            })
+
+            revalidatePath("/app/tools/disease-models")
+
+            return updatedDiseaseModels
+        } catch (error: any) {
+            console.error("Error updating disease models:", error.message);
+            throw new Error(error.message || "Failed to update disease models.");
+        }
+    }
+)
+
 export const updateDiseaseModel = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editDiseaseModelForm>) => {
         try {
@@ -2659,6 +2683,30 @@ export const createDataTool = withOrganizationAuth(
         } catch (error: any) {
             console.error("Error creating biosample:", error.message);
             throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
+export const setDataToolsVisibility = withOrganizationAuth(
+    async (organization: Organization, ids: string[], isPrivate: boolean) => {
+        try {
+            if (!organization.id) throw new Error("No organization id provided.");
+            
+            const updatedDataTools = await prisma.tool.updateMany({
+                where: {
+                    id: {in: ids}
+                },
+                data: {
+                    private: isPrivate
+                }
+            })
+
+            revalidatePath("/app/tools/data")
+
+            return updatedDataTools
+        } catch (error: any) {
+            console.error("Error updating clinical datasets:", error.message);
+            throw new Error(error.message || "Failed to update clinical datasets.");
         }
     }
 )
