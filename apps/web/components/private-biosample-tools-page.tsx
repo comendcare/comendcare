@@ -12,8 +12,13 @@ import {
 import {Tool} from "@prisma/client";
 import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@/packages/components/types";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {revalidate} from "@/packages/lib/revalidate";
+import { Button } from "@/packages/components/ui/button";
+import { Globe, Lock } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { setBiosamplesVisibility } from "@/packages/lib/actions";
+import { useSession } from "next-auth/react";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Tool[],
@@ -21,6 +26,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     searchParams: SearchParams
 }) => {
     const columns = useBiosamplesTableColumns()
+    const {data: session} = useSession()
+    const [rowSelection, setRowSelection] = useState<Object[]>([])
 
     // useEffect(() => {
     //     revalidate('/')
@@ -32,6 +39,42 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                 <FeatureFlagsProvider
                     additionalButtons={(
                         <>
+                            {rowSelection?.length > 0 && (
+                                <>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button
+                                            variant={"secondary"}
+                                            size={"icon"}
+                                            onClick={async () => {
+                                                await setBiosamplesVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), true)
+                                            }}
+                                        >
+                                            <Lock />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Make selected private
+                                    </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button
+                                            variant={"secondary"}
+                                            size={"icon"}
+                                            onClick={async () => {
+                                                await setBiosamplesVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), false)
+                                            }}
+                                        >
+                                            <Globe />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Make selected public
+                                    </TooltipContent>
+                                </Tooltip>
+                                </>
+                            )}
                             <BiosampleBulkImportDialog/>
                             <NewToolDialog type={"biosample"}/>
                         </>
@@ -56,8 +99,13 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                         }
                     >
                         {/* <div className="absolute h-full w-full bg-blue-dark opacity-50" /> */}
-                        <BiosamplesTable data={data} pageCount={pageCount} columns={columns}
-                                         searchParams={searchParams}/>
+                        <BiosamplesTable 
+                            data={data} 
+                            pageCount={pageCount} 
+                            columns={columns}
+                            searchParams={searchParams}
+                            onSelectionChange={setRowSelection}
+                        />
                     </React.Suspense>
                 </FeatureFlagsProvider>
             </Shell>
