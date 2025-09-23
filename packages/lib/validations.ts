@@ -19,6 +19,7 @@ const priorityEnum = z.enum(["low", "medium", "high"]);
 const labelEnum = z.enum(["bug", "feature", "enhancement", "documentation"]);
 
 export const searchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
   filterFlag: parseAsStringEnum(
       flagConfig.featureFlags.map((flag) => flag.value),
   ),
@@ -38,6 +39,7 @@ export const searchParamsCache = createSearchParamsCache({
 });
 
 export const biosampleRequestsSearchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
   filterFlag: parseAsStringEnum(
       flagConfig.featureFlags.map((flag) => flag.value),
   ),
@@ -57,6 +59,7 @@ export const biosampleRequestsSearchParamsCache = createSearchParamsCache({
 });
 
 export const diseaseModelSearchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
   filterFlag: parseAsStringEnum(
       flagConfig.featureFlags.map((flag) => flag.value),
   ),
@@ -122,7 +125,7 @@ export type GetTasksSchema = Awaited<
     ReturnType<typeof searchParamsCache.parse>
 >
 export type GetDiseaseModelSchema = Awaited<
-    ReturnType<typeof biosampleSearchParamsCache.parse>
+    ReturnType<typeof diseaseModelSearchParamsCache.parse>
 >
 export type GetBiosamplesSchema = Awaited<
     ReturnType<typeof biosampleSearchParamsCache.parse>

@@ -49,7 +49,12 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
                         />
                     }
                 >
-                    <DiseaseModelsTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
+                    <DiseaseModelsTable 
+                        data={data} 
+                        pageCount={pageCount} 
+                        columns={columns} 
+                        searchParams={searchParams}
+                    />
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

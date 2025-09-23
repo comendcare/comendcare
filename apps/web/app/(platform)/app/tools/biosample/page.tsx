@@ -23,8 +23,6 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
-    console.log(`get biosamples - load page`)
-
     const {data, pageCount} = await getBiosamples(
         session?.user.organizationId,
         {...search, q: globalFilter, filters: validFilters}

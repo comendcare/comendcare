@@ -67,7 +67,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, searchParams}: 
               />
           </DataTableAdvancedToolbar>
         ) : (
-          <DataTableToolbar table={table} />
+          <DataTableToolbar table={table} enableSearch={true}/>
         )}
       </DataTable>
     </>

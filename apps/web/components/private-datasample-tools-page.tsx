@@ -49,7 +49,12 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         />
                     }
                 >
-                    <ClinicalDatasetsTable data={data} pageCount={pageCount} columns={columns} searchParams={searchParams}/>
+                    <ClinicalDatasetsTable 
+                        data={data} 
+                        pageCount={pageCount} 
+                        columns={columns} 
+                        searchParams={searchParams}
+                    />
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

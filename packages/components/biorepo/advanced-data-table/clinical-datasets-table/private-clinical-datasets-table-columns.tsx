@@ -80,11 +80,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
       ),
       meta: {
         label: "Title",
-        placeholder: "Search titles...",
-        variant: "text",
-        icon: Text,
       },
-      enableColumnFilter: true,
     },
     {
         id: "types",
