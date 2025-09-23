@@ -30,8 +30,7 @@ jobs:
           github.event.client_payload.git.ref == 'preview'
         )
       ) || (
-        github.event_name == 'workflow_dispatch' &&
-        github.event.inputs.branch_name == 'preview'
+        github.event_name == 'workflow_dispatch'
       )
 
     env:
