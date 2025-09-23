@@ -1,8 +1,4 @@
 import { defineConfig, devices } from '@playwright/test';
-
-/**
- * Read environment variables from file.
- */
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '.env.test') });
@@ -54,7 +50,8 @@ export default defineConfig({
     forbidOnly: !!process.env.CI,
 
     // Flake handling
-    retries: process.env.CI ? 2 : 0,
+    // retries: process.env.CI ? 2 : 0,
+    retries: 0,
     workers: process.env.CI ? 1 : undefined,
 
     // DX + CI visibility
