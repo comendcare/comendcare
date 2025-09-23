@@ -25,7 +25,7 @@ jobs:
         github.event.client_payload.git.branch == 'playwright' ||
         github.event.client_payload.git.ref == 'playwright'
       )
-    uses: ./.github/workflows/e2e-runner.yml
+    uses: ./.github/workflows/comend-e2e-playwright-run.yml
     with:
       web_url: https://comend-git-playwright-comend.vercel.app
       git_sha: ${{ github.event.client_payload.git.sha || github.sha }}
