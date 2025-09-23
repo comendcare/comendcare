@@ -15,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { useState } from "react";
 import { Input } from "./../../../ui/input";
 
 const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
@@ -49,7 +50,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         getRowId: (originalRow) => originalRow.id,
         shallow: false,
         clearOnDefault: true,
-        // globalFilterFn: globalFilterFn as any
+        enableRowSelection: true,
     });
 
     React.useEffect(() => {

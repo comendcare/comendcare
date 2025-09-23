@@ -11,10 +11,17 @@ import { ClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-
 import { Tool } from "@prisma/client";
 import { SearchParams } from "@/packages/components/types";
 import { revalidate } from "@/packages/lib/revalidate";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Button } from "@/packages/components/ui/button";
+import { Globe, Lock } from "lucide-react";
+import { setDataToolsVisibility } from "@/packages/lib/actions";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = getClinicalDatasetsTableColumns()
+    const {data: session} = useSession()
+    const [rowSelection, setRowSelection] = useState<Object[]>([])
 
     // useEffect(() => {
     //     revalidate('/')
@@ -26,6 +33,42 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
             <FeatureFlagsProvider
                 additionalButtons={(
                     <>
+                        {rowSelection?.length > 0 && (
+                            <>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant={"secondary"}
+                                        size={"icon"}
+                                        onClick={async () => {
+                                            await setDataToolsVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), true)
+                                        }}
+                                    >
+                                        <Lock />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Make selected private
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        variant={"secondary"}
+                                        size={"icon"}
+                                        onClick={async () => {
+                                            await setDataToolsVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), false)
+                                        }}
+                                    >
+                                        <Globe />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Make selected public
+                                </TooltipContent>
+                            </Tooltip>
+                            </>
+                        )}
                         <AssetBulkImportDialog />
                         <NewToolDialog type={"data"}/>
                     </>
@@ -54,6 +97,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         pageCount={pageCount} 
                         columns={columns} 
                         searchParams={searchParams}
+                        onSelectionChange={setRowSelection}
                     />
                 </React.Suspense>
             </FeatureFlagsProvider>
