@@ -81,8 +81,7 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                         />
                     </DataTableAdvancedToolbar>
                 ) : (
-                    <DataTableToolbar table={table}>
-                    </DataTableToolbar>
+                    <DataTableToolbar table={table} enableSearch={true}/>
                 )}
             </DataTable>
         </>

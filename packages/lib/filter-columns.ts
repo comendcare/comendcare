@@ -37,8 +37,6 @@ export function filterColumns<TWhere extends object>({
     const column = filter.id;
     const columns = filter.id.split(".")
 
-    console.log(`COLUMNS`, columns)
-
     switch (filter.operator) {
       case "eq":
         if (Array.isArray(filter.value)) {
