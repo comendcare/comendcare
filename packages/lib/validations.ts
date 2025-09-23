@@ -79,6 +79,7 @@ export const diseaseModelSearchParamsCache = createSearchParamsCache({
 });
 
 export const biosampleSearchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
   filterFlag: parseAsStringEnum(
       flagConfig.featureFlags.map((flag) => flag.value),
   ),

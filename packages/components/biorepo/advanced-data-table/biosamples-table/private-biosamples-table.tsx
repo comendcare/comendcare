@@ -15,6 +15,19 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { Input } from "./../../../ui/input";
+
+const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
+    // normalize search term
+    const search = String(filterValue ?? "").toLowerCase();
+
+    // get values from both columns
+    const sampleId = String(row.original.id ?? "").toLowerCase();
+    const donorId = String(row.original.donor?.internalId ?? "").toLowerCase();
+
+    // return true if either matches
+    return sampleId.includes(search) || donorId.includes(search);
+}
 
 export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams}: {
     data: Tool[],
@@ -36,6 +49,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         getRowId: (originalRow) => originalRow.id,
         shallow: false,
         clearOnDefault: true,
+        // globalFilterFn: globalFilterFn as any
     });
 
     React.useEffect(() => {
@@ -71,7 +85,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     : undefined
                 }
             >
-                {enableAdvancedFilter ? (
+                {/* {enableAdvancedFilter ? (
                     <DataTableAdvancedToolbar table={table}>
                         <DataTableFilterList
                             table={table}
@@ -81,10 +95,10 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                             align="start"
                         />
                     </DataTableAdvancedToolbar>
-                ) : (
+                ) : ( */}
                     <DataTableToolbar table={table}>
                     </DataTableToolbar>
-                )}
+                {/* )} */}
             </DataTable>
         </>
     );

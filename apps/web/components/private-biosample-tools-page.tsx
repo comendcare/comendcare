@@ -56,8 +56,12 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                         }
                     >
                         {/* <div className="absolute h-full w-full bg-blue-dark opacity-50" /> */}
-                        <BiosamplesTable data={data} pageCount={pageCount} columns={columns}
-                                         searchParams={searchParams}/>
+                        <BiosamplesTable 
+                            data={data} 
+                            pageCount={pageCount} 
+                            columns={columns}
+                            searchParams={searchParams}
+                        />
                     </React.Suspense>
                 </FeatureFlagsProvider>
             </Shell>

@@ -2381,7 +2381,6 @@ export const getBiosamples = withOrganizationAuth(
                 input.filterFlag === "advancedFilters"
 
             let where: any = {};
-            console.log(`input`, input)
 
             if (advancedTable) {
                 const preProcessedFilters: any = input.filters.map(filter => ({
@@ -2444,7 +2443,15 @@ export const getBiosamples = withOrganizationAuth(
                 where = filterColumns({
                     filters,
                     joinOperator: "and"
-                })
+                }) || {}
+            }
+
+            // add global filter
+            if (input.q) {
+                where.OR = [
+                    { id: { contains: input.q, mode: "insensitive" } },
+                    { donor: { internalId: { contains: input.q, mode: "insensitive" } } },
+                ];
             }
 
             const orderBy = input.sort.length
