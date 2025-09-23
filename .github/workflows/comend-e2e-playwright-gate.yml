@@ -9,11 +9,6 @@ permissions:
   actions: read
   pull-requests: read
 
-# Keep gate runs de-duped per commit
-concurrency:
-  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
-  cancel-in-progress: true
-
 jobs:
   route:
     # EXACT same gate logic as before, just moved here
