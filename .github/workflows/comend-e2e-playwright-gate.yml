@@ -1,0 +1,68 @@
+name: E2E Gate
+
+on:
+  repository_dispatch:
+    types: [vercel.deployment.success]
+  workflow_dispatch:
+    inputs:
+      git_sha:
+        description: "Commit SHA to test"
+        required: false
+        type: string
+      web_url:
+        description: "Target WEB_URL (optional)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+# Kill older runs for the same commit
+concurrency:
+  group: e2e-${{ github.event.client_payload.git.sha || inputs.git_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  decide-and-dispatch:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      web_url: ${{ steps.check.outputs.web_url }}
+      git_sha: ${{ steps.check.outputs.git_sha }}
+    steps:
+      - id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHOULD="false"
+          WEB_URL_DEFAULT="https://comend-git-playwright-comend.vercel.app"
+
+          if [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            # Gate: only preview env + playwright branch/ref
+            if [[ "${{ github.event.action }}" == "vercel.deployment.success" ]] \
+              && [[ "${{ github.event.client_payload.environment }}" == "preview" ]] \
+              && { [[ "${{ github.event.client_payload.git.branch }}" == "playwright" ]] \
+                   || [[ "${{ github.event.client_payload.git.ref }}" == "playwright" ]]; }; then
+              SHOULD="true"
+            fi
+          else
+            # workflow_dispatch => allow running when triggered manually
+            SHOULD="true"
+          fi
+
+          # Derive outputs
+          URL_FROM_EVENT="${{ github.event.client_payload.url || '' }}"
+          echo "should_run=$SHOULD" >> "$GITHUB_OUTPUT"
+          echo "web_url=${URL_FROM_EVENT:-${{ inputs.web_url || env.WEB_URL || WEB_URL_DEFAULT }}}" >> "$GITHUB_OUTPUT"
+          echo "git_sha=${{ github.event.client_payload.git.sha || inputs.git_sha || github.sha }}" >> "$GITHUB_OUTPUT"
+
+  run-tests:
+    needs: decide-and-dispatch
+    if: needs.decide-and-dispatch.outputs.should_run == 'true'
+    uses: ./.github/workflows/comend-e2e-playwright-run.yml
+    with:
+      web_url: ${{ needs.decide-and-dispatch.outputs.web_url }}
+      git_sha: ${{ needs.decide-and-dispatch.outputs.git_sha }}
+    secrets: inherit
