@@ -35,7 +35,10 @@ jobs:
       github.event_name == 'repository_dispatch' &&
       github.event.action == 'vercel.deployment.success' &&
       github.event.client_payload.environment == 'preview' &&
-      github.event.client_payload.git.ref == 'preview'
+      (
+        github.event.client_payload.git.branch == 'preview' ||
+        github.event.client_payload.git.ref == 'preview'
+      )
 
     env:
       # From Vercel dispatch payload
