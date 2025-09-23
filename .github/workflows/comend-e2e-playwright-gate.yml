@@ -1,0 +1,32 @@
+name: E2E Gate (Vercel Playwright)
+
+on:
+  repository_dispatch:
+    types: [vercel.deployment.success]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+# Keep gate runs de-duped per commit
+concurrency:
+  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  route:
+    # EXACT same gate logic as before, just moved here
+    if: |
+      github.event_name == 'repository_dispatch' &&
+      github.event.action == 'vercel.deployment.success' &&
+      github.event.client_payload.environment == 'preview' &&
+      (
+        github.event.client_payload.git.branch == 'playwright' ||
+        github.event.client_payload.git.ref == 'playwright'
+      )
+    uses: ./.github/workflows/e2e-runner.yml
+    with:
+      web_url: https://comend-git-playwright-comend.vercel.app
+      git_sha: ${{ github.event.client_payload.git.sha || github.sha }}
+    secrets: inherit
