@@ -10,11 +10,6 @@ permissions:
   actions: read
   pull-requests: read
 
-# Kill older runs for the same commit (same as your original)
-concurrency:
-  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
-  cancel-in-progress: true
-
 jobs:
   compute-and-dispatch:
     runs-on: ubuntu-latest
