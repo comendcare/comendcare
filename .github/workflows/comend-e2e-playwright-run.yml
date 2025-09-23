@@ -1,0 +1,135 @@
+name: E2E Runner
+
+on:
+  workflow_call:
+    inputs:
+      web_url:
+        required: true
+        type: string
+      git_sha:
+        required: true
+        type: string
+    # Either inherit all secrets from the caller, or list them explicitly below.
+    # Here we inherit for simplicity:
+    secrets: {}
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: e2e-${{ inputs.git_sha }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      WEB_URL: ${{ inputs.web_url }}
+      PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
+      GIT_SHA: ${{ inputs.git_sha }}
+      NODE_ENV: test
+      E2E: "1"
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX: vercel.app
+    steps:
+      - name: Checkout repository at deployment SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GIT_SHA }}
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rehydrate SSL certs to /tmp
+        if: ${{ secrets.CLIENT_CERT_BASE64 && secrets.CLIENT_KEY_BASE64 && secrets.SERVER_CA_BASE64 }}
+        shell: bash
+        env:
+          CLIENT_CERT_BASE64: ${{ secrets.CLIENT_CERT_BASE64 }}
+          CLIENT_KEY_BASE64: ${{ secrets.CLIENT_KEY_BASE64 }}
+          SERVER_CA_BASE64: ${{ secrets.SERVER_CA_BASE64 }}
+        run: |
+          set -euo pipefail
+          echo "$CLIENT_CERT_BASE64" | base64 -d > /tmp/client-cert.pem
+          echo "$CLIENT_KEY_BASE64"   | base64 -d > /tmp/client-key.pem
+          echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
+          chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
+          ls -l /tmp/client-*.pem /tmp/server-ca.pem
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: 🔐 Check encryption key presence
+        run: |
+          if [ -z "${PRISMA_FIELD_ENCRYPTION_KEY:-}" ]; then
+            echo "PRISMA_FIELD_ENCRYPTION_KEY is missing"; exit 1
+          else
+            echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
+          fi
+
+      - name: Apply Prisma migrations
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+      - name: 🔎 Check Vercel slugs
+        run: |
+          echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
+          echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
+
+      - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
+        shell: bash
+        env:
+          URL: ${{ env.WEB_URL }}
+          BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          set -euo pipefail
+          echo "Probing: ${URL:-<empty>}"
+          if [ -z "${URL:-}" ]; then
+            echo "ERROR: WEB_URL is empty."; exit 1
+          fi
+          for i in {1..36}; do
+            CODE=$(curl -s -o /tmp/pbody -D /tmp/pheaders -w "%{http_code}" \
+              -H "x-vercel-protection-bypass: $BYPASS" \
+              -H "x-vercel-set-bypass-cookie: true" \
+              -c /tmp/pcookies -b /tmp/pcookies \
+              -L "$URL" || true)
+            echo "Attempt $i -> HTTP $CODE"
+            if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
+              echo "Playwright is reachable."; exit 0
+            fi
+            head -n 20 /tmp/pheaders || true
+            head -c 200 /tmp/pbody || true; echo
+            sleep 5
+          done
+          echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
+
+      - name: 🏃 Run Playwright E2E
+        run: npx playwright test
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+      - name: Upload traces/videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: tests/test-results
+          retention-days: 7
