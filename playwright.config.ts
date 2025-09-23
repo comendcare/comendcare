@@ -16,10 +16,10 @@ const apps = [
 
 const targets = [
     { name: 'chromium', use: devices['Desktop Chrome'] },
-    // { name: 'firefox', use: devices['Desktop Firefox'] },
-    // { name: 'webkit', use: devices['Desktop Safari'] },
-    // { name: 'iphone', use: devices['iPhone 13'] },
-    // { name: 'android', use: devices['Pixel 5'] },
+    { name: 'firefox', use: devices['Desktop Firefox'] },
+    { name: 'webkit', use: devices['Desktop Safari'] },
+    { name: 'iphone', use: devices['iPhone 13'] },
+    { name: 'android', use: devices['Pixel 5'] },
 ];
 
 /**
