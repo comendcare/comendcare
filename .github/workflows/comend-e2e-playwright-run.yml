@@ -52,7 +52,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ⬇️ same behavior, no parser-tripping `if: ${{ secrets.* }}`
       - name: Rehydrate SSL certs to /tmp (if provided)
         shell: bash
         env:
@@ -112,7 +111,7 @@ jobs:
             echo "Attempt $i -> HTTP $CODE"
             if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
               echo "Playwright is reachable."; exit 0
-            fi
+            fi>
             head -n 20 /tmp/pheaders || true
             head -c 200 /tmp/pbody || true; echo
             sleep 5
@@ -123,7 +122,8 @@ jobs:
         run: npx playwright test
 
       - name: Upload Playwright HTML report
-        if: always()
+        # avoid "No files were found" warning if canceled/failed early
+        if: always() && hashFiles('playwright-report/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

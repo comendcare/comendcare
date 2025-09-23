@@ -13,7 +13,6 @@ permissions:
 jobs:
   compute-and-dispatch:
     runs-on: ubuntu-latest
-    # ⬇️ exact same logic as your original
     if: |
       (
         github.event_name == 'repository_dispatch' &&
@@ -32,6 +31,7 @@ jobs:
     steps:
       - id: set
         run: |
+          # TODO: replace with real URL from your Vercel payload when ready
           echo "web_url=https://comend-git-playwright-comend.vercel.app" >> "$GITHUB_OUTPUT"
           echo "git_sha=${{ github.event.client_payload.git.sha || github.event.inputs.git_sha || github.sha }}" >> "$GITHUB_OUTPUT"
 
