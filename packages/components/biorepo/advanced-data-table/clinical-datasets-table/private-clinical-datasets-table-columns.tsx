@@ -12,9 +12,35 @@ import { DataTableColumnHeader } from "./../data-table/data-table-column-header"
 import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
+import { Checkbox } from "./../../../ui/checkbox";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
+    {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+                className="translate-y-[2px]"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+                className="translate-y-[2px]"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        meta: { label: "Select" }
+    },
     {
         id: "private",
         accessorKey: "private",

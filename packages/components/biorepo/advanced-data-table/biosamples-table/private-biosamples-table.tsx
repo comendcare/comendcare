@@ -15,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { useState } from "react";
 
 export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams}: {
     data: Tool[],
@@ -36,6 +37,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         getRowId: (originalRow) => originalRow.id,
         shallow: false,
         clearOnDefault: true,
+        enableRowSelection: true,
     });
 
     React.useEffect(() => {
