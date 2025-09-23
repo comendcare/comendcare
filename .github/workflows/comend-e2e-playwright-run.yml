@@ -1,4 +1,4 @@
-name: E2E Runner
+name: E2E Runner (Playwright)
 
 on:
   workflow_call:
@@ -9,8 +9,6 @@ on:
       git_sha:
         required: true
         type: string
-    # Either inherit all secrets from the caller, or list them explicitly below.
-    # Here we inherit for simplicity:
     secrets: {}
 
 permissions:
@@ -37,6 +35,7 @@ jobs:
       TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX: vercel.app
+
     steps:
       - name: Checkout repository at deployment SHA
         uses: actions/checkout@v4
@@ -52,8 +51,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Rehydrate SSL certs to /tmp
-        if: ${{ secrets.CLIENT_CERT_BASE64 && secrets.CLIENT_KEY_BASE64 && secrets.SERVER_CA_BASE64 }}
+      # ⬇️ same behavior, no parser-tripping `if: ${{ secrets.* }}`
+      - name: Rehydrate SSL certs to /tmp (if provided)
         shell: bash
         env:
           CLIENT_CERT_BASE64: ${{ secrets.CLIENT_CERT_BASE64 }}
@@ -61,11 +60,15 @@ jobs:
           SERVER_CA_BASE64: ${{ secrets.SERVER_CA_BASE64 }}
         run: |
           set -euo pipefail
-          echo "$CLIENT_CERT_BASE64" | base64 -d > /tmp/client-cert.pem
-          echo "$CLIENT_KEY_BASE64"   | base64 -d > /tmp/client-key.pem
-          echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
-          chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
-          ls -l /tmp/client-*.pem /tmp/server-ca.pem
+          if [[ -n "${CLIENT_CERT_BASE64:-}" && -n "${CLIENT_KEY_BASE64:-}" && -n "${SERVER_CA_BASE64:-}" ]]; then
+            echo "$CLIENT_CERT_BASE64" | base64 -d > /tmp/client-cert.pem
+            echo "$CLIENT_KEY_BASE64"   | base64 -d > /tmp/client-key.pem
+            echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
+            chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
+            ls -l /tmp/client-*.pem /tmp/server-ca.pem
+          else
+            echo "SSL cert secrets not provided; skipping rehydrate step."
+          fi
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
@@ -97,39 +100,4 @@ jobs:
           set -euo pipefail
           echo "Probing: ${URL:-<empty>}"
           if [ -z "${URL:-}" ]; then
-            echo "ERROR: WEB_URL is empty."; exit 1
-          fi
-          for i in {1..36}; do
-            CODE=$(curl -s -o /tmp/pbody -D /tmp/pheaders -w "%{http_code}" \
-              -H "x-vercel-protection-bypass: $BYPASS" \
-              -H "x-vercel-set-bypass-cookie: true" \
-              -c /tmp/pcookies -b /tmp/pcookies \
-              -L "$URL" || true)
-            echo "Attempt $i -> HTTP $CODE"
-            if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
-              echo "Playwright is reachable."; exit 0
-            fi
-            head -n 20 /tmp/pheaders || true
-            head -c 200 /tmp/pbody || true; echo
-            sleep 5
-          done
-          echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
-
-      - name: 🏃 Run Playwright E2E
-        run: npx playwright test
-
-      - name: Upload Playwright HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report
-          retention-days: 7
-
-      - name: Upload traces/videos on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: tests/test-results
-          retention-days: 7
+            ec
