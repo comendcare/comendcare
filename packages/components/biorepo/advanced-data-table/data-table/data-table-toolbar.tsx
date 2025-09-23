@@ -17,12 +17,14 @@ import { useEffect } from "react";
 
 interface DataTableToolbarProps<TData> extends React.ComponentProps<"div"> {
   table: Table<TData>;
+  enableSearch?: boolean;
 }
 
 export function DataTableToolbar<TData>({
   table,
   children,
   className,
+  enableSearch = false,
   ...props
 }: DataTableToolbarProps<TData>) {
   const [globalFilter, setGlobalFilter] = useQueryState("q", {
@@ -50,7 +52,7 @@ export function DataTableToolbar<TData>({
       getFilterValue: () => globalFilter,
       setFilterValue: (value: string) => setGlobalFilter(value),
       columnDef: {
-        meta: { label: "Search Sample ID or Donor ID", variant: "text" },
+        meta: { label: "Search...", variant: "text" },
       },
     }),
     [globalFilter, setGlobalFilter],
@@ -77,15 +79,7 @@ export function DataTableToolbar<TData>({
     >
       <div className="flex flex-1 flex-wrap items-center gap-2">
         {/* Global search input */}
-        {/* <Input
-          placeholder="Search..."
-          value={globalFilter}
-          onChange={(e) => {
-            setGlobalFilter(e.target.value)
-          }}
-          className="h-full w-40"
-        /> */}
-        <DataTableToolbarFilter key={'g'} column={globalColumn as any} />
+        {enableSearch && <DataTableToolbarFilter key={'g'} column={globalColumn as any} />}
 
         {columns.map((column) => (
           <DataTableToolbarFilter key={column.id} column={column} />
@@ -132,7 +126,7 @@ function DataTableToolbarFilter<TData>({
               placeholder={columnMeta.placeholder ?? columnMeta.label}
               value={(column.getFilterValue() as string) ?? ""}
               onChange={(event) => column.setFilterValue(event.target.value)}
-              className="h-8 w-40 lg:w-56"
+              className="h-full w-40 lg:w-56"
             />
           );
 

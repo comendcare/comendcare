@@ -85,7 +85,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     : undefined
                 }
             >
-                {/* {enableAdvancedFilter ? (
+                {enableAdvancedFilter ? (
                     <DataTableAdvancedToolbar table={table}>
                         <DataTableFilterList
                             table={table}
@@ -95,10 +95,9 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                             align="start"
                         />
                     </DataTableAdvancedToolbar>
-                ) : ( */}
-                    <DataTableToolbar table={table}>
-                    </DataTableToolbar>
-                {/* )} */}
+                ) : (
+                    <DataTableToolbar table={table} enableSearch={true}/>
+                )}
             </DataTable>
         </>
     );
