@@ -4,8 +4,7 @@ async function deleteItems() {
     try {
         console.log("Resetting database manually...");
 
-        await prisma.user.deleteMany(); // Deletes all records from 'company' table
-        await prisma.whitelist.deleteMany(); // Deletes all records from 'company' table
+        await prisma.company.deleteMany();
 
         console.log("All items deleted successfully.");
     } catch (error) {
