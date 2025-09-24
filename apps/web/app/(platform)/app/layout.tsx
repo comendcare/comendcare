@@ -7,6 +7,9 @@ import InvitationGate from "~web/components/invitation-gate";
 import {Organization} from "@prisma/client";
 import {Button} from "@/packages/components/ui/button";
 import Link from "next/link";
+import {SidebarTrigger} from "@/packages/components/ui/sidebar";
+import {NavUser} from "~web/components/nav-user";
+import * as React from "react";
 
 export default async function AppLayoutServer({children}: { children: React.ReactNode }) {
     const session = await getServerSession(authOptions);
@@ -40,8 +43,13 @@ export default async function AppLayoutServer({children}: { children: React.Reac
     if (memberships.length === 0) {
         return (
             <InvitationGate invitations={invitations}>
-                <div className="min-h-screen flex items-center justify-center">
-                    <main className="mx-auto max-w-md text-left space-y-4">
+                <div className="min-h-screen h-full flex flex-col items-center">
+                    <header
+                        className="px-4 bg-white sticky top-0 flex justify-end h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden"
+                    >
+                        <NavUser/>
+                    </header>
+                    <main className="flex flex-col items-start justify-center h-[calc(100vh-3.5rem)] mx-auto max-w-md text-left space-y-4">
                         <h1 className="text-xl font-semibold">Welcome to Comend!</h1>
 
                         <p>
