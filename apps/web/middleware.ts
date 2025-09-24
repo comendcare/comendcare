@@ -61,7 +61,7 @@ export default async function middleware(req: NextRequest) {
     // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
     let hostname = req.headers
         .get("host")!
-        .replace(".localhost:3000", `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        .replace(/\.localhost:\d+$/, `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`);
 
     // special case for Vercel preview deployment URLs
     if (
@@ -130,7 +130,7 @@ export default async function middleware(req: NextRequest) {
 
     // DON'T rewrite root application to `/home` folder
     if (
-        hostname === "localhost:3000" ||
+        /^localhost(:\d+)?$/.test(hostname) ||
         hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
         hostname === "comendcare.com"
     ) {
