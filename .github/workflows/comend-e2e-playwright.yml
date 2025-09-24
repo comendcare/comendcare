@@ -2,7 +2,7 @@ name: E2E (Vercel Playwright, event-driven)
 
 on:
   repository_dispatch:
-    types: [vercel.deployment.ready]
+    types: [vercel.deployment.success]
   workflow_dispatch: {}
 
 permissions:
@@ -14,10 +14,12 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 35
+
+    # Gate: only Vercel preview for the 'comend' project + playwright branch/ref, OR manual trigger
     if: |
       (
         github.event_name == 'repository_dispatch' &&
-        github.event.action == 'vercel.deployment.ready' &&
+        github.event.action == 'vercel.deployment.success' &&
         github.event.client_payload.environment == 'preview' &&
         github.event.client_payload.project.name == 'comend' &&
         (
@@ -45,17 +47,21 @@ jobs:
         run: |
           echo "=== Dumping $GITHUB_EVENT_PATH ==="
           cat "$GITHUB_EVENT_PATH" | jq .
+
       - name: Checkout repository at deployment SHA
         uses: actions/checkout@v4
         with:
           ref: ${{ env.GIT_SHA }}
+
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
+
       - name: Rehydrate SSL certs to /tmp
         shell: bash
         env:
@@ -69,8 +75,10 @@ jobs:
           echo "$SERVER_CA_BASE64"   | base64 -d > /tmp/server-ca.pem
           chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
           ls -l /tmp/client-*.pem /tmp/server-ca.pem
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+
       - name: 🔐 Check encryption key presence
         run: |
           if [ -z "${PRISMA_FIELD_ENCRYPTION_KEY:-}" ]; then
@@ -78,14 +86,17 @@ jobs:
           else
             echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
           fi
+
       - name: Apply Prisma migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
         run: npx prisma migrate deploy
+
       - name: 🔎 Check Vercel slugs
         run: |
           echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
           echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
+
       - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
         shell: bash
         env:
@@ -112,8 +123,10 @@ jobs:
             sleep 5
           done
           echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
+
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
+
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -121,6 +134,7 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
       - name: Upload traces/videos on failure
         if: failure()
         uses: actions/upload-artifact@v4
