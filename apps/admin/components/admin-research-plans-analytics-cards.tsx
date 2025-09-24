@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getResearchPlansAnalytics} from "~admin/lib/fetchers"
+import {getOrganizationResearchPlansAnalytics, getResearchPlansAnalytics} from "~admin/lib/fetchers"
 import {
   ChartConfig,
   ChartContainer,
@@ -10,13 +10,16 @@ import {
   ChartTooltipContent,
 } from "@comend/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { DollarSign } from "lucide-react";
 
 interface AnalyticsData {
     totalResearchPlans: number,
     totalResearchPlansOfType: {type: string, num: number}[],
     totalResearchPlansByStatus: {type: string, num: number}[],
     totalProjects: number,
-    totalProjectsOfType: {type: string, num: number}[]
+    totalProjectsOfType: {type: string, num: number}[],
+    sumProjectBudgets: number,
+    projectBudgetsByProgress: {type: string, num: number}[]
 }
 
 const researchPlansChartConfig = {
@@ -37,12 +40,21 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getResearchPlansAnalytics(orgId)
-            .then((res) => {
-                console.log(`results`, res)
-                return res
-            })
-            .then(setData);
+        if (orgId) {
+            getOrganizationResearchPlansAnalytics(orgId)
+                .then((res) => {
+                    console.log(`results`, res)
+                    return res
+                })
+                .then(setData);
+        } else {
+            getResearchPlansAnalytics()
+                .then((res) => {
+                    console.log(`results`, res)
+                    return res
+                })
+                .then(setData);
+        }
     }, []);
 
     if (!data) return null; // Or a skeleton
@@ -177,6 +189,16 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                 </CardHeader>
             </Card>
 
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Projects Budget</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums flex flex-row items-center">
+                        <DollarSign />
+                        {data?.sumProjectBudgets?.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+            </Card>
+
             <Card className="col-span-full">
                 <CardHeader>
                     <CardTitle>Total Projects by Modality</CardTitle>
@@ -189,6 +211,60 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                     <BarChart
                         accessibilityLayer
                         data={data.totalProjectsOfType}
+                        layout="vertical"
+                        margin={{left: 100}}
+                    >
+                        <XAxis 
+                            type="number" 
+                            dataKey="num" 
+                        />
+                        <YAxis
+                            type="category"
+                            dataKey="type"
+                            width={undefined}
+                            tick={({ x, y, payload }) => (
+                                <foreignObject x={x - 120} y={y - 15} width={120} height={30}>
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            wordWrap: 'break-word',
+                                            whiteSpace: 'normal',
+                                            width: '100%',
+                                            height: '100%',
+                                            textAlign: 'end',
+                                            paddingRight: '8px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'end',
+                                        }}
+                                    >
+                                        {payload.value}
+                                    </div>
+                                </foreignObject>
+                            )}
+                        />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Bar dataKey="num" fill="var(--color-desktop)" radius={5} />
+                    </BarChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+
+            <Card className="col-span-full">
+                <CardHeader>
+                    <CardTitle>Total Project Budgets by project status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer 
+                        config={projectsChartConfig}
+                        style={{ width: '100%', height: 200 /* fixed height */ }}
+                    >
+                    <BarChart
+                        accessibilityLayer
+                        data={data.projectBudgetsByProgress}
                         layout="vertical"
                         margin={{left: 100}}
                     >

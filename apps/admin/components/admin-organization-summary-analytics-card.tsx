@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getOrganizationAnalytics, getResearchPlansAnalytics} from "~admin/lib/fetchers"
+import {getOrganizationAnalytics} from "~admin/lib/fetchers"
 import {
   ChartConfig,
   ChartContainer,

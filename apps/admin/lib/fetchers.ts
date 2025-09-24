@@ -123,7 +123,73 @@ export const getOrganizationAnalytics = withAdminAuth(
 )
 
 export const getResearchPlansAnalytics = withAdminAuth(
-    async (orgId?: string | undefined) => {
+    async () => {
+        const allResearchPlans = await prisma.roadmap.findMany({
+            include: {milestones: {include: {types: true}}}
+        })
+
+        // Total research plans
+        const totalResearchPlans = allResearchPlans.length
+
+        // Total research plans, by type
+        let totalResearchPlansOfType: {type: string, num: number}[] = await Promise.all(RESEARCH_PLAN_TYPES.map(async (type) => ({
+            type: type.label,
+            num: await prisma.roadmap.count({
+                where: {
+                    modalities: {has: type.value}
+                }
+            })
+        })))
+
+        // Total projects, by type
+        const milestoneTypes = await prisma.milestoneType.findMany()
+        const allProjects = await prisma.milestone.findMany({
+            include: {
+                types: true
+            }
+        })
+        let totalProjects = allProjects.length
+        let totalProjectsOfType: {type: string, num: number}[] = milestoneTypes.map((type) => (
+            {
+                type: type.label,
+                num: allProjects.filter(project => project.types.map(type => type.milestoneTypeId).includes(type.id)).length
+            }
+        ))
+
+        let totalResearchPlansByStatus = Object.values(milestoneCategories).map(({option}) => ({
+            type: option.label,
+            num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
+        }))
+
+        let projectsBudgets = allProjects.map(({budget}) => budget || 0)
+        let sumProjectBudgets = projectsBudgets && projectsBudgets.length > 0
+            ? projectsBudgets.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+        let projectBudgetsByProgress: {type: string, num: number}[] = statuses.map(status => ({
+            type: status, 
+            num: allProjects
+                    .filter(project => project.status === status)
+                    .map(project => project.budget || 0)
+                    .concat([0]) // concat with 0 to avoid reduce error if there are no projects of this status
+                    .reduce((prev, next) => prev + next)
+        }))
+
+        return {
+            totalResearchPlans,
+            totalResearchPlansOfType,
+            totalResearchPlansByStatus,
+            totalProjects,
+            totalProjectsOfType,
+            sumProjectBudgets,
+            projectBudgetsByProgress
+        };
+    }
+)
+
+export const getOrganizationResearchPlansAnalytics = withAdminAuth(
+    async (orgId?: string) => {
         const allResearchPlans = await prisma.roadmap.findMany({
             where: {
                 organizationId: orgId
@@ -168,12 +234,29 @@ export const getResearchPlansAnalytics = withAdminAuth(
             num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
         }))
 
+        let projectsBudgets = allProjects.map(({budget}) => budget || 0)
+        let sumProjectBudgets = projectsBudgets && projectsBudgets.length > 0
+            ? projectsBudgets.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+        let projectBudgetsByProgress: {type: string, num: number}[] = statuses.map(status => ({
+            type: status, 
+            num: allProjects
+                    .filter(project => project.status === status)
+                    .map(project => project.budget || 0)
+                    .concat([0]) // concat with 0 to avoid reduce error if there are no projects of this status
+                    .reduce((prev, next) => prev + next)
+        }))
+
         return {
             totalResearchPlans,
             totalResearchPlansOfType,
             totalResearchPlansByStatus,
             totalProjects,
-            totalProjectsOfType
+            totalProjectsOfType,
+            sumProjectBudgets,
+            projectBudgetsByProgress
         };
     }
 )
