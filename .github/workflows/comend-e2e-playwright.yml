@@ -25,6 +25,7 @@ jobs:
         github.event_name == 'repository_dispatch' &&
         github.event.action == 'vercel.deployment.success' &&
         github.event.client_payload.environment == 'preview' &&
+        github.event.client_payload.project.name == 'comend' &&
         (
           github.event.client_payload.git.branch == 'playwright' ||
           github.event.client_payload.git.ref == 'playwright'
