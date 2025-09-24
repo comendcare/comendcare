@@ -79,9 +79,10 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         console.log("Mixpanel distinct_id:", distinctId)
                         setMixpanelContext({ distinctId })
                     },
-                    record_sessions_percent: 1, // Session Replay enabled, recording 1% of all sessions
-                    record_idle_timeout_ms: 1800000, // End a replay capture after 30mins of inactivity
-                    record_heatmap_data: true   // Enable Heatmap data collection
+                    // session replays currently disabled on development & preview, so we're not tracking too many of them
+                    // record_sessions_percent: 100, // Session Replay enabled, recording 1% of all sessions
+                    // record_idle_timeout_ms: 1800000, // End a replay capture after 30mins of inactivity
+                    // record_heatmap_data: true   // Enable Heatmap data collection
                 };
 
                 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, config)
@@ -120,7 +121,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         const distinctId = mixpanel.get_distinct_id()
                         setMixpanelContext({ distinctId })
                     },
-                    record_sessions_percent: 1, // Session Replay enabled, recording 1% of all sessions
+                    record_sessions_percent: 100, // Session Replay enabled, recording 1% of all sessions
                     record_idle_timeout_ms: 1800000, // End a replay capture after 30mins of inactivity
                     record_heatmap_data: true   // Enable Heatmap data collection
                 };
