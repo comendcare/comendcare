@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getRFPsAnalytics} from "~admin/lib/fetchers"
+import {getOrganizationRFPsAnalytics, getRFPsAnalytics} from "~admin/lib/fetchers"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@comend/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 interface AnalyticsData {
     totalRFPs: number,
+    totalPublishedRFPs: number,
+    totalPrivateRFPs: number,
     RFPsByOpenTo: {type: string, num: number}[],
-    RFPsByBudget: {type: string, num: number}[]
+    RFPsByBudget: {type: string, num: number}[],
 }
 
 const researchPlansChartConfig = {
@@ -23,12 +25,21 @@ export function AdminRFPsAnalyticsCards({orgId}: {orgId?: string | undefined}) {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getRFPsAnalytics(orgId)
-            .then((res) => {
-                console.log(`results`, res)
-                return res
-            })
-            .then(setData);
+        if (orgId) {
+            getOrganizationRFPsAnalytics(orgId)
+                .then((res) => {
+                    console.log(`results`, res)
+                    return res
+                })
+                .then(setData);
+        } else {
+            getRFPsAnalytics()
+                .then((res) => {
+                    console.log(`results`, res)
+                    return res
+                })
+                .then(setData);
+        }
     }, []);
 
     if (!data) return null; // Or a skeleton
@@ -41,6 +52,24 @@ export function AdminRFPsAnalyticsCards({orgId}: {orgId?: string | undefined}) {
                     <CardDescription>Total RFPs</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
                         {data.totalRFPs.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+            </Card>
+
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Published RFPs</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.totalPublishedRFPs.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+            </Card>
+
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Private RFPs</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data.totalPrivateRFPs.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
             </Card>
