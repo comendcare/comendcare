@@ -1,9 +1,8 @@
 name: E2E (Vercel Playwright, event-driven)
 
 on:
-  # Only fire when a PREVIEW build finishes (one event per deployment)
   repository_dispatch:
-    types: [vercel.deployment.ready]
+    types: [vercel.deployment.success]
   workflow_dispatch: {}
 
 permissions:
@@ -11,33 +10,32 @@ permissions:
   actions: read
   pull-requests: read
 
-# One run per deployment *per project*; manual runs are isolated by run_id
+# Kill older runs for the same commit
 concurrency:
-  group: e2e-${{ github.event.client_payload.project.id || 'manual' }}-${{ github.event.client_payload.id || github.run_id }}
+  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 35
-
-    # Filter to your app + branch, and only the one READY event
+    # if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
     if: |
-      github.event_name == 'workflow_dispatch' ||
       (
         github.event_name == 'repository_dispatch' &&
-        github.event.action == 'vercel.deployment.ready' &&
-        contains(github.event.client_payload.url, 'comend-git-playwright-comend.vercel.app') &&
+        github.event.action == 'vercel.deployment.success' &&
+        github.event.client_payload.environment == 'preview' &&
+        github.event.client_payload.project.name == 'comend' &&
         (
-          github.event.client_payload.git.ref == 'refs/heads/playwright' ||
-          github.event.client_payload.git.ref == 'playwright' ||
           github.event.client_payload.git.branch == 'playwright' ||
-          endsWith(github.event.client_payload.git.ref, '/playwright')
+          github.event.client_payload.git.ref == 'playwright'
         )
+      ) || (
+        github.event_name == 'workflow_dispatch'
       )
 
     env:
-      WEB_URL: ${{ github.event.client_payload.url || 'https://comend-git-playwright-comend.vercel.app' }}
+      WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       GIT_SHA: ${{ github.event.client_payload.git.sha || github.event.inputs.git_sha || github.sha }}
       NODE_ENV: test
@@ -76,7 +74,6 @@ jobs:
           echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
           chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
           ls -l /tmp/client-*.pem /tmp/server-ca.pem
-
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
@@ -87,12 +84,15 @@ jobs:
           else
             echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
           fi
-
       - name: Apply Prisma migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
         run: npx prisma migrate deploy
 
+      - name: 🔎 Check Vercel slugs
+        run: |
+          echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
+          echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
       - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
         shell: bash
         env:
@@ -119,7 +119,6 @@ jobs:
             sleep 5
           done
           echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
-
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
 
