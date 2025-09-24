@@ -150,56 +150,62 @@ export const authOptions: NextAuthOptions = {
     },
 
     callbacks: {
-
-        async signIn({ user, account, email }) {
-            // Always allow the initial verification email to be sent
-            if (account?.provider === "email" && email?.verificationRequest) {
-                return true;
+        async signIn({user, account, profile, email, credentials}) {
+            const isAllowedToSignIn = true
+            if (isAllowedToSignIn) {
+                return true
+            } else {
+                return false
             }
-
-            if (!user?.email || !account?.provider) return true;
-
-            const existing = await prisma.user.findUnique({
-                where: { email: user.email },
-                include: { accounts: true },
-            });
-
-            if (!existing) return true;
-
-            const hasOauth = existing.accounts.length > 0;
-            const oauthProviders = new Set(existing.accounts.map(a => a.provider));
-            const trying = account.provider;
-            const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "http://localhost:3000";
-
-            if (hasOauth && trying === "email") {
-                const firstProvider = oauthProviders.values().next().value as string | undefined;
-                return `${baseUrl}/login/error?reason=use_original&provider=${firstProvider}`;
-            }
-
-            if (!hasOauth && trying !== "email") {
-                return `${baseUrl}/login/error?reason=use_original&provider=email`;
-            }
-
-            return true;
         },
 
-        async jwt({ token, user }) {
+        // async signIn({user, account, email}) {
+        //     // Always allow the initial verification email to be sent
+        //     if (account?.provider === "email" && email?.verificationRequest) {
+        //         return true;
+        //     }
+        //
+        //     if (!user?.email || !account?.provider) return true;
+        //
+        //     const existing = await prisma.user.findUnique({
+        //         where: {email: user.email},
+        //         include: {accounts: true},
+        //     });
+        //
+        //     if (!existing) return true;
+        //
+        //     const hasOauth = existing.accounts.length > 0;
+        //     const oauthProviders = new Set(existing.accounts.map(a => a.provider));
+        //     const trying = account.provider;
+        //     const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "http://localhost:3000";
+        //
+        //     if (hasOauth && trying === "email") {
+        //         const first = oauthProviders.values().next().value as string | undefined;
+        //         return `/login/error?reason=use_original&provider=${first}`;
+        //     }
+        //     if (!hasOauth && trying !== "email") {
+        //         return `/login/error?reason=use_original&provider=email`;
+        //     }
+        //     return true;
+        // },
+
+        async jwt({token, user}) {
             if (user) token.user = user; // minimal
             return token;
         },
 
 
-        async session({ session, token }) {
+        async session({session, token}) {
             const dbUser = await prisma.user.findUnique({
-                where: { id: token.sub! },
-                include: { memberships: true },
+                where: {id: token.sub!},
+                include: {memberships: true},
             });
 
             if (!dbUser) {
                 session.terminate = true;
                 session.expires = new Date().toISOString();
                 // @ts-expect-error
-                session.user = { id: token.sub, organizationId: null, membership: null };
+                session.user = {id: token.sub, organizationId: null, membership: null};
                 return session;
             }
 

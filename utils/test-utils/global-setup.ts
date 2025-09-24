@@ -8,7 +8,7 @@ import { encode } from 'next-auth/jwt';
 const TEST_EMAIL = process.env.TEST_EMAIL || 'e2e@comend.test';
 
 export default async function globalSetup(config: FullConfig) {
-    const outDir = path.resolve(process.cwd(), 'storage-states');
+    const outDir = path.resolve(process.cwd(), './tests/storage-states');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
     // Ensure identities exist

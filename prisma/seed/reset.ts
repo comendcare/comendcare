@@ -1,17 +1,17 @@
 import prisma from "@comend/lib/prisma"
 
-async function deleteCompanies() {
+async function deleteItems() {
     try {
-        console.log("Deleting all companies...");
+        console.log("Resetting database manually...");
 
-        await prisma.rawIngestEvent.deleteMany(); // Deletes all records from 'company' table
+        await prisma.company.deleteMany();
 
-        console.log("All companies deleted successfully.");
+        console.log("All items deleted successfully.");
     } catch (error) {
-        console.error("Error deleting companies:", error);
+        console.error("Error deleting items:", error);
     } finally {
         await prisma.$disconnect(); // Ensure Prisma disconnects properly
     }
 }
 
-deleteCompanies();
+deleteItems();

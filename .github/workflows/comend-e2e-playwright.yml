@@ -1,4 +1,4 @@
-name: E2E (Vercel Preview, event-driven)
+name: E2E (Vercel Playwright, event-driven)
 
 on:
   repository_dispatch:
@@ -10,32 +10,28 @@ permissions:
   actions: read
   pull-requests: read
 
-# Kill older runs for the same commit
-#concurrency:
-#  group: e2e-${{ github.event.client_payload.git.sha || github.sha }}
-#  cancel-in-progress: true
-
 jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    # if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+
+    # Gate: only Vercel preview for the 'comend' project + playwright branch/ref, OR manual trigger
     if: |
       (
         github.event_name == 'repository_dispatch' &&
         github.event.action == 'vercel.deployment.success' &&
         github.event.client_payload.environment == 'preview' &&
+        github.event.client_payload.project.name == 'comend' &&
         (
-          github.event.client_payload.git.branch == 'preview' ||
-          github.event.client_payload.git.ref == 'preview'
+          github.event.client_payload.git.branch == 'playwright' ||
+          github.event.client_payload.git.ref == 'playwright'
         )
       ) || (
-        github.event_name == 'workflow_dispatch' &&
-        github.event.inputs.branch_name == 'preview'
+        github.event_name == 'workflow_dispatch'
       )
 
     env:
-      WEB_URL: https://comend-git-preview-comend.vercel.app
+      WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       GIT_SHA: ${{ github.event.client_payload.git.sha || github.event.inputs.git_sha || github.sha }}
       NODE_ENV: test
@@ -47,21 +43,26 @@ jobs:
       NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX: vercel.app
 
     steps:
-      - name: Checkout repository at deployment SHA
+      - name: 📝 Dump full GitHub event payload
+        run: |
+          echo "=== Dumping $GITHUB_EVENT_PATH ==="
+          cat "$GITHUB_EVENT_PATH" | jq .
+
+      - name: 👀 Checkout repository at deployment SHA
         uses: actions/checkout@v4
         with:
           ref: ${{ env.GIT_SHA }}
 
-      - name: Use Node.js 20
+      - name: 🧱 Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: ⏬ Install dependencies
         run: npm ci
 
-      - name: Rehydrate SSL certs to /tmp
+      - name: 💧 Rehydrate SSL certs to /tmp
         shell: bash
         env:
           CLIENT_CERT_BASE64: ${{ secrets.CLIENT_CERT_BASE64 }}
@@ -70,11 +71,12 @@ jobs:
         run: |
           set -euo pipefail
           echo "$CLIENT_CERT_BASE64" | base64 -d > /tmp/client-cert.pem
-          echo "$CLIENT_KEY_BASE64"   | base64 -d > /tmp/client-key.pem
-          echo "$SERVER_CA_BASE64"    | base64 -d > /tmp/server-ca.pem
+          echo "$CLIENT_KEY_BASE64"  | base64 -d > /tmp/client-key.pem
+          echo "$SERVER_CA_BASE64"   | base64 -d > /tmp/server-ca.pem
           chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
           ls -l /tmp/client-*.pem /tmp/server-ca.pem
-      - name: Install Playwright browsers
+
+      - name: ⏬ Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: 🔐 Check encryption key presence
@@ -84,7 +86,8 @@ jobs:
           else
             echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
           fi
-      - name: Apply Prisma migrations
+
+      - name: 🦆 Apply Prisma migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
         run: npx prisma migrate deploy
@@ -113,18 +116,18 @@ jobs:
               -L "$URL" || true)
             echo "Attempt $i -> HTTP $CODE"
             if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
-              echo "Preview is reachable."; exit 0
+              echo "Playwright is reachable."; exit 0
             fi
             head -n 20 /tmp/pheaders || true
             head -c 200 /tmp/pbody || true; echo
             sleep 5
           done
-          echo "Preview not reachable in time."; cat /tmp/pheaders || true; exit 1
+          echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
 
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
 
-      - name: Upload Playwright HTML report
+      - name: ⏫ Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -132,7 +135,7 @@ jobs:
           path: playwright-report
           retention-days: 7
 
-      - name: Upload traces/videos on failure
+      - name: ⏫ Upload traces/videos on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:

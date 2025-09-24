@@ -21,10 +21,11 @@ export default async function DataToolsPage(props: IndexPageProps) {
     const searchParams = await props.searchParams;
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
+    const globalFilter = search.q ?? "";
 
     const {data, pageCount} = await getDatasamples(
         session?.user.organizationId,
-        {...search, filters: validFilters}
+        {...search, q: globalFilter, filters: validFilters}
     )
 
     // not part of an org
