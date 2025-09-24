@@ -151,33 +151,75 @@ export const authOptions: NextAuthOptions = {
 
     callbacks: {
 
-        async signIn({user, account, email}) {
-            // Always allow the initial verification email to be sent
+        // async signIn({user, account, email}) {
+        //     // Always allow the initial verification email to be sent
+        //     if (account?.provider === "email" && email?.verificationRequest) {
+        //         return true;
+        //     }
+        //
+        //     if (!user?.email || !account?.provider) return true;
+        //
+        //     const existing = await prisma.user.findUnique({
+        //         where: {email: user.email},
+        //         include: {accounts: true},
+        //     });
+        //
+        //     if (!existing) return true;
+        //
+        //     const hasOauth = existing.accounts.length > 0;
+        //     const oauthProviders = new Set(existing.accounts.map(a => a.provider));
+        //     const trying = account.provider;
+        //     const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "http://localhost:3000";
+        //
+        //     if (hasOauth && trying === "email") {
+        //         const first = oauthProviders.values().next().value as string | undefined;
+        //         return `/login/error?reason=use_original&provider=${first}`;
+        //     }
+        //     if (!hasOauth && trying !== "email") {
+        //         return `/login/error?reason=use_original&provider=email`;
+        //     }
+        //     return true;
+        // },
+
+        async signIn({ user, account, email }) {
+            // Always allow sending the verification email itself
             if (account?.provider === "email" && email?.verificationRequest) {
                 return true;
             }
 
-            if (!user?.email || !account?.provider) return true;
+            const trying = account?.provider;
+            // Try to resolve the email we’re signing in *as*.
+            // For OAuth, NextAuth populates user.email; for email provider after callback, user.email should be present.
+            const candidateEmail = user?.email;
+
+            if (!trying || !candidateEmail) {
+                // Be strict: if we can’t determine both, don’t silently allow.
+                // You can return false (deny) or redirect to a safe error page.
+                return "/login/error?reason=indeterminate_identity";
+            }
+
+            const userEmail = candidateEmail.toLowerCase();
 
             const existing = await prisma.user.findUnique({
-                where: {email: user.email},
-                include: {accounts: true},
+                where: { email: userEmail },
+                include: { accounts: true },
             });
 
+            // New user — allow creation
             if (!existing) return true;
 
-            const hasOauth = existing.accounts.length > 0;
+            // Note: Email provider doesn’t create an Account row. OAuth providers do.
             const oauthProviders = new Set(existing.accounts.map(a => a.provider));
-            const trying = account.provider;
-            const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "http://localhost:3000";
+            const hasOauth = oauthProviders.size > 0;
 
             if (hasOauth && trying === "email") {
                 const first = oauthProviders.values().next().value as string | undefined;
-                return `/login/error?reason=use_original&provider=${first}`;
+                return `/login/error?reason=use_original&provider=${first ?? "oauth"}`;
             }
             if (!hasOauth && trying !== "email") {
                 return `/login/error?reason=use_original&provider=email`;
             }
+
             return true;
         },
 
