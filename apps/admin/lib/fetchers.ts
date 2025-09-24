@@ -504,6 +504,34 @@ export const getOrganizationRFPsAnalytics = withAdminAuth(
     }
 )
 
+export const getClaimedGenesAnalytics = withAdminAuth(
+    async () => {
+        const totalGenes = await prisma.gene.count({})
+        const conditions = await prisma.condition.findMany({
+            select: {
+                causalGenes: true,
+                // associatedGenes: true,
+            },
+        })
+
+        // Flatten everything into one list
+        const allGenes = conditions.flatMap(c =>
+            [
+                ...c.causalGenes, 
+                // ...c.associatedGenes
+            ]
+        );
+
+        // Deduplicate
+        const uniqueGenes = new Set(allGenes);
+
+        return {
+            totalGenes,
+            claimedGenes: uniqueGenes.size
+        }
+    }
+)
+
 export const getOrganizationsAnalytics = withAdminAuth(
     async () => {
         const now = new Date();

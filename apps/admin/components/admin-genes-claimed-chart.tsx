@@ -14,11 +14,17 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@comend/components/ui/chart"
+import { getClaimedGenesAnalytics } from "~admin/lib/fetchers"
 
-const chartData = [
-  { key: "claimed", num: 275, fill: "hsl(var(--chart-2))" },
-  { key: "unclaimed", num: 200, fill: "hsl(var(--chart-3))" },
-]
+interface AnalyticsData {
+    totalGenes: number,
+    claimedGenes: number
+}
+
+// const chartData = [
+//   { key: "claimed", num: 275, fill: "hsl(var(--chart-2))" },
+//   { key: "unclaimed", num: 200, fill: "hsl(var(--chart-3))" },
+// ]
 
 const chartConfig = {
   claimed: {
@@ -30,11 +36,17 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function AdminGenesClaimedChart() {
-    // const [chartData, setChartData] = React.useState<{ date: string; organizations: number }[]>([])
+    const [data, setData] = React.useState<AnalyticsData | null>(null)
 
-    // React.useEffect(() => {
-    //     getOrganizationChartAnalytics().then(setChartData)
-    // }, [])
+    React.useEffect(() => {
+        // getOrganizationChartAnalytics().then(setChartData)
+        getClaimedGenesAnalytics()
+            .then((res) => {
+                console.log(`results`, res)
+                return res
+            })
+            .then(setData);
+    }, [])
 
     return (
         <Card className="@container/card">
@@ -52,7 +64,10 @@ export function AdminGenesClaimedChart() {
                         content={<ChartTooltipContent hideLabel />}
                     />
                     <Pie
-                        data={chartData}
+                        data={[
+                            {key: 'claimed', num: (data?.claimedGenes || 0), fill: "hsl(var(--chart-2))"},
+                            {key: 'unclaimed', num: (data?.totalGenes || 0) - (data?.claimedGenes || 0), fill: "hsl(var(--chart-3))"}
+                        ]}
                         dataKey="num"
                         nameKey="key"
                         innerRadius={60}
@@ -73,7 +88,9 @@ export function AdminGenesClaimedChart() {
                                             y={viewBox.cy}
                                             className="fill-foreground text-md font-bold"
                                         >
-                                            {`${((275 / 475)*100).toFixed(0)}% claimed`}
+                                            {data && (
+                                                `${((data.claimedGenes / data.totalGenes)*100).toFixed(0)}% claimed`
+                                            )}
                                         </tspan>
                                     </text>
                                 )
