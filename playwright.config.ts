@@ -57,7 +57,7 @@ export default defineConfig({
     // DX + CI visibility
     reporter: [
         ['list'],
-        ['html', { open: 'never', outputFolder: 'playwright-report' }],
+        ['html', { open: 'never', outputFolder: './tests/playwright-report' }],
         // ['junit', { outputFile: 'tests/test-results/junit.xml' }], // uncomment if needed
     ],
 
@@ -79,7 +79,7 @@ export default defineConfig({
             use: {
                 ...t.use,
                 baseURL: process.env[app.envVar] || `http://localhost:${app.port}`,
-                storageState: `storage-states/${app.name}.json`,
+                storageState: `./tests/storage-states/${app.name}.json`,
             },
         })),
     ),

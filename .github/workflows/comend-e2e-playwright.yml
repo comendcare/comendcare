@@ -48,21 +48,21 @@ jobs:
           echo "=== Dumping $GITHUB_EVENT_PATH ==="
           cat "$GITHUB_EVENT_PATH" | jq .
 
-      - name: Checkout repository at deployment SHA
+      - name: 👀 Checkout repository at deployment SHA
         uses: actions/checkout@v4
         with:
           ref: ${{ env.GIT_SHA }}
 
-      - name: Use Node.js 20
+      - name: 🧱 Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: ⏬ Install dependencies
         run: npm ci
 
-      - name: Rehydrate SSL certs to /tmp
+      - name: 💧 Rehydrate SSL certs to /tmp
         shell: bash
         env:
           CLIENT_CERT_BASE64: ${{ secrets.CLIENT_CERT_BASE64 }}
@@ -76,7 +76,7 @@ jobs:
           chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
           ls -l /tmp/client-*.pem /tmp/server-ca.pem
 
-      - name: Install Playwright browsers
+      - name: ⏬ Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: 🔐 Check encryption key presence
@@ -87,7 +87,7 @@ jobs:
             echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
           fi
 
-      - name: Apply Prisma migrations
+      - name: 🦆 Apply Prisma migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
         run: npx prisma migrate deploy
@@ -127,7 +127,7 @@ jobs:
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
 
-      - name: Upload Playwright HTML report
+      - name: ⏫ Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -135,7 +135,7 @@ jobs:
           path: playwright-report
           retention-days: 7
 
-      - name: Upload traces/videos on failure
+      - name: ⏫ Upload traces/videos on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
