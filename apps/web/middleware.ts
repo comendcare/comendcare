@@ -2,13 +2,20 @@ import { redis } from '@comend/lib/redis'
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 
-const RATE_LIMIT = 60
-const WINDOW_SECONDS = 60
-const MAX_LOGIN_PAGE_VISITS = 5
-const MAX_LOGIN_PAGE_VISITS_RESET_TIME = 300
+const RATE_LIMIT = 60        // max requests
+const WINDOW_SECONDS = 60    // per this many seconds
+const MAX_LOGIN_PAGE_VISITS = 5        // max login page visits
+const MAX_LOGIN_PAGE_VISITS_RESET_TIME = 300    // per this many seconds
 
 export const config = {
     matcher: [
+        /*
+         * Match all paths except for:
+         * 1. /api routes
+         * 2. /_next (Next.js internals)
+         * 3. /_static (inside /public)
+         * 4. all root files inside /public (e.g. /favicon.ico)
+         */
         "/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)"
     ]
 }
@@ -27,18 +34,26 @@ export default async function middleware(req: NextRequest) {
         req.headers.get("host")?.includes("localhost");
 
     const url = req.nextUrl
+
     const isPageNavigation = req.method === "GET" && req.headers.get("accept")?.includes("text/html")
 
     // Skip rate limiting in local/dev
     if (isPageNavigation && !isLocal && process.env.NODE_ENV !== 'development') {
         const redisKey = `rate-limit:${ip}`;
         const count = await redis.incr(redisKey);
-        if (count === 1) await redis.expire(redisKey, WINDOW_SECONDS);
+
+        if (count === 1) {
+            await redis.expire(redisKey, WINDOW_SECONDS);
+        }
+
         if (count > RATE_LIMIT) {
             console.warn(`Blocked IP: ${ip} for excessive requests (${count} in ${WINDOW_SECONDS}s)`);
+
             return new Response('Too many requests', {
                 status: 429,
-                headers: { 'Retry-After': WINDOW_SECONDS.toString() },
+                headers: {
+                    'Retry-After': WINDOW_SECONDS.toString(),
+                },
             });
         }
     }
@@ -46,28 +61,36 @@ export default async function middleware(req: NextRequest) {
     // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
     let hostname = req.headers
         .get("host")!
-        // ⬇️ generalized to any localhost port (no prod behavior change)
-        .replace(/\.localhost:\d+$/, `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`);
+        .replace(".localhost:3000", `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
 
     // special case for Vercel preview deployment URLs
     if (
         hostname.includes("---") &&
-        hostname.endsWith(`.${process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX}`)
+        hostname.endsWith(
+            `.${process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX}`
+        )
     ) {
-        hostname = `${hostname.split("---")[0]}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
+        hostname = `${hostname.split("---")[0]}.${
+            process.env.NEXT_PUBLIC_ROOT_DOMAIN
+        }`
     }
 
     const searchParams = req.nextUrl.searchParams.toString()
-    const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ""}`
+    // Get the pathname of the request (e.g. /, /about, /blog/first-post)
+    const path = `${url.pathname}${
+        searchParams.length > 0 ? `?${searchParams}` : ""
+    }`
 
     // Only count visits to the login page
     if (path.startsWith("/login")) {
         const loginKey = `login-hits:${ip}`
         const loginCount = await redis.incr(loginKey)
         if (loginCount === 1) {
-            await redis.expire(loginKey, MAX_LOGIN_PAGE_VISITS_RESET_TIME)
+            await redis.expire(loginKey, MAX_LOGIN_PAGE_VISITS_RESET_TIME) // 5-minute window
         }
+
         const res = NextResponse.next()
+
         if (loginCount >= MAX_LOGIN_PAGE_VISITS) {
             res.cookies.set("require_captcha", "true", {
                 path: "/",
@@ -81,6 +104,7 @@ export default async function middleware(req: NextRequest) {
                 httpOnly: false,
             })
         }
+
         return res
     }
 
@@ -92,22 +116,27 @@ export default async function middleware(req: NextRequest) {
         } else if (session && path == "/login") {
             return NextResponse.redirect(new URL("/", req.url))
         }
-        return NextResponse.rewrite(new URL(`${path === "/" ? "" : path}`, req.url))
+        return NextResponse.rewrite(
+            new URL(`${path === "/" ? "" : path}`, req.url)
+        )
     }
 
     // special case for `vercel.pub` domain
     if (hostname === "vercel.pub") {
-        return NextResponse.redirect("https://vercel.com/blog/platforms-starter-kit")
+        return NextResponse.redirect(
+            "https://vercel.com/blog/platforms-starter-kit"
+        )
     }
 
     // DON'T rewrite root application to `/home` folder
     if (
-        // ⬇️ allow any localhost:<port> (keeps prod logic unchanged)
-        /^localhost(:\d+)?$/.test(hostname) ||
+        hostname === "localhost:3000" ||
         hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
         hostname === "comendcare.com"
     ) {
-        return NextResponse.rewrite(new URL(`${path === "/" ? "/" : path}`, req.url))
+        return NextResponse.rewrite(
+            new URL(`${path === "/" ? "/" : path}`, req.url)
+        )
     }
 
     // rewrite everything else to `/[domain]/[slug] dynamic route
