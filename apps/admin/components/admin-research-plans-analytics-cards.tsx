@@ -179,7 +179,7 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
 
             <Card className="col-span-full">
                 <CardHeader>
-                    <CardTitle>Total Projects by Type</CardTitle>
+                    <CardTitle>Total Projects by Modality</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer 

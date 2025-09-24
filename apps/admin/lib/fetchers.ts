@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {ApiResponse, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, milestoneCategories, RESEARCH_PLAN_TYPES, TOOL_TYPE_OPTIONS} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
 import { subMonths, startOfMonth, monthsToYears } from "date-fns";
 import {Prisma} from "@prisma/client";
@@ -180,14 +180,64 @@ export const getResearchPlansAnalytics = withAdminAuth(
 
 export const getToolsAnalytics = withAdminAuth(
     async (orgId?: string | undefined) => {
-        const totalTools: number = (await prisma.tool.findMany({
+        const totalBiosamples: number = (await prisma.biosample.count({
             where: {
                 organizationId: orgId
             }
-        })).length
+        }))
+
+        const totalDiseaseModels: number = (await prisma.diseaseModel.count({
+            where: {
+                organizationId: orgId
+            }
+        }))
+
+        const totalClinicalDatasets: number = (await prisma.tool.count({
+            where: {
+                organizationId: orgId
+            }
+        }))
+
+        // Total Biosamples, by type
+        let totalBiosamplesOfType: {type: string, num: number}[] = await Promise.all(BIOSAMPLE_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.biosample.count({
+                where: {
+                    organizationId: orgId,
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Disease Models, by type
+        let totalDiseaseModelsOfType: {type: string, num: number}[] = await Promise.all(DISEASE_MODEL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.diseaseModel.count({
+                where: {
+                    organizationId: orgId,
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Clinical Datasets, by type
+        let totalClinicalDatasetsOfType: {type: string, num: number}[] = await Promise.all(TOOL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.tool.count({
+                where: {
+                    organizationId: orgId,
+                    types: {has: type.value}
+                }
+            })
+        })))
 
         return {
-            totalTools,
+            totalBiosamples,
+            totalDiseaseModels,
+            totalClinicalDatasets,
+            totalBiosamplesOfType,
+            totalDiseaseModelsOfType,
+            totalClinicalDatasetsOfType
         };
     }
 )
