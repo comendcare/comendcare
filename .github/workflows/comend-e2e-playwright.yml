@@ -23,16 +23,16 @@ jobs:
     if: |
       (
         github.event_name == 'repository_dispatch' &&
-        github.event.action == 'vercel.deployment.success' &&
+        github.event.action == 'vercel.deployment.ready' &&
         github.event.client_payload.environment == 'preview' &&
-        github.event.client_payload.project.name == 'comend' &&
         (
+          github.event.client_payload.git.ref == 'playwright' ||
           github.event.client_payload.git.branch == 'playwright' ||
-          github.event.client_payload.git.ref == 'playwright'
-        )
-      ) || (
-        github.event_name == 'workflow_dispatch'
-      )
+          endsWith(github.event.client_payload.git.ref, '/playwright')
+        ) &&
+        github.event.client_payload.project.name == 'your-vercel-project-name' # or .project.id == 'prj_...'
+      ) || (github.event_name == 'workflow_dispatch')      
+
     env:
       WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
