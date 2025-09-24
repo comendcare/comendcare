@@ -35,10 +35,6 @@ export default async function middleware(req: NextRequest) {
 
     const url = req.nextUrl
 
-    if (process.env.E2E && url.pathname.startsWith("/api/test-login")) {
-        return NextResponse.next();
-    }
-
     const isPageNavigation = req.method === "GET" && req.headers.get("accept")?.includes("text/html")
 
     // Skip rate limiting in local/dev
@@ -62,31 +58,28 @@ export default async function middleware(req: NextRequest) {
         }
     }
 
-    // ===== CHANGED: Port-agnostic host normalization =====
-    const hostHeader = req.headers.get("host") || "";             // e.g. "localhost:3001", "app.localhost:3000", "foo.127.0.0.1.nip.io:3001"
-    const [hostOnly] = hostHeader.split(":");                     // strip port for comparisons (e.g. "localhost", "app.localhost")
-    const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost").replace(/:\d+$/, "");
+    // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
+    let hostname = req.headers
+        .get("host")!
+        .replace(/\.localhost:\d+$/, `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`);
 
-    // Start from host without port
-    let hostname = hostOnly;
-
-    // Replace any ".localhost" suffix with ".<ROOT_DOMAIN>" (generic; no more .localhost:3000 special-case)
-    // This preserves your original intent but works for any port.
-    if (/\.(localhost)$/.test(hostname)) {
-        hostname = hostname.replace(/\.localhost$/, `.${rootDomain}`);
-    }
-
-    // ===== (original) Vercel preview mapping, now applied to normalized hostname =====
+    // special case for Vercel preview deployment URLs
     if (
         hostname.includes("---") &&
-        hostname.endsWith(`.${process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX}`)
+        hostname.endsWith(
+            `.${process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX}`
+        )
     ) {
-        hostname = `${hostname.split("---")[0]}.${rootDomain}`;
+        hostname = `${hostname.split("---")[0]}.${
+            process.env.NEXT_PUBLIC_ROOT_DOMAIN
+        }`
     }
-    // ===== END CHANGED BLOCK =====
 
     const searchParams = req.nextUrl.searchParams.toString()
-    const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ""}`
+    // Get the pathname of the request (e.g. /, /about, /blog/first-post)
+    const path = `${url.pathname}${
+        searchParams.length > 0 ? `?${searchParams}` : ""
+    }`
 
     // Only count visits to the login page
     if (path.startsWith("/login")) {
@@ -115,8 +108,8 @@ export default async function middleware(req: NextRequest) {
         return res
     }
 
-    // ===== CHANGED: compare without port and against normalized rootDomain =====
-    if (hostname == `app.${rootDomain}`) {
+    // DON'T do rewrites for app pages
+    if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
         const session = await getToken({ req })
         if (!session && path !== "/login") {
             return NextResponse.redirect(new URL("/login", req.url))
@@ -127,7 +120,6 @@ export default async function middleware(req: NextRequest) {
             new URL(`${path === "/" ? "" : path}`, req.url)
         )
     }
-    // ===== END CHANGED BLOCK =====
 
     // special case for `vercel.pub` domain
     if (hostname === "vercel.pub") {
@@ -136,17 +128,16 @@ export default async function middleware(req: NextRequest) {
         )
     }
 
-    // ===== CHANGED: Root app check is now port-agnostic for any localhost:* and still honors rootDomain + production host =====
+    // DON'T rewrite root application to `/home` folder
     if (
-        /^localhost(:\d+)?$/.test(hostHeader) ||   // any "localhost:<port>"
-        hostname === rootDomain ||                 // matches configured root domain (no port)
+        /^localhost(:\d+)?$/.test(hostname) ||
+        hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
         hostname === "comendcare.com"
     ) {
         return NextResponse.rewrite(
             new URL(`${path === "/" ? "/" : path}`, req.url)
         )
     }
-    // ===== END CHANGED BLOCK =====
 
     // rewrite everything else to `/[domain]/[slug] dynamic route
     return NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url))

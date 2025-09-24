@@ -51,7 +51,8 @@ prisma/migrations/migration_lock.toml
 
 # Playwright
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+test-results/
+playwright-report/
+blob-report/
+storage-states/
+playwright/.cache/
