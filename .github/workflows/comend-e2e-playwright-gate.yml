@@ -5,13 +5,13 @@ on:
     types: [vercel.deployment.success]
 
 permissions:
-  contents: read
+  contents: write   # needed to fire repository_dispatch
   actions: read
   pull-requests: read
 
 jobs:
   route:
-    # EXACT same gate logic as before, just moved here
+    # SAME gate logic as before
     if: |
       github.event_name == 'repository_dispatch' &&
       github.event.action == 'vercel.deployment.success' &&
@@ -20,8 +20,18 @@ jobs:
         github.event.client_payload.git.branch == 'playwright' ||
         github.event.client_payload.git.ref == 'playwright'
       )
-    uses: ./.github/workflows/comend-e2e-playwright-run.yml
-    with:
-      web_url: https://comend-git-playwright-comend.vercel.app
-      git_sha: ${{ github.event.client_payload.git.sha || github.sha }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger E2E Runner via repository_dispatch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'e2e.playwright',
+              client_payload: {
+                web_url: 'https://comend-git-playwright-comend.vercel.app',
+                git_sha: '${{ github.event.client_payload.git.sha || github.sha }}'
+              }
+            });

@@ -1,17 +1,8 @@
 name: E2E Runner (Playwright)
 
 on:
-  # Callable by the gate
-  workflow_call:
-    inputs:
-      web_url:
-        required: true
-        type: string
-      git_sha:
-        required: true
-        type: string
-    secrets: {}
-  # Also appears as its own workflow and can be run manually
+  repository_dispatch:
+    types: [e2e.playwright]   # fired by the gate
   workflow_dispatch:
     inputs:
       web_url:
@@ -29,7 +20,7 @@ permissions:
 
 # Kill older runs for the same commit (unchanged logic)
 concurrency:
-  group: e2e-${{ inputs.git_sha || github.event.inputs.git_sha || github.sha }}
+  group: e2e-${{ github.event.client_payload.git_sha || github.event.inputs.git_sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -37,9 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      WEB_URL: ${{ inputs.web_url || github.event.inputs.web_url }}
+      WEB_URL: ${{ github.event.client_payload.web_url || github.event.inputs.web_url }}
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
-      GIT_SHA: ${{ inputs.git_sha || github.event.inputs.git_sha || github.sha }}
+      GIT_SHA: ${{ github.event.client_payload.git_sha || github.event.inputs.git_sha || github.sha }}
       NODE_ENV: test
       E2E: "1"
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
