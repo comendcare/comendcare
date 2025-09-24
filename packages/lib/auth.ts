@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-            // allowDangerousEmailAccountLinking: true,
+            allowDangerousEmailAccountLinking: true,
             profile(profile, tokens) {
                 // You can use the tokens, in case you want to fetch more profile information
                 // For example several OAuth providers do not return email by default.
@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
         FacebookProvider({
             clientId: process.env.FACEBOOK_CLIENT_ID as string,
             clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
-            // allowDangerousEmailAccountLinking: true,
+            allowDangerousEmailAccountLinking: true,
             profile(profile) {
                 return {
                     id: profile.id,
@@ -93,7 +93,7 @@ export const authOptions: NextAuthOptions = {
         LinkedInProvider({
             clientId: process.env.LINKEDIN_CLIENT_ID as string,
             clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
-            // allowDangerousEmailAccountLinking: true,
+            allowDangerousEmailAccountLinking: true,
             async profile(profile, tokens) {
                 const emailResponse = await fetch(
                     "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))",
@@ -193,6 +193,7 @@ export const authOptions: NextAuthOptions = {
             if (user) token.user = user; // minimal
             return token;
         },
+
 
         async session({session, token}) {
             const dbUser = await prisma.user.findUnique({
