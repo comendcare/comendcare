@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Badge } from "@comend/components/ui/badge";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getOrganizationAnalytics} from "~admin/lib/fetchers"
+import {getOrganizationsAnalytics} from "~admin/lib/fetchers"
 
 interface AnalyticsData {
     totalOrganizations: number;
@@ -13,13 +13,14 @@ interface AnalyticsData {
     activeOrganizations: number;
     growthRate: number;
     completedProfiles: number;
+    patientsEngaged: number;
 }
 
 export function AdminOrganizationsAnalyticsCards() {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getOrganizationAnalytics()
+        getOrganizationsAnalytics()
             .then((res) => res)
             .then(setData);
     }, []);
@@ -92,6 +93,19 @@ export function AdminOrganizationsAnalyticsCards() {
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">
                         Organizations completed
+                    </div>
+                </CardFooter>
+            </Card>
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Patients Engaged</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data?.patientsEngaged.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Sum of all patients engaged across all organizations
                     </div>
                 </CardFooter>
             </Card>

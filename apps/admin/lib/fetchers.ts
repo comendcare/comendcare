@@ -84,6 +84,26 @@ export const getUserAnalytics = withAdminAuth(
     }
 )
 
+export const getOrganizationAnalytics = withAdminAuth(
+    async (orgId?: string | undefined) => {
+        const orgConditions = await prisma.condition.findMany({
+            where: {
+                organizations: {
+                    some: {
+                        organizationId: orgId
+                    }
+                }
+            }
+        })
+
+        const numPatientsEngaged = orgConditions.map(org => org.numberOfPatientsEngaged || 0).reduce((prev, curr) => prev + curr)
+
+        return {
+            numPatientsEngaged
+        }
+    }
+)
+
 export const getResearchPlansAnalytics = withAdminAuth(
     async (orgId?: string | undefined) => {
         const allResearchPlans = await prisma.roadmap.findMany({
@@ -212,7 +232,7 @@ export const getRFPsAnalytics = withAdminAuth(
     }
 )
 
-export const getOrganizationAnalytics = withAdminAuth(
+export const getOrganizationsAnalytics = withAdminAuth(
     async () => {
         const now = new Date();
         const startOfCurrentMonth = startOfMonth(now);
@@ -278,13 +298,27 @@ export const getOrganizationAnalytics = withAdminAuth(
             if (isComplete) completedProfiles++;
         }
 
+        // Sum of all patients engaged
+        const conditionsWithPatientsEngaged = await prisma.condition.findMany({
+            select: {
+                numberOfPatientsEngaged: true
+            },
+            where: {
+                numberOfPatientsEngaged: {
+                    not: null
+                }
+            }
+        })
+        const patientsEngaged = conditionsWithPatientsEngaged.map(({numberOfPatientsEngaged}) => numberOfPatientsEngaged || 0).reduce((prev, curr) => prev + curr)
+
         return {
             totalOrganizations,
             newOrganizationsThisMonth,
             newOrganizationsLastMonth,
             activeOrganizations,
             growthRate,
-            completedProfiles
+            completedProfiles,
+            patientsEngaged
         };
     }
 )

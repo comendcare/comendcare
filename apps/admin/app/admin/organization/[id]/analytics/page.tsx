@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation"
 import { AdminResearchPlansAnalyticsCards } from "~admin/components/admin-research-plans-analytics-cards"
 import { AdminToolsAnalyticsCards } from "~admin/components/admin-tools-analytics-cards"
 import { AdminRFPsAnalyticsCards } from "~admin/components/admin-rfps-analytics-cards"
+import { OrganizationOverviewAnalyticsCards } from "~admin/components/admin-organization-summary-analytics-card"
 
 export default async function OrganizationAnalytics({
     params
@@ -44,6 +45,7 @@ export default async function OrganizationAnalytics({
                     </a>
                 </div>
             </div>
+            <OrganizationOverviewAnalyticsCards orgId={data.id} />
             <AdminResearchPlansAnalyticsCards orgId={data.id} />
             <AdminToolsAnalyticsCards orgId={data.id} />
             <AdminRFPsAnalyticsCards orgId={data.id} />
