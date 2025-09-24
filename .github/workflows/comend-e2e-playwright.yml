@@ -30,7 +30,7 @@ jobs:
           github.event.client_payload.git.branch == 'playwright' ||
           endsWith(github.event.client_payload.git.ref, '/playwright')
         ) &&
-        github.event.client_payload.project.name == 'your-vercel-project-name' # or .project.id == 'prj_...'
+        github.event.client_payload.project.name == 'comend'
       ) || (github.event_name == 'workflow_dispatch')      
 
     env:
