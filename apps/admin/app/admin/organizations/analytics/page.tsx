@@ -3,6 +3,7 @@ import PlaceholderCard from "@comend/components/placeholder-card"
 import {AdminOrganizationsAnalyticsCards} from "~admin/components/admin-organizations-analytics-cards";
 import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
 import {AdminOrganizationsAnalyticsChart} from "~admin/components/admin-organizations-analytics-chart";
+import { AdminGenesClaimedChart } from "~admin/components/admin-genes-claimed-chart";
 
 export default function AllOrganizations() {
     return (
@@ -22,6 +23,9 @@ export default function AllOrganizations() {
                         <AdminOrganizationsAnalyticsCards/>
                         <div className="px-4 lg:px-6">
                             <AdminOrganizationsAnalyticsChart/>
+                        </div>
+                        <div className="px-4 lg:px-6">
+                            <AdminGenesClaimedChart />
                         </div>
                     </div>
                 </Suspense>
