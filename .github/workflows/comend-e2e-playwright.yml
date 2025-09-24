@@ -1,8 +1,9 @@
 name: E2E (Vercel Playwright, event-driven)
 
 on:
+  # Only fire when a PREVIEW build finishes (one event per deployment)
   repository_dispatch:
-    types: ['vercel.deployment.*']  # accept all; we filter inside jobs
+    types: [vercel.deployment.ready]
   workflow_dispatch: {}
 
 permissions:
@@ -10,54 +11,38 @@ permissions:
   actions: read
   pull-requests: read
 
+# One run per deployment *per project*; manual runs are isolated by run_id
+concurrency:
+  group: e2e-${{ github.event.client_payload.project.id || 'manual' }}-${{ github.event.client_payload.id || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  # Always runs to show exactly what Vercel sent
-  debug_payload:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🔍 Dump repository_dispatch payload
-        if: github.event_name == 'repository_dispatch'
-        run: |
-          echo "action=${{ github.event.action }}"
-          echo "---- GITHUB_EVENT_PATH ----"
-          cat "$GITHUB_EVENT_PATH"
-          command -v jq >/dev/null && jq . "$GITHUB_EVENT_PATH" || true
-
   e2e:
-    # Don't start until payload is dumped (helps while stabilizing)
-    needs: debug_payload
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
 
-    # Robust filter: event type + URL (your app) + branch == playwright
+    # Filter to your app + branch, and only the one READY event
     if: |
-      github.event_name == 'workflow_dispatch' || (
+      github.event_name == 'workflow_dispatch' ||
+      (
         github.event_name == 'repository_dispatch' &&
-        startsWith(github.event.action, 'vercel.deployment.') &&
+        github.event.action == 'vercel.deployment.ready' &&
         contains(github.event.client_payload.url, 'comend-git-playwright-comend.vercel.app') &&
         (
           github.event.client_payload.git.ref == 'refs/heads/playwright' ||
           github.event.client_payload.git.ref == 'playwright' ||
           github.event.client_payload.git.branch == 'playwright' ||
-          endsWith(github.event.client_payload.git.ref, '/playwright') ||
-          github.ref == 'refs/heads/playwright'
+          endsWith(github.event.client_payload.git.ref, '/playwright')
         )
       )
 
-    # Key change: include project/url so different apps don't cancel each other
-    concurrency:
-      group: e2e-${{ (github.event.client_payload.project.id || github.event.client_payload.url || github.event.client_payload.git.sha || github.sha) }}
-      cancel-in-progress: true
-
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-
     env:
-      # Use the URL from the event; fall back to your known preview URL for manual runs
       WEB_URL: ${{ github.event.client_payload.url || 'https://comend-git-playwright-comend.vercel.app' }}
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       GIT_SHA: ${{ github.event.client_payload.git.sha || github.event.inputs.git_sha || github.sha }}
       NODE_ENV: test
       E2E: "1"
-      NEXTAUTH_SECRET: ${{ secrets.NextAUTH_SECRET }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
