@@ -48,8 +48,8 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
     if (!data) return null; // Or a skeleton
 
     return (
-        <div className="grid grid-cols-2 xl:grid-cols-2 gap-4 px-4 lg:px-6">
-            <h1 className="col-span-2 text-2xl font-semibold">Research Plans</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 px-4 lg:px-6">
+            <h1 className="col-span-full text-2xl font-semibold">Research Plans</h1>
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Total Research Plans</CardDescription>
@@ -58,7 +58,8 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                     </CardTitle>
                 </CardHeader>
             </Card>
-            <Card className="col-span-2">
+
+            <Card className="col-span-full">
                 <CardHeader>
                     <CardTitle>Total Research Plans by Type</CardTitle>
                 </CardHeader>
@@ -111,7 +112,8 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                     </ChartContainer>
                 </CardContent>
             </Card>
-                        <Card className="col-span-2">
+            
+            <Card className="col-span-full">
                 <CardHeader>
                     <CardTitle>Total Research Plans by Status</CardTitle>
                 </CardHeader>
@@ -165,7 +167,7 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                 </CardContent>
             </Card>
 
-            <h1 className="col-span-2 text-2xl font-semibold">Projects</h1>
+            <h1 className="col-span-full text-2xl font-semibold">Projects</h1>
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Total Projects</CardDescription>
@@ -174,7 +176,8 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                     </CardTitle>
                 </CardHeader>
             </Card>
-            <Card className="col-span-2">
+
+            <Card className="col-span-full">
                 <CardHeader>
                     <CardTitle>Total Projects by Type</CardTitle>
                 </CardHeader>

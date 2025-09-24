@@ -23,8 +23,8 @@ export function AdminToolsAnalyticsCards({orgId}: {orgId?: string | undefined}) 
     if (!data) return null; // Or a skeleton
 
     return (
-        <div className="grid grid-cols-2 xl:grid-cols-2 gap-4 px-4 lg:px-6">
-            <h1 className="col-span-2 text-2xl font-semibold">Tools</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 px-4 lg:px-6">
+            <h1 className="col-span-full text-2xl font-semibold">Tools</h1>
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Total Tools</CardDescription>

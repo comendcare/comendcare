@@ -3,7 +3,7 @@
 import prisma from "@comend/lib/prisma"
 import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import { subMonths, startOfMonth } from "date-fns";
+import { subMonths, startOfMonth, monthsToYears } from "date-fns";
 import {Prisma} from "@prisma/client";
 import { InternalArgs } from "@prisma/client/runtime/library"
 import { withAdminAuth } from "./auth";
@@ -96,10 +96,28 @@ export const getOrganizationAnalytics = withAdminAuth(
             }
         })
 
-        const numPatientsEngaged = orgConditions.map(org => org.numberOfPatientsEngaged || 0).reduce((prev, curr) => prev + curr)
+        const patientsEngagedList = orgConditions.map(org => org.numberOfPatientsEngaged || 0)
+
+        const numPatientsEngaged = patientsEngagedList && patientsEngagedList.length > 0
+            ? patientsEngagedList.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const organization = await prisma.organization.findUnique({
+            select: {
+                moneyDeployed: true,
+                moneyRaised: true,
+                researchBudget: true
+            },
+            where: {
+                id: orgId
+            }
+        })
 
         return {
-            numPatientsEngaged
+            numPatientsEngaged: numPatientsEngaged || 0,
+            moneyDeployed: organization?.moneyDeployed || 0,
+            moneyRaised: organization?.moneyRaised || 0,
+            researchBudget: organization?.researchBudget || 0
         }
     }
 )
@@ -309,7 +327,24 @@ export const getOrganizationsAnalytics = withAdminAuth(
                 }
             }
         })
-        const patientsEngaged = conditionsWithPatientsEngaged.map(({numberOfPatientsEngaged}) => numberOfPatientsEngaged || 0).reduce((prev, curr) => prev + curr)
+
+        const patientsEngagedList = conditionsWithPatientsEngaged.map(({numberOfPatientsEngaged}) => numberOfPatientsEngaged || 0)
+        const sumPatientsEngaged = patientsEngagedList && patientsEngagedList.length > 0
+            ? patientsEngagedList.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const orgBudgets = allOrganizations.map(({moneyRaised, moneyDeployed, researchBudget}) => ({
+            moneyRaised: moneyRaised || 0, 
+            moneyDeployed: moneyDeployed || 0, 
+            researchBudget: researchBudget || 0
+        }))
+        const sumOrgBudgets = orgBudgets && orgBudgets.length > 0
+            ? orgBudgets.reduce((prev, curr) => ({
+                moneyRaised: prev.moneyRaised + curr.moneyRaised, 
+                moneyDeployed: prev.moneyDeployed + curr.moneyDeployed, 
+                researchBudget: prev.researchBudget + curr.researchBudget
+            }))
+            : {moneyRaised: 0, moneyDeployed: 0, researchBudget: 0}
 
         return {
             totalOrganizations,
@@ -318,7 +353,10 @@ export const getOrganizationsAnalytics = withAdminAuth(
             activeOrganizations,
             growthRate,
             completedProfiles,
-            patientsEngaged
+            sumPatientsEngaged,
+            sumMoneyRaised: sumOrgBudgets.moneyRaised,
+            sumMoneyDeployed: sumOrgBudgets.moneyDeployed,
+            sumResearchBudget: sumOrgBudgets.researchBudget
         };
     }
 )
