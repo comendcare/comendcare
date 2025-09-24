@@ -2,13 +2,17 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
-import mixpanel from "mixpanel-browser"
+import mixpanel, { Config } from "mixpanel-browser"
 import { useSession } from "next-auth/react"
 import { customerIOIdentify } from "./customer-io"
 import { getOrganizationFromOrganizationId, getUser } from "./fetchers"
 import { getCookie } from "./utils"
 
 const MixpanelContext = createContext<any>(null)
+
+interface MixpanelExtendedConfig extends Partial<Config> {
+  record_heatmap_data?: boolean;
+}
 
 export const useMixpanelContext = () => {
     const context = useContext(MixpanelContext)
@@ -66,7 +70,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             if (!process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV) throw new Error('Mixpanel dev token not found.')
             
             try {
-                mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, {
+                const config: MixpanelExtendedConfig = {
                     debug: true,
                     track_pageview: true,
                     persistence: "localStorage",
@@ -74,8 +78,13 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         const distinctId = mixpanel.get_distinct_id()
                         console.log("Mixpanel distinct_id:", distinctId)
                         setMixpanelContext({ distinctId })
-                    }
-                })
+                    },
+                    record_sessions_percent: 1, // Session Replay enabled, recording 1% of all sessions
+                    record_idle_timeout_ms: 1800000, // End a replay capture after 30mins of inactivity
+                    record_heatmap_data: true   // Enable Heatmap data collection
+                };
+
+                mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV, config)
                 console.log("Mixpanel (dev) initialized")
                 setIsMixpanelInitialized(true)
 
@@ -101,7 +110,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
             }
 
             try {
-                mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
+                const config: MixpanelExtendedConfig = {
                     debug: false,
                     disable_cookie: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
                     disable_persistence: !(getCookie('cookieyes-consent')?.includes('analytics:yes')),
@@ -110,8 +119,13 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                     loaded: function(mixpanel) {
                         const distinctId = mixpanel.get_distinct_id()
                         setMixpanelContext({ distinctId })
-                    }
-                })
+                    },
+                    record_sessions_percent: 1, // Session Replay enabled, recording 1% of all sessions
+                    record_idle_timeout_ms: 1800000, // End a replay capture after 30mins of inactivity
+                    record_heatmap_data: true   // Enable Heatmap data collection
+                };
+
+                mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, config)
                 console.log("Mixpanel initialized")
                 setIsMixpanelInitialized(true)
             } catch (error) {
