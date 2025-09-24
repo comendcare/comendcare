@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getToolsAnalytics} from "~admin/lib/fetchers"
+import {getOrganizationToolsAnalytics, getToolsAnalytics} from "~admin/lib/fetchers"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/packages/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
@@ -26,12 +26,21 @@ export function AdminToolsAnalyticsCards({orgId}: {orgId?: string | undefined}) 
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getToolsAnalytics(orgId)
-            .then((res) => {
-                console.log(`results`, res)
-                return res
-            })
-            .then(setData);
+        if (orgId) {
+            getOrganizationToolsAnalytics(orgId)
+                .then((res) => {
+                    console.log(`results`, res)
+                    return res
+                })
+                .then(setData);
+        } else {
+            getToolsAnalytics()
+                .then((res) => {
+                    console.log(`results`, res)
+                    return res
+                })
+                .then(setData);
+        }
     }, []);
 
     if (!data) return null; // Or a skeleton

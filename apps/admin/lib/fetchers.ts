@@ -179,7 +179,54 @@ export const getResearchPlansAnalytics = withAdminAuth(
 )
 
 export const getToolsAnalytics = withAdminAuth(
-    async (orgId?: string | undefined) => {
+    async () => {
+        const totalBiosamples: number = (await prisma.biosample.count({}))
+        const totalDiseaseModels: number = (await prisma.diseaseModel.count({}))
+        const totalClinicalDatasets: number = (await prisma.tool.count({}))
+
+        // Total Biosamples, by type
+        let totalBiosamplesOfType: {type: string, num: number}[] = await Promise.all(BIOSAMPLE_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.biosample.count({
+                where: {
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Disease Models, by type
+        let totalDiseaseModelsOfType: {type: string, num: number}[] = await Promise.all(DISEASE_MODEL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.diseaseModel.count({
+                where: {
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Clinical Datasets, by type
+        let totalClinicalDatasetsOfType: {type: string, num: number}[] = await Promise.all(TOOL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.tool.count({
+                where: {
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        return {
+            totalBiosamples,
+            totalDiseaseModels,
+            totalClinicalDatasets,
+            totalBiosamplesOfType,
+            totalDiseaseModelsOfType,
+            totalClinicalDatasetsOfType
+        };
+    }
+)
+
+export const getOrganizationToolsAnalytics = withAdminAuth(
+    async (orgId?: string) => {
         const totalBiosamples: number = (await prisma.biosample.count({
             where: {
                 organizationId: orgId
