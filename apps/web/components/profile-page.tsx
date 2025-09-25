@@ -120,7 +120,11 @@ export default function PAGProfilePage({
                                 </div>
                                 <div className="flex flex-row space-x-2">
                                     <Link
-                                        href={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                        href={
+                                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                                ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                                : `http://${organization.subdomain}.localhost:3000`
+                                        }
                                         className={buttonVariants({variant: "secondary"})}
                                         target="_blank"
                                     >
