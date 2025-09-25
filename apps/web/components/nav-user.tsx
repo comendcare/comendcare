@@ -3,7 +3,7 @@
 import {useEffect, useState} from "react";
 import {signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {ChevronsUpDown, LogOut, User} from "lucide-react";
+import {ChevronsUpDown, LogOut} from "lucide-react";
 import {
     Avatar,
     AvatarFallback,
@@ -28,15 +28,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@comend/components/ui/alert-dialog";
-import Loading from "@/loading";
-import {
-    getAllMembershipsFromUserId,
-    getInvitations,
-    getOrganizationFromOrganizationId,
-    getPublicOrganizationData,
-    getUser,
-    getUserMemberRequests
-} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {acceptInvitation, deleteMemberRequest} from "@comend/lib/actions";
 import {
@@ -52,212 +43,23 @@ import {cn} from "@comend/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
-import {MemberRequestWithUser, MembershipWithOrganization} from "@comend/lib/types";
+import {InvitationWithOrganization, MemberRequestWithUserAndOrganization, MembershipWithOrganization} from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
 import Spinner from "@/packages/components/ui/spinner";
+import {User} from "@prisma/client";
+
+type NavUserProps = {
+    user: Partial<User>;
+    memberships: MembershipWithOrganization[];
+    invitations: InvitationWithOrganization[],
+    memberRequests: MemberRequestWithUserAndOrganization[];
+};
 
 
-export function NavUser() {
+export function NavUser({ user, memberships, invitations, memberRequests }: NavUserProps) {
     const {data: session, update, status} = useSession();
     const router = useRouter();
-    const [userData, setUserData] = useState<any>(null);
-    const [memberships, setMemberships] = useState<MembershipWithOrganization[]>();
-    const [invitations, setInvitations] = useState<any[]>([]);
-    const [memberRequests, setMemberRequests] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            if (status === "unauthenticated") {
-                router.push("/login");
-                return;
-            }
-
-            if (status === "authenticated" && session?.user?.id) {
-                try {
-                    const userData = await getUser(session.user.id, {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        notificationSettings: true,
-                        consentSettings: true,
-                        accounts: true,
-                        follows: true,
-                        sentInvitations: true,
-                        memberships: true,
-                        membershipRequests: true,
-                        organizations: true,
-                        posts: true,
-                        reactions: true,
-                        roadmaps: true,
-                        sessions: true,
-                        stakeholders: true,
-                        platformNotifications: true,
-                        reviews: true,
-                        replies: true,
-                        reportOnReviews: true,
-                        reportOnReplies: true,
-                        reviewFeedbacks: true,
-                        metadata: true,
-                    });
-
-                    setUserData(userData);
-
-                    const response = await getInvitations({
-                        id: true,
-                        email: true,
-                        role: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        accepted: true,
-                        organizationId: true,
-                    });
-
-                    if (response.success && response.data) {
-                        const invitationsWithDetails = await Promise.all(
-                            response.data.map(async (invitation) => {
-                                const orgResponse = await getPublicOrganizationData(invitation.organizationId, {
-                                    id: true,
-                                    name: true,
-                                    published: true,
-                                    verified: true,
-                                    public: true,
-                                    description: true,
-                                    contactEmail: true,
-                                    image: true,
-                                    headerImage: true,
-                                    subdomain: true,
-                                    yearFounded: true,
-                                    incorporationStatus: true,
-                                    therapeuticsOfInterest: true,
-                                    therapeuticsInDevelopment: true,
-                                    website: true,
-                                    moneyRaised: true,
-                                    moneyDeployed: true,
-                                    researchBudget: true,
-                                    members: true,
-                                    conditions: true,
-                                });
-                                return {
-                                    ...invitation,
-                                    organization: orgResponse.success ? orgResponse.data : null,
-                                };
-                            })
-                        );
-
-                        setInvitations(invitationsWithDetails);
-                        setIsDialogOpen(true);
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch user data:", error);
-                }
-            }
-        };
-
-        async function fetchOrgData() {
-            if (session) {
-                try {
-                    const response = await getAllMembershipsFromUserId(session.user.id, {
-                        id: true,
-                        role: true,
-                        title: true,
-                        email: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        invitedBy: true,
-                        organization: true,
-                        user: true,
-                        metadata: true
-                    });
-
-                    // Map the response to the correct structure if needed
-                    if (response.success && response.data) {
-                        setMemberships(response.data);
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-
-                } catch (error) {
-                    console.error("Error fetching organizations:", error);
-                    toast.error("Couldn't get organizations");
-                }
-            }
-        }
-
-        async function fetchInvitationData() {
-            if (!session?.user?.email && status !== "loading") {
-                console.error("User email is not available in the session.");
-                toast.error("Session email is missing. Unable to fetch invitations.");
-                return;
-            }
-
-            try {
-                const response = await getInvitations({
-                    id: true,
-                    email: true,
-                    role: true,
-                    organizationId: true,
-                    organization: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    accepted: true,
-                });
-
-                if (response.success && response.data) {
-                    setInvitations(response.data)
-                } else if (response.error) {
-                    console.error(response.error);
-                    toast.error(response.error);
-                } else {
-                    console.error("Unexpected response structure:", response);
-                    toast.error("Couldn't fetch invitations. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error fetching invitations:", error);
-                toast.error("An unexpected error occurred while fetching invitations.");
-            }
-        }
-
-        async function fetchMemberRequestData() {
-            try {
-                const response = await getUserMemberRequests(session?.user.id, {
-                    id: true,
-                    userId: true,
-                    email: true,
-                    role: true,
-                    organizationId: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    approved: true,
-                    user: true,
-                });
-
-                if (response.success && response.data) {
-                    setMemberRequests(response.data);
-                } else if (response.error) {
-                    console.error(response.error);
-                    toast.error(response.error);
-                } else {
-                    console.error("Unexpected response structure:", response);
-                    toast.error("Couldn't fetch member requests. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error fetching member requests:", error);
-                toast.error("An unexpected error occurred while fetching member requests.");
-            }
-        }
-
-        if (status === "authenticated" && session?.user?.id) {
-            fetchUserData();
-            fetchOrgData();
-            fetchInvitationData();
-            fetchMemberRequestData();
-        }
-    }, [status, session, router]);
 
     async function handleAcceptInvitation(invitationId: string) {
         try {
@@ -265,10 +67,6 @@ export function NavUser() {
 
             if (response.success && response.data) {
                 toast.success("Invitation accepted successfully!");
-                // Remove the accepted invitation from the list
-                setInvitations((prevInvitations) =>
-                    prevInvitations?.filter((invitation) => invitation.id !== invitationId)
-                );
                 await update({
                     ...session,
                     organizationId: response.data.organizationId,
@@ -283,7 +81,7 @@ export function NavUser() {
         }
     }
 
-    const handleClose = async (memberRequest: MemberRequestWithUser) => {
+    const handleClose = async (memberRequest: MemberRequestWithUserAndOrganization) => {
         try {
             mixpanelTrack("Membership Request Approval Acknowledged", {
                 "Member Name": memberRequest.user.name,
@@ -309,11 +107,9 @@ export function NavUser() {
         return <Spinner className="scale-100"/>
     }
 
-    if (!userData) {
+    if (!user) {
         return null;
     }
-
-    const {name, email, image} = userData?.data || {};
 
     return (
         <>
@@ -341,9 +137,9 @@ export function NavUser() {
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger>
                         <Avatar className="h-8 w-8 rounded-lg">
-                            <AvatarImage src={image} alt={name}/>
+                            <AvatarImage src={user.image || ""} alt={user.name || "User name"}/>
                             <AvatarFallback className="rounded-lg">
-                                {name?.[0] || "NA"}
+                                {user.name?.[0] || "NA"}
                             </AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
@@ -356,20 +152,20 @@ export function NavUser() {
                                     // onClick={() => router.push(`/user/${session?.user?.id}`)}
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
-                                        <AvatarImage src={image} alt={name}/>
+                                        <AvatarImage src={user.image || ""} alt={user.name || "User name"}/>
                                         <AvatarFallback className="rounded-lg">
-                                            {name?.[0] || "NA"}
+                                            {user.name?.[0] || "NA"}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <div className="inline">
-                                            <span className="truncate font-semibold">{name || "Nameless"}</span>
+                                            <span className="truncate font-semibold">{user.name || "Nameless"}</span>
                                             {session?.user.membership?.role && (
                                                 <> - <span
                                                     className="capitalize">{session.user.membership.role}</span></>
                                             )}
                                         </div>
-                                        <span className="truncate text-xs">{email}</span>
+                                        <span className="truncate text-xs">{user.email}</span>
                                     </div>
                                 </DropdownMenuItem>
                             </DialogTrigger>
@@ -461,7 +257,7 @@ export function NavUser() {
                                                     </div>
                                                     <Button
                                                         variant="default"
-                                                        onClick={() => handleAcceptInvitation(invitation.id)}
+                                                        onClick={() => handleAcceptInvitation(invitation?.id || "")}
                                                     >
                                                         Accept
                                                     </Button>
