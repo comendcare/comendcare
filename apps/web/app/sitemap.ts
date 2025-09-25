@@ -1,4 +1,4 @@
-import { getPublicRoadmapsForOrganization } from "@comend/lib/fetchers"
+import { getPublicRoadmapsForOrganization } from "@/packages/lib/fetchers"
 import { headers } from "next/headers"
 
 export default async function Sitemap() {
