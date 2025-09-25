@@ -1,9 +1,9 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import {ApiResponse, milestoneCategories, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {ApiResponse, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, milestoneCategories, RESEARCH_PLAN_TYPES, TOOL_TYPE_OPTIONS} from "@comend/lib/types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "@comend/lib/utils";
-import { subMonths, startOfMonth } from "date-fns";
+import { subMonths, startOfMonth, monthsToYears } from "date-fns";
 import {Prisma} from "@prisma/client";
 import { InternalArgs } from "@prisma/client/runtime/library"
 import { withAdminAuth } from "./auth";
@@ -84,8 +84,112 @@ export const getUserAnalytics = withAdminAuth(
     }
 )
 
-export const getResearchPlansAnalytics = withAdminAuth(
+export const getOrganizationAnalytics = withAdminAuth(
     async (orgId?: string | undefined) => {
+        const orgConditions = await prisma.condition.findMany({
+            where: {
+                organizations: {
+                    some: {
+                        organizationId: orgId
+                    }
+                }
+            }
+        })
+
+        const patientsEngagedList = orgConditions.map(org => org.numberOfPatientsEngaged || 0)
+
+        const numPatientsEngaged = patientsEngagedList && patientsEngagedList.length > 0
+            ? patientsEngagedList.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const organization = await prisma.organization.findUnique({
+            select: {
+                moneyDeployed: true,
+                moneyRaised: true,
+                researchBudget: true
+            },
+            where: {
+                id: orgId
+            }
+        })
+
+        return {
+            numPatientsEngaged: numPatientsEngaged || 0,
+            moneyDeployed: organization?.moneyDeployed || 0,
+            moneyRaised: organization?.moneyRaised || 0,
+            researchBudget: organization?.researchBudget || 0
+        }
+    }
+)
+
+export const getResearchPlansAnalytics = withAdminAuth(
+    async () => {
+        const allResearchPlans = await prisma.roadmap.findMany({
+            include: {milestones: {include: {types: true}}}
+        })
+
+        // Total research plans
+        const totalResearchPlans = allResearchPlans.length
+
+        // Total research plans, by type
+        let totalResearchPlansOfType: {type: string, num: number}[] = await Promise.all(RESEARCH_PLAN_TYPES.map(async (type) => ({
+            type: type.label,
+            num: await prisma.roadmap.count({
+                where: {
+                    modalities: {has: type.value}
+                }
+            })
+        })))
+
+        // Total projects, by type
+        const milestoneTypes = await prisma.milestoneType.findMany()
+        const allProjects = await prisma.milestone.findMany({
+            include: {
+                types: true
+            }
+        })
+        let totalProjects = allProjects.length
+        let totalProjectsOfType: {type: string, num: number}[] = milestoneTypes.map((type) => (
+            {
+                type: type.label,
+                num: allProjects.filter(project => project.types.map(type => type.milestoneTypeId).includes(type.id)).length
+            }
+        ))
+
+        let totalResearchPlansByStatus = Object.values(milestoneCategories).map(({option}) => ({
+            type: option.label,
+            num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
+        }))
+
+        let projectsBudgets = allProjects.map(({budget}) => budget || 0)
+        let sumProjectBudgets = projectsBudgets && projectsBudgets.length > 0
+            ? projectsBudgets.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+        let projectBudgetsByProgress: {type: string, num: number}[] = statuses.map(status => ({
+            type: status, 
+            num: allProjects
+                    .filter(project => project.status === status)
+                    .map(project => project.budget || 0)
+                    .concat([0]) // concat with 0 to avoid reduce error if there are no projects of this status
+                    .reduce((prev, next) => prev + next)
+        }))
+
+        return {
+            totalResearchPlans,
+            totalResearchPlansOfType,
+            totalResearchPlansByStatus,
+            totalProjects,
+            totalProjectsOfType,
+            sumProjectBudgets,
+            projectBudgetsByProgress
+        };
+    }
+)
+
+export const getOrganizationResearchPlansAnalytics = withAdminAuth(
+    async (orgId?: string) => {
         const allResearchPlans = await prisma.roadmap.findMany({
             where: {
                 organizationId: orgId
@@ -130,38 +234,224 @@ export const getResearchPlansAnalytics = withAdminAuth(
             num: allResearchPlans.filter(researchPlan => getStage(researchPlan.milestones as any).value === option.value).length
         }))
 
+        let projectsBudgets = allProjects.map(({budget}) => budget || 0)
+        let sumProjectBudgets = projectsBudgets && projectsBudgets.length > 0
+            ? projectsBudgets.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+        let projectBudgetsByProgress: {type: string, num: number}[] = statuses.map(status => ({
+            type: status, 
+            num: allProjects
+                    .filter(project => project.status === status)
+                    .map(project => project.budget || 0)
+                    .concat([0]) // concat with 0 to avoid reduce error if there are no projects of this status
+                    .reduce((prev, next) => prev + next)
+        }))
+
         return {
             totalResearchPlans,
             totalResearchPlansOfType,
             totalResearchPlansByStatus,
             totalProjects,
-            totalProjectsOfType
+            totalProjectsOfType,
+            sumProjectBudgets,
+            projectBudgetsByProgress
         };
     }
 )
 
 export const getToolsAnalytics = withAdminAuth(
-    async (orgId?: string | undefined) => {
-        const totalTools: number = (await prisma.tool.findMany({
+    async () => {
+        const totalBiosamples: number = (await prisma.biosample.count({}))
+        const totalDiseaseModels: number = (await prisma.diseaseModel.count({}))
+        const totalClinicalDatasets: number = (await prisma.tool.count({}))
+
+        // Total Biosamples, by type
+        let totalBiosamplesOfType: {type: string, num: number}[] = await Promise.all(BIOSAMPLE_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.biosample.count({
+                where: {
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Disease Models, by type
+        let totalDiseaseModelsOfType: {type: string, num: number}[] = await Promise.all(DISEASE_MODEL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.diseaseModel.count({
+                where: {
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Clinical Datasets, by type
+        let totalClinicalDatasetsOfType: {type: string, num: number}[] = await Promise.all(TOOL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.tool.count({
+                where: {
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        return {
+            totalBiosamples,
+            totalDiseaseModels,
+            totalClinicalDatasets,
+            totalBiosamplesOfType,
+            totalDiseaseModelsOfType,
+            totalClinicalDatasetsOfType
+        };
+    }
+)
+
+export const getOrganizationToolsAnalytics = withAdminAuth(
+    async (orgId?: string) => {
+        const totalBiosamples: number = (await prisma.biosample.count({
             where: {
                 organizationId: orgId
             }
-        })).length
+        }))
+
+        const totalDiseaseModels: number = (await prisma.diseaseModel.count({
+            where: {
+                organizationId: orgId
+            }
+        }))
+
+        const totalClinicalDatasets: number = (await prisma.tool.count({
+            where: {
+                organizationId: orgId
+            }
+        }))
+
+        // Total Biosamples, by type
+        let totalBiosamplesOfType: {type: string, num: number}[] = await Promise.all(BIOSAMPLE_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.biosample.count({
+                where: {
+                    organizationId: orgId,
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Disease Models, by type
+        let totalDiseaseModelsOfType: {type: string, num: number}[] = await Promise.all(DISEASE_MODEL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.diseaseModel.count({
+                where: {
+                    organizationId: orgId,
+                    types: {has: type.value}
+                }
+            })
+        })))
+
+        // Total Clinical Datasets, by type
+        let totalClinicalDatasetsOfType: {type: string, num: number}[] = await Promise.all(TOOL_TYPE_OPTIONS.map(async (type) => ({
+            type: type.label,
+            num: await prisma.tool.count({
+                where: {
+                    organizationId: orgId,
+                    types: {has: type.value}
+                }
+            })
+        })))
 
         return {
-            totalTools,
+            totalBiosamples,
+            totalDiseaseModels,
+            totalClinicalDatasets,
+            totalBiosamplesOfType,
+            totalDiseaseModelsOfType,
+            totalClinicalDatasetsOfType
         };
     }
 )
 
 export const getRFPsAnalytics = withAdminAuth(
-    async (orgId?: string | undefined) => {
+    async () => {
+        const allRFPs = await prisma.rFP.findMany({})
+        const totalRFPs: number = allRFPs.length
+
+        const totalPublishedRFPs: number = await prisma.rFP.count({
+            where: {
+                private: false
+            }
+        })
+
+        const totalPrivateRFPs = totalRFPs - totalPublishedRFPs
+
+        const RFPsByOpenTo = await Promise.all(["CRO", "ACADEMIC"].map(async (openToKey) => ({
+            type: openToKey,
+            num: (await prisma.rFP.findMany({
+                where: {
+                    openTo: {has: openToKey}
+                }
+            })).length
+        })))
+
+        const createMoneyFormatter = (cents?: boolean) => Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: cents ? 2 : 0,
+            maximumFractionDigits: cents ? 2 : 0,
+        });
+        const moneyFormatter = createMoneyFormatter(undefined)
+
+        const budgetBuckets = [50000, 100000, 500000, 1000000, 5000000]
+        let RFPsByBudget: {type: string, num: number}[] = []
+
+        for (let i = 0; i < budgetBuckets.length; i++) {
+            const min = i <= 0 ? 0 : budgetBuckets[i-1]
+            const max = budgetBuckets[i]
+
+            RFPsByBudget.push({
+                type: `${moneyFormatter.format(min)} - ${moneyFormatter.format(max - 1)}`,
+                num: allRFPs.filter(rfp => typeof rfp.budget === 'number' && rfp.budget >= min && rfp.budget < max).length
+            })
+        }
+
+        RFPsByBudget.push({
+            type: `${formatMoney(budgetBuckets[budgetBuckets.length - 1])} +`,
+            num: allRFPs.filter(rfp => typeof rfp.budget === 'number' && rfp.budget >= budgetBuckets[budgetBuckets.length - 1]).length
+        })
+
+        RFPsByBudget.push({
+            type: 'No Budget',
+            num: allRFPs.filter(rfp => rfp.budget === undefined || rfp.budget === null).length
+        })
+
+        return {
+            totalRFPs,
+            totalPublishedRFPs,
+            totalPrivateRFPs,
+            RFPsByOpenTo,
+            RFPsByBudget
+        };
+    }
+)
+
+export const getOrganizationRFPsAnalytics = withAdminAuth(
+    async (orgId?: string) => {
         const allRFPs = await prisma.rFP.findMany({
             where: {
                 organizationId: orgId
             }
         })
         const totalRFPs: number = allRFPs.length
+
+        const totalPublishedRFPs: number = await prisma.rFP.count({
+            where: {
+                organizationId: orgId,
+                private: false
+            }
+        })
+
+        const totalPrivateRFPs = totalRFPs - totalPublishedRFPs
 
         const RFPsByOpenTo = await Promise.all(["CRO", "ACADEMIC"].map(async (openToKey) => ({
             type: openToKey,
@@ -206,13 +496,43 @@ export const getRFPsAnalytics = withAdminAuth(
 
         return {
             totalRFPs,
+            totalPublishedRFPs,
+            totalPrivateRFPs,
             RFPsByOpenTo,
             RFPsByBudget
         };
     }
 )
 
-export const getOrganizationAnalytics = withAdminAuth(
+export const getClaimedGenesAnalytics = withAdminAuth(
+    async () => {
+        const totalGenes = await prisma.gene.count({})
+        const conditions = await prisma.condition.findMany({
+            select: {
+                causalGenes: true,
+                // associatedGenes: true,
+            },
+        })
+
+        // Flatten everything into one list
+        const allGenes = conditions.flatMap(c =>
+            [
+                ...c.causalGenes, 
+                // ...c.associatedGenes
+            ]
+        );
+
+        // Deduplicate
+        const uniqueGenes = new Set(allGenes);
+
+        return {
+            totalGenes,
+            claimedGenes: uniqueGenes.size
+        }
+    }
+)
+
+export const getOrganizationsAnalytics = withAdminAuth(
     async () => {
         const now = new Date();
         const startOfCurrentMonth = startOfMonth(now);
@@ -278,13 +598,47 @@ export const getOrganizationAnalytics = withAdminAuth(
             if (isComplete) completedProfiles++;
         }
 
+        // Sum of all patients engaged
+        const conditionsWithPatientsEngaged = await prisma.condition.findMany({
+            select: {
+                numberOfPatientsEngaged: true
+            },
+            where: {
+                numberOfPatientsEngaged: {
+                    not: null
+                }
+            }
+        })
+
+        const patientsEngagedList = conditionsWithPatientsEngaged.map(({numberOfPatientsEngaged}) => numberOfPatientsEngaged || 0)
+        const sumPatientsEngaged = patientsEngagedList && patientsEngagedList.length > 0
+            ? patientsEngagedList.reduce((prev, curr) => prev + curr)
+            : 0
+
+        const orgBudgets = allOrganizations.map(({moneyRaised, moneyDeployed, researchBudget}) => ({
+            moneyRaised: moneyRaised || 0, 
+            moneyDeployed: moneyDeployed || 0, 
+            researchBudget: researchBudget || 0
+        }))
+        const sumOrgBudgets = orgBudgets && orgBudgets.length > 0
+            ? orgBudgets.reduce((prev, curr) => ({
+                moneyRaised: prev.moneyRaised + curr.moneyRaised, 
+                moneyDeployed: prev.moneyDeployed + curr.moneyDeployed, 
+                researchBudget: prev.researchBudget + curr.researchBudget
+            }))
+            : {moneyRaised: 0, moneyDeployed: 0, researchBudget: 0}
+
         return {
             totalOrganizations,
             newOrganizationsThisMonth,
             newOrganizationsLastMonth,
             activeOrganizations,
             growthRate,
-            completedProfiles
+            completedProfiles,
+            sumPatientsEngaged,
+            sumMoneyRaised: sumOrgBudgets.moneyRaised,
+            sumMoneyDeployed: sumOrgBudgets.moneyDeployed,
+            sumResearchBudget: sumOrgBudgets.researchBudget
         };
     }
 )

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { DollarSign, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Badge } from "@comend/components/ui/badge";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@comend/components/ui/card";
-import {getOrganizationAnalytics} from "~admin/lib/fetchers"
+import {getOrganizationsAnalytics} from "~admin/lib/fetchers"
 
 interface AnalyticsData {
     totalOrganizations: number;
@@ -13,13 +13,17 @@ interface AnalyticsData {
     activeOrganizations: number;
     growthRate: number;
     completedProfiles: number;
+    sumPatientsEngaged: number;
+    sumMoneyRaised: number;
+    sumMoneyDeployed: number;
+    sumResearchBudget: number;
 }
 
 export function AdminOrganizationsAnalyticsCards() {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        getOrganizationAnalytics()
+        getOrganizationsAnalytics()
             .then((res) => res)
             .then(setData);
     }, []);
@@ -43,6 +47,7 @@ export function AdminOrganizationsAnalyticsCards() {
                     </div>
                 </CardFooter>
             </Card>
+
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>New Organizations This Month</CardDescription>
@@ -71,6 +76,7 @@ export function AdminOrganizationsAnalyticsCards() {
                     </div>
                 </CardFooter>
             </Card>
+
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Active Accounts</CardDescription>
@@ -83,6 +89,7 @@ export function AdminOrganizationsAnalyticsCards() {
                     </div>
                 </CardFooter>
             </Card>
+
             <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Complete Organizations</CardDescription>
@@ -92,6 +99,65 @@ export function AdminOrganizationsAnalyticsCards() {
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">
                         Organizations completed
+                    </div>
+                </CardFooter>
+            </Card>
+
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Patients Engaged</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                        {data?.sumPatientsEngaged.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Sum of all patients engaged across all organizations
+                    </div>
+                </CardFooter>
+            </Card>
+
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Money Raised</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums flex flex-row items-center">
+                        <DollarSign />
+                        {data?.sumMoneyRaised.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Sum of all money raised across all organizations
+                    </div>
+                </CardFooter>
+            </Card>
+
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Money Deployed</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums flex flex-row items-center">
+                        <DollarSign />
+                        {data?.sumMoneyDeployed.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Sum of all money deployed across all organizations
+                    </div>
+                </CardFooter>
+            </Card>
+
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Research Budget</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums flex flex-row items-center">
+                        <DollarSign />
+                        {data?.sumResearchBudget.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1 text-sm">
+                    <div className="text-muted-foreground">
+                        Sum of all research budgets across all organizations
                     </div>
                 </CardFooter>
             </Card>
