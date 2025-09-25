@@ -14,9 +14,9 @@ import Link from "next/link";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@comend/components/ui/skeleton";
+import {MembershipWithOrganization} from "@/packages/lib/types";
 
-export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
-    console.log("memberships again again: ", memberships)
+export function OrganizationSwitcher({memberships}: { memberships: MembershipWithOrganization[] }) {
     const {data: session, update} = useSession();
     const activeId = session?.user?.organizationId ?? null;
     const router = useRouter();
@@ -33,8 +33,6 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
     };
 
     const activeOrg = memberships.find(m => m.organizationId === activeId) ?? null;
-    console.log("activeId: ", activeId)
-    console.log("activeOrg: ", activeOrg)
 
     if (activeOrg) {
         return (
