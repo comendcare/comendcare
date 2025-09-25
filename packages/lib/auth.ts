@@ -35,15 +35,33 @@ export const authOptions: NextAuthOptions = {
                 const subject = "Sign in to Comend";
                 const text = `Complete signing in: ${preflightUrl}`;
                 const html = `
-                    <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;">
+                    <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.5; color:#111;">
                         <p>Click the button to complete signing in:</p>
-                            <p><a href="${preflightUrl}" 
-                                    style="display:inline-block;padding:10px 16px;border-radius:8px;border:1px solid #ccc;text-decoration:none">
+                        <p>
+                            <a
+                                href="${preflightUrl}"
+                                style="display:inline-block;padding:10px 16px;border-radius:8px;border:1px solid #d0d7de;text-decoration:none;"
+                            >
                                 Complete sign in
-                              </a></p>
-                            <p>If you didn’t request this, you can ignore this email.</p>
-                        </div>
-                  `;
+                            </a>
+                        </p>
+
+                        <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0;" />
+
+                        <p><strong>Or copy & paste this link:</strong></p>
+                        <!-- Show as selectable plain text AND as a link. The outer container prevents ugly wrapping. -->
+                        <p style="margin:8px 0;">
+                            <a href="${preflightUrl}" style="text-decoration:none;color:inherit;">
+                                <span style="display:inline-block; max-width:100%; word-break:break-all; overflow-wrap:anywhere; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; background:#f6f8fa; padding:8px 10px; border-radius:6px; border:1px solid #e5e7eb;">
+                                    ${preflightUrl}
+                                </span>
+                            </a>
+                        </p>
+
+                        <p style="color:#6b7280; font-size:12px; margin-top:12px;">
+                            If you didn’t request this, you can safely ignore this email.
+                        </p>
+                    </div>`;
 
                 await sgMail.send({
                     to: identifier,
