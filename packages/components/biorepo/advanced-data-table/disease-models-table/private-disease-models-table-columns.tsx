@@ -47,6 +47,40 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         }
     }
 
+    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE GENE SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        }
+    };
+
     // useEffect(() => {
     //     const init = async () => {
     //         const response = await getDiagnosisTypes()
@@ -178,8 +212,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "gene.symbol",
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -187,8 +221,13 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Gene"
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
             }
         },
         // {
@@ -237,8 +276,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name",
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -255,8 +294,13 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Storage Facility"
+                label: "Storage Facility",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncInstitutionSearch
             }
         },
         {
@@ -274,6 +318,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Point of Contact"
@@ -294,6 +339,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Links"
@@ -331,6 +377,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {

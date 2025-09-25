@@ -1,6 +1,6 @@
 "use client";
 
-import type {ColumnDef} from "@tanstack/react-table";
+import type {ColumnDef, SortingFn} from "@tanstack/react-table";
 import {
     CircleDashed,
     Globe,
@@ -200,13 +200,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Internal Donor ID"/>
+            // accessorFn: (row) => row.donor?.internalId ?? null,
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Internal Donor ID" />
             ),
+            // enableSorting: true,
+            // sortingFn: nullsLast,
             enableHiding: true,
-            meta: {
-                label: "Internal Donor ID"
-            }
+            meta: { 
+                label: "Internal Donor ID" 
+            },
         },
         {
             id: "donorId",
@@ -251,8 +254,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "gene.symbol",
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -366,6 +369,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     })}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -426,8 +430,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name",
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -459,6 +463,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Point of Contact"
@@ -479,6 +484,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Links"
@@ -751,6 +757,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {

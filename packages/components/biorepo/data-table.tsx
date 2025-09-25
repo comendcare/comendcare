@@ -4,6 +4,7 @@ import * as React from "react"
 import {
     ColumnDef,
     ColumnFiltersState,
+    SortingFn,
     SortingState,
     VisibilityState,
     flexRender,
@@ -33,6 +34,19 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
+
+export const nullsLast: SortingFn<any> = (rowA, rowB, columnId) => {
+    console.log(`GOT here`)
+    const a = rowA.getValue(columnId);
+    const b = rowB.getValue(columnId);
+
+    if ((a == null && b == null) || (a == undefined && b == undefined)) return 0;   // both null/undefined
+    if (a == null || a == undefined) return 1;                // a is null -> after b
+    if (b == null || b == undefined) return -1;               // b is null -> after a
+
+    // normalize to string for comparison
+    return String(a).localeCompare(String(b), undefined, { numeric: true });
+};
 
 export function DataTable<TData, TValue>({
                                              columns,

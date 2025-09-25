@@ -13,8 +13,43 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import { Checkbox } from "./../../../ui/checkbox";
+import { Option } from "./../../../../../packages/lib/types";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
+    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE GENE SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
+
+        try {
+            const response = await fetch(`/api/institutions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            return [];
+        }
+    };
+
   const columns: ColumnDef<any>[] = [
     {
         id: "select",
@@ -152,8 +187,8 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "gene",
-        accessorKey: "gene",
+        id: "gene.symbol",
+        accessorKey: "gene.symbol",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Gene"/>
         ),
@@ -161,8 +196,13 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <>{row.original.gene?.symbol}</>
         ),
         enableHiding: true,
+        enableColumnFilter: true,
         meta: {
-            label: "Gene"
+            label: "Gene",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncGeneSearch
         }
     },
     // {
@@ -189,8 +229,8 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     //     }
     // },
     {
-        id: "institution",
-        accessorKey: "institution",
+        id: "institution.name",
+        accessorKey: "institution.name",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Storage Facility"/>
         ),
@@ -207,8 +247,13 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             return <>{row.original.institution?.name}</>
         },
         enableHiding: true,
+        enableColumnFilter: true,
         meta: {
-            label: "Storage Facility"
+            label: "Storage Facility",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncInstitutionSearch
         }
     },
     {
@@ -225,6 +270,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
     {
@@ -241,6 +287,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
 
@@ -274,6 +321,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
     {
