@@ -2309,7 +2309,20 @@ export const getDiseaseModels = withOrganizationAuth(
                 where = filterColumns({
                     filters,
                     joinOperator: "and"
-                })
+                }) || {}
+            }
+
+            // add global filter
+            if (input.q) {
+                where.OR = [
+                    { id: { contains: input.q, mode: "insensitive" } },
+                    { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
+                    { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                    { description: {contains: input.q, mode: "insensitive"}},
+                    // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
+                    // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
+                    // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
+                ];
             }
 
             const orderBy = input.sort.length
@@ -2381,7 +2394,6 @@ export const getBiosamples = withOrganizationAuth(
                 input.filterFlag === "advancedFilters"
 
             let where: any = {};
-            console.log(`input`, input)
 
             if (advancedTable) {
                 const preProcessedFilters: any = input.filters.map(filter => ({
@@ -2444,7 +2456,32 @@ export const getBiosamples = withOrganizationAuth(
                 where = filterColumns({
                     filters,
                     joinOperator: "and"
-                })
+                }) || {}
+            }
+
+            // add global filter
+            if (input.q) {
+                where.OR = [
+                    { id: { contains: input.q, mode: "insensitive" } },
+                    { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
+                    { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                    // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
+                    // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
+                    // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
+                    { donor: { internalId: { contains: input.q, mode: "insensitive" } } },
+                    { donor: { id: {contains: input.q, mode: "insensitive" } } },
+                    {
+                        donor: {
+                            diagnoses: {
+                                some: {
+                                    type: {
+                                        label: { contains: input.q, mode: "insensitive" },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ];
             }
 
             const orderBy = input.sort.length
@@ -2705,7 +2742,21 @@ export const getDatasamples = withOrganizationAuth(
                 where = filterColumns({
                     filters,
                     joinOperator: "and"
-                })
+                }) || {}
+            }
+
+            // add global filter
+            if (input.q) {
+                where.OR = [
+                    { id: { contains: input.q, mode: "insensitive" } },
+                    { title: {contains: input.q, mode: "insensitive"}},
+                    { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
+                    { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                    { description: {contains: input.q, mode: "insensitive"}},
+                    // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
+                    // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
+                    // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
+                ];
             }
 
             const orderBy = input.sort.length

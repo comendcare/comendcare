@@ -23,6 +23,7 @@ import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu
 import {useSession} from "next-auth/react";
 import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
+import { Checkbox } from "./../../../ui/checkbox";
 import { getDiagnosisTypes, getMilestones } from "./../../../../../packages/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
@@ -115,6 +116,31 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                    className="translate-y-[2px]"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="translate-y-[2px]"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+            meta: { label: "Select" }
+        },
+        {
             id: "private",
             accessorKey: "private",
             header: ({column}) => (
@@ -168,7 +194,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: {
-                label: "Sample ID"
+                label: "Sample ID",
             }
         },
         {

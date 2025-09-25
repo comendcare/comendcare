@@ -150,14 +150,14 @@ export const authOptions: NextAuthOptions = {
     },
 
     callbacks: {
-        async signIn({user, account, profile, email, credentials}) {
-            const isAllowedToSignIn = true
-            if (isAllowedToSignIn) {
-                return true
-            } else {
-                return false
-            }
-        },
+        // async signIn({user, account, profile, email, credentials}) {
+        //     const isAllowedToSignIn = true
+        //     if (isAllowedToSignIn) {
+        //         return true
+        //     } else {
+        //         return false
+        //     }
+        // },
 
         // async signIn({user, account, email}) {
         //     // Always allow the initial verification email to be sent
@@ -177,7 +177,6 @@ export const authOptions: NextAuthOptions = {
         //     const hasOauth = existing.accounts.length > 0;
         //     const oauthProviders = new Set(existing.accounts.map(a => a.provider));
         //     const trying = account.provider;
-        //     const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "http://localhost:3000";
         //
         //     if (hasOauth && trying === "email") {
         //         const first = oauthProviders.values().next().value as string | undefined;

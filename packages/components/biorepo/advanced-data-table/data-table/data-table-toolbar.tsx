@@ -12,18 +12,28 @@ import { Button } from "./../../../ui/button";
 import { Input } from "./../../../ui/input";
 import { cn } from "./../../../../../packages/lib/utils";
 import { DataTableSortList } from "./data-table-sort-list";
+import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 
 interface DataTableToolbarProps<TData> extends React.ComponentProps<"div"> {
   table: Table<TData>;
+  enableSearch?: boolean;
 }
 
 export function DataTableToolbar<TData>({
   table,
   children,
   className,
+  enableSearch = false,
   ...props
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const [globalFilter, setGlobalFilter] = useQueryState("q", {
+    history: "replace",
+    defaultValue: "",
+  });
+  
+  const isFiltered =
+    table.getState().columnFilters.length > 0 || globalFilter.length > 0;
 
   const columns = React.useMemo(
     () => table.getAllColumns().filter((column) => column.columnDef.enableColumnFilter && !column.columnDef.meta?.showInAdvancedOnly),
@@ -32,7 +42,30 @@ export function DataTableToolbar<TData>({
 
   const onReset = React.useCallback(() => {
     table.resetColumnFilters();
+    setGlobalFilter(""); // clear global search too
   }, [table]);
+
+  // virtual column object for global search
+  const globalColumn = React.useMemo(
+    () => ({
+      id: "global",
+      getFilterValue: () => globalFilter,
+      setFilterValue: (value: string) => setGlobalFilter(value),
+      columnDef: {
+        meta: { label: "Search...", variant: "text" },
+      },
+    }),
+    [globalFilter, setGlobalFilter],
+  );
+
+  useEffect(() => {
+    // whenever globalFilter changes, update the table's columnFilters
+    table.setColumnFilters((prev) => {
+      const withoutGlobal = prev.filter(f => f.id !== "g");
+      if (!globalFilter) return withoutGlobal;
+      return [...withoutGlobal, { id: "g", value: globalFilter }];
+    });
+  }, [globalFilter, table]);
 
   return (
     <div
@@ -45,9 +78,13 @@ export function DataTableToolbar<TData>({
       {...props}
     >
       <div className="flex flex-1 flex-wrap items-center gap-2">
+        {/* Global search input */}
+        {enableSearch && <DataTableToolbarFilter key={'g'} column={globalColumn as any} />}
+
         {columns.map((column) => (
           <DataTableToolbarFilter key={column.id} column={column} />
         ))}
+
         {isFiltered && (
           <Button
             aria-label="Reset filters"
@@ -89,7 +126,7 @@ function DataTableToolbarFilter<TData>({
               placeholder={columnMeta.placeholder ?? columnMeta.label}
               value={(column.getFilterValue() as string) ?? ""}
               onChange={(event) => column.setFilterValue(event.target.value)}
-              className="h-8 w-40 lg:w-56"
+              className="h-full w-40 lg:w-56"
             />
           );
 

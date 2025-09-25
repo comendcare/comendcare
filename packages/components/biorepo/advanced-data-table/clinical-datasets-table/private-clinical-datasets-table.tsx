@@ -6,7 +6,7 @@ import { DataTableAdvancedToolbar } from "./../data-table/data-table-advanced-to
 import { DataTableFilterList } from "./../data-table/data-table-filter-list";
 import { DataTableToolbar } from "./../data-table/data-table-toolbar";
 import { useDataTable } from "./../../../../../packages/lib/hooks/use-data-table";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { useFeatureFlags } from "../lib/feature-flags-provider";
 import { Tool } from "@prisma/client";
 import Image from "next/image";
@@ -14,7 +14,13 @@ import { useSearchParams } from "next/navigation";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-export function ClinicalDatasetsTable({data, pageCount, columns, searchParams}: {data: Tool[], pageCount: number, columns: ColumnDef<any>[], searchParams: SearchParams}) {
+export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChange, searchParams}: {
+  data: Tool[], 
+  pageCount: number, 
+  columns: ColumnDef<any>[], 
+  onSelectionChange?: (selectedRows: Tool[]) => void, 
+  searchParams: SearchParams
+}) {
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
@@ -29,6 +35,13 @@ export function ClinicalDatasetsTable({data, pageCount, columns, searchParams}: 
     shallow: false,
     clearOnDefault: true,
   });
+
+  React.useEffect(() => {
+      if (!onSelectionChange) return;
+
+      const selected = table.getSelectedRowModel().rows.map((row: Row<any>) => row.original);
+      onSelectionChange(selected);
+  }, [table.getSelectedRowModel().rows, onSelectionChange])
 
   return (
     <>
@@ -67,7 +80,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, searchParams}: 
               />
           </DataTableAdvancedToolbar>
         ) : (
-          <DataTableToolbar table={table} />
+          <DataTableToolbar table={table} enableSearch={true}/>
         )}
       </DataTable>
     </>
