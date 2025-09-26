@@ -1,13 +1,8 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React from "react"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { useShallow } from "zustand/react/shallow";
-import InfiniteScroll from "@comend/components/ui/infinite-scroll";
-import Image from "next/image";
-import {CROMarketplaceCard} from "~web/components/marketplace/marketplace-cro-card";
-import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
-import { Card, CardContent } from "@comend/components/ui/card";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table";
@@ -31,8 +26,6 @@ export function BiosampleSearchResults({
     const columns = useBiosamplesTableColumns()
 
     setSortBy(searchParams?.sort)
-
-    // console.log(`search params changed`, searchParams)
 
     if (!searchResults) {
         return (

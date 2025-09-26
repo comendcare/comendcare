@@ -17,12 +17,12 @@ const sendTypeSenseRequest = async (
     const body = data ? JSON.stringify(data) : undefined;
 
     console.log(`Sending TypeSense request: ${method} ${url}`);
-    // if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
+    if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
 
     try {
         const response = await fetch(url, { method, headers, body });
         const responseData = await response.json();
-        // console.log(`Response from TypeSense (${method} ${url}):`, responseData);
+        console.log(`Response from TypeSense (${method} ${url}):`, responseData);
         return responseData;
     } catch (error) {
         console.error(`Error in TypeSense request (${method} ${url}):`, error);
@@ -50,7 +50,7 @@ const manageCollection = async (
     }
 
     if (schema) {
-        // console.log(`Creating collection: ${collectionName} with schema:`, JSON.stringify(schema, null, 2));
+        console.log(`Creating collection: ${collectionName} with schema:`, JSON.stringify(schema, null, 2));
         await sendTypeSenseRequest(`${typesenseUrl}/collections`, 'POST', apiKey, schema);
         console.log(`Recreated collection: ${collectionName}`);
     }
@@ -65,8 +65,8 @@ const bulkImportDocuments = async (
     const importUrl = `${typesenseUrl}/collections/${collectionName}/documents/import`;
     const documentsString = documents.map((doc) => JSON.stringify(doc)).join('\n');
 
-    // console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
-    // console.log('Documents being imported:', documents);
+    console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
+    console.log('Documents being imported:', documents);
 
     try {
         const response = await fetch(importUrl, {
@@ -78,7 +78,7 @@ const bulkImportDocuments = async (
             body: documentsString,
         });
         const result = await response.text();
-        // console.log(`Bulk import result for ${collectionName}:`, result);
+        console.log(`Bulk import result for ${collectionName}:`, result);
 
         const lines = result.trim().split('\n');
         const failed = lines.filter((line) => {
@@ -671,12 +671,12 @@ export const syncToTypesense = async (env: {
             ]
         }
 
-        // console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
-        // console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
-        // console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
+        console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
+        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
+        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
         console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
-        // console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
-        // console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
+        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
+        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
 
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
@@ -776,19 +776,19 @@ export const syncToTypesense = async (env: {
             }
         })
 
-        // console.log('Raw organizations data:', organizations);
-        // console.log('Raw milestones data:', milestones);
-        // console.log('Raw companies data:', companies);
-        // console.log('Raw biosamples data:', biosamples)
-        // console.log('Raw disease models data:', diseaseModels)
-        // console.log('Raw clinical datasets data:', clinicalDatasets)
+        console.log('Raw organizations data:', organizations);
+        console.log('Raw milestones data:', milestones);
+        console.log('Raw companies data:', companies);
+        console.log('Raw biosamples data:', biosamples)
+        console.log('Raw disease models data:', diseaseModels)
+        console.log('Raw clinical datasets data:', clinicalDatasets)
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
 
             // map orgs to include all required data
             const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
-                // console.log(`Org ${index + 1}:`, org)
+                console.log(`Org ${index + 1}:`, org)
                 const organization = await prisma.organization.findUnique({
                     where: { id: org.id },
                     include: { 
@@ -834,7 +834,7 @@ export const syncToTypesense = async (env: {
             console.log('Validating milestone data...');
 
             const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
-                // console.log(`Milestone ${index + 1}:`, ms)
+                console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
                     include: { node: true }
@@ -900,7 +900,6 @@ export const syncToTypesense = async (env: {
                 // description: true,
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
-            // await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosamples);
         } else {
             console.log('No biosamples to import.');
         }

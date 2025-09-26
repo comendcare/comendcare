@@ -17,69 +17,12 @@ import {
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {useSession} from "next-auth/react";
-import { getMilestones } from "./../../../../../packages/lib/fetchers";
-import { Option } from "./../../../../../packages/lib/types";
 import { Checkbox } from "./../../../ui/checkbox";
+import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
     // const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
-
-    const handleAsyncMilestoneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []
-
-        try {
-            // const response = await fetch(`/api/institutions?search=${query}`);
-            // const data = await response.json();
-            const response = await getMilestones(session?.user.organizationId)
-
-            if (response.success && response.data) {
-                return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
-            } else {
-                return []
-            }
-
-            // Return the fetched options
-            // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    }
-
-    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        console.log(`HANDLE GENE SEARCH`, query)
-
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
-
-        try {
-            const response = await fetch(`/api/institutions?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    };
 
     // useEffect(() => {
     //     const init = async () => {
@@ -385,7 +328,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncMilestoneSearch
+                onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
             }
         },
         {

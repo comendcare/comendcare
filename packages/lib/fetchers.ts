@@ -2325,9 +2325,6 @@ export const getDiseaseModels = withOrganizationAuth(
                 ];
             }
 
-            // const orderBy = input.sort.length
-            //     ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-            //     : [{createdAt: "asc"}];
             const orderBy = input.sort.length
                 ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
                 : [{ createdAt: { sort: "asc" } }];
@@ -2624,11 +2621,6 @@ export const getAllBiosamples = withResearcherAuth(
                 });
             }
 
-            // const orderBy = input.sort.length
-            //     ? input.sort.map((s) => ({
-            //         [s.id]: s.desc ? "desc" : "asc",
-            //     }))
-            //     : [{createdAt: "asc"}];
             const orderBy = input.sort.length
                 ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
                 : [{ createdAt: { sort: "asc" } }];
@@ -2774,9 +2766,6 @@ export const getDatasamples = withOrganizationAuth(
                 ];
             }
 
-            // const orderBy = input.sort.length
-            //     ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-            //     : [{createdAt: "asc"}];
             const orderBy = input.sort.length
                 ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
                 : [{ createdAt: { sort: "asc" } }];

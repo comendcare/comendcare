@@ -13,43 +13,9 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import { Checkbox } from "./../../../ui/checkbox";
-import { Option } from "./../../../../../packages/lib/types";
+import { handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
-    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        console.log(`HANDLE GENE SEARCH`, query)
-
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
-
-        try {
-            const response = await fetch(`/api/institutions?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    };
-
   const columns: ColumnDef<any>[] = [
     {
         id: "select",

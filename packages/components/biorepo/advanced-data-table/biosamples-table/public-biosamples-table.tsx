@@ -32,12 +32,12 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         clearOnDefault: true,
     });
 
-    // React.useEffect(() => {
-    //     if (!onSelectionChange) return;
+    React.useEffect(() => {
+        if (!onSelectionChange) return;
 
-    //     const selected = table.getSelectedRowModel().rows.map((row: Row<any>) => row.original);
-    //     onSelectionChange(selected);
-    // }, [table.getSelectedRowModel().rows, onSelectionChange])
+        const selected = table.getSelectedRowModel().rows.map((row: Row<any>) => row.original);
+        onSelectionChange(selected);
+    }, [table.getSelectedRowModel().rows, onSelectionChange])
 
     return (
         <>

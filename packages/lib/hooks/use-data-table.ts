@@ -62,9 +62,6 @@ interface UseDataTableProps<TData>
   scroll?: boolean;
   shallow?: boolean;
   startTransition?: React.TransitionStartFunction;
-  setFiltersCallback?: (filters: ExtendedColumnFilter<TData>[]) => void,
-  setSortingCallback?: (sort: ExtendedColumnSort<TData>[]) => void
-  setPageCallback?: (page: number) => void
 }
 
 export function useDataTable<TData>(props: UseDataTableProps<TData>) {
@@ -80,8 +77,6 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     scroll = false,
     shallow = true,
     startTransition,
-    setFiltersCallback,
-    setSortingCallback,
     ...tableProps
   } = props;
 

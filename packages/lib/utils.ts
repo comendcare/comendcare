@@ -17,8 +17,62 @@ import {
     Task
 } from "./types";
 import Papa from "papaparse";
+import { getMilestones } from "./fetchers";
+import { getSession } from "auth";
 
 const normalize = (s: string) => s.trim().toLowerCase()
+
+export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/genes?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch genes:", error);
+        return [];
+    }
+};
+
+export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/institutions?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+    } catch (error) {
+        console.error("Failed to fetch institutions:", error);
+        return [];
+    }
+};
+
+export const handleAsyncMilestoneSearch = async (organizationId: string | null | undefined, query?: string | undefined): Promise<Option[]> => {
+    if (!query || !organizationId) return []
+
+    try {
+        // const response = await fetch(`/api/institutions?search=${query}`);
+        // const data = await response.json();
+        const response = await getMilestones(organizationId)
+
+        if (response.success && response.data) {
+            return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
+        } else {
+            return []
+        }
+
+        // Return the fetched options
+        // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+    } catch (error) {
+        console.error("Failed to fetch institutions:", error);
+        return [];
+    }
+}
 
 export const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
     if (sample?.quantity !== null) {
