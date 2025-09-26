@@ -319,6 +319,10 @@ export const useClinicalDatasetSearchStore = create<ClinicalDatasetSearchState>(
                     ...get().filters,
                     ...updatedFilters
                 }
+
+                // if the filters are the same, don't update them
+                if (JSON.stringify(newFilters) === JSON.stringify(get().filters)) return
+            
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
