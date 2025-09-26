@@ -403,7 +403,7 @@ export const TimelineItemContent = ({
 
         <span className="flex flex-wrap gap-2 items-center">
             {(milestone?.types || []).map((milestoneType, index) => (
-                <Badge className="min-w-fit w-fit m-1 font-normal">
+                <Badge key={index} className="min-w-fit w-fit m-1 font-normal">
                     {milestoneType?.milestoneType?.label || "No type"}
                 </Badge>
             ))}
@@ -429,26 +429,26 @@ export const TimelineItemContent = ({
 
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 <>
-                    {(milestone.biosamples || []).map(({biosample}) => {
+                    {(milestone.biosamples || []).map(({biosample}, index) => {
                         const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                         return (
-                            <Badge variant="violet" className="min-w-fit w-fit font-normal">
+                            <Badge key={index} variant="violet" className="min-w-fit w-fit font-normal">
                                 <Microscope size={16} />
                                 {`${biosample.donorId} --- ${type?.label || ''}`}
                             </Badge>
                         )
                     })}
-                    {(milestone.diseaseModels || []).map(({diseaseModel}) => {
+                    {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
                         const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                         return (
-                            <Badge variant="yellow" className="min-w-fit w-fit font-normal">
+                            <Badge key={index} variant="yellow" className="min-w-fit w-fit font-normal">
                                 <Microscope size={16} />
                                 {`${diseaseModel.id} --- ${type?.label}`}
                             </Badge>
                         )
                     })}
-                    {(milestone.tools || []).map(({tool}) => (
-                        <Badge variant="emerald" className="min-w-fit w-fit font-normal">
+                    {(milestone.tools || []).map(({tool}, index) => (
+                        <Badge key={index} variant="emerald" className="min-w-fit w-fit font-normal">
                             <Microscope size={16} />
                             {tool?.title}
                         </Badge>
@@ -457,8 +457,8 @@ export const TimelineItemContent = ({
             )}
             {milestone?.rfps?.length > 0 && (
                 <>
-                    {milestone.rfps.map(({rfp}) => (
-                        <Badge variant="orange" className="min-w-fit w-fit font-normal">
+                    {milestone.rfps.map(({rfp}, index) => (
+                        <Badge key={index} variant="orange" className="min-w-fit w-fit font-normal">
                             <Megaphone size={16} />
                             {rfp?.title}
                         </Badge>

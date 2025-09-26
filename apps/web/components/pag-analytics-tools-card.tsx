@@ -1,10 +1,6 @@
-"use client"
-
 import {Database, Microscope, TestTubeDiagonal, Rat, ExternalLink, Info} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
-import {Prisma} from "@prisma/client";
-import {Button} from "@comend/components/ui/button";
-import {useRouter} from "next/navigation";
+import {Button, buttonVariants} from "@comend/components/ui/button";
 import {
     Tooltip,
     TooltipContent,
@@ -12,9 +8,9 @@ import {
     TooltipTrigger
 } from "@comend/components/ui/tooltip"
 import {OrganizationForAnalytics} from "@/packages/lib/types";
+import Link from "next/link";
 
 export default function PAGAnalyticsToolsCard({organization}: { organization: OrganizationForAnalytics }) {
-    const router = useRouter();
 
     return (
         <Card className="col-span-4 flex flex-col">
@@ -33,14 +29,16 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                             <span className="text-sm font-medium">
                                 Patient biosamples
                             </span>
-                            <Button
-                                onClick={() => router.push("/app/tools/biosample")}
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
+                            <Link
+                                href={"/app/tools/biosample"}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
                             >
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
-                            </Button>
+                            </Link>
                         </div>
                         <div className="text-lg font-bold">
                             {organization.biosamples.length}
@@ -54,14 +52,16 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                             <span className="text-sm font-medium">
                                 Disease models
                             </span>
-                            <Button
-                                onClick={() => router.push("/app/tools/disease-models")}
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
+                            <Link
+                                href={"/app/tools/disease-models"}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
                             >
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
-                            </Button>
+                            </Link>
                         </div>
                         <div className="text-lg font-bold">
                             {organization.diseaseModel.length}
@@ -75,14 +75,16 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                             <span className="text-sm font-medium">
                                 Clinical datasets
                             </span>
-                            <Button
-                                onClick={() => router.push("/app/tools/data")}
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
+                            <Link
+                                href={"/app/tools/data"}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
                             >
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
-                            </Button>
+                            </Link>
                         </div>
                         <div className="text-lg font-bold">
                             {organization.tools.length}
@@ -109,14 +111,16 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                         <p>{`Requests that are pending approval across all tool types.`}</p>
                                     </TooltipContent>
                                 </Tooltip>
-                                <Button
-                                    onClick={() => router.push("/app/requests")}
-                                    variant="ghost"
-                                    size="icon"
-                                    className="p-0 h-auto w-auto"
+                                <Link
+                                    href={"/app/requests"}
+                                    className={buttonVariants({
+                                        variant: "ghost",
+                                        size: "icon",
+                                        className: "p-0 h-auto w-auto",
+                                    })}
                                 >
                                     <ExternalLink className="h-4 w-4 text-muted-foreground"/>
-                                </Button>
+                                </Link>
                             </TooltipProvider>
                         </span>
                         <div className="text-2xl font-bold">
