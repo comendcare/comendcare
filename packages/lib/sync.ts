@@ -503,6 +503,52 @@ export const syncToTypesense = async (env: {
                     optional: true,
                 },
             ]
+        }
+        const diseaseModelSchema = {
+            name: 'disease-models',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: ".*",
+                    type: "auto",
+                },
+                {
+                    name: "sortId.id", // hack to allow typesense to sort on the string type
+                    type: "string",
+                    sort: true,
+                    optional: true
+                },
+                {
+                    name: "gene.symbol",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+                {
+                    name: "condition.name",
+                    type: "string",
+                    sort: true,
+                    optional: true
+                },
+                {
+                    name: "type.label",
+                    type: "string",
+                    sort: true,
+                    optional: true
+                },
+                {
+                    name: "organization.name",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+                {
+                    name: "institution.name",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+            ]
             // fields: [
             //     {
             //         name: "id",
@@ -522,7 +568,7 @@ export const syncToTypesense = async (env: {
             //     },
             //     {
             //         name: "gene",
-            //         type: "Object",
+            //         type: "string",
             //         index: true,
             //         store: true,
             //         facet: true,
@@ -553,60 +599,6 @@ export const syncToTypesense = async (env: {
             //         optional: true
             //     }
             // ]
-        }
-        const diseaseModelSchema = {
-            name: 'disease-models',
-            enable_nested_fields: true,
-            fields: [
-                {
-                    name: "id",
-                    type: "string",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: false
-                },
-                {
-                    name: "description",
-                    type: "string",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
-                },
-                {
-                    name: "gene",
-                    type: "string",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
-                },
-                {
-                    name: "conditions",
-                    type: "string[]",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
-                },
-                {
-                    name: "types",
-                    type: "object[]",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
-                },
-                {
-                    name: "organization",
-                    type: "object",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
-                }
-            ]
         }
         const clinicalDatasetSchema = {
             name: 'clinical-datasets',
@@ -755,9 +747,27 @@ export const syncToTypesense = async (env: {
                 private: false
             },
             select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 id: true,
                 description: true,
-                organization: {include: {conditions: {include: {condition: true}}}},
+                institution: true,
                 gene: true,
                 types: true,
             }
@@ -867,37 +877,16 @@ export const syncToTypesense = async (env: {
 
         if (biosamples.length > 0) {
             const uploadBiosamples = biosamples.map(biosample => ({
-                // id: biosample.id,
-                // description: biosample.description,
-                // // types: biosample.types,
-                // types: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value)),
-                // gene: biosample.gene?.symbol,
-                // conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                // organization: biosample.organization
                 ...biosample,
                 id_sort: stringToSortableInt(biosample.id),
                 createdAt: biosample.createdAt.getTime(), // special case for created at to enable sorting
-
                 // special case to allow typesense sorting on the id string
                 sortId: {id: biosample.id},
-
                 availability: handleGetAvailability(biosample),
-
                 // special case for types to enable searching by label & sorting include all info, and only include one type
                 type: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value))[0],
                 // special case for conditions to enable sorting include only one condition
                 condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition
-
-                // organization: {include: {conditions: {include: {condition: true}}}},
-                // id: true,
-                // // only include public donor ID (no other donor information should be uploaded to typesense)
-                // donor: {select: {id: true}},
-                // types: true,
-                // gene: true,
-                // availability: true,
-                // quantity: true,
-                // institution: true,
-                // description: true,
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
@@ -906,13 +895,25 @@ export const syncToTypesense = async (env: {
 
         if (diseaseModels.length > 0) {
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
-                id: diseaseModel.id,
-                description: diseaseModel.description,
-                // types: diseaseModel.types,
-                types: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value)),
-                gene: diseaseModel.gene?.symbol,
-                conditions: diseaseModel.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                organization: diseaseModel.organization
+                ...diseaseModel,
+                id_sort: stringToSortableInt(diseaseModel.id),
+                createdAt: diseaseModel.createdAt.getTime(), // special case for created at to enable sorting
+                // special case to allow typesense sorting on the id string
+                sortId: {id: diseaseModel.id},
+                // special case to allow typesense sorting on the description string
+                description: {description: diseaseModel.description},
+                availability: handleGetAvailability(diseaseModel),
+                // special case for types to enable searching by label & sorting include all info, and only include one type
+                type: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value))[0],
+                // special case for conditions to enable sorting include only one condition
+                condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition
+                // id: diseaseModel.id,
+                // description: diseaseModel.description,
+                // // types: diseaseModel.types,
+                // types: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value)),
+                // gene: diseaseModel.gene?.symbol,
+                // conditions: diseaseModel.organization?.conditions?.map(condition => condition.condition?.name) || [],
+                // organization: diseaseModel.organization
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
         } else {

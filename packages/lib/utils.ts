@@ -20,6 +20,11 @@ import Papa from "papaparse";
 
 const normalize = (s: string) => s.trim().toLowerCase()
 
+export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
+    const direction = desc ? "desc" : "asc";
+    return `${id}:${direction}`;
+}
+
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
     if (!query) return []; // Return empty if no input
 

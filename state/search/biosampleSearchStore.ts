@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
-import { getExclusiveToFirstGroup } from '@comend/lib/utils';
+import { getExclusiveToFirstGroup, typesenseSortByFromColumnId } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 
@@ -86,11 +86,6 @@ function generateFiltersString(filters: FiltersType): string {
 
     console.log(`Typesense filters: ${typesenseFilters}`);
     return typesenseFilters;
-}
-
-function typesenseSortByFromColumnId(id: string, desc: boolean): string {
-    const direction = desc ? "desc" : "asc";
-    return `${id}:${direction}`;
 }
 
 const getUpdatedSearchResults = async (
