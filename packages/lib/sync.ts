@@ -607,64 +607,6 @@ export const syncToTypesense = async (env: {
                     optional: true,
                 }
             ]
-            // fields: [
-            //     {
-            //         name: "id",
-            //         type: "string",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: false
-            //     },
-            //     {
-            //         name: "title",
-            //         type: "string",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: true
-            //     },
-            //     {
-            //         name: "description",
-            //         type: "string",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: true
-            //     },
-            //     {
-            //         name: "gene",
-            //         type: "string",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: true
-            //     },
-            //     {
-            //         name: "conditions",
-            //         type: "string[]",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: true
-            //     },
-            //     {
-            //         name: "types",
-            //         type: "object[]",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: true
-            //     },
-            //     {
-            //         name: "organization",
-            //         type: "object",
-            //         index: true,
-            //         store: true,
-            //         facet: true,
-            //         optional: true
-            //     }
-            // ]
         }
 
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));

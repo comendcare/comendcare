@@ -24,7 +24,8 @@ type ToolCounts = {
     clinicalDatasetCount: number;
 };
 
-export default async function ProfilePage(_props: IndexPageProps) {
+export default async function ProfilePage(props: IndexPageProps) {
+    const searchParams = props.searchParams
     const session = await getServerSession(authOptions);
     const orgId = session?.user?.organizationId;
     if (!orgId) return <NoOrganization />;
@@ -144,6 +145,7 @@ export default async function ProfilePage(_props: IndexPageProps) {
             rfps={rfps}
             isOwner={!!isOwner}
             rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "comend.io"}
+            searchParams={searchParams}
         />
     );
 }

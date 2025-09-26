@@ -30,21 +30,24 @@ import { NoResultsView } from "./marketplace/no-results";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 import { useSession } from "next-auth/react";
+import { SearchParams } from "@/packages/components/types";
 
 const biosamplesSelector = (state: BiosampleSearchState) => ({
     searchResults: state.searchResults,
     setFilters: state.setFilters,
-    
+    setSortBy: state.setSortBy
 })
 
 const diseaseModelsSelector = (state: DiseaseModelSearchState) => ({
     searchResults: state.searchResults,
     setFilters: state.setFilters,
+    setSortBy: state.setSortBy
 })
 
 const clinicalDatasetsSelector = (state: ClinicalDatasetSearchState) => ({
     searchResults: state.searchResults,
     setFilters: state.setFilters,
+    setSortBy: state.setSortBy
 })
 
 const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}) => {
@@ -55,23 +58,31 @@ const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number
     return 'biosamples'
 }
 
-export const PAGProfileToolsCard = ({organizationId, toolCounts} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}}) => {
+export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}, searchParams?: SearchParams | undefined}) => {
     const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>(getInitState(toolCounts))
     const { 
         searchResults: biosamples,
         setFilters: setBiosampleFilters,
+        setSortBy: setBiosampleSortBy,
     } = useBiosampleSearchStore(useShallow(biosamplesSelector))
     const biosampleColumns = useBiosamplesTableColumns()
     const { 
         searchResults: diseaseModels,
         setFilters: setDiseaseModelFilters,
+        setSortBy: setDiseaseModelSortBy,
     } = useDiseaseModelSearchStore(useShallow(diseaseModelsSelector))
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const { 
         searchResults: clinicalDatasets,
         setFilters: setClinicalDatasetFilters,
+        setSortBy: setClinicalDatasetSortBy,
     } = useClinicalDatasetSearchStore(useShallow(clinicalDatasetsSelector))
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    
+    console.log(`search params`, searchParams)
+    if (section === 'biosamples') setBiosampleSortBy(searchParams?.sort)
+    if (section === 'disease-models') setDiseaseModelSortBy(searchParams?.sort)
+    if (section === 'clinical-datasets') setClinicalDatasetSortBy(searchParams?.sort)
 
     useEffect(() => {
         setBiosampleFilters({

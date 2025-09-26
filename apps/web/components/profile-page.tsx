@@ -17,6 +17,7 @@ import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
+import { SearchParams } from "@/packages/components/types";
 
 type ToolCounts = {
     biosampleCount: number;
@@ -32,6 +33,7 @@ type PAGProfilePageProps = {
     rfps: any[];
     isOwner: boolean;
     rootDomain: string;
+    searchParams: SearchParams
 };
 
 export default function PAGProfilePage({
@@ -42,6 +44,7 @@ export default function PAGProfilePage({
                                            rfps,
                                            isOwner,
                                            rootDomain,
+                                           searchParams
                                        }: PAGProfilePageProps) {
     if (!organization) return null;
     return (
@@ -177,7 +180,7 @@ export default function PAGProfilePage({
                                         rfps={rfps}
                                     />
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
-                                    <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
+                                    <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
                                     <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                 </div>
                             </div>
