@@ -21,7 +21,6 @@ type Props = {
 
 export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
     const router = useRouter()
-    const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
 
