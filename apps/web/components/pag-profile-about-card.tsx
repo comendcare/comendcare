@@ -1,3 +1,5 @@
+"use client"
+
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {isOnboarded, nameToInitials, setOnboarded} from "@comend/lib/utils";
 import {Member, Organization, User} from "@prisma/client";

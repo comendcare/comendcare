@@ -1,6 +1,11 @@
+"use client"
+
 import {Skeleton} from "@comend/components/ui/skeleton";
+import {useLoadingTimeout} from "~web/hooks/useLoadingTimeout";
 
 export default function Loading() {
+    useLoadingTimeout(5000)
+
     return (
         <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8">
             <Skeleton className="h-[20px] w-full" />
