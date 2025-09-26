@@ -16,7 +16,7 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import { Badge } from "./../../../ui/badge";
 import { Option } from "./../../../../../packages/lib/types";
-import { handleGetAvailability } from "@comend/lib/utils";
+import { handleGetAvailability } from "./../../../../../packages/lib/utils";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
