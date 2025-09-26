@@ -17,8 +17,6 @@ import {
     Task
 } from "./types";
 import Papa from "papaparse";
-import { getMilestones } from "./fetchers";
-import { getSession } from "auth";
 
 const normalize = (s: string) => s.trim().toLowerCase()
 
@@ -56,18 +54,11 @@ export const handleAsyncMilestoneSearch = async (organizationId: string | null |
     if (!query || !organizationId) return []
 
     try {
-        // const response = await fetch(`/api/institutions?search=${query}`);
-        // const data = await response.json();
-        const response = await getMilestones(organizationId)
-
-        if (response.success && response.data) {
-            return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
-        } else {
-            return []
-        }
+        const response = await fetch(`/api/milestones?search=${query}&orgId=${organizationId}`);
+        const data = await response.json();
 
         // Return the fetched options
-        // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+        return data
     } catch (error) {
         console.error("Failed to fetch institutions:", error);
         return [];
