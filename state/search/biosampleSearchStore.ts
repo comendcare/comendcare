@@ -52,7 +52,7 @@ function generateFiltersString(filters: FiltersType): string {
     // conditions
     if (filters?.conditions && filters.conditions.length > 0) {
         const conditionFilter = filters.conditions
-            .map(condition => `conditions:=[${escapeValue(condition.value)}]`)
+            .map(condition => `organization.conditions.condition.name:=[${escapeValue(condition.value)}]`)
             .join(" || ");
         filtersList.push(`(${conditionFilter})`);
     }
@@ -60,7 +60,7 @@ function generateFiltersString(filters: FiltersType): string {
     // genes
     if (filters?.genes && filters.genes.length > 0) {
         const geneFilter = filters.genes
-            .map(gene => `gene:=[${escapeValue(gene.value)}]`)
+            .map(gene => `gene.symbol:=[${escapeValue(gene.value)}]`)
             .join(" || ");
         filtersList.push(`(${geneFilter})`);
     }
@@ -68,7 +68,7 @@ function generateFiltersString(filters: FiltersType): string {
     // Biosample Types (Array Field)
     if (filters?.types && filters.types.length > 0) {
         const typeFilter = filters.types
-            .map(type => `types.value:=[${escapeValue(type.value)}]`)
+            .map(type => `type.value:=[${escapeValue(type.value)}]`)
             .join(" || ");
         filtersList.push(`(${typeFilter})`);
     }
@@ -88,10 +88,9 @@ function generateFiltersString(filters: FiltersType): string {
     return typesenseFilters;
 }
 
-const sortByFilters: { [key: string]: string } = {
-    // "alphabetical": "title:asc",
-    // "highest-rated": "avgRating:desc",
-    // "most-reviewed": "moneyDeployed:desc",
+function typesenseSortByFromColumnId(id: string, desc: boolean): string {
+    const direction = desc ? "desc" : "asc";
+    return `${id}:${direction}`;
 }
 
 const getUpdatedSearchResults = async (
@@ -99,25 +98,31 @@ const getUpdatedSearchResults = async (
     isNewSearch: boolean = true
 ): Promise<{results: any[], total: number, totalPages: number}> => {
     try {
-        // const TAG_PRIORITY_SORT = "_eval([ (tags:=[`Experienced in rare disease`]):2, (tags:=[`PAG friendly`]):1 ]):desc,avgRating:desc";
-
+        let sortByList = []
         const filtersString = generateFiltersString(state.filters)
 
-        console.log(`FILTERS STRING`, filtersString)
+        if (state.sortBy) {
+            const parsedSort = JSON.parse(state.sortBy)
 
-        // Merge tag-priority sort with user-chosen sort
-        // let sortBy = TAG_PRIORITY_SORT;
-        // if (state.sortBy && sortByFilters[state.sortBy]) {
-        //     sortBy += `,${sortByFilters[state.sortBy]}`;
-        // }
+            if (parsedSort && Array.isArray(parsedSort)) {
+                parsedSort.map((sort: any) => {
+                    sortByList.push(`${typesenseSortByFromColumnId(sort.id, sort.desc)}`)
+                })
+            }
+        }
+
+        sortByList.push(`createdAt:desc`)
+        const sortBy = sortByList.join(`,`)
+
+        console.log(`SORT BY`, sortBy)
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "description,gene,types,conditions,organization",
+            query_by: "description,gene.symbol,type.label,organization.conditions.condition.name,organization",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),
-            // sort_by: sortBy,
+            sort_by: sortBy,
         };
 
         const results = await typesense
@@ -188,8 +193,8 @@ export interface BiosampleSearchState {
     initState: (filters: FiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
-    sortBy: string,
-    setSortBy: (sortBy: string | undefined) => void,
+    sortBy: string | string[] | undefined,
+    setSortBy: (sortBy: string | string[] | undefined) => void,
     resultsPerPage: number,
     setResultsPerPage: (numResults: number) => void,
     page: number,
@@ -247,8 +252,11 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                     totalResults: total,
                 })
             },
-            sortBy: "alphabetical",
-            setSortBy: async (sortBy: string | undefined) => {
+            sortBy: undefined,
+            setSortBy: async (sortBy: string | string[] | undefined) => {
+                // if new sort by value == previous sort by value, don't update
+                if (JSON.stringify(get().sortBy) === JSON.stringify(sortBy)) return
+
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,

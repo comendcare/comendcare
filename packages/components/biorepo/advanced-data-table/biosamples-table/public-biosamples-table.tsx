@@ -9,6 +9,7 @@ import Image from "next/image";
 import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useBiosampleSearchStore } from "../../../../../state/search/biosampleSearchStore";
+import {DataTableToolbar} from "./../data-table/data-table-toolbar";
 
 export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams, showPagination = true}: {
     data: Tool[],
@@ -31,12 +32,12 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         clearOnDefault: true,
     });
 
-    React.useEffect(() => {
-        if (!onSelectionChange) return;
+    // React.useEffect(() => {
+    //     if (!onSelectionChange) return;
 
-        const selected = table.getSelectedRowModel().rows.map((row: Row<any>) => row.original);
-        onSelectionChange(selected);
-    }, [table.getSelectedRowModel().rows, onSelectionChange])
+    //     const selected = table.getSelectedRowModel().rows.map((row: Row<any>) => row.original);
+    //     onSelectionChange(selected);
+    // }, [table.getSelectedRowModel().rows, onSelectionChange])
 
     return (
         <>
@@ -65,7 +66,13 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                 //     )
                 //     : undefined
                 // }
-            />
+            >
+                {/* 
+                    Required for in header sorting functionality, but hidden so we don't clog up the table
+                    in the public views.
+                */}
+                <DataTableToolbar table={table} className="hidden"/>
+            </DataTable>
         </>
     );
 }

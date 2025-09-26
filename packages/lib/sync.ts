@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
+import { handleGetAvailability } from "./utils";
 import prisma from "./prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "./types";
 
@@ -16,12 +17,12 @@ const sendTypeSenseRequest = async (
     const body = data ? JSON.stringify(data) : undefined;
 
     console.log(`Sending TypeSense request: ${method} ${url}`);
-    if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
+    // if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
 
     try {
         const response = await fetch(url, { method, headers, body });
         const responseData = await response.json();
-        console.log(`Response from TypeSense (${method} ${url}):`, responseData);
+        // console.log(`Response from TypeSense (${method} ${url}):`, responseData);
         return responseData;
     } catch (error) {
         console.error(`Error in TypeSense request (${method} ${url}):`, error);
@@ -49,7 +50,7 @@ const manageCollection = async (
     }
 
     if (schema) {
-        console.log(`Creating collection: ${collectionName} with schema:`, JSON.stringify(schema, null, 2));
+        // console.log(`Creating collection: ${collectionName} with schema:`, JSON.stringify(schema, null, 2));
         await sendTypeSenseRequest(`${typesenseUrl}/collections`, 'POST', apiKey, schema);
         console.log(`Recreated collection: ${collectionName}`);
     }
@@ -64,8 +65,8 @@ const bulkImportDocuments = async (
     const importUrl = `${typesenseUrl}/collections/${collectionName}/documents/import`;
     const documentsString = documents.map((doc) => JSON.stringify(doc)).join('\n');
 
-    console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
-    console.log('Documents being imported:', documents);
+    // console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
+    // console.log('Documents being imported:', documents);
 
     try {
         const response = await fetch(importUrl, {
@@ -77,7 +78,7 @@ const bulkImportDocuments = async (
             body: documentsString,
         });
         const result = await response.text();
-        console.log(`Bulk import result for ${collectionName}:`, result);
+        // console.log(`Bulk import result for ${collectionName}:`, result);
 
         const lines = result.trim().split('\n');
         const failed = lines.filter((line) => {
@@ -101,6 +102,17 @@ const bulkImportDocuments = async (
         throw error;
     }
 };
+
+function stringToSortableInt(str: string | null, maxLength = 10): number | null {
+  if (str === null) return null // preserve nulls
+  str = str.slice(0, maxLength) // limit to prevent huge numbers
+  let result = ""
+  for (const char of str) {
+    const code = char.charCodeAt(0)
+    result += code.toString().padStart(3, "0")
+  }
+  return parseInt(result, 10)
+}
 
 export const syncToTypesense = async (env: {
     TYPESENSE_ADMIN_API_KEY: string;
@@ -439,54 +451,108 @@ export const syncToTypesense = async (env: {
             enable_nested_fields: true,
             fields: [
                 {
-                    name: "id",
+                    name: ".*",
+                    type: "auto",
+                },
+                {
+                    name: "sortId.id", // hack to allow typesense to sort on the string type
                     type: "string",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: false
+                    sort: true,
+                    optional: true
                 },
                 {
-                    name: "description",
+                    name: "type.label",
                     type: "string",
-                    index: true,
-                    store: true,
-                    facet: true,
+                    sort: true,
                     optional: true
                 },
                 {
-                    name: "gene",
+                    name: "availability.value",
                     type: "string",
-                    index: true,
-                    store: true,
-                    facet: true,
+                    sort: true,
                     optional: true
                 },
                 {
-                    name: "conditions",
-                    type: "string[]",
-                    index: true,
-                    store: true,
-                    facet: true,
+                    name: "condition.name",
+                    type: "string",
+                    sort: true,
                     optional: true
                 },
                 {
-                    name: "types",
-                    type: "object[]",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
+                    name: "organization.name",
+                    type: "string",
+                    sort: true,
+                    optional: true,
                 },
                 {
-                    name: "organization",
-                    type: "object",
-                    index: true,
-                    store: true,
-                    facet: true,
-                    optional: true
-                }
+                    name: "institution.name",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+                {
+                    name: "donor.id",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+                {
+                    name: "gene.symbol",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
             ]
+            // fields: [
+            //     {
+            //         name: "id",
+            //         type: "string",
+            //         index: true,
+            //         store: true,
+            //         facet: true,
+            //         optional: false
+            //     },
+            //     {
+            //         name: "description",
+            //         type: "string",
+            //         index: true,
+            //         store: true,
+            //         facet: true,
+            //         optional: true
+            //     },
+            //     {
+            //         name: "gene",
+            //         type: "Object",
+            //         index: true,
+            //         store: true,
+            //         facet: true,
+            //         optional: true
+            //     },
+            //     {
+            //         name: "conditions",
+            //         type: "string[]",
+            //         index: true,
+            //         store: true,
+            //         facet: true,
+            //         optional: true
+            //     },
+            //     {
+            //         name: "types",
+            //         type: "object[]",
+            //         index: true,
+            //         store: true,
+            //         facet: true,
+            //         optional: true
+            //     },
+            //     {
+            //         name: "organization",
+            //         type: "object",
+            //         index: true,
+            //         store: true,
+            //         facet: true,
+            //         optional: true
+            //     }
+            // ]
         }
         const diseaseModelSchema = {
             name: 'disease-models',
@@ -605,12 +671,12 @@ export const syncToTypesense = async (env: {
             ]
         }
 
-        console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
-        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
-        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
+        // console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
+        // console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
+        // console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
         console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
-        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
-        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
+        // console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
+        // console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
 
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
@@ -655,11 +721,33 @@ export const syncToTypesense = async (env: {
                 private: false // only sync public biosamples
             },
             select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 id: true,
-                description: true,
-                organization: {include: {conditions: {include: {condition: true}}}},
-                gene: true,
+                // only include public donor ID (no other donor information should be uploaded to typesense)
+                donor: {select: {id: true}},
                 types: true,
+                gene: true,
+                availability: true,
+                quantity: true,
+                institution: true,
+                description: true,
             }
         })
         const diseaseModels = await prisma.diseaseModel.findMany({
@@ -688,19 +776,19 @@ export const syncToTypesense = async (env: {
             }
         })
 
-        console.log('Raw organizations data:', organizations);
-        console.log('Raw milestones data:', milestones);
-        console.log('Raw companies data:', companies);
-        console.log('Raw biosamples data:', biosamples)
-        console.log('Raw disease models data:', diseaseModels)
-        console.log('Raw clinical datasets data:', clinicalDatasets)
+        // console.log('Raw organizations data:', organizations);
+        // console.log('Raw milestones data:', milestones);
+        // console.log('Raw companies data:', companies);
+        // console.log('Raw biosamples data:', biosamples)
+        // console.log('Raw disease models data:', diseaseModels)
+        // console.log('Raw clinical datasets data:', clinicalDatasets)
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
 
             // map orgs to include all required data
             const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
-                console.log(`Org ${index + 1}:`, org)
+                // console.log(`Org ${index + 1}:`, org)
                 const organization = await prisma.organization.findUnique({
                     where: { id: org.id },
                     include: { 
@@ -746,7 +834,7 @@ export const syncToTypesense = async (env: {
             console.log('Validating milestone data...');
 
             const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
-                console.log(`Milestone ${index + 1}:`, ms)
+                // console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
                     include: { node: true }
@@ -779,15 +867,40 @@ export const syncToTypesense = async (env: {
 
         if (biosamples.length > 0) {
             const uploadBiosamples = biosamples.map(biosample => ({
-                id: biosample.id,
-                description: biosample.description,
-                // types: biosample.types,
-                types: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value)),
-                gene: biosample.gene?.symbol,
-                conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                organization: biosample.organization
+                // id: biosample.id,
+                // description: biosample.description,
+                // // types: biosample.types,
+                // types: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value)),
+                // gene: biosample.gene?.symbol,
+                // conditions: biosample.organization?.conditions?.map(condition => condition.condition?.name) || [],
+                // organization: biosample.organization
+                ...biosample,
+                id_sort: stringToSortableInt(biosample.id),
+                createdAt: biosample.createdAt.getTime(), // special case for created at to enable sorting
+
+                // special case to allow typesense sorting on the id string
+                sortId: {id: biosample.id},
+
+                availability: handleGetAvailability(biosample),
+
+                // special case for types to enable searching by label & sorting include all info, and only include one type
+                type: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value))[0],
+                // special case for conditions to enable sorting include only one condition
+                condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition
+
+                // organization: {include: {conditions: {include: {condition: true}}}},
+                // id: true,
+                // // only include public donor ID (no other donor information should be uploaded to typesense)
+                // donor: {select: {id: true}},
+                // types: true,
+                // gene: true,
+                // availability: true,
+                // quantity: true,
+                // institution: true,
+                // description: true,
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
+            // await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosamples);
         } else {
             console.log('No biosamples to import.');
         }

@@ -31,7 +31,7 @@ import * as React from "react";
 
 import { useDebouncedCallback } from "./use-debounced-callback";
 import { getSortingStateParser } from "./../parsers";
-import type { ExtendedColumnSort } from "../types/data-table";
+import type { ExtendedColumnFilter, ExtendedColumnSort } from "../types/data-table";
 
 const PAGE_KEY = "page";
 const PER_PAGE_KEY = "perPage";
@@ -62,6 +62,9 @@ interface UseDataTableProps<TData>
   scroll?: boolean;
   shallow?: boolean;
   startTransition?: React.TransitionStartFunction;
+  setFiltersCallback?: (filters: ExtendedColumnFilter<TData>[]) => void,
+  setSortingCallback?: (sort: ExtendedColumnSort<TData>[]) => void
+  setPageCallback?: (page: number) => void
 }
 
 export function useDataTable<TData>(props: UseDataTableProps<TData>) {
@@ -77,6 +80,8 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     scroll = false,
     shallow = true,
     startTransition,
+    setFiltersCallback,
+    setSortingCallback,
     ...tableProps
   } = props;
 

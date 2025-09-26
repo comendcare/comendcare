@@ -19,6 +19,7 @@ import { cn } from "./../../../../../packages/lib/utils";
 interface DataTablePaginationProps<TData> extends React.ComponentProps<"div"> {
   table: Table<TData>;
   pageSizeOptions?: number[];
+  // useStore?: any;
 }
 
 interface TypesenseDataTablePaginationProps<TData> extends React.ComponentProps<"div"> {
@@ -34,9 +35,11 @@ interface TypesenseDataTablePaginationProps<TData> extends React.ComponentProps<
 export function DataTablePagination<TData>({
   table,
   pageSizeOptions = [10, 20, 30, 40, 50],
+  // useStore,
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
+
   return (
     <div
       className={cn(
@@ -55,7 +58,7 @@ export function DataTablePagination<TData>({
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              table.setPageSize(Number(value))
             }}
           >
             <SelectTrigger className="h-8 w-[4.5rem] [&[data-size]]:h-8">
@@ -80,7 +83,9 @@ export function DataTablePagination<TData>({
             variant="outline"
             size="icon"
             className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(0)}
+            onClick={() => {
+              table.setPageIndex(0)
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronsLeft />
@@ -90,7 +95,9 @@ export function DataTablePagination<TData>({
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() => table.previousPage()}
+            onClick={() => {
+              table.previousPage()
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronLeft />
@@ -100,7 +107,9 @@ export function DataTablePagination<TData>({
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() => table.nextPage()}
+            onClick={() => {
+              table.nextPage()
+            }}
             disabled={!table.getCanNextPage()}
           >
             <ChevronRight />
@@ -110,7 +119,9 @@ export function DataTablePagination<TData>({
             variant="outline"
             size="icon"
             className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => {
+              table.setPageIndex(table.getPageCount() - 1)
+            }}
             disabled={!table.getCanNextPage()}
           >
             <ChevronsRight />

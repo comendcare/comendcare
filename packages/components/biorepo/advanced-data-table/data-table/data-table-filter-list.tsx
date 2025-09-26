@@ -81,6 +81,7 @@ interface DataTableFilterListProps<TData>
   debounceMs?: number;
   throttleMs?: number;
   shallow?: boolean;
+  setFiltersCallback?: (filters: ExtendedColumnFilter<TData>[]) => void
 }
 
 export function DataTableFilterList<TData>({

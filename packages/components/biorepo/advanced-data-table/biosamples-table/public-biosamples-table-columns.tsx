@@ -16,22 +16,9 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import { Badge } from "./../../../ui/badge";
 import { Option } from "./../../../../../packages/lib/types";
+import { handleGetAvailability } from "@comend/lib/utils";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
-
-    const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
-        if (sample?.quantity !== null) {
-            if (sample.quantity > 0) {
-                if (sample?.materialAndDataAccessRequests?.length > 0) {
-                    return {value: 'Reserved', variant: 'yellow'}
-                }
-                return {value: 'Available', variant: 'green'}
-            }
-            if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
-        }
-
-        return undefined
-    }
 
     const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -65,8 +52,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
 
     const columns: ColumnDef<any>[] = [
         {
-            id: "organization",
-            accessorKey: "organization",
+            id: "organization.name",
+            accessorKey: "organization.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Organization"/>
             ),
@@ -82,7 +69,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
         },
         {
-            id: "id",
+            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts)
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Sample ID"/>
@@ -92,14 +79,15 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     <p>{row.original.id || 'No Sample ID'}</p>
                 </div>
             ),
+            // enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Sample ID"
             }
         },
         {
-            id: "donorId",
-            accessorKey: "donorId",
+            id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts) 
+            accessorKey: "donor.id",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Public Donor ID"/>
             ),
@@ -115,7 +103,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "types",
+            id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts)
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Type"/>
@@ -131,16 +119,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
-            enableColumnFilter: true,
             meta: {
                 label: "Type",
-                variant: "multiSelect",
-                options: BIOSAMPLE_TYPE_OPTIONS,
-                icon: CircleDashed,
             },
         },
         {
-            id: "condition",
+            id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts)
             accessorKey: "condition",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Condition"/>
@@ -156,8 +140,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             }
         },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "gene.symbol", // must match typesense accessor key (see biosampleSchema in sync.ts)
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -165,17 +149,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
-            enableColumnFilter: true,
             meta: {
                 label: "Gene",
-                variant: "select",
-                icon: CircleDashed,
-                showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncGeneSearch
             }
         },
         {
-            id: "availability",
+            id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts)
             accessorKey: "availability",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Availability"/>
@@ -188,19 +167,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
-            enableColumnFilter: true,
             meta: {
                 label: "Availability",
-                variant: "select",
-                options: AVAILABILITY_OPTIONS,
-                icon: CircleDashed,
-                showInAdvancedOnly: true
             }
         },
         {
             // NOTE: in order for filters to access the proper nested database object the path to
             // the nested object must be defined in BOTH the id & accessorKey
-            id: "quantity",
+            id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts)
             accessorKey: "quantity",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Available Quantity"/>
@@ -215,17 +189,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
-            enableColumnFilter: true,
             meta: {
-                label: "Available Quantity",
-                variant: "range",
-                range: [0, 1000],
-                unit: 'ml',
+                label: "Available Quantity"
             },
         },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name",
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -233,13 +203,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
-            enableColumnFilter: true,
             meta: {
                 label: "Storage Facility",
-                variant: "select",
-                icon: CircleDashed,
-                showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncInstitutionSearch
             }
         },
         {
@@ -257,27 +222,28 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Links"
             }
         },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Other Notes"/>
-            ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
-            meta: {
-                label: "Other Notes"
-            },
-            enableHiding: true,
-        },
+        // {
+        //     id: "description",
+        //     accessorKey: "description",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Other Notes"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <div className="line-clamp-3">
+        //             {row.original.description}
+        //         </div>
+        //     ),
+        //     meta: {
+        //         label: "Other Notes"
+        //     },
+        //     enableHiding: true,
+        // },
     ]
 
     return columns

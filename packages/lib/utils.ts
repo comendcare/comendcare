@@ -20,6 +20,20 @@ import Papa from "papaparse";
 
 const normalize = (s: string) => s.trim().toLowerCase()
 
+export const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
+    if (sample?.quantity !== null) {
+        if (sample.quantity > 0) {
+            if (sample?.materialAndDataAccessRequests?.length > 0) {
+                return {value: 'Reserved', variant: 'yellow'}
+            }
+            return {value: 'Available', variant: 'green'}
+        }
+        if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
+    }
+
+    return undefined
+}
+
 const SERVICE_TO_MILESTONES: Record<string, Milestone[]> = (() => {
     const map: Record<string, Milestone[]> = {}
     for (const m of MILESTONE_TYPE_OPTIONS) {
