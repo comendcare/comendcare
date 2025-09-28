@@ -67,28 +67,52 @@ jobs:
         run: |
           set -euo pipefail
           echo "Looking up Vercel deployment for commit: $GIT_SHA"
+          
+          API="https://api.vercel.com/v6/deployments"
           for i in {1..90}; do
-            RESP=$(curl -fsS -G \
+            # Fetch recent preview deployments for this project
+            HTTP_CODE=$(curl -sS -w "%{http_code}" -o /tmp/resp.json -G \
               -H "Authorization: Bearer $VERCEL_TOKEN" \
               --data-urlencode "projectId=$VERCEL_PROJECT_ID" \
-              --data-urlencode "meta-githubCommitSha=$GIT_SHA" \
-              --data-urlencode "limit=1" \
-              "https://api.vercel.com/v13/deployments") || true
-
-            COUNT=$(echo "${RESP:-}" | jq -r '.deployments | length' 2>/dev/null || echo 0)
-            if [ "$COUNT" -gt 0 ]; then
-              URL=$(echo "$RESP" | jq -r '.deployments[0].url')
-              STATE=$(echo "$RESP" | jq -r '.deployments[0].readyState')
-              echo "Found deployment: $URL (state=$STATE)"
-              if [ "$STATE" = "READY" ]; then
-                echo "url=https://$URL" >> "$GITHUB_OUTPUT"
+              --data-urlencode "target=preview" \
+              --data-urlencode "limit=20" \
+              "$API" || true)
+          
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "List deployments HTTP $HTTP_CODE"
+              head -c 300 /tmp/resp.json || true; echo
+              sleep 5
+              continue
+            fi
+          
+            # Pick the first deployment whose meta.githubCommitSha matches our commit
+            URL=$(jq -r --arg sha "$GIT_SHA" '
+              .deployments
+              | map(select(.meta.githubCommitSha == $sha))
+              | first
+              | .url // empty
+            ' /tmp/resp.json)
+          
+            STATE=$(jq -r --arg sha "$GIT_SHA" '
+              .deployments
+              | map(select(.meta.githubCommitSha == $sha))
+              | first
+              | .readyState // empty
+            ' /tmp/resp.json)
+          
+            if [ -n "${URL:-}" ]; then
+              echo "Found deployment: $URL (state=${STATE:-unknown})"
+              if [ "${STATE:-}" = "READY" ]; then
+                echo "url=https://${URL}" >> "$GITHUB_OUTPUT"
                 exit 0
               fi
             else
-              echo "No deployment found yet for this commit."
+              echo "No deployment for this commit yet."
             fi
+          
             sleep 5
           done
+          
           echo "Timed out waiting for the auto-created Vercel deployment to be READY."
           exit 1
 
