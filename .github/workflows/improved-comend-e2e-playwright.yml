@@ -54,7 +54,7 @@ jobs:
       - name: 🔑 Vercel pull (preview env)
         run: npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
 
-      # NEW: read project/team from .vercel/project.json written by vercel pull
+      # Read project/team from .vercel/project.json
       - name: 🧭 Read Vercel project info
         id: project_info
         shell: bash
@@ -70,7 +70,7 @@ jobs:
           echo "org_id=$ORG_ID" >> "$GITHUB_OUTPUT"
           echo "Resolved project: ${PROJECT_ID:-<empty>} org/team: ${ORG_ID:-<empty>}"
 
-      # 🔎 Try to reuse the deployment Vercel already created for this commit/branch
+      # Try to reuse the deployment Vercel already created for this commit/branch
       - name: 🔎 Find existing Vercel deployment for this commit
         id: find_deploy
         shell: bash
@@ -100,41 +100,20 @@ jobs:
             echo "Found existing deployment: $url"
             echo "url=$url" >> "$GITHUB_OUTPUT"
           else
-            echo "No existing deployment found."
+            echo "No existing deployment found; will skip dynamic wait and rely on alias."
             echo "url=" >> "$GITHUB_OUTPUT"
           fi
 
-      # Only create a new deployment if none exists
-      - name: ☁️ Vercel deploy (cloud build) and capture deploy URL
-        id: deploy
-        if: ${{ steps.find_deploy.outputs.url == '' }}
-        run: |
-          set -euo pipefail
-          URL=$(npx vercel deploy --token "$VERCEL_TOKEN")
-          echo "Deployed preview: $URL"
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-
-      # Pick the URL to wait on: existing (preferred) or newly created
-      - name: 🔗 Select DEPLOY_URL
-        id: pick_url
-        run: |
-          URL="${{ steps.find_deploy.outputs.url }}"
-          if [ -z "$URL" ]; then URL="${{ steps.deploy.outputs.url }}"; fi
-          echo "Using deploy URL: $URL"
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-
-      # Wait for the specific deployment URL to be ready
+      # Wait for the specific deployment URL ONLY if one was found
       - name: ⏳ Wait for DEPLOY_URL to respond (with debug + bypass)
+        if: ${{ steps.find_deploy.outputs.url != '' }}
         shell: bash
         env:
-          URL: ${{ steps.pick_url.outputs.url }}
+          URL: ${{ steps.find_deploy.outputs.url }}
           BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
           echo "Probing deploy URL: ${URL:-<empty>}"
-          if [ -z "${URL:-}" ]; then
-            echo "ERROR: Deploy URL is empty."; exit 1
-          fi
           for i in {1..36}; do
             CODE=$(curl -s -o /tmp/dbody -D /tmp/dheaders -w "%{http_code}" \
               -H "x-vercel-protection-bypass: $BYPASS" \
