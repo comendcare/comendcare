@@ -16,12 +16,10 @@ jobs:
     timeout-minutes: 35
 
     env:
-      # --- Vercel deploy inputs (new, required for deploy) ---
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      # --- your existing env (unchanged) ---
       WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       GIT_SHA: ${{ github.sha }}
@@ -53,23 +51,63 @@ jobs:
       - name: ⏬ Install dependencies
         run: npm ci
 
-      # --- NEW: create a fresh Vercel Preview for this commit (do not overwrite WEB_URL) ---
       - name: 🔑 Vercel pull (preview env)
         run: npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
 
+      # 🔎 NEW: try to reuse the deployment Vercel already created for this commit
+      - name: 🔎 Find existing Vercel deployment for this commit
+        id: find_deploy
+        shell: bash
+        env:
+          TOKEN: ${{ env.VERCEL_TOKEN }}
+          PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+          SHA: ${{ env.GIT_SHA }}
+        run: |
+          set -euo pipefail
+          api="https://api.vercel.com/v13/deployments"
+          # First try by commit SHA
+          resp=$(curl -fsSL -H "Authorization: Bearer $TOKEN" \
+            "$api?projectId=$PROJECT_ID&target=preview&limit=50&meta-githubCommitSha=$SHA")
+          url=$(echo "$resp" | jq -r '(.deployments // []) | sort_by(.created) | last | .url // empty')
+          # Fallback: by branch ref (playwright)
+          if [ -z "$url" ]; then
+            resp=$(curl -fsSL -H "Authorization: Bearer $TOKEN" \
+              "$api?projectId=$PROJECT_ID&target=preview&limit=50&meta-githubCommitRef=playwright")
+            url=$(echo "$resp" | jq -r '(.deployments // []) | sort_by(.created) | last | .url // empty')
+          fi
+          if [ -n "$url" ]; then
+            if [[ "$url" != http* ]]; then url="https://$url"; fi
+            echo "Found existing deployment: $url"
+            echo "url=$url" >> "$GITHUB_OUTPUT"
+          else
+            echo "No existing deployment found for this commit/branch."
+            echo "url=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ☁️ Only create a new deployment if none exists
       - name: ☁️ Vercel deploy (cloud build) and capture deploy URL
         id: deploy
+        if: ${{ steps.find_deploy.outputs.url == '' }}
         run: |
           set -euo pipefail
           URL=$(npx vercel deploy --token "$VERCEL_TOKEN")
           echo "Deployed preview: $URL"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
-      # --- NEW: wait for the specific deployment URL to be ready ---
+      # Pick the URL to wait on: existing (preferred) or newly created
+      - name: 🔗 Select DEPLOY_URL
+        id: pick_url
+        run: |
+          URL="${{ steps.find_deploy.outputs.url }}"
+          if [ -z "$URL" ]; then URL="${{ steps.deploy.outputs.url }}"; fi
+          echo "Using deploy URL: $URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      # Wait for the specific deployment URL to be ready
       - name: ⏳ Wait for DEPLOY_URL to respond (with debug + bypass)
         shell: bash
         env:
-          URL: ${{ steps.deploy.outputs.url }}
+          URL: ${{ steps.pick_url.outputs.url }}
           BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
@@ -128,7 +166,6 @@ jobs:
           echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
           echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
 
-      # Keep your existing alias wait to ensure the branch URL has switched to the new build
       - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
         shell: bash
         env:
