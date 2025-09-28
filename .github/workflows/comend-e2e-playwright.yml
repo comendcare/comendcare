@@ -38,7 +38,6 @@ jobs:
         run: |
           echo "=== Dumping $GITHUB_EVENT_PATH ==="
           cat "$GITHUB_EVENT_PATH" | jq .
-
       - name: 👀 Checkout repository at deployment SHA
         uses: actions/checkout@v4
         with:
@@ -53,70 +52,18 @@ jobs:
       - name: ⏬ Install dependencies
         run: npm ci
 
-      # --- Keep vercel pull (does not deploy) ---
+      # --- NEW: create a fresh Vercel Preview for this commit (do not overwrite WEB_URL) ---
       - name: 🔑 Vercel pull (preview env)
         run: npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
 
-      # --- REPLACED: find the auto-created Vercel deployment for this commit ---
-      - name: 🔎 Find existing Vercel deployment for this commit (no new deploy)
+      - name: ☁️ Vercel deploy (cloud build) and capture deploy URL
         id: deploy
-        env:
-          VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
-          GIT_SHA: ${{ env.GIT_SHA }}
         run: |
           set -euo pipefail
-          echo "Looking up Vercel deployment for commit: $GIT_SHA"
-          
-          API="https://api.vercel.com/v6/deployments"
-          for i in {1..90}; do
-            # Fetch recent preview deployments for this project
-            HTTP_CODE=$(curl -sS -w "%{http_code}" -o /tmp/resp.json -G \
-              -H "Authorization: Bearer $VERCEL_TOKEN" \
-              --data-urlencode "projectId=$VERCEL_PROJECT_ID" \
-              --data-urlencode "target=preview" \
-              --data-urlencode "limit=20" \
-              "$API" || true)
-          
-            if [ "$HTTP_CODE" != "200" ]; then
-              echo "List deployments HTTP $HTTP_CODE"
-              head -c 300 /tmp/resp.json || true; echo
-              sleep 5
-              continue
-            fi
-          
-            # Pick the first deployment whose meta.githubCommitSha matches our commit
-            URL=$(jq -r --arg sha "$GIT_SHA" '
-              .deployments
-              | map(select(.meta.githubCommitSha == $sha))
-              | first
-              | .url // empty
-            ' /tmp/resp.json)
-          
-            STATE=$(jq -r --arg sha "$GIT_SHA" '
-              .deployments
-              | map(select(.meta.githubCommitSha == $sha))
-              | first
-              | .readyState // empty
-            ' /tmp/resp.json)
-          
-            if [ -n "${URL:-}" ]; then
-              echo "Found deployment: $URL (state=${STATE:-unknown})"
-              if [ "${STATE:-}" = "READY" ]; then
-                echo "url=https://${URL}" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
-            else
-              echo "No deployment for this commit yet."
-            fi
-          
-            sleep 5
-          done
-          
-          echo "Timed out waiting for the auto-created Vercel deployment to be READY."
-          exit 1
-
-      # --- unchanged: wait for that specific deployment URL to be reachable ---
+          URL=$(npx vercel deploy --token "$VERCEL_TOKEN")
+          echo "Deployed preview: $URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+      # --- NEW: wait for the specific deployment URL to be ready ---
       - name: ⏳ Wait for DEPLOY_URL to respond (with debug + bypass)
         shell: bash
         env:
@@ -143,7 +90,6 @@ jobs:
             sleep 5
           done
           echo "Deploy URL not reachable in time."; cat /tmp/dheaders || true; exit 1
-
       - name: 💧 Rehydrate SSL certs to /tmp
         shell: bash
         env:
@@ -157,7 +103,6 @@ jobs:
           echo "$SERVER_CA_BASE64"   | base64 -d > /tmp/server-ca.pem
           chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
           ls -l /tmp/client-*.pem /tmp/server-ca.pem
-
       - name: ⏬ Install Playwright browsers
         run: npx playwright install --with-deps
 
@@ -168,7 +113,6 @@ jobs:
           else
             echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
           fi
-
       - name: 🦆 Apply Prisma migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -178,7 +122,6 @@ jobs:
         run: |
           echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
           echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
-
       # Keep your existing alias wait to ensure the branch URL has switched to the new build
       - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
         shell: bash
@@ -206,7 +149,6 @@ jobs:
             sleep 5
           done
           echo "Alias not reachable in time."; cat /tmp/pheaders || true; exit 1
-
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
 
