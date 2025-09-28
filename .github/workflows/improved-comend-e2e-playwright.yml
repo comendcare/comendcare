@@ -16,10 +16,12 @@ jobs:
     timeout-minutes: 35
 
     env:
+      # --- Vercel deploy inputs (new, required for deploy) ---
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      # --- your existing env (unchanged) ---
       WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
       GIT_SHA: ${{ github.sha }}
@@ -51,71 +53,57 @@ jobs:
       - name: ⏬ Install dependencies
         run: npm ci
 
-      - name: ✅ Check Vercel env
-        run: |
-          test -n "${VERCEL_TOKEN:-}" || (echo "Missing VERCEL_TOKEN" && exit 1)
-          test -n "${VERCEL_PROJECT_ID:-}" || (echo "Missing VERCEL_PROJECT_ID" && exit 1)
-          test -n "${VERCEL_ORG_ID:-}" || (echo "Missing VERCEL_ORG_ID" && exit 1)
+      # --- Keep vercel pull (does not deploy) ---
+      - name: 🔑 Vercel pull (preview env)
+        run: npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
 
-      # 🔎 Poll the Vercel API for an existing deployment of this commit/branch (no new deploys)
-      - name: 🔎 Wait for existing Vercel deployment (commit or branch)
-        id: wait_deploy
-        shell: bash
+      # --- REPLACED: find the auto-created Vercel deployment for this commit ---
+      - name: 🔎 Find existing Vercel deployment for this commit (no new deploy)
+        id: deploy
         env:
-          TOKEN: ${{ env.VERCEL_TOKEN }}
-          PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
-          ORG_ID: ${{ env.VERCEL_ORG_ID }}   # team or user id (team_xxx / user_xxx)
-          SHA: ${{ env.GIT_SHA }}
+          VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+          GIT_SHA: ${{ env.GIT_SHA }}
         run: |
           set -euo pipefail
-          base="https://api.vercel.com/v13/deployments"
-          qs="projectId=${PROJECT_ID}&target=preview&limit=50"
-          # scope to team if provided
-          if [ -n "${ORG_ID:-}" ]; then qs="${qs}&teamId=${ORG_ID}"; fi
-          
-          url=""
-          state=""
-          
+          echo "Looking up Vercel deployment for commit: $GIT_SHA"
           for i in {1..36}; do
-            # Try by commit SHA
-            resp=$(curl -sS -H "Authorization: Bearer ${TOKEN}" "${base}?${qs}&meta-githubCommitSha=${SHA}" || true)
-            url=$(echo "$resp" | jq -r '(.deployments // []) | map(select(.readyState!="CANCELED")) | sort_by(.created) | last | .url // empty')
-            state=$(echo "$resp" | jq -r '(.deployments // []) | map(select(.readyState!="CANCELED")) | sort_by(.created) | last | .readyState // empty')
-          
-            # Fallback by branch ref if none by SHA yet
-            if [ -z "$url" ]; then
-              resp=$(curl -sS -H "Authorization: Bearer ${TOKEN}" "${base}?${qs}&meta-githubCommitRef=playwright" || true)
-              url=$(echo "$resp" | jq -r '(.deployments // []) | map(select(.readyState!="CANCELED")) | sort_by(.created) | last | .url // empty')
-              state=$(echo "$resp" | jq -r '(.deployments // []) | map(select(.readyState!="CANCELED")) | sort_by(.created) | last | .readyState // empty')
+            RESP=$(curl -fsS -G \
+              -H "Authorization: Bearer $VERCEL_TOKEN" \
+              --data-urlencode "projectId=$VERCEL_PROJECT_ID" \
+              --data-urlencode "meta-githubCommitSha=$GIT_SHA" \
+              --data-urlencode "limit=1" \
+              "https://api.vercel.com/v13/deployments") || true
+
+            COUNT=$(echo "${RESP:-}" | jq -r '.deployments | length' 2>/dev/null || echo 0)
+            if [ "$COUNT" -gt 0 ]; then
+              URL=$(echo "$RESP" | jq -r '.deployments[0].url')
+              STATE=$(echo "$RESP" | jq -r '.deployments[0].readyState')
+              echo "Found deployment: $URL (state=$STATE)"
+              if [ "$STATE" = "READY" ]; then
+                echo "url=https://$URL" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+            else
+              echo "No deployment found yet for this commit."
             fi
-          
-            if [ -n "$url" ] && [ "$state" = "READY" ]; then
-              break
-            fi
-          
-            echo "Waiting for existing deployment… attempt $i state=${state:-<none>}"
             sleep 5
           done
-          
-          if [ -n "$url" ]; then
-            [[ "$url" != http* ]] && url="https://${url}"
-            echo "Found deployment: $url (state=$state)"
-            echo "url=$url" >> "$GITHUB_OUTPUT"
-          else
-            echo "No deployment located in time; will skip dynamic wait and rely on alias."
-            echo "url=" >> "$GITHUB_OUTPUT"
-          fi
+          echo "Timed out waiting for the auto-created Vercel deployment to be READY."
+          exit 1
 
-      # ⏳ Wait on that specific deployment URL only if we found one
+      # --- unchanged: wait for that specific deployment URL to be reachable ---
       - name: ⏳ Wait for DEPLOY_URL to respond (with debug + bypass)
-        if: ${{ steps.wait_deploy.outputs.url != '' }}
         shell: bash
         env:
-          URL: ${{ steps.wait_deploy.outputs.url }}
+          URL: ${{ steps.deploy.outputs.url }}
           BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
           echo "Probing deploy URL: ${URL:-<empty>}"
+          if [ -z "${URL:-}" ]; then
+            echo "ERROR: Deploy URL is empty."; exit 1
+          fi
           for i in {1..36}; do
             CODE=$(curl -s -o /tmp/dbody -D /tmp/dheaders -w "%{http_code}" \
               -H "x-vercel-protection-bypass: $BYPASS" \
@@ -167,6 +155,7 @@ jobs:
           echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
           echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
 
+      # Keep your existing alias wait to ensure the branch URL has switched to the new build
       - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
         shell: bash
         env:
