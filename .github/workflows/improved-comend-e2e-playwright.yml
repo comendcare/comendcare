@@ -67,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Looking up Vercel deployment for commit: $GIT_SHA"
-          for i in {1..36}; do
+          for i in {1..90}; do
             RESP=$(curl -fsS -G \
               -H "Authorization: Bearer $VERCEL_TOKEN" \
               --data-urlencode "projectId=$VERCEL_PROJECT_ID" \
