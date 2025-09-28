@@ -54,37 +54,57 @@ jobs:
       - name: 🔑 Vercel pull (preview env)
         run: npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
 
-      # 🔎 NEW: try to reuse the deployment Vercel already created for this commit
+      # NEW: read project/team from .vercel/project.json written by vercel pull
+      - name: 🧭 Read Vercel project info
+        id: project_info
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE=".vercel/project.json"
+          if [ ! -f "$FILE" ]; then
+            echo "Missing $FILE after vercel pull"; ls -la .vercel || true; exit 1
+          fi
+          PROJECT_ID=$(jq -r '.projectId // empty' "$FILE")
+          ORG_ID=$(jq -r '.orgId // empty' "$FILE")
+          echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
+          echo "org_id=$ORG_ID" >> "$GITHUB_OUTPUT"
+          echo "Resolved project: ${PROJECT_ID:-<empty>} org/team: ${ORG_ID:-<empty>}"
+
+      # 🔎 Try to reuse the deployment Vercel already created for this commit/branch
       - name: 🔎 Find existing Vercel deployment for this commit
         id: find_deploy
         shell: bash
         env:
           TOKEN: ${{ env.VERCEL_TOKEN }}
-          PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+          PROJECT_ID: ${{ steps.project_info.outputs.project_id || env.VERCEL_PROJECT_ID }}
+          ORG_ID: ${{ steps.project_info.outputs.org_id || env.VERCEL_ORG_ID }}
           SHA: ${{ env.GIT_SHA }}
         run: |
           set -euo pipefail
-          api="https://api.vercel.com/v13/deployments"
-          # First try by commit SHA
-          resp=$(curl -fsSL -H "Authorization: Bearer $TOKEN" \
-            "$api?projectId=$PROJECT_ID&target=preview&limit=50&meta-githubCommitSha=$SHA")
+          base="https://api.vercel.com/v13/deployments"
+          qs="projectId=${PROJECT_ID}&target=preview&limit=50"
+          if [ -n "${ORG_ID:-}" ]; then qs="${qs}&teamId=${ORG_ID}"; fi
+
+          # by commit SHA
+          resp=$(curl -sS -H "Authorization: Bearer ${TOKEN}" "${base}?${qs}&meta-githubCommitSha=${SHA}" || true)
           url=$(echo "$resp" | jq -r '(.deployments // []) | sort_by(.created) | last | .url // empty')
-          # Fallback: by branch ref (playwright)
+
+          # fallback: by branch ref
           if [ -z "$url" ]; then
-            resp=$(curl -fsSL -H "Authorization: Bearer $TOKEN" \
-              "$api?projectId=$PROJECT_ID&target=preview&limit=50&meta-githubCommitRef=playwright")
+            resp=$(curl -sS -H "Authorization: Bearer ${TOKEN}" "${base}?${qs}&meta-githubCommitRef=playwright" || true)
             url=$(echo "$resp" | jq -r '(.deployments // []) | sort_by(.created) | last | .url // empty')
           fi
+
           if [ -n "$url" ]; then
-            if [[ "$url" != http* ]]; then url="https://$url"; fi
+            [[ "$url" != http* ]] && url="https://${url}"
             echo "Found existing deployment: $url"
             echo "url=$url" >> "$GITHUB_OUTPUT"
           else
-            echo "No existing deployment found for this commit/branch."
+            echo "No existing deployment found."
             echo "url=" >> "$GITHUB_OUTPUT"
           fi
 
-      # ☁️ Only create a new deployment if none exists
+      # Only create a new deployment if none exists
       - name: ☁️ Vercel deploy (cloud build) and capture deploy URL
         id: deploy
         if: ${{ steps.find_deploy.outputs.url == '' }}
