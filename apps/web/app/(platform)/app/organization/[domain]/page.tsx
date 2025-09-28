@@ -226,6 +226,9 @@ export default async function OrganizationHomePage({
                         icon: <IconShare/>,
                         dialog: <ShareDialog
                             url={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                            trackShareEvent={{
+                                title: `Organization Profile Shared`
+                            }}
                         />
                     },
                     ...(organization.contactEmail

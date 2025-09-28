@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
 
                         <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0;" />
 
-                        <p><strong>Or copy & paste this link:</strong></p>
+                        <p>Or copy & paste this link:</p>
                         <!-- Show as selectable plain text AND as a link. The outer container prevents ugly wrapping. -->
                         <p style="margin:8px 0;">
                             <a href="${preflightUrl}" style="text-decoration:none;color:inherit;">
@@ -57,6 +57,17 @@ export const authOptions: NextAuthOptions = {
                                 </span>
                             </a>
                         </p>
+                        
+                        
+                        <!-- SECURITY WARNING -->
+                        <div style="margin:16px 0; padding:12px 14px; border:1px solid #f59e0b; background:#fffbeb; border-radius:8px;">
+                            <strong style="display:block; margin-bottom:4px;">Security warning</strong>
+                            <div style="font-size:14px; color:#553c04;">
+                                • This link is for you only — do <em>not</em> share or forward this email.<br/>
+                                • Anyone with this link can access your account.<br/>
+                                • If you didn’t request this, please delete this email.
+                            </div>
+                        </div>
 
                         <p style="color:#6b7280; font-size:12px; margin-top:12px;">
                             If you didn’t request this, you can safely ignore this email.

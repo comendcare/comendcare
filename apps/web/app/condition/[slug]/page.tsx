@@ -553,6 +553,9 @@ export default async function ConditionPage({
                         icon: <IconShare/>,
                         dialog: <ShareDialog 
                             url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`}
+                            trackShareEvent={{
+                                title: `Condition Page Shared`
+                            }}
                         />
                     },
                     {
