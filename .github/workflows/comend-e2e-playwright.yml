@@ -1,8 +1,8 @@
-name: E2E (Vercel Playwright, event-driven)
+name: E2E (playwright, push-driven)
 
 on:
-  repository_dispatch:
-    types: [vercel.deployment.success]
+  push:
+    branches: [playwright]
   workflow_dispatch: {}
 
 permissions:
@@ -15,25 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
 
-    # Gate: only Vercel preview for the 'comend' project + playwright branch/ref, OR manual trigger
-    if: |
-      (
-        github.event_name == 'repository_dispatch' &&
-        github.event.action == 'vercel.deployment.success' &&
-        github.event.client_payload.environment == 'preview' &&
-        github.event.client_payload.project.name == 'comend' &&
-        (
-          github.event.client_payload.git.branch == 'playwright' ||
-          github.event.client_payload.git.ref == 'playwright'
-        )
-      ) || (
-        github.event_name == 'workflow_dispatch'
-      )
-
     env:
+      # --- Vercel deploy inputs (new, required for deploy) ---
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # --- your existing env (unchanged) ---
       WEB_URL: https://comend-git-playwright-comend.vercel.app
       PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
-      GIT_SHA: ${{ github.event.client_payload.git.sha || github.event.inputs.git_sha || github.sha }}
+      GIT_SHA: ${{ github.sha }}
       NODE_ENV: test
       E2E: "1"
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
@@ -47,7 +38,6 @@ jobs:
         run: |
           echo "=== Dumping $GITHUB_EVENT_PATH ==="
           cat "$GITHUB_EVENT_PATH" | jq .
-
       - name: 👀 Checkout repository at deployment SHA
         uses: actions/checkout@v4
         with:
@@ -62,6 +52,44 @@ jobs:
       - name: ⏬ Install dependencies
         run: npm ci
 
+      # --- NEW: create a fresh Vercel Preview for this commit (do not overwrite WEB_URL) ---
+      - name: 🔑 Vercel pull (preview env)
+        run: npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
+
+      - name: ☁️ Vercel deploy (cloud build) and capture deploy URL
+        id: deploy
+        run: |
+          set -euo pipefail
+          URL=$(npx vercel deploy --token "$VERCEL_TOKEN")
+          echo "Deployed preview: $URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+      # --- NEW: wait for the specific deployment URL to be ready ---
+      - name: ⏳ Wait for DEPLOY_URL to respond (with debug + bypass)
+        shell: bash
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+          BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          set -euo pipefail
+          echo "Probing deploy URL: ${URL:-<empty>}"
+          if [ -z "${URL:-}" ]; then
+            echo "ERROR: Deploy URL is empty."; exit 1
+          fi
+          for i in {1..36}; do
+            CODE=$(curl -s -o /tmp/dbody -D /tmp/dheaders -w "%{http_code}" \
+              -H "x-vercel-protection-bypass: $BYPASS" \
+              -H "x-vercel-set-bypass-cookie: true" \
+              -c /tmp/dcookies -b /tmp/dcookies \
+              -L "$URL" || true)
+            echo "Attempt $i (deploy URL) -> HTTP $CODE"
+            if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
+              echo "Deploy URL is reachable."; exit 0
+            fi
+            head -n 20 /tmp/dheaders || true
+            head -c 200 /tmp/dbody || true; echo
+            sleep 5
+          done
+          echo "Deploy URL not reachable in time."; cat /tmp/dheaders || true; exit 1
       - name: 💧 Rehydrate SSL certs to /tmp
         shell: bash
         env:
@@ -75,7 +103,6 @@ jobs:
           echo "$SERVER_CA_BASE64"   | base64 -d > /tmp/server-ca.pem
           chmod 600 /tmp/client-key.pem /tmp/client-cert.pem /tmp/server-ca.pem
           ls -l /tmp/client-*.pem /tmp/server-ca.pem
-
       - name: ⏬ Install Playwright browsers
         run: npx playwright install --with-deps
 
@@ -86,7 +113,6 @@ jobs:
           else
             echo "PRISMA_FIELD_ENCRYPTION_KEY is set ✅"
           fi
-
       - name: 🦆 Apply Prisma migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -96,7 +122,7 @@ jobs:
         run: |
           echo "VERCEL_PROJECT_SLUG=${{ vars.VERCEL_PROJECT_SLUG || '<missing>' }}"
           echo "VERCEL_TEAM_SLUG=${{ vars.VERCEL_TEAM_SLUG || '<missing>' }}"
-
+      # Keep your existing alias wait to ensure the branch URL has switched to the new build
       - name: ⏳ Wait for WEB_URL to respond (with debug + bypass)
         shell: bash
         env:
@@ -104,7 +130,7 @@ jobs:
           BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
-          echo "Probing: ${URL:-<empty>}"
+          echo "Probing (alias): ${URL:-<empty>}"
           if [ -z "${URL:-}" ]; then
             echo "ERROR: WEB_URL is empty. Dumping event:"; cat "$GITHUB_EVENT_PATH"; exit 1
           fi
@@ -114,16 +140,15 @@ jobs:
               -H "x-vercel-set-bypass-cookie: true" \
               -c /tmp/pcookies -b /tmp/pcookies \
               -L "$URL" || true)
-            echo "Attempt $i -> HTTP $CODE"
+            echo "Attempt $i (alias) -> HTTP $CODE"
             if echo "$CODE" | grep -Eq '^(200|301|302|307|308)$'; then
-              echo "Playwright is reachable."; exit 0
+              echo "Playwright alias is reachable."; exit 0
             fi
             head -n 20 /tmp/pheaders || true
             head -c 200 /tmp/pbody || true; echo
             sleep 5
           done
-          echo "Playwright not reachable in time."; cat /tmp/pheaders || true; exit 1
-
+          echo "Alias not reachable in time."; cat /tmp/pheaders || true; exit 1
       - name: 🏃 Run Playwright E2E
         run: npx playwright test
 
