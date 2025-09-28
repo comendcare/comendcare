@@ -22,7 +22,8 @@ import {
     Institution,
     SavedOrganization,
     Biosample,
-    DiseaseModel
+    DiseaseModel,
+    Invitation
 } from "@prisma/client";
 import {z} from "zod";
 
@@ -361,6 +362,10 @@ export type MembershipWithOrganization = Partial<Member> & {
     organization?: Partial<Organization> | null; // Optional because the organization might be null if not fetched
 };
 
+export type InvitationWithOrganization = Partial<Invitation> & {
+    organization?: Partial<Organization> | null; // Optional because the organization might be null if not fetched
+};
+
 export type OrganizationsWithConditions = Organization & {
     conditions?: (ConditionToOrganization & {
         condition?: Condition | null;
@@ -377,8 +382,8 @@ export type MemberWithUser = Prisma.MemberGetPayload<{
     include: { user: true };
 }>;
 
-export type MemberRequestWithUser = Prisma.MemberRequestGetPayload<{
-    include: { user: true };
+export type MemberRequestWithUserAndOrganization = Prisma.MemberRequestGetPayload<{
+    include: { user: true, organization: true };
 }>;
 
 export type CommentWithUser = Prisma.RequestCommentGetPayload<{

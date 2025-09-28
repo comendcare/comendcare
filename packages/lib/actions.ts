@@ -43,7 +43,7 @@ import {
     editBiosampleForm,
     editDataToolForm,
     editDiseaseModelForm,
-    MemberRequestWithUser,
+    MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
     optionSchema,
@@ -1159,6 +1159,11 @@ export const editUser = withAuth(
                 },
                 data: data, // Pass the data object directly
             });
+
+            for (const p of PATHS) {
+                revalidatePath(p);
+            }
+
             return response;
         } catch (error: any) {
             if (error.code === "P2002") {
@@ -1284,7 +1289,7 @@ export const inviteUser = withOrganizationAuth(
 )
 
 export const approveMemberRequestAndCreateMember = withOrganizationAuth(
-    async (organization: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
+    async (organization: Organization, memberRequest: MemberRequestWithUserAndOrganization): Promise<ApiResponse<any>> => {
         if (!memberRequest) {
             throw new Error("Invalid member request");
         }
@@ -1372,7 +1377,7 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
 )
 
 export const deleteMemberRequest = withUserAuth(
-    async (user: User, memberRequest: MemberRequestWithUser) => {
+    async (user: User, memberRequest: MemberRequestWithUserAndOrganization) => {
         if (!memberRequest) {
             throw new Error("Invalid member request");
         }
@@ -1398,7 +1403,7 @@ export const deleteMemberRequest = withUserAuth(
 )
 
 export const denyMemberRequest = withOrganizationAuth(
-    async (organization: Organization, memberRequest: MemberRequestWithUser): Promise<ApiResponse<any>> => {
+    async (organization: Organization, memberRequest: MemberRequestWithUserAndOrganization): Promise<ApiResponse<any>> => {
         if (!memberRequest) {
             throw new Error("Invalid member request");
         }
