@@ -235,10 +235,9 @@ export function Roadmap({
                             setBulkImportIsOpen={setBulkImportIsOpen}
                             orgSubdomain={orgSubdomain}
                         />
-                        <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                        <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                             <div className="flex flex-row items-center gap-x-1 justify-start">
                                 <TabsList className="mr-auto">
-                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                     <TabsTrigger value="flow" className="relative">
                                         Flow View
                                         <Tooltip>
@@ -253,6 +252,7 @@ export function Roadmap({
                                         </Tooltip>
                                         {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
+                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 </TabsList>
 
                                 {selectedView === "timeline" || selectedView === null && (
