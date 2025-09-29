@@ -255,7 +255,7 @@ export function Roadmap({
                                     <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 </TabsList>
 
-                                {selectedView === "timeline" || selectedView === null && (
+                                {selectedView === "timeline" && (
                                     <div className="flex flex-row gap-4 items-center">
                                         <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                             <SelectTrigger className="w-[180px]">
