@@ -18,6 +18,13 @@ import {
 } from "./types";
 import Papa from "papaparse";
 
+export function runInProduction<T>(fn: () => T | Promise<T>) {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+        return fn();
+    }
+    return undefined;
+}
+
 const normalize = (s: string) => s.trim().toLowerCase()
 
 export function stringToSortableInt(str: string | null, maxLength = 10): number | null {
@@ -311,7 +318,7 @@ export function standardizeYear(dateString: string): string {
     return match ? match[1] : "";
 }
 
-export function formatNumberWithCommas(number: string | undefined | null) {
+export function formatNumberWithCommas(number: string | number | undefined | null) {
     if (number === undefined || number === null) return "0"
 
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
