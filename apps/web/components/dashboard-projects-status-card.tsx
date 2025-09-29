@@ -21,6 +21,7 @@ import {OrganizationForAnalytics, StatusType} from "@comend/lib/types"
 import {Button} from "@comend/components/ui/button";
 import {ExternalLink} from "lucide-react"
 import {useRouter} from "next/navigation";
+import Image from "next/image"
 
 
 const STATUS_LABELS: Record<StatusType, string> = {
@@ -45,7 +46,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
     const router = useRouter();
 
     // Derive counts + chart data directly from props (no effects/state)
-    const { data, total } = React.useMemo(() => {
+    const {data, total} = React.useMemo(() => {
         const counts: Record<StatusType, number> = {
             PLANNED: 0,
             INPROGRESS: 0,
@@ -76,7 +77,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
 
         const sum = orderedStatuses.reduce((acc, s) => acc + counts[s], 0)
 
-        return { data: chartData, total: sum }
+        return {data: chartData, total: sum}
     }, [organization.milestones])
 
     const chartConfig: ChartConfig = {
@@ -84,6 +85,65 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
         INPROGRESS: {label: STATUS_LABELS.INPROGRESS, color: STATUS_COLORS.INPROGRESS},
         COMPLETED: {label: STATUS_LABELS.COMPLETED, color: STATUS_COLORS.COMPLETED},
     }
+
+    if (organization.milestones.length === 0) return (
+        <Card className="col-span-3 flex flex-col">
+            <CardHeader className="items-start pb-0">
+                <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                    Project overview
+                    <Button
+                        onClick={() => router.push("/app/research-plan")}
+                        variant="ghost"
+                        size="icon"
+                        className="p-0 h-auto w-auto"
+                    >
+                        <ExternalLink className="h-4 w-4 text-muted-foreground"/>
+                    </Button>
+                </CardTitle>
+                <div className="flex flex-row mb-4">
+                    {data.map((item, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center text-sm font-medium text-gray-900 dark:text-white me-3"
+                        >
+                            <div
+                                style={{backgroundColor: item.colorPreview}}
+                                className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
+                            />
+                            {STATUS_LABELS[item.status]}
+                        </div>
+                    ))}
+                </div>
+            </CardHeader>
+            <CardContent className="flex-1 pb-0">
+                <div
+                    className="mx-auto aspect-square max-h-[250px]"
+                >
+                    <div className="h-full flex flex-col items-center justify-center py-20">
+                        <Image
+                            alt="No projects"
+                            src="https://illustrations.popsy.co/gray/cute-smiling-cat.svg"
+                            width={150}
+                            height={150}
+                            className="dark:hidden"
+                        />
+                        <Image
+                            alt="No projects"
+                            src="https://illustrations.popsy.co/white/cute-smiling-cat.svg"
+                            width={200}
+                            height={200}
+                            className="hidden dark:block"
+                        />
+                        <div className="flex flex-col justify-center items-center text-center space-y-8">
+                            <p className="font-title text-base text-stone-600 dark:text-stone-400">
+                                {`Your organization doesn't have any projects yet.`}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
 
     return (
         <Card className="col-span-3 flex flex-col">
@@ -101,16 +161,16 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                 </CardTitle>
                 <div className="flex flex-row mb-4">
                     {data.map((item, index) => (
-                        <span
+                        <div
                             key={index}
                             className="flex items-center text-sm font-medium text-gray-900 dark:text-white me-3"
                         >
-      <span
-          style={{backgroundColor: item.colorPreview}}
-          className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
-      />
+                            <div
+                                style={{backgroundColor: item.colorPreview}}
+                                className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
+                            />
                             {STATUS_LABELS[item.status]}
-    </span>
+                        </div>
                     ))}
                 </div>
             </CardHeader>

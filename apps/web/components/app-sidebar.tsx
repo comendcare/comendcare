@@ -199,7 +199,6 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function AppSidebar({memberships}: { memberships: MembershipWithOrganization[] }) {
-    console.log("memberships again: ", memberships)
     const {data: session, status} = useSession()
     const {startOnborda} = useOnborda()
     const pathname = usePathname()

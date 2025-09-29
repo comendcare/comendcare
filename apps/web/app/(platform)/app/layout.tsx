@@ -54,7 +54,6 @@ export default async function AppLayoutServer({children}: { children: React.Reac
             orderBy: { createdAt: "desc" },
         }),
     ]);
-    console.log("memberships", memberships)
 
     // If not logged in, render a loading or redirect logic as you already do.
     if (!user) return <div/>;

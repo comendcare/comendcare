@@ -78,7 +78,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
     const disabled = session?.user?.membership?.role !== "owner";
 
     return (
-        <main className="flex flex-col items-start w-full h-screen mx-auto p-8 space-y-8">
+        <main className="flex flex-col items-start w-full h-full mx-auto p-8 space-y-8">
             <div className="w-full flex flex-col space-y-4">
                 <div>
                     <h2 className="text-xl font-semibold leading-6 text-gray-900">

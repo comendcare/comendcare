@@ -74,8 +74,19 @@ const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
     step: state.step
 })
 
-export function Roadmap() {
-    // Zustand state management
+export function Roadmap({
+                            milestoneTypes,
+                            organization,
+                            orgSubdomain,
+                            orgIsPublished,
+                            researchPlanId,
+                        }: {
+    milestoneTypes: MilestoneType[];
+    organization?: Organization;
+    orgSubdomain?: string;
+    orgIsPublished: boolean;
+    researchPlanId: string;
+}) {    // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
         roadmapId,
@@ -101,23 +112,27 @@ export function Roadmap() {
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // controllig tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
     const [tab, setTab] = useState<TabType>('projects')
-    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
-    const [organization, setOrganization] = useState<Organization | undefined>()
-    const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
-    const [orgIsPublished, setOrgIsPublished] = useState<boolean>(false)
     const { isOnbordaVisible } = useOnborda()
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const focusRef = useRef<any>(null);
-    const [newFlowProjects, setNewFlowProjects] = useState(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
+    // 1) Safe initial state (runs on server too)
+    const [newFlowProjects, setNewFlowProjects] = useState<string | undefined>(() => {
+        if (typeof window === "undefined") return undefined
+        return window.functionalConsentedLocalStorage?.get("newFlowProjects")
+    })
 
+    // 2) Update after mount (browser only)
     useEffect(() => {
         // delay this by 1 second so the browser has time to set the localstorage flag (if the user has consented)
-        setTimeout(() => {
-            setNewFlowProjects(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
+        const t = setTimeout(() => {
+            if (typeof window !== "undefined") {
+                setNewFlowProjects(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
+            }
         }, 1000)
+        return () => clearTimeout(t)
     }, [milestones, selectedView])
 
     useEffect(() => {
@@ -127,86 +142,7 @@ export function Roadmap() {
         }
     }, [step])
 
-    useEffect(() => {
-        const init = async () => {
-            // get milestone types from database
-            const response = await getMilestoneTypes({
-                id: true,
-                label: true,
-                services: true,
-                categories: true,
-                description: true
-            })
-            if (response.success && response.data) {
-                setMilestoneTypes(response.data || [])
-            }
 
-            if (session?.user.organizationId) {
-                let orgData = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                    id: true,
-                    public: true,
-                    verified: true,
-                    published: true,
-                    name: true,
-                    description: true,
-                    contactEmail: true,
-                    logo: true,
-                    image: true,
-                    headerImage: true,
-                    biopharmaConsentSettings: true,
-                    subdomain: true,
-                    customDomain: true,
-                    statedGoal: true,
-                    yearFounded: true,
-                    incorporationStatus: true,
-                    therapeuticsOfInterest: true,
-                    therapeuticsInDevelopment: true,
-                    website: true,
-                    moneyRaised: true,
-                    moneyDeployed: true,
-                    researchBudget: true,
-                    // address1                  String?
-                    // address2                  String?
-                    // formattedAddress          String?
-                    // city                      String?
-                    // region                    String?
-                    // postalCode                String?
-                    // country                   String?
-                    // lat                       String?
-                    // lng                       String?
-                    createdAt: true,
-                    updatedAt: true,
-                    user: true,
-                    userId: true,
-                    roadmaps: true,
-                    members: true,
-                    clients: true,
-                    invitations: true,
-                    membershipRequests: true,
-                    conditions: true,
-                    kanban: true,
-                    milestones: true,
-                    platformNotifications: true,
-                    reviews: true,
-                    savedCompanies: true,
-                    tools: true,
-                    rfps: true,
-                    metadata: true
-                })
-                if (orgData.success && orgData.data) {
-                    setOrganization(orgData.data)
-                    setOrgSubdomain(orgData.data.subdomain || undefined)
-                    setOrgIsPublished(orgData.data.published || false)
-                }
-            }
-        }
-
-        init()
-
-    // missing dependencies disabled - we only want to run this once on initialization
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    
     useEffect(() => {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
     
@@ -299,10 +235,9 @@ export function Roadmap() {
                             setBulkImportIsOpen={setBulkImportIsOpen}
                             orgSubdomain={orgSubdomain}
                         />
-                        <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                        <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                             <div className="flex flex-row items-center gap-x-1 justify-start">
                                 <TabsList className="mr-auto">
-                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                     <TabsTrigger value="flow" className="relative">
                                         Flow View
                                         <Tooltip>
@@ -317,9 +252,10 @@ export function Roadmap() {
                                         </Tooltip>
                                         {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
+                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 </TabsList>
 
-                                {selectedView === "timeline" || selectedView === null && (
+                                {selectedView === "timeline" && (
                                     <div className="flex flex-row gap-4 items-center">
                                         <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                             <SelectTrigger className="w-[180px]">
@@ -411,7 +347,7 @@ export function Roadmap() {
                                 className="mt-0 h-[calc(100vh-12rem)]"
                             >
                                 {milestones.length > 0 ? (
-                                    <TimelineView 
+                                    <TimelineView
                                         sortBy={sortBy} 
                                         contextMenuRef={contextMenuRef} 
                                     />
