@@ -49,18 +49,18 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
             <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
-                    <h2 className="col-span-full font-semibold text-2xl">Research Plans</h2>
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleShare()
-                            }}
-                            variant={'secondary'}
-                            className="onborda-share-research-plan"
-                        >
-                            <Share />
-                            Share
-                        </Button>
+                    <h2 className="col-span-full font-semibold text-2xl">My Research Plans</h2>
+                    <Button
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleShare()
+                        }}
+                        variant={'secondary'}
+                        className="onborda-share-research-plan"
+                    >
+                        <Share />
+                        Share
+                    </Button>
                 </div>
                 {/* {roadmaps.length > 0 && ( */}
                     <RoadmapsTable 

@@ -94,7 +94,8 @@ export const RoadmapCard = ({
 
     return (
         <Tabs
-            defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'timeline'}
+            // defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'timeline'} // timeline default
+            defaultValue={urlView === 'timeline' || params.get('view') === 'timeline' ? 'timeline' : 'flow'} // flow default
             className="w-full"
             onValueChange={setUrlView ? setUrlView: () => {}}
         >
@@ -112,25 +113,16 @@ export const RoadmapCard = ({
                     </div>
 
                     <TabsList className="w-min">
-                        <TabsTrigger value="timeline">
-                            Timeline View
-                        </TabsTrigger>
                         <TabsTrigger value="flow">
                             Flow View
+                        </TabsTrigger>
+                        <TabsTrigger value="timeline">
+                            Timeline View
                         </TabsTrigger>
                     </TabsList>
                 </CardHeader>
 
                 <CardContent className="px-8">
-                    <TabsContent value="timeline" className="space-y-4 w-full">
-                        <PublicTimelineView 
-                            roadmap={roadmap} 
-                            subdomain={subdomain}
-                            externalLinks={externalLinks}
-                            urlMilestone={urlMilestone}
-                            setUrlMilestone={setUrlMilestone}
-                        />
-                    </TabsContent>
                     <TabsContent value="flow" className="space-y-4 w-full">
                         <div className="h-[40vh] w-full">
                             <PublicFlowView 
@@ -141,6 +133,15 @@ export const RoadmapCard = ({
                                 externalLinks={externalLinks}
                             />
                         </div>
+                    </TabsContent>
+                    <TabsContent value="timeline" className="space-y-4 w-full">
+                        <PublicTimelineView 
+                            roadmap={roadmap} 
+                            subdomain={subdomain}
+                            externalLinks={externalLinks}
+                            urlMilestone={urlMilestone}
+                            setUrlMilestone={setUrlMilestone}
+                        />
                     </TabsContent>
                 </CardContent>
             </Card>
