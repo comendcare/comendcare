@@ -14,14 +14,16 @@ import Link from "next/link";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@comend/components/ui/skeleton";
+import {MembershipWithOrganization} from "@/packages/lib/types";
 
-export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
+export function OrganizationSwitcher({memberships}: { memberships: MembershipWithOrganization[] }) {
     const {data: session, update} = useSession();
     const activeId = session?.user?.organizationId ?? null;
     const router = useRouter();
     const {isMobile} = useSidebar();
 
-    const handleSelect = async (orgId: string) => {
+    const handleSelect = async (orgId: string | undefined) => {
+        if (!orgId) return
         const res = await switchOrganization(orgId);
         if (!res.success) {
             toast.error(res.error ?? "Could not switch organization");
@@ -53,9 +55,9 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
                                     )}
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {activeOrg ? activeOrg.organization.name : "Select an organization"}
-                </span>
+                                    <div className="truncate font-semibold">
+                                        {activeOrg ? activeOrg?.organization?.name : "Select an organization"}
+                                    </div>
                                 </div>
                                 <ChevronsUpDown className="ml-auto"/>
                             </SidebarMenuButton>
@@ -85,7 +87,7 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
                                                 className="size-4 shrink-0"
                                             />
                                         </div>
-                                        {m.organization.name}
+                                        {m.organization?.name}
                                         {activeId === m.organizationId && <Check className="ml-auto opacity-100"/>}
                                     </DropdownMenuItem>
                                 ))}

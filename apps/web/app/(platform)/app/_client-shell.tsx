@@ -1,11 +1,15 @@
 "use client";
 
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@comend/components/ui/sidebar";
-import { AppSidebar } from "~web/components/app-sidebar";
-import { useIsMobile } from "@comend/lib/hooks/use-mobile";
-import { MobileWarning } from "~web/components/mobile-warning";
-import { NavUser } from "~web/components/nav-user";
-import {MembershipWithOrganization} from "@/packages/lib/types";
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
+import {AppSidebar} from "~web/components/app-sidebar";
+import {useIsMobile} from "@comend/lib/hooks/use-mobile";
+import {MobileWarning} from "~web/components/mobile-warning";
+import {NavUser} from "~web/components/nav-user";
+import {
+    InvitationWithOrganization,
+    MemberRequestWithUserAndOrganization,
+    MembershipWithOrganization
+} from "@/packages/lib/types";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
@@ -18,8 +22,8 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/packages/components/ui/dialog";
-import { Button } from "@/packages/components/ui/button";
-import { cn } from "@/packages/lib/utils";
+import {Button} from "@/packages/components/ui/button";
+import {cn} from "@/packages/lib/utils";
 import {
     Carousel,
     CarouselApi,
@@ -37,30 +41,43 @@ import {
 } from "@/packages/components/ui/card";
 import researchPlanner from "@/public/screenshots/research-planner.png";
 import Image from "next/image"
+import {User} from "@prisma/client";
 
 export default function AppClientShell({
+                                           user,
                                            memberships,
+                                           invitations,
+                                           memberRequests,
                                            children,
                                        }: {
+    user: Partial<User>;
     memberships: MembershipWithOrganization[];
+    invitations: InvitationWithOrganization[];
+    memberRequests: MemberRequestWithUserAndOrganization[];
     children: React.ReactNode;
 }) {
     const isMobile = useIsMobile();
-    if (isMobile) return <MobileWarning />;
+    if (isMobile) return <MobileWarning/>;
 
     return (
         <SidebarProvider>
-            <AppSidebar memberships={memberships} />
+            <AppSidebar memberships={memberships}/>
             <SidebarInset className="w-full max-w-full overflow-hidden">
-                <header className="bg-white sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
+                <header
+                    className="bg-white sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
                     <div className="w-full flex items-center justify-between gap-4 px-4">
-                        <SidebarTrigger className="-ml-1" />
-                        <NavUser />
+                        <SidebarTrigger className="-ml-1"/>
+                        <NavUser
+                            user={user}
+                            memberships={memberships}
+                            invitations={invitations}
+                            memberRequests={memberRequests}
+                        />
                     </div>
                 </header>
                 <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
                     {children}
-                    <OnboardingCards />
+                    <OnboardingCards/>
                 </div>
             </SidebarInset>
         </SidebarProvider>
@@ -119,7 +136,7 @@ const OnboardingCards = () => {
                     const params = new URLSearchParams(searchParams.toString())
                     params.delete("showIntro")
 
-                    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                    router.push(`${pathname}?${params.toString()}`, {scroll: false})
                 }
             }}
         >
@@ -136,7 +153,7 @@ const OnboardingCards = () => {
                                     <CardContent>
                                         {card.img && (
                                             <Image
-                                                style={{ objectFit: 'scale-down' }}
+                                                style={{objectFit: 'scale-down'}}
                                                 src={card.img}
                                                 quality={100}
                                                 priority={true}
@@ -173,7 +190,7 @@ const OnboardingCards = () => {
                             >
                                 Next
                             </Button>
-                        ): (
+                        ) : (
                             <DialogClose>
                                 <Button
                                     variant={'cta'}

@@ -1,7 +1,7 @@
 "use client"
 
 
-import {MemberRequestWithUser} from "@comend/lib/types";
+import {MemberRequestWithUserAndOrganization} from "@comend/lib/types";
 import {approveMemberRequestAndCreateMember, denyMemberRequest} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@comend/components/ui/dropdown-menu";
@@ -9,10 +9,10 @@ import {useSession} from "next-auth/react";
 import { Ellipsis, UserCheck, UserX } from "lucide-react";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
-export default function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
+export default function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUserAndOrganization }) {
     const session = useSession()
 
-    async function approveMemberRequestClick(memberRequest: MemberRequestWithUser) {
+    async function approveMemberRequestClick(memberRequest: MemberRequestWithUserAndOrganization) {
         if (session?.data?.user.organizationId) {
             const response = await approveMemberRequestAndCreateMember(session.data.user.organizationId, memberRequest)
 
@@ -33,7 +33,7 @@ export default function MemberRequestsDropdown({memberRequest}: { memberRequest:
         }
     }
 
-    async function denyMemberRequestClick(memberRequest: MemberRequestWithUser) {
+    async function denyMemberRequestClick(memberRequest: MemberRequestWithUserAndOrganization) {
         if (session?.data?.user.organizationId) {
             const response = await denyMemberRequest(session.data.user.organizationId, memberRequest)
 

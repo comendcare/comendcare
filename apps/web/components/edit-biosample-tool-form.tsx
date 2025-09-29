@@ -422,7 +422,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                 <FormLabel className="flex items-center gap-1 grow">
                     Visibility
                     <Tooltip delayDuration={0}>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                             <Info className="h-4 w-4"/>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-80 text-wrap text-left">

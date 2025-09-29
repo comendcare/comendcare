@@ -1,8 +1,7 @@
 "use client"
-import React, {useEffect} from "react";
+
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {isOnboarded, nameToInitials, setOnboarded} from "@comend/lib/utils";
-import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
@@ -16,45 +15,6 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
     editable: boolean
     isPrivate?: boolean
 }) => {
-    faker.seed(235)
-    // const {startOnborda} = useOnborda()
-    // const pathname = usePathname();
-
-    // const startOnbordaAndRemoveToast = () => {
-    //     startOnborda('organization-profile-tour')
-    //     setOnboarded('organization-profile-tour')
-    //     toast.dismiss()
-    // }
-
-    // useEffect(() => {
-    //     // Only start tour if user is new and is on the /app/profile page
-    //     if (pathname === "/app/profile" && !isOnboarded('organization-profile-tour')) {
-    //         toast("Welcome to Comend!", {
-    //             id: "onborda",
-    //             duration: 300000,
-    //             description: `Would you like to take a quick tour?`,
-    //             action: (
-    //                 <div className="flex flex-col space-y-2 ml-4">
-    //                     <Button
-    //                         onClick={startOnbordaAndRemoveToast}
-    //                         variant="secondary"
-    //                     >
-    //                         {`Yes please!`}
-    //                     </Button>
-    //                     <Button
-    //                         onClick={() => {
-    //                             toast.dismiss()
-    //                             setOnboarded('organization-profile-tour')
-    //                         }}
-    //                         variant="ghost"
-    //                     >
-    //                         {`No thanks!`}
-    //                     </Button>
-    //                 </div>
-    //             )
-    //         })
-    //     }
-    // }, [pathname, startOnbordaAndRemoveToast])
 
     return (
         <Card className="organization-profile-tour-step1">
@@ -150,10 +110,10 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                         <div className="flex flex-wrap gap-1">
                                             {organization?.therapeuticsOfInterest?.map((item, index) => (
                                                 <span key={index}>
-                                                                <Badge className="text-sm inline">
-                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                                </Badge>
-                                                            </span>
+                                                    <Badge className="text-sm inline">
+                                                        {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                    </Badge>
+                                                </span>
                                             ))}
                                         </div>
                                     );

@@ -18,6 +18,7 @@ import {useRouter} from "next/navigation";
 import {Organization} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
 import {useSession} from "next-auth/react";
+import LoadingDots from "@/packages/components/icons/loading-dots";
 
 export default function InvitationBlocker({
                                               invitations,
@@ -119,13 +120,13 @@ export default function InvitationBlocker({
                                             disabled={working}
                                             onClick={() => onDecline(inv.id, inv.organizationId)}
                                         >
-                                            Decline
+                                            {working ? <LoadingDots color="#ffffff" /> : "Decline"}
                                         </Button>
                                         <Button
                                             disabled={working}
                                             onClick={() => onAccept(inv.id)}
                                         >
-                                            Accept
+                                            {working ? <LoadingDots color="#ffffff" /> : "Accept"}
                                         </Button>
                                     </div>
                                 </div>

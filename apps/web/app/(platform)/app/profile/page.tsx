@@ -1,4 +1,3 @@
-// app/app/profile/page.tsx (Server Component)
 import NoOrganization from "~web/components/no-organization";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/packages/lib/auth";
@@ -6,7 +5,6 @@ import prisma from "@/packages/lib/prisma";
 import PAGProfilePage from "~web/components/profile-page";
 import {
     getConditionsDataFromOrgId,
-    getPublicClinicalDatasetsForOrganization, // if needed
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization,
     getPublicToolCountsForOrganization

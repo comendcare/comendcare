@@ -1,4 +1,3 @@
-"use client"
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Card} from "@comend/components/ui/card";
@@ -46,7 +45,6 @@ export default function PAGProfilePage({
                                            rootDomain,
                                            searchParams
                                        }: PAGProfilePageProps) {
-    if (!organization) return null;
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
             <main className="col-span-5 flex flex-col items-center">
