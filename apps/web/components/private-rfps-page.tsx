@@ -1,17 +1,32 @@
 "use client"
 
-import Image from "next/image"
+import { useEffect } from "react"
 import { useShallow } from "zustand/react/shallow"
-import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
-import { EditRFPDialog, NewRFPDialog } from "./edit-rfp-dialog"
+import { useRFPStore, RFPState } from "@/state/rfp/rfpStore"
 import { RFPCard } from "./rfp-card"
+import { EditRFPDialog, NewRFPDialog } from "./edit-rfp-dialog"
+import Image from "next/image"
 
-const rfpSelector = (state: RFPState) => ({
-    rfps: state.rfps
+type Props = {
+    initialRFPs: any[] // or RFP[] if you have the type locally
+}
+
+const rfpSelector = (s: RFPState) => ({
+    rfps: s.rfps,
+    initialized: s.initialized,
+    initState: s.initState,
 })
 
-export const PrivateRFPsPage = () => {
-    const { rfps } = useRFPStore(useShallow(rfpSelector))
+export function PrivateRFPsPage({ initialRFPs }: Props) {
+    const { rfps, initialized, initState } = useRFPStore(useShallow(rfpSelector))
+
+    useEffect(() => {
+        if (!initialized) {
+            initState(initialRFPs)
+        }
+    }, [initialized, initState, initialRFPs])
+
+    const renderRfps = initialized ? rfps : initialRFPs
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
@@ -20,7 +35,7 @@ export const PrivateRFPsPage = () => {
                 <NewRFPDialog />
             </div>
 
-            {rfps.length <= 0 && (
+            {renderRfps.length <= 0 && (
                 <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                     <h1 className="font-cal text-4xl">You do not have any RFPs</h1>
                     <Image
@@ -30,21 +45,21 @@ export const PrivateRFPsPage = () => {
                         height={300}
                     />
                     <p className="text-lg text-stone-500">
-                        An RFP is a milestone you want to support through funding and/or other resources. 
+                        An RFP is a milestone you want to support through funding and/or other resources.
                     </p>
                     <NewRFPDialog />
                 </div>
             )}
-            {rfps.length > 0 && (
-                <div className={"w-full gap-4 flex flex-col"}>
-                    {rfps.map((rfp) => (
+
+            {renderRfps.length > 0 && (
+                <div className="w-full gap-4 flex flex-col">
+                    {renderRfps.map((rfp) => (
                         <EditRFPDialog key={rfp.id} data={rfp}>
-                            <RFPCard rfp={rfp} isPrivate={true}/>
+                            <RFPCard rfp={rfp} isPrivate />
                         </EditRFPDialog>
                     ))}
                 </div>
             )}
-
         </main>
     )
 }
