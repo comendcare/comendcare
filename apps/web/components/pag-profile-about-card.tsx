@@ -2,21 +2,19 @@
 import React, {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {isOnboarded, nameToInitials, setOnboarded} from "@comend/lib/utils";
-import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import EditPagProfileAboutCardDialog from "~web/components/edit-pag-profile-about-card-dialog";
 import {ExternalLink} from "lucide-react";
 import {Badge} from "@comend/components/ui/badge";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 
 export const PagProfileAboutCard = ({organization, editable, isPrivate = false}: {
     organization: Partial<Organization> & { members: (Member & { user: User })[] } | null
     editable: boolean
     isPrivate?: boolean
 }) => {
-    faker.seed(235)
     // const {startOnborda} = useOnborda()
     // const pathname = usePathname();
 
@@ -87,7 +85,8 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                         rel="noreferrer"
                                         className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                                     >
-                                        <span className="truncate block max-w-[180px] overflow-hidden whitespace-nowrap">
+                                        <span
+                                            className="truncate block max-w-[180px] overflow-hidden whitespace-nowrap">
                                             {organization?.website}
                                         </span>
                                         <ExternalLink className="h-4 w-4"/>
@@ -149,11 +148,9 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                     return (
                                         <div className="flex flex-wrap gap-1">
                                             {organization?.therapeuticsOfInterest?.map((item, index) => (
-                                                <span key={index}>
-                                                                <Badge className="text-sm inline">
-                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                                </Badge>
-                                                            </span>
+                                                <Badge data-testid="toi-badge" key={index} className="text-sm">
+                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                </Badge>
                                             ))}
                                         </div>
                                     );
@@ -183,11 +180,9 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                     return (
                                         <div className="flex flex-wrap gap-1">
                                             {organization?.therapeuticsInDevelopment?.map((item, index) => (
-                                                <span key={index}>
-                                                                <Badge className="text-sm inline">
-                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                                </Badge>
-                                                            </span>
+                                                <Badge data-testid="tid-badge" key={index} className="text-sm">
+                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                </Badge>
                                             ))}
                                         </div>
                                     );
@@ -227,9 +222,9 @@ export const PagProfileAboutCard = ({organization, editable, isPrivate = false}:
                                         </h4>
                                         {member.title &&
                                             <div className="flex items-center">
-                                                <span className="text-xs text-muted-foreground">
+                                                <div className="text-xs text-muted-foreground">
                                                     {member.title}
-                                                </span>
+                                                </div>
                                             </div>
                                         }
                                     </div>
