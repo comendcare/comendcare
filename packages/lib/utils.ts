@@ -20,6 +20,17 @@ import Papa from "papaparse";
 
 const normalize = (s: string) => s.trim().toLowerCase()
 
+export function stringToSortableInt(str: string | null, maxLength = 10): number | null {
+  if (str === null) return null // preserve nulls
+  str = str.slice(0, maxLength) // limit to prevent huge numbers
+  let result = ""
+  for (const char of str) {
+    const code = char.charCodeAt(0)
+    result += code.toString().padStart(3, "0")
+  }
+  return parseInt(result, 10)
+}
+
 export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
     const direction = desc ? "desc" : "asc";
     return `${id}:${direction}`;

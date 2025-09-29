@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
-import { handleGetAvailability } from "./utils";
+import { handleGetAvailability, stringToSortableInt } from "./utils";
 import prisma from "./prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "./types";
 
@@ -102,17 +102,6 @@ const bulkImportDocuments = async (
         throw error;
     }
 };
-
-function stringToSortableInt(str: string | null, maxLength = 10): number | null {
-  if (str === null) return null // preserve nulls
-  str = str.slice(0, maxLength) // limit to prevent huge numbers
-  let result = ""
-  for (const char of str) {
-    const code = char.charCodeAt(0)
-    result += code.toString().padStart(3, "0")
-  }
-  return parseInt(result, 10)
-}
 
 export const syncToTypesense = async (env: {
     TYPESENSE_ADMIN_API_KEY: string;
