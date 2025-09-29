@@ -53,13 +53,17 @@ const unifiedSchema = z.object({
     // join existing
     org: z.array(optionSchema).optional(), // id,label (max 1)
     // create new
-    orgName: z.string().min(2).max(60).optional(),
+    orgName: z.string({
+        required_error: "Please enter your organization's name."
+    }).min(2).max(60),
     description: z.string().min(2, {
         message: "Your organization's description must be at least 2 characters long.",
     }).max(500, {
         message: "Your organization's description must less than 500 characters long.",
     }).optional(),
-    subdomain: z.string().min(2).max(60).optional(),
+    subdomain: z.string({
+        required_error: "Your organization must claim a subdomain."
+    }).min(2).max(60),
     website: z.string().optional(),
     contactEmail: z.string().email().optional(),
     title: z.string().optional(),
@@ -436,10 +440,12 @@ export default function NewOrganizationForm({invitations, organizations}: {
                                 <FormItem>
                                     <FormLabel>Year Founded</FormLabel>
                                     <Select onValueChange={(v) => field.onChange(`${v}-01-01`)}
-                                            defaultValue={field.value?.split("-")?.[0]}>
+                                            defaultValue={field.value?.split('-')?.[0]}>
                                         <FormControl>
-                                            <SelectTrigger><SelectValue
-                                                placeholder="Select a year"/></SelectTrigger>
+                                            <SelectTrigger data-testid="founded-select"
+                                                           aria-label="Year Founded">
+                                                <SelectValue placeholder="Select a year"/>
+                                            </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
                                             {years.map((y) => (
@@ -455,24 +461,36 @@ export default function NewOrganizationForm({invitations, organizations}: {
                         <FormField
                             control={form.control}
                             name="therapeuticsInDevelopment"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Therapeutics under development</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MODALITIES}
-                                            placeholder="Select modalities..."
-                                            hidePlaceholderWhenSelected
-                                            emptyIndicator={<p
-                                                className="text-center text-sm text-muted-foreground">no
-                                                results found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-ther-dev";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Therapeutics under development
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Therapeutics under development", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                emptyIndicator={<p
+                                                    className="text-center text-sm text-muted-foreground">no
+                                                    results found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
 
                         {form.watch("therapeuticsInDevelopment")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
@@ -493,24 +511,36 @@ export default function NewOrganizationForm({invitations, organizations}: {
                         <FormField
                             control={form.control}
                             name="therapeuticsOfInterest"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Therapeutics of interest</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MODALITIES}
-                                            placeholder="Select modalities..."
-                                            hidePlaceholderWhenSelected
-                                            emptyIndicator={<p
-                                                className="text-center text-sm text-muted-foreground">no
-                                                results found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-ther-interest";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Therapeutics of interest
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Therapeutics of Interest", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                emptyIndicator={<p
+                                                    className="text-center text-sm text-muted-foreground">no
+                                                    results found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
 
                         {form.watch("therapeuticsOfInterest")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
@@ -588,49 +618,73 @@ export default function NewOrganizationForm({invitations, organizations}: {
                         <FormField
                             control={form.control}
                             name="disorder"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name of condition</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            creatable
-                                            maxSelected={1}
-                                            onSearch={handleConditionSearch}
-                                            placeholder="Search for conditions..."
-                                            hidePlaceholderWhenSelected
-                                            loadingIndicator={<p>Loading conditions...</p>}
-                                            emptyIndicator={<p>No conditions found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-disorder"
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Name of condition
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                creatable
+                                                maxSelected={1}
+                                                onSearch={handleConditionSearch}
+                                                placeholder="Search for conditions..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Name of condition", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                loadingIndicator={<p>Loading conditions...</p>}
+                                                emptyIndicator={<p>No conditions found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
 
                         <FormField
                             control={form.control}
                             name="associatedConditions"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Associated Conditions</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            creatable
-                                            maxSelected={5}
-                                            onSearch={handleConditionSearch}
-                                            placeholder="Search for conditions..."
-                                            hidePlaceholderWhenSelected
-                                            loadingIndicator={<p>Loading conditions...</p>}
-                                            emptyIndicator={<p>No conditions found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-associated-conditions";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Associated Conditions
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                creatable
+                                                maxSelected={5}
+                                                onSearch={handleConditionSearch}
+                                                placeholder="Search for conditions..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Associated Conditions", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                loadingIndicator={<p>Loading conditions...</p>}
+                                                emptyIndicator={<p>No conditions found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
 
                         <FormField control={form.control} name="summary" render={({field}) => (
@@ -650,26 +704,38 @@ export default function NewOrganizationForm({invitations, organizations}: {
                         <FormField
                             control={form.control}
                             name="categories"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Mechanisms of action</FormLabel>
-                                    <FormDescription>What types of genetic effects are you investigating?
-                                        Select all that apply.</FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MOLECULAR_MECHANISMS}
-                                            placeholder="Select categories..."
-                                            hidePlaceholderWhenSelected
-                                            emptyIndicator={<p
-                                                className="text-center text-sm text-muted-foreground">no
-                                                results found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-categories";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Mechanisms of action
+                                        </FormLabel>
+                                        <FormDescription>What types of genetic effects are you investigating?
+                                            Select all that apply.</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MOLECULAR_MECHANISMS}
+                                                placeholder="Select categories..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Mechanisms of action", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                emptyIndicator={<p
+                                                    className="text-center text-sm text-muted-foreground">no
+                                                    results found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
 
                         {form.watch("categories")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
@@ -715,47 +781,71 @@ export default function NewOrganizationForm({invitations, organizations}: {
                         <FormField
                             control={form.control}
                             name="causal"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Causal genes</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            onSearch={handleGeneSearch}
-                                            placeholder="Search for genes..."
-                                            triggerSearchOnFocus
-                                            hidePlaceholderWhenSelected
-                                            loadingIndicator={<p>Loading genes...</p>}
-                                            emptyIndicator={<p>No genes found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-causal-genes"
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Causal genes
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                onSearch={handleGeneSearch}
+                                                placeholder="Search for genes..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Causal genes", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                triggerSearchOnFocus
+                                                hidePlaceholderWhenSelected
+                                                loadingIndicator={<p>Loading genes...</p>}
+                                                emptyIndicator={<p>No genes found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
 
                         <FormField
                             control={form.control}
                             name="genes"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Associated genes</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            onSearch={handleGeneSearch}
-                                            placeholder="Search for genes..."
-                                            triggerSearchOnFocus
-                                            hidePlaceholderWhenSelected
-                                            loadingIndicator={<p>Loading genes...</p>}
-                                            emptyIndicator={<p>No genes found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            render={({field}) => {
+                                const id = "ms-associated-genes";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Associated genes
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                onSearch={handleGeneSearch}
+                                                placeholder="Search for genes..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Associated genes", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                triggerSearchOnFocus
+                                                hidePlaceholderWhenSelected
+                                                loadingIndicator={<p>Loading genes...</p>}
+                                                emptyIndicator={<p>No genes found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
                         />
                     </section>
 
