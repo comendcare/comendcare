@@ -78,7 +78,7 @@ export const PAGProfileConditionsCard = ({
             <Card className="organization-profile-tour-step2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">Conditions</CardTitle>
-                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
+                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization}/>}
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col space-y-2 text-left">
@@ -183,9 +183,15 @@ export const PAGProfileConditionsCard = ({
                                         {condition?.prevalenceNumerator && condition?.prevalenceDenominator && (
                                             <li>
                                                     <span
-                                                        className="font-bold">{condition?.prevalenceNumerator}</span> in{" "}
+                                                        className="font-bold"
+                                                    >
+                                                        {condition?.prevalenceNumerator}
+                                                    </span> in{" "}
                                                 <span
-                                                    className="font-bold">{condition?.prevalenceDenominator}</span> prevalence
+                                                    className="font-bold"
+                                                >
+                                                        {condition?.prevalenceDenominator}
+                                                    </span> prevalence
                                             </li>
                                         )}
                                         {condition?.numberOfPatientsEngaged && (
@@ -248,11 +254,9 @@ export const PAGProfileConditionsCard = ({
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
                                                         {condition?.diseaseCategories?.map((item, index) => (
-                                                            <span key={index}>
-                                                                <Badge className="text-sm inline">
-                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                                </Badge>
-                                                            </span>
+                                                            <Badge data-testid="categories-badge" key={index} className="text-sm">
+                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                            </Badge>
                                                         ))}
                                                     </div>
                                                 );
@@ -282,11 +286,9 @@ export const PAGProfileConditionsCard = ({
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
                                                         {condition?.causalGenes?.map((item, index) => (
-                                                            <span key={index}>
-                                                                <Badge className="text-sm inline">
-                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                                </Badge>
-                                                            </span>
+                                                            <Badge key={index} className="text-sm">
+                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                            </Badge>
                                                         ))}
                                                     </div>
                                                 );
@@ -316,11 +318,9 @@ export const PAGProfileConditionsCard = ({
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
                                                         {condition?.associatedGenes?.map((item, index) => (
-                                                            <span key={index}>
-                                                                <Badge className="text-sm inline">
-                                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                                                                </Badge>
-                                                            </span>
+                                                            <Badge key={index} className="text-sm">
+                                                                {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                            </Badge>
                                                         ))}
                                                     </div>
                                                 );
