@@ -20,7 +20,7 @@ import {
     addTypeSenseDocument,
     deleteTypeSenseDocument,
     getBlurDataURL,
-    logError,
+    logError, runInProduction,
     toKebabCase,
     updateTypeSenseDocument
 } from "./utils";
@@ -502,20 +502,22 @@ export const createOrganization = withAuth(
                 `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
 
-            await sendNewOrganizationEmail(
-                {
-                    user: {
-                        name: session.user.name,
-                        email: session.user.email
-                    },
-                    organization: {
-                        name: result.organization.name,
-                        subdomain: result.organization.subdomain
+            await runInProduction(() =>
+                sendNewOrganizationEmail(
+                    {
+                        user: {
+                            name: session.user.name,
+                            email: session.user.email
+                        },
+                        organization: {
+                            name: result.organization.name,
+                            subdomain: result.organization.subdomain
+                        }
                     }
-                }
-            ).then(() => {
-                console.log("email sent")
-            })
+                ).then(() => {
+                    console.log("email sent")
+                })
+            )
 
             if (result.organization.verified && result.organization.published) {
                 await writeRawEvent({
@@ -2104,8 +2106,8 @@ export const updateCondition = withOrganizationAuth(
             };
 
             const link = await prisma.conditionToOrganization.findFirst({
-                where: { organizationId: organization.id },
-                select: { conditionId: true, condition: { select: { slug: true } } },
+                where: {organizationId: organization.id},
+                select: {conditionId: true, condition: {select: {slug: true}}},
             });
 
             // Pull out incoming associated condition slugs before scalar updates
@@ -2117,8 +2119,8 @@ export const updateCondition = withOrganizationAuth(
             const ensureConditionsBySlugs = async (slugs: string[]) => {
                 if (!slugs.length) return new Map<string, string>();
                 const existing = await prisma.condition.findMany({
-                    where: { slug: { in: slugs } },
-                    select: { id: true, slug: true },
+                    where: {slug: {in: slugs}},
+                    select: {id: true, slug: true},
                 });
                 const bySlug = new Map(existing.map((e) => [e.slug, e.id]));
 
@@ -2128,9 +2130,9 @@ export const updateCondition = withOrganizationAuth(
                         missing.map((slug) => {
                             const nameGuess = slug.replace(/-/g, " ");
                             return prisma.condition.upsert({
-                                where: { slug },
-                                update: { name: nameGuess, slug },
-                                create: { name: nameGuess, slug },
+                                where: {slug},
+                                update: {name: nameGuess, slug},
+                                create: {name: nameGuess, slug},
                             });
                         })
                     );
@@ -2147,10 +2149,10 @@ export const updateCondition = withOrganizationAuth(
             ): Promise<string[]> => {
                 const filteredSlugs = (targetSlugs || []).filter((s) => s && s !== selfSlug);
                 const bySlug = await ensureConditionsBySlugs(filteredSlugs);
-                const connectIds = Array.from(bySlug.values()).map((id) => ({ id }));
+                const connectIds = Array.from(bySlug.values()).map((id) => ({id}));
 
                 await prisma.condition.update({
-                    where: { id: conditionId },
+                    where: {id: conditionId},
                     data: {
                         associatedConditions: {
                             set: [],
@@ -2175,7 +2177,7 @@ export const updateCondition = withOrganizationAuth(
 
                 if (added.length) {
                     await prisma.conditionToOrganization.createMany({
-                        data: added.map((conditionId) => ({ conditionId, organizationId: orgId })),
+                        data: added.map((conditionId) => ({conditionId, organizationId: orgId})),
                         skipDuplicates: true,
                     });
                 }
@@ -2184,7 +2186,7 @@ export const updateCondition = withOrganizationAuth(
                     await prisma.conditionToOrganization.deleteMany({
                         where: {
                             organizationId: orgId,
-                            conditionId: { in: removed },
+                            conditionId: {in: removed},
                         },
                     });
                 }
@@ -2199,27 +2201,27 @@ export const updateCondition = withOrganizationAuth(
                 // Find existing by id or slug
                 let existing =
                     requestedId
-                        ? await prisma.condition.findUnique({ where: { id: requestedId } })
+                        ? await prisma.condition.findUnique({where: {id: requestedId}})
                         : requestedSlug
-                            ? await prisma.condition.findUnique({ where: { slug: requestedSlug } })
+                            ? await prisma.condition.findUnique({where: {slug: requestedSlug}})
                             : null;
 
                 let condition;
                 if (existing) {
                     condition = await prisma.condition.update({
-                        where: { id: existing.id },
+                        where: {id: existing.id},
                         data,
                     });
                 } else {
                     const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
                     condition = await prisma.condition.create({
-                        data: { ...data, slug, name: data.name },
+                        data: {...data, slug, name: data.name},
                     });
                 }
 
                 // Link org → primary condition
                 await prisma.conditionToOrganization.create({
-                    data: { conditionId: condition.id, organizationId: organization.id },
+                    data: {conditionId: condition.id, organizationId: organization.id},
                 });
 
                 // Replace associated conditions (if provided)
@@ -2236,7 +2238,7 @@ export const updateCondition = withOrganizationAuth(
                 await syncOrgLinksForAssociatedConditions(organization.id, [], nextAssocIds);
 
                 revalidatePath("/app/profile");
-                return { success: true, data: condition };
+                return {success: true, data: condition};
             }
 
             // ---------- UPDATE branch ----------
@@ -2245,14 +2247,14 @@ export const updateCondition = withOrganizationAuth(
 
             // Fetch previous associated (for diff)
             const prev = await prisma.condition.findUnique({
-                where: { id: conditionId },
-                select: { associatedConditions: { select: { id: true } } },
+                where: {id: conditionId},
+                select: {associatedConditions: {select: {id: true}}},
             });
             const prevAssocIds = (prev?.associatedConditions ?? []).map((c) => c.id);
 
             // Update scalar fields first (as you had)
             const updated = await prisma.condition.update({
-                where: { id: conditionId },
+                where: {id: conditionId},
                 data,
             });
 
@@ -2266,10 +2268,10 @@ export const updateCondition = withOrganizationAuth(
             await syncOrgLinksForAssociatedConditions(organization.id, prevAssocIds, nextAssocIds);
 
             revalidatePath("/app/profile");
-            return { success: true, data: updated };
+            return {success: true, data: updated};
         } catch (error: any) {
             console.error("Error in updateCondition:", error);
-            return { success: false, error: error.message || "Failed to update or create condition." };
+            return {success: false, error: error.message || "Failed to update or create condition."};
         }
     }
 );
@@ -2347,7 +2349,7 @@ export const setDiseaseModelsVisibility = withOrganizationAuth(
     async (organization: Organization, ids: string[], isPrivate: boolean) => {
         try {
             if (!organization.id) throw new Error("No organization id provided.");
-            
+
             const updatedDiseaseModels = await prisma.diseaseModel.updateMany({
                 where: {
                     id: {in: ids}
@@ -2696,7 +2698,7 @@ export const setDataToolsVisibility = withOrganizationAuth(
     async (organization: Organization, ids: string[], isPrivate: boolean) => {
         try {
             if (!organization.id) throw new Error("No organization id provided.");
-            
+
             const updatedDataTools = await prisma.tool.updateMany({
                 where: {
                     id: {in: ids}
@@ -3029,7 +3031,7 @@ export const setBiosamplesVisibility = withOrganizationAuth(
     async (organization: Organization, ids: string[], isPrivate: boolean) => {
         try {
             if (!organization.id) throw new Error("No organization id provided.");
-            
+
             const updatedBiosamples = await prisma.biosample.updateMany({
                 where: {
                     id: {in: ids}
