@@ -52,7 +52,7 @@ export default function ShareDialog({
         additonalProperties?: {[key: string]: string} | undefined
     },
 }) {
-    const [view, setView] = useState('timeline')
+    const [view, setView] = useState('flow')
     function embedCode(link: string) {
         return (
             `<iframe
