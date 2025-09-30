@@ -16,6 +16,7 @@ import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
+import { SearchParams } from "@/packages/components/types";
 
 type ToolCounts = {
     biosampleCount: number;
@@ -31,6 +32,7 @@ type PAGProfilePageProps = {
     rfps: any[];
     isOwner: boolean;
     rootDomain: string;
+    searchParams: SearchParams
 };
 
 export default function PAGProfilePage({
@@ -41,6 +43,7 @@ export default function PAGProfilePage({
                                            rfps,
                                            isOwner,
                                            rootDomain,
+                                           searchParams
                                        }: PAGProfilePageProps) {
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
@@ -175,7 +178,7 @@ export default function PAGProfilePage({
                                         rfps={rfps}
                                     />
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
-                                    <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
+                                    <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
                                     <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                 </div>
                             </div>
@@ -183,66 +186,6 @@ export default function PAGProfilePage({
                     </div>
                 </ScrollArea>
             </main>
-            {/*<Card className="col-span-1 flex flex-col space-y-4 h-fit">*/}
-            {/*    <CardHeader className="flex flex-col gap-4 pb-0">*/}
-            {/*        /!*<PublishOrganizationSwitch organization={organization}/>*!/*/}
-            {/*        <BiopharmaConsentSwitch organization={organization}/>*/}
-
-            {/*        <div className="flex flex-col gap-2 pb-0">*/}
-            {/*            <div*/}
-            {/*                className="flex flex-row items-center justify-between"*/}
-            {/*            >*/}
-            {/*                Public URL*/}
-            {/*                <EditPagProfileSubdomainDialog organization={organization}/>*/}
-            {/*            </div>*/}
-            {/*            <Link*/}
-            {/*                href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}*/}
-            {/*                target="_blank"*/}
-            {/*                rel="noreferrer"*/}
-            {/*                className="w-full inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700 text-center"*/}
-            {/*            >*/}
-            {/*                <span className="truncate block max-w-[150px] w-full text-center overflow-hidden whitespace-nowrap">*/}
-            {/*                    {organization.subdomain}.comend.io*/}
-            {/*                </span>*/}
-            {/*                <ExternalLink className="flex-shrink-0 h-4 w-4"/>*/}
-            {/*            </Link>*/}
-
-            {/*            <Dialog>*/}
-            {/*                <DialogTrigger asChild>*/}
-            {/*                    <Button variant="cta">*/}
-            {/*                        Share public profile*/}
-            {/*                    </Button>*/}
-            {/*                </DialogTrigger>*/}
-            {/*                <DialogContent className="min-w-fit">*/}
-            {/*                    <ShareDialog*/}
-            {/*                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}*/}
-            {/*                        organization={organization}*/}
-            {/*                        trackShareEvent={{*/}
-            {/*                            title: `Organization Profile Shared`,*/}
-            {/*                        }}*/}
-            {/*                    />*/}
-            {/*                </DialogContent>*/}
-            {/*            </Dialog>*/}
-            {/*        </div>*/}
-            {/*    </CardHeader>*/}
-            {/*    <CardContent>*/}
-            {/*        <div className="flex flex-col gap-2 pb-0">*/}
-            {/*            <div className="flex flex-row items-center justify-between">*/}
-            {/*                Contact Email*/}
-            {/*                <EditPAGContactEmailDialog organization={organization}/>*/}
-            {/*            </div>*/}
-            {/*            {organization.contactEmail && organization.contactEmail.trim() !== "" ?*/}
-            {/*                <p className="truncate">*/}
-            {/*                    {organization.contactEmail}*/}
-            {/*                </p>*/}
-            {/*                :*/}
-            {/*                <p className="text-muted-foreground">*/}
-            {/*                    No contact email set*/}
-            {/*                </p>*/}
-            {/*            }*/}
-            {/*        </div>*/}
-            {/*    </CardContent>*/}
-            {/*</Card>*/}
         </div>
     )
 }

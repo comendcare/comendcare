@@ -2326,8 +2326,8 @@ export const getDiseaseModels = withOrganizationAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const [data, total] = await prisma.$transaction([
                 prisma.diseaseModel.findMany({
@@ -2357,6 +2357,15 @@ export const getDiseaseModels = withOrganizationAuth(
         }
     }
 )
+
+function prismaOrderByFromColumnId(id: string, desc: boolean): any {
+    const parts = id.split(".")
+
+    // build nested object dynamically
+    return parts.reduceRight((acc, key) => {
+        return { [key]: Object.keys(acc).length ? acc : (desc ? "desc" : "asc") }
+    }, {})
+}
 
 export const getBiosamples = withOrganizationAuth(
     async (organization: Organization, input?: GetBiosamplesSchema): Promise<{
@@ -2485,8 +2494,8 @@ export const getBiosamples = withOrganizationAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const [data, total] = await prisma.$transaction([
                 prisma.biosample.findMany({
@@ -2613,10 +2622,8 @@ export const getAllBiosamples = withResearcherAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({
-                    [s.id]: s.desc ? "desc" : "asc",
-                }))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
 
@@ -2760,8 +2767,8 @@ export const getDatasamples = withOrganizationAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const [data, total] = await prisma.$transaction([
                 prisma.tool.findMany({

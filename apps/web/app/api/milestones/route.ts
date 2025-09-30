@@ -3,26 +3,35 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
     try {
-        const { ids } = await req.json();
-        if (!ids || ids.length === 0) return NextResponse.json([], { status: 200 });
+        // Extract and normalize the search query from the request URL
+        const url = new URL(req.url);
+        const searchQuery = url.searchParams.get("search")?.toLowerCase() || "";
+        const organizationId = url.searchParams.get("orgId");
 
-        const results = await prisma.milestone.findMany({
+        if (!organizationId) {
+            return NextResponse.json([])
+        }
+
+        // Query the Milestone model with a case-insensitive search
+        const milestones = await prisma.milestone.findMany({
             where: {
-                id: { in: ids }, // Ensure we fetch all organizations
-                private: false
+                private: false,
+                title: {
+                    contains: searchQuery,
+                    mode: 'insensitive',
+                },
             },
-            include: {
-                organization: true,
-                node: true,
-                contacts: true,
-                attachments: true,
-                types: { include: { milestoneType: true } },
-                tools: { include: { tool: true } },
-                rfps: { include: { rfp: true } }
-            }
+            take: 50, // Limit results
+            orderBy: {title: 'asc'}
         });
 
-        return NextResponse.json(results, { status: 200 });
+        // Format for selector input (e.g., dropdown)
+        const formattedResults = milestones.map((milestone) => ({
+            label: milestone.title,
+            value: milestone.id, // You could also use milestone.title if preferred
+        }));
+
+        return NextResponse.json(formattedResults);
     } catch (error) {
         console.error("Prisma fetch error:", error);
         return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
