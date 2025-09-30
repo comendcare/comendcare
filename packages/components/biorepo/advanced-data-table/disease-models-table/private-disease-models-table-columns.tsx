@@ -149,9 +149,6 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Strain"/>
             ),
-            cell: ({row}) => (
-                <>{row.original.strain}</>
-            ),
             enableHiding: true,
             meta: {
                 label: "Strain"
