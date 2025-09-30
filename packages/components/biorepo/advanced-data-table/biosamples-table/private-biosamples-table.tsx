@@ -85,6 +85,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     )
                     : undefined
                 }
+                
             >
                 {enableAdvancedFilter ? (
                     <DataTableAdvancedToolbar table={table}>

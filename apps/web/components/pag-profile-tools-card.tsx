@@ -1,50 +1,38 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
-import { Building, Calendar, Database, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, Rat, TestTubeDiagonal, User } from "lucide-react";
-import { DateView } from "./miletone-date-view";
-import Link from "next/link";
-import { ScrollArea } from "@comend/components/ui/scroll-area";
-import { PropertyBadge } from "./property-badge";
-import { cn, formatMoney } from "@comend/lib/utils";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { useSearchParams } from "next/navigation";
-import { NoRFPs } from "./no-rfps";
-import { RFPCard } from "./rfp-card";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselApi } from "@/packages/components/ui/carousel";
-import { Suspense, useEffect, useState } from "react";
-import { ToolsNav } from "./tools-nav";
+import { Database, Rat, TestTubeDiagonal } from "lucide-react";
+import { cn } from "@comend/lib/utils";
+import { useEffect, useState } from "react";
 import { Button } from "@/packages/components/ui/button";
 import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { Biosample, DiseaseModel, Tool } from "@prisma/client";
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table";
 import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table";
-import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import { DataTableSkeleton } from "@/packages/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { NoResultsView } from "./marketplace/no-results";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
-import { useSession } from "next-auth/react";
+import { SearchParams } from "@/packages/components/types";
+import { useQueryState } from "nuqs";
 
 const biosamplesSelector = (state: BiosampleSearchState) => ({
     searchResults: state.searchResults,
     setFilters: state.setFilters,
-    
+    setSortBy: state.setSortBy,
 })
 
 const diseaseModelsSelector = (state: DiseaseModelSearchState) => ({
     searchResults: state.searchResults,
     setFilters: state.setFilters,
+    setSortBy: state.setSortBy,
 })
 
 const clinicalDatasetsSelector = (state: ClinicalDatasetSearchState) => ({
     searchResults: state.searchResults,
     setFilters: state.setFilters,
+    setSortBy: state.setSortBy,
 })
 
 const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}) => {
@@ -55,23 +43,31 @@ const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number
     return 'biosamples'
 }
 
-export const PAGProfileToolsCard = ({organizationId, toolCounts} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}}) => {
+export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}, searchParams?: SearchParams | undefined}) => {
     const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>(getInitState(toolCounts))
+    const [sort, setSort] = useQueryState("sort");
     const { 
         searchResults: biosamples,
         setFilters: setBiosampleFilters,
+        setSortBy: setBiosampleSortBy,
     } = useBiosampleSearchStore(useShallow(biosamplesSelector))
     const biosampleColumns = useBiosamplesTableColumns()
     const { 
         searchResults: diseaseModels,
         setFilters: setDiseaseModelFilters,
+        setSortBy: setDiseaseModelSortBy,
     } = useDiseaseModelSearchStore(useShallow(diseaseModelsSelector))
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const { 
         searchResults: clinicalDatasets,
         setFilters: setClinicalDatasetFilters,
+        setSortBy: setClinicalDatasetSortBy,
     } = useClinicalDatasetSearchStore(useShallow(clinicalDatasetsSelector))
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+
+    if (section === 'biosamples') setBiosampleSortBy(searchParams?.sort)
+    if (section === 'disease-models') setDiseaseModelSortBy(searchParams?.sort)
+    if (section === 'clinical-datasets') setClinicalDatasetSortBy(searchParams?.sort)
 
     useEffect(() => {
         setBiosampleFilters({
@@ -102,7 +98,10 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts} : {organization
                     {toolCounts.biosampleCount > 0 && (
                         <Button
                             variant={"link"}
-                            onClick={() => setSection('biosamples')}
+                            onClick={async () => {
+                                await setSort(null)
+                                setSection("biosamples");
+                            }}
                             className={cn(
                                 "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
                                 section === 'biosamples'
@@ -117,7 +116,10 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts} : {organization
                     {toolCounts.diseaseModelCount > 0 && (
                         <Button
                             variant={"link"}
-                            onClick={() => setSection('disease-models')}
+                            onClick={async () => {
+                                await setSort(null)
+                                setSection("disease-models");
+                            }}
                             className={cn(
                                 "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
                                 section === 'disease-models'
@@ -132,7 +134,10 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts} : {organization
                     {toolCounts.clinicalDatasetCount > 0 && (
                         <Button
                             variant={"link"}
-                            onClick={() => setSection('clinical-datasets')}
+                            onClick={async () => {
+                                await setSort(null)
+                                setSection('clinical-datasets')
+                            }}
                             className={cn(
                                 "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
                                 section === 'clinical-datasets'

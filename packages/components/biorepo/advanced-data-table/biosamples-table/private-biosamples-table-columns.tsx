@@ -20,88 +20,17 @@ import {
 } from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
-import {useSession} from "next-auth/react";
-import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { Checkbox } from "./../../../ui/checkbox";
-import { getDiagnosisTypes, getMilestones } from "./../../../../../packages/lib/fetchers";
+import { getDiagnosisTypes } from "./../../../../../packages/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
+import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
+import { useSession } from "next-auth/react";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
-    const pathname = usePathname()
     const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
-
-    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        console.log(`HANDLE GENE SEARCH`, query)
-
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        console.log(`HANDLE INSTITUTIONS SEARCH`, query)
-
-        try {
-            const response = await fetch(`/api/institutions?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncMilestoneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []
-
-        try {
-            // const response = await fetch(`/api/institutions?search=${query}`);
-            // const data = await response.json();
-            const response = await getMilestones(session?.user.organizationId)
-
-            if (response.success && response.data) {
-                return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
-            } else {
-                return []
-            }
-
-            // Return the fetched options
-            // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    }
-
-    const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
-        if (sample?.quantity !== null) {
-            if (sample.quantity > 0) {
-                if (sample?.materialAndDataAccessRequests?.length > 0) {
-                    return {value: 'Reserved', variant: 'yellow'}
-                }
-                return {value: 'Available', variant: 'green'}
-            }
-            if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
-        }
-
-        return undefined
-    }
 
     useEffect(() => {
         const init = async () => {
@@ -193,20 +122,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: {
-                label: "Sample ID",
-            }
+            meta: { label: "Sample ID" }
         },
         {
             id: "donor.internalId",
             accessorKey: "donor.internalId",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Internal Donor ID"/>
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Internal Donor ID" />
             ),
             enableHiding: true,
-            meta: {
-                label: "Internal Donor ID"
-            }
+            meta: { label: "Internal Donor ID" }
         },
         {
             id: "donorId",
@@ -221,9 +146,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: {
-                label: "Public Donor ID"
-            }
+            meta: { label: "Public Donor ID" }
         },
         {
             id: "types",
@@ -251,8 +174,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "gene.symbol",
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -366,6 +289,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     })}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -426,8 +350,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name",
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -459,10 +383,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
-            meta: {
-                label: "Point of Contact"
-            }
+            meta: { label: "Point of Contact" }
         },
         {
             id: "links",
@@ -479,10 +402,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
-            meta: {
-                label: "Links"
-            }
+            meta: { label: "Links" }
         },
 
         // {
@@ -751,6 +673,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -758,7 +681,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncMilestoneSearch
+                onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
             }
         },
         {
@@ -772,9 +695,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {row.original.description}
                 </div>
             ),
-            meta: {
-                label: "Other Notes"
-            },
+            meta: { label: "Other Notes" },
             enableHiding: true,
         },
         {
