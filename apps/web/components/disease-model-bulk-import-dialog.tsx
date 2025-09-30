@@ -15,7 +15,6 @@ import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@/packages/lib
 import { revalidate } from "@/packages/lib/revalidate";
 import z from "zod";
 import { getOrganizationFromOrganizationId } from "@/packages/lib/fetchers";
-import { Donor, Institution } from "@prisma/client";
 
 export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer<typeof editDiseaseModelForm>> {
     const genesResponse = await fetch(`/api/genes?search=${encodeURIComponent(diseaseModel['Gene'] || '')}`)
@@ -23,6 +22,57 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
 
     const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(diseaseModel['Storage Facility'] || '')}`)
     const foundInstitutions = await institutionsResponse.json()
+
+    const contactNames = (diseaseModel['Contact Name'] || "").split(",")
+    const contactEmails = (diseaseModel['Contact Email'] || "").split(",")
+
+    const contactsLength = Math.max(contactNames.length, contactEmails.length)
+    const contacts = []
+    for (let i = 0; i < contactsLength; i++) {
+        if (contactNames[i] && contactEmails[i]) {
+            contacts.push({
+                name: contactNames[i] || "", 
+                email: contactEmails[i] || "", 
+                role: null
+            })
+        } else if (contactNames[i]) {
+            contacts.push({
+                name: contactNames[i] || "", 
+                email: "", 
+                role: null
+            })
+        } else if (contactEmails[i]) {
+            contacts.push({
+                name: "", 
+                email: contactEmails[i] || "", 
+                role: null
+            })
+        }
+    }
+
+    const linkNames = (diseaseModel['Link Name'] || "").split(",")
+    const linkURLs = (diseaseModel['Link URL'] || "").split(",")
+
+    const linksLength = Math.max(linkNames.length, linkURLs.length)
+    const links = []
+    for (let i = 0; i < linksLength; i++) {
+        if (linkNames[i] && linkURLs[i]) {
+            links.push({
+                name: linkNames[i],
+                link: linkURLs[i]
+            })
+        } else if (linkNames[i]) {
+            links.push({
+                name: linkNames[i],
+                link: ""
+            })
+        } else if (linkURLs[i]) {
+            links.push({
+                name: "",
+                link: linkURLs[i]
+            })
+        }
+    }
 
     const data: z.infer<typeof editDiseaseModelForm> = {
         types: (() => {
@@ -38,20 +88,26 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
         institutions: (() => {
             if (foundInstitutions && foundInstitutions.length > 0 && diseaseModel['Storage Facility']) {
                 return foundInstitutions
-            } else if (diseaseModel['Storage Facility']) {
-                return [{label: diseaseModel['Storage Facility'], value: diseaseModel['Storage Facility']}]
             }
 
             return []
         })(),
         description: diseaseModel.Description,
-        contacts: ((diseaseModel['Contact Name'] || diseaseModel['Contact Email'])
-            ? [{
-                name: diseaseModel['Contact Name'] || "", 
-                email: diseaseModel['Contact Email'] || "", 
-                role: null
-            }] 
-            : undefined),
+        // contacts: ((diseaseModel['Contact Name'] || diseaseModel['Contact Email'])
+        //     ? [{
+        //         name: diseaseModel['Contact Name'] || "", 
+        //         email: diseaseModel['Contact Email'] || "", 
+        //         role: null
+        //     }] 
+        //     : undefined),
+        contacts,
+        // attachments: ((diseaseModel['Link Name'] || diseaseModel['Link URL'])
+        //     ? [{
+        //         name: diseaseModel['Link Name'],
+        //         link: diseaseModel['Link URL']
+        //     }]
+        //     : undefined),
+        attachments: links,
         isPrivate: diseaseModel['Visibility'] ? (diseaseModel['Visibility'] === 'Published' ? false : true) : true
     }
     return data
@@ -76,6 +132,8 @@ export function DiseaseModelBulkImportDialog() {
                         {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Link URL', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Visibility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                     ]
                 )
