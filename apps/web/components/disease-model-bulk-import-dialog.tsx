@@ -93,20 +93,7 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
             return []
         })(),
         description: diseaseModel.Description,
-        // contacts: ((diseaseModel['Contact Name'] || diseaseModel['Contact Email'])
-        //     ? [{
-        //         name: diseaseModel['Contact Name'] || "", 
-        //         email: diseaseModel['Contact Email'] || "", 
-        //         role: null
-        //     }] 
-        //     : undefined),
         contacts,
-        // attachments: ((diseaseModel['Link Name'] || diseaseModel['Link URL'])
-        //     ? [{
-        //         name: diseaseModel['Link Name'],
-        //         link: diseaseModel['Link URL']
-        //     }]
-        //     : undefined),
         attachments: links,
         genotype: diseaseModel['Genotype'] || undefined,
         strain: diseaseModel['Strain'] || undefined,
