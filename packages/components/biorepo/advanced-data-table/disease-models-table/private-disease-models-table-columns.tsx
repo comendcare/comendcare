@@ -143,17 +143,20 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             },
         },
-        // {
-        //     id: "strain",
-        //     accessorKey: "strain",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Strain"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Strain"
-        //     }
-        // },
+        {
+            id: "strain",
+            accessorKey: "strain",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Strain"/>
+            ),
+            cell: ({row}) => (
+                <>{row.original.strain}</>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Strain"
+            }
+        },
         {
             id: "gene.symbol",
             accessorKey: "gene.symbol",
@@ -173,17 +176,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 onAsyncSearch: handleAsyncGeneSearch
             }
         },
-        // {
-        //     id: "genotype",
-        //     accessorKey: "genotype",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Genotype"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Genotype",
-        //     }
-        // },
+        {
+            id: "genotype",
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
         // {
         //     id: "phenotype",
         //     accessorKey: "phenotype",
