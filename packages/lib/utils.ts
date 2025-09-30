@@ -18,7 +18,89 @@ import {
 } from "./types";
 import Papa from "papaparse";
 
+export function runInProduction<T>(fn: () => T | Promise<T>) {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+        return fn();
+    }
+    return undefined;
+}
+
 const normalize = (s: string) => s.trim().toLowerCase()
+
+export function stringToSortableInt(str: string | null, maxLength = 10): number | null {
+  if (str === null) return null // preserve nulls
+  str = str.slice(0, maxLength) // limit to prevent huge numbers
+  let result = ""
+  for (const char of str) {
+    const code = char.charCodeAt(0)
+    result += code.toString().padStart(3, "0")
+  }
+  return parseInt(result, 10)
+}
+
+export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
+    const direction = desc ? "desc" : "asc";
+    return `${id}:${direction}`;
+}
+
+export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/genes?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch genes:", error);
+        return [];
+    }
+};
+
+export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/institutions?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
+    } catch (error) {
+        console.error("Failed to fetch institutions:", error);
+        return [];
+    }
+};
+
+export const handleAsyncMilestoneSearch = async (organizationId: string | null | undefined, query?: string | undefined): Promise<Option[]> => {
+    if (!query || !organizationId) return []
+
+    try {
+        const response = await fetch(`/api/milestones?search=${query}&orgId=${organizationId}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data
+    } catch (error) {
+        console.error("Failed to fetch institutions:", error);
+        return [];
+    }
+}
+
+export const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
+    if (sample?.quantity !== null) {
+        if (sample.quantity > 0) {
+            if (sample?.materialAndDataAccessRequests?.length > 0) {
+                return {value: 'Reserved', variant: 'yellow'}
+            }
+            return {value: 'Available', variant: 'green'}
+        }
+        if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
+    }
+
+    return undefined
+}
 
 const SERVICE_TO_MILESTONES: Record<string, Milestone[]> = (() => {
     const map: Record<string, Milestone[]> = {}
@@ -236,7 +318,7 @@ export function standardizeYear(dateString: string): string {
     return match ? match[1] : "";
 }
 
-export function formatNumberWithCommas(number: string | undefined | null) {
+export function formatNumberWithCommas(number: string | number | undefined | null) {
     if (number === undefined || number === null) return "0"
 
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

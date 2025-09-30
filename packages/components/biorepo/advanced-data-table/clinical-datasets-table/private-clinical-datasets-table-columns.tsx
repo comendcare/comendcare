@@ -13,6 +13,7 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import { Checkbox } from "./../../../ui/checkbox";
+import { handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
@@ -152,8 +153,8 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "gene",
-        accessorKey: "gene",
+        id: "gene.symbol",
+        accessorKey: "gene.symbol",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Gene"/>
         ),
@@ -161,8 +162,13 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <>{row.original.gene?.symbol}</>
         ),
         enableHiding: true,
+        enableColumnFilter: true,
         meta: {
-            label: "Gene"
+            label: "Gene",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncGeneSearch
         }
     },
     // {
@@ -189,8 +195,8 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     //     }
     // },
     {
-        id: "institution",
-        accessorKey: "institution",
+        id: "institution.name",
+        accessorKey: "institution.name",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Storage Facility"/>
         ),
@@ -207,8 +213,13 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             return <>{row.original.institution?.name}</>
         },
         enableHiding: true,
+        enableColumnFilter: true,
         meta: {
-            label: "Storage Facility"
+            label: "Storage Facility",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncInstitutionSearch
         }
     },
     {
@@ -225,6 +236,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
     {
@@ -241,6 +253,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
 
@@ -274,6 +287,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
     {
