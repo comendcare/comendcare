@@ -198,14 +198,14 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                     <div className="w-full grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard
-                                    organization={organization as any}
-                                    editable={false}
-                                />
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
                                     showEditDialog={false}
+                                />
+                                <PagProfileAboutCard
+                                    organization={organization as any}
+                                    editable={false}
                                 />
                             </div>
                         </div>
