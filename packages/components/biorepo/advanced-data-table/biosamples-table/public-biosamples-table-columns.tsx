@@ -112,6 +112,17 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: { label: "Gene" }
         },
         {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
+        {
             id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "availability",
             header: ({column}) => (

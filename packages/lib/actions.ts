@@ -2888,7 +2888,8 @@ export const createBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                genotype: data.genotype,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3104,6 +3105,7 @@ export const updateBiosample = withOrganizationAuth(
                     data.institutions && data.institutions.length > 0
                         ? data.institutions[0]
                         : undefined,
+                genotype: data.genotype,
             };
 
             const newBiosample = await prisma.biosample.update({

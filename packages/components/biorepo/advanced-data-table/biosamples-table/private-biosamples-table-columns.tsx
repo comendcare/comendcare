@@ -192,6 +192,17 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 onAsyncSearch: handleAsyncGeneSearch
             }
         },
+        {
+            id: "genotype",
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
         // {
         //     id: "variant",
         //     accessorKey: "variant",
@@ -201,17 +212,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //     enableHiding: true,
         //     meta: {
         //         label: "Variant",
-        //     }
-        // },
-        // {
-        //     id: "genotype",
-        //     accessorKey: "genotype",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Genotype"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Genotype",
         //     }
         // },
         {

@@ -164,6 +164,7 @@ export function EditBiosampleToolForm({
             weight: toolData?.donor?.weight?.toString() || undefined,
             bmi: toolData?.donor?.bmi?.toString() || undefined,
             medications: toolData?.donor?.medications || undefined,
+            genotype: toolData?.genotype || undefined,
         }
     })
 
@@ -511,7 +512,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                 )}
             />
 
-            {/* <FormField
+            <FormField
                 control={form.control}
                 name="genotype"
                 render={({field}) => (
@@ -530,7 +531,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                         </div>
                     </FormItem>
                 )}
-            /> */}
+            />
 
             <FormItem className={cn("w-full flex gap-4 items-center")}>
                 <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
