@@ -74,6 +74,8 @@ export function EditDiseaseModelToolForm({
             institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+            genotype: toolData?.genotype || undefined,
+            strain: toolData?.strain || undefined,
         }
     })
 
@@ -303,23 +305,26 @@ export function EditDiseaseModelToolForm({
                         </>
                     )}
 
-                    {/* <FormField
+                    <FormField
                         control={form.control}
                         name="strain"
                         render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Strain`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="strain"
-                                        placeholder={`Enter a description...`}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="strain"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a strain`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
                             </FormItem>
                         )}
-                    /> */}
+                    />
 
                     <FormField
                         control={form.control}
@@ -347,7 +352,7 @@ export function EditDiseaseModelToolForm({
                         )}
                     />
 
-                    {/* <FormField
+                    <FormField
                         control={form.control}
                         name="genotype"
                         render={({field}) => (
@@ -366,7 +371,7 @@ export function EditDiseaseModelToolForm({
                                 </div>
                             </FormItem>
                         )}
-                    /> */}
+                    />
 
                     {/* <FormField
                         control={form.control}

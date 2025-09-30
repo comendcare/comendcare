@@ -1985,6 +1985,7 @@ export const editBiosampleForm = z.object({
     currentCountry: z.string().optional(),
     countryOfCollection: z.string().optional(),
     collectionDate: z.date().optional(),
+    genotype: z.string().optional(),
     // volume: z.string().optional(),
     // mass: z.string().optional(),
     // area: z.string().optional(),
@@ -2073,6 +2074,8 @@ export const editDiseaseModelForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
+    genotype: z.string().optional(),
+    strain: z.string().optional(),
 
     // disease model properties
     genes: z.array(optionSchema).optional(),

@@ -108,6 +108,8 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
         //     }]
         //     : undefined),
         attachments: links,
+        genotype: diseaseModel['Genotype'] || undefined,
+        strain: diseaseModel['Strain'] || undefined,
         isPrivate: diseaseModel['Visibility'] ? (diseaseModel['Visibility'] === 'Published' ? false : true) : true
     }
     return data
@@ -134,6 +136,8 @@ export function DiseaseModelBulkImportDialog() {
                         {key: 'Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Link URL', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Genotype', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Strain', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Visibility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                     ]
                 )

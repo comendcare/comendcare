@@ -335,6 +335,8 @@ model DiseaseModel {
   pinned      Boolean              @default(false)
   metadata    Json?
   types       String[] // values (DiseaseModelType ids)
+  genotype    String?
+  strain      String?
 
   institutionId                 String?
   institution                   Institution?                                 @relation(fields: [institutionId], references: [id], onDelete: SetNull)
@@ -360,6 +362,7 @@ model Biosample {
   pinned      Boolean              @default(false)
   metadata    Json?
   types       String[] // values (BiosampleType ids)
+  genotype    String?
 
   gene                Gene?     @relation(fields: [geneId], references: [id])
   variant             String?

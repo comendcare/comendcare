@@ -2391,6 +2391,8 @@ export const updateDiseaseModel = withOrganizationAuth(
                 })),
                 attachments: data.attachments,
                 contacts: data.contacts,
+                genotype: data.genotype,
+                strain: data.strain
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
@@ -2502,6 +2504,8 @@ export const createDiseaseModel = withOrganizationAuth(
                 }),
                 attachments: data.attachments,
                 contacts: data.contacts,
+                genotype: data.genotype,
+                strain: data.strain,
             }
 
             const response = await prisma.diseaseModel.create({

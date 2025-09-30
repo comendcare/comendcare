@@ -705,6 +705,8 @@ export const syncToTypesense = async (env: {
                 institution: true,
                 gene: true,
                 types: true,
+                genotype: true,
+                strain: true,
             }
         })
         const clinicalDatasets = await prisma.tool.findMany({
