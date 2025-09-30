@@ -48,7 +48,7 @@ export default async function CreateNewOrganizationPage() {
     }
 
     return (
-        <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8">
+        <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8 px-6">
             <div>
                 <h1 className="text-2xl font-semibold">
                     Create a new organization
