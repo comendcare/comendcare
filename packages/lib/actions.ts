@@ -3980,7 +3980,7 @@ export const createRoadmap = withOrganizationAuth(
                 },
             });
 
-            // This is to make it so that shortlisting shows the newly created projects from the roadmap
+            // This is to make it so that saving shows the newly created projects from the roadmap
             revalidatePath("/app/marketplace/service-providers")
 
             return finalRoadmap;

@@ -5,13 +5,13 @@ import { Building2, Users } from "lucide-react";
 const links = [
     {
         name: "Service Providers",
-        href: "/shortlist/service-providers",
+        href: "/saved/service-providers",
         icon: Building2,
         comingSoon: false
     },
     {
         name: "Patient Groups",
-        href: "/shortlist/patient-groups",
+        href: "/saved/patient-groups",
         icon: Users,
         comingSoon: false
     },
@@ -22,7 +22,7 @@ const links = [
     // },
 ]
 
-export function ShortlistNav({className}: React.HTMLAttributes<HTMLDivElement>) {
+export function SavedNav({className}: React.HTMLAttributes<HTMLDivElement>) {
     return (
         <TabNav 
             className={className}

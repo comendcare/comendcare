@@ -42,7 +42,7 @@ const formSchema = z.object({
 type SaveCROFormData = z.infer<typeof formSchema>;
 
 const engagementOptions = [
-    { id: "EXPLORING", label: "Exploring (Shortlist)" },
+    { id: "EXPLORING", label: "Exploring (Saved)" },
     { id: "QUOTE", label: "Needs a Quote" },
     { id: "COLLABORATING", label: "Currently Collaborating" },
     { id: "COLLABORATED", label: "Previously Worked With" },
@@ -102,7 +102,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
             );
 
             if (response.success && response.data) {
-                va.track("Shortlisted CRO");
+                va.track("Saved CRO");
 
                 // Safe analytics payload building
                 const baseProps: Record<string, any> = {
@@ -165,13 +165,13 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                     </TooltipTrigger>
                     {!session?.user?.organizationId && (
                         <TooltipContent>
-                            <p>Please join an organization to enable Service Provider shortlisting.</p>
+                            <p>Please join an organization to enable Service Provider saving.</p>
                         </TooltipContent>
                     )}
                 </Tooltip>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Save {cro.title} to shortlist</DialogTitle>
+                    <DialogTitle>Save {cro.title}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -214,7 +214,7 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
                         />
 
                         <Button type="submit" disabled={isSubmitting} className="w-full">
-                            {isSubmitting ? "Shortlisting..." : "Shortlist Company"}
+                            {isSubmitting ? "Saving..." : "Save Company"}
                         </Button>
                     </form>
                 </Form>

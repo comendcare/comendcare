@@ -36,7 +36,7 @@ const formSchema = z.object({
 type SaveCROFormData = z.infer<typeof formSchema>;
 
 const engagementOptions = [
-    {id: "EXPLORING", label: "Exploring (Shortlist)"},
+    {id: "EXPLORING", label: "Exploring (Saved)"},
     {id: "QUOTE", label: "Needs a Quote"},
     {id: "COLLABORATING", label: "Currently Collaborating"},
     {id: "COLLABORATED", label: "Previously Worked With"},
