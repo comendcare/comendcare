@@ -5616,6 +5616,8 @@ export const saveCRO = withOrganizationAuth(
             }
 
             revalidatePath(`/app/service-providers/${croId}`);
+            revalidatePath(`/app/marketplace`);
+            revalidatePath(`/app/marketplace/service-providers`);
 
             return {success: true, data: response};
         } catch (error) {
@@ -5727,6 +5729,9 @@ export const saveOrganization = withOrganizationAuth(
             }
 
             console.log(`response`, response)
+
+            revalidatePath(`/app/marketplace`);
+            revalidatePath(`/app/marketplace/patient-groups`);
 
             return {success: true, data: response}
         } catch (error: any) {

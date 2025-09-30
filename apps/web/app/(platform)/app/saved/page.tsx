@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
 
-export default function MarketplacePage() {
+export default function SavedPage() {
     redirect("/app/saved/service-providers")
 }

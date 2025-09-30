@@ -52,7 +52,6 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
     const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
     const [isSaved, setIsSaved] = useState(false);
     const [open, setOpen] = useState(false); // New state for dialog open/close
 
@@ -80,7 +79,6 @@ export default function SaveCRODialog({ cro, type, milestone, location }: { cro:
             });
             if (savedCompaniesResponse.success) {
                 const savedCompaniesData = savedCompaniesResponse.data as SavedCompany[];
-                setSavedCompanies(savedCompaniesData);
                 setIsSaved(savedCompaniesData.some(sc => sc.companyId === cro.id));
             } else {
                 console.error(savedCompaniesResponse.error);

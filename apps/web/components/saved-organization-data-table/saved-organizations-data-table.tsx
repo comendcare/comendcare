@@ -89,7 +89,7 @@ export function SavedOrganizationsDataTable<TValue>({
 
     return (
         <div className="space-y-4 w-full min-w-full">
-            <DataTableToolbar table={table} />
+            {/*<DataTableToolbar table={table} />*/}
             <div className="rounded-md border" ref={scrollContainerRef}>
                 <Table>
                     <TableHeader ref={headerRef as React.LegacyRef<HTMLTableSectionElement>}>
