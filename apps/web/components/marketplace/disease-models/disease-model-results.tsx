@@ -7,16 +7,25 @@ import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table";
+import { SearchParams } from "@/packages/components/types";
 
 const selector = (state: DiseaseModelSearchState) => ({
-    searchResults: state.searchResults
+    searchResults: state.searchResults,
+    setSortBy: state.setSortBy
 })
 
-export function DiseaseModelSearchResults() {
+export function DiseaseModelSearchResults({
+    searchParams
+}: {
+    searchParams?: SearchParams | undefined
+}) {
     const { 
-        searchResults 
+        searchResults,
+        setSortBy
     } = useDiseaseModelSearchStore(useShallow(selector))
     const columns = useDiseaseModelsTableColumns()
+
+    setSortBy(searchParams?.sort)
 
     if (!searchResults) {
         return (

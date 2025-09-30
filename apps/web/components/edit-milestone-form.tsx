@@ -993,7 +993,7 @@ export function EditMilestoneForm({
                                             <>
                                                 {/* <FormLabel>Additional Properties</FormLabel> */}
                                                 <span className="flex flex-wrap gap-2">
-                                                    {!hasBudget && (
+                                                    {(!hasBudget) && (
                                                         <Button 
                                                             onClick={() => setHasBudget(true)}
                                                             variant={'secondary'}
@@ -1002,7 +1002,7 @@ export function EditMilestoneForm({
                                                             {'+ Add Budget'}
                                                         </Button>
                                                     )}
-                                                    {!hasStartDate && (
+                                                    {(!hasStartDate) && (
                                                         <Button 
                                                             onClick={() => setHasStartDate(true)}
                                                             variant={'secondary'}
@@ -1011,7 +1011,7 @@ export function EditMilestoneForm({
                                                             {'+ Add Start Date'}
                                                         </Button>
                                                     )}
-                                                    {!hasEndDate && (
+                                                    {(!hasEndDate) && (
                                                         <Button 
                                                             onClick={() => setHasEndDate(true)}
                                                             variant={'secondary'}
@@ -1020,7 +1020,7 @@ export function EditMilestoneForm({
                                                             {'+ Add End Date'}
                                                         </Button>
                                                     )}
-                                                    {!formData?.contacts || formData?.contacts.length <= 0 && (
+                                                    {(!formData?.contacts || formData?.contacts.length <= 0) && (
                                                         <Button 
                                                             onClick={() => {
                                                                 form.setValue("contacts", [
@@ -1033,7 +1033,7 @@ export function EditMilestoneForm({
                                                             {'+ Add Contacts'}
                                                         </Button>
                                                     )}
-                                                    {!formData?.attachments || formData?.attachments.length <= 0 && (
+                                                    {(!formData?.attachments || formData?.attachments.length <= 0) && (
                                                         <Button 
                                                             onClick={() => {
                                                                 form.setValue("attachments", [

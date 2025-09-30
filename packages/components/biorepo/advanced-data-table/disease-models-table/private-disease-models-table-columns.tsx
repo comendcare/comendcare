@@ -17,35 +17,12 @@ import {
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {useSession} from "next-auth/react";
-import { getMilestones } from "./../../../../../packages/lib/fetchers";
-import { Option } from "./../../../../../packages/lib/types";
 import { Checkbox } from "./../../../ui/checkbox";
+import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
     // const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
-
-    const handleAsyncMilestoneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []
-
-        try {
-            // const response = await fetch(`/api/institutions?search=${query}`);
-            // const data = await response.json();
-            const response = await getMilestones(session?.user.organizationId)
-
-            if (response.success && response.data) {
-                return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
-            } else {
-                return []
-            }
-
-            // Return the fetched options
-            // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    }
 
     // useEffect(() => {
     //     const init = async () => {
@@ -178,8 +155,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "gene.symbol",
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -187,8 +164,13 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Gene"
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
             }
         },
         // {
@@ -237,8 +219,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name",
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -255,8 +237,13 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Storage Facility"
+                label: "Storage Facility",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncInstitutionSearch
             }
         },
         {
@@ -274,6 +261,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Point of Contact"
@@ -294,6 +282,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Links"
@@ -331,6 +320,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -338,7 +328,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncMilestoneSearch
+                onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
             }
         },
         {
