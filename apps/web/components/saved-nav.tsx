@@ -4,13 +4,13 @@ import { Building2, Users } from "lucide-react";
 
 const links = [
     {
-        name: "Service Providers",
+        name: "Service providers",
         href: "/saved/service-providers",
         icon: Building2,
         comingSoon: false
     },
     {
-        name: "Patient Groups",
+        name: "Patient groups",
         href: "/saved/patient-groups",
         icon: Users,
         comingSoon: false

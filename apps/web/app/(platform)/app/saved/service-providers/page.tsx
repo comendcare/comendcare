@@ -32,7 +32,7 @@ export default async function ServiceProviderSavesPage() {
     }
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
+        <main className="flex gap-4 flex-col w-full max-w-7xl h-full items-center mx-auto">
             {/* {savedCompanies.length === 0 ?
                 <div className="h-full flex flex-col items-center justify-center py-20">
                     <Image
