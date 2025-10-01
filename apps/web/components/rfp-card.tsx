@@ -66,15 +66,15 @@ export const RFPCard = ({rfp, isPrivate = false}: {rfp: any, isPrivate?: boolean
 
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
-            <CardHeader className="gap-2 relative overflow-visible">
+            <CardHeader className="gap-2 relative">
                 {isPrivate && (
                     <div className="absolute top-1 right-1">
                         <RFPActionsMenu rfp={rfp}/>
                     </div>
                 )}
-                <span className="flex gap-2 items-center overflow-visible">
+                <span className="flex gap-2 items-center">
                     <Megaphone className="w-6 min-w-6 h-6 min-h-6"/>
-                    <CardTitle className="max-w-full truncate overflow-visible">{rfp.title} </CardTitle>
+                    <CardTitle className="max-w-full truncate leading-normal">{rfp.title} </CardTitle>
                     {rfp.private && <PrivateBadge iconOnly/>}
                     {status && <Badge variant={status.variant} className="text-sm">{status.status}</Badge>}
                 </span>
