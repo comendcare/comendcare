@@ -100,16 +100,16 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                         <Pencil/>
                         Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleDuplicate()
-                        }}
-                    >
-                        <Copy/>
-                        Duplicate
-                    </DropdownMenuItem>
+                    {/*<DropdownMenuItem*/}
+                    {/*    onClick={(e) => {*/}
+                    {/*        e.preventDefault()*/}
+                    {/*        e.stopPropagation()*/}
+                    {/*        handleDuplicate()*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <Copy/>*/}
+                    {/*    Duplicate*/}
+                    {/*</DropdownMenuItem>*/}
                     <DropdownMenuItem
                         onClick={(e) => {
                             e.preventDefault()

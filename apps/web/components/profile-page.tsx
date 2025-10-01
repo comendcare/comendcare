@@ -68,14 +68,14 @@ export default function PAGProfilePage({
                                         {isOwner ? (
                                             <EditableProfilePhoto
                                                 img={organization.image}
-                                                name={organization.name}
+                                                name={organization.name ?? "No name organization"}
                                                 className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                                                 textSize="large"
                                             />
                                         ) : (
                                             <ProfilePhoto
                                                 img={organization.image}
-                                                name={organization.name}
+                                                name={organization.name ?? "No name organization"}
                                                 className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                                                 textSize="large"
                                             />
@@ -84,7 +84,7 @@ export default function PAGProfilePage({
                                     <div className="flex flex-col">
                                         <div className="flex gap-4 justify-between">
                                             <h1 className="text-wrap text-2xl lg:text-3xl font-semibold">
-                                                {organization?.name}
+                                                {organization?.name ?? "No name organization"}
                                             </h1>
                                             {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
                                             <EditPAGProfileHeaderDialog organization={organization}/>

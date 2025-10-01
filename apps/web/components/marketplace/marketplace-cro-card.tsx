@@ -26,6 +26,7 @@ import {TypeBadge} from "../type-badge";
 import Image from "next/image"
 import ImageWithFallback from "@/packages/components/image-with-fallback";
 import {getMilestonesForService} from "@comend/lib/utils";
+import SaveCROButton from "~web/components/save-cro-button";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -126,7 +127,8 @@ export function CROCardHeaderContents({cro, milestone, location}: {
                         {title}
                     </CardTitle>
                 </Link>
-                <SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>
+                {/*<SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>*/}
+                <SaveCROButton cro={cro} type={"card"} location={location} />
             </div>
             <Link
                 href={
