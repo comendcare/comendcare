@@ -58,12 +58,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({ row }) => (
-                // <Checkbox
-                //     checked={row.getIsSelected()}
-                //     onCheckedChange={(value) => row.toggleSelected(!!value)}
-                //     aria-label="Select row"
-                //     className="translate-y-[2px]"
-                // />
                 <div
                     onClick={(e) => {
                         e.stopPropagation(); // prevent row onClick from firing

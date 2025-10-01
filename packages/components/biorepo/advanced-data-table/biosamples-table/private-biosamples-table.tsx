@@ -16,9 +16,7 @@ import Image from "next/image";
 import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useState } from "react";
-import { Input } from "./../../../ui/input";
 import { Dialog, DialogPortal } from "./../../../ui/dialog";
-import { nanoid } from "nanoid";
 
 const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
     // normalize search term
@@ -123,22 +121,6 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     </div>
                 </DialogPortal>
             </Dialog>
-
-            {/* {editingTool && (
-                <Dialog 
-                    open={!!editingTool} 
-                    onOpenChange={(open) => {
-                        if (!open) setEditingTool(undefined);
-                    }}
-                >
-                    <EditAssetDialog
-                        key={editingTool.id}
-                        data={editingTool}
-                        type="biosample"
-                        closeDialog={() => setEditingTool(undefined)}
-                    />
-                </Dialog>
-            )} */}
         </>
     );
 }
