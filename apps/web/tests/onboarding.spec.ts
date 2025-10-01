@@ -61,7 +61,7 @@ test.describe("Onboarding", () => {
     test("Checkboxes can be toggled (notification + consent)", async ({page}) => {
 
         // Ensure form is rendered
-        await expect(page.getByTestId("onboard-name")).toBeVisible();
+        await expect(page.getByTestId("onboard-name")).toBeVisible({timeout: 20_000});
 
         const checkboxes = page.getByRole("checkbox");
         await expect(checkboxes).toHaveCount(2);

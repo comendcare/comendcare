@@ -6,8 +6,23 @@ import * as childProcess from 'child_process';
 import prisma from '@comend/lib/test-prisma';
 import { encode } from 'next-auth/jwt';
 
-function exec(cmd: string, args: string[]) {
-    childProcess.execFileSync(cmd, args, { stdio: 'inherit' });
+function runPrisma(args: string[]) {
+    // Resolve the installed prisma package.json from the repo root
+    const pkgPath = require.resolve("prisma/package.json", { paths: [process.cwd()] });
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+    const prismaDir = path.dirname(pkgPath);
+    // Find the "bin" entry for prisma (usually "build/index.js")
+    const binRel = (pkg.bin && (pkg.bin.prisma || pkg.bin)) || "build/index.js";
+    const binAbs = path.resolve(prismaDir, typeof binRel === "string" ? binRel : binRel.prisma);
+
+    // Use Node to exec the CLI script directly
+    childProcess.execFileSync(process.execPath, [binAbs, ...args], {
+        stdio: "inherit",
+        env: {
+            ...process.env,
+            PRISMA_HIDE_UPDATE_MESSAGE: "1",
+        },
+    });
 }
 
 function assertSafeTestDatabase(url?: string) {
@@ -26,7 +41,16 @@ async function resetDatabase() {
     const url = process.env.DATABASE_URL;
     assertSafeTestDatabase(url);
 
-    exec('npx', ['prisma', 'migrate', 'reset', '--force', '--skip-generate', '--skip-seed', '--schema', 'prisma/schema.prisma']);
+    const schemaPath = path.resolve(process.cwd(), "prisma", "schema.prisma");
+
+    try {
+        // Preferred: real migrations
+        runPrisma(["migrate", "reset", "--force", "--skip-generate", "--skip-seed", "--schema", schemaPath]);
+    } catch (err) {
+        // Fallback: fast schema sync if migrations aren’t available in the environment
+        console.warn("[global-setup] migrate reset failed, falling back to db push --force-reset");
+        runPrisma(["db", "push", "--force-reset", "--skip-generate", "--schema", schemaPath]);
+    }
 }
 
 const TEST_EMAIL = process.env.TEST_EMAIL || 'e2e@comend.test';

@@ -103,12 +103,13 @@ export function EditablePAGBannerPhoto({
                         size="icon"
                         variant="ghost"
                         className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
+                        data-testid="edit-banner-btn"
                         disabled={session?.user?.membership?.role !== "owner"}
                     >
                         <Pencil className="w-4 h-4"/>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
                     <DialogHeader>
                         <DialogTitle>Edit organization banner image</DialogTitle>
                         <DialogDescription>
@@ -134,6 +135,7 @@ export function EditablePAGBannerPhoto({
                                 type="submit" 
                                 className="w-fit"
                                 disabled={isCropping}
+                                data-testid="dialog-save-btn"
                             >
                                 Save
                             </Button>

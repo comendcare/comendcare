@@ -115,11 +115,12 @@ export function EditableProfilePhoto({
                         size="icon"
                         variant="ghost"
                         className="absolute bottom-0 right-0 p-0.5 bg-white shadow-md rounded-full"
+                        data-testid="edit-avatar-btn"
                     >
                         <Pencil className="w-1 h-1"/>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
                     <DialogHeader>
                         <DialogTitle>Edit organization profile picture</DialogTitle>
                         <DialogDescription>
@@ -144,6 +145,7 @@ export function EditableProfilePhoto({
                                 type="submit"
                                 className="w-fit"
                                 disabled={loading || isCropping}
+                                data-testid="dialog-save-btn"
                             >
                                 {loading ? <LoadingDots color="#808080"/> : "Save"}
                             </Button>
