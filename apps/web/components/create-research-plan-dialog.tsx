@@ -45,7 +45,7 @@ export default function CreateResearchPlanDialog({
                 )}
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
                 {isLoading ? (
                     <div className="h-full w-full p-10 gap-4">
                         <div className="h-full flex flex-col space-y-8 items-center justify-center">
