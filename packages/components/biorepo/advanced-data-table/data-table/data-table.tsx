@@ -1,4 +1,4 @@
-import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
+import { flexRender, Row, type Table as TanstackTable } from "@tanstack/react-table";
 import type * as React from "react";
 
 import { DataTablePagination, TypesenseDataTablePagination } from "./../data-table/data-table-pagination";
@@ -13,16 +13,15 @@ import {
 import { getCommonPinningStyles } from "./../../../../../packages/lib/data-table";
 import { cn } from "./../../../../../packages/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { StoreApi, UseBoundStore } from "zustand";
-import { TemporalState } from "zundo";
+import { MouseEvent } from "react";
 
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
   table: TanstackTable<TData>;
   noResults?: React.ReactNode;
   actionBar?: React.ReactNode;
   showPagination?: boolean;
-  // useStore?: UseBoundStore<Write<StoreApi<any>, {temporal: StoreApi<TemporalState<any>>;}>>
   useStore?: any;
+  onRowClickCallback?: (e: MouseEvent, row: Row<TData> | undefined) => any
 }
 
 export function DataTable<TData>({
@@ -30,6 +29,7 @@ export function DataTable<TData>({
   noResults,
   actionBar,
   showPagination = true,
+  onRowClickCallback,
   useStore,
   children,
   className,
@@ -94,6 +94,8 @@ export function DataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={(e: MouseEvent) => onRowClickCallback && onRowClickCallback(e, row)}
+                  className={cn(onRowClickCallback ? "cursor-pointer" : "")}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

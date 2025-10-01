@@ -377,23 +377,23 @@ export function EditBiosampleToolForm({
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                             <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
-                            <Button
-                                disabled={!form.formState.isValid || isSaving}
-                                variant={"cta"}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleFormSubmit(form.getValues())
-                                }}
-                            >
-                                {isSaving 
-                                    ? (
-                                        <div className="w-[81px] flex justify-center items-center">
-                                            <LoadingDots/>
-                                        </div>
-                                    ) 
-                                    : ("Save Changes")
-                                }
-                            </Button>
+                        <Button
+                            disabled={!form.formState.isValid || isSaving}
+                            variant={"cta"}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleFormSubmit(form.getValues())
+                            }}
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save Changes")
+                            }
+                        </Button>
                     </span>
                 </form>
             </ScrollArea>

@@ -58,12 +58,24 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                    className="translate-y-[2px]"
-                />
+                // <Checkbox
+                //     checked={row.getIsSelected()}
+                //     onCheckedChange={(value) => row.toggleSelected(!!value)}
+                //     aria-label="Select row"
+                //     className="translate-y-[2px]"
+                // />
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent row onClick from firing
+                    }}
+                >
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                        className="translate-y-[2px]"
+                    />
+                </div>
             ),
             enableSorting: false,
             enableHiding: false,
@@ -698,11 +710,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: { label: "Other Notes" },
             enableHiding: true,
         },
-        {
-            id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
-            enableHiding: false,
-        },
+        // {
+        //     id: "actions",
+        //     cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+        //     enableHiding: false,
+        // },
     ]
 
     return columns
