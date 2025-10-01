@@ -27,7 +27,7 @@ import { getDonorData, getOrganizationFromOrganizationId } from "@comend/lib/fet
 import { useSession } from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Pin, Info, } from "lucide-react"
+import { Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { Option } from "@comend/lib/types"
@@ -74,6 +74,9 @@ export function EditDiseaseModelToolForm({
             institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
+            genotype: toolData?.genotype || undefined,
+            strain: toolData?.strain || undefined,
+            notes: toolData?.notes || undefined
         }
     })
 
@@ -303,23 +306,26 @@ export function EditDiseaseModelToolForm({
                         </>
                     )}
 
-                    {/* <FormField
+                    <FormField
                         control={form.control}
                         name="strain"
                         render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">{`Strain`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="strain"
-                                        placeholder={`Enter a description...`}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="strain"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a strain`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
                             </FormItem>
                         )}
-                    /> */}
+                    />
 
                     <FormField
                         control={form.control}
@@ -347,7 +353,7 @@ export function EditDiseaseModelToolForm({
                         )}
                     />
 
-                    {/* <FormField
+                    <FormField
                         control={form.control}
                         name="genotype"
                         render={({field}) => (
@@ -366,7 +372,7 @@ export function EditDiseaseModelToolForm({
                                 </div>
                             </FormItem>
                         )}
-                    /> */}
+                    />
 
                     {/* <FormField
                         control={form.control}
@@ -466,6 +472,38 @@ export function EditDiseaseModelToolForm({
                                     <Textarea
                                         id="description"
                                         placeholder={`Enter a description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <Separator />
+
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px] flex items-center">
+                                <span>Internal Notes</span>
+                                <Tooltip>
+                                    <TooltipTrigger className="pl-2">
+                                        <Lock className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                    <p className="text-normal">
+                                        Only visible to your team
+                                    </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="notes"
+                                        placeholder={`Enter internal notes...`}
                                         {...field}
                                     />
                                 </FormControl>

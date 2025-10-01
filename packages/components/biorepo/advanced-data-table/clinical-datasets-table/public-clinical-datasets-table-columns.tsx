@@ -43,15 +43,15 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "id",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Tool ID"/>
+            <DataTableColumnHeader column={column} title="Dataset ID"/>
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
-                <p>{row.original.id || 'No Tool ID'}</p>
+                <p>{row.original.id || 'No Dataset ID'}</p>
             </div>
         ),
         enableHiding: true,
-        meta: { label: "Tool ID" }
+        meta: { label: "Dataset ID" }
     },
     {
       id: "title.title", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)

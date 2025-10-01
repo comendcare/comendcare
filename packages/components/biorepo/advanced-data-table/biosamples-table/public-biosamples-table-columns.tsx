@@ -47,20 +47,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
         },
         {
-            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "id",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: { label: "Sample ID" }
-        },
-        {
             id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "donor.id",
             header: ({column}) => (
@@ -74,6 +60,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: { label: "Public Donor ID" }
+        },
+        {
+            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: { label: "Sample ID" }
         },
         {
             id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -121,10 +121,21 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: { label: "Gene" }
         },
         {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
+        {
             id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "availability",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability"/>
+                <DataTableColumnHeader column={column} title="Availability Status"/>
             ),
             cell: ({row}) => {
                 const availability = handleGetAvailability(row.original)
@@ -134,7 +145,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
-            meta: { label: "Availability" }
+            meta: { label: "Availability Status" }
         },
         {
             id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)

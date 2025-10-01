@@ -40,15 +40,15 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
+                <DataTableColumnHeader column={column} title="Model ID"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                    <p>{row.original.id || 'No Model ID'}</p>
                 </div>
             ),
             enableHiding: true,
-            meta: { label: "Sample ID" }
+            meta: { label: "Model ID" }
         },
         {
             id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -90,6 +90,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             meta: { label: "Condition" }
         },
         {
+            id: "strain.strain", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "strain",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Strain"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Strain"
+            }
+        },
+        {
             id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "gene",
             header: ({column}) => (
@@ -100,6 +111,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: { label: "Gene" }
+        },
+        {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
         },
         {
             id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)

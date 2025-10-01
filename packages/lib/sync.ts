@@ -491,6 +491,12 @@ export const syncToTypesense = async (env: {
                     sort: true,
                     optional: true,
                 },
+                {
+                    name: "genotype.genotype", // hack to allow typesense to sort on the string type
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
             ]
         }
         const diseaseModelSchema = {
@@ -537,6 +543,18 @@ export const syncToTypesense = async (env: {
                     sort: true,
                     optional: true,
                 },
+                {
+                    name: "genotype.genotype", // hack to allow typesense to sort on the string type
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+                {
+                    name: "strain.strain", // hack to allow typesense to sort on the string type
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                }
             ]
         }
         const clinicalDatasetSchema = {
@@ -675,6 +693,7 @@ export const syncToTypesense = async (env: {
                 quantity: true,
                 institution: true,
                 description: true,
+                genotype: true,
             }
         })
         const diseaseModels = await prisma.diseaseModel.findMany({
@@ -705,6 +724,8 @@ export const syncToTypesense = async (env: {
                 institution: true,
                 gene: true,
                 types: true,
+                genotype: true,
+                strain: true,
             }
         })
         const clinicalDatasets = await prisma.tool.findMany({
@@ -840,7 +861,8 @@ export const syncToTypesense = async (env: {
                 // special case for types to enable searching by label & sorting include all info, and only include one type
                 type: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value))[0],
                 // special case for conditions to enable sorting include only one condition
-                condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition
+                condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition,
+                genotype: {genotype: biosample.genotype},
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
@@ -858,7 +880,9 @@ export const syncToTypesense = async (env: {
                 // special case for types to enable searching by label & sorting include all info, and only include one type
                 type: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value))[0],
                 // special case for conditions to enable sorting include only one condition
-                condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition
+                condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition,
+                genotype: {genotype: diseaseModel.genotype},
+                strain: {strain: diseaseModel.strain},
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
         } else {
