@@ -95,7 +95,8 @@ export const RoadmapCard = ({
     return (
         <Tabs
             // defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'timeline'} // timeline default
-            defaultValue={urlView === 'timeline' || params.get('view') === 'timeline' ? 'timeline' : 'flow'} // flow default
+            // defaultValue={urlView === 'timeline' || params.get('view') === 'timeline' ? 'timeline' : 'flow'} // flow default
+            value={urlView === 'timeline' || params.get('view') === 'timeline' ? 'timeline' : 'flow'}
             className="w-full"
             onValueChange={setUrlView ? setUrlView: () => {}}
         >
