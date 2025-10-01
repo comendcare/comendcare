@@ -61,7 +61,7 @@ export default function PAGProfilePage({
                             <div
                                 className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
                                 <div className="w-full flex flex-row gap-4 items-start">
-                                    <div className="h-fit w-fit -mt-16">
+                                    <div className="h-fit w-fit -mt-16" data-testid="avatar-image">
                                         {isOwner ? (
                                             <EditableProfilePhoto
                                                 img={organization.image}

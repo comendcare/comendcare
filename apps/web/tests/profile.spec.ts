@@ -201,7 +201,7 @@ test.describe("PAG Profile – edit flows", () => {
 
     test("Edit Cover (banner) photo flow: upload, crop, save, and persist", async ({ page }) => {
         const headerCard = await withinCard(page, "pag-profile-header-card");
-        const maybeEditCover = headerCard.getByTestId("edit-cover-btn").first();
+        const maybeEditCover = headerCard.getByTestId("edit-banner-btn").first();
         if (await maybeEditCover.isVisible().catch(() => false)) {
             await maybeEditCover.click();
         }
@@ -234,10 +234,8 @@ test.describe("PAG Profile – edit flows", () => {
     });
 
     test("Edit Profile photo flow: upload, crop, save, and persist", async ({ page }) => {
-        // Click the profile photo editor (usually overlaps the avatar)
         const avatarEdit = page.getByTestId("edit-avatar-btn").first();
 
-        // If not explicitly labeled, try to click on the avatar container to reveal controls
         if (!(await avatarEdit.isVisible().catch(() => false))) {
             const avatarContainer = page.getByTestId("avatar-image").first();
             if (await avatarContainer.isVisible().catch(() => false)) {
@@ -246,6 +244,8 @@ test.describe("PAG Profile – edit flows", () => {
         } else {
             await avatarEdit.click();
         }
+
+        await expect(page.getByTestId("avatar-dialog")).toBeVisible();
 
         const file = page.getByTestId("avatar-file-input").first();
         await expect(file).toBeAttached({ timeout: 5000 });
@@ -261,14 +261,14 @@ test.describe("PAG Profile – edit flows", () => {
             await expect(cropBar).toBeHidden();
         }
 
-        const dlg = page.getByTestId("dialog");
+        const dlg = page.getByTestId("avatar-dialog");
         if (await dlg.isVisible().catch(() => false)) {
             const save = dlg.getByTestId("dialog-save-btn").or(dlg.getByTestId("apply-btn"));
             await save.click();
-            await expect(dlg).toBeHidden();
+            await expect(dlg).toBeHidden();  // passes if it closes OR after a reload (detached counts as hidden)
         }
 
-        // Assert the avatar now shows (or at least the <img> element is present)
+        // Final assertion: avatar is rendered
         await expect(page.getByTestId("avatar-image").first()).toBeVisible();
     });
 

@@ -120,7 +120,7 @@ export function EditableProfilePhoto({
                         <Pencil className="w-1 h-1"/>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
+                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="avatar-dialog">
                     <DialogHeader>
                         <DialogTitle>Edit organization profile picture</DialogTitle>
                         <DialogDescription>
@@ -140,6 +140,7 @@ export function EditableProfilePhoto({
                                 setSelectedFile={setSelectedFileProfile}
                                 className="mx-auto"
                                 setIsCropping={setIsCropping}
+                                testIdPrefix="avatar"
                             />
                             <Button
                                 type="submit"

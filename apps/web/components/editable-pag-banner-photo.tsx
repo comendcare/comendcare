@@ -70,13 +70,7 @@ export function EditablePAGBannerPhoto({
             }
         }
 
-        if (!selectedFileHeader) {
-            // no file selected, set profile image to null, allow deleting profile photo
-            formData.set("headerImage", "")
-        }
-
-        if (values.image !== img && img) {
-            // if the image is being changed, delete the old image in our google cloud storage bucket
+        if (values.headerImage !== img && img) {
             await handleImageDelete(img)
         }
 
@@ -109,7 +103,7 @@ export function EditablePAGBannerPhoto({
                         <Pencil className="w-4 h-4"/>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
+                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="banner-dialog">
                     <DialogHeader>
                         <DialogTitle>Edit organization banner image</DialogTitle>
                         <DialogDescription>
@@ -130,6 +124,7 @@ export function EditablePAGBannerPhoto({
                                 setSelectedFile={setSelectedFileHeader}
                                 className="rounded h-[100px] w-[400px] mx-auto"
                                 setIsCropping={setIsCropping}
+                                testIdPrefix="cover"
                             />
                             <Button 
                                 type="submit" 
