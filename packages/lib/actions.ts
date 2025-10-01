@@ -2392,7 +2392,8 @@ export const updateDiseaseModel = withOrganizationAuth(
                 attachments: data.attachments,
                 contacts: data.contacts,
                 genotype: data.genotype,
-                strain: data.strain
+                strain: data.strain,
+                notes: data.notes
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
@@ -2506,6 +2507,7 @@ export const createDiseaseModel = withOrganizationAuth(
                 contacts: data.contacts,
                 genotype: data.genotype,
                 strain: data.strain,
+                notes: data.notes,
             }
 
             const response = await prisma.diseaseModel.create({
@@ -2615,7 +2617,8 @@ export const createDataTool = withOrganizationAuth(
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                notes: data.notes,
             }
 
             const response = await prisma.tool.create({
@@ -2750,7 +2753,8 @@ export const updateDataTool = withOrganizationAuth(
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                notes: data.notes,
             }
 
             const newDataTool = await prisma.tool.update({
@@ -2890,6 +2894,7 @@ export const createBiosample = withOrganizationAuth(
                 variant: data.variant,
                 institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
                 genotype: data.genotype,
+                notes: data.notes,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3106,6 +3111,7 @@ export const updateBiosample = withOrganizationAuth(
                         ? data.institutions[0]
                         : undefined,
                 genotype: data.genotype,
+                notes: data.notes,
             };
 
             const newBiosample = await prisma.biosample.update({

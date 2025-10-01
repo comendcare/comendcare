@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm, UseFormReturn} from "react-hook-form"
+import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -20,29 +20,18 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
 } from "@comend/components/ui/dialog"
-import {ANATOMICAL_SITE_OPTIONS, Asset, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, optionSchema, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
-import {Biosample, Donor, DonorDiagnosis, Institution, MilestoneType, Prisma} from "@prisma/client"
+import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS } from "@comend/lib/types"
+import { Prisma } from "@prisma/client"
 import {getDonorData, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Pin, Plus, Router, Trash, Info, CalendarIcon } from "lucide-react"
+import { Plus, Trash, Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
-import { ToolState, useToolStore } from "@/state/tool/toolStore"
-import { useShallow } from "zustand/react/shallow"
 import ProjectMultipleSelector from "./project-multiple-selector"
-import { DeleteAssetDialog } from "./delete-asset-dialog"
-import { badgeVariants } from "@comend/components/ui/badge"
 // import { DeleteAssetDialog } from "./delete-tool-dialog"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { JsonObject } from "@prisma/client/runtime/library"
 import { editBiosampleForm, Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
@@ -51,11 +40,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createBiosample, updateBiosample } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
-import { Popover } from "@/packages/components/ui/popover"
-import { PopoverContent, PopoverTrigger } from "@/packages/components/plate-ui/popover"
 import { cn } from "@/packages/lib/utils"
-import { format } from "date-fns"
-import { Calendar } from "@/packages/components/ui/calendar"
 import { Label } from "@/packages/components/ui/label"
 import { Switch } from "@/packages/components/ui/switch"
 import LoadingDots from "@/packages/components/icons/loading-dots"
@@ -165,6 +150,7 @@ export function EditBiosampleToolForm({
             bmi: toolData?.donor?.bmi?.toString() || undefined,
             medications: toolData?.donor?.medications || undefined,
             genotype: toolData?.genotype || undefined,
+            notes: toolData?.notes || undefined,
         }
     })
 
@@ -629,11 +615,43 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                 name="description"
                 render={({field}) => (
                     <FormItem className="w-full flex gap-4 items-center">
-                        <FormLabel className="w-[100px]">{`Other Notes`}</FormLabel>
+                        <FormLabel className="w-[100px]">{`Description`}</FormLabel>
                         <FormControl>
                             <Textarea
                                 id="description"
-                                placeholder={`Enter other notes...`}
+                                placeholder={`Enter description...`}
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <Separator />
+
+            <FormField
+                control={form.control}
+                name="notes"
+                render={({field}) => (
+                    <FormItem className="w-full flex gap-4 items-center">
+                        <FormLabel className="w-[100px] flex items-center">
+                        <span>Internal Notes</span>
+                        <Tooltip>
+                            <TooltipTrigger className="pl-2">
+                            <Lock className="h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-80 text-wrap text-left">
+                            <p className="text-normal">
+                                Only visible to your team
+                            </p>
+                            </TooltipContent>
+                        </Tooltip>
+                        </FormLabel>
+                        <FormControl>
+                            <Textarea
+                                id="notes"
+                                placeholder={`Enter internal notes...`}
                                 {...field}
                             />
                         </FormControl>

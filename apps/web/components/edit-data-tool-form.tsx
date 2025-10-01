@@ -33,7 +33,7 @@ import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Info, Pin } from "lucide-react"
+import { Delete, Info, Pin, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
@@ -88,6 +88,7 @@ export function EditDataToolForm({
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             cohortSize: toolData?.cohortSize?.toString() || undefined,
             institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
+            notes: toolData?.notes || undefined,
         }
     })
 
@@ -497,6 +498,38 @@ export function EditDataToolForm({
                                     <Textarea
                                         id="description"
                                         placeholder={`Enter a description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <Separator />
+
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px] flex items-center">
+                                <span>Internal Notes</span>
+                                <Tooltip>
+                                    <TooltipTrigger className="pl-2">
+                                    <Lock className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                    <p className="text-normal">
+                                        Only visible to your team
+                                    </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="notes"
+                                        placeholder={`Enter internal notes...`}
                                         {...field}
                                     />
                                 </FormControl>

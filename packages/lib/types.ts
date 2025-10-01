@@ -2032,6 +2032,7 @@ export const editBiosampleForm = z.object({
     matchedPairId: z.string().optional(),
     mirroredPairId: z.string().optional(),
     ageAtExcision: z.string().optional(),
+    notes: z.string().optional(),
 
     // donor properties
     donorId: z.string().optional(),
@@ -2076,6 +2077,7 @@ export const editDiseaseModelForm = z.object({
     milestones: z.array(z.custom<Milestone>()).optional(),
     genotype: z.string().optional(),
     strain: z.string().optional(),
+    notes: z.string().optional(),
 
     // disease model properties
     genes: z.array(optionSchema).optional(),
@@ -2102,6 +2104,7 @@ export const editDataToolForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
+    notes: z.string().optional(),
 
     genes: z.array(optionSchema).optional(),
     cohortSize: z.string().optional(),

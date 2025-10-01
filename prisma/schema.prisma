@@ -312,6 +312,7 @@ model Tool {
   pinned      Boolean              @default(false)
   metadata    Json?
   types       String[] // values (ToolType ids)
+  notes       String?
 
   institutionId                 String?
   institution                   Institution?                         @relation(fields: [institutionId], references: [id], onDelete: SetNull)
@@ -337,6 +338,7 @@ model DiseaseModel {
   types       String[] // values (DiseaseModelType ids)
   genotype    String?
   strain      String?
+  notes       String?
 
   institutionId                 String?
   institution                   Institution?                                 @relation(fields: [institutionId], references: [id], onDelete: SetNull)
@@ -378,6 +380,7 @@ model Biosample {
   ageAtCollection     Int?
   price               Float?
   priceUnit           String?
+  notes               String?
 
   institutionId                 String?
   institution                   Institution?                              @relation(fields: [institutionId], references: [id], onDelete: SetNull)
