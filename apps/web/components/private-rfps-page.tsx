@@ -11,22 +11,9 @@ type Props = {
     initialRFPs: any[] // or RFP[] if you have the type locally
 }
 
-const rfpSelector = (s: RFPState) => ({
-    rfps: s.rfps,
-    initialized: s.initialized,
-    initState: s.initState,
-})
-
 export function PrivateRFPsPage({ initialRFPs }: Props) {
-    const { rfps, initialized, initState } = useRFPStore(useShallow(rfpSelector))
 
-    useEffect(() => {
-        if (!initialized) {
-            initState(initialRFPs)
-        }
-    }, [initialized, initState, initialRFPs])
-
-    const renderRfps = initialized ? rfps : initialRFPs
+    const renderRfps = initialRFPs
 
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
