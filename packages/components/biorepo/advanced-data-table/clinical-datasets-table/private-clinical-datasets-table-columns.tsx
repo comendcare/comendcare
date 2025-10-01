@@ -87,16 +87,16 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "id",
         accessorKey: "id",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Tool ID"/>
+            <DataTableColumnHeader column={column} title="Dataset ID"/>
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
-                <p>{row.original.id || 'No Tool ID'}</p>
+                <p>{row.original.id || 'No Dataset ID'}</p>
             </div>
         ),
         enableHiding: true,
         meta: {
-            label: "Tool ID"
+            label: "Dataset ID"
         }
     },
     {
@@ -300,6 +300,20 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 {row.original.description}
             </div>
         ),
+        enableHiding: true,
+    },
+    {
+        id: "notes",
+        accessorKey: "notes",
+        header: ({column}) => (
+            <DataTableColumnHeader column={column} title="Internal Notes"/>
+        ),
+        cell: ({row}) => (
+            <div className="line-clamp-3">
+                {row.original.notes}
+            </div>
+        ),
+        meta: { label: "Internal Notes" },
         enableHiding: true,
     },
     {

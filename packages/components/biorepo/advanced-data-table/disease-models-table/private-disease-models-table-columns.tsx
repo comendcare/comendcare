@@ -106,16 +106,16 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "id",
             accessorKey: "id",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
+                <DataTableColumnHeader column={column} title="Model ID"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                    <p>{row.original.id || 'No Model ID'}</p>
                 </div>
             ),
             enableHiding: true,
             meta: {
-                label: "Sample ID"
+                label: "Model ID"
             }
         },
         {
@@ -143,17 +143,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             },
         },
-        // {
-        //     id: "strain",
-        //     accessorKey: "strain",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Strain"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Strain"
-        //     }
-        // },
+        {
+            id: "strain",
+            accessorKey: "strain",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Strain"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Strain"
+            }
+        },
         {
             id: "gene.symbol",
             accessorKey: "gene.symbol",
@@ -173,17 +173,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 onAsyncSearch: handleAsyncGeneSearch
             }
         },
-        // {
-        //     id: "genotype",
-        //     accessorKey: "genotype",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Genotype"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Genotype",
-        //     }
-        // },
+        {
+            id: "genotype",
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
         // {
         //     id: "phenotype",
         //     accessorKey: "phenotype",
@@ -345,6 +345,20 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             meta: {
                 label: "Description"
             },
+            enableHiding: true,
+        },
+        {
+            id: "notes",
+            accessorKey: "notes",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Internal Notes"/>
+            ),
+            cell: ({row}) => (
+                <div className="line-clamp-3">
+                    {row.original.notes}
+                </div>
+            ),
+            meta: { label: "Internal Notes" },
             enableHiding: true,
         },
         {

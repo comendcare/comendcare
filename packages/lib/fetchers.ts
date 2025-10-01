@@ -2324,6 +2324,8 @@ export const getDiseaseModels = withOrganizationAuth(
                     { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                     { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                     { description: {contains: input.q, mode: "insensitive"}},
+                    { genotype: {contains: input.q, mode: "insensitive"}},
+                    { strain: {contains: input.q, mode: "insensitive"}},
                     // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2487,6 +2489,7 @@ export const getBiosamples = withOrganizationAuth(
                     { id: { contains: input.q, mode: "insensitive" } },
                     { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                     { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                    { genotype: {contains: input.q, mode: "insensitive"}},
                     // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
