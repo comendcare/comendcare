@@ -123,10 +123,10 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         cell: ({ row }) => (
           <>
-            {(row.original.types || []).map((type: string) => {
+            {(row.original.types || []).map((type: string, index: number) => {
               const typeOption = TOOL_TYPE_OPTIONS.find(t => t.value === type)
               return (
-                <MilestoneTypeBadge label={typeOption?.label}/>
+                <MilestoneTypeBadge key={index} label={typeOption?.label}/>
               )
             })}
           </>
