@@ -89,7 +89,7 @@ export function SavedCROsDataTable<TValue>({
 
     return (
         <div className="space-y-4 w-full min-w-full">
-            <DataTableToolbar table={table} />
+            {/*<DataTableToolbar table={table} />*/}
             <div className="rounded-md border" ref={scrollContainerRef}>
                 <Table>
                     <TableHeader ref={headerRef as React.LegacyRef<HTMLTableSectionElement>}>
@@ -148,22 +148,22 @@ export function SavedCROsDataTable<TValue>({
                                 <TableCell colSpan={columns.length}>
                                     <div className="h-full flex flex-col items-center justify-center py-4">
                                         <Image
-                                            alt="No service providers shortlisted"
+                                            alt="No service providers saved"
                                             src="https://illustrations.popsy.co/gray/digital-nomad.svg"
                                             width={300}
                                             height={300}
                                             className="dark:hidden"
                                         />
                                         <Image
-                                            alt="No service providers shortlisted"
+                                            alt="No service providers saved"
                                             src="https://illustrations.popsy.co/white/digital-nomad.svg"
                                             width={300}
                                             height={300}
                                             className="hidden dark:block"
                                         />
-                                        <div className="max-w-xl flex flex-col justify-center items-center space-y-8">
+                                        <div className="max-w-xl flex flex-col justify-center items-center text-center space-y-8">
                                             <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                                                {`You do not have any shortlisted service providers yet. Visit the marketplace to save some service providers.`}
+                                                {`You can save service providers/patient groups from the marketplace.`}
                                             </p>
                                             <PulsatingButton
                                                 className="bg-black"
@@ -189,14 +189,14 @@ export function SavedCROsDataTable<TValue>({
                         <div className="h-full flex flex-col justify-center">
                             <div className="h-full flex flex-col items-center justify-center">
                                 <Image
-                                    alt="No service providers shortlisted"
+                                    alt="No service providers saved"
                                     src="https://illustrations.popsy.co/gray/digital-nomad.svg"
                                     width={300}
                                     height={300}
                                     className="dark:hidden"
                                 />
                                 <Image
-                                    alt="No service providers shortlisted"
+                                    alt="No service providers saved"
                                     src="https://illustrations.popsy.co/white/digital-nomad.svg"
                                     width={300}
                                     height={300}
@@ -204,7 +204,7 @@ export function SavedCROsDataTable<TValue>({
                                 />
                                 <div className="max-w-xl flex flex-col justify-center items-center space-y-8">
                                     <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                                        {`You do not have any shortlisted service providers yet. Visit the marketplace to save some service providers.`}
+                                        {`You do not have any saved service providers yet. Visit the marketplace to save some service providers.`}
                                     </p>
                                     <PulsatingButton
                                         className="bg-blue-dark"

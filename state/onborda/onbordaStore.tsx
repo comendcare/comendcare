@@ -50,7 +50,7 @@ export const onbordaTours: any[] = [
             {
                 icon: <>⭐</>,
                 title: "Save service providers",
-                content: <>{`Select and save service providers to your shortlist and associate them with your project to stay organized.`}</>,
+                content: <>{`Save service providers and associate them with your project to stay organized.`}</>,
                 selector: ".onborda-save-service-provider",
                 side:  "left" as any,
                 showControls: true,

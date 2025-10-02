@@ -255,7 +255,7 @@ export function ImageSelector({
                     Click or drop!
                 </AvatarFallback>
             </Avatar>
-            <div className={cn("w-full flex justify-center gap-2", selectedFile ? "" : "hidden")}>
+            <div className={cn("w-full flex flex-col sm:flex-row justify-center gap-2", selectedFile ? "" : "hidden")}>
                 <Button
                     size={"sm"}
                     type="reset"

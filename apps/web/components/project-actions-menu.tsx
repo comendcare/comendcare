@@ -224,16 +224,16 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
                             )}
                         </Tooltip>
                     </TooltipProvider>
-                    <DropdownMenuItem
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleDuplicate()
-                            setIsOpen(false)
-                        }}
-                    >
-                        <Copy/>
-                        Duplicate
-                    </DropdownMenuItem>
+                    {/*<DropdownMenuItem*/}
+                    {/*    onClick={(e) => {*/}
+                    {/*        e.preventDefault()*/}
+                    {/*        handleDuplicate()*/}
+                    {/*        setIsOpen(false)*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <Copy/>*/}
+                    {/*    Duplicate*/}
+                    {/*</DropdownMenuItem>*/}
                     <DropdownMenuItem
                         onClick={(e) => {
                             e.preventDefault()

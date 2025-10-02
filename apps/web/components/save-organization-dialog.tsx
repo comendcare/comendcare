@@ -110,19 +110,19 @@ export default function SaveOrganizationDialog({ savedOrganization, type }: { sa
                 </TooltipTrigger>
                 {!session?.user?.organizationId && (
                     <TooltipContent>
-                        <p>Please join an organization to enable Organization shortlisting.</p>
+                        <p>Please join an organization to enable Organization saving.</p>
                     </TooltipContent>
                 )}
             </Tooltip>
             <DialogContent onClick={(e) => e.stopPropagation()}>
                 <DialogHeader>
-                    <DialogTitle>Save {savedOrganization.name} to shortlist</DialogTitle>
+                    <DialogTitle>Save {savedOrganization.name}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         {/* Add additional form fields here if we decide saved organizations need to link to something. */}
                         <Button type="submit" disabled={isSubmitting} className="w-full" onClick={(e) => e.stopPropagation()}>
-                            {isSubmitting ? "Shortlisting..." : "Shortlist Organization"}
+                            {isSubmitting ? "Saving..." : "Save Organization"}
                         </Button>
                     </form>
                 </Form>

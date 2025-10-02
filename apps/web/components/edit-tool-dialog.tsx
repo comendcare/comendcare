@@ -50,13 +50,7 @@ export const NewToolDialog = ({type}: {type: 'biosample' | 'data' | 'diseaseMode
     )
 }
 
-export const EditAssetDialog = ({children, data, type}: {children?: ReactNode, data: Partial<Asset>, type: 'biosample' | 'data' | 'diseaseModel'}) => {
-    const [isOpen, setIsOpen] = useState(false)
-
-    const closeDialog = () => {
-        setIsOpen(false)
-    }
-
+export const EditAssetDialog = ({children, data, type, closeDialog}: {children?: ReactNode, data: Partial<Asset>, type: 'biosample' | 'data' | 'diseaseModel', closeDialog: () => void}) => {
     return (
         <DialogContent>
             <DialogHeader>

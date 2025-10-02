@@ -564,20 +564,11 @@ export function EditMilestoneForm({
                                     <TabsTrigger
                                         className="relative data-[state=active]:bg-secondary"
                                         value="recommendations"
-                                        style={
-                                            (recommendations && recommendations.length > 0 && !recommendationsViewed ? (
-                                                {
-                                                    // "--pulse-color": "#0096ff",
-                                                    "--pulse-color": "#dcebfe", // light blue
-                                                    "--duration": "1.5s",
-                                                } as React.CSSProperties
-                                            ): {})
-                                        }
                                     >
                                         <div className="relative z-10 flex gap-2 items-center">
                                             Relevant vendors
                                         </div>
-                                        <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit")} />
+                                        <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 rounded-lg bg-inherit")} />
                                         {/* {
                                             // notifications &&
                                             // notifications
