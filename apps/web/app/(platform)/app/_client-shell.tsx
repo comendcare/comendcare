@@ -46,13 +46,11 @@ import {User} from "@prisma/client";
 export default function AppClientShell({
                                            user,
                                            memberships,
-                                           invitations,
                                            memberRequests,
                                            children,
                                        }: {
     user: Partial<User>;
     memberships: MembershipWithOrganization[];
-    invitations: InvitationWithOrganization[];
     memberRequests: MemberRequestWithUserAndOrganization[];
     children: React.ReactNode;
 }) {
@@ -69,8 +67,6 @@ export default function AppClientShell({
                         <SidebarTrigger className="-ml-1"/>
                         <NavUser
                             user={user}
-                            memberships={memberships}
-                            invitations={invitations}
                             memberRequests={memberRequests}
                         />
                     </div>
