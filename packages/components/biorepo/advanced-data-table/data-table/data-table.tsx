@@ -95,7 +95,7 @@ export function DataTable<TData>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={(e: MouseEvent) => onRowClickCallback && onRowClickCallback(e, row)}
-                  className={cn(onRowClickCallback ? "cursor-pointer" : "")}
+                  className={cn(onRowClickCallback ? "cursor-pointer group" : "")}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
