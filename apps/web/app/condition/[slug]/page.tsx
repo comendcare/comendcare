@@ -241,7 +241,7 @@ export default async function ConditionPage({
     }
 
     return (
-        <TooltipProvider>
+        <>
             <div className="flex flex-col items-center justify-center my-24 space-y-24 max-w-7xl mx-auto">
                 <div className="flex flex-col items-center justify-center mt-8 space-y-8">
                     {/*<Breadcrumb>*/}
@@ -374,18 +374,20 @@ export default async function ConditionPage({
                                         <CardHeader
                                             className="flex flex-row items-center justify-between space-y-0 pb-2">
                                             <CardTitle className="text-sm font-medium">
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        Prevalence
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className="max-w-80">
-                                                        <p>
-                                                            {`The estimated proportion of a population that has a characteristic at a specific time, regardless of when they first developed it.`}
-                                                        </p>
-                                                    </TooltipContent>
-                                                </Tooltip>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            Prevalence
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80">
+                                                            <p>
+                                                                {`The estimated proportion of a population that has a characteristic at a specific time, regardless of when they first developed it.`}
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             </CardTitle>
-                                            <UserSearch />
+                                            <UserSearch/>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
@@ -551,7 +553,7 @@ export default async function ConditionPage({
                     {
                         title: "Share on social media",
                         icon: <IconShare/>,
-                        dialog: <ShareDialog 
+                        dialog: <ShareDialog
                             url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`}
                             trackShareEvent={{
                                 title: `Condition Page Shared`
@@ -583,7 +585,6 @@ export default async function ConditionPage({
                 orientation="vertical"
                 desktopClassName="right-4"
             />
-
-        </TooltipProvider>
+        </>
     )
 }

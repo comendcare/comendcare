@@ -60,17 +60,17 @@ export default function LandingFooter() {
                             </a>
                         </li>
 
-                        {/*<li>*/}
-                        {/*    <a*/}
-                        {/*        href="https://twitter.com/comendcare"*/}
-                        {/*        rel="noreferrer"*/}
-                        {/*        target="_blank"*/}
-                        {/*        className="text-gray-700 transition hover:opacity-75"*/}
-                        {/*    >*/}
-                        {/*        <span className="sr-only">Twitter</span>*/}
-                        {/*        <Twitter className="size-8" />*/}
-                        {/*    </a>*/}
-                        {/*</li>*/}
+                        <li>
+                            <a
+                                href="https://twitter.com/comendcare"
+                                rel="noreferrer"
+                                target="_blank"
+                                className="text-gray-700 transition hover:opacity-75"
+                            >
+                                <span className="sr-only">Twitter</span>
+                                <Twitter className="size-8" />
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
