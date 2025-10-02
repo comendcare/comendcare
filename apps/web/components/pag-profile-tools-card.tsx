@@ -51,19 +51,19 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
         setFilters: setBiosampleFilters,
         setSortBy: setBiosampleSortBy,
     } = useBiosampleSearchStore(useShallow(biosamplesSelector))
-    const biosampleColumns = useBiosamplesTableColumns()
+    const biosampleColumns = useBiosamplesTableColumns("profile")
     const { 
         searchResults: diseaseModels,
         setFilters: setDiseaseModelFilters,
         setSortBy: setDiseaseModelSortBy,
     } = useDiseaseModelSearchStore(useShallow(diseaseModelsSelector))
-    const diseaseModelColumns = useDiseaseModelsTableColumns()
+    const diseaseModelColumns = useDiseaseModelsTableColumns("profile")
     const { 
         searchResults: clinicalDatasets,
         setFilters: setClinicalDatasetFilters,
         setSortBy: setClinicalDatasetSortBy,
     } = useClinicalDatasetSearchStore(useShallow(clinicalDatasetsSelector))
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns("profile")
 
     if (section === 'biosamples') setBiosampleSortBy(searchParams?.sort)
     if (section === 'disease-models') setDiseaseModelSortBy(searchParams?.sort)
