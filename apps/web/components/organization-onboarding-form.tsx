@@ -78,7 +78,7 @@ export const newOrgFormSchema = z.object({
     country: z.string().optional(),
     lat: z.number().optional(),
     lng: z.number().optional(),
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
     metadata: z.string().optional()
 })
 
