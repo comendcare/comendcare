@@ -49,7 +49,10 @@ const editOrgFormSchema = z.object({
     }).max(60, {
         message: "Your organization's nickname must be a maximum of 50 characters."
     }),
-    contactEmail: z.string().email({message: "Please enter a valid email address."}),
+    contactEmail: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().email({ message: "Please enter a valid email address." }).optional()
+    ),
     founded: z.string().optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
     raised: z.number().optional(),
@@ -191,6 +194,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                         <Button
                             variant="ghost"
                             className="organization-profile-tour-step3"
+                            data-testid="header-edit-btn"
                         >
                             <Pencil/>
                         </Button>
@@ -217,7 +221,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                         </TooltipContent>
                     </Tooltip>
                 )}
-                <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
                     <DialogHeader>
                         <DialogTitle>Edit Organization Profile</DialogTitle>
                         <DialogDescription>{`Update your organization's details.`}</DialogDescription>
@@ -236,7 +240,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Organization Name</FormLabel>
-                                        <FormControl><Input {...field} /></FormControl>
+                                        <FormControl><Input {...field} data-testid="org-name-input" /></FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
@@ -286,7 +290,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                             <FormField
                                 control={editOrgForm.control}
                                 name="founded"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Year Founded</FormLabel>
                                         <Select
@@ -297,19 +301,25 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                             defaultValue={field.value?.split("-")[0]}
                                         >
                                             <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a year"/>
+                                                <SelectTrigger data-testid="founded-select-trigger">
+                                                    <SelectValue placeholder="Select a year" />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent>
+
+                                            {/* Radix renders this in a portal */}
+                                            <SelectContent data-testid="founded-select-content">
                                                 {years.map((year) => (
-                                                    <SelectItem key={year} value={year.toString()}>
+                                                    <SelectItem
+                                                        key={year}
+                                                        value={year.toString()}
+                                                        data-testid={`founded-option-${year}`}
+                                                    >
                                                         {year}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -384,7 +394,11 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
 
                             {/*<BiopharmaConsentSwitch organization={organization}/>*/}
 
-                            <Button type="submit" onClick={() => console.log("Save (Org tab) clicked")}>
+                            <Button
+                                type="submit"
+                                onClick={() => console.log("Save (Org tab) clicked")}
+                                data-testid="dialog-save-btn"
+                            >
                                 Save
                             </Button>
                         </form>

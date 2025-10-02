@@ -10,11 +10,12 @@ import { DataTableColumnHeader } from "./../data-table/data-table-column-header"
 import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
+import Link from "next/link";
 
 export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
     {
-        id: "organization",
+        id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "organization",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Organization"/>
@@ -26,28 +27,35 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                     name={row.original?.organization?.name}
                     className="size-8"
                 />
-                {row.original.organization?.name}
+                <Link
+                    href={
+                        process.env.NEXT_PUBLIC_VERCEL_ENV
+                            ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                            : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                    }
+                    className="underline"
+                >
+                    {row.original.organization?.name}
+                </Link>
             </div>
         ),
     },
     {
-        id: "id",
+        id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "id",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Tool ID"/>
+            <DataTableColumnHeader column={column} title="Dataset ID"/>
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
-                <p>{row.original.id || 'No Tool ID'}</p>
+                <p>{row.original.id || 'No Dataset ID'}</p>
             </div>
         ),
         enableHiding: true,
-        meta: {
-            label: "Tool ID"
-        }
+        meta: { label: "Dataset ID" }
     },
     {
-      id: "title",
+      id: "title.title", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
       accessorKey: "title",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Title" />
@@ -61,17 +69,17 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
       enableColumnFilter: true,
     },
     {
-        id: "types",
+        id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "types",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Type" />
         ),
         cell: ({ row }) => (
           <>
-            {(row.original.types || []).map((type: string) => {
+            {(row.original.types || []).map((type: string, index: number) => {
               const typeOption = TOOL_TYPE_OPTIONS.find(t => t.value === type)
               return (
-                <MilestoneTypeBadge label={typeOption?.label}/>
+                <MilestoneTypeBadge key={index} label={typeOption?.label}/>
               )
             })}
           </>
@@ -86,7 +94,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         },
     },
     {
-        id: "cohortSize",
+        id: "cohortSize", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "cohortSize",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Cohort Size"/>
@@ -104,7 +112,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "condition",
+        id: "condition.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "condition",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Condition"/>
@@ -120,7 +128,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "gene",
+        id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "gene",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Gene"/>
@@ -134,7 +142,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "institution",
+        id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "institution",
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Storage Facility"/>
@@ -170,6 +178,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
     {
@@ -182,6 +191,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 {row.original.description}
             </div>
         ),
+        enableSorting: false,
         enableHiding: true,
     },
   ]

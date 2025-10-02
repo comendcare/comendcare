@@ -119,18 +119,18 @@ export const RFPActionsMenu = ({rfp}: {rfp: RFP}) => {
                         )}
                     </Tooltip>
                 </TooltipProvider>
-                <DropdownMenuItem
-                    onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleDuplicate()
-                        setIsOpen(false)
-                    }}
-                    className="h-full justify-start"
-                >
-                    <Copy />
-                    Duplicate
-                </DropdownMenuItem>
+                {/*<DropdownMenuItem*/}
+                {/*    onClick={(e) => {*/}
+                {/*        e.preventDefault()*/}
+                {/*        e.stopPropagation()*/}
+                {/*        handleDuplicate()*/}
+                {/*        setIsOpen(false)*/}
+                {/*    }}*/}
+                {/*    className="h-full justify-start"*/}
+                {/*>*/}
+                {/*    <Copy />*/}
+                {/*    Duplicate*/}
+                {/*</DropdownMenuItem>*/}
                 <DropdownMenuItem
                     onClick={(e) => {
                         e.preventDefault()

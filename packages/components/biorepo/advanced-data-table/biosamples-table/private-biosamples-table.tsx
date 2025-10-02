@@ -13,10 +13,10 @@ import {useFeatureFlags} from "../lib/feature-flags-provider";
 import {Tool} from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
+import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useState } from "react";
-import { Input } from "./../../../ui/input";
+import { Dialog, DialogPortal } from "./../../../ui/dialog";
 
 const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
     // normalize search term
@@ -37,6 +37,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
     onSelectionChange?: (selectedRows: Tool[]) => void,
     searchParams: SearchParams
 }) {
+    const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
@@ -59,6 +60,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         const selected = table.getSelectedRowModel().rows.map((row: Row<any>) => row.original);
         onSelectionChange(selected);
     }, [table.getSelectedRowModel().rows, onSelectionChange])
+    
 
     return (
         <>
@@ -85,6 +87,9 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     )
                     : undefined
                 }
+                onRowClickCallback={(e: any, row: Row<any> | undefined) => 
+                    setEditingTool(row?.original)
+                }
             >
                 {enableAdvancedFilter ? (
                     <DataTableAdvancedToolbar table={table}>
@@ -100,6 +105,22 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     <DataTableToolbar table={table} enableSearch={true}/>
                 )}
             </DataTable>
+
+            <Dialog 
+                open={!!editingTool}
+                onOpenChange={(open) => !open && setEditingTool(undefined)}
+            >
+                <DialogPortal>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <EditAssetDialog
+                            key={editingTool?.id}
+                            data={editingTool} 
+                            type={'biosample'}
+                            closeDialog={() => {setEditingTool(undefined)}}
+                        />
+                    </div>
+                </DialogPortal>
+            </Dialog>
         </>
     );
 }

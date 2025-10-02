@@ -11,8 +11,10 @@ import { useFeatureFlags } from "../lib/feature-flags-provider";
 import { Tool } from "@prisma/client";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
+import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { useState } from "react";
+import { Dialog, DialogPortal } from "./../../../ui/dialog";
 
 export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChange, searchParams}: {
   data: Tool[], 
@@ -21,6 +23,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChan
   onSelectionChange?: (selectedRows: Tool[]) => void, 
   searchParams: SearchParams
 }) {
+  const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
   const { table, shallow, debounceMs, throttleMs } = useDataTable({
     data,
@@ -68,6 +71,9 @@ export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChan
             )
             : undefined
         }
+        onRowClickCallback={(e: any, row: Row<any> | undefined) => 
+            setEditingTool(row?.original)
+        }
       >
         {enableAdvancedFilter ? (
           <DataTableAdvancedToolbar table={table}>
@@ -83,6 +89,22 @@ export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChan
           <DataTableToolbar table={table} enableSearch={true}/>
         )}
       </DataTable>
+
+      <Dialog 
+          open={!!editingTool}
+          onOpenChange={(open) => !open && setEditingTool(undefined)}
+      >
+          <DialogPortal>
+              <div onClick={(e) => e.stopPropagation()}>
+                  <EditAssetDialog
+                      key={editingTool?.id}
+                      data={editingTool} 
+                      type={'data'}
+                      closeDialog={() => {setEditingTool(undefined)}}
+                  />
+              </div>
+          </DialogPortal>
+      </Dialog>
     </>
   );
 }

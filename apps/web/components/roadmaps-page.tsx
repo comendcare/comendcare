@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
+
 import { Organization, Roadmap } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
 import Loading from "@/loading";
@@ -7,20 +8,21 @@ import { initializeRoadmapState } from "@comend/lib/initialize-client-state";
 import { useRouter } from "next/navigation";
 import { RoadmapsTable } from "./public-roadmap-card";
 import { Button } from "@comend/components/ui/button";
-import { Ellipsis, Share } from "lucide-react";
+import { Share } from "lucide-react";
 import { Dialog, DialogContent } from "@comend/components/ui/dialog";
 import ShareDialog from "./share-dialog";
-import { getOrganizationFromOrganizationId, getRoadmaps } from "@comend/lib/fetchers";
-import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
-export default function RoadmapsPage({orgId}: {orgId: string}) {
+type Props = {
+    orgId: string;
+    organization: Pick<Organization, "id" | "name" | "subdomain" | "customDomain" | "public" | "verified" | "published" | "image">;
+    roadmaps: Array<Pick<Roadmap, "id" | "title" | "description" | "slug" | "image" | "createdAt" | "updatedAt" | "published" | "organizationId" | "userId">>;
+};
+
+export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
     const router = useRouter()
-    const {data: session, status} = useSession()
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
-    const [organization, setOrganization] = useState<Organization | {}>({})
-    const [roadmaps, setRoadmaps] = useState<Roadmap[]>([])
 
     useEffect(() => {
         // un-initialize any active research plans
@@ -35,105 +37,6 @@ export default function RoadmapsPage({orgId}: {orgId: string}) {
         })
     }, [])
 
-    useEffect(() => {
-        async function fetchOrgData() {
-            if (session?.user.organizationId) {
-                try {
-                    const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                        id: true,
-                        public: true,
-                        verified: true,
-                        published: true,
-                        name: true,
-                        description: true,
-                        contactEmail: true,
-                        logo: true,
-                        image: true,
-                        headerImage: true,
-                        biopharmaConsentSettings: true,
-                        subdomain: true,
-                        customDomain: true,
-                        statedGoal: true,
-                        yearFounded: true,
-                        incorporationStatus: true,
-                        therapeuticsOfInterest: true,
-                        therapeuticsInDevelopment: true,
-                        website: true,
-                        moneyRaised: true,
-                        moneyDeployed: true,
-                        researchBudget: true,
-                        // address1                  String?
-                        // address2                  String?
-                        // formattedAddress          String?
-                        // city                      String?
-                        // region                    String?
-                        // postalCode                String?
-                        // country                   String?
-                        // lat                       String?
-                        // lng                       String?
-                        createdAt: true,
-                        updatedAt: true,
-                        user: true,
-                        userId: true,
-                        roadmaps: true,
-                        members: true,
-                        clients: true,
-                        invitations: true,
-                        membershipRequests: true,
-                        conditions: true,
-                        kanban: true,
-                        milestones: true,
-                        platformNotifications: true,
-                        reviews: true,
-                        savedCompanies: true,
-                        tools: true,
-                        rfps: true,
-                        metadata: true
-                    })
-
-                    // Map the response to the correct structure if needed
-                    if (response.success && response.data) {
-                        setOrganization(response.data);
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-
-                    const roadmapsResponse = await getRoadmaps(session.user.organizationId, {
-                        id: true,
-                        title: true,
-                        description: true,
-                        content: true,
-                        slug: true,
-                        image: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        published: true,
-                        organizationId: true,
-                        userId: true,
-                        edges: true,
-                        milestones: true,
-                        nodes: true,
-                        organization: true,
-                        user: true,
-                        modalities: true,
-                        metadata: true,
-                    })
-                    if (roadmapsResponse.success && roadmapsResponse.data) {
-                        setRoadmaps(roadmapsResponse.data)
-                    }
-
-                } catch (error) {
-                    console.error("Error fetching organizations:", error);
-                    toast.error("Couldn't get organizations");
-                }
-                setIsLoading(false)
-            }
-        }
-
-        fetchOrgData()
-    }, [session])
-
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
         setShareIsOpen(true)
@@ -146,18 +49,18 @@ export default function RoadmapsPage({orgId}: {orgId: string}) {
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
             <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
-                    <h2 className="col-span-full font-semibold text-2xl">Research Plans</h2>
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleShare()
-                            }}
-                            variant={'secondary'}
-                            className="onborda-share-research-plan"
-                        >
-                            <Share />
-                            Share
-                        </Button>
+                    <h2 className="col-span-full font-semibold text-2xl">My Research Plans</h2>
+                    <Button
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleShare()
+                        }}
+                        variant={'secondary'}
+                        className="onborda-share-research-plan"
+                    >
+                        <Share />
+                        Share
+                    </Button>
                 </div>
                 {/* {roadmaps.length > 0 && ( */}
                     <RoadmapsTable 

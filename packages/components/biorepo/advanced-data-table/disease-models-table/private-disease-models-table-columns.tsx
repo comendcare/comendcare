@@ -17,35 +17,12 @@ import {
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {useSession} from "next-auth/react";
-import { getMilestones } from "./../../../../../packages/lib/fetchers";
-import { Option } from "./../../../../../packages/lib/types";
 import { Checkbox } from "./../../../ui/checkbox";
+import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
     // const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
-
-    const handleAsyncMilestoneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []
-
-        try {
-            // const response = await fetch(`/api/institutions?search=${query}`);
-            // const data = await response.json();
-            const response = await getMilestones(session?.user.organizationId)
-
-            if (response.success && response.data) {
-                return response.data.map((project: Milestone) => ({label: project.title, value: project.title}))
-            } else {
-                return []
-            }
-
-            // Return the fetched options
-            // return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    }
 
     // useEffect(() => {
     //     const init = async () => {
@@ -73,12 +50,18 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                    className="translate-y-[2px]"
-                />
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent row onClick from firing
+                    }}
+                >
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                        className="translate-y-[2px]"
+                    />
+                </div>
             ),
             enableSorting: false,
             enableHiding: false,
@@ -129,16 +112,16 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "id",
             accessorKey: "id",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
+                <DataTableColumnHeader column={column} title="Model ID"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                    <p>{row.original.id || 'No Model ID'}</p>
                 </div>
             ),
             enableHiding: true,
             meta: {
-                label: "Sample ID"
+                label: "Model ID"
             }
         },
         {
@@ -166,20 +149,20 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             },
         },
-        // {
-        //     id: "strain",
-        //     accessorKey: "strain",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Strain"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Strain"
-        //     }
-        // },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "strain",
+            accessorKey: "strain",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Strain"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Strain"
+            }
+        },
+        {
+            id: "gene.symbol",
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -187,21 +170,26 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Gene"
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
             }
         },
-        // {
-        //     id: "genotype",
-        //     accessorKey: "genotype",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Genotype"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Genotype",
-        //     }
-        // },
+        {
+            id: "genotype",
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
         // {
         //     id: "phenotype",
         //     accessorKey: "phenotype",
@@ -237,8 +225,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name",
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -255,8 +243,13 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
+            enableColumnFilter: true,
             meta: {
-                label: "Storage Facility"
+                label: "Storage Facility",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncInstitutionSearch
             }
         },
         {
@@ -274,6 +267,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Point of Contact"
@@ -294,6 +288,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             meta: {
                 label: "Links"
@@ -331,6 +326,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -338,7 +334,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncMilestoneSearch
+                onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
             }
         },
         {
@@ -358,10 +354,24 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
         },
         {
-            id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'diseaseModel'}/>,
-            enableHiding: false,
+            id: "notes",
+            accessorKey: "notes",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Internal Notes"/>
+            ),
+            cell: ({row}) => (
+                <div className="line-clamp-3">
+                    {row.original.notes}
+                </div>
+            ),
+            meta: { label: "Internal Notes" },
+            enableHiding: true,
         },
+        // {
+        //     id: "actions",
+        //     cell: ({row}) => <AssetActionsMenu tool={row.original} type={'diseaseModel'}/>,
+        //     enableHiding: false,
+        // },
     ]
 
     return columns

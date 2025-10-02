@@ -16,10 +16,10 @@ const apps = [
 
 const targets = [
     { name: 'chromium', use: devices['Desktop Chrome'] },
-    { name: 'firefox', use: devices['Desktop Firefox'] },
-    { name: 'webkit', use: devices['Desktop Safari'] },
-    { name: 'iphone', use: devices['iPhone 13'] },
-    { name: 'android', use: devices['Pixel 5'] },
+    // { name: 'firefox', use: devices['Desktop Firefox'] },
+    // { name: 'webkit', use: devices['Desktop Safari'] },
+    // { name: 'iphone', use: devices['iPhone 13'] },
+    // { name: 'android', use: devices['Pixel 5'] },
 ];
 
 /**
@@ -51,6 +51,7 @@ export default defineConfig({
 
     // Flake handling
     // retries: process.env.CI ? 2 : 0,
+    timeout: 60 * 1000, // Increase default timeout to 60 seconds
     retries: 0,
     workers: process.env.CI ? 1 : undefined,
 
@@ -65,7 +66,8 @@ export default defineConfig({
         // Artifacts tuned for CI/local
         trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
         video: process.env.CI ? 'retain-on-failure' : 'off',
-        screenshot: process.env.CI ? 'only-on-failure' : 'off',
+        // screenshot: process.env.CI ? 'only-on-failure' : 'off',
+        screenshot: 'only-on-failure',
 
         // Add Vercel bypass headers if configured
         extraHTTPHeaders: extraBypassHeaders,

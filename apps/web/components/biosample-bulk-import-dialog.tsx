@@ -67,6 +67,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         medications: biosample['Donor Medications']?.split(",") || [],
         treatments: biosample['Donor Medical Treatments']?.split(",") || [],
         priceUnit: 'usd',
+        genotype: biosample['Genotype'] || undefined,
         isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true
     }
     return data
@@ -110,6 +111,7 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Donor BMI', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Medications', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Medical Treatments', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Genotype', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Visibility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                     ]
                 )

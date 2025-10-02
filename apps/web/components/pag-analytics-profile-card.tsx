@@ -1,15 +1,12 @@
-"use client"
-
 import {Users, UserCircle, CircleDollarSign, Earth, ExternalLink} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
 import { Prisma } from "@prisma/client";
 import {formatMoney, formatNumberWithCommas} from "@/packages/lib/utils";
-import {Button} from "@comend/components/ui/button";
-import {useRouter} from "next/navigation";
+import {Button, buttonVariants} from "@comend/components/ui/button";
 import {OrganizationForAnalytics} from "@/packages/lib/types";
+import Link from "next/link";
 
 export default function PAGAnalyticsProfileCard({organization}: { organization: OrganizationForAnalytics }) {
-    const router = useRouter();
 
     return (
         <Card className="col-span-3 flex flex-col">
@@ -29,14 +26,16 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                             <span className="text-sm font-medium">
                                 Members
                             </span>
-                            <Button
-                                onClick={() => router.push("/app/settings?tab=members")}
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
+                            <Link
+                                href={"/app/team"}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
                             >
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                            </Button>
+                            </Link>
                         </div>
                         <div className="text-lg font-bold">
                             {organization.members.length}
@@ -50,14 +49,16 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                             <span className="text-sm font-medium">
                                 Patients engaged
                             </span>
-                            <Button
-                                onClick={() => router.push("/app/profile")}
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
+                            <Link
+                                href={"/app/profile"}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
                             >
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                            </Button>
+                            </Link>
                         </div>
                         <div className="text-lg font-bold">
                             {organization.conditions?.[0]?.condition?.numberOfPatientsEngaged
@@ -73,14 +74,16 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                             <span className="text-sm font-medium">
                                 Research budget
                             </span>
-                            <Button
-                                onClick={() => router.push("/app/profile")}
-                                variant="ghost"
-                                size="icon"
-                                className="p-0 h-auto w-auto"
+                            <Link
+                                href={"/app/profile"}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
                             >
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                            </Button>
+                            </Link>
                         </div>
                         <div className="text-lg font-bold">
                             {`$${formatMoney(organization.researchBudget)}`}

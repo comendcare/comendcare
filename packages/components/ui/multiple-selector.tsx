@@ -26,6 +26,8 @@ interface GroupOption {
     [key: string]: Option[];
 }
 
+type InputExtraData = { [key: `data-${string}`]: string }; // allow any data-* attribute
+
 interface MultipleSelectorProps {
     value?: Option[];
     defaultOptions?: Option[];
@@ -78,7 +80,7 @@ interface MultipleSelectorProps {
     inputProps?: Omit<
         React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>,
         'value' | 'placeholder' | 'disabled'
-    >;
+    > & InputExtraData;
     /** hide the clear all button. */
     hideClearAllButton?: boolean;
     showHoverCard?: boolean;
@@ -436,6 +438,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         //     return undefined;
         // }, [creatable, commandProps?.filter]);
 
+        const autoId = React.useId();
+        const listboxId = React.useId();
+
         return (
             <Command
                 ref={dropdownRef}
@@ -522,7 +527,11 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         {/* Avoid having the "Search" Icon */}
                         <CommandPrimitive.Input
                             {...inputProps}
+                            id={inputProps?.id ?? autoId}
                             ref={inputRef}
+                            role="combobox"
+                            aria-expanded={open ? "true" : "false"}
+                            aria-controls={listboxId}
                             value={inputValue}
                             disabled={maxSelected ? disabled || selected.length >= maxSelected : disabled}
                             onValueChange={(value) => {
@@ -588,7 +597,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 </div>
                 <div className="relative">
                     {open && (
-                        <CommandList>
+                        <CommandList id={listboxId} role="listbox">
                             {open && (
                                 <div
                                     className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">

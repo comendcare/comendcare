@@ -16,57 +16,14 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import { Badge } from "./../../../ui/badge";
 import { Option } from "./../../../../../packages/lib/types";
+import Link from "next/link";
+import { handleGetAvailability } from "./../../../../../packages/lib/utils";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
-
-    const handleGetAvailability = (sample: any): {value: string, variant: 'green' | 'yellow' | 'red'} | undefined => {
-        if (sample?.quantity !== null) {
-            if (sample.quantity > 0) {
-                if (sample?.materialAndDataAccessRequests?.length > 0) {
-                    return {value: 'Reserved', variant: 'yellow'}
-                }
-                return {value: 'Available', variant: 'green'}
-            }
-            if (sample.quantity <= 0) return {value: 'Depleted', variant: 'red'}
-        }
-
-        return undefined
-    }
-
-    const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        try {
-            const response = await fetch(`/api/institutions?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
-        } catch (error) {
-            console.error("Failed to fetch institutions:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
     const columns: ColumnDef<any>[] = [
         {
-            id: "organization",
-            accessorKey: "organization",
+            id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "organization.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Organization"/>
             ),
@@ -77,29 +34,22 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                         name={row.original?.organization?.name}
                         className="size-8"
                     />
-                    {row.original.organization?.name}
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                        }
+                        className="underline"
+                    >
+                        {row.original.organization?.name}
+                    </Link>
                 </div>
             ),
         },
         {
-            id: "id",
-            accessorKey: "id",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: {
-                label: "Sample ID"
-            }
-        },
-        {
-            id: "donorId",
-            accessorKey: "donorId",
+            id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "donor.id",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Public Donor ID"/>
             ),
@@ -110,12 +60,24 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: {
-                label: "Public Donor ID"
-            }
+            meta: { label: "Public Donor ID" }
         },
         {
-            id: "types",
+            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: { label: "Sample ID" }
+        },
+        {
+            id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Type"/>
@@ -131,16 +93,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Type",
-                variant: "multiSelect",
-                options: BIOSAMPLE_TYPE_OPTIONS,
-                icon: CircleDashed,
-            },
+            meta: { label: "Type" }
         },
         {
-            id: "condition",
+            id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "condition",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Condition"/>
@@ -151,13 +107,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: {
-                label: "Condition"
-            }
+            meta: { label: "Condition" }
         },
         {
-            id: "gene",
-            accessorKey: "gene",
+            id: "gene.symbol", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "gene.symbol",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
             ),
@@ -165,20 +119,24 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
-            enableColumnFilter: true,
+            meta: { label: "Gene" }
+        },
+        {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
             meta: {
-                label: "Gene",
-                variant: "select",
-                icon: CircleDashed,
-                showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncGeneSearch
+                label: "Genotype"
             }
         },
         {
-            id: "availability",
+            id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "availability",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability"/>
+                <DataTableColumnHeader column={column} title="Availability Status"/>
             ),
             cell: ({row}) => {
                 const availability = handleGetAvailability(row.original)
@@ -188,19 +146,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Availability",
-                variant: "select",
-                options: AVAILABILITY_OPTIONS,
-                icon: CircleDashed,
-                showInAdvancedOnly: true
-            }
+            meta: { label: "Availability Status" }
         },
         {
-            // NOTE: in order for filters to access the proper nested database object the path to
-            // the nested object must be defined in BOTH the id & accessorKey
-            id: "quantity",
+            id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "quantity",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Available Quantity"/>
@@ -215,17 +164,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </>
             ),
             enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Available Quantity",
-                variant: "range",
-                range: [0, 1000],
-                unit: 'ml',
-            },
+            meta: { label: "Available Quantity" }
         },
         {
-            id: "institution",
-            accessorKey: "institution",
+            id: "institution.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
             ),
@@ -233,14 +176,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Storage Facility",
-                variant: "select",
-                icon: CircleDashed,
-                showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncInstitutionSearch
-            }
+            meta: { label: "Storage Facility" }
         },
         {
             id: "links",
@@ -257,27 +193,26 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
-            meta: {
-                label: "Links"
-            }
+            meta: { label: "Links" }
         },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Other Notes"/>
-            ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
-            meta: {
-                label: "Other Notes"
-            },
-            enableHiding: true,
-        },
+        // {
+        //     id: "description",
+        //     accessorKey: "description",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Other Notes"/>
+        //     ),
+        //     cell: ({row}) => (
+        //         <div className="line-clamp-3">
+        //             {row.original.description}
+        //         </div>
+        //     ),
+        //     meta: {
+        //         label: "Other Notes"
+        //     },
+        //     enableHiding: true,
+        // },
     ]
 
     return columns

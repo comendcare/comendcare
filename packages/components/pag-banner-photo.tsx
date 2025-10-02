@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 
 export function PAGBannerPhoto({
@@ -9,9 +7,9 @@ export function PAGBannerPhoto({
 }) {
     return (
         img ? (
-            <img className={"w-full object-cover"} src={img || ""} alt=""/>
+            <img className={"w-full object-cover"} src={img || ""} alt="" data-testid="banner-img"/>
         ) : (
-            <div className={"h-32 w-full object-cover lg:h-48 bg-secondary"}></div>
+            <div className={"h-32 w-full object-cover lg:h-48 bg-secondary"} data-testid="banner-img"></div>
         )
     )
 }

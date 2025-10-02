@@ -14,15 +14,16 @@ import Link from "next/link";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@comend/components/ui/skeleton";
+import {MembershipWithOrganization} from "@/packages/lib/types";
 
-export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
-    console.log("memberships again again: ", memberships)
+export function OrganizationSwitcher({memberships}: { memberships: MembershipWithOrganization[] }) {
     const {data: session, update} = useSession();
     const activeId = session?.user?.organizationId ?? null;
     const router = useRouter();
     const {isMobile} = useSidebar();
 
-    const handleSelect = async (orgId: string) => {
+    const handleSelect = async (orgId: string | undefined) => {
+        if (!orgId) return
         const res = await switchOrganization(orgId);
         if (!res.success) {
             toast.error(res.error ?? "Could not switch organization");
@@ -33,8 +34,6 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
     };
 
     const activeOrg = memberships.find(m => m.organizationId === activeId) ?? null;
-    console.log("activeId: ", activeId)
-    console.log("activeOrg: ", activeOrg)
 
     if (activeOrg) {
         return (
@@ -50,15 +49,15 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
                                     {activeOrg && (
                                         <ProfilePhoto
                                             img={activeOrg?.organization?.image}
-                                            name={activeOrg?.organization?.name}
+                                            name={activeOrg?.organization?.name ?? "No Name"}
                                             className="size-6"
                                         />
                                     )}
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {activeOrg ? activeOrg.organization.name : "Select an organization"}
-                </span>
+                                    <div className="truncate font-semibold">
+                                        {activeOrg?.organization?.name ?? "No name organization"}
+                                    </div>
                                 </div>
                                 <ChevronsUpDown className="ml-auto"/>
                             </SidebarMenuButton>
@@ -84,11 +83,11 @@ export function OrganizationSwitcher({memberships}: { memberships: any[] }) {
                                         <div className="flex size-6 items-center justify-center">
                                             <ProfilePhoto
                                                 img={m?.organization?.image}
-                                                name={m?.organization?.name}
+                                                name={m?.organization?.name ?? "No name organization"}
                                                 className="size-4 shrink-0"
                                             />
                                         </div>
-                                        {m.organization.name}
+                                        {m.organization?.name ?? "No name organization"}
                                         {activeId === m.organizationId && <Check className="ml-auto opacity-100"/>}
                                     </DropdownMenuItem>
                                 ))}

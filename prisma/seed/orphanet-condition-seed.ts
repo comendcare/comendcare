@@ -6,7 +6,7 @@ async function main() {
     console.log("Starting condition seed script...");
 
     // Load the JSON data
-    const data = JSON.parse(await fs.readFile("data/orphanet-conditions.json", "utf-8"));
+    const data = JSON.parse(await fs.readFile("./packages/data/orphanet-conditions.json", "utf-8"));
 
     console.log(`Total conditions to process: ${data.length}`);
 

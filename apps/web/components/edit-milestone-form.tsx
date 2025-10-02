@@ -564,20 +564,11 @@ export function EditMilestoneForm({
                                     <TabsTrigger
                                         className="relative data-[state=active]:bg-secondary"
                                         value="recommendations"
-                                        style={
-                                            (recommendations && recommendations.length > 0 && !recommendationsViewed ? (
-                                                {
-                                                    // "--pulse-color": "#0096ff",
-                                                    "--pulse-color": "#dcebfe", // light blue
-                                                    "--duration": "1.5s",
-                                                } as React.CSSProperties
-                                            ): {})
-                                        }
                                     >
                                         <div className="relative z-10 flex gap-2 items-center">
                                             Relevant vendors
                                         </div>
-                                        <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit")} />
+                                        <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 rounded-lg bg-inherit")} />
                                         {/* {
                                             // notifications &&
                                             // notifications
@@ -993,7 +984,7 @@ export function EditMilestoneForm({
                                             <>
                                                 {/* <FormLabel>Additional Properties</FormLabel> */}
                                                 <span className="flex flex-wrap gap-2">
-                                                    {!hasBudget && (
+                                                    {(!hasBudget) && (
                                                         <Button 
                                                             onClick={() => setHasBudget(true)}
                                                             variant={'secondary'}
@@ -1002,7 +993,7 @@ export function EditMilestoneForm({
                                                             {'+ Add Budget'}
                                                         </Button>
                                                     )}
-                                                    {!hasStartDate && (
+                                                    {(!hasStartDate) && (
                                                         <Button 
                                                             onClick={() => setHasStartDate(true)}
                                                             variant={'secondary'}
@@ -1011,7 +1002,7 @@ export function EditMilestoneForm({
                                                             {'+ Add Start Date'}
                                                         </Button>
                                                     )}
-                                                    {!hasEndDate && (
+                                                    {(!hasEndDate) && (
                                                         <Button 
                                                             onClick={() => setHasEndDate(true)}
                                                             variant={'secondary'}
@@ -1020,7 +1011,7 @@ export function EditMilestoneForm({
                                                             {'+ Add End Date'}
                                                         </Button>
                                                     )}
-                                                    {!formData?.contacts || formData?.contacts.length <= 0 && (
+                                                    {(!formData?.contacts || formData?.contacts.length <= 0) && (
                                                         <Button 
                                                             onClick={() => {
                                                                 form.setValue("contacts", [
@@ -1033,7 +1024,7 @@ export function EditMilestoneForm({
                                                             {'+ Add Contacts'}
                                                         </Button>
                                                     )}
-                                                    {!formData?.attachments || formData?.attachments.length <= 0 && (
+                                                    {(!formData?.attachments || formData?.attachments.length <= 0) && (
                                                         <Button 
                                                             onClick={() => {
                                                                 form.setValue("attachments", [

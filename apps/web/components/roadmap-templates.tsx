@@ -261,7 +261,11 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
     orgId: string,
     setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
-    const [isHidden, setIsHidden] = useState(window.functionalConsentedLocalStorage?.get('isHidden') ? true : false)
+    const [isHidden, setIsHidden] = useState<boolean>(() =>
+        typeof window !== 'undefined'
+            ? !!window.functionalConsentedLocalStorage?.get('isHidden')
+            : false
+    );
 
     useEffect(() => {
         // after first visit, templates are hidden by default

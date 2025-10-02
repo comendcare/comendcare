@@ -7,11 +7,12 @@ import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
 import {DISEASE_MODEL_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
+import Link from "next/link";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
         {
-            id: "organization",
+            id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Organization"/>
@@ -23,28 +24,35 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                         name={row.original?.organization?.name}
                         className="size-8"
                     />
-                    {row.original.organization?.name}
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                        }
+                        className="underline"
+                    >
+                        {row.original.organization?.name}
+                    </Link>
                 </div>
             ),
         },
         {
-            id: "id",
+            id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
+                <DataTableColumnHeader column={column} title="Model ID"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                    <p>{row.original.id || 'No Model ID'}</p>
                 </div>
             ),
             enableHiding: true,
-            meta: {
-                label: "Sample ID"
-            }
+            meta: { label: "Model ID" }
         },
         {
-            id: "types",
+            id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Type"/>
@@ -69,7 +77,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "condition",
+            id: "condition.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "condition",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Condition"/>
@@ -80,12 +88,21 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
+            meta: { label: "Condition" }
+        },
+        {
+            id: "strain.strain", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "strain",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Strain"/>
+            ),
+            enableHiding: true,
             meta: {
-                label: "Condition"
+                label: "Strain"
             }
         },
         {
-            id: "gene",
+            id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "gene",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Gene"/>
@@ -94,12 +111,21 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <>{row.original.gene?.symbol}</>
             ),
             enableHiding: true,
+            meta: { label: "Gene" }
+        },
+        {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
             meta: {
-                label: "Gene"
+                label: "Genotype"
             }
         },
         {
-            id: "institution",
+            id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "institution",
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Storage Facility"/>
@@ -108,9 +134,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding: true,
-            meta: {
-                label: "Storage Facility"
-            }
+            meta: { label: "Storage Facility" }
         },
         {
             id: "links",
@@ -127,10 +151,9 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     ))}
                 </ul>
             ),
+            enableSorting: false,
             enableHiding: true,
-            meta: {
-                label: "Links"
-            }
+            meta: { label: "Links" }
         },
         {
             id: "description",
@@ -143,10 +166,9 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     {row.original.description}
                 </div>
             ),
-            meta: {
-                label: "Description"
-            },
+            enableSorting: false,
             enableHiding: true,
+            meta: { label: "Description" }
         },
     ]
 

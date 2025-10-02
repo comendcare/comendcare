@@ -3,6 +3,7 @@
 import prisma from "./prisma"
 import {
     ApiResponse,
+    DISEASE_MODEL_TYPE_OPTIONS,
     GLOBAL_FEED_TYPES,
     milestoneCategories,
     RequestFiltersType,
@@ -2314,20 +2315,30 @@ export const getDiseaseModels = withOrganizationAuth(
 
             // add global filter
             if (input.q) {
+                // custom filtering for types - if any of the type labels include the query, include biosamples
+                // with these types
+                const queriedTypes = DISEASE_MODEL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
                 where.OR = [
                     { id: { contains: input.q, mode: "insensitive" } },
                     { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                     { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                     { description: {contains: input.q, mode: "insensitive"}},
+                    { genotype: {contains: input.q, mode: "insensitive"}},
+                    { strain: {contains: input.q, mode: "insensitive"}},
                     // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
                 ];
+
+                if (queriedTypes) {
+                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                }
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const [data, total] = await prisma.$transaction([
                 prisma.diseaseModel.findMany({
@@ -2357,6 +2368,15 @@ export const getDiseaseModels = withOrganizationAuth(
         }
     }
 )
+
+function prismaOrderByFromColumnId(id: string, desc: boolean): any {
+    const parts = id.split(".")
+
+    // build nested object dynamically
+    return parts.reduceRight((acc, key) => {
+        return { [key]: Object.keys(acc).length ? acc : (desc ? "desc" : "asc") }
+    }, {})
+}
 
 export const getBiosamples = withOrganizationAuth(
     async (organization: Organization, input?: GetBiosamplesSchema): Promise<{
@@ -2461,10 +2481,15 @@ export const getBiosamples = withOrganizationAuth(
 
             // add global filter
             if (input.q) {
+                // custom filtering for types - if any of the type labels include the query, include biosamples
+                // with these types
+                const queriedTypes = BIOSAMPLE_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
                 where.OR = [
                     { id: { contains: input.q, mode: "insensitive" } },
                     { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                     { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                    { genotype: {contains: input.q, mode: "insensitive"}},
                     // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2482,11 +2507,15 @@ export const getBiosamples = withOrganizationAuth(
                         },
                     },
                 ];
+
+                if (queriedTypes) {
+                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                }
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const [data, total] = await prisma.$transaction([
                 prisma.biosample.findMany({
@@ -2613,10 +2642,8 @@ export const getAllBiosamples = withResearcherAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({
-                    [s.id]: s.desc ? "desc" : "asc",
-                }))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
 
@@ -2747,6 +2774,10 @@ export const getDatasamples = withOrganizationAuth(
 
             // add global filter
             if (input.q) {
+                // custom filtering for types - if any of the type labels include the query, include biosamples
+                // with these types
+                const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
                 where.OR = [
                     { id: { contains: input.q, mode: "insensitive" } },
                     { title: {contains: input.q, mode: "insensitive"}},
@@ -2757,11 +2788,15 @@ export const getDatasamples = withOrganizationAuth(
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
                 ];
+
+                if (queriedTypes) {
+                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                }
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map((s) => ({[s.id]: s.desc ? "desc" : "asc"}))
-                : [{createdAt: "asc"}];
+                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                : [{ createdAt: { sort: "asc" } }];
 
             const [data, total] = await prisma.$transaction([
                 prisma.tool.findMany({

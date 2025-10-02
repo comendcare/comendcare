@@ -21,6 +21,12 @@ import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import {Mail, Share} from "lucide-react";
 import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
+import { SearchParams } from "@/packages/components/types";
+
+interface IndexPageProps {
+    params: {domain: string},
+    searchParams: Promise<SearchParams>
+}
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -47,12 +53,9 @@ export async function generateStaticParams() {
     return allPaths
 }
 
-export default async function OrganizationHomePage({
-                                                       params
-                                                   }: {
-    params: { domain: string }
-}) {
-    const domain = decodeURIComponent(params.domain)
+export default async function OrganizationHomePage(props: IndexPageProps) {
+    const searchParams = await props.searchParams
+    const domain = decodeURIComponent(props.params.domain)
     const [organization, roadmaps, toolCounts, rfps] = await Promise.all([
         getOrganizationData(domain, {
             id: true,
@@ -195,14 +198,14 @@ export default async function OrganizationHomePage({
                     <div className="w-full grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard
-                                    organization={organization as any}
-                                    editable={false}
-                                />
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
                                     showEditDialog={false}
+                                />
+                                <PagProfileAboutCard
+                                    organization={organization as any}
+                                    editable={false}
                                 />
                             </div>
                         </div>
@@ -220,7 +223,7 @@ export default async function OrganizationHomePage({
                                 toolCounts.diseaseModelCount > 0 || 
                                 toolCounts.clinicalDatasetCount > 0
                             ) && 
-                                <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts}/>
+                                <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
                             }
                             <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>

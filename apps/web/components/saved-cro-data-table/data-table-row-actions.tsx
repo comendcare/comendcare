@@ -48,7 +48,7 @@ const formSchema = z.object({
 type SaveCROFormData = z.infer<typeof formSchema>;
 
 const engagementOptions = [
-    {id: "EXPLORING", label: "Exploring (Shortlist)"},
+    {id: "EXPLORING", label: "Exploring (Saved)"},
     {id: "QUOTE", label: "Needs a Quote"},
     {id: "COLLABORATING", label: "Currently Collaborating"},
     {id: "COLLABORATED", label: "Previously Worked With"},
@@ -258,7 +258,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                     />
 
                     <Button type="submit" disabled={isSubmitting} className="w-full">
-                        {isSubmitting ? "Shortlisting..." : "Shortlist Company"}
+                        {isSubmitting ? "Saving..." : "Save Company"}
                     </Button>
                 </form>
             </Form>

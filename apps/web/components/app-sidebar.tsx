@@ -65,7 +65,7 @@ const data = {
         //     title: "Shortlist",
         //     icon: Bookmark,
         //     variant: "ghost",
-        //     url: "/app/shortlist/service-providers"
+        //     url: "/app/saved/service-providers"
         // },
         {
             title: "Research Planner",
@@ -150,11 +150,11 @@ const data = {
             url: "/app/marketplace",
             match: (path: string) => path.startsWith('/app/marketplace'),
             subPages: [{
-                title: "Shortlist",
+                title: "Saved",
                 icon: Bookmark,
                 variant: "ghost",
-                match: (path: string) => path.startsWith('/app/shortlist'),
-                url: "/app/shortlist/service-providers"
+                match: (path: string) => path.startsWith('/app/saved'),
+                url: "/app/saved/service-providers"
             }]
 
             // subPages: [
@@ -199,7 +199,6 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function AppSidebar({memberships}: { memberships: MembershipWithOrganization[] }) {
-    console.log("memberships again: ", memberships)
     const {data: session, status} = useSession()
     const {startOnborda} = useOnborda()
     const pathname = usePathname()

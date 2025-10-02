@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, {useEffect} from "react"
 import ReactCrop, {
     centerCrop,
     convertToPixelCrop,
@@ -9,13 +9,13 @@ import ReactCrop, {
     type PixelCrop,
 } from "react-image-crop"
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Button } from "./ui/button"
+import {Avatar, AvatarFallback, AvatarImage} from "./ui/avatar"
+import {Button} from "./ui/button"
 
 import "react-image-crop/dist/ReactCrop.css"
-import { CropIcon, Image, Pencil, Trash2Icon, Upload } from "lucide-react"
+import {CropIcon, Image, Pencil, Trash2Icon, Upload} from "lucide-react"
 import {acceptedFiletypes, cn, getPublicFile, sleep} from "./../../packages/lib/utils";
-import { toast } from "sonner"
+import {toast} from "sonner"
 import {FileWithPath, useDropzone} from "react-dropzone";
 
 export type FileWithPreview = File & { preview: string }
@@ -26,15 +26,21 @@ interface ImageSelectorProps {
     aspect: number,
     className?: string,
     setParentIsCropping: React.Dispatch<React.SetStateAction<boolean>>
+    fileInputTestId?: string
+    cropToolbarTestId?: string
+    cropButtonTestId?: string
 }
 
 export function ImageSelector({
-    selectedFile,
-    setSelectedFile,
-    aspect,
-    className = "",
-    setParentIsCropping
-}: ImageSelectorProps) {
+                                  selectedFile,
+                                  setSelectedFile,
+                                  aspect,
+                                  className = "",
+                                  setParentIsCropping,
+                                  fileInputTestId,
+                                  cropToolbarTestId,
+                                  cropButtonTestId,
+                              }: ImageSelectorProps) {
     const imgRef = React.useRef<HTMLImageElement | null>(null)
     const fileInputRef = React.useRef<HTMLInputElement | null>(null)
 
@@ -64,7 +70,7 @@ export function ImageSelector({
 
     function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
         if (aspect) {
-            const { width, height } = e.currentTarget
+            const {width, height} = e.currentTarget
             const newCrop = centerAspectCrop(width, height, aspect)
             setCrop(newCrop)
 
@@ -93,21 +99,21 @@ export function ImageSelector({
         const canvas = document.createElement("canvas");
         const scaleX = image.naturalWidth / image.width;
         const scaleY = image.naturalHeight / image.height;
-      
+
         // Set canvas dimensions based on the crop size and image scaling
         canvas.width = crop.width * scaleX;
         canvas.height = crop.height * scaleY;
-      
+
         const ctx = canvas.getContext("2d");
-      
+
         if (ctx) {
             // Disable image smoothing for pixel-perfect results (optional)
             ctx.imageSmoothingEnabled = false;
-    
+
             // Fill the canvas with a white background
             ctx.fillStyle = "#ffffff"; // Set background color to white
             ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the entire canvas with white
-        
+
             // Draw the cropped image onto the canvas
             ctx.drawImage(
                 image,
@@ -121,7 +127,7 @@ export function ImageSelector({
                 crop.height * scaleY
             );
         }
-      
+
         // Return the cropped image as a data URL with the specified format and quality
         return canvas.toDataURL(format, quality);
     }
@@ -132,7 +138,7 @@ export function ImageSelector({
             setIsCropping(false)
 
             if (!cropFile) throw Error('No file selected to crop')
- 
+
             const newSelectedFile = Object.assign(cropFile, {
                 preview: croppedImageUrl
             })
@@ -190,111 +196,118 @@ export function ImageSelector({
 
     return (
         <>
-        {isCropping ? (
-            // user is currently cropping the image, show cropping UI
-            <div className="p-0 gap-0 overflow-hidden w-full">
-                <div className="p-6 size-full max-h-full w-full">
-                    <ReactCrop
-                        crop={crop}
-                        onComplete={(c) => onCropComplete(c)}
-                        onChange={(_, percentCrop) => setCrop(percentCrop)}
-                        aspect={aspect}
-                        className="w-full"
+            {isCropping ? (
+                // user is currently cropping the image, show cropping UI
+                <div className="p-0 gap-0 overflow-hidden w-full">
+                    <div className="p-6 size-full max-h-full w-full">
+                        <ReactCrop
+                            crop={crop}
+                            onComplete={(c) => onCropComplete(c)}
+                            onChange={(_, percentCrop) => setCrop(percentCrop)}
+                            aspect={aspect}
+                            className="w-full"
+                        >
+                            <img
+                                className="w-full object-cover"
+                                ref={imgRef}
+                                src={cropFile?.preview}
+                                onLoad={onImageLoad}
+                            />
+                        </ReactCrop>
+                    </div>
+                    <div className={cn("w-full flex justify-center gap-2")} data-testid={cropToolbarTestId}>
+                        <Button
+                            size={"sm"}
+                            className="w-fit"
+                            variant={"secondary"}
+                            onClick={() => {
+                                setIsCropping(false)
+                                setCropFile(null)
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            size={"sm"}
+                            className="w-fit"
+                            onClick={onCrop}
+                            data-testid={cropButtonTestId}
+                        >
+                            <CropIcon className="mr-1.5 size-4"/>
+                            Crop
+                        </Button>
+                    </div>
+                </div>
+            ) : (
+                // user has not previously selected an image, show fallback
+                <>
+                    <Avatar
+                        {...getRootProps()}
+                        className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
                     >
-                        <img
-                            className="w-full object-cover"
-                            ref={imgRef}
-                            src={cropFile?.preview}
-                            onLoad={onImageLoad}
+                        <input
+                            type="file"
+                            accept="image/jpg, image/jpeg, image/png"
+                            // callback ref, so we can trigger opening the file select dialog from inside ImageCropper
+                            ref={setFileInputRef}
+                            className="hidden"
+                            onChange={(e: any) => onDrop([...e.target.files] as FileWithPath[])}
+                            data-testid={fileInputTestId}
                         />
-                    </ReactCrop>
-                </div>
-                <div className={cn("w-full flex justify-center gap-2")}>
-                    <Button 
-                        size={"sm"} 
-                        className="w-fit" 
-                        variant={"secondary"} 
-                        onClick={() => {
-                            setIsCropping(false)
-                            setCropFile(null)
-                        }}
-                    >
-                        Cancel
-                    </Button>
-                    <Button type="submit" size={"sm"} className="w-fit" onClick={onCrop}>
-                        <CropIcon className="mr-1.5 size-4" />
-                        Crop
-                    </Button>
-                </div>
-            </div>
-        ) : (
-            // user has not previously selected an image, show fallback
-            <>
-            <Avatar
-                {...getRootProps()}
-                className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
-            >
-                <input
-                    type="file"
-                    accept="image/jpg, image/jpeg, image/png"
-                    // callback ref, so we can trigger opening the file select dialog from inside ImageCropper
-                    ref={setFileInputRef}
-                    className="hidden"
-                    onChange={(e: any) => onDrop([...e.target.files] as FileWithPath[])}
-                />
-                <AvatarImage
-                    src={croppedImage ? croppedImage : selectedFile?.preview}
-                    alt="@shadcn"
-                    className={cn("object-cover", className)}
-                    onClick={handleClick}
-                />
-                <AvatarFallback
-                    onClick={handleClick}
-                    className={cn("text-center flex flex-col justify-center gap-y-4", className)}>
-                    <Upload />
-                    Click or drop!
-                </AvatarFallback>
-            </Avatar>
-            <div className={cn("w-full flex justify-center gap-2", selectedFile ? "" : "hidden")}>
-                <Button
-                    size={"sm"}
-                    type="reset"
-                    className="w-fit"
-                    variant={"outline"}
-                    onClick={() => {
-                        setSelectedFile(null)
-                        setCropFile(null)
-                    }}
-                >
-                    <Trash2Icon className="mr-1.5 size-4" />
-                    Delete
-                </Button>
-                <Button
-                    size={"sm"}
-                    type="reset"
-                    className="w-fit"
-                    variant={"outline"}
-                    onClick={() => {
-                        setCropFile(selectedFile)
-                        setIsCropping(true)
-                    }}
-                >
-                    <Pencil className="mr-1.5 size-4" />
-                    Edit
-                </Button>
-                <Button
-                    size={"sm"}
-                    type="reset"
-                    className="w-fit"
-                    variant={"outline"}
-                    onClick={() => handleClick()}
-                >
-                    <Image />
-                    Select New Photo
-                </Button>
-            </div>
-            </>
-        )}
+                        <AvatarImage
+                            src={croppedImage ? croppedImage : selectedFile?.preview}
+                            alt="@shadcn"
+                            className={cn("object-cover", className)}
+                            onClick={handleClick}
+                        />
+                        <AvatarFallback
+                            onClick={handleClick}
+                            className={cn("text-center flex flex-col justify-center gap-y-4", className)}>
+                            <Upload/>
+                            Click or drop!
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className={cn("w-full flex justify-center gap-2", selectedFile ? "" : "hidden")}>
+                        <Button
+                            size={"sm"}
+                            type="reset"
+                            className="w-fit"
+                            variant={"outline"}
+                            onClick={() => {
+                                setSelectedFile(null)
+                                setCropFile(null)
+                            }}
+                        >
+                            <Trash2Icon className="mr-1.5 size-4"/>
+                            Delete
+                        </Button>
+                        <Button
+                            size={"sm"}
+                            type="reset"
+                            className="w-fit"
+                            variant={"outline"}
+                            onClick={() => {
+                                setCropFile(selectedFile)
+                                setIsCropping(true)
+                            }}
+                        >
+                            <Pencil className="mr-1.5 size-4"/>
+                            Edit
+                        </Button>
+                        <Button
+                            size={"sm"}
+                            type="reset"
+                            className="w-fit"
+                            variant={"outline"}
+                            onClick={() => handleClick()}
+                        >
+                            <Image/>
+                            Select New Photo
+                        </Button>
+                    </div>
+                </>
+            )}
         </>
     )
 }
