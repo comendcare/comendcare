@@ -17,16 +17,20 @@ import {
   DropdownMenuTrigger,
 } from "./../../../ui/dropdown-menu";
 import { cn } from "./../../../../../packages/lib/utils";
+import { Tooltip, TooltipTrigger, TooltipContent } from "./../../../ui/tooltip";
+import { Info } from "lucide-react";
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.ComponentProps<typeof DropdownMenuTrigger> {
   column: Column<TData, TValue>;
   title: string;
+  tooltip?: string | undefined;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
+  tooltip,
   className,
   ...props
 }: DataTableColumnHeaderProps<TData, TValue>) {
@@ -44,6 +48,16 @@ export function DataTableColumnHeader<TData, TValue>({
         {...props}
       >
         {title}
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="inline" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64 h-fit text-wrap">
+                <p>{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         {column.getCanSort() &&
           (column.getIsSorted() === "desc" ? (
             <ChevronDown />

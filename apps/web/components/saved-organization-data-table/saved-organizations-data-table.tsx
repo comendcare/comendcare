@@ -89,7 +89,7 @@ export function SavedOrganizationsDataTable<TValue>({
 
     return (
         <div className="space-y-4 w-full min-w-full">
-            <DataTableToolbar table={table} />
+            {/*<DataTableToolbar table={table} />*/}
             <div className="rounded-md border" ref={scrollContainerRef}>
                 <Table>
                     <TableHeader ref={headerRef as React.LegacyRef<HTMLTableSectionElement>}>
@@ -147,14 +147,14 @@ export function SavedOrganizationsDataTable<TValue>({
                                 <TableCell colSpan={columns.length}>
                                     <div className="h-full flex flex-col items-center justify-center py-4">
                                         <Image
-                                            alt="No patient groups shortlisted"
+                                            alt="No patient groups saved"
                                             src="https://illustrations.popsy.co/gray/digital-nomad.svg"
                                             width={300}
                                             height={300}
                                             className="dark:hidden"
                                         />
                                         <Image
-                                            alt="No patient groups shortlisted"
+                                            alt="No patient groups saved"
                                             src="https://illustrations.popsy.co/white/digital-nomad.svg"
                                             width={300}
                                             height={300}
@@ -162,7 +162,7 @@ export function SavedOrganizationsDataTable<TValue>({
                                         />
                                         <div className="max-w-xl flex flex-col justify-center items-center space-y-8">
                                             <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                                                {`You do not have any shortlisted patient groups yet. Visit the marketplace to save some patient groups.`}
+                                                {`You do not have any saved patient groups yet. Visit the marketplace to save some patient groups.`}
                                             </p>
                                             <PulsatingButton
                                                 className="bg-black"
@@ -188,14 +188,14 @@ export function SavedOrganizationsDataTable<TValue>({
                         <div className="h-full flex flex-col justify-center">
                             <div className="h-full flex flex-col items-center justify-center">
                                 <Image
-                                    alt="No patient groups shortlisted"
+                                    alt="No patient groups saved"
                                     src="https://illustrations.popsy.co/gray/digital-nomad.svg"
                                     width={300}
                                     height={300}
                                     className="dark:hidden"
                                 />
                                 <Image
-                                    alt="No patient groups shortlisted"
+                                    alt="No patient groups saved"
                                     src="https://illustrations.popsy.co/white/digital-nomad.svg"
                                     width={300}
                                     height={300}
@@ -203,7 +203,7 @@ export function SavedOrganizationsDataTable<TValue>({
                                 />
                                 <div className="max-w-xl flex flex-col justify-center items-center space-y-8">
                                     <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                                        {`You do not have any shortlisted patient groups yet. Visit the marketplace to save some patient groups.`}
+                                        {`You do not have any saved patient groups yet. Visit the marketplace to save some patient groups.`}
                                     </p>
                                     <PulsatingButton
                                         className="bg-black"
