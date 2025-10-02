@@ -130,6 +130,7 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                             key={tool.id}
                             data={tool} 
                             type={type}
+                            closeDialog={() => setEditIsOpen(false)}
                         />
                     </div>
                 </DialogPortal>

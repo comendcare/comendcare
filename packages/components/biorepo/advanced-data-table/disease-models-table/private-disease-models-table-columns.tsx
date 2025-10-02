@@ -50,12 +50,18 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                    className="translate-y-[2px]"
-                />
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent row onClick from firing
+                    }}
+                >
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                        className="translate-y-[2px]"
+                    />
+                </div>
             ),
             enableSorting: false,
             enableHiding: false,
@@ -361,11 +367,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             meta: { label: "Internal Notes" },
             enableHiding: true,
         },
-        {
-            id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'diseaseModel'}/>,
-            enableHiding: false,
-        },
+        // {
+        //     id: "actions",
+        //     cell: ({row}) => <AssetActionsMenu tool={row.original} type={'diseaseModel'}/>,
+        //     enableHiding: false,
+        // },
     ]
 
     return columns

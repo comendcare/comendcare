@@ -12,8 +12,10 @@ import {ColumnDef, Row} from "@tanstack/react-table";
 import {useFeatureFlags} from "../lib/feature-flags-provider";
 import {Tool} from "@prisma/client";
 import Image from "next/image";
-import { NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
+import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
+import { Dialog, DialogPortal } from "./../../../ui/dialog";
+import { useState } from "react";
 
 export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange, searchParams}: {
     data: Tool[],
@@ -22,6 +24,7 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
     onSelectionChange?: (selectedRows: Tool[]) => void,
     searchParams: SearchParams
 }) {
+    const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
@@ -69,6 +72,9 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                     )
                     : undefined
                 }
+                onRowClickCallback={(e: any, row: Row<any> | undefined) => 
+                    setEditingTool(row?.original)
+                }
             >
                 {enableAdvancedFilter ? (
                     <DataTableAdvancedToolbar table={table}>
@@ -84,6 +90,22 @@ export function DiseaseModelsTable({data, pageCount, columns, onSelectionChange,
                     <DataTableToolbar table={table} enableSearch={true}/>
                 )}
             </DataTable>
+
+            <Dialog 
+                open={!!editingTool}
+                onOpenChange={(open) => !open && setEditingTool(undefined)}
+            >
+                <DialogPortal>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <EditAssetDialog
+                            key={editingTool?.id}
+                            data={editingTool} 
+                            type={'diseaseModel'}
+                            closeDialog={() => {setEditingTool(undefined)}}
+                        />
+                    </div>
+                </DialogPortal>
+            </Dialog>
         </>
     );
 }
