@@ -1,49 +1,47 @@
-import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@comend/lib/fetchers";
-import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-columns";
-import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
-import {SavedCompanyData} from "@comend/lib/types";
 import NoOrganization from "~web/components/no-organization";
+import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
+import { SavedOrganizationsDataTable } from "~web/components/saved-organization-data-table/saved-organizations-data-table";
+import { columns } from "~web/components/saved-organization-data-table/saved-organizations-data-columns";
+import { SavedOrganizationData } from "@/packages/lib/types";
 import {getSession} from "@/packages/lib/auth";
 
-export default async function ServiceProviderSavesPage() {
+export default async function OrganizationSavesPage() {
     const session = await getSession()
 
     if (!session?.user?.organizationId) return <NoOrganization />
 
-    let savedCompanies: SavedCompanyData[] = []
+    let savedOrganizations: SavedOrganizationData[] = []
     if (session?.user.organizationId) {
-        const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined, {
+        const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
             id: true,
             organizationId: true,
             organization: true,
-            companyId: true,
-            company: true,
-            milestoneId: true,
-            milestone: true,
+            savedOrganizationId: true,
+            savedOrganization: true,
             updatedAt: true,
             createdAt: true,
             metadata: true
         });
-        if (savedCompaniesResponse.success) {
-            savedCompanies = savedCompaniesResponse.data as SavedCompanyData[];
+        if (savedOrganizationsResponse.success) {
+            savedOrganizations = savedOrganizationsResponse.data as SavedOrganizationData[];
         } else {
-            console.error(savedCompaniesResponse.error);
+            console.error(savedOrganizationsResponse.error);
         }
     }
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
-            {/* {savedCompanies.length === 0 ?
+        <main className="flex gap-4 flex-col w-full max-w-7xl h-full items-center mx-auto">
+            {/* {savedOrganizations.length === 0 ?
                 <div className="h-full flex flex-col items-center justify-center py-20">
                     <Image
-                        alt="No service providers shortlisted"
+                        alt="No patient groups saved"
                         src="https://illustrations.popsy.co/gray/digital-nomad.svg"
                         width={300}
                         height={300}
                         className="dark:hidden"
                     />
                     <Image
-                        alt="No service providers shortlisted"
+                        alt="No patient groups saved"
                         src="https://illustrations.popsy.co/white/digital-nomad.svg"
                         width={300}
                         height={300}
@@ -51,7 +49,7 @@ export default async function ServiceProviderSavesPage() {
                     />
                     <div className="flex flex-col justify-center items-center space-y-8">
                         <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                            {`You do not have any shortlisted service providers yet. Visit the marketplace to save some service providers.`}
+                            {`You do not have any saved patient groups yet. Visit the marketplace to save some patient groups.`}
                         </p>
                         <PulsatingButton
                             className="bg-black"
@@ -63,7 +61,7 @@ export default async function ServiceProviderSavesPage() {
                     </div>
                 </div>
                 : */}
-                <SavedCROsDataTable data={savedCompanies} columns={columns}/>
+                <SavedOrganizationsDataTable data={savedOrganizations} columns={columns}/>
             {/* } */}
         </main>
     )

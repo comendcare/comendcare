@@ -3,6 +3,7 @@
 import prisma from "./prisma"
 import {
     ApiResponse,
+    DISEASE_MODEL_TYPE_OPTIONS,
     GLOBAL_FEED_TYPES,
     milestoneCategories,
     RequestFiltersType,
@@ -2314,15 +2315,25 @@ export const getDiseaseModels = withOrganizationAuth(
 
             // add global filter
             if (input.q) {
+                // custom filtering for types - if any of the type labels include the query, include biosamples
+                // with these types
+                const queriedTypes = DISEASE_MODEL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
                 where.OR = [
                     { id: { contains: input.q, mode: "insensitive" } },
                     { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                     { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                     { description: {contains: input.q, mode: "insensitive"}},
+                    { genotype: {contains: input.q, mode: "insensitive"}},
+                    { strain: {contains: input.q, mode: "insensitive"}},
                     // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
                 ];
+
+                if (queriedTypes) {
+                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                }
             }
 
             const orderBy = input.sort.length
@@ -2470,10 +2481,15 @@ export const getBiosamples = withOrganizationAuth(
 
             // add global filter
             if (input.q) {
+                // custom filtering for types - if any of the type labels include the query, include biosamples
+                // with these types
+                const queriedTypes = BIOSAMPLE_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
                 where.OR = [
                     { id: { contains: input.q, mode: "insensitive" } },
                     { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                     { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                    { genotype: {contains: input.q, mode: "insensitive"}},
                     // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2491,6 +2507,10 @@ export const getBiosamples = withOrganizationAuth(
                         },
                     },
                 ];
+
+                if (queriedTypes) {
+                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                }
             }
 
             const orderBy = input.sort.length
@@ -2754,6 +2774,10 @@ export const getDatasamples = withOrganizationAuth(
 
             // add global filter
             if (input.q) {
+                // custom filtering for types - if any of the type labels include the query, include biosamples
+                // with these types
+                const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
                 where.OR = [
                     { id: { contains: input.q, mode: "insensitive" } },
                     { title: {contains: input.q, mode: "insensitive"}},
@@ -2764,6 +2788,10 @@ export const getDatasamples = withOrganizationAuth(
                     // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                     // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
                 ];
+
+                if (queriedTypes) {
+                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                }
             }
 
             const orderBy = input.sort.length

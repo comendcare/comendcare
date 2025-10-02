@@ -8,6 +8,7 @@ import {FileText, HandCoins, Megaphone, MegaphoneIcon, Microscope, MicroscopeIco
 import React from "react";
 import {PropertyBadge} from "../property-badge";
 import SaveOrganizationDialog from "../save-organization-dialog";
+import SaveOrganizationButton from "~web/components/save-organization-button";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -51,7 +52,8 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                                 {name}
                             </CardTitle>
                         </Link>
-                        {!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}
+                        {/*{!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}*/}
+                        {!isPublic && <SaveOrganizationButton savedOrganization={organization} type={"card"}/>}
                     </div>
                     {(moneyDeployed || numberOfPatientsEngaged) && (
                         <div className="w-full grid gap-2 grid-cols-2">

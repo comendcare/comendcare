@@ -7,6 +7,7 @@ import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
 import {DISEASE_MODEL_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
+import Link from "next/link";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -23,7 +24,16 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                         name={row.original?.organization?.name}
                         className="size-8"
                     />
-                    {row.original.organization?.name}
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                        }
+                        className="underline"
+                    >
+                        {row.original.organization?.name}
+                    </Link>
                 </div>
             ),
         },
@@ -31,15 +41,15 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
+                <DataTableColumnHeader column={column} title="Model ID"/>
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                    <p>{row.original.id || 'No Model ID'}</p>
                 </div>
             ),
             enableHiding: true,
-            meta: { label: "Sample ID" }
+            meta: { label: "Model ID" }
         },
         {
             id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -81,6 +91,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             meta: { label: "Condition" }
         },
         {
+            id: "strain.strain", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "strain",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Strain"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Strain"
+            }
+        },
+        {
             id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "gene",
             header: ({column}) => (
@@ -91,6 +112,17 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: { label: "Gene" }
+        },
+        {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
         },
         {
             id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)

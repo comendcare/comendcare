@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/u
 import { Button } from "@/packages/components/ui/button";
 import { Lock, Globe } from "lucide-react"
 import { setDiseaseModelsVisibility } from "@/packages/lib/actions";
+import { DiseaseModelBulkImportDialog } from "./disease-model-bulk-import-dialog";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const columns = useDiseaseModelsTableColumns()
@@ -69,7 +70,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
                             </Tooltip>
                             </>
                         )}
-                        {/* <BiosampleBulkImportDialog/> */}
+                        <DiseaseModelBulkImportDialog/>
                         <NewToolDialog type={"diseaseModel"}/>
                     </>
                 )}

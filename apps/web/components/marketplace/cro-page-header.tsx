@@ -22,6 +22,7 @@ import React from "react";
 import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
 import {companyTypeMap, CompanyWithReviewsAndServices} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
+import SaveCROButton from "~web/components/save-cro-button";
 
 
 const companyTypeIcons: Record<string, React.ReactElement | null> = {
@@ -165,7 +166,8 @@ export default async function CROPageHeader({company}: {company: CompanyWithRevi
             </div>
             <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
                 <ServiceProviderWebsiteButton cro={company}/>
-                <SaveCRODialog cro={company} type={"page"} location={"Service Provider Profile"}/>
+                {/*<SaveCRODialog cro={company} type={"page"} location={"Service Provider Profile"}/>*/}
+                <SaveCROButton cro={company} type={"page"} location={"Service Provider Profile"} />
                 <ContactCroDialog cro={company}/>
             </div>
         </div>

@@ -2391,6 +2391,9 @@ export const updateDiseaseModel = withOrganizationAuth(
                 })),
                 attachments: data.attachments,
                 contacts: data.contacts,
+                genotype: data.genotype,
+                strain: data.strain,
+                notes: data.notes
             }
 
             const newDiseaseModel = await prisma.diseaseModel.update({
@@ -2502,6 +2505,9 @@ export const createDiseaseModel = withOrganizationAuth(
                 }),
                 attachments: data.attachments,
                 contacts: data.contacts,
+                genotype: data.genotype,
+                strain: data.strain,
+                notes: data.notes,
             }
 
             const response = await prisma.diseaseModel.create({
@@ -2611,7 +2617,8 @@ export const createDataTool = withOrganizationAuth(
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                notes: data.notes,
             }
 
             const response = await prisma.tool.create({
@@ -2746,7 +2753,8 @@ export const updateDataTool = withOrganizationAuth(
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                notes: data.notes,
             }
 
             const newDataTool = await prisma.tool.update({
@@ -2884,7 +2892,9 @@ export const createBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined
+                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                genotype: data.genotype,
+                notes: data.notes,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3100,6 +3110,8 @@ export const updateBiosample = withOrganizationAuth(
                     data.institutions && data.institutions.length > 0
                         ? data.institutions[0]
                         : undefined,
+                genotype: data.genotype,
+                notes: data.notes,
             };
 
             const newBiosample = await prisma.biosample.update({
@@ -3982,7 +3994,7 @@ export const createRoadmap = withOrganizationAuth(
                 },
             });
 
-            // This is to make it so that shortlisting shows the newly created projects from the roadmap
+            // This is to make it so that saving shows the newly created projects from the roadmap
             revalidatePath("/app/marketplace/service-providers")
 
             return finalRoadmap;
@@ -5618,6 +5630,8 @@ export const saveCRO = withOrganizationAuth(
             }
 
             revalidatePath(`/app/service-providers/${croId}`);
+            revalidatePath(`/app/marketplace`);
+            revalidatePath(`/app/marketplace/service-providers`);
 
             return {success: true, data: response};
         } catch (error) {
@@ -5729,6 +5743,9 @@ export const saveOrganization = withOrganizationAuth(
             }
 
             console.log(`response`, response)
+
+            revalidatePath(`/app/marketplace`);
+            revalidatePath(`/app/marketplace/patient-groups`);
 
             return {success: true, data: response}
         } catch (error: any) {

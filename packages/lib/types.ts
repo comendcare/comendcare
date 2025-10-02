@@ -1985,6 +1985,7 @@ export const editBiosampleForm = z.object({
     currentCountry: z.string().optional(),
     countryOfCollection: z.string().optional(),
     collectionDate: z.date().optional(),
+    genotype: z.string().optional(),
     // volume: z.string().optional(),
     // mass: z.string().optional(),
     // area: z.string().optional(),
@@ -2031,6 +2032,7 @@ export const editBiosampleForm = z.object({
     matchedPairId: z.string().optional(),
     mirroredPairId: z.string().optional(),
     ageAtExcision: z.string().optional(),
+    notes: z.string().optional(),
 
     // donor properties
     donorId: z.string().optional(),
@@ -2069,10 +2071,13 @@ export const editDiseaseModelForm = z.object({
         .min(1, "Type is required")
         .max(1, "Max one type"),
     otherTypeDetails: z.string().optional(),
-    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    attachments: z.array(z.custom<any>()).optional(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
+    genotype: z.string().optional(),
+    strain: z.string().optional(),
+    notes: z.string().optional(),
 
     // disease model properties
     genes: z.array(optionSchema).optional(),
@@ -2099,6 +2104,7 @@ export const editDataToolForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
+    notes: z.string().optional(),
 
     genes: z.array(optionSchema).optional(),
     cohortSize: z.string().optional(),

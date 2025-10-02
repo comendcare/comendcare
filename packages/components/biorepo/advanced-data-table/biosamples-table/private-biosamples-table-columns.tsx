@@ -58,12 +58,18 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                    className="translate-y-[2px]"
-                />
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation(); // prevent row onClick from firing
+                    }}
+                >
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                        className="translate-y-[2px]"
+                    />
+                </div>
             ),
             enableSorting: false,
             enableHiding: false,
@@ -111,33 +117,14 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "id",
-            accessorKey: "id",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: { label: "Sample ID" }
-        },
-        {
-            id: "donor.internalId",
-            accessorKey: "donor.internalId",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Internal Donor ID" />
-            ),
-            enableHiding: true,
-            meta: { label: "Internal Donor ID" }
-        },
-        {
             id: "donorId",
             accessorKey: "donorId",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Public Donor ID"/>
+                <DataTableColumnHeader 
+                    column={column} 
+                    title="Public Donor ID"
+                    tooltip="This is a unique ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
+                />
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 min-w-[200px] items-center">
@@ -147,6 +134,37 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: { label: "Public Donor ID" }
+        },
+        {
+            id: "donor.internalId",
+            accessorKey: "donor.internalId",
+            header: ({ column }) => (
+                <DataTableColumnHeader 
+                    column={column} 
+                    title="Internal Donor ID" 
+                    tooltip="This ID is optional, and can be used to track any previously used donor ID. This ID cannot be guarenteed to be unique across our platform, and will only be visible to members of your organization."
+                />
+            ),
+            enableHiding: true,
+            meta: { label: "Internal Donor ID" }
+        },
+        {
+            id: "id",
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    column={column} 
+                    title="Sample ID"
+                    tooltip="This is a unique ID assigned to this sample. This ID is public, and will appear in the marketplace."
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: { label: "Sample ID" }
         },
         {
             id: "types",
@@ -192,6 +210,17 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 onAsyncSearch: handleAsyncGeneSearch
             }
         },
+        {
+            id: "genotype",
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
         // {
         //     id: "variant",
         //     accessorKey: "variant",
@@ -201,17 +230,6 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         //     enableHiding: true,
         //     meta: {
         //         label: "Variant",
-        //     }
-        // },
-        // {
-        //     id: "genotype",
-        //     accessorKey: "genotype",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Genotype"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Genotype",
         //     }
         // },
         {
@@ -304,7 +322,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             id: "availability",
             accessorKey: "availability",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability"/>
+                <DataTableColumnHeader column={column} title="Availability Status"/>
             ),
             cell: ({row}) => {
                 const availability = handleGetAvailability(row.original)
@@ -316,7 +334,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Availability",
+                label: "Availability Status",
                 variant: "select",
                 options: AVAILABILITY_OPTIONS,
                 icon: CircleDashed,
@@ -688,21 +706,35 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             id: "description",
             accessorKey: "description",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Other Notes"/>
+                <DataTableColumnHeader column={column} title="Description"/>
             ),
             cell: ({row}) => (
                 <div className="line-clamp-3">
                     {row.original.description}
                 </div>
             ),
-            meta: { label: "Other Notes" },
+            meta: { label: "Description" },
             enableHiding: true,
         },
         {
-            id: "actions",
-            cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
-            enableHiding: false,
+            id: "notes",
+            accessorKey: "notes",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Internal Notes"/>
+            ),
+            cell: ({row}) => (
+                <div className="line-clamp-3">
+                    {row.original.notes}
+                </div>
+            ),
+            meta: { label: "Internal Notes" },
+            enableHiding: true,
         },
+        // {
+        //     id: "actions",
+        //     cell: ({row}) => <AssetActionsMenu tool={row.original} type={'biosample'}/>,
+        //     enableHiding: false,
+        // },
     ]
 
     return columns

@@ -16,6 +16,7 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import { Badge } from "./../../../ui/badge";
 import { Option } from "./../../../../../packages/lib/types";
+import Link from "next/link";
 import { handleGetAvailability } from "./../../../../../packages/lib/utils";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
@@ -33,23 +34,18 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                         name={row.original?.organization?.name}
                         className="size-8"
                     />
-                    {row.original.organization?.name}
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                        }
+                        className="underline"
+                    >
+                        {row.original.organization?.name}
+                    </Link>
                 </div>
             ),
-        },
-        {
-            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "id",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
-                </div>
-            ),
-            enableHiding: true,
-            meta: { label: "Sample ID" }
         },
         {
             id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -65,6 +61,20 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             meta: { label: "Public Donor ID" }
+        },
+        {
+            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Sample ID"/>
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding: true,
+            meta: { label: "Sample ID" }
         },
         {
             id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -112,10 +122,21 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             meta: { label: "Gene" }
         },
         {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Genotype"/>
+            ),
+            enableHiding: true,
+            meta: {
+                label: "Genotype"
+            }
+        },
+        {
             id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "availability",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability"/>
+                <DataTableColumnHeader column={column} title="Availability Status"/>
             ),
             cell: ({row}) => {
                 const availability = handleGetAvailability(row.original)
@@ -125,7 +146,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 return <></>
             },
             enableHiding: true,
-            meta: { label: "Availability" }
+            meta: { label: "Availability Status" }
         },
         {
             id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
