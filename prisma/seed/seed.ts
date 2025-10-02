@@ -3,6 +3,18 @@ import prisma from "@comend/lib/prisma"
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@comend/lib/utils";
 import {DEFAULT_KANBAN_COLUMNS, MILESTONE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS} from '@comend/lib/types';
 
+async function whitelistEmails(emails: string[]) {
+    if (!emails?.length) return;
+
+    // De-dupe + strip empties just in case
+    const unique = Array.from(new Set(emails.filter(Boolean)));
+
+    await prisma.whitelist.createMany({
+        data: unique.map((email) => ({ email })),
+        skipDuplicates: true, // <- avoids errors if already whitelisted
+    });
+}
+
 
 async function main() {
 
@@ -169,6 +181,10 @@ async function main() {
     });
 
     console.log({alice, bob})
+    await whitelistEmails(
+        (await prisma.user.findMany({ select: { email: true } })).map(u => u.email)
+    );
+
 
     const celocyn = await prisma.organization.create({
         data: {
