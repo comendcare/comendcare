@@ -132,22 +132,22 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 label: "Genotype"
             }
         },
-        {
-            id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "availability",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability Status"/>
-            ),
-            cell: ({row}) => {
-                const availability = handleGetAvailability(row.original)
-                if (availability !== undefined) {
-                    return <Badge variant={availability.variant}>{availability.value}</Badge>
-                }
-                return <></>
-            },
-            enableHiding: true,
-            meta: { label: "Availability Status" }
-        },
+        // {
+        //     id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+        //     accessorKey: "availability",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Availability Status"/>
+        //     ),
+        //     cell: ({row}) => {
+        //         const availability = handleGetAvailability(row.original)
+        //         if (availability !== undefined) {
+        //             return <Badge variant={availability.variant}>{availability.value}</Badge>
+        //         }
+        //         return <></>
+        //     },
+        //     enableHiding: true,
+        //     meta: { label: "Availability Status" }
+        // },
         {
             id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "quantity",
