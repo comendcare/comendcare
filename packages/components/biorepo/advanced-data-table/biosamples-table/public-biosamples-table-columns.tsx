@@ -157,7 +157,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <>
                     {
-                        (row.original.quantity && row.original.quantityUnit && row.original.quantity >= 0 )
+                        (
+                            row.original.quantity !== null && 
+                            row.original.quantity !== undefined && 
+                            row.original.quantityUnit && 
+                            row.original.quantity >= 0 
+                        )
                             ? `${row.original.quantity}${row.original.quantityUnit}`
                             : `unknown`
                     }
