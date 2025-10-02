@@ -199,6 +199,7 @@ export function DataRequestDataTable<TData, TValue>({
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <EditAssetDialog
+                                    closeDialog={() => {}}
                                     key={row.id}
                                     data={{...row.original} as Partial<Asset>} 
                                     type={'data'}

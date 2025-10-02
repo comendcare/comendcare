@@ -10,6 +10,7 @@ import { DataTableColumnHeader } from "./../data-table/data-table-column-header"
 import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
+import Link from "next/link";
 
 export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const comendColumns: ColumnDef<any>[] = [
@@ -26,7 +27,16 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                     name={row.original?.organization?.name}
                     className="size-8"
                 />
-                {row.original.organization?.name}
+                <Link
+                    href={
+                        process.env.NEXT_PUBLIC_VERCEL_ENV
+                            ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                            : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                    }
+                    className="underline"
+                >
+                    {row.original.organization?.name}
+                </Link>
             </div>
         ),
     },
@@ -66,10 +76,10 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         cell: ({ row }) => (
           <>
-            {(row.original.types || []).map((type: string) => {
+            {(row.original.types || []).map((type: string, index: number) => {
               const typeOption = TOOL_TYPE_OPTIONS.find(t => t.value === type)
               return (
-                <MilestoneTypeBadge label={typeOption?.label}/>
+                <MilestoneTypeBadge key={index} label={typeOption?.label}/>
               )
             })}
           </>

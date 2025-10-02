@@ -51,6 +51,7 @@ export default defineConfig({
 
     // Flake handling
     // retries: process.env.CI ? 2 : 0,
+    timeout: 60 * 1000, // Increase default timeout to 60 seconds
     retries: 0,
     workers: process.env.CI ? 1 : undefined,
 

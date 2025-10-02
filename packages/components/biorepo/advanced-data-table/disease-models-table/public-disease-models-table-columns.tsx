@@ -7,6 +7,7 @@ import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
 import {DISEASE_MODEL_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
+import Link from "next/link";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -23,7 +24,16 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                         name={row.original?.organization?.name}
                         className="size-8"
                     />
-                    {row.original.organization?.name}
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                        }
+                        className="underline"
+                    >
+                        {row.original.organization?.name}
+                    </Link>
                 </div>
             ),
         },

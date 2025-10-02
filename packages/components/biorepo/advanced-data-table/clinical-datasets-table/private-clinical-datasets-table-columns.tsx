@@ -31,12 +31,18 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             />
         ),
         cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-                className="translate-y-[2px]"
-            />
+            <div
+                onClick={(e) => {
+                    e.stopPropagation(); // prevent row onClick from firing
+                }}
+            >
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="translate-y-[2px]"
+                />
+            </div>
         ),
         enableSorting: false,
         enableHiding: false,
@@ -117,10 +123,10 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         cell: ({ row }) => (
           <>
-            {(row.original.types || []).map((type: string) => {
+            {(row.original.types || []).map((type: string, index: number) => {
               const typeOption = TOOL_TYPE_OPTIONS.find(t => t.value === type)
               return (
-                <MilestoneTypeBadge label={typeOption?.label}/>
+                <MilestoneTypeBadge key={index} label={typeOption?.label}/>
               )
             })}
           </>
@@ -316,11 +322,11 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         meta: { label: "Internal Notes" },
         enableHiding: true,
     },
-    {
-        id: "actions",
-        cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'data'}/>,
-        enableHiding: false,
-    },
+    // {
+    //     id: "actions",
+    //     cell: ({ row }) => <AssetActionsMenu tool={row.original} type={'data'}/>,
+    //     enableHiding: false,
+    // },
   ]
 
   return columns
