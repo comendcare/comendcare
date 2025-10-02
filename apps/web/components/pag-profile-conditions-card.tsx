@@ -61,26 +61,31 @@ export const PAGProfileConditionsCard = ({
 
     if (conditions === null) {
         return (
-            <Card>
+            <Card data-testid="conditions-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="conditions-title">
                         Conditions
                     </CardTitle>
                 </CardHeader>
 
-                <CardContent>
+                <CardContent data-testid="conditions-error">
                     {`We couldn't get this organization's condition information.`}
                 </CardContent>
             </Card>
         )
     } else if (conditions.length === 0) {
         return (
-            <Card className="organization-profile-tour-step2">
+            <Card className="organization-profile-tour-step2" data-testid="conditions-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">Conditions</CardTitle>
+                    <CardTitle
+                        className="scroll-m-20 text-2xl font-bold tracking-tight"
+                        data-testid="conditions-title"
+                    >
+                        Conditions
+                    </CardTitle>
                     {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization}/>}
                 </CardHeader>
-                <CardContent>
+                <CardContent data-testid="conditions-empty-state">
                     <div className="flex flex-col space-y-2 text-left">
                         <h3 className="scroll-m-20 text-md tracking-tight font-semibold">No Conditions Yet</h3>
                         <p className="text-gray-400">
@@ -95,9 +100,12 @@ export const PAGProfileConditionsCard = ({
 
         return (
             <TooltipProvider>
-                <Card className="organization-profile-tour-step2">
+                <Card className="organization-profile-tour-step2" data-testid="conditions-card">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                        <CardTitle
+                            className="scroll-m-20 text-2xl font-bold tracking-tight"
+                            data-testid="conditions-title"
+                        >
                             {condition?.name ?? "No name condition"}
                         </CardTitle>
                         {showEditDialog &&
@@ -110,7 +118,7 @@ export const PAGProfileConditionsCard = ({
                             key={condition?.id}
                             className="flex flex-col space-y-4"
                         >
-                            <p className="line-clamp-4">
+                            <p className="line-clamp-4" data-testid="conditions-summary">
                                 {condition?.summary}
                             </p>
 
@@ -162,16 +170,16 @@ export const PAGProfileConditionsCard = ({
                             {/*    </p>*/}
                             {/*</div>*/}
 
-                            <div className="space-y-2">
+                            <div className="space-y-2" data-testid="epidemiology-section">
                                 <div className="flex flex-row items-center justify-start w-full gap-2">
                                     <h4 className="scroll-m-20 text-base font-semibold">Epidemiology</h4>
                                     <Tooltip delayDuration={0}>
                                         {/*disabled to make the tooltip unclickable*/}
-                                        <TooltipTrigger disabled>
+                                        <TooltipTrigger disabled data-testid="epi-info-trigger">
                                             <Info
                                                 className="text-black h-4 w-4"/>
                                         </TooltipTrigger>
-                                        <TooltipContent>
+                                        <TooltipContent data-testid="epi-info-content">
                                             <p>
                                                 {`The numbers presented here are all approximate.`}
                                             </p>
@@ -181,7 +189,7 @@ export const PAGProfileConditionsCard = ({
                                 {condition?.prevalenceNumerator || condition?.prevalenceDenominator || condition?.numberOfPatientsEngaged ? (
                                     <ul className="flex flex-col list-disc list-inside">
                                         {condition?.prevalenceNumerator && condition?.prevalenceDenominator && (
-                                            <li>
+                                            <li data-testid="epi-prevalence">
                                                     <span
                                                         className="font-bold"
                                                     >
@@ -195,7 +203,7 @@ export const PAGProfileConditionsCard = ({
                                             </li>
                                         )}
                                         {condition?.numberOfPatientsEngaged && (
-                                            <li>
+                                            <li data-testid="epi-patients-engaged">
                                                     <span
                                                         className="font-bold"
                                                     >
@@ -204,7 +212,7 @@ export const PAGProfileConditionsCard = ({
                                             </li>
                                         )}
                                         {condition?.nationalEstimatedPopulation && (
-                                            <li>
+                                            <li data-testid="epi-us-population">
                                                     <span
                                                         className="font-bold"
                                                     >
@@ -214,7 +222,7 @@ export const PAGProfileConditionsCard = ({
                                             </li>
                                         )}
                                         {condition?.globalEstimatedPopulation && (
-                                            <li>
+                                            <li data-testid="epi-global-population">
                                                     <span
                                                         className="font-bold"
                                                     >
@@ -225,18 +233,18 @@ export const PAGProfileConditionsCard = ({
                                         )}
                                     </ul>
                                 ) : (
-                                    <p className="text-gray-400">
+                                    <p className="text-gray-400" data-testid="epi-empty">
                                         No data available.
                                     </p>
                                 )}
                             </div>
 
 
-                            <div className="space-y-2">
+                            <div className="space-y-2" data-testid="disease-categories-section">
                                 {(isPrivate || (!isPrivate && condition?.diseaseCategories && condition.diseaseCategories.length > 0)) && (
                                     <>
                                         <div className="flex flex-row items-center justify-between w-full">
-                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                            <h4 className="scroll-m-20 text-base font-semibold" data-testid="disease-categories-heading">
                                                 Disease categories
                                             </h4>
                                         </div>
@@ -245,7 +253,7 @@ export const PAGProfileConditionsCard = ({
 
                                                 if (!condition?.diseaseCategories?.length) {
                                                     return (
-                                                        <p className="text-gray-400">
+                                                        <p className="text-gray-400" data-testid="disease-categories-empty">
                                                             {`No relevant badges.`}
                                                         </p>
                                                     );
@@ -268,7 +276,7 @@ export const PAGProfileConditionsCard = ({
                                 {(isPrivate || (!isPrivate && condition?.causalGenes && condition.causalGenes.length > 0)) && (
                                     <>
                                         <div className="flex flex-row items-center justify-between w-full">
-                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                            <h4 className="scroll-m-20 text-base font-semibold" data-testid="causal-genes-heading">
                                                 Causal genes
                                             </h4>
                                         </div>
@@ -277,7 +285,7 @@ export const PAGProfileConditionsCard = ({
 
                                                 if (!condition?.causalGenes?.length) {
                                                     return (
-                                                        <p className="text-gray-400">
+                                                        <p className="text-gray-400" data-testid="causal-genes-empty">
                                                             {`No relevant badges.`}
                                                         </p>
                                                     );
@@ -286,7 +294,7 @@ export const PAGProfileConditionsCard = ({
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
                                                         {condition?.causalGenes?.map((item, index) => (
-                                                            <Badge key={index} className="text-sm">
+                                                            <Badge key={index} className="text-sm" data-testid="causal-gene-badge">
                                                                 {item.charAt(0).toUpperCase() + item.slice(1)}
                                                             </Badge>
                                                         ))}
@@ -300,7 +308,7 @@ export const PAGProfileConditionsCard = ({
                                 {(isPrivate || (!isPrivate && condition?.associatedGenes && condition.associatedGenes.length > 0)) && (
                                     <>
                                         <div className="flex flex-row items-center justify-between w-full">
-                                            <h4 className="scroll-m-20 text-base font-semibold">
+                                            <h4 className="scroll-m-20 text-base font-semibold" data-testid="associated-genes-heading">
                                                 Associated genes
                                             </h4>
                                         </div>
@@ -309,7 +317,7 @@ export const PAGProfileConditionsCard = ({
 
                                                 if (!condition?.associatedGenes?.length) {
                                                     return (
-                                                        <p className="text-gray-400">
+                                                        <p className="text-gray-400" data-testid="associated-genes-empty">
                                                             {`No relevant badges.`}
                                                         </p>
                                                     );
@@ -318,7 +326,7 @@ export const PAGProfileConditionsCard = ({
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
                                                         {condition?.associatedGenes?.map((item, index) => (
-                                                            <Badge key={index} className="text-sm">
+                                                            <Badge key={index} className="text-sm" data-testid="associated-gene-badge">
                                                                 {item.charAt(0).toUpperCase() + item.slice(1)}
                                                             </Badge>
                                                         ))}
@@ -331,7 +339,7 @@ export const PAGProfileConditionsCard = ({
                             </div>
 
                             {!condition && (
-                                <div className="flex flex-col space-y-2 text-left">
+                                <div className="flex flex-col space-y-2 text-left" data-testid="conditions-empty-state">
                                     <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
                                         No Conditions Yet
                                     </h3>

@@ -47,10 +47,10 @@ export default function PAGProfilePage({
                                        }: PAGProfilePageProps) {
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
-            <main className="col-span-5 flex flex-col items-center">
+            <main className="col-span-5 flex flex-col items-center" data-testid="pag-profile-main">
                 <ScrollArea id="profile-scroll-area" className="w-full flex flex-col mx-4 space-y-2">
                     <div className="w-full h-fit flex flex-col space-y-4">
-                        <Card className="pb-4 flex flex-col gap-4 overflow-hidden">
+                        <Card className="pb-4 flex flex-col gap-4 overflow-hidden" data-testid="pag-profile-header-card">
                             {isOwner ? (
                                 <EditablePAGBannerPhoto
                                     img={organization.headerImage}
@@ -64,7 +64,7 @@ export default function PAGProfilePage({
                             <div
                                 className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
                                 <div className="w-full flex flex-row gap-4 items-start">
-                                    <div className="h-fit w-fit -mt-16">
+                                    <div className="h-fit w-fit -mt-16" data-testid="avatar-image">
                                         {isOwner ? (
                                             <EditableProfilePhoto
                                                 img={organization.image}
@@ -83,7 +83,7 @@ export default function PAGProfilePage({
                                     </div>
                                     <div className="flex flex-col">
                                         <div className="flex gap-4 justify-between">
-                                            <h1 className="text-wrap text-2xl lg:text-3xl font-semibold">
+                                            <h1 className="text-wrap text-2xl lg:text-3xl font-semibold" data-testid="org-name-heading">
                                                 {organization?.name ?? "No name organization"}
                                             </h1>
                                             {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
@@ -91,7 +91,7 @@ export default function PAGProfilePage({
                                         </div>
                                         <div className="w-full flex flex-wrap gap-x-6">
                                             {typeof organization?.moneyRaised === "number" && organization.moneyRaised > 0 && (
-                                                <div className="mt-2 flex items-center text-gray-500">
+                                                <div className="mt-2 flex items-center text-gray-500" data-testid="raised-chip">
                                                     <HandCoins
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"
@@ -100,7 +100,7 @@ export default function PAGProfilePage({
                                                 </div>
                                             )}
                                             {organization?.yearFounded && (
-                                                <div className="mt-2 flex items-center text-gray-500">
+                                                <div className="mt-2 flex items-center text-gray-500" data-testid="founded-chip">
                                                     <Calendar
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
@@ -109,7 +109,7 @@ export default function PAGProfilePage({
                                                 </div>
                                             )}
                                             {organization?.incorporationStatus === "YES" &&
-                                                <div className="mt-2 flex items-center text-gray-500">
+                                                <div className="mt-2 flex items-center text-gray-500" data-testid="c3-chip">
                                                     <Building2
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
@@ -128,16 +128,17 @@ export default function PAGProfilePage({
                                         }
                                         className={buttonVariants({variant: "secondary"})}
                                         target="_blank"
+                                        data-testid="public-profile-link"
                                     >
                                         View public profile
                                     </Link>
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Button variant="cta">
+                                            <Button variant="cta" data-testid="share-public-profile-btn">
                                                 Share public profile
                                             </Button>
                                         </DialogTrigger>
-                                        <DialogContent className="min-w-fit">
+                                        <DialogContent className="min-w-fit" data-testid="dialog">
                                             <ShareDialog
                                                 url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                                 organization={organization}
