@@ -118,7 +118,7 @@ export const PAGProfileConditionsCard = ({
                             key={condition?.id}
                             className="flex flex-col space-y-4"
                         >
-                            <p className="line-clamp-4" data-testid="conditions-summary">
+                            <p className="line-clamp-6" data-testid="conditions-summary">
                                 {condition?.summary}
                             </p>
 
