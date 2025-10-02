@@ -33,6 +33,7 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                             ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
                             : `http://${row.original?.organization?.subdomain}.localhost:3000`
                     }
+                    className="underline"
                 >
                     {row.original.organization?.name}
                 </Link>
