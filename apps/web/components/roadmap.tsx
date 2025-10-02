@@ -247,15 +247,15 @@ export function Roadmap({
                                                 </div>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {"Interactive whiteboard to organize research plans. Project order changes in this view or the timeline stay separate."}
+                                                {"Interactive whiteboard to organize research plans. Project order changes in this view or the list stay separate."}
                                             </TooltipContent>
                                         </Tooltip>
                                         {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
-                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
+                                    <TabsTrigger value="list">List View</TabsTrigger>
                                 </TabsList>
 
-                                {selectedView === "timeline" && (
+                                {selectedView === "list" && (
                                     <div className="flex flex-row gap-4 items-center">
                                         <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                             <SelectTrigger className="w-[180px]">
@@ -341,9 +341,9 @@ export function Roadmap({
                                 )}
                             </TabsContent>
                             
-                            {/* Timeline view */}
+                            {/* List view */}
                             <TabsContent
-                                value="timeline"
+                                value="list"
                                 className="mt-0 h-[calc(100vh-12rem)]"
                             >
                                 {milestones.length > 0 ? (
