@@ -16,6 +16,7 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import { Badge } from "./../../../ui/badge";
 import { Option } from "./../../../../../packages/lib/types";
+import Link from "next/link";
 import { handleGetAvailability } from "./../../../../../packages/lib/utils";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
@@ -33,7 +34,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                         name={row.original?.organization?.name}
                         className="size-8"
                     />
-                    {row.original.organization?.name}
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                        }
+                        className="underline"
+                    >
+                        {row.original.organization?.name}
+                    </Link>
                 </div>
             ),
         },
