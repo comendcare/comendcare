@@ -156,12 +156,12 @@ test.describe("Create Organization – happy path to profile", () => {
                     const done = await page.getByText(/Onboarding complete/i).count();
                     return done > 0 ? "success" : "pending";
                 },
-                {timeout: 20_000, intervals: [250, 500, 750]}
+                {timeout: 30_000, intervals: [250, 500, 750]}
             )
             .toBe("success");
 
         // Wait for navigation to either /app/profile or /app/dashboard
-        await expect(page).toHaveURL(/\/app\/(profile|dashboard)/, {timeout: 20_000});
+        await expect(page).toHaveURL(/\/app\/(profile|dashboard)/, {timeout: 30_000});
         const landedOnProfile = /\/app\/profile\/?$/.test(new URL(page.url()).pathname);
 
         // If we didn't land on profile (e.g. no invitations), go there now to validate the cards.

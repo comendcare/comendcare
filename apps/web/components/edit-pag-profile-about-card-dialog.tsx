@@ -37,9 +37,12 @@ const editOrgFormSchema = z.object({
     description: z.string().max(500, {
         message: "Your organization's description must be less than 500 characters long."
     }).optional(),
-    website: z.string().url({
-        message: "Enter a valid URL for your organization's website."
-    }).optional(),
+    website: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().url({
+            message: "Enter a valid URL for your organization's website."
+        }).optional()
+    ),
     therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
     otherTherapeuticsInDevelopment: z.string().optional(),
     therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
@@ -176,7 +179,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                     <TooltipTrigger asChild>
                         {isOwner ? (
                             <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Edit">
+                                <Button variant="ghost" size="icon" aria-label="Edit" data-testid="about-edit-btn">
                                     <Pencil className="h-4 w-4"/>
                                 </Button>
                             </DialogTrigger>
@@ -195,7 +198,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                         </TooltipContent>
                     )}
                 </Tooltip>
-                <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
                     <DialogHeader>
                         <DialogTitle>Edit Organization Profile</DialogTitle>
                         <DialogDescription>
@@ -211,7 +214,11 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                     <FormItem>
                                         <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="Tell us about your organization" {...field} />
+                                            <Textarea
+                                                {...field}
+                                                placeholder="Tell us about your organization"
+                                                data-testid="about-description-input"
+                                            />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
@@ -228,8 +235,9 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                         </FormDescription>
                                         <FormControl>
                                             <Input
-                                                id="website"
                                                 {...field}
+                                                id="website"
+                                                data-testid="website-input"
                                             />
                                         </FormControl>
                                         <FormMessage/>
@@ -353,7 +361,12 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                 />
                             )}
 
-                            <Button type="submit">Save</Button>
+                            <Button
+                                type="submit"
+                                data-testid="dialog-save-btn"
+                            >
+                                Save
+                            </Button>
                         </form>
                     </Form>
                 </DialogContent>

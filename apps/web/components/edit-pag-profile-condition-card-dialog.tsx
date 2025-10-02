@@ -270,7 +270,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 <TooltipTrigger asChild>
                     {isOwner ? (
                         <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon" aria-label="Edit">
+                            <Button variant="ghost" size="icon" aria-label="Edit" data-testid="conditions-edit-btn">
                                 <Pencil className="h-4 w-4"/>
                             </Button>
                         </DialogTrigger>
@@ -290,7 +290,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 )}
             </Tooltip>
             <DialogPortal>
-                <DialogContent className="max-h-[80vh] overflow-y-auto overflow-x-visible">
+                <DialogContent className="max-h-[80vh] overflow-y-auto overflow-x-visible" data-testid="dialog">
                     <TooltipProvider>
                         <DialogHeader>
                             <DialogTitle>
@@ -318,25 +318,37 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                 <FormField
                                     control={editResearchForm.control}
                                     name="disorder"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name of condition (required)</FormLabel>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    creatable={true}
-                                                    maxSelected={1}
-                                                    onSearch={handleConditionAsyncSearch}
-                                                    placeholder="Search for conditions..."
-                                                    hidePlaceholderWhenSelected={true}
-                                                    loadingIndicator={<p>Loading conditions...</p>}
-                                                    emptyIndicator={<p>No conditions found.</p>}
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
+                                    render={({field}) => {
+                                        const id = "ms-disorder";
+
+                                        return (
+                                            <FormItem>
+                                                <FormLabel htmlFor={id} id={`${id}-label`}>
+                                                    Name of condition (required)
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        creatable={true}
+                                                        maxSelected={1}
+                                                        onSearch={handleConditionAsyncSearch}
+                                                        placeholder="Search for conditions..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading conditions...</p>}
+                                                        emptyIndicator={<p>No conditions found.</p>}
+                                                        showHoverCard={false}
+                                                        inputProps={{
+                                                            id,
+                                                            "aria-labelledby": `${id}-label`,
+                                                            "aria-label": "Name of condition",
+                                                            "data-testid": id,
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )
+                                    }}
                                 />
 
                                 <FormField
@@ -680,7 +692,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     )}
                                 />
 
-                                <Button type="submit">
+                                <Button type="submit" data-testid="dialog-save-btn">
                                     Save
                                 </Button>
                             </form>
