@@ -99,8 +99,6 @@ const selector = (state: RoadmapState) => ({
 })
 
 const recommendationsSelector = (state: CROSearchState) => ({
-    recommendations: state.recommendations,
-    setRecommendations: state.setRecommendations,
     searchResults: state.searchResults,
     setFilters: state.setFilters
 })
@@ -174,7 +172,7 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const {recommendations, setRecommendations, searchResults, setFilters} = useCROSearchStore(useShallow(recommendationsSelector))
+    const {searchResults, setFilters} = useCROSearchStore(useShallow(recommendationsSelector))
     const {
         initialized: notificationsInitialized,
         notifications,
@@ -376,19 +374,11 @@ export function EditMilestoneForm({
 
         // update recommendations
         if (milestoneData) {
-            // await setRecommendations([{
-            //     ...milestoneData,
-            //     ...updateData
-            // } as Milestone], {limit: 3})
-            console.log(`milestone data`, milestoneData)
             const filters = MILESTONE_TYPE_OPTIONS
                     .filter(type => milestoneData.types.map(t => t.milestoneTypeId).includes(type.id))
                     .map(type => ({value: type.id, label: type.label}))
 
-            console.log(`milestone type filters`, filters)
-            await setFilters({
-                milestoneTypes: filters
-            } as FiltersType)
+            await setFilters({milestoneTypes: filters} as FiltersType)
         }
 
         // toast('Success!', {
@@ -407,7 +397,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit,
-        [milestoneData, session?.user.organizationId, setMilestone, setRecommendations, milestoneTypes]
+        [milestoneData, session?.user.organizationId, setMilestone, milestoneTypes]
     )
 
     const handleShare = async () => {
@@ -503,24 +493,12 @@ export function EditMilestoneForm({
             setMilestoneTypes(response.data || [])
         }
 
-        // if (milestoneData) {
-        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
-        // }
-
         if (milestoneData) {
-            // await setRecommendations([{
-            //     ...milestoneData,
-            //     ...updateData
-            // } as Milestone], {limit: 3})
-            console.log(`milestone data`, milestoneData)
             const filters = MILESTONE_TYPE_OPTIONS
                     .filter(type => milestoneData.types.map(t => t.milestoneTypeId).includes(type.id))
                     .map(type => ({value: type.id, label: type.label}))
 
-            console.log(`milestone type filters`, filters)
-            await setFilters({
-                milestoneTypes: filters
-            } as FiltersType)
+            await setFilters({milestoneTypes: filters} as FiltersType)
         }
 
         // trigger a form validation, if the imported data is not valid, let the user know right away
@@ -1162,11 +1140,9 @@ export function EditMilestoneForm({
                                             <>
                                                 <div className={cn("w-full grid gap-4 grid-cols-1")}>
                                                     {(searchResults || []).slice(0, 3).map((result: any, index) => (
-                                                        // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
                                                         <CROMarketplaceCard 
                                                             cro={result} 
                                                             key={index}
-                                                            // milestone={milestoneData}
                                                             location={"Research Planner"}
                                                         />
                                                     ))}

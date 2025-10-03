@@ -53,11 +53,6 @@ export const defaultFilters = {
     // genes: []
 }
 
-export type Recommendation = {
-    content: any
-    milestone: Milestone
-}
-
 function generateFiltersString(filters: FiltersType): string {
     let filtersList: string[] = [];
 
@@ -114,41 +109,6 @@ const sortByFilters: { [key: string]: string } = {
     "alphabetical": "title:asc",
     "highest-rated": "avgRating:desc",
     // "most-reviewed": "moneyDeployed:desc",
-}
-
-const generateRecommendations = async (milestones: Milestone[]) => {
-    let recommendationResults: Recommendation[] = []
-
-    await Promise.all(
-        milestones.map(async (milestone) => {
-            const newFilters = {
-                categories: Array.from(
-                    new Set((milestone?.types || []).flatMap(type => type?.milestoneType?.categories || []))
-                )
-                    .map(categoryValue => (ASSOCIATED_CATEGORIES.find(c => c.value === categoryValue)))
-                    .filter(c => c !== undefined)
-                    .map(c => ({label: c?.label, value: c?.value})),
-                types: [],
-                certifications: [],
-                tags: []
-            }
-            const {results: newSearchResults} = await getUpdatedSearchResults({
-                searchTerm: '',
-                sortBy: "alphabetical",
-                filters: newFilters,
-                lastFetchedPage: 1,
-            }, true)
-
-            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
-                return ({
-                    content: result,
-                    milestone
-                } as Recommendation)
-            }))
-        })
-    )
-
-    return recommendationResults
 }
 
 const getUpdatedSearchResults = async (
@@ -223,11 +183,6 @@ const getUpdatedSearchResults = async (
     }
 };
 
-type SetRecommendationsOptions = {
-    limit?: number,
-    priority?: string // milestone id
-}
-
 export interface CROSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => void,
@@ -245,8 +200,6 @@ export interface CROSearchState {
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void,
-    recommendations: Recommendation[] | undefined
-    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
     totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
@@ -255,7 +208,7 @@ export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: (filters: FiltersType) => {
-                set({ initialized: true, recommendations: [], filters })
+                set({ initialized: true, filters })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
@@ -373,27 +326,6 @@ export const useCROSearchStore = create<CROSearchState>()(
                     searchResults: results,
                     totalResults: total,
                 })
-            },
-            recommendations: undefined,
-            setRecommendations: async (milestones: Milestone[], options?: SetRecommendationsOptions) => {
-                console.log(`get recommendations`, options)
-                set({recommendations: undefined})
-                const recommendationResults = await generateRecommendations(
-                    options?.priority
-                        // ? milestones.sort(function(x,y){ return x == first ? -1 : y == first ? 1 : 0; })
-                        ? milestones.sort((x, y) => x.id === options.priority ? -1 : y.id === options.priority ? 1 : 0)
-                        : milestones
-                )
-
-                // remove duplicates before returning
-                const prunedRecommendations = options?.limit
-                    ? Array.from(new Set(recommendationResults)).slice(0, options.limit)
-                    : Array.from(new Set(recommendationResults))
-
-                set({
-                    recommendations: prunedRecommendations
-                })
-                return prunedRecommendations
             },
             totalResults: undefined,
             setTotalResults: (total: number) => set({ totalResults: total }),
