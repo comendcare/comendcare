@@ -123,7 +123,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     title="Public Donor ID"
-                    tooltip="This is a unique ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
+                    tooltip="This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
                 />
             ),
             cell: ({row}) => (
@@ -142,7 +142,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     title="Internal Donor ID" 
-                    tooltip="This ID is optional, and can be used to track any previously used donor ID. This ID cannot be guarenteed to be unique across our platform, and will only be visible to members of your organization."
+                    tooltip="This ID is optional, and can be used to match any previously used donor ID. This ID will only be visible to members of your organization. "
                 />
             ),
             enableHiding: true,
