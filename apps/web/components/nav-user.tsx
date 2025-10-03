@@ -43,20 +43,22 @@ import {cn} from "@comend/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
-import {InvitationWithOrganization, MemberRequestWithUserAndOrganization, MembershipWithOrganization} from "@comend/lib/types";
+import {
+    InvitationWithOrganization,
+    MemberRequestWithUserAndOrganization,
+    MembershipWithOrganization
+} from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
 import Spinner from "@/packages/components/ui/spinner";
 import {User} from "@prisma/client";
 
 type NavUserProps = {
     user: Partial<User>;
-    memberships: MembershipWithOrganization[];
-    invitations: InvitationWithOrganization[],
     memberRequests: MemberRequestWithUserAndOrganization[];
 };
 
 
-export function NavUser({ user, memberships, invitations, memberRequests }: NavUserProps) {
+export function NavUser({user, memberRequests}: NavUserProps) {
     const {data: session, update, status} = useSession();
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -189,91 +191,11 @@ export function NavUser({ user, memberships, invitations, memberRequests }: NavU
                         <DialogDescription>
                             {`You can edit your user profile's settings here.`}
                         </DialogDescription>
-                        <Tabs defaultValue="account" className="w-full">
-                            <TabsList>
-                                <TabsTrigger value="organizations">
-                                    Organizations
-                                </TabsTrigger>
-                                <TabsTrigger value="settings">
-                                    Settings
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="organizations" className="flex flex-col gap-8">
-                                <div className="flex flex-col gap-2">
-                                    <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                        Organizations
-                                    </h2>
-                                    <div className="flex flex-col items-start gap-4">
-                                        {memberships && (
-                                            memberships.length > 0 ? memberships?.map((membership) =>
-                                                <div key={membership.id}
-                                                     className="flex items-center gap-4">
-                                                    <Avatar className="hidden h-9 w-9 sm:flex">
-                                                        <AvatarImage src="/avatars/01.png" alt="Avatar"/>
-                                                        <AvatarFallback>OM</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="grid gap-1">
-                                                        <>
-                                                            <p className="text-sm font-medium leading-none">
-                                                                {membership.organization?.name}
-                                                            </p>
-                                                            <p className="text-sm text-muted-foreground capitalize">
-                                                                {membership.role}
-                                                            </p>
-                                                        </>
-                                                    </div>
-                                                </div>
-                                            ) : <div className="flex flex-col space-y-2 text-left">
-                                                <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
-                                                    {`No Organizations Yet`}
-                                                </h3>
-                                                <p>
-                                                    {`You aren't part of any organizations yet.`}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                        Invitations
-                                    </h2>
-                                    <div className="flex items-center gap-4">
-                                        {invitations && (
-                                            invitations.length > 0 ? invitations?.map((invitation) =>
-                                                <>
-                                                    <Avatar className="hidden h-9 w-9 sm:flex">
-                                                        <AvatarImage src="/avatars/01.png" alt="Avatar"/>
-                                                        <AvatarFallback>OM</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="grid gap-1">
-                                                        <p className="text-sm font-medium leading-none">
-                                                            {invitation.organization?.name || "Unknown Organization"}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {`${invitation.organization?.subdomain || "unknown"}.comend.io`}
-                                                        </p>
-                                                    </div>
-                                                    <Button
-                                                        variant="default"
-                                                        onClick={() => handleAcceptInvitation(invitation?.id || "")}
-                                                    >
-                                                        Accept
-                                                    </Button>
-                                                </>
-                                            ) : <p className="text-muted-foreground text-sm">
-                                                {`You don't have any pending invitations.`}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </TabsContent>
-                            <TabsContent value="settings" className="flex flex-col gap-8 w-full">
-                                <UserEditForm/>
-                                <UserSettings/>
-                            </TabsContent>
-                        </Tabs>
+                        <div className="flex flex-col gap-8 w-full">
+                            <UserEditForm/>
+                            <UserSettings/>
+                        </div>
                     </DialogHeader>
                 </DialogContent>
             </Dialog>

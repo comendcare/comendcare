@@ -59,7 +59,7 @@ const userFormSchema = z.object({
     conditionsOfInterest: z.array(optionSchema).optional(),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
 });
 
 export default function ResearcherOnboardingForm() {

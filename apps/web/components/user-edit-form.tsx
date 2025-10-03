@@ -44,7 +44,7 @@ const userFormSchema = z.object({
     country: z.string().optional(),
     lat: z.string().optional(),
     lng: z.string().optional(),
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
 });
 
 export default function UserEditForm() {
@@ -341,7 +341,7 @@ export default function UserEditForm() {
                         <FormImageSelector
                             form={form}
                             name="image"
-                            title="Profile Image"
+                            title="Your Profile Picture"
                             description="PNG/JPG only (no SVG)."
                             aspect={1}
                             img={defaultValues?.image}

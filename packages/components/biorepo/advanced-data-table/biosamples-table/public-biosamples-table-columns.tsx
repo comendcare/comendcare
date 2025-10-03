@@ -18,8 +18,20 @@ import { Badge } from "./../../../ui/badge";
 import { Option } from "./../../../../../packages/lib/types";
 import Link from "next/link";
 import { handleGetAvailability } from "./../../../../../packages/lib/utils";
+import {usePathname} from "next/navigation";
 
-export function useBiosamplesTableColumns(): ColumnDef<any>[] {
+type Preset = "default" | "profile";
+
+function useColumnsPreset(explicit?: Preset) {
+    const pathname = usePathname();
+    if (explicit) return explicit;
+    if (pathname?.startsWith("/app/profile")) return "profile";
+    return "default";
+}
+
+export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[] {
+    const preset = useColumnsPreset(presetName);
+
     const columns: ColumnDef<any>[] = [
         {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -220,5 +232,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
         // },
     ]
 
-    return columns
+    const presets: Record<Preset, string[]> = {
+        default: columns.map((c) => c.id as string),
+        profile: ["type.label", "pointOfContact.name", "links"],
+    };
+
+    const wanted = new Set(presets[preset]);
+    return columns.filter((c) => wanted.has(c.id as string));
 }
