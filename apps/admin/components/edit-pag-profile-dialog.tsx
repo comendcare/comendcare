@@ -120,7 +120,7 @@ const editOrgFormSchema = z.object({
     country: z.string().optional(),
     lat: z.number().optional(),
     lng: z.number().optional(),
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
     headerImage: z.string().optional(),
 })
 

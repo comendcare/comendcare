@@ -217,6 +217,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                     rfps={rfps}
                                 />
                             )}
+                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                             {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
                             {(
                                 toolCounts.biosampleCount > 0 || 
@@ -225,7 +226,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                             ) && 
                                 <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
                             }
-                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                         </div>
                     </div>
                 </div>

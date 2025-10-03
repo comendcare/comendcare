@@ -8,8 +8,20 @@ import {DISEASE_MODEL_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
+import {usePathname} from "next/navigation";
 
-export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
+type Preset = "default" | "profile";
+
+function useColumnsPreset(explicit?: Preset) {
+    const pathname = usePathname();
+    if (explicit) return explicit;
+    if (pathname?.startsWith("/app/profile")) return "profile";
+    return "default";
+}
+
+export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any>[] {
+    const preset = useColumnsPreset(presetName);
+
     const columns: ColumnDef<any>[] = [
         {
             id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -172,5 +184,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         },
     ]
 
-    return columns
+    const presets: Record<Preset, string[]> = {
+        default: columns.map((c) => c.id as string),
+        profile: ["type.label", "pointOfContact.name", "links"],
+    };
+
+    const wanted = new Set(presets[preset]);
+    return columns.filter((c) => wanted.has(c.id as string));
 }
