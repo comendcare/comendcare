@@ -94,9 +94,9 @@ export const RoadmapCard = ({
 
     return (
         <Tabs
-            // defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'timeline'} // timeline default
-            // defaultValue={urlView === 'timeline' || params.get('view') === 'timeline' ? 'timeline' : 'flow'} // flow default
-            value={urlView === 'timeline' || params.get('view') === 'timeline' ? 'timeline' : 'flow'}
+            // defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'list'} // list default
+            // defaultValue={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'} // flow default
+            value={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'}
             className="w-full"
             onValueChange={setUrlView ? setUrlView: () => {}}
         >
@@ -117,8 +117,8 @@ export const RoadmapCard = ({
                         <TabsTrigger value="flow">
                             Flow View
                         </TabsTrigger>
-                        <TabsTrigger value="timeline">
-                            Timeline View
+                        <TabsTrigger value="list">
+                            List View
                         </TabsTrigger>
                     </TabsList>
                 </CardHeader>
@@ -135,7 +135,7 @@ export const RoadmapCard = ({
                             />
                         </div>
                     </TabsContent>
-                    <TabsContent value="timeline" className="space-y-4 w-full">
+                    <TabsContent value="list" className="space-y-4 w-full">
                         <PublicTimelineView 
                             roadmap={roadmap} 
                             subdomain={subdomain}

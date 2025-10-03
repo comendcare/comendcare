@@ -165,6 +165,14 @@ export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextM
                                     
                                             // Move items without startDate to the end
                                             return !!a.endDate ? -1 : 1
+                                        case "default":
+                                            if (!!a.node?.positionX && !!b.node?.positionX) return a.node.positionX - b.node.positionX
+
+                                            // Keep relative order of items without a node position
+                                            if (!a.node?.positionX && !b.node?.positionX) return 0
+                                    
+                                            // Move items without nodePosition to the end
+                                            return !!a.node?.positionX ? -1 : 1
                                         default:
                                             return 0
                                     }
@@ -339,7 +347,8 @@ export const TimelineItemContent = ({
         <>
         <div className="flex flex-row items-start justify-start gap-4 mr-8">
             <span>
-                {isDraggable && (
+                {/* hide for now, until we bring back custom order in the list view */}
+                {/* {isDraggable && (
                     disabled ? (
                         <Tooltip>
                             <TooltipTrigger>
@@ -373,7 +382,7 @@ export const TimelineItemContent = ({
                             <GripVertical/>
                         </Button>
                     )
-                )}
+                )} */}
                 <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
                 {milestone.private && (
                     <Tooltip>

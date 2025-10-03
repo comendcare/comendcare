@@ -95,7 +95,7 @@ export const onbordaTours: any[] = [
             {
                 icon: <>⭐</>,
                 title: "Your research plan",
-                content: <>{`A timeline view of your research plan will be found here. To create and edit your plan, visit the Research Planner.`}</>,
+                content: <>{`A list view of your research plan will be found here. To create and edit your plan, visit the Research Planner.`}</>,
                 selector: ".organization-profile-tour-step4",
                 side: "top-right" as any,
                 showControls: true,
