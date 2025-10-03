@@ -95,7 +95,7 @@ export function PharmaProjectRecentRecommendations() {
                 return (
                     <div key={organization.id} className="flex items-center">
                         <Avatar className="h-9 w-9">
-                            <AvatarImage src={organization.image || "/avatars/01.png"} alt={organization.name ?? ""}/>
+                            <AvatarImage src={organization.image || ""} alt={organization.name ?? ""}/>
                             <AvatarFallback>
                                 {organization.name ? organization.name
                                     .split(" ")
