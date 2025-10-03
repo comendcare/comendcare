@@ -123,7 +123,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     title="Public Donor ID"
-                    tooltip="This is a unique ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
+                    tooltip="This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
                 />
             ),
             cell: ({row}) => (
@@ -142,7 +142,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     title="Internal Donor ID" 
-                    tooltip="This ID is optional, and can be used to track any previously used donor ID. This ID cannot be guarenteed to be unique across our platform, and will only be visible to members of your organization."
+                    tooltip="This ID is optional, and can be used to match any previously used donor ID. This ID will only be visible to members of your organization. "
                 />
             ),
             enableHiding: true,
@@ -318,29 +318,29 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             }
         },
-        {
-            id: "availability",
-            accessorKey: "availability",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability Status"/>
-            ),
-            cell: ({row}) => {
-                const availability = handleGetAvailability(row.original)
-                if (availability !== undefined) {
-                    return <Badge variant={availability.variant}>{availability.value}</Badge>
-                }
-                return <></>
-            },
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Availability Status",
-                variant: "select",
-                options: AVAILABILITY_OPTIONS,
-                icon: CircleDashed,
-                showInAdvancedOnly: true
-            }
-        },
+        // {
+        //     id: "availability",
+        //     accessorKey: "availability",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Availability Status"/>
+        //     ),
+        //     cell: ({row}) => {
+        //         const availability = handleGetAvailability(row.original)
+        //         if (availability !== undefined) {
+        //             return <Badge variant={availability.variant}>{availability.value}</Badge>
+        //         }
+        //         return <></>
+        //     },
+        //     enableHiding: true,
+        //     enableColumnFilter: true,
+        //     meta: {
+        //         label: "Availability Status",
+        //         variant: "select",
+        //         options: AVAILABILITY_OPTIONS,
+        //         icon: CircleDashed,
+        //         showInAdvancedOnly: true
+        //     }
+        // },
         {
             // NOTE: in order for filters to access the proper nested database object the path to
             // the nested object must be defined in BOTH the id & accessorKey
@@ -352,7 +352,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <>
                     {
-                        (row.original.quantity && row.original.quantityUnit && row.original.quantity >= 0 )
+                        (
+                            row.original.quantity !== null && 
+                            row.original.quantity !== undefined && 
+                            row.original.quantityUnit && 
+                            row.original.quantity >= 0 
+                        )
                             ? `${row.original.quantity}${row.original.quantityUnit}`
                             : `unknown`
                     }

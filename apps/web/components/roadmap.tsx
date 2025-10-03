@@ -112,7 +112,8 @@ export function Roadmap({
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // controllig tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
     const [tab, setTab] = useState<TabType>('projects')
-    const [sortBy, setSortBy] = useState('custom')
+    // const [sortBy, setSortBy] = useState('custom')
+    const [sortBy, setSortBy] = useState('default')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const { isOnbordaVisible } = useOnborda()
     const contextMenuRef = useRef<HTMLDivElement>(null)
@@ -247,33 +248,40 @@ export function Roadmap({
                                                 </div>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {"Interactive whiteboard to organize research plans. Project order changes in this view or the timeline stay separate."}
+                                                {"Interactive whiteboard to organize research plans. Project order changes in this view or the list stay separate."}
                                             </TooltipContent>
                                         </Tooltip>
                                         {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
-                                    <TabsTrigger value="timeline">Timeline View</TabsTrigger>
+                                    <TabsTrigger value="list">List View</TabsTrigger>
                                 </TabsList>
 
-                                {selectedView === "timeline" && (
+                                {selectedView === "list" && (
                                     <div className="flex flex-row gap-4 items-center">
                                         <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                             <SelectTrigger className="w-[180px]">
-                                                <SelectValue defaultValue={'custom'} placeholder={"Sort by"}>
+                                                <SelectValue 
+                                                    // defaultValue={'custom'} 
+                                                    defaultValue={'default'}
+                                                    placeholder={"Sort by"}
+                                                >
                                                     {(() => {
                                                         switch(sortBy) {
                                                             case "start":
                                                                 return "Sort by: Start Date"
                                                             case "end":
                                                                 return "Sort by: End Date"
+                                                            // default:
+                                                            //     return "Sort by: Custom"
                                                             default:
-                                                                return "Sort by: Custom"
+                                                                return "Sort by: Default"
                                                         }
                                                     })()}
                                                 </SelectValue>
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="custom">{`Custom`}</SelectItem>
+                                                {/* <SelectItem value="custom">{`Custom`}</SelectItem> */}
+                                                <SelectItem value="default">{`Default`}</SelectItem>
                                                 <SelectItem value="start">{`Start Date`}</SelectItem>
                                                 <SelectItem value="end">{`End Date`}</SelectItem>
                                             </SelectContent>
@@ -341,9 +349,9 @@ export function Roadmap({
                                 )}
                             </TabsContent>
                             
-                            {/* Timeline view */}
+                            {/* List view */}
                             <TabsContent
-                                value="timeline"
+                                value="list"
                                 className="mt-0 h-[calc(100vh-12rem)]"
                             >
                                 {milestones.length > 0 ? (

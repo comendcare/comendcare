@@ -44,7 +44,7 @@ const userFormSchema = z.object({
     country: z.string().optional(),
     lat: z.string().optional(),
     lng: z.string().optional(),
-    image: z.string().optional(),
+    image: z.string().nullable().optional(),
 });
 
 export default function UserEditForm() {
@@ -216,12 +216,15 @@ export default function UserEditForm() {
             // handle mixpanel opt-in/opt-out
             if (values.consentSettings) {
                 console.log(`mixpanel opt-in`)
-                if (session?.user?.id && session?.user?.email) {
+                mixpanel.opt_in_tracking()
+
+                if (session?.user?.id && session?.user?.email && !(mixpanel as any)._disabled) {
                     // identify the user if we can, to ensure we have the proper distinct ID
                     if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
                     else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+                } else {
+                    console.warn("Tried to call identify while Mixpanel is disabled.");
                 }
-                mixpanel.opt_in_tracking()
             } else if (!values.consentSettings) {
                 console.log(`mixpanel opt-out`)
                 mixpanel.opt_out_tracking()
@@ -341,7 +344,7 @@ export default function UserEditForm() {
                         <FormImageSelector
                             form={form}
                             name="image"
-                            title="Profile Image"
+                            title="Your Profile Picture"
                             description="PNG/JPG only (no SVG)."
                             aspect={1}
                             img={defaultValues?.image}

@@ -12,7 +12,7 @@ import {
 import {Tool} from "@prisma/client";
 import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@/packages/components/types";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {revalidate} from "@/packages/lib/revalidate";
 import { Button } from "@/packages/components/ui/button";
 import { Globe, Lock } from "lucide-react";
@@ -28,13 +28,35 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const columns = useBiosamplesTableColumns()
     const {data: session} = useSession()
     const [rowSelection, setRowSelection] = useState<Object[]>([])
+    const [parentWidth, setParentWidth] = useState(0)
+    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const parentRef = useRef<HTMLDivElement>(null)
 
-    // useEffect(() => {
-    //     revalidate('/')
-    // }, [])
+    useEffect(() => {
+        const el = parentRef.current;
+        if (!el) return;
+
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry?.contentRect) {
+            setParentWidth(entry.contentRect.width);
+            }
+        });
+
+        observer.observe(el);
+
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        setIsCollapsed(parentWidth <= 1100)
+    }, [parentWidth])
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
+        <main 
+            className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4" 
+            ref={parentRef}
+        >
             <Shell className="gap-2">
                 <FeatureFlagsProvider
                     additionalButtons={(
@@ -45,12 +67,13 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                     <TooltipTrigger>
                                         <Button
                                             variant={"secondary"}
-                                            size={"icon"}
+                                            size={isCollapsed ? "icon" : "default"}
                                             onClick={async () => {
                                                 await setBiosamplesVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), true)
                                             }}
                                         >
                                             <Lock />
+                                            {!isCollapsed && `Make selected private`}
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -61,12 +84,13 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                     <TooltipTrigger>
                                         <Button
                                             variant={"secondary"}
-                                            size={"icon"}
+                                            size={isCollapsed ? "icon" : "default"}
                                             onClick={async () => {
                                                 await setBiosamplesVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), false)
                                             }}
                                         >
                                             <Globe />
+                                            {!isCollapsed && `Make selected public`}
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>

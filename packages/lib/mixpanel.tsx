@@ -158,6 +158,13 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                     }
  
                     if (userData.data.consentSettings === true) {
+                        // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
+                        // set the user's 'opt-in' flag
+                        if (window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
+                            console.log(`mixpanel opt-in`)
+                            mixpanel.opt_in_tracking()
+                        }
+
                         // user has consented to data tracking, opt into mixpanel tracking
                         console.log(`mixpanel identify user`, userData)
                         if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
@@ -235,12 +242,6 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         const distinctId = mixpanel.get_distinct_id()
                         setMixpanelContext({ distinctId })
 
-                        // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
-                        // set the user's 'opt-in' flag
-                        if (window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
-                            console.log(`mixpanel opt-in`)
-                            mixpanel.opt_in_tracking()
-                        }
                         if (session.user.email) customerIOIdentify(distinctId, session)
                     } else {
                         // if the user has not consented, make sure they are opted out of mixpanel tracking

@@ -11,9 +11,21 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
-  const comendColumns: ColumnDef<any>[] = [
+type Preset = "default" | "profile";
+
+function useColumnsPreset(explicit?: Preset) {
+    const pathname = usePathname();
+    if (explicit) return explicit;
+    if (pathname?.startsWith("/app/profile")) return "profile";
+    return "default";
+}
+
+export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<any>[] {
+    const preset = useColumnsPreset(presetName);
+
+    const comendColumns: ColumnDef<any>[] = [
     {
         id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "organization",
@@ -196,5 +208,11 @@ export function useClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     },
   ]
 
-  return comendColumns
+    const presets: Record<Preset, string[]> = {
+        default: comendColumns.map((c) => c.id as string),
+        profile: ["title.title", "cohortSize", "pointOfContact.name"],
+    };
+
+    const wanted = new Set(presets[preset]);
+    return comendColumns.filter((c) => wanted.has(c.id as string));
 }
