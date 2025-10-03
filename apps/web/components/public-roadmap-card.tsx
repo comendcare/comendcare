@@ -169,8 +169,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
         <Table>
             <TableHeader>
                 <TableRow className="pointer-events-none">
-                <TableHead className="w-full">Title & Description</TableHead>
-                <TableHead className="w-fit text-nowrap">Stage of Activity</TableHead>
+                <TableHead className="w-full">Therapeutic Strategy</TableHead>
+                <TableHead className="w-fit text-nowrap">Stage</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

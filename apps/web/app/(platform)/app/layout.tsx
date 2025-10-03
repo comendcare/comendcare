@@ -67,8 +67,6 @@ export default async function AppLayoutServer({children}: { children: React.Reac
                     >
                         <NavUser
                             user={user}
-                            memberships={memberships}
-                            invitations={invitations}
                             memberRequests={memberRequests}
                         />
                     </header>
@@ -93,7 +91,6 @@ export default async function AppLayoutServer({children}: { children: React.Reac
             <AppClientShell
                 user={user}
                 memberships={memberships}
-                invitations={invitations}
                 memberRequests={memberRequests}
             >
                 {children}

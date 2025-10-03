@@ -214,7 +214,7 @@ export default function UserProfilePage() {
                                         memberships.length > 0 ? memberships?.map((membership) =>
                                             <div key={membership.id} className="flex items-center gap-4">
                                                 <Avatar className="hidden h-9 w-9 sm:flex">
-                                                    <AvatarImage src="/avatars/01.png" alt="Avatar"/>
+                                                    <AvatarImage src={user.image ?? ""} alt={user.image ?? "User's name"}/>
                                                     <AvatarFallback>OM</AvatarFallback>
                                                 </Avatar>
                                                 <div className="grid gap-1">
@@ -249,7 +249,7 @@ export default function UserProfilePage() {
                                         invitations.length > 0 ? invitations?.map((invitation) =>
                                             <>
                                                 <Avatar className="hidden h-9 w-9 sm:flex">
-                                                    <AvatarImage src="/avatars/01.png" alt="Avatar"/>
+                                                    <AvatarImage src={user.image ?? ""} alt={user.image ?? "User's name"}/>
                                                     <AvatarFallback>OM</AvatarFallback>
                                                 </Avatar>
                                                 <div className="grid gap-1">

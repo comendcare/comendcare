@@ -3096,13 +3096,13 @@ export const updateBiosample = withOrganizationAuth(
                 countryOfCollection: data.countryOfCollection,
                 collectionDate: data.collectionDate,
                 availability: data.availability,
-                ...(data.quantity !== undefined && data.quantity !== null
+                ...((data.quantity !== undefined && data.quantity !== null && data.quantity !== '')
                     ? {quantity: JSON.parse(data.quantity)}
-                    : undefined),
+                    : {quantity: null}),
                 quantityUnit: data.quantityUnit,
-                ...(data.price !== undefined && data.price !== null
+                ...((data.price !== undefined && data.price !== null && data.quantity !== '')
                     ? {price: JSON.parse(data.price)}
-                    : undefined),
+                    : {price: null}),
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,

@@ -51,19 +51,19 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
         setFilters: setBiosampleFilters,
         setSortBy: setBiosampleSortBy,
     } = useBiosampleSearchStore(useShallow(biosamplesSelector))
-    const biosampleColumns = useBiosamplesTableColumns()
+    const biosampleColumns = useBiosamplesTableColumns("profile")
     const { 
         searchResults: diseaseModels,
         setFilters: setDiseaseModelFilters,
         setSortBy: setDiseaseModelSortBy,
     } = useDiseaseModelSearchStore(useShallow(diseaseModelsSelector))
-    const diseaseModelColumns = useDiseaseModelsTableColumns()
+    const diseaseModelColumns = useDiseaseModelsTableColumns("profile")
     const { 
         searchResults: clinicalDatasets,
         setFilters: setClinicalDatasetFilters,
         setSortBy: setClinicalDatasetSortBy,
     } = useClinicalDatasetSearchStore(useShallow(clinicalDatasetsSelector))
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns("profile")
 
     if (section === 'biosamples') setBiosampleSortBy(searchParams?.sort)
     if (section === 'disease-models') setDiseaseModelSortBy(searchParams?.sort)
@@ -92,79 +92,99 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
 
     return (
         <Card className="organization-profile-tour-step5">
-            <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <CardTitle>Tools</CardTitle>
-                <div className="text-muted-foreground text-sm flex flex-wrap gap-4 justify-end">
-                    {toolCounts.biosampleCount > 0 && (
-                        <Button
-                            variant={"link"}
-                            onClick={async () => {
-                                await setSort(null)
-                                setSection("biosamples");
-                            }}
-                            className={cn(
-                                "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                section === 'biosamples'
-                                    ? "bg-blue-light font-medium text-primary"
-                                    : "text-muted-foreground",
-                            )}
-                        >
-                            {<TestTubeDiagonal className="mr-2 h-4 w-4"/>}
-                            Biosamples
-                        </Button>
-                    )}
-                    {toolCounts.diseaseModelCount > 0 && (
-                        <Button
-                            variant={"link"}
-                            onClick={async () => {
-                                await setSort(null)
-                                setSection("disease-models");
-                            }}
-                            className={cn(
-                                "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                section === 'disease-models'
-                                    ? "bg-blue-light font-medium text-primary"
-                                    : "text-muted-foreground",
-                            )}
-                        >
-                            {<Rat className="mr-2 h-4 w-4"/>}
-                            Disease Models
-                        </Button>
-                    )}
-                    {toolCounts.clinicalDatasetCount > 0 && (
-                        <Button
-                            variant={"link"}
-                            onClick={async () => {
-                                await setSort(null)
-                                setSection('clinical-datasets')
-                            }}
-                            className={cn(
-                                "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                section === 'clinical-datasets'
-                                    ? "bg-blue-light font-medium text-primary"
-                                    : "text-muted-foreground",
-                            )}
-                        >
-                            {<Database className="mr-2 h-4 w-4"/>}
-                            Clinical Datasets
-                        </Button>
-                    )}
-                </div>
+            <CardHeader className="w-full flex flex-row items-start justify-between gap-4">
+                <CardTitle className="w-full flex flex-row items-center justify-between">
+                    Tools
+                    <div className="text-muted-foreground text-sm flex flex-wrap gap-2 justify-end">
+                        {toolCounts.biosampleCount > 0 && (
+                            <Button
+                                variant={"link"}
+                                onClick={async () => {
+                                    await setSort(null)
+                                    setSection("biosamples");
+                                }}
+                                className={cn(
+                                    "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                    section === 'biosamples'
+                                        ? "bg-blue-light font-medium text-primary"
+                                        : "text-muted-foreground",
+                                )}
+                            >
+                                {<TestTubeDiagonal className="mr-2 h-4 w-4"/>}
+                                Biosamples ({toolCounts.biosampleCount})
+                            </Button>
+                        )}
+                        {toolCounts.diseaseModelCount > 0 && (
+                            <Button
+                                variant={"link"}
+                                onClick={async () => {
+                                    await setSort(null)
+                                    setSection("disease-models");
+                                }}
+                                className={cn(
+                                    "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                    section === 'disease-models'
+                                        ? "bg-blue-light font-medium text-primary"
+                                        : "text-muted-foreground",
+                                )}
+                            >
+                                {<Rat className="mr-2 h-4 w-4"/>}
+                                Disease Models ({toolCounts.diseaseModelCount})
+                            </Button>
+                        )}
+                        {toolCounts.clinicalDatasetCount > 0 && (
+                            <Button
+                                variant={"link"}
+                                onClick={async () => {
+                                    await setSort(null)
+                                    setSection('clinical-datasets')
+                                }}
+                                className={cn(
+                                    "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                    section === 'clinical-datasets'
+                                        ? "bg-blue-light font-medium text-primary"
+                                        : "text-muted-foreground",
+                                )}
+                            >
+                                {<Database className="mr-2 h-4 w-4"/>}
+                                Clinical Datasets ({toolCounts.clinicalDatasetCount})
+                            </Button>
+                        )}
+                    </div>
+                </CardTitle>
             </CardHeader>
             <CardContent className="w-full max-w-full">
                 {section === 'biosamples' && (
                     <div className="max-w-7xl w-full overflow-auto">
-                        <BiosamplesTable data={biosamples || []} pageCount={1} columns={biosampleColumns} searchParams={{}}/>
+                        <BiosamplesTable
+                            data={biosamples || []}
+                            pageCount={1}
+                            columns={biosampleColumns}
+                            searchParams={{}}
+                            showPagination={toolCounts.biosampleCount > 10}
+                        />
                     </div>
                 )}
                 {section === 'disease-models' && (
                     <div className="max-w-7xl w-full overflow-auto">
-                        <DiseaseModelsTable data={diseaseModels || []} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
+                        <DiseaseModelsTable
+                            data={diseaseModels || []}
+                            pageCount={1}
+                            columns={diseaseModelColumns}
+                            searchParams={{}}
+                            showPagination={toolCounts.diseaseModelCount > 10}
+                        />
                     </div>
                 )}
                 {section === 'clinical-datasets' && (
                     <div className="max-w-7xl w-full overflow-auto">
-                        <ClinicalDatasetsTable data={clinicalDatasets || []} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
+                        <ClinicalDatasetsTable
+                            data={clinicalDatasets || []}
+                            pageCount={1}
+                            columns={clinicalDatasetColumns}
+                            searchParams={{}}
+                            showPagination={toolCounts.clinicalDatasetCount > 10}
+                        />
                     </div>
                 )}
             </CardContent>
