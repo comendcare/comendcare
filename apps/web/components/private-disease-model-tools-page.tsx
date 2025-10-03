@@ -10,7 +10,7 @@ import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/she
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns";
 import { Tool } from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { revalidate } from "@/packages/lib/revalidate";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
@@ -23,13 +23,35 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
     const columns = useDiseaseModelsTableColumns()
     const {data: session} = useSession()
     const [rowSelection, setRowSelection] = useState<Object[]>([])
+    const [parentWidth, setParentWidth] = useState(0)
+    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const parentRef = useRef<HTMLDivElement>(null)
 
-    // useEffect(() => {
-    //     revalidate('/')
-    // }, [])
+    useEffect(() => {
+        const el = parentRef.current;
+        if (!el) return;
+
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry?.contentRect) {
+            setParentWidth(entry.contentRect.width);
+            }
+        });
+
+        observer.observe(el);
+
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        setIsCollapsed(parentWidth <= 1100)
+    }, [parentWidth])
 
     return (
-        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4">
+        <main 
+            className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4"
+            ref={parentRef}
+        >
         <Shell className="gap-2">
             <FeatureFlagsProvider
                 additionalButtons={(
@@ -40,12 +62,13 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
                                 <TooltipTrigger>
                                     <Button
                                         variant={"secondary"}
-                                        size={"icon"}
+                                        size={isCollapsed ? "icon" : "default"}
                                         onClick={async () => {
                                             await setDiseaseModelsVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), true)
                                         }}
                                     >
                                         <Lock />
+                                        {!isCollapsed && `Make selected private`}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -56,12 +79,13 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {d
                                 <TooltipTrigger>
                                     <Button
                                         variant={"secondary"}
-                                        size={"icon"}
+                                        size={isCollapsed ? "icon" : "default"}
                                         onClick={async () => {
                                             await setDiseaseModelsVisibility(session?.user.organizationId, rowSelection.map((row: any) => row.id), false)
                                         }}
                                     >
                                         <Globe />
+                                        {!isCollapsed && `Make selected public`}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>

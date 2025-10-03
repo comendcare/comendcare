@@ -318,29 +318,29 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 icon: CircleDashed,
             }
         },
-        {
-            id: "availability",
-            accessorKey: "availability",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Availability Status"/>
-            ),
-            cell: ({row}) => {
-                const availability = handleGetAvailability(row.original)
-                if (availability !== undefined) {
-                    return <Badge variant={availability.variant}>{availability.value}</Badge>
-                }
-                return <></>
-            },
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Availability Status",
-                variant: "select",
-                options: AVAILABILITY_OPTIONS,
-                icon: CircleDashed,
-                showInAdvancedOnly: true
-            }
-        },
+        // {
+        //     id: "availability",
+        //     accessorKey: "availability",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader column={column} title="Availability Status"/>
+        //     ),
+        //     cell: ({row}) => {
+        //         const availability = handleGetAvailability(row.original)
+        //         if (availability !== undefined) {
+        //             return <Badge variant={availability.variant}>{availability.value}</Badge>
+        //         }
+        //         return <></>
+        //     },
+        //     enableHiding: true,
+        //     enableColumnFilter: true,
+        //     meta: {
+        //         label: "Availability Status",
+        //         variant: "select",
+        //         options: AVAILABILITY_OPTIONS,
+        //         icon: CircleDashed,
+        //         showInAdvancedOnly: true
+        //     }
+        // },
         {
             // NOTE: in order for filters to access the proper nested database object the path to
             // the nested object must be defined in BOTH the id & accessorKey
@@ -352,7 +352,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <>
                     {
-                        (row.original.quantity && row.original.quantityUnit && row.original.quantity >= 0 )
+                        (
+                            row.original.quantity !== null && 
+                            row.original.quantity !== undefined && 
+                            row.original.quantityUnit && 
+                            row.original.quantity >= 0 
+                        )
                             ? `${row.original.quantity}${row.original.quantityUnit}`
                             : `unknown`
                     }

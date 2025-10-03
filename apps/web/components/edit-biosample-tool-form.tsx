@@ -533,6 +533,18 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                     className="w-full min-h-[40px]"
                                     placeholder={`Enter a number`}
                                     type="number"
+                                    min="0"
+                                    onInput={(e) => {
+                                        const target = e.currentTarget;
+                                        if (Number(target.value) < 0) {
+                                        target.value = "0"; // reset to 0 if negative
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "-" || e.key === "e") {
+                                        e.preventDefault(); // block typing "-" and "e" for exponent notation
+                                        }
+                                    }}
                                     {...field}
                                 />
                                 </div>
