@@ -29,7 +29,7 @@ import {
     AlertDialogTitle,
 } from "@comend/components/ui/alert-dialog";
 import {toast} from "sonner";
-import {acceptInvitation, deleteMemberRequest} from "@comend/lib/actions";
+import {deleteMemberRequest} from "@comend/lib/actions";
 import {
     Dialog,
     DialogContent,
@@ -38,15 +38,10 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Button} from "@comend/components/ui/button";
-import {cn} from "@comend/lib/utils";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import UserEditForm from "~web/components/user-edit-form";
 import UserSettings from "~web/components/user-settings";
 import {
-    InvitationWithOrganization,
     MemberRequestWithUserAndOrganization,
-    MembershipWithOrganization
 } from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
 import Spinner from "@/packages/components/ui/spinner";
@@ -59,29 +54,8 @@ type NavUserProps = {
 
 
 export function NavUser({user, memberRequests}: NavUserProps) {
-    const {data: session, update, status} = useSession();
-    const router = useRouter();
+    const {data: session, status} = useSession();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    async function handleAcceptInvitation(invitationId: string) {
-        try {
-            const response = await acceptInvitation(invitationId);
-
-            if (response.success && response.data) {
-                toast.success("Invitation accepted successfully!");
-                await update({
-                    ...session,
-                    organizationId: response.data.organizationId,
-                })
-                router.refresh()
-            } else {
-                toast.error(response.error || "Failed to accept the invitation.");
-            }
-        } catch (error) {
-            console.error("Error accepting invitation:", error);
-            toast.error("An unexpected error occurred. Please try again.");
-        }
-    }
 
     const handleClose = async (memberRequest: MemberRequestWithUserAndOrganization) => {
         try {
