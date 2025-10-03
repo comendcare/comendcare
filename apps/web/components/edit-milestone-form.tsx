@@ -39,7 +39,7 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@comend/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import {Biosample, DiseaseModel, MilestoneType, Organization, PlatformNotification, Prisma, Tool} from "@prisma/client"
 import {getAssets, getBiosamples, getDatasamples, getDiseaseModels, getRFPs} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -56,7 +56,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
 import {PlateEditor} from "@comend/components/editor/plate-editor"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
-import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
+import {CROSearchState, FiltersType, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
 import {Card, CardContent} from "@comend/components/ui/card"
 import Image from "next/image"
 import {CROMarketplaceCard} from "./marketplace/marketplace-cro-card"
@@ -100,7 +100,9 @@ const selector = (state: RoadmapState) => ({
 
 const recommendationsSelector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
-    setRecommendations: state.setRecommendations
+    setRecommendations: state.setRecommendations,
+    searchResults: state.searchResults,
+    setFilters: state.setFilters
 })
 
 const notificationsSelector = (state: NotificationsState) => ({
@@ -172,7 +174,7 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
+    const {recommendations, setRecommendations, searchResults, setFilters} = useCROSearchStore(useShallow(recommendationsSelector))
     const {
         initialized: notificationsInitialized,
         notifications,
@@ -374,10 +376,19 @@ export function EditMilestoneForm({
 
         // update recommendations
         if (milestoneData) {
-            await setRecommendations([{
-                ...milestoneData,
-                ...updateData
-            } as Milestone], {limit: 3})
+            // await setRecommendations([{
+            //     ...milestoneData,
+            //     ...updateData
+            // } as Milestone], {limit: 3})
+            console.log(`milestone data`, milestoneData)
+            const filters = MILESTONE_TYPE_OPTIONS
+                    .filter(type => milestoneData.types.map(t => t.milestoneTypeId).includes(type.id))
+                    .map(type => ({value: type.id, label: type.label}))
+
+            console.log(`milestone type filters`, filters)
+            await setFilters({
+                milestoneTypes: filters
+            } as FiltersType)
         }
 
         // toast('Success!', {
@@ -492,8 +503,24 @@ export function EditMilestoneForm({
             setMilestoneTypes(response.data || [])
         }
 
+        // if (milestoneData) {
+        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
+        // }
+
         if (milestoneData) {
-            await setRecommendations([milestoneData as Milestone], {limit: 3})
+            // await setRecommendations([{
+            //     ...milestoneData,
+            //     ...updateData
+            // } as Milestone], {limit: 3})
+            console.log(`milestone data`, milestoneData)
+            const filters = MILESTONE_TYPE_OPTIONS
+                    .filter(type => milestoneData.types.map(t => t.milestoneTypeId).includes(type.id))
+                    .map(type => ({value: type.id, label: type.label}))
+
+            console.log(`milestone type filters`, filters)
+            await setFilters({
+                milestoneTypes: filters
+            } as FiltersType)
         }
 
         // trigger a form validation, if the imported data is not valid, let the user know right away
@@ -1095,7 +1122,7 @@ export function EditMilestoneForm({
                                         />
                                     </TabsContent>
                                     <TabsContent value="recommendations" className="space-y-4 w-full">
-                                        {!recommendations && (
+                                        {!searchResults && (
                                             <div className="flex flex-col gap-4">
                                                 <Skeleton className="w-full h-[230px]"/>
                                                 <Skeleton className="w-full h-[230px]"/>
@@ -1103,7 +1130,7 @@ export function EditMilestoneForm({
                                             </div>
                                         )}
 
-                                        {(recommendations && recommendations.length === 0) && (
+                                        {(searchResults && searchResults.length === 0) && (
                                             <Card
                                                 className="w-full flex flex-col mx-auto justify-center items-center align-center">
                                                 <CardContent className="flex flex-col gap-4 p-4">
@@ -1131,14 +1158,17 @@ export function EditMilestoneForm({
                                             </Card>
                                         )}
 
-                                        {recommendations && recommendations.length > 0 && (
+                                        {searchResults && searchResults.length > 0 && (
                                             <>
                                                 <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                                    {(recommendations || []).map((result: Recommendation, index) => (
+                                                    {(searchResults || []).slice(0, 3).map((result: any, index) => (
                                                         // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
-                                                        <CROMarketplaceCard cro={result.content} key={index}
-                                                                            milestone={milestoneData}
-                                                                            location={"Research Planner"}/>
+                                                        <CROMarketplaceCard 
+                                                            cro={result} 
+                                                            key={index}
+                                                            // milestone={milestoneData}
+                                                            location={"Research Planner"}
+                                                        />
                                                     ))}
                                                 </div>
                                             </>
