@@ -242,7 +242,7 @@ export default function OrganizationOnboardingForm(
                 if (key === "therapeuticsOfInterest") return
                 if (key === "otherTherapeuticsOfInterest") return
 
-                if (value !== undefined) {
+                if (value !== undefined && value !== null) {
                     formData.append(key, value.toString());
                 }
             });
