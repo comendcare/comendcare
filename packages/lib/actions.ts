@@ -3951,7 +3951,44 @@ export const createRoadmap = withOrganizationAuth(
 
             // If a template was provided, create nodes/edges/milestones first
             if (roadmapTemplate?.milestones) {
-                await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, roadmapTemplate);
+                const sortedMilestones = roadmapTemplate?.milestones.sort((a, b) => {
+                    const aNode = roadmapTemplate?.nodes?.find(node => node.id === a.nodeId)
+                    const bNode = roadmapTemplate?.nodes?.find(node => node.id === b.nodeId)
+
+                    if (aNode?.positionX && bNode?.positionX) {
+                        return aNode.positionX - bNode.positionX
+                    } else if (aNode?.positionX) {
+                        // node a is defiend, node b is not, put node a first
+                        return -1
+                    } else if (bNode?.positionX) {
+                        // node b is defined, node b is not, put node b first
+                        return 1
+                    }
+
+                    // if nether is defined, don't re-sort
+                    return 0
+                })
+                const sortedNodes = roadmapTemplate?.nodes.sort((a, b) => {
+                    if (a?.positionX && b?.positionX) {
+                        return a.positionX - b.positionX
+                    } else if (a?.positionX) {
+                        // node a is defiend, node b is not, put node a first
+                        return -1
+                    } else if (b?.positionX) {
+                        // node b is defined, node b is not, put node b first
+                        return 1
+                    }
+
+                    // if nether is defined, don't re-sort
+                    return 0
+                })
+
+                // sort milestones and nodes, just in case they're not sorted properly in the template file
+                await createNodesAndEdgesFromTemplate(organization.id, roadmap.id, {
+                    ...roadmapTemplate,
+                    milestones: sortedMilestones,
+                    nodes: sortedNodes
+                });
             }
 
             // Re-fetch with full graph
