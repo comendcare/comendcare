@@ -42,6 +42,8 @@ import {
     GetBiosamplesSchema,
     GetDiseaseModelSchema
 } from "./validations";
+import {notFound, redirect} from "next/navigation";
+import {switchOrganization} from "./actions";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function getServicesOfCompany(
@@ -3041,4 +3043,55 @@ export async function fetchFeedPage(opts: {
         items,
         nextCursor: next ? {createdAt: next.createdAt, id: next.id} : null,
     };
+}
+
+export async function ensureOrgContextForRoadmap(roadmapId: string) {
+    const session = await getSession()
+    if (!session?.user?.id) redirect("/login");
+
+    // Minimal lookup to learn which org owns this roadmap (no sensitive fields)
+    const roadmap = await prisma.roadmap.findUnique({
+        where: { id: roadmapId },
+        select: { id: true, organizationId: true },
+    });
+
+    if (!roadmap) notFound(); // 404 if it doesn’t exist
+
+    const orgId = roadmap.organizationId ?? null;
+
+    // If roadmap isn't tied to an org (rare), only allow if it's published or owned, etc.
+    // Customize this branch as your product rules require.
+    if (!orgId) {
+        return { orgId: null, switched: false };
+    }
+
+    // Is the user a member of that org?
+    const membership = await prisma.member.findUnique({
+        where: {
+            userId_organizationId: { userId: session.user.id, organizationId: orgId },
+        },
+        select: { id: true },
+    });
+
+    // If not a member: pretend it doesn’t exist (or show a 403 page if you prefer)
+    if (!membership) notFound();
+
+    // Switch org if needed (server-side, before render)
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { activeOrganizationId: true },
+    });
+
+    let switched = false;
+    if (user?.activeOrganizationId !== orgId) {
+        await switchOrganization(orgId);
+        switched = true;
+    }
+
+    const organization = await prisma.organization.findUnique({
+        where: { id: orgId },
+        select: {id: true, name: true},
+    })
+
+    return { organization, switched };
 }
