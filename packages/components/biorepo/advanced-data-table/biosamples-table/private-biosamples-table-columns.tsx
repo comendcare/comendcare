@@ -142,7 +142,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     title="Internal Donor ID" 
-                    tooltip="This ID is optional, and can be used to match any previously used donor ID. This ID will only be visible to members of your organization. "
+                    tooltip="This ID is optional, and can be used to match any previously used donor ID. This ID will only be visible to members of your organization."
                 />
             ),
             enableHiding: true,
