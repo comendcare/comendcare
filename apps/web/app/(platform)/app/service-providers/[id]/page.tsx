@@ -11,13 +11,20 @@ import CROPageHeader from "~web/components/marketplace/cro-page-header";
 import {notFound} from "next/navigation";
 import prisma from "@/packages/lib/prisma";
 import {CompanyWithReviewsAndServices} from "@/packages/lib/types";
+import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
+import {getSession} from "@/packages/lib/auth";
+import NoOrganization from "~web/components/no-organization";
+import {SavedCompany} from "@prisma/client";
 
 export default async function CompanyHomePage({
                                                   params
                                               }: {
     params: { id: string }
 }) {
+    const session = await getSession()
     const id = decodeURIComponent(params.id)
+
+    if (!session?.user?.organizationId) return <NoOrganization />
 
     const company = await prisma.company.findUnique({
         where: {id},
@@ -54,6 +61,15 @@ export default async function CompanyHomePage({
         },
     });
 
+    const res = await getSavedCompaniesFromOrganizationId(session?.user.organizationId, {
+        companyId: true,
+    });
+
+    let savedCompanyIds: Set<string> = new Set()
+    if (res.success && res.data) {
+        savedCompanyIds = new Set(res.data.map((c: SavedCompany) => c.companyId))
+    }
+
     if (!company) {
         notFound();
     }
@@ -76,7 +92,10 @@ export default async function CompanyHomePage({
                     Return to marketplace
                 </Link>
                 <main className="flex flex-col w-full max-w-7xl mx-auto space-y-8">
-                    <CROPageHeader company={company as CompanyWithReviewsAndServices}/>
+                    <CROPageHeader
+                        company={company as CompanyWithReviewsAndServices}
+                        savedCompanyIds={savedCompanyIds}
+                    />
                     <CROPageTabs company={company as CompanyWithReviewsAndServices}/>
                 </main>
             </div>

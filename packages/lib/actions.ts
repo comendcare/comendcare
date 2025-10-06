@@ -5724,32 +5724,57 @@ export const deleteReview = withOrganizationAuth(
 export const saveCRO = withOrganizationAuth(
     async (organization: Organization, croId: string, milestoneId?: string | null) => {
         try {
+            // Check if this CRO is already saved by this organization
+            const existing = await prisma.savedCompany.findFirst({
+                where: {
+                    companyId: croId,
+                    organizationId: organization.id,
+                },
+            });
+
+            if (existing) {
+                return {
+                    success: false,
+                    error: "This CRO is already saved. To remove it, go to your saved page and unsave it there.",
+                };
+            }
+
             const data: Prisma.SavedCompanyUncheckedCreateInput = {
                 companyId: croId,
                 organizationId: organization.id,
-                ...(milestoneId ? {milestoneId} : {}), // omit if none
+                ...(milestoneId ? { milestoneId } : {}), // omit if none
             };
 
             const response = await prisma.savedCompany.create({
                 data,
                 include: {
                     company: true,
-                    ...(milestoneId ? {milestone: {include: {types: true}}} : {}),
+                    ...(milestoneId ? { milestone: { include: { types: true } } } : {}),
                 },
             });
 
             if (!response) {
-                return {success: false, error: "Database error. please try again later."};
+                return { success: false, error: "Database error. Please try again later." };
             }
 
+            // Revalidate relevant pages
             revalidatePath(`/app/service-providers/${croId}`);
             revalidatePath(`/app/marketplace`);
             revalidatePath(`/app/marketplace/service-providers`);
 
-            return {success: true, data: response};
-        } catch (error) {
+            return { success: true, data: response };
+        } catch (error: any) {
             console.error("Error saving company:", error);
-            return {success: false, error: "Database error. please try again later."};
+
+            // Handle unique constraint directly (fallback)
+            if (error.code === "P2002") {
+                return {
+                    success: false,
+                    error: "This CRO is already saved. To remove it, go to your saved page and unsave it there.",
+                };
+            }
+
+            return { success: false, error: "Database error. Please try again later." };
         }
     }
 );

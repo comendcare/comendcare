@@ -79,27 +79,34 @@ export function CRORecommendationCard({cro, milestone, location}: { cro: Company
     );
 }
 
-export function CROMarketplaceCard({cro, milestone, location}: {
+export function CROMarketplaceCard({cro, milestone, location, savedCompanyIds}: {
     cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
-    location?: string
+    location?: string,
+    savedCompanyIds?: Set<string>
 }) {
     const {id} = cro;
 
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
-                <CROCardHeaderContents cro={cro} milestone={milestone} location={location}/>
+                <CROCardHeaderContents
+                    cro={cro}
+                    milestone={milestone}
+                    location={location}
+                    savedCompanyIds={savedCompanyIds}
+                />
             </CardHeader>
             <CROCardContents cro={cro}/>
         </Card>
     )
 }
 
-export function CROCardHeaderContents({cro, milestone, location}: {
+export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds}: {
     cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
-    location?: string
+    location?: string,
+    savedCompanyIds?: Set<string>
 }) {
     const {id, title, description, companyType, avgRating} = cro;
 
@@ -128,7 +135,12 @@ export function CROCardHeaderContents({cro, milestone, location}: {
                     </CardTitle>
                 </Link>
                 {/*<SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>*/}
-                <SaveCROButton cro={cro} type={"card"} location={location} />
+                <SaveCROButton
+                    cro={cro}
+                    type={"card"}
+                    location={location}
+                    savedCompanyIds={savedCompanyIds}
+                />
             </div>
             <Link
                 href={
