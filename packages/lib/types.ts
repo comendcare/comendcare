@@ -1214,8 +1214,8 @@ export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
     },
     // {
     //     id: '5',
-    //     label: 'Theraputic-Agnostic',
-    //     value: 'THERAPUTIC_AGNOSTIC',
+    //     label: 'Therapeutic-agnostic',
+    //     value: 'THERAPEUTIC_AGNOSTIC',
     // },
     {
         id: '6',
