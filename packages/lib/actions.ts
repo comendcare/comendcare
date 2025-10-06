@@ -1186,11 +1186,12 @@ export const editUser = withAuth(
 export const inviteUser = withOrganizationAuth(
     async (
         organization: Organization,
-        session: Session | null,
         email: string,
         role: string = "member",
         ip: string,
     ): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+
         try {
             if (!session) {
                 throw new Error("You must be signed in to perform this action")
@@ -1775,7 +1776,9 @@ export const deleteMember = withOrganizationAuth(
 
 // Invite user function with updated Organization model
 export const deleteUser = withAuth(
-    async (session: Session | null) => {
+    async () => {
+        const session = await getSession();
+
         try {
             if (!session) {
                 return {success: false, error: "Internal server error"};

@@ -131,7 +131,6 @@ export default function InviteUserToOrgDialog() {
         try {
             const response = await inviteUser(
                 organization?.id as string, // organizationId
-                session as any,             // your action expects the session object; adjust typing if needed
                 values.email,
                 values.role,
                 await getIp()
