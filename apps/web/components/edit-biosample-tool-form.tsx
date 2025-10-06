@@ -1020,7 +1020,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                 <Info className="h-4 w-4"/>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                {`This ID is optional, and can be used to match any previously used donor ID. This ID will only be visible to members of your organization.`}
+                                {`This ID is optional, and can be used to track donor IDs from any previously used donor identification system outside the Comend platform. This ID cannot be guaranteed to be unique across our platform, and will only be visible to members of your organization.`}
                             </TooltipContent>
                         </Tooltip>
                     </FormLabel>
