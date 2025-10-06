@@ -51,6 +51,7 @@ import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { useShallow } from "zustand/react/shallow"
 import MoneyInput from "@comend/components/money-input"
 import ProjectMultipleSelector from "./project-multiple-selector"
+import { revalidate } from "@/packages/lib/revalidate"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -239,6 +240,8 @@ export function EditRFPForm({
                     {position: "bottom-left"}
                 )
             }
+            revalidate('/app/rfps') // update page contents
+
             if (closeDialog) closeDialog(updatedOrNewRFP)
         } catch (error) {
             console.error("Error updating or createing RFP:", error);
