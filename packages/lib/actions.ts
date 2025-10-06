@@ -9,7 +9,7 @@ import {
     Invitation,
     PlatformNotification,
     Review,
-    Institution,
+    Institution, Condition,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {authOptions, withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
@@ -2118,26 +2118,37 @@ export const updateCondition = withOrganizationAuth(
             // Helper to upsert any missing conditions by slug and return {slug -> id}
             const ensureConditionsBySlugs = async (slugs: string[]) => {
                 if (!slugs.length) return new Map<string, string>();
+
                 const existing = await prisma.condition.findMany({
                     where: {slug: {in: slugs}},
                     select: {id: true, slug: true},
                 });
-                const bySlug = new Map(existing.map((e) => [e.slug, e.id]));
+                const bySlug = new Map(existing.map(e => [e.slug, e.id]));
 
-                const missing = slugs.filter((s) => !bySlug.has(s));
+                const missing = slugs.filter(s => !bySlug.has(s));
                 if (missing.length) {
-                    const created = await Promise.all(
-                        missing.map((slug) => {
-                            const nameGuess = slug.replace(/-/g, " ");
-                            return prisma.condition.upsert({
-                                where: {slug},
-                                update: {name: nameGuess, slug},
-                                create: {name: nameGuess, slug},
-                            });
-                        })
-                    );
-                    created.forEach((c) => bySlug.set(c.slug, c.id));
+                    for (const slug of missing) {
+                        const nameGuess = slug.replace(/-/g, " ").replace(/\s+/g, " ").trim();
+
+                        // 1) If a condition with this *name* already exists, use it
+                        const byName = await prisma.condition.findUnique({
+                            where: {name: nameGuess},
+                            select: {id: true, slug: true},
+                        });
+                        if (byName) {
+                            bySlug.set(slug, byName.id);
+                            continue;
+                        }
+
+                        // 2) Otherwise create a fresh one (slug is the unique key)
+                        const created = await prisma.condition.create({
+                            data: {slug, name: nameGuess},
+                            select: {id: true, slug: true},
+                        });
+                        bySlug.set(created.slug, created.id);
+                    }
                 }
+
                 return bySlug;
             };
 
@@ -2206,17 +2217,31 @@ export const updateCondition = withOrganizationAuth(
                             ? await prisma.condition.findUnique({where: {slug: requestedSlug}})
                             : null;
 
-                let condition;
+                let condition: Condition;
+
                 if (existing) {
-                    condition = await prisma.condition.update({
-                        where: {id: existing.id},
-                        data,
-                    });
+                    condition = await prisma.condition.update({where: {id: existing.id}, data});
                 } else {
                     const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
-                    condition = await prisma.condition.create({
-                        data: {...data, slug, name: data.name},
-                    });
+
+                    // If a condition with this name already exists, use that one
+                    if (data.name) {
+                        const byName = await prisma.condition.findUnique({where: {name: data.name}});
+                        if (byName) {
+                            condition = await prisma.condition.update({
+                                where: {id: byName.id},
+                                data, // safe: you’re updating the existing record
+                            });
+                        } else {
+                            condition = await prisma.condition.create({
+                                data: {...data, slug, name: data.name ?? slug.replace(/-/g, " ")},
+                            });
+                        }
+                    } else {
+                        condition = await prisma.condition.create({
+                            data: {...data, slug, name: slug.replace(/-/g, " ")},
+                        });
+                    }
                 }
 
                 // Link org → primary condition
@@ -2242,26 +2267,77 @@ export const updateCondition = withOrganizationAuth(
             }
 
             // ---------- UPDATE branch ----------
-            const conditionId = link.conditionId;
-            const thisSlug = link.condition?.slug ?? null;
+            let conditionId = link.conditionId;
+            let thisSlug = link.condition?.slug ?? null;
 
-            // Fetch previous associated (for diff)
-            const prev = await prisma.condition.findUnique({
-                where: {id: conditionId},
-                select: {associatedConditions: {select: {id: true}}},
-            });
-            const prevAssocIds = (prev?.associatedConditions ?? []).map((c) => c.id);
+            // Fetch previous associated (for diff) from the record we will actually update/use
+            const getAssocIds = async (id: string) => {
+                const prev = await prisma.condition.findUnique({
+                    where: {id},
+                    select: {associatedConditions: {select: {id: true}}, slug: true, name: true},
+                });
+                return {
+                    ids: (prev?.associatedConditions ?? []).map((c) => c.id),
+                    slug: prev?.slug ?? null,
+                    name: prev?.name ?? null,
+                };
+            };
 
-            // Update scalar fields first (as you had)
+            // Pull out possible name/slug from incoming data
+            const {name: incomingName, slug: incomingSlug, ...restData} = data ?? {};
+
+            let targetConditionId = conditionId;
+
+            // If a conflicting name is requested, re-point the org to the canonical row
+            if (incomingName) {
+                const byName = await prisma.condition.findUnique({
+                    where: {name: incomingName},
+                    select: {id: true},
+                });
+
+                if (byName && byName.id !== conditionId) {
+                    // Move this organization's link to the existing condition with that name
+                    await prisma.conditionToOrganization.upsert({
+                        where: {
+                            // uses @@unique([conditionId, organizationId]) compound unique
+                            conditionId_organizationId: {conditionId, organizationId: organization.id},
+                        },
+                        update: {conditionId: byName.id},
+                        create: {conditionId: byName.id, organizationId: organization.id},
+                    });
+
+                    targetConditionId = byName.id;
+                }
+            }
+
+            // Re-fetch prev associations from the actual target row
+            const {ids: prevAssocIds, slug: targetSlug} = await getAssocIds(targetConditionId);
+
+            // Decide what scalar data we can safely apply:
+            // - If we re-pointed to another record, do NOT try to change its slug arbitrarily
+            // - Only allow changing 'name' when it's the same record (no conflict)
+            const safeScalarData: Record<string, any> = {...restData};
+
+            if (incomingName) {
+                if (targetConditionId === conditionId) {
+                    // safe to update name on the same record
+                    safeScalarData.name = incomingName;
+                } // else: we re-pointed → don't change the target row's name
+            }
+
+            // Protect slug unless you explicitly support slug changes; ignore incomingSlug by default
+            // If you DO want to allow slug changes on the same record, uncomment:
+            // if (incomingSlug && targetConditionId === conditionId) safeScalarData.slug = incomingSlug;
+
             const updated = await prisma.condition.update({
-                where: {id: conditionId},
-                data,
+                where: {id: targetConditionId},
+                data: safeScalarData,
             });
 
-            // Replace associations based on incoming slugs (preserve your prior semantics)
+            // Replace associations based on incoming slugs (preserve prior semantics)
             let nextAssocIds = prevAssocIds;
             if (incomingSlugs) {
-                nextAssocIds = await replaceAssociatedConditions(conditionId, incomingSlugs, thisSlug);
+                nextAssocIds = await replaceAssociatedConditions(targetConditionId, incomingSlugs, targetSlug);
             }
 
             // Sync Org↔AssociatedCondition links using diff
