@@ -1188,35 +1188,35 @@ export const TREATMENT_TYPE = [
 ]
 
 export const ADDITIONAL_RESEARCH_PLAN_TYPES: Option[] = [
-    {
-        id: '1',
-        label: 'Drug Repurposing or Drug Screening',
-        value: 'DRUG_REPURPOSING_SCREENING',
-        description: 'Strategies to identify new therapeutic uses for existing drugs or discover novel compounds for specific diseases through systematic screening.',
-        strengths: 'Reduces development timelines, leverages existing safety profiles, and cost-effective compared to de novo drug development.',
-    },
-    {
-        id: '2',
-        label: 'Pathway Modulators',
-        value: 'PATHWAY_MODULATORS',
-        description: 'Therapies designed to target and modulate biological pathways involved in disease processes, such as signaling cascades and metabolic pathways.',
-        strengths: 'Addresses disease mechanisms at a systemic level, potential for broad applications, and integrates well with other therapeutic modalities.',
-    },
+    // {
+    //     id: '1',
+    //     label: 'Drug Repurposing or Drug Screening',
+    //     value: 'DRUG_REPURPOSING_SCREENING',
+    //     description: 'Strategies to identify new therapeutic uses for existing drugs or discover novel compounds for specific diseases through systematic screening.',
+    //     strengths: 'Reduces development timelines, leverages existing safety profiles, and cost-effective compared to de novo drug development.',
+    // },
+    // {
+    //     id: '2',
+    //     label: 'Pathway Modulators',
+    //     value: 'PATHWAY_MODULATORS',
+    //     description: 'Therapies designed to target and modulate biological pathways involved in disease processes, such as signaling cascades and metabolic pathways.',
+    //     strengths: 'Addresses disease mechanisms at a systemic level, potential for broad applications, and integrates well with other therapeutic modalities.',
+    // },
     {
         id: '3',
-        label: 'Exploratory Research',
+        label: 'Exploratory research',
         value: 'EXPLORATORY_RESEARCH',
     },
     {
         id: '4',
-        label: 'Tool Development',
+        label: 'Tool development',
         value: 'TOOL_DEVELOPMENT',
     },
-    {
-        id: '5',
-        label: 'Theraputic-Agnostic',
-        value: 'THERAPUTIC_AGNOSTIC',
-    },
+    // {
+    //     id: '5',
+    //     label: 'Theraputic-Agnostic',
+    //     value: 'THERAPUTIC_AGNOSTIC',
+    // },
     {
         id: '6',
         label: 'Other',
@@ -1262,42 +1262,42 @@ export const milestoneCategories = {
 export const MODALITIES: Option[] = [
     {
         id: '1',
-        label: 'Gene Therapy (AAV)',
+        label: 'Gene therapy (AAV)',
         value: 'GENE_THERAPY_AAV',
         description: 'A therapeutic approach using adeno-associated viruses (AAV) to deliver genetic material into cells, often to correct or replace defective genes.',
         strengths: 'High precision in targeting specific cells, long-term expression of therapeutic genes, and growing clinical success in various diseases.',
     },
         {
         id: '2',
-        label: 'Gene Therapy (non-AAV)',
+        label: 'Gene therapy (non-AAV)',
         value: 'GENE_THERAPY',
         description: 'A therapeutic approach using adeno-associated viruses (AAV) to deliver genetic material into cells, often to correct or replace defective genes.',
         strengths: 'High precision in targeting specific cells, long-term expression of therapeutic genes, and growing clinical success in various diseases.',
     },
     {
         id: '3',
-        label: 'Gene Editing',
+        label: 'Gene editing',
         value: 'GENE_EDITING',
         description: 'A technology for directly altering the DNA of an organism, including techniques like CRISPR/Cas9 to modify genes for therapeutic purposes.',
         strengths: 'Highly versatile, precise gene modifications, and potential for permanent therapeutic outcomes.',
     },
     {
         id: '4',
-        label: 'Antisense Oligonucleotide (ASO)',
+        label: 'Antisense oligonucleotide (ASO)',
         value: 'ANTISENSE_OLIGONUCLEOTIDE',
         description: 'Short, synthetic strands of DNA or RNA designed to bind to specific mRNA sequences, modifying gene expression or protein production.',
         strengths: 'Targets specific genes, reversible effects, and customizable for various genetic disorders.',
     },
     {
         id: '5',
-        label: 'Other RNA Therapy',
+        label: 'Other RNA therapy',
         value: 'OTHER_RNA_THERAPY',
         description: 'A broad category of therapies leveraging RNA molecules, such as RNA interference (RNAi) and mRNA vaccines, to modulate gene expression or induce immune responses.',
         strengths: 'Rapid development timelines, adaptable to different diseases, and avoids permanent DNA alterations.',
     },
     {
         id: '6',
-        label: 'Enzyme or Protein Replacement',
+        label: 'Enzyme or protein replacement',
         value: 'ENZYME_REPLACEMENT',
         description: 'A treatment approach involving the administration of exogenous enzymes to replace deficient or malfunctioning enzymes in patients.',
         strengths: 'Addresses underlying enzyme deficiencies, well-established for several metabolic disorders, and provides symptomatic relief.',
@@ -1311,7 +1311,7 @@ export const MODALITIES: Option[] = [
     },
     {
         id: '10',
-        label: 'Small Molecule',
+        label: 'Small molecule',
         value: 'NOVEL_CHEMISTRY',
         description: 'Innovative small molecule drugs designed using advanced chemical techniques to target unique mechanisms of action.',
         strengths: 'Highly customizable for specific targets, scalable production, and potential for oral administration.',
@@ -1325,14 +1325,14 @@ export const MODALITIES: Option[] = [
     },
     {
         id: '12',
-        label: 'Cell Therapies',
+        label: 'Cell therapies',
         value: 'STEM_CELL_TRANSPLANT',
         description: 'The use of stem cells to regenerate or repair damaged tissues and treat conditions like hematological diseases and genetic disorders.',
         strengths: 'Potential for long-term regeneration, versatile applications, and addresses root causes of diseases.',
     },
     {
         id: '13',
-        label: 'Drug Repurposing',
+        label: 'Drug repurposing',
         value: 'DRUG_REPURPOSING',
         description: 'The process of identifying and developing existing drugs for new therapeutic uses beyond their original medical indication.',
         strengths: 'Faster and less costly development compared to novel drugs, existing safety data reduces risk, and potential to quickly address unmet medical needs.',

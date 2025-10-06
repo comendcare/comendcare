@@ -26,7 +26,7 @@ export default function CreateResearchPlanPage() {
     return (
         <div className="h-full w-full flex flex-col justify-start items-start py-8 sm:px-6 lg:px-8 space-y-4">
             <div className="space-y-2">
-                <h1 className="text-xl font-semibold">Create a Research Plan</h1>
+                <h1 className="text-xl font-semibold">Create a research plan</h1>
                 <p>
                     {`To help create your research plan, please answer a few questions.`}
                 </p>

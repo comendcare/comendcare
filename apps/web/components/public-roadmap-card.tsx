@@ -189,9 +189,9 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                                 <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
                                     <TableCell>
                                         <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-                                        {roadmap.description && (
+                                        {/* {roadmap.description && (
                                             <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
-                                        )}
+                                        )} */}
                                     </TableCell>
                                     <TableCell className="flex justify-end items-center">
                                         <StageOfActivityBadge milestones={roadmap.milestones} />
@@ -211,9 +211,9 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                             <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
                                 <TableCell>
                                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-                                    {roadmap.description && (
+                                    {/* {roadmap.description && (
                                         <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
-                                    )}
+                                    )} */}
                                 </TableCell>
                                 <TableCell className="flex justify-end items-center">
                                     <StageOfActivityBadge milestones={roadmap.milestones} />
