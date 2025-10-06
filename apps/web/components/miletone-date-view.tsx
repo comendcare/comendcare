@@ -21,6 +21,10 @@ export function DateView({
 
         return (
             <span className="flex items-center gap-2 text-bottom">
+                <Calendar
+                    aria-hidden="true"
+                    className="h-4 w-4"
+                />
                 {specific ? (
                     <p>
                         {`${startDate.toLocaleDateString(
@@ -49,7 +53,7 @@ export function DateView({
 
         return (
             <span className="flex items-center gap-2 text-bottom">
-                <Calendar 
+                <Calendar
                     aria-hidden="true"
                     className="h-4 w-4"
                 />

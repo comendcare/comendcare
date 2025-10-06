@@ -15,7 +15,6 @@ import { MilestoneDetails } from "./milestone-details"
 import { getPublicMilestoneDetails } from "@comend/lib/fetchers"
 
 export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, urlMilestone: string | null}) {
-    const searchParams = useSearchParams()
     const [milestone, setMilestone] = useState<any>()
 
     useEffect(() => {
@@ -32,6 +31,7 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
                     status: true,
                     types: true,
                     attachments: true,
+                    contacts: true,
                     rfps: true,
                     tools: true,
                 }).then(response => {
