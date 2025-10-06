@@ -339,7 +339,7 @@ export const CreateEmptyResearchPlanCard = ({setIsLoading}: {
                     <Card className="h-full hover:border-black">
                         <CardContent
                             className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
-                            <CardTitle className="text-xl font-normal">{`Create an empty Research Plan`}</CardTitle>
+                            <CardTitle className="text-xl font-normal">{`Create an empty research plan`}</CardTitle>
                             <Plus/>
                         </CardContent>
                     </Card>
