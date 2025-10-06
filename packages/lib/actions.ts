@@ -5856,6 +5856,22 @@ export const contactCRO = withOrganizationAuth(
 export const saveOrganization = withOrganizationAuth(
     async (organization: Organization, savedOrganizationId: string) => {
         try {
+            // Check if this organization is already saved by this organization
+            const existing = await prisma.savedOrganization.findFirst({
+                where: {
+                    organizationId: organization.id,
+                    savedOrganizationId: savedOrganizationId,
+                },
+            });
+
+            if (existing) {
+                return {
+                    success: false,
+                    error:
+                        "This organization is already saved. To remove it, go to your saved page and unsave it there.",
+                };
+            }
+
             const response = await prisma.savedOrganization.create({
                 include: {
                     savedOrganization: true,
@@ -5864,34 +5880,44 @@ export const saveOrganization = withOrganizationAuth(
                 data: {
                     savedOrganization: {
                         connect: {
-                            id: savedOrganizationId
-                        }
+                            id: savedOrganizationId,
+                        },
                     },
                     organization: {
                         connect: {
-                            id: organization.id
-                        }
+                            id: organization.id,
+                        },
                     },
-                }
+                },
             });
 
             if (!response) {
-                console.error("Error saving organization.")
-                return {success: false, error: "Database error. please try again later."}
+                console.error("Error saving organization.");
+                return { success: false, error: "Database error. Please try again later." };
             }
 
-            console.log(`response`, response)
+            console.log(`response`, response);
 
             revalidatePath(`/app/marketplace`);
             revalidatePath(`/app/marketplace/patient-groups`);
 
-            return {success: true, data: response}
+            return { success: true, data: response };
         } catch (error: any) {
-            console.error("Error saving organization:", error)
-            return {success: false, error: "Database error. please try again later."}
+            console.error("Error saving organization:", error);
+
+            // Handle unique constraint directly (fallback)
+            if (error.code === "P2002") {
+                return {
+                    success: false,
+                    error:
+                        "This organization is already saved. To remove it, go to your saved page and unsave it there.",
+                };
+            }
+
+            return { success: false, error: "Database error. Please try again later." };
         }
     }
-)
+);
 
 export const editSavedCRO = withOrganizationAuth(
     async (_: Organization, savedCROId: string, milestoneId: string) => {
