@@ -39,6 +39,7 @@ import { createDiseaseModel, updateDiseaseModel } from "@/packages/lib/actions"
 import { cn } from "@/packages/lib/utils"
 import LoadingDots from "@/packages/components/icons/loading-dots"
 import ProjectMultipleSelector from "./project-multiple-selector"
+import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -526,7 +527,7 @@ export function EditDiseaseModelToolForm({
                             Delete Tool
                         </Button>
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            {/* <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/> */}
+                            <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
                             <Button
                                 disabled={!form.formState.isValid || isSaving}
