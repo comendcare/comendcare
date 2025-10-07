@@ -4,34 +4,14 @@ import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {cn} from "./../../packages/lib/utils"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "./ui/tooltip";
-import {Database, LucideIcon, Rat, TestTubeDiagonal} from "lucide-react";
-
-const links = [
-    {
-        name: "Patient Biosamples",
-        href: "/biosample",
-        icon: TestTubeDiagonal,
-        comingSoon: false,
-    },
-    {
-        name: "Disease Models",
-        href: "/disease-models",
-        icon: Rat,
-        comingSoon: false,
-    },
-    {
-        name: "Clinical Datasets",
-        href: "/data",
-        icon: Database,
-        comingSoon: false,
-    },
-]
+import { LucideIcon } from "lucide-react";
 
 export function TabNav({
-    className,
-    baseLink,
-    ...props
-}: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string})) {
+                           className,
+                           baseLink,
+                           links,
+                           ...props
+                       }: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string, links: {name: string, href: string, comingSoon: boolean, icon?: LucideIcon}[]})) {
     const pathname = usePathname()
 
     return (
