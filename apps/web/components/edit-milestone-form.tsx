@@ -64,7 +64,7 @@ import Link from "next/link"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
-import {Globe, Lock, Plus, X, Store, Share, Trash} from "lucide-react"
+import {Globe, Lock, Plus, X, Store, Share, Trash, TestTubeDiagonal, Rat, Database, Megaphone} from "lucide-react"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
@@ -228,8 +228,9 @@ export function EditMilestoneForm({
                         {
                             value: biosample.id, 
                             type: 'Biosamples', 
-                            img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                            label: `${biosample.donorId} --- ${type?.label || ''}`,
+                            icon: TestTubeDiagonal,
+                            // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                            label: `${biosample.id}`,
                             biosample
                         }
                     )
@@ -239,7 +240,8 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: diseaseModel.id, 
-                            label: `${diseaseModel.id} --- ${type?.label}`,
+                            label: `${diseaseModel.id}`,
+                            icon: Rat,
                             type: 'Disease Models',
                             diseaseModel
                         }
@@ -249,7 +251,8 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: tool?.id, 
-                            label: tool?.title || tool?.id, 
+                            label: `${tool?.id}`, 
+                            icon: Database,
                             type: 'Clinical Datasets',
                             datasample: tool,
                         }
@@ -430,8 +433,9 @@ export function EditMilestoneForm({
                     {
                         value: biosample.id, 
                         type: 'Biosamples', 
-                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                        label: `${biosample.donorId} --- ${type?.label || ''}`,
+                        icon: TestTubeDiagonal,
+                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${biosample.id}`,
                         biosample
                     }
                 )
@@ -442,7 +446,8 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: diseaseModel.id, 
-                        label: `${diseaseModel.id} --- ${type?.label}`,
+                        label: `${diseaseModel.id}`,
+                        icon: Rat,
                         type: 'Disease Models',
                         diseaseModel
                     }
@@ -453,7 +458,8 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: datasample.id, 
-                        label: datasample.title || datasample.id, 
+                        label: datasample.id, 
+                        icon: Database,
                         type: 'Clinical Datasets',
                         datasample
                     }
@@ -690,6 +696,7 @@ export function EditMilestoneForm({
                                                                 hidePlaceholderWhenSelected={true}
                                                                 showHoverCard={false}
                                                                 placeholder="Link tools"
+                                                                badgeClassName="border-transparent bg-green-100 text-green-900"
                                                                 emptyIndicator={
                                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                         no results found.
@@ -756,13 +763,14 @@ export function EditMilestoneForm({
                                                                 value={field.value?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
-                                                                    label: rfp.title
+                                                                    label: rfp.title,
+                                                                    icon: Megaphone
                                                                 } as Option))}
                                                                 onChange={field.onChange}
                                                                 defaultOptions={fetchedRFPs.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
-                                                                    label: rfp.title
+                                                                    label: rfp.title,
                                                                 } as Option))}
                                                                 options={fetchedRFPs.map(rfp => ({
                                                                     ...rfp,
@@ -770,6 +778,7 @@ export function EditMilestoneForm({
                                                                     label: rfp.title
                                                                 } as Option))}
                                                                 hidePlaceholderWhenSelected={true}
+                                                                badgeClassName="border-transparent bg-orange-100 text-orange-900"
                                                                 showHoverCard={false}
                                                                 placeholder="Link RFPs"
                                                                 emptyIndicator={
@@ -1193,8 +1202,8 @@ export function EditMilestoneForm({
                                     {
                                         value: newBiosample.id, 
                                         type: 'Biosamples', 
-                                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.donorId} --- ${type?.label || ''}`,
+                                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                        label: `${newBiosample.id}`,
                                         biosample: newBiosample
                                     }
                                 ])
@@ -1225,7 +1234,7 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDiseaseModel.id, 
-                                        label: `${type?.label || ''}`,
+                                        label: `${newDiseaseModel.id}`,
                                         type: 'Disease Models',
                                         diseaseModel: newDiseaseModel
                                     }
@@ -1256,7 +1265,7 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDatasample.id, 
-                                        label: newDatasample.title || newDatasample.id, 
+                                        label: newDatasample.id, 
                                         type: 'Clinical Datasets',
                                         datasample: newDatasample
                                     }
