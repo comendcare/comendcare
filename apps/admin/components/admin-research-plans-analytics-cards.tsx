@@ -9,8 +9,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@comend/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Label, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { DollarSign } from "lucide-react";
+import { StatusType } from "@/packages/lib/types";
 
 interface AnalyticsData {
     totalResearchPlans: number,
@@ -19,7 +20,27 @@ interface AnalyticsData {
     totalProjects: number,
     totalProjectsOfType: {type: string, num: number}[],
     sumProjectBudgets: number,
+    projectsByStauts: {type: string, num: number}[],
+    projectStatusData: any,
     projectBudgetsByProgress: {type: string, num: number}[]
+}
+
+const STATUS_LABELS: Record<StatusType, string> = {
+    PLANNED: "Planned",
+    INPROGRESS: "In progress",
+    COMPLETED: "Completed",
+}
+
+const STATUS_COLORS: Record<StatusType, string> = {
+    PLANNED: "hsl(var(--chart-1))",
+    INPROGRESS: "hsl(var(--chart-2))",
+    COMPLETED: "hsl(var(--chart-3))",
+}
+
+const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
+    PLANNED: "hsl(var(--chart-1))",
+    INPROGRESS: "hsl(var(--chart-2))",
+    COMPLETED: "hsl(var(--chart-3))",
 }
 
 const researchPlansChartConfig = {
@@ -36,6 +57,19 @@ const projectsChartConfig = {
   },
 } satisfies ChartConfig
 
+const projectStatusChartConfig: ChartConfig = {
+    PLANNED: {label: STATUS_LABELS.PLANNED, color: STATUS_COLORS.PLANNED},
+    INPROGRESS: {label: STATUS_LABELS.INPROGRESS, color: STATUS_COLORS.INPROGRESS},
+    COMPLETED: {label: STATUS_LABELS.COMPLETED, color: STATUS_COLORS.COMPLETED},
+}
+
+const projectBudgetsChartConfig = {
+  num: {
+    label: "Budget across projects: $",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig
+
 export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | undefined}) {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
@@ -43,14 +77,25 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
         if (orgId) {
             getOrganizationResearchPlansAnalytics(orgId)
                 .then((res) => {
-                    console.log(`results`, res)
                     return res
                 })
                 .then(setData);
         } else {
             getResearchPlansAnalytics()
                 .then((res) => {
-                    console.log(`results`, res)
+                    res.projectStatusData = (res.projectsByStatus as {type: StatusType, num: number}[]).map(
+                        ({type, num}) => {
+                            const hslValue = STATUS_COLORS_VAR_MAP[type]
+
+                            return {
+                                status: type,
+                                count: num,
+                                fill: hslValue,         // Used for <Pie />
+                                colorPreview: hslValue, // Used for legend
+                            }
+                        }
+                    )
+
                     return res
                 })
                 .then(setData);
@@ -180,23 +225,69 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
             </Card>
 
             <h1 className="col-span-full text-2xl font-semibold">Projects</h1>
-            <Card className="@container/card">
+            {/* <Card className="@container/card">
                 <CardHeader className="relative">
                     <CardDescription>Total Projects</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
                         {data?.totalProjects?.toLocaleString()}
                     </CardTitle>
                 </CardHeader>
-            </Card>
+            </Card> */}
 
             <Card className="@container/card">
                 <CardHeader className="relative">
-                    <CardDescription>Total Projects Budget</CardDescription>
-                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums flex flex-row items-center">
-                        <DollarSign />
-                        {data?.sumProjectBudgets?.toLocaleString()}
-                    </CardTitle>
+                    <CardTitle>Total Projects by Status</CardTitle>
                 </CardHeader>
+            <CardContent className="flex-1 pb-0">
+                <ChartContainer
+                    config={projectStatusChartConfig}
+                    className="mx-auto aspect-square max-h-[400px]"
+                >
+                    <PieChart>
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel/>}
+                        />
+                        <Pie
+                            data={data.projectStatusData}
+                            dataKey="count"
+                            nameKey="status"
+                            innerRadius={60}
+                            strokeWidth={5}
+                        >
+                            <Label
+                                content={({viewBox}) => {
+                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                        return (
+                                            <text
+                                                x={viewBox.cx}
+                                                y={viewBox.cy}
+                                                textAnchor="middle"
+                                                dominantBaseline="middle"
+                                            >
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={viewBox.cy}
+                                                    className="fill-foreground text-3xl font-bold"
+                                                >
+                                                    {data.totalProjects.toLocaleString()}
+                                                </tspan>
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) + 24}
+                                                    className="fill-muted-foreground"
+                                                >
+                                                    total projects
+                                                </tspan>
+                                            </text>
+                                        )
+                                    }
+                                }}
+                            />
+                        </Pie>
+                    </PieChart>
+                </ChartContainer>
+            </CardContent>
             </Card>
 
             <Card className="col-span-full">
@@ -253,13 +344,24 @@ export function AdminResearchPlansAnalyticsCards({orgId}: {orgId?: string | unde
                 </CardContent>
             </Card>
 
+            <h1 className="col-span-full text-2xl font-semibold">Project Budgets</h1>
+            <Card className="@container/card">
+                <CardHeader className="relative">
+                    <CardDescription>Total Projects Budget</CardDescription>
+                    <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums flex flex-row items-center">
+                        <DollarSign />
+                        {data?.sumProjectBudgets?.toLocaleString()}
+                    </CardTitle>
+                </CardHeader>
+            </Card>
             <Card className="col-span-full">
                 <CardHeader>
-                    <CardTitle>Total Project Budgets by project status</CardTitle>
+                    <CardTitle>GMV</CardTitle>
+                    <CardDescription>Total value of project budgets, broken down by completed, in progress, and planning.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer 
-                        config={projectsChartConfig}
+                        config={projectBudgetsChartConfig}
                         style={{ width: '100%', height: 200 /* fixed height */ }}
                     >
                     <BarChart

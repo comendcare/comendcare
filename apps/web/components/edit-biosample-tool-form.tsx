@@ -971,7 +971,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                         <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
-                                        {`This is an encrypted ID automatically generated to protect the donor’s personal health information (PHI). It allows you to reference biosamples without exposing identifiable data. `}
+                                        {`This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace.`}
                                     </TooltipContent>
                                 </Tooltip>
                             </FormLabel>
@@ -1013,7 +1013,17 @@ export const DonorFormFields = ({form}: {form: any}) => {
             name="internalDonorId"
             render={({field}) => (
                 <FormItem>
-                    <FormLabel>{`Internal Donor ID`}</FormLabel>
+                    <FormLabel className="flex items-center gap-1 grow pb-3">
+                        {`Internal Donor ID`}
+                        <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                                <Info className="h-4 w-4"/>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                {`This ID is optional, and can be used to track donor IDs from any previously used donor identification system outside the Comend platform. This ID cannot be guaranteed to be unique across our platform, and will only be visible to members of your organization.`}
+                            </TooltipContent>
+                        </Tooltip>
+                    </FormLabel>
                     <div className="w-full">
                         <FormControl className="w-full">
                             <Input

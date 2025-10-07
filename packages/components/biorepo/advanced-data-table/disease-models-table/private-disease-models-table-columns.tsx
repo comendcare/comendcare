@@ -112,7 +112,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "id",
             accessorKey: "id",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Model ID"/>
+                <DataTableColumnHeader
+                    column={column} 
+                    title="Model ID"
+                    tooltip="This is a unique ID assigned to this model. This ID is public, and will appear in the marketplace."
+                />
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">

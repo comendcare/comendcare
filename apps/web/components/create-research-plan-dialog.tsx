@@ -41,7 +41,7 @@ export default function CreateResearchPlanDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger ?? (
-                    <Button variant="cta">Create Research Plan</Button>
+                    <Button variant="cta">Create research plan</Button>
                 )}
             </DialogTrigger>
 
@@ -59,7 +59,7 @@ export default function CreateResearchPlanDialog({
                 ) : (
                     <div className="flex flex-col space-y-4">
                         <DialogHeader>
-                            <DialogTitle className="text-xl">Create a Research Plan</DialogTitle>
+                            <DialogTitle className="text-xl">Create a research plan</DialogTitle>
                             <DialogDescription>
                                 To help create your research plan, please answer a few questions.
                             </DialogDescription>
