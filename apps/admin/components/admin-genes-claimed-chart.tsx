@@ -91,7 +91,7 @@ export function AdminGenesClaimedChart() {
                                         )}
                                         {data && (
                                             <tspan x={viewBox.cx} dy="1.2em">
-                                                {`${((data.claimedGenes / data.totalGenes) * 100).toFixed(0)}% claimed`}
+                                                {`${((data.claimedGenes / data.totalGenes) * 100).toFixed(3)}% claimed`}
                                             </tspan>
                                         )}
                                         </>
