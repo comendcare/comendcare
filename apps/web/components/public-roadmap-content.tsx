@@ -34,8 +34,8 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
     
     return (
         <>
-        <div className="flex flex-col-reverse md:grid md:grid-cols-2 m-auto w-full gap-4">
-            <div className={cn(!(roadmap.milestones && roadmap.milestones.length > 0) ? "col-span-full" : "")}>
+        <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
+            <div className={cn(!(roadmap.milestones && roadmap.milestones.length > 0) ? "col-span-2" : "col-span-2")}>
                 <RoadmapCard
                     roadmap={roadmap}
                     subdomain={subdomain || undefined}

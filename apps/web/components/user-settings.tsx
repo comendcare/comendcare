@@ -30,7 +30,7 @@ export default function UserSettings() {
 
         try {
             await signOut()
-            const response = await deleteUser(session)
+            const response = await deleteUser()
 
             mixpanelTrack("User Account Deleted", {
                 "Name": response?.data?.name,

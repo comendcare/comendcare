@@ -13,9 +13,10 @@ import {useDrainWriteQueue} from "~web/hooks/useDrainWriteQueue"
 import {useWriteQueue} from "~web/state/writeQueue"
 import {beaconFlush} from "~web/lib/flushOps"
 import {usePathname} from "next/navigation"
+import {Session} from "next-auth";
 
 
-export function Providers({children}: { children: React.ReactNode }) {
+export function Providers({children, session}: { children: React.ReactNode, session: Session | null }) {
     // useDrainWriteQueue();
     const pathname = usePathname();
 
@@ -39,7 +40,7 @@ export function Providers({children}: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <SessionProvider>
+        <SessionProvider session={session}>
             <Toaster
                 className="dark:hidden"
                 closeButton

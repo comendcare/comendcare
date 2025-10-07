@@ -20,7 +20,7 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
     const genesResponse = await fetch(`/api/genes?search=${encodeURIComponent(diseaseModel['Gene'] || '')}`)
     const foundGenes = await genesResponse.json()
 
-    const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(diseaseModel['Storage Facility'] || '')}`)
+    const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(diseaseModel['Storage Facility'].trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
 
     const contactNames = (diseaseModel['Contact Name'] || "").split(",")

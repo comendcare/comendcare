@@ -90,7 +90,7 @@ export default async function TeamPage() {
             <TooltipProvider>
                 <div className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8">
                     <PAGSettingsMembersTab members={organization.members}/>
-                    <PAGSettingsInvitationsTab invitations={organization.invitations}/>
+                    <PAGSettingsInvitationsTab organization={organization}/>
                 </div>
             </TooltipProvider>
         )
