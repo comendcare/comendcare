@@ -285,7 +285,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
 
                 {!isOwner && (
                     <TooltipContent className="max-w-80">
-                        Editing is owners-only. See Organization Settings → Memberships.
+                        Editing is owners-only. Visit the Team page to manage members.
                     </TooltipContent>
                 )}
             </Tooltip>

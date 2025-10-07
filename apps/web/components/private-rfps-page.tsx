@@ -1,8 +1,3 @@
-"use client"
-
-import { useEffect } from "react"
-import { useShallow } from "zustand/react/shallow"
-import { useRFPStore, RFPState } from "@/state/rfp/rfpStore"
 import { RFPCard } from "./rfp-card"
 import { EditRFPDialog, NewRFPDialog } from "./edit-rfp-dialog"
 import Image from "next/image"

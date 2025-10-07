@@ -7,11 +7,11 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "./ui/too
 import { LucideIcon } from "lucide-react";
 
 export function TabNav({
-    className,
-    baseLink,
-    links,
-    ...props
-}: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string, links: {name: string, href: string, comingSoon: boolean, icon?: LucideIcon}[]})) {
+                           className,
+                           baseLink,
+                           links,
+                           ...props
+                       }: (React.HTMLAttributes<HTMLDivElement> & {baseLink: string, links: {name: string, href: string, comingSoon: boolean, icon?: LucideIcon}[]})) {
     const pathname = usePathname()
 
     return (

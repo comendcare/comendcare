@@ -14,37 +14,21 @@ import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 
 
-export default function SaveCROButton({cro, type, location}: {
+export default function SaveCROButton({cro, type, location, savedCompanyIds}: {
     cro: Company,
     type: "card" | "page",
-    location?: string
+    location?: string,
+    savedCompanyIds?: Set<string>
 }) {
     const router = useRouter()
     const {data: session} = useSession();
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
-        async function fetchData() {
-            const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                companyId: true,
-                company: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedCompaniesResponse.success) {
-                const savedCompaniesData = savedCompaniesResponse.data as SavedCompany[];
-                setIsSaved(savedCompaniesData.some(sc => sc.companyId === cro.id));
-            } else {
-                console.error(savedCompaniesResponse.error);
-            }
+        if (savedCompanyIds) {
+            setIsSaved(savedCompanyIds.has(cro.id));
         }
-
-        fetchData();
-    }, [session?.user?.organizationId, cro.id])
+    }, [savedCompanyIds, cro.id]);
 
     const onSubmit = async () => {
         try {

@@ -37,88 +37,17 @@ import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import LoadingDots from "@comend/components/icons/loading-dots";
+import {Organization} from "@prisma/client";
 
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
     role: z.enum(["member", "owner"], { message: "Role must be either Member or Owner." }),
 });
 
-export default function InviteUserToOrgDialog() {
+export default function InviteUserToOrgDialog({organization}: {organization: Organization}) {
     const { data: session, status } = useSession();
     const [loading, setLoading] = useState(false);
-    const [organization, setOrganization] = useState<any>(null);
     const [isOpen, setIsOpen] = useState(false);
-
-    useEffect(() => {
-        if (status === "loading") return; // wait for session to resolve
-        if (status === "unauthenticated") return; // no-op if not signed in
-
-        const orgId = session?.user?.organizationId;
-        if (!orgId) {
-            // only show once session is resolved
-            toast.error("No organizationId provided");
-            return;
-        }
-
-        let cancelled = false;
-        (async () => {
-            const response = await getOrganizationFromOrganizationId(orgId, {
-                id: true,
-                public: true,
-                verified: true,
-                published: true,
-                name: true,
-                description: true,
-                contactEmail: true,
-                logo: true,
-                image: true,
-                headerImage: true,
-                biopharmaConsentSettings: true,
-                subdomain: true,
-                customDomain: true,
-                statedGoal: true,
-                yearFounded: true,
-                incorporationStatus: true,
-                therapeuticsOfInterest: true,
-                therapeuticsInDevelopment: true,
-                website: true,
-                moneyRaised: true,
-                moneyDeployed: true,
-                researchBudget: true,
-                createdAt: true,
-                updatedAt: true,
-                user: true,
-                userId: true,
-                roadmaps: true,
-                members: true,
-                clients: true,
-                invitations: true,
-                membershipRequests: true,
-                conditions: true,
-                kanban: true,
-                milestones: true,
-                platformNotifications: true,
-                reviews: true,
-                savedCompanies: true,
-                tools: true,
-                rfps: true,
-                metadata: true,
-            });
-
-            if (cancelled) return;
-
-            if (response.success) {
-                setOrganization(response.data);
-            } else {
-                console.error(response.error);
-                toast.error(response.error);
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [status, session?.user?.organizationId]);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -131,7 +60,6 @@ export default function InviteUserToOrgDialog() {
         try {
             const response = await inviteUser(
                 organization?.id as string, // organizationId
-                session as any,             // your action expects the session object; adjust typing if needed
                 values.email,
                 values.role,
                 await getIp()

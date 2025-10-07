@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, {useEffect, useState} from "react"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
@@ -10,6 +10,9 @@ import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list
 import { Card, CardContent } from "@comend/components/ui/card";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
+import {useSession} from "next-auth/react";
+import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
+import {SavedCompany} from "@prisma/client";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -19,12 +22,30 @@ const selector = (state: CROSearchState) => ({
 })
 
 export function CROSearchResults() {
-    const { 
+    const {data: session, status} = useSession()
+    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    const {
         lastFetchedPage, 
         setLastFetchedPage, 
         view, 
         searchResults 
     } = useCROSearchStore(useShallow(selector))
+
+    useEffect(() => {
+        async function fetchSavedCompanies() {
+            if (status === "authenticated" && !session?.user?.organizationId) return;
+
+            const res = await getSavedCompaniesFromOrganizationId(session?.user.organizationId, {
+                companyId: true,
+            });
+
+            if (res.success && res.data) {
+                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+            }
+        }
+
+        fetchSavedCompanies();
+    }, [session?.user.organizationId, status]);
 
     if (!searchResults) {
         return (
@@ -60,7 +81,12 @@ export function CROSearchResults() {
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((cro, index) => (
-                            <CROMarketplaceCard cro={cro} key={index} location={"Marketplace"}/>
+                            <CROMarketplaceCard
+                                cro={cro}
+                                key={index}
+                                location={"Marketplace"}
+                                savedCompanyIds={savedCompanyIds}
+                            />
                         ))}
                     </div>
                 )}

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {useRouter, usePathname} from "next/navigation";
-import {switchOrganization} from "@comend/lib/actions";
 import {
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
     DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
@@ -24,13 +23,8 @@ export function OrganizationSwitcher({memberships}: { memberships: MembershipWit
 
     const handleSelect = async (orgId: string | undefined) => {
         if (!orgId) return
-        const res = await switchOrganization(orgId);
-        if (!res.success) {
-            toast.error(res.error ?? "Could not switch organization");
-            return;
-        }
-        router.push("/app/profile");
-        await update({})
+
+        window.location.href = `/api/switch-org/${orgId}?next=/app/profile`;
     };
 
     const activeOrg = memberships.find(m => m.organizationId === activeId) ?? null;

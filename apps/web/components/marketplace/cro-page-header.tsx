@@ -35,7 +35,15 @@ const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Consultant (<5 employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
 };
 
-export default async function CROPageHeader({company}: {company: CompanyWithReviewsAndServices}) {
+export default async function CROPageHeader({
+                                                company,
+                                                savedCompanyIds
+                                            }:
+                                            {
+                                                company: CompanyWithReviewsAndServices,
+                                                savedCompanyIds?: Set<string>
+                                            }
+) {
 
     const allowedCertifications = new Set([
         "Good Clinical Practice (GCP)",
@@ -167,7 +175,12 @@ export default async function CROPageHeader({company}: {company: CompanyWithRevi
             <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
                 <ServiceProviderWebsiteButton cro={company}/>
                 {/*<SaveCRODialog cro={company} type={"page"} location={"Service Provider Profile"}/>*/}
-                <SaveCROButton cro={company} type={"page"} location={"Service Provider Profile"} />
+                <SaveCROButton
+                    cro={company}
+                    type={"page"}
+                    location={"Service Provider Profile"}
+                    savedCompanyIds={savedCompanyIds}
+                />
                 <ContactCroDialog cro={company}/>
             </div>
         </div>

@@ -13,33 +13,20 @@ import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 
-export default function SaveOrganizationButton({ savedOrganization, type }: { savedOrganization: Organization, type: "card" | "page" }) {
+export default function SaveOrganizationButton({ savedOrganization, type, savedOrganizationIds }: {
+    savedOrganization: Organization,
+    type: "card" | "page",
+    savedOrganizationIds?: Set<string>
+}) {
     const router = useRouter()
     const { data: session } = useSession();
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
-        async function fetchData() {
-            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                savedOrganizationId: true,
-                savedOrganization: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedOrganizationsResponse.success) {
-                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
-                setIsSaved(savedOrganizationData.some(sc => sc.savedOrganizationId === savedOrganization.id));
-            } else {
-                console.error(savedOrganizationsResponse.error);
-            }
+        if (savedOrganizationIds) {
+            setIsSaved(savedOrganizationIds.has(savedOrganization.id));
         }
-
-        fetchData();
-    }, [session?.user?.organizationId, savedOrganization.id])
+    }, [savedOrganizationIds, savedOrganization.id]);
 
     const onSubmit = async () => {
         try {

@@ -18,7 +18,8 @@ export const contentType = "image/png"
 export default async function Image(req: NextRequest): Promise<ImageResponse> {
     console.log(req)
     const params = encode({
-        url: "https://www.comend.io/",
+        // url: "https://www.comend.io/",
+        url: "https://comend.io/",
         screenshot: true,
         meta: false,
         embed: "screenshot.url",
