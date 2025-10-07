@@ -7,7 +7,7 @@ import {
     CardHeader,
     CardTitle
 } from "@comend/components/ui/card"
-import {NODE_TYPE_OPTIONS} from "@comend/lib/types"
+import {BIOSAMPLE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@comend/lib/types"
 import {DateView} from "./miletone-date-view"
 import Link from "next/link"
 import {Button} from "@comend/components/ui/button"
@@ -151,66 +151,52 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 )}
 
                 {/* Linked Tools (biosamples / disease models / tools) */}
-                {hasAnyLinks && (
-                    <section className="space-y-3">
-                        <Separator className="bg-gray-300 h-[2px] rounded-full"/>
-                        <div className="border-l-4 border-emerald-200 pl-4 space-y-3">
-                            <div className="flex items-center gap-2 text-sm font-semibold">
-                                <Microscope className="h-4 w-4 min-w-4 text-emerald-900"/>
-                                <span className="text-emerald-900">Linked Tools</span>
-                            </div>
-
-                            {/* Keep your detailed table w/ dialogs for Tools */}
-                            {Array.isArray(milestone?.tools) && milestone.tools.length > 0 && (
-                                <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Title</TableHead>
-                                                <TableHead>Description</TableHead>
-                                                <TableHead>Contacts</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {milestone.tools
-                                                .map((t: any) => t.tool)
-                                                .filter(Boolean)
-                                                .map((tool: any) => (
-                                                    <Dialog key={tool.id}>
-                                                        <DialogTrigger asChild>
-                                                            <TableRow className="cursor-pointer">
-                                                                <TableCell>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="truncate">{tool.title}</span>
-                                                                        {tool.private && <PrivateBadge iconOnly/>}
-                                                                    </div>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <div
-                                                                        className="line-clamp-3">{tool.description}</div>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <ul className="flex flex-col gap-1">
-                                                                        {(tool.contacts || []).map((c: any, i: number) => (
-                                                                            <li key={i} className="truncate">
-                                                                                {c.name || c.email || c.affiliation}
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        </DialogTrigger>
-                                                        <DialogContent>
-                                                            <AssetDetails tool={tool}/>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            )}
-                        </div>
-                    </section>
+                {(Array.isArray(milestone?.tools) || Array.isArray(milestone?.biosamples) || Array.isArray(milestone?.diseaseModels)) && (
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Title</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead>Contacts</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {[
+                                    ...(milestone?.tools ?? []).map((x: any) => ({ type: "Tool", item: x?.tool })),
+                                    ...(milestone?.biosamples ?? []).map((x: any) => ({ type: "Biosample", item: x?.biosample })),
+                                    ...(milestone?.diseaseModels ?? []).map((x: any) => ({ type: "Disease model", item: x?.diseaseModel })),
+                                ]
+                                    .filter((row) => row.item)
+                                    .map(({ type, item }: any) => (
+                                        <TableRow key={`${type}-${item.id || item.title}`}>
+                                            <TableCell>
+                                                <Badge className="w-fit">{type}</Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="truncate">{item.title || item.name || BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === item.types[0])?.label || "Untitled"}</span>
+                                                    {item.private && <PrivateBadge iconOnly />}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="line-clamp-3">{item.description}</div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <ul className="flex flex-col gap-1">
+                                                    {(item.contacts || []).map((c: any, i: number) => (
+                                                        <li key={i} className="truncate">
+                                                            {c.name || c.email || c.affiliation}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
 
                 {/* Linked RFPs */}

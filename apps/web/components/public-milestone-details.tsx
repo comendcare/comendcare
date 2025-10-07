@@ -32,8 +32,22 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
                     types: true,
                     attachments: true,
                     contacts: true,
-                    rfps: true,
-                    tools: true,
+                    rfps: { include: { rfp: true } }, // optional, keeps shape consistent
+                    tools: {
+                        include: {
+                            tool: { include: { contacts: true, attachments: true } }, // or just: tool: true
+                        },
+                    },
+                    biosamples: {
+                        include: {
+                            biosample: { include: { contacts: true, attachments: true } }, // or: biosample: true
+                        },
+                    },
+                    diseaseModels: {
+                        include: {
+                            diseaseModel: { include: { contacts: true, attachments: true } }, // or: diseaseModel: true
+                        },
+                    },
                 }).then(response => {
                     if (response.success) {
                         console.log(`fetched milestone`, response.data)
