@@ -167,6 +167,12 @@ export const getResearchPlansAnalytics = withAdminAuth(
             : 0
 
         const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+
+        let projectsByStatus: {type: string, num: number}[] = statuses.map(status => ({
+            type: status,
+            num: allProjects.filter(project => project.status === status).length
+        }))
+
         let projectBudgetsByProgress: {type: string, num: number}[] = statuses.map(status => ({
             type: status, 
             num: allProjects
@@ -183,6 +189,7 @@ export const getResearchPlansAnalytics = withAdminAuth(
             totalProjects,
             totalProjectsOfType,
             sumProjectBudgets,
+            projectsByStatus,
             projectBudgetsByProgress
         };
     }
