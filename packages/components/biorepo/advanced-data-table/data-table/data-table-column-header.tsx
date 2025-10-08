@@ -53,7 +53,7 @@ export function DataTableColumnHeader<TData, TValue>({
             <TooltipTrigger asChild>
               <Info className="inline" />
             </TooltipTrigger>
-            <TooltipContent className="max-w-64 h-fit text-wrap">
+            <TooltipContent className="max-w-64 h-fit text-wrap my-4">
                 <p>{tooltip}</p>
             </TooltipContent>
           </Tooltip>
