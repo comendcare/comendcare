@@ -95,7 +95,7 @@ export const RFPCard = ({ rfp, isPrivate = false }: { rfp: any; isPrivate?: bool
                     <>
             <span className="flex gap-2 items-center">
               <Megaphone className="w-6 min-w-6 h-6 min-h-6" />
-              <CardTitle className="max-w-full truncate">{rfp.title}</CardTitle>
+              <CardTitle className="max-w-full truncate leading-normal">{rfp.title}</CardTitle>
                 {rfp.private && <PrivateBadge iconOnly />}
                 {status && (
                     <Badge variant={status.variant as any} className="text-sm">

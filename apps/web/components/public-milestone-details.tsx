@@ -15,7 +15,6 @@ import { MilestoneDetails } from "./milestone-details"
 import { getPublicMilestoneDetails } from "@comend/lib/fetchers"
 
 export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, urlMilestone: string | null}) {
-    const searchParams = useSearchParams()
     const [milestone, setMilestone] = useState<any>()
 
     useEffect(() => {
@@ -32,8 +31,23 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
                     status: true,
                     types: true,
                     attachments: true,
-                    rfps: true,
-                    tools: true,
+                    contacts: true,
+                    rfps: { include: { rfp: true } }, // optional, keeps shape consistent
+                    tools: {
+                        include: {
+                            tool: { include: { contacts: true, attachments: true } }, // or just: tool: true
+                        },
+                    },
+                    biosamples: {
+                        include: {
+                            biosample: { include: { contacts: true, attachments: true } }, // or: biosample: true
+                        },
+                    },
+                    diseaseModels: {
+                        include: {
+                            diseaseModel: { include: { contacts: true, attachments: true } }, // or: diseaseModel: true
+                        },
+                    },
                 }).then(response => {
                     if (response.success) {
                         console.log(`fetched milestone`, response.data)

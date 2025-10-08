@@ -167,7 +167,6 @@ export function EditResearchPlanForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Title</FormLabel>
-                            <FormDescription>Enter a title for your Research Plan</FormDescription>
                             <FormControl>
                                 <Input id="title" placeholder="Enter a title..." {...field} />
                             </FormControl>
@@ -182,9 +181,6 @@ export function EditResearchPlanForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Description</FormLabel>
-                            <FormDescription>
-                                Enter a short description for your Research Plan.
-                            </FormDescription>
                             <FormControl>
                                 <Textarea id="description" placeholder={`Enter a description...`} {...field} />
                             </FormControl>
@@ -198,16 +194,13 @@ export function EditResearchPlanForm({
                     name="modalities"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Type</FormLabel>
-                            <FormDescription>
-                                Select a type that represents the goal of your research plan.
-                            </FormDescription>
+                            <FormLabel>Scientific strategy</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
                                     defaultOptions={
-                                        MODALITIES.map((o) => ({ ...o, type: "Modality" })).concat(
-                                            ADDITIONAL_RESEARCH_PLAN_TYPES.map((o) => ({ ...o, type: "Non-Modality" }))
+                                        MODALITIES.map((o) => ({ ...o, type: "Therapeutic approach" })).concat(
+                                            ADDITIONAL_RESEARCH_PLAN_TYPES.map((o) => ({ ...o, type: "Therapeutic agnostic" }))
                                         )
                                     }
                                     placeholder="Select a type..."
@@ -317,7 +310,7 @@ export function EditResearchPlanForm({
                     )}
 
                     <Button disabled={!form.formState.isValid} type="submit" variant={"cta"} className="w-fit">
-                        {researchPlanData?.id ? `Save` : `Create Research Plan`}
+                        {researchPlanData?.id ? `Save` : `Create research plan`}
                     </Button>
                 </div>
             </form>

@@ -83,15 +83,18 @@ export function AdminGenesClaimedChart() {
                                         textAnchor="middle"
                                         dominantBaseline="middle"
                                     >
-                                        <tspan
-                                            x={viewBox.cx}
-                                            y={viewBox.cy}
-                                            className="fill-foreground text-md font-bold"
-                                        >
-                                            {data && (
-                                                `${((data.claimedGenes / data.totalGenes)*100).toFixed(0)}% claimed`
-                                            )}
-                                        </tspan>
+                                        <>
+                                        {data && (
+                                            <tspan x={viewBox.cx} dy="0">
+                                                {`${data.claimedGenes.toLocaleString()} of ${data.totalGenes.toLocaleString()} claimed`}
+                                            </tspan>
+                                        )}
+                                        {data && (
+                                            <tspan x={viewBox.cx} dy="1.2em">
+                                                {`${((data.claimedGenes / data.totalGenes) * 100).toFixed(3)}% claimed`}
+                                            </tspan>
+                                        )}
+                                        </>
                                     </text>
                                 )
                             }

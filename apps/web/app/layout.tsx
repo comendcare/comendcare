@@ -11,10 +11,8 @@ import Loading from "@/loading";
 import {onbordaTours} from "@/state/onborda/onbordaStore";
 import Onborda from "~web/components/onborda/Onborda";
 import OnboardingCard from "~web/components/onboarding-card";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/packages/lib/auth";
-import prisma from "@comend/lib/prisma";
-import {Organization} from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/packages/lib/auth";
 
 
 // Set up Playfair Display and Source Sans 3 fonts
@@ -82,6 +80,7 @@ export default async function RootLayout({
                                          }: {
     children: React.ReactNode
 }) {
+    const session = await getServerSession(authOptions);
 
     return (
         <html
@@ -108,6 +107,7 @@ export default async function RootLayout({
                         id="cookieyes"
                         type="text/javascript"
                         src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
+                        data-cookiescript-domain=".comend.io"
                     ></script>
                     <script
                         data-cookieyes='cookieyes-functional'
@@ -122,7 +122,7 @@ export default async function RootLayout({
         </head>
         <body>
         <Suspense fallback={<Loading/>}>
-            <Providers>
+            <Providers session={session}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="light"

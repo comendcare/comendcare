@@ -17,9 +17,12 @@ import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/sea
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { useEffect } from "react"
+import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
+import {getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
+import {SavedOrganization} from "@prisma/client";
+import {useSession} from "next-auth/react";
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
@@ -46,6 +49,7 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
 })
 
 export default function MarketplacePage() {
+    const {data: session, status} = useSession()
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
@@ -53,6 +57,30 @@ export default function MarketplacePage() {
     const biosampleColumns = useBiosamplesTableColumns()
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+
+    useEffect(() => {
+        async function fetchData() {
+            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
+                id: true,
+                organizationId: true,
+                organization: true,
+                savedOrganizationId: true,
+                savedOrganization: true,
+                updatedAt: true,
+                createdAt: true,
+                metadata: true
+            });
+            if (savedOrganizationsResponse.success) {
+                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
+                setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
+            } else {
+                console.error(savedOrganizationsResponse.error);
+            }
+        }
+
+        fetchData();
+    }, [session, status])
 
     useEffect(() => {
         organizationStore.setSearchTerm("")
@@ -81,7 +109,12 @@ export default function MarketplacePage() {
                         ? (
                             <>
                                 {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                    <OrganizationMarketplaceCard organization={organization} key={index} isPublic={true}/>
+                                    <OrganizationMarketplaceCard
+                                        organization={organization}
+                                        key={index}
+                                        isPublic={true}
+                                        savedOrganizationIds={savedOrganizationIds}
+                                    />
                                 ))}
                             </>
                         )

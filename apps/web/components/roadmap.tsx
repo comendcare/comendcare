@@ -13,9 +13,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comen
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/tabs"
 import { PrivateFlowView } from "~web/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
-import { useEffect, useRef, useState } from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { getMilestones, getMilestoneTypes, getOrganizationFromOrganizationId, getPublicMilestoneDetails } from "@comend/lib/fetchers"
+import {
+    getMilestones,
+    getMilestoneTypes,
+    getOrganizationFromOrganizationId,
+    getPublicMilestoneDetails,
+    getRoadmap
+} from "@comend/lib/fetchers"
 import { TimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "@comend/components/ui/button"
 import { cn, parseCSV } from "@comend/lib/utils"
@@ -54,6 +60,7 @@ import {
 } from "@comend/components/ui/context-menu"
 import { NotificationBubble } from "./notification-bubble"
 import { useOnborda } from "./onborda/OnbordaContext"
+import {initializeRoadmapState} from "@/packages/lib/initialize-client-state";
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -103,7 +110,7 @@ export function Roadmap({
         setMilestone
     } = useRoadmapStore(useShallow(selector))
     const { step } = useOnbordaStore(useShallow(onbordaSelector))
-    const {data: session} = useSession()
+    const {data: session, status} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
@@ -119,6 +126,92 @@ export function Roadmap({
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const focusRef = useRef<any>(null);
+
+    // stable string for deps
+    const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
+
+    useEffect(() => {
+        // Don’t call the API until we know the session status
+        if (status !== "authenticated") return
+
+        const orgId = session?.user.organizationId
+        if (!orgId) {
+            // If you WANT a toast only when the user is actually authenticated but missing an org:
+            // toast.error("You’re signed in but not part of an organization.")
+            return
+        }
+
+        let cancelled = false
+        const init = async () => {
+            const response = await getRoadmap(orgId, researchPlanId, {
+                id: true,
+                title: true,
+                description: true,
+                content: true,
+                slug: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
+                published: true,
+                organizationId: true,
+                organization: true,
+                user: true,
+                edges: true,
+                milestones: true,
+                nodes: true,
+                modalities: true,
+                metadata: true,
+            })
+
+            if (cancelled) return
+
+            if (response.success && response.data) {
+                const urlNode = new URLSearchParams(searchParamsString).get("milestone")
+                const urlView = new URLSearchParams(searchParamsString).get("view")
+
+                initializeRoadmapState({
+                    roadmapId: researchPlanId,
+                    details: response.data,
+                    nodes: response.data.nodes,
+                    edges: response.data.edges,
+                    milestones: response.data.milestones,
+                    selectedView: urlView,
+                    selectedNodeIds: urlNode ? [urlNode] : [],
+                })
+                // optional: toast.success("Research Plan loaded")
+            } else {
+                console.error(`Could not initialize active roadmap with id ${researchPlanId}. Error: ${response.error}`)
+                toast.error(`Could not initialize active roadmap with id ${researchPlanId}. Error: ${response.error}`)
+            }
+        }
+
+        // Init notifications
+        // let notifications = await getAllNotifications({
+        //     id: true,
+        //     type: true,
+        //     title: true,
+        //     message: true,
+        //     link: true,
+        //     createdAt: true,
+        //     updatedAt: true,
+        //     lastViewedAt: true,
+        // })
+        // if (notifications.success && notifications.data) {
+        //     initializeNotificationsState({
+        //         notifications: notifications.data
+        //     })
+        //     console.log(`Notificaions initialized...`)
+        // } else {
+        //     console.error(notifications.error)
+        //     toast.error(notifications.error)
+        // }
+
+        void init()
+        return () => {
+            cancelled = true
+        }
+    }, [status, session?.user.organizationId, researchPlanId, searchParamsString])
+
     // 1) Safe initial state (runs on server too)
     const [newFlowProjects, setNewFlowProjects] = useState<string | undefined>(() => {
         if (typeof window === "undefined") return undefined

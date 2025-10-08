@@ -12,7 +12,16 @@ import SaveOrganizationButton from "~web/components/save-organization-button";
 
 type NodeTypeCount = Record<string, number>;
 
-export function OrganizationMarketplaceCard({organization, isPublic}: { organization: any, isPublic: boolean }) {
+export function OrganizationMarketplaceCard({
+                                                organization,
+                                                isPublic,
+                                                savedOrganizationIds
+                                            }: {
+                                                organization: any,
+                                                isPublic: boolean,
+                                                savedOrganizationIds?: Set<string>
+                                            }
+) {
     const {subdomain, image, name, description, moneyDeployed, conditions, therapeuticsOfInterest} = organization
     const orgCondition = conditions?.[0]?.condition || {}
     const {associatedGenes = [], causalGenes = [], numberOfPatientsEngaged} = orgCondition
@@ -53,7 +62,11 @@ export function OrganizationMarketplaceCard({organization, isPublic}: { organiza
                             </CardTitle>
                         </Link>
                         {/*{!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}*/}
-                        {!isPublic && <SaveOrganizationButton savedOrganization={organization} type={"card"}/>}
+                        {!isPublic && <SaveOrganizationButton
+                            savedOrganization={organization}
+                            type={"card"}
+                            savedOrganizationIds={savedOrganizationIds}
+                        />}
                     </div>
                     {(moneyDeployed || numberOfPatientsEngaged) && (
                         <div className="w-full grid gap-2 grid-cols-2">

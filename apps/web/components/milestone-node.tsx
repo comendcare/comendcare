@@ -153,7 +153,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                     {(props?.data?.startDate || props?.data?.endDate) && (
                         <li>
                             <Badge>
-                                <Calendar size={16}/>
                                 <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
                             </Badge>
                         </li>
@@ -186,24 +185,24 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                     <span className="text-emerald-900 text-nowrap">Linked Tools</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {(props.data?.biosamples || []).map(({biosample}) => {
+                                    {(props.data?.biosamples || []).map(({biosample}, index) => {
                                         const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                                         return (
-                                            <Badge variant="violet">
+                                            <Badge key={index} variant="violet">
                                                 {`${biosample.donorId} --- ${type?.label || ''}`}
                                             </Badge>
                                         )
                                     })}
-                                    {(props.data?.diseaseModels || []).map(({diseaseModel}) => {
+                                    {(props.data?.diseaseModels || []).map(({diseaseModel}, index) => {
                                         const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                                         return (
-                                            <Badge variant="yellow">
+                                            <Badge key={index} variant="yellow">
                                                 {`${diseaseModel.id} --- ${type?.label}`}
                                             </Badge>
                                         )
                                     })}
-                                    {(props.data?.tools || []).map(({tool}) => (
-                                        <Badge variant="emerald">
+                                    {(props.data?.tools || []).map(({tool}, index) => (
+                                        <Badge key={index} variant="emerald">
                                             {tool?.title}
                                         </Badge>
                                     ))}
@@ -217,8 +216,8 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                     <span className="text-orange-900 text-nowrap">Linked RFPs</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {props.data?.rfps.map(({rfp}) => (
-                                        <Badge variant="orange">
+                                    {props.data?.rfps.map(({rfp}, index) => (
+                                        <Badge key={index} variant="orange">
                                             {rfp?.title}
                                         </Badge>
                                     ))}
