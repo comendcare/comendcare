@@ -94,7 +94,7 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
         <Card className="organization-profile-tour-step5">
             <CardHeader className="w-full flex flex-row items-start justify-between gap-4">
                 <CardTitle className="w-full flex flex-row items-center justify-between">
-                    Tools
+                    Toolkit
                     <div className="text-muted-foreground text-sm flex flex-wrap gap-2 justify-end">
                         {toolCounts.biosampleCount > 0 && (
                             <Button

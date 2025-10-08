@@ -38,7 +38,7 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
     }, [urlMilestone]);
 
     const breadcrumbItems = [
-        { label: "Home", href: "/" },
+        // { label: "Home", href: "/" },
         organization && {
             label: organization.name,
             href: `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`

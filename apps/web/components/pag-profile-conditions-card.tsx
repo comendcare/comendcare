@@ -119,15 +119,9 @@ export const PAGProfileConditionsCard = ({
                             {/* Epidemiology (unchanged) */}
                             <div className="space-y-2" data-testid="epidemiology-section">
                                 <div className="flex flex-row items-center justify-start w-full gap-2">
-                                    <h4 className="scroll-m-20 text-base font-semibold">Epidemiology</h4>
-                                    <Tooltip delayDuration={0}>
-                                        <TooltipTrigger disabled data-testid="epi-info-trigger">
-                                            <Info className="text-black h-4 w-4" />
-                                        </TooltipTrigger>
-                                        <TooltipContent data-testid="epi-info-content">
-                                            <p>{`The numbers presented here are all approximate.`}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    <h4 className="scroll-m-20 text-base font-semibold">
+                                        Patient population
+                                    </h4>
                                 </div>
                                 {condition?.prevalenceNumerator ||
                                 condition?.prevalenceDenominator ||

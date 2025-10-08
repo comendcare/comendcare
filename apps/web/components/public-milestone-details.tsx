@@ -71,11 +71,8 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
         <Card className="w-full border-2 border-black">
             <CardHeader>
                 <CardTitle>
-                    Select a Milestone!
+                    Select a project
                 </CardTitle>
-                <CardDescription>
-                    Select a milestone from the timeline or flow to see more details about it.
-                </CardDescription>
             </CardHeader>
         </Card>
     )

@@ -48,7 +48,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                         <CardTitle className="text-gray-900 flex items-center gap-2">
-                            <span className="truncate">{milestone.title || "Untitled Milestone"}</span>
+                            <span className="break-words">{milestone.title || "Untitled Milestone"}</span>
                             {milestone?.private && (
                                 <Lock size={18} className="text-gray-700" aria-label="Private"/>
                             )}
@@ -57,10 +57,6 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             {truncate(milestone?.description || "", 300)}
                         </CardDescription>
                     </div>
-
-                    {milestone.nodeType && (
-                        <TypeBadge className="w-fit shrink-0" type={nodeType}/>
-                    )}
                 </div>
             </CardHeader>
 
@@ -152,50 +148,62 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
 
                 {/* Linked Tools (biosamples / disease models / tools) */}
                 {(Array.isArray(milestone?.tools) || Array.isArray(milestone?.biosamples) || Array.isArray(milestone?.diseaseModels)) && (
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Type</TableHead>
-                                    <TableHead>Title</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead>Contacts</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {[
-                                    ...(milestone?.tools ?? []).map((x: any) => ({ type: "Tool", item: x?.tool })),
-                                    ...(milestone?.biosamples ?? []).map((x: any) => ({ type: "Biosample", item: x?.biosample })),
-                                    ...(milestone?.diseaseModels ?? []).map((x: any) => ({ type: "Disease model", item: x?.diseaseModel })),
-                                ]
-                                    .filter((row) => row.item)
-                                    .map(({ type, item }: any) => (
-                                        <TableRow key={`${type}-${item.id || item.title}`}>
-                                            <TableCell>
-                                                <Badge className="w-fit">{type}</Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="truncate">{item.title || item.name || BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === item.types[0])?.label || "Untitled"}</span>
-                                                    {item.private && <PrivateBadge iconOnly />}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="line-clamp-3">{item.description}</div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <ul className="flex flex-col gap-1">
-                                                    {(item.contacts || []).map((c: any, i: number) => (
-                                                        <li key={i} className="truncate">
-                                                            {c.name || c.email || c.affiliation}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                            </TableBody>
-                        </Table>
+                    <div className="flex flex-col justify-between space-y-2">
+                        <h2 className="font-semibold text-lg flex items-center gap-2">
+                            Tools
+                        </h2>
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead>Contacts</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {[
+                                        ...(milestone?.tools ?? []).map((x: any) => ({type: "Tool", item: x?.tool})),
+                                        ...(milestone?.biosamples ?? []).map((x: any) => ({
+                                            type: "Biosample",
+                                            item: x?.biosample
+                                        })),
+                                        ...(milestone?.diseaseModels ?? []).map((x: any) => ({
+                                            type: "Disease model",
+                                            item: x?.diseaseModel
+                                        })),
+                                    ]
+                                        .filter((row) => row.item)
+                                        .map(({type, item}: any) => (
+                                            <TableRow key={`${type}-${item.id || item.title}`}>
+                                                <TableCell>
+                                                    <Badge className="w-fit">{type}</Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <span
+                                                            className="truncate">{item.title || item.name || BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === item.types[0])?.label || "Untitled"}</span>
+                                                        {item.private && <PrivateBadge iconOnly/>}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="line-clamp-3">{item.description}</div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <ul className="flex flex-col gap-1">
+                                                        {(item.contacts || []).map((c: any, i: number) => (
+                                                            <li key={i} className="truncate">
+                                                                {c.name || c.email || c.affiliation}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
                 )}
 
