@@ -85,16 +85,16 @@ const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
 })
 
 export function Roadmap({
-                            milestoneTypes,
-                            organization,
-                            orgSubdomain,
-                            orgIsPublished,
-                            researchPlanId,
-                            initRoadmap,
-                            initEdges,
-                            initNodes,
-                            initMilestones
-                        }: {
+    milestoneTypes,
+    organization,
+    orgSubdomain,
+    orgIsPublished,
+    researchPlanId,
+    initRoadmap,
+    initEdges,
+    initNodes,
+    initMilestones
+}: {
     milestoneTypes: MilestoneType[];
     organization?: Organization;
     orgSubdomain?: string;
@@ -104,12 +104,11 @@ export function Roadmap({
     initEdges: any[];
     initNodes: any[];
     initMilestones: any[];
-}) {    // Zustand state management
+}) {
     const { defaultLayout } = useSidebarStore()
     const { 
         roadmapId,
         details,
-        initialized,
         selectedView,
         setSelectedView,
         selectedNodeIds, 
@@ -136,7 +135,6 @@ export function Roadmap({
     const { isOnbordaVisible } = useOnborda()
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
-    const focusRef = useRef<any>(null);
 
     // stable string for deps
     const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
@@ -153,123 +151,21 @@ export function Roadmap({
         }
 
         let cancelled = false
-        // const init = async () => {
-        //     console.log(`Start Research Plan Init: Fetch Data`)
-        //     const response = await getRoadmap(orgId, researchPlanId, {
-        //         id: true,
-        //         title: true,
-        //         description: true,
-        //         content: true,
-        //         slug: true,
-        //         image: true,
-        //         createdAt: true,
-        //         updatedAt: true,
-        //         published: true,
-        //         organizationId: true,
-        //         organization: true,
-        //         user: true,
-        //         // edges: true,
-        //         // milestones: true,
-        //         // nodes: true,
-        //         modalities: true,
-        //         metadata: true,
-        //     })
-        //     console.log(`Fetched roadmap data`)
-        //     const milestonesResponse = await getRoadmapMilestones(orgId, researchPlanId, {
-        //         id: true,
-        //         createdAt: true,
-        //         updatedAt: true,
-        //         title: true,
-        //         description: true,
-        //         notes: true,
-        //         status: true,
-        //         budget: true,
-        //         endDate: true,
-        //         startDate: true,
-        //         private: true,
-        //         otherTypeDetails: true,
-        //         timelineOrder: true,
-        //         nodeType: true,
-        //         roadmapId: true,
-        //         organizationId: true,
-        //         nodeId: true,
-        //         metadata: true,
-        //         node: true,
-        //         contacts: true,
-        //         attachments: true,
-        //         types: {include: {milestoneType: true}},
-        //         tools: {include: {tool: true}},
-        //         rfps: {include: {rfp: true}}
-        //     })
-        //     console.log(`Fetched project data`)
-        //     const nodesResponse = await getRoadmapNodes(orgId, researchPlanId, {
-        //         id: true,
-        //         createdAt: true,
-        //         updatedAt: true,
-        //         positionX: true,
-        //         positionY: true,
-        //         origin: true,
-        //         roadmapId: true,
-        //     })
-        //     console.log(`Fetched node data`)
-        //     const edgesResponse = await getRoadmapEdges(orgId, researchPlanId, {
-        //         id: true,
-        //         source: true,
-        //         target: true,
-        //         type: true,
-        //         data: true,
-        //         roadmapId: true
-        //     })
-        //     console.log(`Fetched edges data`)
+        const urlNode = new URLSearchParams(searchParamsString).get("project")
+        const urlView = new URLSearchParams(searchParamsString).get("view")
 
-        //     if (cancelled) return
+        console.log(`url node`, urlNode)
 
-        //     if (response.success && response.data && milestonesResponse.success && nodesResponse.success && edgesResponse.success) {
-                const urlNode = new URLSearchParams(searchParamsString).get("milestone")
-                const urlView = new URLSearchParams(searchParamsString).get("view")
+        initializeRoadmapState({
+            roadmapId: researchPlanId,
+            details: initRoadmap,
+            nodes: initNodes || [],
+            edges: initEdges || [],
+            milestones: initMilestones || [],
+            selectedView: urlView,
+            selectedNodeIds: urlNode ? [urlNode] : [],
+        })
 
-        //         console.log(`Start zustand initialization`)
-
-                initializeRoadmapState({
-                    roadmapId: researchPlanId,
-                    details: initRoadmap,
-                    nodes: initNodes || [],
-                    edges: initEdges || [],
-                    milestones: initMilestones || [],
-                    selectedView: urlView,
-                    selectedNodeIds: urlNode ? [urlNode] : [],
-                })
-
-        //         console.log(`Zustand initialized successfully`)
-        //         // optional: toast.success("Research Plan loaded")
-        //     } else {
-        //         console.error(`Could not initialize active roadmap with id ${researchPlanId}. Error: ${response.error}`)
-        //         toast.error(`Could not initialize active roadmap with id ${researchPlanId}. Error: ${response.error}`)
-        //     }
-        // }
-
-        // Init notifications
-        // let notifications = await getAllNotifications({
-        //     id: true,
-        //     type: true,
-        //     title: true,
-        //     message: true,
-        //     link: true,
-        //     createdAt: true,
-        //     updatedAt: true,
-        //     lastViewedAt: true,
-        // })
-        // if (notifications.success && notifications.data) {
-        //     initializeNotificationsState({
-        //         notifications: notifications.data
-        //     })
-        //     console.log(`Notificaions initialized...`)
-        // } else {
-        //     console.error(notifications.error)
-        //     toast.error(notifications.error)
-        // }
-
-        // void init()
         return () => {
             cancelled = true
         }
@@ -367,9 +263,9 @@ export function Roadmap({
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
     }
 
-    // if (!roadmapId || !initialized) {
-    //     return <Loading />
-    // }
+    if (!roadmapId) {
+        return <Loading />
+    }
 
     return (
         <ContextMenu>
