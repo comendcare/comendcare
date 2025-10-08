@@ -2490,7 +2490,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
                     ...(diseaseModelData.gene
-                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
+                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
                         ? {
@@ -2606,7 +2606,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
                     ...(diseaseModelData.gene
-                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
+                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : undefined),
                     ...(diseaseModelData.institution
                         ? ({
@@ -2747,7 +2747,7 @@ export const createDataTool = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: dataToolData.metadata as InputJsonObject,
                     ...(dataToolData.gene
-                        ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
+                        ? ({gene: {connect: {symbol: dataToolData.gene.value.toUpperCase()}}})
                         : undefined),
                     ...((
                         data.cohortSize !== undefined &&
@@ -2896,7 +2896,7 @@ export const updateDataTool = withOrganizationAuth(
                     metadata: dataToolData.metadata as InputJsonObject,
                     ...(dataToolData.gene ? ({
                         gene: {
-                            connect: {symbol: dataToolData.gene.value}
+                            connect: {symbol: dataToolData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
                     ...(dataToolData.institution
@@ -3028,7 +3028,8 @@ export const createBiosample = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
-                        ? ({gene: {connect: {symbol: biosampleData.gene.value}}})
+                        // transform symbol to uppercase because all genes are uppercase in our database
+                        ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
                     ...(biosampleData.institution
                         ? ({
@@ -3252,7 +3253,7 @@ export const updateBiosample = withOrganizationAuth(
                             : false,
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
-                        ? {gene: {connect: {symbol: biosampleData.gene.value}}}
+                        ? {gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}}
                         : {gene: {disconnect: true}}),
                     ...(biosampleData.institution
                         ? {
@@ -3520,7 +3521,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
-                            connect: {symbol: biosampleData.gene.value}
+                            connect: {symbol: biosampleData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
                     ...(biosampleData.institution ? ({
@@ -3609,7 +3610,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
-                            connect: {symbol: biosampleData.gene.value}
+                            connect: {symbol: biosampleData.gene.value.toUpperCase()}
                         }
                     }) : undefined),
                     ...(biosampleData.institution ? ({
