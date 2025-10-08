@@ -123,9 +123,9 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                         </Tooltip>
                     )}
                 </CardTitle>
-                <CardDescription className="line-clamp-2">
+                {/* <CardDescription className="line-clamp-2">
                     {truncate(props.data?.description || "", 200)}
-                </CardDescription>
+                </CardDescription> */}
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
                 <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">

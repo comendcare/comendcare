@@ -406,9 +406,9 @@ export const TimelineItemContent = ({
                 </div>
             )}
         </div>
-        <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
+        {/* <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
             {milestone.description}
-        </p>
+        </p> */}
 
         <span className="flex flex-wrap gap-2 items-center">
             {(milestone?.types || []).map((milestoneType, index) => (
