@@ -4,6 +4,7 @@ import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
     Globe,
+    Info,
     Lock,
 } from "lucide-react";
 import * as React from "react";
@@ -27,6 +28,7 @@ import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
 import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
 import { useSession } from "next-auth/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
