@@ -149,13 +149,13 @@ const data = {
             variant: "ghost",
             url: "/app/marketplace",
             match: (path: string) => path.startsWith('/app/marketplace'),
-            subPages: [{
-                title: "Saved",
-                icon: Bookmark,
-                variant: "ghost",
-                match: (path: string) => path.startsWith('/app/saved'),
-                url: "/app/saved/service-providers"
-            }]
+            // subPages: [{
+            //     title: "Saved",
+            //     icon: Bookmark,
+            //     variant: "ghost",
+            //     match: (path: string) => path.startsWith('/app/saved'),
+            //     url: "/app/saved/service-providers"
+            // }]
 
             // subPages: [
             //     {
