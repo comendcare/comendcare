@@ -135,12 +135,12 @@ export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds
                     </CardTitle>
                 </Link>
                 {/*<SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>*/}
-                <SaveCROButton
-                    cro={cro}
-                    type={"card"}
-                    location={location}
-                    savedCompanyIds={savedCompanyIds}
-                />
+                {/*<SaveCROButton*/}
+                {/*    cro={cro}*/}
+                {/*    type={"card"}*/}
+                {/*    location={location}*/}
+                {/*    savedCompanyIds={savedCompanyIds}*/}
+                {/*/>*/}
             </div>
             <Link
                 href={

@@ -48,7 +48,7 @@ import {useOnborda} from "~web/components/onborda/OnbordaContext";
 import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import {useSession} from "next-auth/react";
-import { Separator } from "@/packages/components/ui/separator"
+import {Separator} from "@/packages/components/ui/separator"
 import path from "path"
 
 // This is sample data.
@@ -149,13 +149,13 @@ const data = {
             variant: "ghost",
             url: "/app/marketplace",
             match: (path: string) => path.startsWith('/app/marketplace'),
-            subPages: [{
-                title: "Saved",
-                icon: Bookmark,
-                variant: "ghost",
-                match: (path: string) => path.startsWith('/app/saved'),
-                url: "/app/saved/service-providers"
-            }]
+            // subPages: [{
+            //     title: "Saved",
+            //     icon: Bookmark,
+            //     variant: "ghost",
+            //     match: (path: string) => path.startsWith('/app/saved'),
+            //     url: "/app/saved/service-providers"
+            // }]
 
             // subPages: [
             //     {
@@ -229,64 +229,69 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
                 <SidebarGroup>
                     <SidebarGroupLabel>Manage</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <NavMain items={manageItems} />
+                        <NavMain items={manageItems}/>
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
                     <SidebarGroupLabel>Explore</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <NavMain items={exploreItems} />
+                        <NavMain items={exploreItems}/>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="bg-gray-50 p-2">
-                <Separator className="w-full"/>
+                {/*<Separator className="w-full"/>*/}
                 <div className="flex flex-col gap-1">
-                <SidebarMenuButton
-                    asChild
-                    className={pathname.startsWith('/app/guides') ? "bg-blue-light border border-blue-dark text-primary" : ""}
-                >
-                    <Link href={'/app/guides'} className="flex">
-                        <div className="relative">
-                            <BookOpen className="mr-2 h-4 w-4"/>
-                            {state === "collapsed" &&
-                                <NavNotificationCollapsedIcon item={{title: 'Guides', url: '/app/guides'}}/>
-                            }
-                        </div>
-                        {'Guides'}
-                        {state === "expanded" &&
-                            <NavNotificationExpandedIcon item={{title: 'Guides', url: '/app/guides'}}/>
-                        }
-                    </Link>
-                </SidebarMenuButton>
-                <FeedbackSheet />
+                    {/*<SidebarMenuButton*/}
+                    {/*    asChild*/}
+                    {/*    className={pathname.startsWith('/app/guides') ? "bg-blue-light border border-blue-dark text-primary" : ""}*/}
+                    {/*>*/}
+                    {/*    <Link href={'/app/guides'} className="flex">*/}
+                    {/*        <div className="relative">*/}
+                    {/*            <BookOpen className="mr-2 h-4 w-4"/>*/}
+                    {/*            {state === "collapsed" &&*/}
+                    {/*                <NavNotificationCollapsedIcon item={{title: 'Guides', url: '/app/guides'}}/>*/}
+                    {/*            }*/}
+                    {/*        </div>*/}
+                    {/*        {'Guides'}*/}
+                    {/*        {state === "expanded" &&*/}
+                    {/*            <NavNotificationExpandedIcon item={{title: 'Guides', url: '/app/guides'}}/>*/}
+                    {/*        }*/}
+                    {/*    </Link>*/}
+                    {/*</SidebarMenuButton>*/}
+                    <FeedbackSheet/>
                 </div>
                 {state === "expanded" && (
                     <>
-                    <Separator className="w-full"/>
-                    <div className="w-full flex flex-wrap justify-start gap-1 p-2 items-center" >
-                        <Button variant="ghost" className="text-xs cky-banner-element p-0 flex justify-start m-0 h-fit hover:underline hover:bg-transparent">
-                            Cookies
-                        </Button>
-                        <p className="text-md">{'\u00B7'}</p>
-                        <Link href="https://www.comend.io/terms-of-service" className="text-xs hover:underline hover:text-primary">
-                            Terms of Services
-                        </Link>
-                        <p className="text-md">{'\u00B7'}</p>
-                        <Link href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link" className="text-xs hover:underline hover:text-primary">
-                            Privacy Policy
-                        </Link>
-                        {/* <p className="text-md">{'\u00B7'}</p> */}
-                        <Link href="https://comend.io/security" className="text-xs hover:underline hover:text-primary">
-                            Security Promise
-                        </Link>
-                        {/* <Button
+                        <Separator className="w-full"/>
+                        <div className="w-full flex flex-wrap justify-start gap-1 p-2 items-center">
+                            <Button variant="ghost"
+                                    className="text-xs cky-banner-element p-0 flex justify-start m-0 h-fit hover:underline hover:bg-transparent">
+                                Cookies
+                            </Button>
+                            <p className="text-md">{'\u00B7'}</p>
+                            <Link href="https://www.comend.io/terms-of-service"
+                                  className="text-xs hover:underline hover:text-primary">
+                                Terms of Services
+                            </Link>
+                            <p className="text-md">{'\u00B7'}</p>
+                            <Link
+                                href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link"
+                                className="text-xs hover:underline hover:text-primary">
+                                Privacy Policy
+                            </Link>
+                            {/* <p className="text-md">{'\u00B7'}</p> */}
+                            <Link href="https://comend.io/security"
+                                  className="text-xs hover:underline hover:text-primary">
+                                Security Promise
+                            </Link>
+                            {/* <Button
                             variant="ghost"
                             className="pointer-events-none p-0"
                         >
                             <Image className="h-4 w-4" priority src={logo} alt="Comend logo"/>
                         </Button> */}
-                    </div>
+                        </div>
                     </>
                 )}
             </SidebarFooter>
