@@ -25,7 +25,7 @@ const links = [
 
 export function ToolsNav({className}: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <TabNav 
+        <TabNav
             className={className}
             baseLink={"/app/tools"}
             links={links}

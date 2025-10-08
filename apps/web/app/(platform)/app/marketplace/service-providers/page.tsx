@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 import { ScrollArea } from "@comend/components/ui/scroll-area";
 import {CROSearchResults} from "~web/components/marketplace/service-providers/cro-search-results";

@@ -3,13 +3,15 @@ import InviteUserToOrgDialog from "~web/components/invite-user-to-org-dialog"
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import InvitationsDropdown from "~web/components/invitations-dropdown"
-import {Invitation} from "@prisma/client";
+import {Invitation, Prisma} from "@prisma/client";
 import {getSession} from "@/packages/lib/auth";
 
-export default async function PAGSettingsInvitationsTab({invitations}: {invitations: Invitation[]}) {
+export default async function PAGSettingsInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
+        include: { invitations: true };
+    }>}) {
     const session = await getSession()
 
-    const invitees = invitations.filter(inv => !inv.accepted);
+    const invitees = organization.invitations.filter((inv: Invitation) => !inv.accepted);
 
     if (!session?.user?.organizationId) {
         return (
@@ -46,7 +48,7 @@ export default async function PAGSettingsInvitationsTab({invitations}: {invitati
                         <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
                         <p className="text-sm text-gray-700">All open invitations sent by your organization.</p>
                     </div>
-                    <InviteUserToOrgDialog />
+                    <InviteUserToOrgDialog organization={organization}/>
                 </div>
                 <Image
                     alt="No open invitations"
@@ -76,7 +78,7 @@ export default async function PAGSettingsInvitationsTab({invitations}: {invitati
                     <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
                     <p className="text-sm text-gray-700">All open invitations sent by your organization.</p>
                 </div>
-                <InviteUserToOrgDialog />
+                <InviteUserToOrgDialog organization={organization}/>
             </div>
 
             <div className="mt-8 flow-root">

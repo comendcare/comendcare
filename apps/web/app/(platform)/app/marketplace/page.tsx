@@ -17,11 +17,14 @@ import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/sea
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { useEffect } from "react"
+import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { CROMarketplaceCard } from "~web/components/marketplace/marketplace-cro-card"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
 import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
+import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
+import {SavedCompany, SavedOrganization} from "@prisma/client";
+import {useSession} from "next-auth/react";
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -53,6 +56,7 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
 })
 
 export default function MarketplacePage() {
+    const {data: session, status} = useSession()
     const croStore = useCROSearchStore(useShallow(croSelector))
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
@@ -61,6 +65,31 @@ export default function MarketplacePage() {
     const biosampleColumns = useBiosamplesTableColumns()
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+
+    useEffect(() => {
+        async function fetchData() {
+            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
+                id: true,
+                organizationId: true,
+                organization: true,
+                savedOrganizationId: true,
+                savedOrganization: true,
+                updatedAt: true,
+                createdAt: true,
+                metadata: true
+            });
+            if (savedOrganizationsResponse.success) {
+                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
+                setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
+            } else {
+                console.error(savedOrganizationsResponse.error);
+            }
+        }
+
+        fetchData();
+    }, [session, status])
 
     useEffect(() => {
         croStore.setSearchTerm("")
@@ -70,7 +99,22 @@ export default function MarketplacePage() {
         clinicalDatasetStore.setSearchTerm("")
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    
+
+    useEffect(() => {
+        async function fetchSavedCompanies() {
+            const res = await getSavedCompaniesFromOrganizationId(
+                session?.user?.organizationId,
+                { companyId: true }
+            );
+
+            if (res.success && res.data) {
+                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+            }
+        }
+
+        fetchSavedCompanies();
+    }, [session, status]);
+
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
@@ -91,7 +135,12 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     {croStore.searchResults?.slice(0, 3).map((cro, index) => (
-                                        <CROMarketplaceCard cro={cro} key={index} location={"Marketplace"}/>
+                                        <CROMarketplaceCard
+                                            cro={cro}
+                                            key={index}
+                                            location={"Marketplace"}
+                                            savedCompanyIds={savedCompanyIds}
+                                        />
                                     ))}
                                 </>
                             )
@@ -123,7 +172,12 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceCard organization={organization} key={index} isPublic={false} />
+                                        <OrganizationMarketplaceCard
+                                            organization={organization}
+                                            key={index}
+                                            isPublic={false}
+                                            savedOrganizationIds={savedOrganizationIds}
+                                        />
                                     ))}
                                 </>
                             )

@@ -50,9 +50,7 @@ const userFormSchema = z.object({
 export default function UserEditForm() {
     const router = useRouter();
     const {data: session} = useSession();
-    // const [searchInput, setSearchInput] = useState("");
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
-    const [isDialogOpen, setDialogOpen] = useState(false);
     const [isCropping, setIsCropping] = useState(false)
     const [loadingUserData, setLoadingUserData] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -76,7 +74,6 @@ export default function UserEditForm() {
             });
 
             setSelectedFile(fileWithPreview);
-            setDialogOpen(true);
         },
         []
     );

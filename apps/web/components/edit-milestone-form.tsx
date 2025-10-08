@@ -40,8 +40,24 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@comend/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
-import {Biosample, DiseaseModel, MilestoneType, Organization, PlatformNotification, Prisma, Tool} from "@prisma/client"
-import {getAssets, getBiosamples, getDatasamples, getDiseaseModels, getRFPs} from "@comend/lib/fetchers"
+import {
+    Biosample,
+    DiseaseModel,
+    MilestoneType,
+    Organization,
+    PlatformNotification,
+    Prisma,
+    SavedCompany,
+    Tool
+} from "@prisma/client"
+import {
+    getAssets,
+    getBiosamples,
+    getDatasamples,
+    getDiseaseModels,
+    getRFPs,
+    getSavedCompaniesFromOrganizationId
+} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
@@ -180,7 +196,7 @@ export function EditMilestoneForm({
         setNotificationsViewed,
     } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
-    const {data: session} = useSession()
+    const {data: session, status} = useSession()
     const pathname = usePathname()
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
@@ -196,6 +212,23 @@ export function EditMilestoneForm({
     const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
     const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
+    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+
+    useEffect(() => {
+        async function fetchSavedCompanies() {
+            const res = await getSavedCompaniesFromOrganizationId(
+                session?.user?.organizationId,
+                { companyId: true }
+            );
+
+            if (res.success && res.data) {
+                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+            }
+        }
+
+        fetchSavedCompanies();
+    }, [session, status]);
+
 
     // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget || false)
@@ -1145,9 +1178,13 @@ export function EditMilestoneForm({
                                                 <div className={cn("w-full grid gap-4 grid-cols-1")}>
                                                     {(recommendations || []).map((result: Recommendation, index) => (
                                                         // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
-                                                        <CROMarketplaceCard cro={result.content} key={index}
-                                                                            milestone={milestoneData}
-                                                                            location={"Research Planner"}/>
+                                                        <CROMarketplaceCard
+                                                            cro={result.content}
+                                                            key={index}
+                                                            milestone={milestoneData}
+                                                            location={"Research Planner"}
+                                                            savedCompanyIds={savedCompanyIds}
+                                                        />
                                                     ))}
                                                 </div>
                                             </>

@@ -153,7 +153,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                     {(props?.data?.startDate || props?.data?.endDate) && (
                         <li>
                             <Badge>
-                                <Calendar size={16}/>
                                 <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
                             </Badge>
                         </li>
