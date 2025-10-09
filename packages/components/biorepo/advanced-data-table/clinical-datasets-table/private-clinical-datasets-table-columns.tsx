@@ -14,6 +14,7 @@ import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import { Checkbox } from "./../../../ui/checkbox";
 import { handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
+import Link from "next/link";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
@@ -257,10 +258,16 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Links" />
         ),
         cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-2 min-w-[120px]">
                 {row.original.attachments?.map((attachment: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
+                    <li key={index}>
+                        <Link 
+                            className="line-clamp-2 underline" 
+                            href={attachment.link || "/"}
+                            onClick={(e) => e.stopPropagation()}
+                        >
                         {attachment.name || attachment.link}
+                        </Link>
                     </li>
                 ))}
             </ul>

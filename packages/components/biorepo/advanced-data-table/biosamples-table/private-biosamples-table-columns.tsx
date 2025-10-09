@@ -4,6 +4,7 @@ import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
     Globe,
+    Info,
     Lock,
 } from "lucide-react";
 import * as React from "react";
@@ -27,6 +28,8 @@ import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
 import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
 import { useSession } from "next-auth/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import Link from "next/link";
 
 export function useBiosamplesTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
@@ -417,10 +420,16 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader column={column} title="Links"/>
             ),
             cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-2 min-w-[120px]">
                     {row.original.attachments?.map((attachment: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
+                        <li key={index}>
+                            <Link 
+                                className="line-clamp-2 underline" 
+                                href={attachment.link || "/"}
+                                onClick={(e) => e.stopPropagation()}
+                            >
                             {attachment.name || attachment.link}
+                            </Link>
                         </li>
                     ))}
                 </ul>
