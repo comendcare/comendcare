@@ -19,6 +19,7 @@ import {
 import { cn } from "./../../../../../packages/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./../../../ui/tooltip";
 import { Info } from "lucide-react";
+import { TooltipPortal } from "@radix-ui/react-tooltip";
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.ComponentProps<typeof DropdownMenuTrigger> {
@@ -53,9 +54,11 @@ export function DataTableColumnHeader<TData, TValue>({
             <TooltipTrigger asChild>
               <Info className="inline" />
             </TooltipTrigger>
-            <TooltipContent className="max-w-64 h-fit text-wrap">
+            <TooltipPortal>
+            <TooltipContent className="max-w-64 h-fit text-wrap my-4">
                 <p>{tooltip}</p>
             </TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         )}
         {column.getCanSort() &&
