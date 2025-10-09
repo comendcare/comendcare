@@ -1386,45 +1386,7 @@ export const getRoadmap = withOrganizationAuth(
                     organizationId: organization.id,
                     id: roadmapId
                 },
-                // include: {
-                //     nodes: {
-                //         include: {data: true},
-                //         orderBy: [{ createdAt: "desc" }]
-                //     },
-                //     milestones: {
-                //         include: {
-                //             node: true,
-                //             contacts: true,
-                //             attachments: true,
-                //             types: {include: { milestoneType: true }},
-                //             tools: {include: {tool: true}},
-                //             rfps: {include: {rfp: true}}
-                //         },
-                //         orderBy: [{ createdAt: "desc" }]
-                //     },
-                //     edges: true,
-                //     organization: true
-                // }
-                select: {
-                    ...select,
-                    // nodes: {
-                    //     include: {data: true},
-                    //     orderBy: [{createdAt: "desc"}]
-                    // },
-                    // milestones: {
-                    //     include: {
-                    //         node: true,
-                    //         contacts: true,
-                    //         attachments: true,
-                    //         types: {include: {milestoneType: true}},
-                    //         biosamples: {include: {biosample: true}},
-                    //         diseaseModels: {include: {diseaseModel: true}},
-                    //         tools: {include: {tool: true}},
-                    //         rfps: {include: {rfp: true}}
-                    //     },
-                    //     orderBy: [{createdAt: "desc"}]
-                    // }
-                }
+                select
             })
 
             return {success: true, data: roadmap}
