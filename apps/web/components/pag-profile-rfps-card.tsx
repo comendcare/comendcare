@@ -1,4 +1,6 @@
 "use client"
+
+import {useEffect, useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {
     Dialog,
@@ -13,7 +15,7 @@ import {DateView} from "./miletone-date-view";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
-import {formatMoney} from "@comend/lib/utils";
+import {cn, formatMoney} from "@comend/lib/utils";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {useSearchParams} from "next/navigation";
 import {NoRFPs} from "./no-rfps";
@@ -26,7 +28,7 @@ import {
     CarouselNext,
     CarouselApi
 } from "@/packages/components/ui/carousel";
-import {useEffect, useState} from "react";
+import {Badge} from "@/packages/components/ui/badge";
 
 export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
@@ -49,7 +51,9 @@ export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], is
         return (
             <Card className="organization-profile-tour-step5" data-testid="rfps-card">
                 <CardHeader className="flex flex-row items-start justify-between">
-                    <CardTitle data-testid="rfps-heading">Request for proposals (RFPs)</CardTitle>
+                    <CardTitle data-testid="rfps-heading">
+                        Requests for proposals
+                    </CardTitle>
                     <div className="text-muted-foreground text-sm" data-testid="rfps-count">
                         {current} of {count}
                     </div>
@@ -156,25 +160,25 @@ export const AssetDetails = ({tool}: { tool: any }) => {
 export const RFPDetails = ({rfp}: { rfp: any }) => {
     return (
         <>
-            <div
-                className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">
-                <img
-                    src={rfp.headerImage}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "center"
-                    }}
-                    className="absolute w-full"
-                />
-            </div>
-            <ScrollArea className={"max-h-[600px] -mr-2 pr-3 pt-[80px]"}>
+            {/*<div*/}
+            {/*    className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">*/}
+            {/*    <img*/}
+            {/*        src={rfp.headerImage}*/}
+            {/*        style={{*/}
+            {/*            width: "100%",*/}
+            {/*            height: "100%",*/}
+            {/*            objectFit: "cover",*/}
+            {/*            objectPosition: "center"*/}
+            {/*        }}*/}
+            {/*        className="absolute w-full"*/}
+            {/*    />*/}
+            {/*</div>*/}
+            <ScrollArea className="max-h-[600px] -mr-2 pr-3">
                 <DialogHeader>
                     <DialogTitle>{rfp.title}</DialogTitle>
                     <DialogDescription>{rfp.description}</DialogDescription>
                 </DialogHeader>
-                <ul className="pt-2 w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                <ul className="pt-4 w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {(rfp.milestones || []).map((milestone: any, index: number) => {
                         return (
                             <li key={index}>
@@ -195,7 +199,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                     {(rfp.startDate || rfp.endDate) && (
                         <li>
-                            <PropertyBadge icon={Calendar}>
+                            <PropertyBadge>
                                 <DateView
                                     specific={true}
                                     startDate={rfp.startDate || undefined}
@@ -251,6 +255,41 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </li>
                     )}
                 </ul>
+
+                <div className="pt-4 flex flex-row w-full gap-4">
+                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
+                        <p className="font-normal">Organization: </p>
+                        <p>{rfp?.organization?.name || "No organization"}</p>
+                    </Badge>
+
+                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
+                        <p className="font-normal">Primary Attachment: </p>
+                        <a
+                            className={cn(rfp?.attachments?.[0]?.link && "underline")}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                            href={rfp?.attachments?.[0]?.link}
+                        >
+                            {rfp?.attachments?.[0]?.name || rfp?.attachments?.[0]?.link || "No attachments"}
+                        </a>
+                    </Badge>
+
+                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
+                        <p className="font-normal">Primary Contact: </p>
+                        <a
+                            className={cn(rfp?.contacts?.[0]?.email && "underline")}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                            href={rfp?.contacts?.[0]?.email ? `mailto:${rfp?.contacts[0]?.email}` : undefined}
+                        >
+                            {rfp?.contacts?.[0]?.name ||
+                                rfp?.contacts?.[0]?.email ||
+                                rfp?.contacts?.[0]?.affiliation || "No primary contacts"}
+                        </a>
+                    </Badge>
+                </div>
             </ScrollArea>
         </>
     )

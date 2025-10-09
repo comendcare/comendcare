@@ -1,14 +1,14 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
-import { PrivateBadge } from "~web/components/private-badge";
-import { Calendar, Clock, DollarSign, Megaphone, School, User } from "lucide-react";
-import { PropertyBadge } from "./property-badge";
-import { cn, formatMoney } from "@comend/lib/utils";
-import { RFPActionsMenu } from "./rfp-actions-menu";
-import { Badge } from "@/packages/components/ui/badge";
-import { Skeleton } from "@comend/components/ui/skeleton";
+import React, {useEffect, useMemo, useState} from "react";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {PrivateBadge} from "~web/components/private-badge";
+import {Calendar, Clock, DollarSign, Megaphone, School, User} from "lucide-react";
+import {PropertyBadge} from "./property-badge";
+import {cn, formatMoney} from "@comend/lib/utils";
+import {RFPActionsMenu} from "./rfp-actions-menu";
+import {Badge} from "@/packages/components/ui/badge";
+import {Skeleton} from "@comend/components/ui/skeleton";
 
 type DateStatus =
     | { status: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
@@ -32,12 +32,12 @@ function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | D
     const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
     const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
 
-    if (start && todayUTC < start) return { status: "Not Open", daysRemaining: undefined, variant: "yellow" };
-    if (end && todayUTC > end) return { status: "Closed", daysRemaining: undefined, variant: "red" };
+    if (start && todayUTC < start) return {status: "Not Open", daysRemaining: undefined, variant: "yellow"};
+    if (end && todayUTC > end) return {status: "Closed", daysRemaining: undefined, variant: "red"};
 
     if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
         const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;
-        return { status: "Open", daysRemaining, variant: "green" };
+        return {status: "Open", daysRemaining, variant: "green"};
     }
     return undefined;
 }
@@ -61,16 +61,16 @@ function HeaderSkeleton() {
     return (
         <div className="gap-2 relative">
             <div className="flex items-center gap-2">
-                <Skeleton className="h-6 w-6 rounded" />
-                <Skeleton className="h-6 w-48 rounded" />
-                <Skeleton className="h-5 w-16 rounded" />
+                <Skeleton className="h-6 w-6 rounded"/>
+                <Skeleton className="h-6 w-48 rounded"/>
+                <Skeleton className="h-5 w-16 rounded"/>
             </div>
-            <Skeleton className="mt-2 h-[3.5rem] w-3/4 rounded" />
+            <Skeleton className="mt-2 w-3/4 rounded"/>
         </div>
     );
 }
 
-export const RFPCard = ({ rfp, isPrivate = false }: { rfp: any; isPrivate?: boolean }) => {
+export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolean }) => {
     // Gate the header (and actions menu) until after hydration
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
@@ -83,28 +83,29 @@ export const RFPCard = ({ rfp, isPrivate = false }: { rfp: any; isPrivate?: bool
                 {/* Actions menu only after mount to avoid portal jank */}
                 {isPrivate && mounted && (
                     <div className="absolute top-1 right-1">
-                        <RFPActionsMenu rfp={rfp} />
+                        <RFPActionsMenu rfp={rfp}/>
                     </div>
                 )}
 
                 {/* Before hydration: render a stable skeleton to prevent any flash.
             After hydration: render the real header. */}
                 {!mounted ? (
-                    <HeaderSkeleton />
+                    <HeaderSkeleton/>
                 ) : (
                     <>
-            <span className="flex gap-2 items-center">
-              <Megaphone className="w-6 min-w-6 h-6 min-h-6" />
-              <CardTitle className="max-w-full truncate leading-normal">{rfp.title}</CardTitle>
-                {rfp.private && <PrivateBadge iconOnly />}
-                {status && (
-                    <Badge variant={status.variant as any} className="text-sm">
-                        {status.status}
-                    </Badge>
-                )}
-            </span>
+                        <div className="flex gap-2 items-center">
+                            <CardTitle className="text-lg max-w-full truncate leading-normal">
+                                {rfp.title}
+                            </CardTitle>
+                            {rfp.private && <PrivateBadge iconOnly/>}
+                            {status && (
+                                <Badge variant={status.variant as any} className="text-sm">
+                                    {status.status}
+                                </Badge>
+                            )}
+                        </div>
 
-                        <CardDescription className="line-clamp-3 overflow-hidden min-h-[3.5rem]">
+                        <CardDescription className="line-clamp-3 overflow-hidden">
                             {rfp.description}
                         </CardDescription>
                     </>
@@ -112,7 +113,7 @@ export const RFPCard = ({ rfp, isPrivate = false }: { rfp: any; isPrivate?: bool
             </CardHeader>
 
             <CardContent className="flex flex-col gap-4">
-                <ul className="w-full flex flex-wrap gap-4 text-sm text-wrap break-words">
+                <ul className="w-full flex flex-col flex-wrap gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
                             <PropertyBadge icon={DollarSign}>
@@ -163,45 +164,11 @@ export const RFPCard = ({ rfp, isPrivate = false }: { rfp: any; isPrivate?: bool
 
                 {status?.daysRemaining !== undefined && (
                     <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18} />
+                        <Clock size={18}/>
                         {`${status.daysRemaining} days remaining to submit proposals`}
                     </Badge>
                 )}
 
-                <span className="flex flex-row w-full gap-4">
-          <Badge variant={"secondary"} className="flex justify-between w-full text-sm">
-            <p className="font-normal">Organization: </p>
-            <p>{rfp?.organization?.name}</p>
-          </Badge>
-
-          <Badge variant={"secondary"} className="flex justify-between w-full text-sm">
-            <p className="font-normal">Primary Attachment: </p>
-            <a
-                className={cn(rfp?.attachments?.[0]?.link && "underline")}
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-                href={rfp?.attachments?.[0]?.link}
-            >
-              {rfp?.attachments?.[0]?.name || rfp?.attachments?.[0]?.link}
-            </a>
-          </Badge>
-
-          <Badge variant={"secondary"} className="flex justify-between w-full text-sm">
-            <p className="font-normal">Primary Contact: </p>
-            <a
-                className={cn(rfp?.contacts?.[0]?.email && "underline")}
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-                href={rfp?.contacts?.[0]?.email ? `mailto:${rfp?.contacts[0]?.email}` : undefined}
-            >
-              {rfp?.contacts?.[0]?.name ||
-                  rfp?.contacts?.[0]?.email ||
-                  rfp?.contacts?.[0]?.affiliation}
-            </a>
-          </Badge>
-        </span>
             </CardContent>
         </Card>
     );
