@@ -102,8 +102,8 @@ export const RoadmapCard = ({
             onValueChange={setUrlView ? setUrlView : () => {
             }}
         >
-            <Card className="organization-profile-tour-step4">
-                <CardHeader className="w-full pt-6 pb-2 space-y-4">
+            <Card className="organization-profile-tour-step4 flex flex-col gap-0">
+                <CardHeader className="w-full pt-6 pb-0 space-y-4">
                     <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                         {roadmap.title || 'Untitled Research Plan'}
                     </CardTitle>
@@ -116,7 +116,7 @@ export const RoadmapCard = ({
                         <StageOfActivityBadge milestones={roadmap.milestones}/>
                     </div>
 
-                    <TabsList className="w-min">
+                    <TabsList className="w-min rounded-t-md rounded-b-none">
                         <TabsTrigger value="flow">
                             Flow View
                         </TabsTrigger>
@@ -126,9 +126,9 @@ export const RoadmapCard = ({
                     </TabsList>
                 </CardHeader>
 
-                <CardContent className="px-8">
-                    <TabsContent value="flow" className="space-y-4 w-full">
-                        <div className="h-[40vh] w-full">
+                <CardContent className="bg-secondary mx-6 mb-6 rounded-b-md rounded-r-md">
+                    <TabsContent value="flow" className="w-full">
+                        <div className="h-[60vh] w-full bg-white rounded-md">
                             <PublicFlowView
                                 roadmap={roadmap}
                                 subdomain={subdomain}
@@ -138,14 +138,14 @@ export const RoadmapCard = ({
                             />
                         </div>
                     </TabsContent>
-                    <TabsContent value="list" className="space-y-4 w-full">
-                        <PublicTimelineView
-                            roadmap={roadmap}
-                            subdomain={subdomain}
-                            externalLinks={externalLinks}
-                            urlMilestone={urlMilestone}
-                            setUrlMilestone={setUrlMilestone}
-                        />
+                    <TabsContent value="list" className="w-full">
+                            <PublicTimelineView
+                                roadmap={roadmap}
+                                subdomain={subdomain}
+                                externalLinks={externalLinks}
+                                urlMilestone={urlMilestone}
+                                setUrlMilestone={setUrlMilestone}
+                            />
                     </TabsContent>
                 </CardContent>
             </Card>
