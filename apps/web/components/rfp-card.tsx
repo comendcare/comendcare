@@ -5,10 +5,11 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend
 import {PrivateBadge} from "~web/components/private-badge";
 import {Calendar, Clock, DollarSign, Megaphone, School, User} from "lucide-react";
 import {PropertyBadge} from "./property-badge";
-import {cn, formatMoney} from "@comend/lib/utils";
+import {cn, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
 import {Badge} from "@/packages/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
+
 
 type DateStatus =
     | { status: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
@@ -40,20 +41,6 @@ function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | D
         return {status: "Open", daysRemaining, variant: "green"};
     }
     return undefined;
-}
-
-const dateFmtUTC = new Intl.DateTimeFormat("en-US", {
-    timeZone: "UTC",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-});
-
-function formatDateUTC(d?: string | Date) {
-    if (!d) return "";
-    const dd = new Date(d);
-    if (isNaN(dd.getTime())) return "";
-    return dateFmtUTC.format(dd);
 }
 
 /** Header skeleton that matches the header’s layout/height to prevent reflow */
@@ -117,7 +104,7 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                     {rfp.budget && (
                         <li>
                             <PropertyBadge icon={DollarSign}>
-                                <p>{formatMoney(rfp.budget)}</p>
+                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
                             </PropertyBadge>
                         </li>
                     )}
@@ -125,7 +112,8 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                     {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
                             <PropertyBadge icon={School}>
-                                {`Open to: ${rfp.openTo
+                                <b>Open to:</b>
+                                {rfp.openTo
                                     .map((option: string) => {
                                         switch (option) {
                                             case "CRO":
@@ -136,30 +124,30 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                                                 return option;
                                         }
                                     })
-                                    .join(", ")}`}
+                                    .join(", ")}
                             </PropertyBadge>
                         </li>
                     )}
 
                     {rfp.startDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}>{`Opens: ${formatDateUTC(rfp.startDate)}`}</PropertyBadge>
+                            <PropertyBadge icon={Calendar}><b>Opens: </b>{formatDateUTC(rfp.startDate)}</PropertyBadge>
                         </li>
                     )}
 
                     {rfp.endDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}>{`Due: ${formatDateUTC(rfp.endDate)}`}</PropertyBadge>
+                            <PropertyBadge icon={Calendar}><b>Due: </b>{formatDateUTC(rfp.endDate)}</PropertyBadge>
                         </li>
                     )}
 
-                    {(rfp.contacts || []).map((contact: any, index: number) => (
+                    {/* {(rfp.contacts || []).map((contact: any, index: number) => (
                         <li key={index}>
                             <PropertyBadge icon={User}>
                                 <p>{contact?.name || contact?.email || contact?.affiliation}</p>
                             </PropertyBadge>
                         </li>
-                    ))}
+                    ))} */}
                 </ul>
 
                 {status?.daysRemaining !== undefined && (

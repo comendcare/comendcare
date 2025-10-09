@@ -10,12 +10,12 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, User} from "lucide-react";
+import {Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, School, User} from "lucide-react";
 import {DateView} from "./miletone-date-view";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
-import {cn, formatMoney} from "@comend/lib/utils";
+import {cn, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {useSearchParams} from "next/navigation";
 import {NoRFPs} from "./no-rfps";
@@ -179,79 +179,43 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <DialogDescription>{rfp.description}</DialogDescription>
                 </DialogHeader>
                 <ul className="pt-4 w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {(rfp.milestones || []).map((milestone: any, index: number) => {
-                        return (
-                            <li key={index}>
-                                <PropertyBadge icon={FileText}>
-                                    <p className="text-wrap break-words">{milestone.milestone.title}</p>
-                                </PropertyBadge>
-                            </li>
-                        )
-                    })}
-
-                    {(rfp.budget) && (
+                    {rfp.budget && (
                         <li>
                             <PropertyBadge icon={DollarSign}>
-                                <p>{formatMoney(rfp.budget)}</p>
+                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
                             </PropertyBadge>
                         </li>
                     )}
 
-                    {(rfp.startDate || rfp.endDate) && (
+                    {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
-                            <PropertyBadge>
-                                <DateView
-                                    specific={true}
-                                    startDate={rfp.startDate || undefined}
-                                    endDate={rfp.endDate || undefined}
-                                    startLabel="Request Opens:"
-                                    endLabel="Deadline for Proposals:"
-                                />
+                            <PropertyBadge icon={School}>
+                                <b>Open to:</b>
+                                {rfp.openTo
+                                    .map((option: string) => {
+                                        switch (option) {
+                                            case "CRO":
+                                                return "Service Providers";
+                                            case "ACADEMIC":
+                                                return "Academics";
+                                            default:
+                                                return option;
+                                        }
+                                    })
+                                    .join(", ")}
                             </PropertyBadge>
                         </li>
                     )}
 
-                    {(rfp.contacts || []).map((contact: any, index: number) => {
-                        return (
-                            <li key={index}>
-                                <PropertyBadge icon={User}>
-                                    <p className="text-wrap break-words">
-                                        {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
-                                    </p>
-                                </PropertyBadge>
-                            </li>
-                        )
-                    })}
-
-                    {(rfp.attachments || []).map((attachment: any, index: number) => {
-                        return (
-                            <li key={index}>
-                                <PropertyBadge icon={LinkIcon}>
-                                    <Link
-                                        target="_blank"
-                                        className="text-wrap break-words underline"
-                                        href={attachment.link || "#"}
-                                    >
-                                        {attachment.name || attachment.link}
-                                    </Link>
-                                </PropertyBadge>
-                            </li>
-                        )
-                    })}
-
-                    {rfp.openTo && rfp.openTo.includes('ACADEMIC') && (
+                    {rfp.startDate && (
                         <li>
-                            <PropertyBadge icon={GraduationCap}>
-                                <p>Open to Academics</p>
-                            </PropertyBadge>
+                            <PropertyBadge icon={Calendar}><b>Opens: </b>{formatDateUTC(rfp.startDate)}</PropertyBadge>
                         </li>
                     )}
 
-                    {rfp.openTo && rfp.openTo.includes('CRO') && (
+                    {rfp.endDate && (
                         <li>
-                            <PropertyBadge icon={Building}>
-                                <p>Open to Service Providers</p>
-                            </PropertyBadge>
+                            <PropertyBadge icon={Calendar}><b>Due: </b>{formatDateUTC(rfp.endDate)}</PropertyBadge>
                         </li>
                     )}
                 </ul>
