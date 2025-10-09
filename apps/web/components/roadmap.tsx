@@ -110,7 +110,7 @@ export function Roadmap({
     const pathname = usePathname()
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
-    const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
+    // const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // controlling tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
     const [tab, setTab] = useState<TabType>('projects')
@@ -238,7 +238,7 @@ export function Roadmap({
                             setTab={setTab}
                             setNewMilestoneIsOpen={setNewMilestoneIsOpen}
                             milestoneTypes={milestoneTypes}
-                            setBulkImportIsOpen={setBulkImportIsOpen}
+                            // setBulkImportIsOpen={setBulkImportIsOpen}
                             orgSubdomain={orgSubdomain}
                         />
                         <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
@@ -395,7 +395,7 @@ export function Roadmap({
                         </>
                     )}
 
-                    <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
+                    {/* <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
                         setBulkImportIsOpen(open)
                     }}>
                         <DialogContent className="flex flex-col justify-start">
@@ -464,7 +464,7 @@ export function Roadmap({
                                 }}
                             />
                         </DialogContent>
-                    </Dialog>
+                    </Dialog> */}
 
                     <NewMilestoneDialogForm 
                         open={newMilestoneIsOpen}
@@ -656,7 +656,7 @@ const RoadmapHeader = ({
     setTab, 
     setNewMilestoneIsOpen, 
     milestoneTypes, 
-    setBulkImportIsOpen,
+    // setBulkImportIsOpen,
     orgSubdomain
 }: {
     researchPlanId: string,
@@ -664,7 +664,7 @@ const RoadmapHeader = ({
     setTab: any, 
     setNewMilestoneIsOpen: any, 
     milestoneTypes: any, 
-    setBulkImportIsOpen: any,
+    // setBulkImportIsOpen: any,
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()
@@ -752,7 +752,7 @@ const RoadmapHeader = ({
             </span>
 
             <span className="flex flex-row items-center justify-end">
-                <Tooltip>
+                {/* <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
                             onClick={() => {
@@ -763,14 +763,13 @@ const RoadmapHeader = ({
                             size={isCollapsed ? "icon" : "default"}
                         >
                             <Import />
-                            {/* If the header is < size MD, collapse the button to just the icon (hide text) */}
                             {!isCollapsed && <p>{`Import projects`}</p>}
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
                         <p>{`Import projects from a .csv file`}</p>
                     </TooltipContent>
-                </Tooltip>
+                </Tooltip> */}
 
                 <Button 
                     variant={"ghost"}  
