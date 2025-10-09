@@ -233,6 +233,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
+        id: "contacts",
         accessorKey: "contacts",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Point of Contact" />
@@ -250,6 +251,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         enableHiding: true,
     },
     {
+        id: "links",
         accessorKey: "links",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Links" />
@@ -301,6 +303,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         enableHiding: true,
     },
     {
+        id: "description",
         accessorKey: "description",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Description" />
