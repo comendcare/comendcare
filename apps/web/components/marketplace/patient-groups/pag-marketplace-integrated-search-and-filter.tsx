@@ -24,7 +24,7 @@ import type { OrganizationSearchState } from "@/state/search/organizationSearchS
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 
 // Options
-import { mechanisms } from "comend-pag-platform/components/edit-condition-profile-dialog";
+import {mechanisms} from "@comend/lib/types";
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
 import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
