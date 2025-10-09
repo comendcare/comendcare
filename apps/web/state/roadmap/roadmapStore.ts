@@ -143,7 +143,6 @@ export const useRoadmapStore = create<RoadmapState>()(
             },
             selectedView: null,
             setSelectedView: (view: string | null) => {
-                window.functionalConsentedLocalStorage?.remove("newFlowProjects")
                 set({selectedView: view})
             },
             selectedNodeIds: [],
@@ -348,10 +347,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 })
 
                 const nodes = await get().addNodes(newNodes, creationMethod)
-
-                if (get().selectedView !== 'flow') {
-                    window.functionalConsentedLocalStorage?.set("newFlowProjects", true)
-                }
                 return nodes
             },
             addNodes: async (nodes: Node[], creationMethod?: string) => {
