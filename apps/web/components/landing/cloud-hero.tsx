@@ -47,7 +47,6 @@ const bubbles = [
 ];
 
 export const CloudHeroSection = () => {
-    const router = useRouter()
     const containerRef = useRef<HTMLDivElement>(null)
     const heroRef = useRef<HTMLDivElement>(null) // Ref for hero section
     const [isHeroInView, setIsHeroInView] = useState(false) // State to track if hero is in view
@@ -74,7 +73,7 @@ export const CloudHeroSection = () => {
 
     const cloudPositions: any[] = []
 
-    bubbles.forEach((_, index) => {
+    bubbles.forEach((_) => {
         let x: number = 0
         let y: number = 0
         let isValidPosition = false

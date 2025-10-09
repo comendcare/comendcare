@@ -140,19 +140,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         notFound()
     }
 
-    let dbMilestones = []
-    dbMilestones = await prisma.milestone.findMany({
-        where: {roadmapId: organization.roadmaps?.[0]?.id},
-        include: {
-            node: true,
-            contacts: true,
-            attachments: true,
-            types: {include: {milestoneType: true}},
-            tools: {include: {tool: true}},
-            rfps: {include: {rfp: true}}
-        }
-    })
-
     let conditions = null
     if (organization) {
         const response = await getConditionsDataFromOrgId(organization?.id, {
