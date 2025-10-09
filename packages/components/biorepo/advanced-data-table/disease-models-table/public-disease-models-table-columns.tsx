@@ -155,10 +155,16 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                 <DataTableColumnHeader column={column} title="Links"/>
             ),
             cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-2 min-w-[120px]">
                     {row.original.attachments?.map((attachment: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
+                        <li key={index}>
+                            <Link 
+                                className="line-clamp-2 underline" 
+                                href={attachment.link || "/"}
+                                onClick={(e) => e.stopPropagation()}
+                            >
                             {attachment.name || attachment.link}
+                            </Link>
                         </li>
                     ))}
                 </ul>
