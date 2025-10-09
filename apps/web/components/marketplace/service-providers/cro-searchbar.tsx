@@ -23,9 +23,6 @@ export default function CROSearchBar() {
         setSearchTerm,
         sortBy,
         setSortBy,
-        view,
-        setView,
-        filters,
         totalResults,
     } = useCROSearchStore(useShallow(selector))
 

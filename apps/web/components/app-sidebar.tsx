@@ -199,22 +199,8 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function AppSidebar({memberships}: { memberships: MembershipWithOrganization[] }) {
-    const {data: session, status} = useSession()
-    const {startOnborda} = useOnborda()
     const pathname = usePathname()
-    const {roadmapId, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const [tourName, setTourName] = useState(getTourName())
     const {state} = useSidebar()
-
-    function getTourName() {
-        if (pathname === '/app/research-plan') return 'research-plans-page-tour'
-        if (pathname === `/app/research-plan/${roadmapId}`) return 'research-plan-tour'
-        return null
-    }
-
-    useEffect(() => {
-        setTourName(getTourName())
-    }, [pathname, roadmapId, getTourName])
 
     const exploreSet = new Set(["Notifications", "Marketplace"])
     const exploreItems = data.navMain.filter(i => exploreSet.has(i.title))

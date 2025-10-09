@@ -22,7 +22,7 @@ import {acceptInvitation} from "@comend/lib/actions";
 import Image from "next/image"
 import {useRouter} from "next/navigation";
 import {MembershipWithOrganization} from "@comend/lib/types";
-import { ArrowLeft } from "lucide-react";
+import {ArrowLeft} from "lucide-react";
 
 type InvitationWithOrganization = Invitation & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
@@ -178,7 +178,7 @@ export default function UserProfilePage() {
                         href="/app/profile"
                         className="inline-flex items-center gap-x-2"
                     >
-                        <ArrowLeft />
+                        <ArrowLeft/>
                         Back to organization
                     </Link>
 
@@ -214,7 +214,8 @@ export default function UserProfilePage() {
                                         memberships.length > 0 ? memberships?.map((membership) =>
                                             <div key={membership.id} className="flex items-center gap-4">
                                                 <Avatar className="hidden h-9 w-9 sm:flex">
-                                                    <AvatarImage src={user.image ?? ""} alt={user.image ?? "User's name"}/>
+                                                    <AvatarImage src={user.image ?? ""}
+                                                                 alt={user.image ?? "User's name"}/>
                                                     <AvatarFallback>OM</AvatarFallback>
                                                 </Avatar>
                                                 <div className="grid gap-1">
@@ -249,7 +250,8 @@ export default function UserProfilePage() {
                                         invitations.length > 0 ? invitations?.map((invitation) =>
                                             <>
                                                 <Avatar className="hidden h-9 w-9 sm:flex">
-                                                    <AvatarImage src={user.image ?? ""} alt={user.image ?? "User's name"}/>
+                                                    <AvatarImage src={user.image ?? ""}
+                                                                 alt={user.image ?? "User's name"}/>
                                                     <AvatarFallback>OM</AvatarFallback>
                                                 </Avatar>
                                                 <div className="grid gap-1">
@@ -338,6 +340,7 @@ export default function UserProfilePage() {
             </main>
         )
     } else {
-        <Loading/>
+        return <Loading/>
+
     }
 }
