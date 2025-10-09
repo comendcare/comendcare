@@ -22,6 +22,7 @@ type ConditionForCard = Prisma.ConditionGetPayload<{
         nationalEstimatedPopulation: true;
         globalEstimatedPopulation: true;
         diseaseCategories: true;
+        associatedSystems: true;
         causalGenes: true;
         associatedGenes: true;
         associatedConditions: { select: { id: true; name: true; slug: true } };
@@ -97,6 +98,7 @@ export const PAGProfileConditionsCard = ({
 
         // Cleaned arrays
         const diseaseCategories = cleanBadges(condition?.diseaseCategories);
+        const associatedSystems = cleanBadges(condition?.associatedSystems);
         const causalGenes = cleanBadges(condition?.causalGenes);
         const associatedGenes = cleanBadges(condition?.associatedGenes);
 
@@ -175,6 +177,24 @@ export const PAGProfileConditionsCard = ({
                                     </div>
                                     <div className="flex flex-wrap gap-1 sm:gap-2">
                                         {diseaseCategories.map((item, index) => (
+                                            <Badge data-testid="categories-badge" key={`${item}-${index}`} className="text-sm">
+                                                {item.charAt(0).toUpperCase() + item.slice(1)}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Badge sections: render ONLY when there are cleaned items */}
+                            {associatedSystems.length > 0 && (
+                                <div className="space-y-2" data-testid="disease-categories-section">
+                                    <div className="flex flex-row items-center justify-between w-full">
+                                        <h4 className="scroll-m-20 text-base font-semibold" data-testid="disease-categories-heading">
+                                            Associated systems
+                                        </h4>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                                        {associatedSystems.map((item, index) => (
                                             <Badge data-testid="categories-badge" key={`${item}-${index}`} className="text-sm">
                                                 {item.charAt(0).toUpperCase() + item.slice(1)}
                                             </Badge>
