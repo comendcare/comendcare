@@ -147,7 +147,9 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 )}
 
                 {/* Linked Tools (biosamples / disease models / tools) */}
-                {(Array.isArray(milestone?.tools) || Array.isArray(milestone?.biosamples) || Array.isArray(milestone?.diseaseModels)) && (
+                {(Array.isArray(milestone?.tools) || Array.isArray(milestone?.biosamples) || Array.isArray(milestone?.diseaseModels)) 
+                && ((milestone?.tools || []).length > 0 || (milestone?.biosamples || []).length > 0 || (milestone?.diseaseModels || []).length > 0)
+                && (
                     <div className="flex flex-col justify-between space-y-2">
                         <h2 className="font-semibold text-lg flex items-center gap-2">
                             Tools
