@@ -233,25 +233,25 @@ export function Roadmap({
         return () => document.removeEventListener("keydown", handleUndoRedo);
     }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
 
-    // useEffect(() => {
-    //     const params = new URLSearchParams()
+    useEffect(() => {
+        const params = new URLSearchParams()
 
-    //     if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-    //         params.set("project", selectedNodeIds[0])
-    //     } else {
-    //         params.delete("project")
-    //     }
+        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+            params.set("project", selectedNodeIds[0])
+        } else {
+            params.delete("project")
+        }
 
-    //     if (selectedView) {
-    //         params.set("view", selectedView)
-    //     } else {
-    //         params.delete("view")
-    //     }
+        if (selectedView) {
+            params.set("view", selectedView)
+        } else {
+            params.delete("view")
+        }
 
-    //     // ensure shallow url update
-    //     const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
-    //     window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    // }, [selectedNodeIds, selectedView, pathname])
+        // ensure shallow url update
+        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
+        window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
+    }, [selectedNodeIds, selectedView, pathname])
     
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) { setSelectedNodeIds([]) }
@@ -727,7 +727,6 @@ const RoadmapHeader = ({
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
-    const [organization, setOrganization] = useState<Organization | {}>({})
 
     useEffect(() => {
         const el = parentRef.current;
@@ -744,80 +743,6 @@ const RoadmapHeader = ({
 
         return () => observer.disconnect();
     }, []);
-
-    useEffect(() => {
-        async function fetchOrgData() {
-            if (session?.user.organizationId) {
-                try {
-                    const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                        id: true,
-                        // public: true,
-                        // verified: true,
-                        // published: true,
-                        name: true,
-                        // description: true,
-                        // contactEmail: true,
-                        // logo: true,
-                        // image: true,
-                        // headerImage: true,
-                        // biopharmaConsentSettings: true,
-                        subdomain: true,
-                        // customDomain: true,
-                        // statedGoal: true,
-                        // yearFounded: true,
-                        // incorporationStatus: true,
-                        // therapeuticsOfInterest: true,
-                        // therapeuticsInDevelopment: true,
-                        // website: true,
-                        // moneyRaised: true,
-                        // moneyDeployed: true,
-                        // researchBudget: true,
-                        // address1                  String?
-                        // address2                  String?
-                        // formattedAddress          String?
-                        // city                      String?
-                        // region                    String?
-                        // postalCode                String?
-                        // country                   String?
-                        // lat                       String?
-                        // lng                       String?
-                        // createdAt: true,
-                        // updatedAt: true,
-                        // user: true,
-                        // userId: true,
-                        // roadmaps: true,
-                        // members: true,
-                        // clients: true,
-                        // invitations: true,
-                        // membershipRequests: true,
-                        // conditions: true,
-                        // kanban: true,
-                        // milestones: true,
-                        // platformNotifications: true,
-                        // reviews: true,
-                        // savedCompanies: true,
-                        // tools: true,
-                        // rfps: true,
-                        // metadata: true
-                    })
-
-                    // Map the response to the correct structure if needed
-                    if (response.success && response.data) {
-                        setOrganization(response.data);
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-
-                } catch (error) {
-                    console.error("Error fetching organizations:", error);
-                    toast.error("Couldn't get organizations");
-                }
-            }
-        }
-
-        fetchOrgData()
-    }, [session])
 
     useEffect(() => {
         setIsCollapsed(parentWidth <= 1024)
@@ -1015,15 +940,18 @@ const RoadmapHeader = ({
 
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">
-                    { "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                    {typeof orgSubdomain === "string" ? (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlanId}`}
-                            organization={organization}
+                            url={`${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlanId}`}
+                            organization={{
+                                id: session?.user.organizationId || undefined,
+                                subdomain: orgSubdomain
+                            }}
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             // embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`}
                             embeddedResearchPlanData={{
-                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`,
+                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${orgSubdomain}/research-plan/${researchPlanId}`,
                                 resarchPlanId: researchPlanId,
                                 researchPlanTitle: researchPlanDetails.title || ''
                             }}
