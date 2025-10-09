@@ -14,7 +14,7 @@ import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/
 import { PrivateFlowView } from "~web/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import {useEffect, useMemo, useRef, useState} from "react"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import {
     getMilestones,
     getMilestoneTypes,
@@ -93,7 +93,9 @@ export function Roadmap({
     initRoadmap,
     initEdges,
     initNodes,
-    initMilestones
+    initMilestones,
+    urlNode,
+    urlView,
 }: {
     milestoneTypes: MilestoneType[];
     organization?: Organization;
@@ -104,6 +106,8 @@ export function Roadmap({
     initEdges: any[];
     initNodes: any[];
     initMilestones: any[];
+    urlNode: string | string[] | undefined;
+    urlView: string | string[] | undefined;
 }) {
     const { defaultLayout } = useSidebarStore()
     const { 
@@ -122,7 +126,6 @@ export function Roadmap({
     const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
@@ -136,9 +139,6 @@ export function Roadmap({
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
-    // stable string for deps
-    const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
-
     useEffect(() => {
         // Don’t call the API until we know the session status
         if (status !== "authenticated") return
@@ -151,10 +151,6 @@ export function Roadmap({
         }
 
         let cancelled = false
-        const urlNode = new URLSearchParams(searchParamsString).get("project")
-        const urlView = new URLSearchParams(searchParamsString).get("view")
-
-        console.log(`url node`, urlNode)
 
         initializeRoadmapState({
             roadmapId: researchPlanId,
@@ -162,14 +158,21 @@ export function Roadmap({
             nodes: initNodes || [],
             edges: initEdges || [],
             milestones: initMilestones || [],
-            selectedView: urlView,
-            selectedNodeIds: urlNode ? [urlNode] : [],
+            selectedView: (() => {
+                if (typeof urlView === 'string') return urlView
+                return undefined
+            })(),
+            selectedNodeIds: (() => {
+                if (typeof urlNode === 'string') return [urlNode]
+                if (Array.isArray(urlNode)) return urlNode
+                return []
+            })(),
         })
 
         return () => {
             cancelled = true
         }
-    }, [status, session?.user.organizationId, researchPlanId, searchParamsString])
+    }, [status, session?.user.organizationId, researchPlanId])
 
     // 1) Safe initial state (runs on server too)
     const [newFlowProjects, setNewFlowProjects] = useState<string | undefined>(() => {
@@ -230,25 +233,25 @@ export function Roadmap({
         return () => document.removeEventListener("keydown", handleUndoRedo);
     }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
 
-    useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString())
+    // useEffect(() => {
+    //     const params = new URLSearchParams()
 
-        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-            params.set("project", selectedNodeIds[0])
-        } else {
-            params.delete("project")
-        }
+    //     if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+    //         params.set("project", selectedNodeIds[0])
+    //     } else {
+    //         params.delete("project")
+    //     }
 
-        if (selectedView) {
-            params.set("view", selectedView)
-        } else {
-            params.delete("view")
-        }
+    //     if (selectedView) {
+    //         params.set("view", selectedView)
+    //     } else {
+    //         params.delete("view")
+    //     }
 
-        // ensure shallow url update
-        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
-        window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    }, [selectedNodeIds, selectedView, pathname, searchParams])
+    //     // ensure shallow url update
+    //     const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
+    //     window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
+    // }, [selectedNodeIds, selectedView, pathname])
     
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) { setSelectedNodeIds([]) }

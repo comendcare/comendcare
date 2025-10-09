@@ -2,9 +2,14 @@ import {getSession} from "@/packages/lib/auth"
 import {Roadmap} from "~web/components/roadmap"
 import NoOrganization from "~web/components/no-organization";
 import {getMilestoneTypes, getOrganizationFromOrganizationId, getRoadmap, getRoadmapEdges, getRoadmapMilestones, getRoadmapNodes} from "@/packages/lib/fetchers";
-import { initializeRoadmapState } from "@/packages/lib/initialize-client-state";
 
-export default async function RoadmapPage({params}: { params: { id: string } }) {
+export default async function RoadmapPage({
+    params,
+    searchParams
+}: { 
+    params: { id: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+}) {
     const session = await getSession()
     const orgId = session?.user.organizationId
 
@@ -20,45 +25,8 @@ export default async function RoadmapPage({params}: { params: { id: string } }) 
         }),
         getOrganizationFromOrganizationId(orgId, {
             id: true,
-            // public: true,
-            // verified: true,
-            // published: true,
             name: true,
-            // description: true,
-            // contactEmail: true,
-            // logo: true,
-            // image: true,
-            // headerImage: true,
-            // biopharmaConsentSettings: true,
             subdomain: true,
-            // customDomain: true,
-            // statedGoal: true,
-            // yearFounded: true,
-            // incorporationStatus: true,
-            // therapeuticsOfInterest: true,
-            // therapeuticsInDevelopment: true,
-            // website: true,
-            // moneyRaised: true,
-            // moneyDeployed: true,
-            // researchBudget: true,
-            // createdAt: true,
-            // updatedAt: true,
-            // user: true,
-            // userId: true,
-            // roadmaps: true,
-            // members: true,
-            // clients: true,
-            // invitations: true,
-            // membershipRequests: true,
-            // conditions: true,
-            // kanban: true,
-            // milestones: true,
-            // platformNotifications: true,
-            // reviews: true,
-            // savedCompanies: true,
-            // tools: true,
-            // rfps: true,
-            // metadata: true
         }),
     ]);
 
@@ -76,9 +44,6 @@ export default async function RoadmapPage({params}: { params: { id: string } }) 
         organizationId: true,
         organization: true,
         user: true,
-        // edges: true,
-        // milestones: true,
-        // nodes: true,
         modalities: true,
         metadata: true,
     })
@@ -129,32 +94,9 @@ export default async function RoadmapPage({params}: { params: { id: string } }) 
         roadmapId: true
     })
     console.log(`Fetched edges data`)
-    
-    if (response.success && response.data && milestonesResponse.success && nodesResponse.success && edgesResponse.success) {
-        // const urlNode = new URLSearchParams(searchParamsString).get("milestone")
-        // const urlView = new URLSearchParams(searchParamsString).get("view")
 
-        console.log(`Start zustand initialization`)
-
-        // initializeRoadmapState({
-        //     roadmapId: params.id,
-        //     details: response.data,
-        //     nodes: nodesResponse.data || [],
-        //     edges: edgesResponse.data || [],
-        //     milestones: milestonesResponse.data || [],
-        //     selectedView: undefined,
-        //     selectedNodeIds: []
-        //     // selectedView: urlView,
-        //     // selectedNodeIds: urlNode ? [urlNode] : [],
-        // })
-
-        console.log(`Zustand initialized successfully`)
-        // optional: toast.success("Research Plan loaded")
-    } else {
-        console.error(`Could not initialize active roadmap with id ${params.id}. Error: ${response.error}`)
-        // toast.error(`Could not initialize active roadmap with id ${params.id}. Error: ${response.error}`)
-    }
-
+    const urlNode = searchParams.project
+    const urlView = searchParams.view
     const milestoneTypes = milestoneTypesRes.success ? (milestoneTypesRes.data ?? []) : [];
     const organization = organizationRes.success ? organizationRes.data : undefined;
 
@@ -169,6 +111,8 @@ export default async function RoadmapPage({params}: { params: { id: string } }) 
             initEdges={edgesResponse.data}
             initNodes={nodesResponse.data}
             initMilestones={milestonesResponse.data}
+            urlNode={urlNode}
+            urlView={urlView}
         />
     )
 }
