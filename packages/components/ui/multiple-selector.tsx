@@ -19,7 +19,7 @@ export interface Option {
     fixed?: boolean;
 
     /** Group the options by providing key. */
-    [key: string]: string | boolean | undefined | null;
+    [key: string]: string | boolean | undefined | null | any;
 }
 
 interface GroupOption {
@@ -495,6 +495,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             data-fixed={option.fixed}
                                             data-disabled={disabled || undefined}
                                         >
+                                            {option.icon && (
+                                                <option.icon className="h-4 w-4 mr-2"/>
+                                            )}
                                             {typeof option.img === 'string' && (
                                                 <img className="h-8 w-8 rounded-full mr-2 my-1" src={option.img}
                                                      alt="Option icon"/>
