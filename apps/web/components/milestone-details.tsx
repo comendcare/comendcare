@@ -12,7 +12,7 @@ import {DateView} from "./miletone-date-view"
 import Link from "next/link"
 import {Button} from "@comend/components/ui/button"
 import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge"
-import {ExternalLink, Megaphone, Microscope, User, DollarSign, Lock} from "lucide-react"
+import {ExternalLink, Megaphone, Microscope, User, DollarSign, Lock, Calendar} from "lucide-react"
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog"
 import {RFPCard} from "./rfp-card"
 import {
@@ -76,45 +76,88 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                                 </Badge>
                             </li>
                         ))}
-
-                    {(milestone?.contacts || []).map((contact: any, i: number) => {
-                        const label = contact?.affiliation || contact?.name || contact?.email
-                        if (!label) return null
-                        return (
-                            <li key={i}>
-                                <Badge className="w-fit flex items-center gap-1">
-                                    <User size={16}/>
-                                    <span className="max-w-[180px] truncate">{label}</span>
-                                </Badge>
-                            </li>
-                        )
-                    })}
-
-                    {(milestone?.startDate || milestone?.endDate) && (
-                        <li>
-                            <Badge className="w-fit">
-                                <DateView startDate={milestone?.startDate} endDate={milestone?.endDate}/>
-                            </Badge>
-                        </li>
-                    )}
-
-                    {typeof milestone?.budget === "number" && (
-                        <li>
-                            <Badge className="w-fit flex items-center gap-1">
-                                <DollarSign size={16}/>
-                                <span>{formatMoney(milestone.budget)}</span>
-                            </Badge>
-                        </li>
-                    )}
                 </ul>
+
 
                 <StatusButton
                     status={milestone?.status}
-                    minimal
                     disabled
                     onStatusChange={() => {
                     }}
                 />
+
+                {(milestone?.startDate || milestone?.endDate) && (
+                    <section className="flex flex-col gap-3">
+                        <Separator className="bg-gray-300 h-[2px] rounded-full"/>
+                        {milestone?.startDate && (
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-md flex items-center gap-2">
+                                    Start Date
+                                </h2>
+                                <p className="text-md flex gap-2 items-center">
+                                    <Calendar />
+                                    {milestone.startDate.toDateString()}
+                                </p>
+                            </div>
+                        )}
+                        {milestone?.endDate && (
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-md flex items-center gap-2">
+                                    End Date
+                                </h2>
+                                <p className="text-md flex gap-2 items-center">
+                                    <Calendar />
+                                    {milestone.endDate.toDateString()}
+                                </p>
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                {typeof milestone?.budget === "number" && (
+                    <section className="flex flex-col gap-3">
+                        {/* <Separator className="bg-gray-300 h-[2px] rounded-full"/> */}
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-md flex items-center gap-2">
+                                Budget
+                            </h2>
+                            <p className="text-md flex gap-2 items-center">
+                                <DollarSign />
+                                {milestone?.budget?.toLocaleString()}
+                            </p>
+                        </div>
+                    </section>
+                )}
+
+
+                {milestone.contacts && (
+                    <section className="flex flex-col gap-3">
+                        <Separator className="bg-gray-300 h-[2px] rounded-full"/>
+                        <div className="flex items-center justify-between">
+                            <h2 className="font-semibold text-lg flex items-center gap-2">
+                                Contacts
+                            </h2>
+                        </div>
+                        <ol className="flex flex-col justify-start gap-2">
+                            {milestone.contacts.map((contact: any) => (
+                                <div className="bg-secondary w-full rounded-md p-4">
+                                    <h4 className="font-semibold text-md flex gap-2 items-center text-wrap">
+                                        <User className="h-4 w-4"/>
+                                        {contact.name}
+                                    </h4>
+                                    {contact.email && (
+                                        <Link href={`mailto:${contact.email}`} className="underline">
+                                            <p className="text-sm pl-6 text-wrap">{contact.email}</p>
+                                        </Link>
+                                    )}
+                                    {contact.affiliation && (
+                                        <p className="text-sm pl-6 text-muted-foreground text-wrap">{contact.affiliation}</p>
+                                    )}
+                                </div>
+                            ))}
+                        </ol>
+                    </section>
+                )}
 
                 {/* Attachments */}
                 {hasAnyAttachments && (
@@ -151,6 +194,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 && ((milestone?.tools || []).length > 0 || (milestone?.biosamples || []).length > 0 || (milestone?.diseaseModels || []).length > 0)
                 && (
                     <div className="flex flex-col justify-between space-y-2">
+                        <Separator className="bg-gray-300 h-[2px] rounded-full"/>
                         <h2 className="font-semibold text-lg flex items-center gap-2">
                             Tools
                         </h2>
