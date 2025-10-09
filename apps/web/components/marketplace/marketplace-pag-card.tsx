@@ -62,11 +62,11 @@ export function OrganizationMarketplaceCard({
                             </CardTitle>
                         </Link>
                         {/*{!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}*/}
-                        {!isPublic && <SaveOrganizationButton
-                            savedOrganization={organization}
-                            type={"card"}
-                            savedOrganizationIds={savedOrganizationIds}
-                        />}
+                        {/*{!isPublic && <SaveOrganizationButton*/}
+                        {/*    savedOrganization={organization}*/}
+                        {/*    type={"card"}*/}
+                        {/*    savedOrganizationIds={savedOrganizationIds}*/}
+                        {/*/>}*/}
                     </div>
                     {(moneyDeployed || numberOfPatientsEngaged) && (
                         <div className="w-full grid gap-2 grid-cols-2">

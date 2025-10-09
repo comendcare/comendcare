@@ -80,7 +80,7 @@ import Link from "next/link"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
-import {Globe, Lock, Plus, X, Store, Share, Trash} from "lucide-react"
+import {Globe, Lock, Plus, X, Store, Share, Trash, TestTubeDiagonal, Rat, Database, Megaphone} from "lucide-react"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
@@ -105,26 +105,26 @@ import { revalidate } from "@/packages/lib/revalidate"
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
-const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
-    step: state.step
-})
+// const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
+//     step: state.step
+// })
 
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone,
     selectedNodeIds: state.selectedNodeIds
 })
 
-const recommendationsSelector = (state: CROSearchState) => ({
-    recommendations: state.recommendations,
-    setRecommendations: state.setRecommendations
-})
+// const recommendationsSelector = (state: CROSearchState) => ({
+//     recommendations: state.recommendations,
+//     setRecommendations: state.setRecommendations
+// })
 
-const notificationsSelector = (state: NotificationsState) => ({
-    initialized: state.initialized,
-    notifications: state.notifications,
-    addNotification: state.addNotification,
-    setNotificationsViewed: state.setNotificationsViewed
-})
+// const notificationsSelector = (state: NotificationsState) => ({
+//     initialized: state.initialized,
+//     notifications: state.notifications,
+//     addNotification: state.addNotification,
+//     setNotificationsViewed: state.setNotificationsViewed
+// })
 
 const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
     z.preprocess(v => (v === "" || v === null ? undefined : v), inner.optional());
@@ -165,16 +165,16 @@ const editMilestoneForm = z.object({
 
 type SimpleAttachment = { name: string; link: string };
 
-function addAttachmentToForm(form: any, att: SimpleAttachment) {
-    const prev = form.getValues("attachments") ?? [];
-    const norm = (s: string) => s.trim().toLowerCase();
+// function addAttachmentToForm(form: any, att: SimpleAttachment) {
+//     const prev = form.getValues("attachments") ?? [];
+//     const norm = (s: string) => s.trim().toLowerCase();
 
-    const already = prev.some((a: any) => norm(a.link) === norm(att.link));
-    if (already) return false;
+//     const already = prev.some((a: any) => norm(a.link) === norm(att.link));
+//     if (already) return false;
 
-    form.setValue("attachments", [...prev, att], { shouldValidate: true, shouldDirty: true });
-    return true;
-}
+//     form.setValue("attachments", [...prev, att], { shouldValidate: true, shouldDirty: true });
+//     return true;
+// }
 
 export function EditMilestoneForm({
                                       organization,
@@ -188,13 +188,13 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
-    const {
-        initialized: notificationsInitialized,
-        notifications,
-        addNotification,
-        setNotificationsViewed,
-    } = useNotificationsStore(useShallow(notificationsSelector))
+    // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
+    // const {
+    //     initialized: notificationsInitialized,
+    //     notifications,
+    //     addNotification,
+    //     setNotificationsViewed,
+    // } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session, status} = useSession()
     const pathname = usePathname()
@@ -203,9 +203,9 @@ export function EditMilestoneForm({
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
-    const [tab, setTab] = useState<"edit" | "recommendations">("edit")
-    const {step} = useOnbordaStore(useShallow(onbordaSelector))
-    const {isOnbordaVisible} = useOnborda()
+    const [tab, setTab] = useState<string>("edit")
+    // const {step} = useOnbordaStore(useShallow(onbordaSelector))
+    // const {isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const [createRFPIsOpen, setCreateRFPIsOpen] = useState(false)
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
@@ -261,8 +261,9 @@ export function EditMilestoneForm({
                         {
                             value: biosample.id, 
                             type: 'Biosamples', 
-                            img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                            label: `${biosample.donorId} --- ${type?.label || ''}`,
+                            icon: TestTubeDiagonal,
+                            // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                            label: `${biosample.id}`,
                             biosample
                         }
                     )
@@ -272,7 +273,8 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: diseaseModel.id, 
-                            label: `${diseaseModel.id} --- ${type?.label}`,
+                            label: `${diseaseModel.id}`,
+                            icon: Rat,
                             type: 'Disease Models',
                             diseaseModel
                         }
@@ -282,7 +284,8 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: tool?.id, 
-                            label: tool?.title || tool?.id, 
+                            label: `${tool?.id}`, 
+                            icon: Database,
                             type: 'Clinical Datasets',
                             datasample: tool,
                         }
@@ -406,12 +409,12 @@ export function EditMilestoneForm({
         if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
 
         // update recommendations
-        if (milestoneData) {
-            await setRecommendations([{
-                ...milestoneData,
-                ...updateData
-            } as Milestone], {limit: 3})
-        }
+        // if (milestoneData) {
+        //     await setRecommendations([{
+        //         ...milestoneData,
+        //         ...updateData
+        //     } as Milestone], {limit: 3})
+        // }
 
         // toast('Success!', {
         //     position: "bottom-left",
@@ -429,7 +432,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit,
-        [milestoneData, session?.user.organizationId, setMilestone, setRecommendations, milestoneTypes]
+        [milestoneData, session?.user.organizationId, setMilestone, milestoneTypes]
     )
 
     const handleShare = async () => {
@@ -463,8 +466,9 @@ export function EditMilestoneForm({
                     {
                         value: biosample.id, 
                         type: 'Biosamples', 
-                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                        label: `${biosample.donorId} --- ${type?.label || ''}`,
+                        icon: TestTubeDiagonal,
+                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${biosample.id}`,
                         biosample
                     }
                 )
@@ -475,7 +479,8 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: diseaseModel.id, 
-                        label: `${diseaseModel.id} --- ${type?.label}`,
+                        label: `${diseaseModel.id}`,
+                        icon: Rat,
                         type: 'Disease Models',
                         diseaseModel
                     }
@@ -486,7 +491,8 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: datasample.id, 
-                        label: datasample.title || datasample.id, 
+                        label: datasample.id, 
+                        icon: Database,
                         type: 'Clinical Datasets',
                         datasample
                     }
@@ -525,9 +531,9 @@ export function EditMilestoneForm({
             setMilestoneTypes(response.data || [])
         }
 
-        if (milestoneData) {
-            await setRecommendations([milestoneData as Milestone], {limit: 3})
-        }
+        // if (milestoneData) {
+        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
+        // }
 
         // trigger a form validation, if the imported data is not valid, let the user know right away
         form.trigger()
@@ -544,9 +550,9 @@ export function EditMilestoneForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    useEffect(() => {
-        if (tab === "recommendations") setRecommendationsViewed(true)
-    }, [tab])
+    // useEffect(() => {
+    //     if (tab === "recommendations") setRecommendationsViewed(true)
+    // }, [tab])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
@@ -559,12 +565,12 @@ export function EditMilestoneForm({
         if (!initializing.current) form.trigger()
     }, [formData.startDate, formData.endDate])
 
-    // handle onborda steps
-    useEffect(() => {
-        if (step === ".onborda-recommendations" && isOnbordaVisible) {
-            setTab("recommendations")
-        }
-    }, [step])
+    // // handle onborda steps
+    // useEffect(() => {
+    //     if (step === ".onborda-recommendations" && isOnbordaVisible) {
+    //         setTab("recommendations")
+    //     }
+    // }, [step])
 
     return (
         <>
@@ -584,7 +590,7 @@ export function EditMilestoneForm({
 
                         <EditTitle form={form}/>
 
-                        <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")}
+                        <Tabs value={tab} onValueChange={(value) => setTab(value)}
                               className="space-y-4 w-full h-full">
                             <div className="flex gap-4 items-center justify-between">
                                 <TabsList className="flex flex-wrap h-fit gap-2 bg-white">
@@ -594,7 +600,7 @@ export function EditMilestoneForm({
                                     <TabsTrigger value="notes" className="data-[state=active]:bg-secondary">
                                         Notes
                                     </TabsTrigger>
-                                    <TabsTrigger
+                                    {/* <TabsTrigger
                                         className="relative data-[state=active]:bg-secondary"
                                         value="recommendations"
                                     >
@@ -602,19 +608,7 @@ export function EditMilestoneForm({
                                             Relevant vendors
                                         </div>
                                         <div className={cn("absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 rounded-lg bg-inherit")} />
-                                        {/* {
-                                            // notifications &&
-                                            // notifications
-                                            //     .filter((notification: any) => (
-                                            //         notification.type === "NEW_RECOMMENDATION" &&
-                                            //         notification.metadata?.milestoneId === milestoneData.id &&
-                                            //         (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
-                                            //         !notification.lastViewedAt
-                                            //     )).length > 0 &&
-                                            recommendations && recommendations.length > 0 && !recommendationsViewed &&
-                                            <NotificationBubble/>
-                                        } */}
-                                    </TabsTrigger>
+                                    </TabsTrigger> */}
                                     {/*<TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">*/}
                                     {/*    Publications*/}
                                     {/*</TabsTrigger>*/}
@@ -723,6 +717,7 @@ export function EditMilestoneForm({
                                                                 hidePlaceholderWhenSelected={true}
                                                                 showHoverCard={false}
                                                                 placeholder="Link tools"
+                                                                badgeClassName="border-transparent bg-green-100 text-green-900"
                                                                 emptyIndicator={
                                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                         no results found.
@@ -789,13 +784,14 @@ export function EditMilestoneForm({
                                                                 value={field.value?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
-                                                                    label: rfp.title
+                                                                    label: rfp.title,
+                                                                    icon: Megaphone
                                                                 } as Option))}
                                                                 onChange={field.onChange}
                                                                 defaultOptions={fetchedRFPs.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
-                                                                    label: rfp.title
+                                                                    label: rfp.title,
                                                                 } as Option))}
                                                                 options={fetchedRFPs.map(rfp => ({
                                                                     ...rfp,
@@ -803,6 +799,7 @@ export function EditMilestoneForm({
                                                                     label: rfp.title
                                                                 } as Option))}
                                                                 hidePlaceholderWhenSelected={true}
+                                                                badgeClassName="border-transparent bg-orange-100 text-orange-900"
                                                                 showHoverCard={false}
                                                                 placeholder="Link RFPs"
                                                                 emptyIndicator={
@@ -1127,7 +1124,7 @@ export function EditMilestoneForm({
                                             )}
                                         />
                                     </TabsContent>
-                                    <TabsContent value="recommendations" className="space-y-4 w-full">
+                                    {/* <TabsContent value="recommendations" className="space-y-4 w-full">
                                         {!recommendations && (
                                             <div className="flex flex-col gap-4">
                                                 <Skeleton className="w-full h-[230px]"/>
@@ -1168,7 +1165,6 @@ export function EditMilestoneForm({
                                             <>
                                                 <div className={cn("w-full grid gap-4 grid-cols-1")}>
                                                     {(recommendations || []).map((result: Recommendation, index) => (
-                                                        // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
                                                         <CROMarketplaceCard
                                                             cro={result.content}
                                                             key={index}
@@ -1181,7 +1177,6 @@ export function EditMilestoneForm({
                                             </>
                                         )}
 
-                                        {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
                                         <Link
                                             href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
                                                 .map((t: any) => t?.value || t?.id)
@@ -1192,7 +1187,7 @@ export function EditMilestoneForm({
                                                 Explore Marketplace
                                             </Button>
                                         </Link>
-                                    </TabsContent>
+                                    </TabsContent> */}
                                     {/*<TabsContent value="publications" className="space-y-4 w-full">*/}
                                     {/*    <EditMilestoneDetailsPublicationsTab*/}
                                     {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
@@ -1230,8 +1225,8 @@ export function EditMilestoneForm({
                                     {
                                         value: newBiosample.id, 
                                         type: 'Biosamples', 
-                                        img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.donorId} --- ${type?.label || ''}`,
+                                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                        label: `${newBiosample.id}`,
                                         biosample: newBiosample
                                     }
                                 ])
@@ -1262,7 +1257,7 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDiseaseModel.id, 
-                                        label: `${type?.label || ''}`,
+                                        label: `${newDiseaseModel.id}`,
                                         type: 'Disease Models',
                                         diseaseModel: newDiseaseModel
                                     }
@@ -1293,7 +1288,7 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDatasample.id, 
-                                        label: newDatasample.title || newDatasample.id, 
+                                        label: newDatasample.id, 
                                         type: 'Clinical Datasets',
                                         datasample: newDatasample
                                     }

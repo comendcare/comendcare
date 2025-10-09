@@ -1,4 +1,4 @@
-import { mechanisms } from 'comend-pag-platform/components/edit-condition-profile-dialog';
+import {mechanisms} from "@comend/lib/types";
 import {typesense} from '@comend/lib/typesense';
 import {temporal} from 'zundo';
 import {create} from 'zustand';
