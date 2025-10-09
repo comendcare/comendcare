@@ -4903,13 +4903,15 @@ export const updateMilestones = withOrganizationAuth(
                 milestones.map(async (milestone: any) => {
                     const previousMilestone = await prisma.milestone.findUnique({
                         where: {nodeId: milestone.nodeId},
-                        include: {
-                            node: true,
-                            contacts: true,
-                            attachments: true,
-                            types: {include: {milestoneType: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}},
+                        select: {
+                            id: true,
+                            private: true,
+                            // node: true,
+                            // contacts: true,
+                            // attachments: true,
+                            // types: {include: {milestoneType: true}},
+                            // tools: {include: {tool: true}},
+                            // rfps: {include: {rfp: true}},
                         },
                     });
 
